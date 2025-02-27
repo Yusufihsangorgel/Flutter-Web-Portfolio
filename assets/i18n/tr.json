@@ -1,0 +1,241 @@
+{
+  "app_name": "Yusuf İhsan Görgel - Portföy",
+  "theme": {
+    "primary_color": "#3F51B5",
+    "secondary_color": "#FF4081",
+    "background_color": {
+      "light": "#FFFFFF",
+      "dark": "#121212"
+    },
+    "surface_color": {
+      "light": "#F5F5F5",
+      "dark": "#1E1E1E"
+    },
+    "text_color": {
+      "light": "#212121",
+      "dark": "#FFFFFF"
+    },
+    "light_mode": "Aydınlık Mod",
+    "dark_mode": "Karanlık Mod"
+  },
+  "navigation": {
+    "items": [
+      { "id": "home", "title": "Ana Sayfa" },
+      { "id": "about", "title": "Hakkımda" },
+      { "id": "experience", "title": "Deneyim" },
+      { "id": "projects", "title": "Projeler" },
+      { "id": "skills", "title": "Yetenekler" },
+      { "id": "references", "title": "Referanslar" },
+      { "id": "contact", "title": "İletişim" }
+    ]
+  },
+  "translations": {
+    "app_name": "Yusuf İhsan Görgel - Portföy",
+    "home": "Ana Sayfa",
+    "about": "Hakkımda",
+    "experience": "Deneyim",
+    "projects": "Projeler",
+    "skills": "Yetenekler",
+    "references": "Referanslar",
+    "contact": "İletişim",
+    "explore_more": "Daha Fazla Keşfet",
+    "dark_mode": "Karanlık Mod",
+    "light_mode": "Aydınlık Mod",
+    "personal_info": "Kişisel Bilgiler",
+    "education": "Eğitim",
+    "languages": "Diller",
+    "name": "İsim",
+    "email": "E-posta",
+    "phone": "Telefon",
+    "location": "Konum",
+    "github": "GitHub",
+    "linkedin": "LinkedIn",
+    "send_message": "Mesaj Gönder",
+    "contact_me": "Benimle İletişime Geç",
+    "your_name": "Adınız",
+    "your_email": "E-posta Adresiniz",
+    "your_message": "Mesajınız",
+    "send": "Gönder",
+    "subject": "Konu",
+    "portfolio_loading": "Portföy Yükleniyor...",
+    "error_name": "Lütfen adınızı girin",
+    "error_email": "Lütfen geçerli bir e-posta adresi girin",
+    "error_subject": "Lütfen bir konu girin",
+    "error_message": "Lütfen mesajınızı girin"
+  },
+  "animations": {
+    "loading_animation": "assets/animations/loading.json",
+    "scroll_animation_duration": 500,
+    "page_transition_duration": 300
+  },
+  "social_links": {
+    "github": "https://github.com/Yusufihsangorgel",
+    "linkedin": "https://linkedin.com/in/yusuf-ihsan-görgel/"
+  },
+  "cv_data": {
+    "personal_info": {
+      "name": "Yusuf İhsan Görgel",
+      "title": "Software Engineer",
+      "phone": "+90 544 953 0128",
+      "email": "developeryusuf@icloud.com",
+      "github": "https://github.com/Yusufihsangorgel",
+      "linkedin": "https://linkedin.com/in/yusuf-ihsan-görgel/",
+      "bio": "Merhaba, ben Yusuf İhsan, son sınıf Yazılım Mühendisliği öğrencisiyim ve 4 yıllık tecrübeye sahibim. İkinci sınıfta freelance çalışmaya başladım ve o zamandan beri hem kurumsal hem de start-up ortamlarında deneyim kazandım. Flutter kullanarak mobil, ERP ve POS yazılım geliştirme konularında yoğunlaşan 3 yıllık profesyonel deneyimim var. Ayrıca, çeşitli freelance projelerde Backend ve DevOps görevlerinde de çalıştım. Problem çözmeye tutkuyla yaklaşıyorum ve işbirlikçi takım ortamlarında başarılı oluyorum. Proje yönetimi için Atlassian-Jira kullanma konusunda sağlam bir geçmişe sahibim, günlük toplantılar, sprintler, scrum ve sıkı teslim tarihlerine uyma konusunda deneyimliyim."
+    },
+    "experiences": [
+      {
+        "title": "Full Stack Developer",
+        "company": "Juniustech",
+        "period": "Haziran 2023 – Şubat 2025",
+        "description": "Mobile Team Lead (Dorse projesi), geliştirme, dağıtım, frontend, backend ve QA koordinasyonu."
+      },
+      {
+        "title": "Flutter Developer",
+        "company": "Uzman Adres",
+        "period": "Mart 2022 – Ekim 2024",
+        "description": "POS, Barcode Sales, muhasebe yönetim sistemleri, ERP; FugaSoft projesinin front-end'i, socket teknolojisi ve karmaşık SQL mimarileri."
+      },
+      {
+        "title": "Flutter Developer",
+        "company": "Promob TR",
+        "period": "Ekim 2022 – Haziran 2024",
+        "description": "Freelance projeler; \"Aydınlık E-Newspaper\" ve \"Bilim ve Ütopya E-Magazine\" projelerinin front-end'i (backend: PHP-Laravel veya Node.js-Express.js-MongoDB)."
+      }
+    ],
+    "projects": [
+      {
+        "title": "FugaSoft (Pos - Sales Management Software)",
+        "description": "Flutter front-end, SQLite-Drift, GetX, i18n, reaktif programlama; Android/iOS tablet ve masaüstü (Linux, macOS, Windows); Mentor: Arge Team Lead Abdüsselam Kösecik",
+        "url": "https://fugasoft.com/",
+        "image": "assets/images/fugasoft.png"
+      },
+      {
+        "title": "Aydınlık E-Newspaper",
+        "description": "Flutter front-end, GetX, Dio, MVVM; Mentor: Senior Ferhat Balaban",
+        "url": {
+          "google_play": "https://play.google.com/store/apps/details?id=com.aydinlikgazetesi.egazete&hl=tr",
+          "app_store": "https://apps.apple.com/us/app/ayd%C4%B1nl%C4%B1k-e-gazete/id1560103805"
+        },
+        "image": "assets/images/aydinlik.png"
+      },
+      {
+        "title": "Bilim ve Ütopya E-Magazine",
+        "description": "Flutter front-end, GetX, Dio, MVVM; Mentor: Senior Ferhat Balaban",
+        "url": {
+          "google_play": "https://play.google.com/store/apps/details?id=com.aydinlikgazetesi.edergi_v1_bvu&pcampaignid=web_share",
+          "app_store": "https://apps.apple.com/tr/app/bilim-ve-%C3%BCtopya-e-dergi/id6478221195"
+        },
+        "image": "assets/images/bilim_utopya.png"
+      },
+      {
+        "title": "Dorse App",
+        "description": "Hem mobil uygulama hem de web sitesi; Mobil: Flutter; Web: HTML, CSS, JavaScript, React; Kullanılan teknolojiler: RESTful API, SOLID, Google ve Apple Maps entegrasyonu, WebSocket",
+        "url": {
+          "website": "https://dorseapp.com/",
+          "google_play": "https://play.google.com/store/apps/details?id=com.juniustech.dorse",
+          "app_store": "https://apps.apple.com/tr/app/dorse/id6670605686"
+        },
+        "image": "assets/images/dorse.png"
+      }
+    ],
+    "education": [
+      {
+        "school": "Mehmet Akif Ersoy University",
+        "degree": "Yazılım Mühendisliği",
+        "period": "2021-2025"
+      },
+      {
+        "school": "Dursun Yalım Science High School",
+        "period": "2015-2020"
+      }
+    ],
+    "skills": [
+      {
+        "category": "Mobile",
+        "items": ["Flutter", "Swift"]
+      },
+      {
+        "category": "Backend",
+        "items": ["Node.js", "Express.js", "MongoDB", "SQLite", "MSSQL"]
+      },
+      {
+        "category": "Frontend",
+        "items": ["HTML", "CSS", "JavaScript", "React"]
+      },
+      {
+        "category": "DevOps",
+        "items": ["AWS"]
+      }
+    ],
+    "references": [
+      {
+        "name": "Abdüsselam Kösecik",
+        "title": "Arge Team Lead",
+        "phone": "+90 542 819 80 69",
+        "linkedin": "https://www.linkedin.com/in/abdusselam-k%C3%B6secik-ab209327/"
+      },
+      {
+        "name": "Ferhat Balaban",
+        "title": "Senior Computer Engineer",
+        "phone": "+90 542 350 50 95",
+        "linkedin": "https://www.linkedin.com/in/balabanferhat/"
+      },
+      {
+        "name": "Emrah Türk",
+        "title": "Senior Software Developer",
+        "phone": "+90 551 956 03 91",
+        "linkedin": "https://www.linkedin.com/in/emrah-t%C3%BCrk/"
+      }
+    ],
+    "languages": [
+      {
+        "name": "Türkçe",
+        "level": "Anadil"
+      },
+      {
+        "name": "İngilizce",
+        "level": "B2"
+      }
+    ],
+    "contact": {
+      "form": {
+        "name_label": "İsim",
+        "email_label": "E-posta",
+        "message_label": "Mesaj",
+        "submit_button": "Gönder"
+      },
+      "success_message": "Mesajınız başarıyla gönderildi!",
+      "error_message": "Bir hata oluştu. Lütfen tekrar deneyin."
+    }
+  },
+  "language_info": {
+    "code": "tr",
+    "name": "Türkçe",
+    "flag": "🇹🇷",
+    "direction": "ltr"
+  },
+  "terminal": {
+    "title": "Terminal",
+    "welcome_title": "Yusuf İhsan Görgel - Terminal",
+    "welcome_text": "Hoş geldiniz! Kullanılabilir komutları görmek için 'help' yazın.",
+    "help_hint": "İpucu: Kullanılabilir komutları görmek için 'help' yazın",
+    "commands": {
+      "help": "Yardım - kullanılabilir komutları gösterir",
+      "about": "Hakkımda - kişisel bilgilerimi gösterir",
+      "skills": "Yetenekler - teknik yeteneklerimi gösterir",
+      "experience": "Deneyim - iş deneyimlerimi gösterir",
+      "education": "Eğitim - eğitim geçmişimi gösterir",
+      "projects": "Projeler - tamamlanmış projelerimi gösterir",
+      "contact": "İletişim - iletişim bilgilerimi gösterir",
+      "social": "Sosyal - sosyal medya hesaplarımı gösterir",
+      "download-cv": "CV İndir - özgeçmişimi indirir",
+      "clear": "Temizle - terminal ekranını temizler"
+    },
+    "command_not_found": "'%s' komutu bulunamadı. Kullanılabilir komutları görmek için 'help' yazın.",
+    "prefix": "> ",
+    "type_command": "Bir komut yazın..."
+  },
+  "about_section": {
+    "title": "Hakkımda"
+  }
+}

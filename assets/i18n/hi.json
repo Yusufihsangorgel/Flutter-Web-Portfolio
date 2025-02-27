@@ -1,0 +1,225 @@
+{
+  "app_name": "युसुफ इहसान गोरगेल - पोर्टफोलियो",
+  "theme": {
+    "primary_color": "#3F51B5",
+    "secondary_color": "#FF4081",
+    "background_color": {
+      "light": "#FFFFFF",
+      "dark": "#121212"
+    },
+    "surface_color": {
+      "light": "#F5F5F5",
+      "dark": "#1E1E1E"
+    },
+    "text_color": {
+      "light": "#212121",
+      "dark": "#FFFFFF"
+    }
+  },
+  "navigation": {
+    "items": [
+      { "id": "home", "title": "होम" },
+      { "id": "about", "title": "परिचय" },
+      { "id": "experience", "title": "अनुभव" },
+      { "id": "projects", "title": "प्रोजेक्ट्स" },
+      { "id": "skills", "title": "कौशल" },
+      { "id": "references", "title": "संदर्भ" },
+      { "id": "contact", "title": "संपर्क" }
+    ]
+  },
+  "translations": {
+    "app_name": "युसुफ इहसान गोरगेल - पोर्टफोलियो",
+    "home": "होम",
+    "about": "परिचय",
+    "experience": "अनुभव",
+    "projects": "प्रोजेक्ट्स",
+    "skills": "कौशल",
+    "references": "संदर्भ",
+    "contact": "संपर्क",
+    "explore_more": "और अन्वेषण करें",
+    "dark_mode": "डार्क मोड",
+    "light_mode": "लाइट मोड",
+    "personal_info": "व्यक्तिगत जानकारी",
+    "education": "शिक्षा",
+    "languages": "भाषाएँ",
+    "name": "नाम",
+    "email": "ईमेल",
+    "phone": "फोन",
+    "location": "स्थान",
+    "github": "GitHub",
+    "linkedin": "LinkedIn",
+    "send_message": "संदेश भेजें",
+    "contact_me": "मुझसे संपर्क करें",
+    "your_name": "आपका नाम",
+    "your_email": "आपका ईमेल",
+    "your_message": "आपका संदेश",
+    "send": "भेजें",
+    "subject": "विषय",
+    "portfolio_loading": "पोर्टफोलियो लोड हो रहा है...",
+    "error_name": "कृपया अपना नाम दर्ज करें",
+    "error_email": "कृपया एक वैध ईमेल पता दर्ज करें",
+    "error_subject": "कृपया एक विषय दर्ज करें",
+    "error_message": "कृपया अपना संदेश दर्ज करें"
+  },
+  "animations": {
+    "loading_animation": "assets/animations/loading.json",
+    "scroll_animation_duration": 500,
+    "page_transition_duration": 300
+  },
+  "social_links": {
+    "github": "https://github.com/Yusufihsangorgel",
+    "linkedin": "https://linkedin.com/in/yusuf-ihsan-görgel/"
+  },
+  "cv_data": {
+    "personal_info": {
+      "name": "युसुफ इहसान गोरगेल",
+      "title": "सॉफ्टवेयर इंजीनियर",
+      "phone": "+90 544 953 0128",
+      "email": "developeryusuf@icloud.com",
+      "github": "https://github.com/Yusufihsangorgel",
+      "linkedin": "https://linkedin.com/in/yusuf-ihsan-görgel/",
+      "bio": "नमस्ते, मैं युसुफ इहसान हूँ, 4 साल के अनुभव के साथ एक अंतिम वर्ष के सॉफ्टवेयर इंजीनियरिंग छात्र हूँ। मैंने अपने द्वितीय वर्ष में फ्रीलांसिंग शुरू की और तब से कॉर्पोरेट और स्टार्ट-अप दोनों वातावरणों में अनुभव प्राप्त किया है। मेरे पास Flutter का उपयोग करके मोबाइल, ERP और POS सॉफ्टवेयर विकास पर केंद्रित 3 साल का पेशेवर अनुभव है। मैंने विभिन्न फ्रीलांस प्रोजेक्ट्स में बैकएंड और DevOps भूमिकाओं पर भी काम किया है। मैं समस्या समाधान के प्रति उत्साही हूँ और सहयोगी टीम वातावरण में फलता-फूलता हूँ। मेरे पास परियोजना प्रबंधन के लिए Atlassian-Jira का उपयोग करने का एक ठोस पृष्ठभूमि है, दैनिक बैठकों, स्प्रिंट्स, स्क्रम और कड़ी समय सीमाओं को पूरा करने का अनुभव है।"
+    },
+    "experiences": [
+      {
+        "title": "फुल स्टैक डेवलपर",
+        "company": "Juniustech",
+        "period": "जून 2023 – फरवरी 2025",
+        "description": "मोबाइल टीम लीड (Dorse प्रोजेक्ट), विकास, तैनाती, फ्रंटएंड, बैकएंड और QA समन्वय।"
+      },
+      {
+        "title": "Flutter डेवलपर",
+        "company": "Uzman Adres",
+        "period": "मार्च 2022 – अक्टूबर 2024",
+        "description": "POS, बारकोड बिक्री, लेखा प्रबंधन प्रणाली, ERP; FugaSoft प्रोजेक्ट का फ्रंट-एंड, सॉकेट तकनीक और जटिल SQL आर्किटेक्चर।"
+      },
+      {
+        "title": "Flutter डेवलपर",
+        "company": "Promob TR",
+        "period": "अक्टूबर 2022 – जून 2024",
+        "description": "फ्रीलांस प्रोजेक्ट्स; \"Aydınlık E-Newspaper\" और \"Bilim ve Ütopya E-Magazine\" प्रोजेक्ट्स का फ्रंट-एंड (बैकएंड: PHP-Laravel या Node.js-Express.js-MongoDB)।"
+      }
+    ],
+    "projects": [
+      {
+        "title": "FugaSoft (पॉस - बिक्री प्रबंधन सॉफ्टवेयर)",
+        "description": "Flutter फ्रंट-एंड, SQLite-Drift, GetX, i18n, रिएक्टिव प्रोग्रामिंग; Android/iOS टैबलेट और डेस्कटॉप (Linux, macOS, Windows); मेंटर: Arge टीम लीड Abdüsselam Kösecik",
+        "url": "https://fugasoft.com/",
+        "image": "assets/images/fugasoft.png"
+      },
+      {
+        "title": "Aydınlık E-Newspaper",
+        "description": "Flutter फ्रंट-एंड, GetX, Dio, MVVM; मेंटर: सीनियर Ferhat Balaban",
+        "url": {
+          "google_play": "https://play.google.com/store/apps/details?id=com.aydinlikgazetesi.egazete&hl=tr",
+          "app_store": "https://apps.apple.com/us/app/ayd%C4%B1nl%C4%B1k-e-gazete/id1560103805"
+        },
+        "image": "assets/images/aydinlik.png"
+      },
+      {
+        "title": "Bilim ve Ütopya E-Magazine",
+        "description": "Flutter फ्रंट-एंड, GetX, Dio, MVVM; मेंटर: सीनियर Ferhat Balaban",
+        "url": {
+          "google_play": "https://play.google.com/store/apps/details?id=com.aydinlikgazetesi.edergi_v1_bvu&pcampaignid=web_share",
+          "app_store": "https://apps.apple.com/tr/app/bilim-ve-%C3%BCtopya-e-dergi/id6478221195"
+        },
+        "image": "assets/images/bilim_utopya.png"
+      },
+      {
+        "title": "Dorse App",
+        "description": "मोबाइल एप्लिकेशन और वेबसाइट दोनों; मोबाइल: Flutter; वेब: HTML, CSS, JavaScript, React; उपयोग की गई तकनीकें: RESTful API, SOLID, Google और Apple Maps एकीकरण, WebSocket",
+        "url": {
+          "website": "https://dorseapp.com/",
+          "google_play": "https://play.google.com/store/apps/details?id=com.juniustech.dorse",
+          "app_store": "https://apps.apple.com/tr/app/dorse/id6670605686"
+        },
+        "image": "assets/images/dorse.png"
+      }
+    ],
+    "education": [
+      {
+        "school": "मेहमेत अकिफ एरसॉय विश्वविद्यालय",
+        "degree": "सॉफ्टवेयर इंजीनियरिंग",
+        "period": "2021-2025"
+      },
+      {
+        "school": "दुरसुन यालिम साइंस हाई स्कूल",
+        "period": "2015-2020"
+      }
+    ],
+    "skills": [
+      {
+        "category": "मोबाइल",
+        "items": [
+          "Flutter",
+          "स्टेट मैनेजमेंट (GetX, Provider, Bloc)",
+          "RESTful API",
+          "WebSocket",
+          "लोकलाइजेशन",
+          "Google Maps",
+          "लोकल स्टोरेज",
+          "JWT प्रमाणीकरण",
+          "Swift"
+        ]
+      },
+      {
+        "category": "बैकएंड",
+        "items": ["Node.js", "Express.js", "MongoDB", "SQLite", "MSSQL"]
+      },
+      {
+        "category": "फ्रंटएंड",
+        "items": ["HTML", "CSS", "JavaScript", "React"]
+      },
+      {
+        "category": "DevOps",
+        "items": ["AWS"]
+      }
+    ],
+    "references": [
+      {
+        "name": "Abdüsselam Kösecik",
+        "title": "Arge टीम लीड",
+        "phone": "+90 542 819 80 69",
+        "linkedin": "https://www.linkedin.com/in/abdusselam-k%C3%B6secik-ab209327/"
+      },
+      {
+        "name": "Ferhat Balaban",
+        "title": "सीनियर कंप्यूटर इंजीनियर",
+        "phone": "+90 542 350 50 95",
+        "linkedin": "https://www.linkedin.com/in/balabanferhat/"
+      },
+      {
+        "name": "Emrah Türk",
+        "title": "सीनियर सॉफ्टवेयर डेवलपर",
+        "phone": "+90 551 956 03 91",
+        "linkedin": "https://www.linkedin.com/in/emrah-t%C3%BCrk/"
+      }
+    ],
+    "languages": [
+      {
+        "name": "तुर्की",
+        "level": "मातृभाषा"
+      },
+      {
+        "name": "अंग्रेज़ी",
+        "level": "B2"
+      }
+    ],
+    "contact": {
+      "form": {
+        "name_label": "नाम",
+        "email_label": "ईमेल",
+        "message_label": "संदेश",
+        "submit_button": "भेजें"
+      },
+      "success_message": "आपका संदेश सफलतापूर्वक भेजा गया है!",
+      "error_message": "एक त्रुटि हुई। कृपया पुनः प्रयास करें।"
+    }
+  },
+  "language_info": {
+    "code": "hi",
+    "name": "हिन्दी",
+    "flag": "🇮🇳",
+    "direction": "ltr"
+  }
+}

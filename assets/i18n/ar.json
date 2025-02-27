@@ -1,0 +1,225 @@
+{
+  "app_name": "يوسف إحسان جورجل - معرض الأعمال",
+  "theme": {
+    "primary_color": "#3F51B5",
+    "secondary_color": "#FF4081",
+    "background_color": {
+      "light": "#FFFFFF",
+      "dark": "#121212"
+    },
+    "surface_color": {
+      "light": "#F5F5F5",
+      "dark": "#1E1E1E"
+    },
+    "text_color": {
+      "light": "#212121",
+      "dark": "#FFFFFF"
+    }
+  },
+  "navigation": {
+    "items": [
+      { "id": "home", "title": "الرئيسية" },
+      { "id": "about", "title": "نبذة عني" },
+      { "id": "experience", "title": "الخبرة" },
+      { "id": "projects", "title": "المشاريع" },
+      { "id": "skills", "title": "المهارات" },
+      { "id": "references", "title": "المراجع" },
+      { "id": "contact", "title": "اتصل بي" }
+    ]
+  },
+  "translations": {
+    "app_name": "يوسف إحسان جورجل - معرض الأعمال",
+    "home": "الرئيسية",
+    "about": "نبذة عني",
+    "experience": "الخبرة",
+    "projects": "المشاريع",
+    "skills": "المهارات",
+    "references": "المراجع",
+    "contact": "اتصل بي",
+    "explore_more": "استكشف المزيد",
+    "dark_mode": "الوضع الداكن",
+    "light_mode": "الوضع الفاتح",
+    "personal_info": "المعلومات الشخصية",
+    "education": "التعليم",
+    "languages": "اللغات",
+    "name": "الاسم",
+    "email": "البريد الإلكتروني",
+    "phone": "الهاتف",
+    "location": "الموقع",
+    "github": "GitHub",
+    "linkedin": "LinkedIn",
+    "send_message": "إرسال رسالة",
+    "contact_me": "اتصل بي",
+    "your_name": "اسمك",
+    "your_email": "بريدك الإلكتروني",
+    "your_message": "رسالتك",
+    "send": "إرسال",
+    "subject": "الموضوع",
+    "portfolio_loading": "جاري تحميل معرض الأعمال...",
+    "error_name": "الرجاء إدخال اسمك",
+    "error_email": "الرجاء إدخال عنوان بريد إلكتروني صالح",
+    "error_subject": "الرجاء إدخال موضوع",
+    "error_message": "الرجاء إدخال رسالتك"
+  },
+  "animations": {
+    "loading_animation": "assets/animations/loading.json",
+    "scroll_animation_duration": 500,
+    "page_transition_duration": 300
+  },
+  "social_links": {
+    "github": "https://github.com/Yusufihsangorgel",
+    "linkedin": "https://linkedin.com/in/yusuf-ihsan-görgel/"
+  },
+  "cv_data": {
+    "personal_info": {
+      "name": "يوسف إحسان جورجل",
+      "title": "مهندس برمجيات",
+      "phone": "+90 544 953 0128",
+      "email": "developeryusuf@icloud.com",
+      "github": "https://github.com/Yusufihsangorgel",
+      "linkedin": "https://linkedin.com/in/yusuf-ihsan-görgel/",
+      "bio": "مرحبًا، أنا يوسف إحسان، طالب في السنة النهائية في هندسة البرمجيات مع 4 سنوات من الخبرة. بدأت العمل الحر في سنتي الثانية واكتسبت منذ ذلك الحين خبرة في بيئات الشركات والشركات الناشئة. لدي 3 سنوات من الخبرة المهنية في تطوير برامج الجوال وERP وPOS باستخدام Flutter. كما عملت في أدوار الواجهة الخلفية وDevOps في مشاريع مستقلة مختلفة. أنا شغوف بحل المشكلات وأزدهر في بيئات الفريق التعاونية. لدي خلفية قوية في استخدام Atlassian-Jira لإدارة المشاريع، مع خبرة في الاجتماعات اليومية والسباقات والسكرم والالتزام بالمواعيد النهائية الضيقة."
+    },
+    "experiences": [
+      {
+        "title": "مطور الويب الشامل",
+        "company": "Juniustech",
+        "period": "يونيو 2023 - فبراير 2025",
+        "description": "قائد فريق الجوال (مشروع Dorse)، التطوير، النشر، الواجهة الأمامية، الواجهة الخلفية وتنسيق ضمان الجودة."
+      },
+      {
+        "title": "مطور Flutter",
+        "company": "Uzman Adres",
+        "period": "مارس 2022 - أكتوبر 2024",
+        "description": "POS، مبيعات الباركود، أنظمة إدارة المحاسبة، ERP؛ الواجهة الأمامية لمشروع FugaSoft، تقنية Socket وهندسة SQL المعقدة."
+      },
+      {
+        "title": "مطور Flutter",
+        "company": "Promob TR",
+        "period": "أكتوبر 2022 - يونيو 2024",
+        "description": "مشاريع مستقلة؛ الواجهة الأمامية لمشاريع \"Aydınlık E-Newspaper\" و \"Bilim ve Ütopya E-Magazine\" (الواجهة الخلفية: PHP-Laravel أو Node.js-Express.js-MongoDB)."
+      }
+    ],
+    "projects": [
+      {
+        "title": "FugaSoft (برنامج إدارة المبيعات - POS)",
+        "description": "واجهة أمامية Flutter، SQLite-Drift، GetX، i18n، برمجة تفاعلية؛ أجهزة لوحية Android/iOS وسطح المكتب (Linux، macOS، Windows)؛ المرشد: قائد فريق Arge Abdüsselam Kösecik",
+        "url": "https://fugasoft.com/",
+        "image": "assets/images/fugasoft.png"
+      },
+      {
+        "title": "Aydınlık E-Newspaper",
+        "description": "واجهة أمامية Flutter، GetX، Dio، MVVM؛ المرشد: كبير المهندسين Ferhat Balaban",
+        "url": {
+          "google_play": "https://play.google.com/store/apps/details?id=com.aydinlikgazetesi.egazete&hl=tr",
+          "app_store": "https://apps.apple.com/us/app/ayd%C4%B1nl%C4%B1k-e-gazete/id1560103805"
+        },
+        "image": "assets/images/aydinlik.png"
+      },
+      {
+        "title": "Bilim ve Ütopya E-Magazine",
+        "description": "واجهة أمامية Flutter، GetX، Dio، MVVM؛ المرشد: كبير المهندسين Ferhat Balaban",
+        "url": {
+          "google_play": "https://play.google.com/store/apps/details?id=com.aydinlikgazetesi.edergi_v1_bvu&pcampaignid=web_share",
+          "app_store": "https://apps.apple.com/tr/app/bilim-ve-%C3%BCtopya-e-dergi/id6478221195"
+        },
+        "image": "assets/images/bilim_utopya.png"
+      },
+      {
+        "title": "Dorse App",
+        "description": "تطبيق جوال وموقع ويب؛ الجوال: Flutter؛ الويب: HTML، CSS، JavaScript، React؛ التقنيات المستخدمة: RESTful API، SOLID، تكامل خرائط Google وApple، WebSocket",
+        "url": {
+          "website": "https://dorseapp.com/",
+          "google_play": "https://play.google.com/store/apps/details?id=com.juniustech.dorse",
+          "app_store": "https://apps.apple.com/tr/app/dorse/id6670605686"
+        },
+        "image": "assets/images/dorse.png"
+      }
+    ],
+    "education": [
+      {
+        "school": "جامعة محمد عاكف إرسوي",
+        "degree": "هندسة البرمجيات",
+        "period": "2021-2025"
+      },
+      {
+        "school": "مدرسة دورسون ياليم الثانوية العلمية",
+        "period": "2015-2020"
+      }
+    ],
+    "skills": [
+      {
+        "category": "الجوال",
+        "items": [
+          "Flutter",
+          "إدارة الحالة (GetX، Provider، Bloc)",
+          "RESTful API",
+          "WebSocket",
+          "التوطين",
+          "خرائط Google",
+          "التخزين المحلي",
+          "مصادقة JWT",
+          "Swift"
+        ]
+      },
+      {
+        "category": "الواجهة الخلفية",
+        "items": ["Node.js", "Express.js", "MongoDB", "SQLite", "MSSQL"]
+      },
+      {
+        "category": "الواجهة الأمامية",
+        "items": ["HTML", "CSS", "JavaScript", "React"]
+      },
+      {
+        "category": "DevOps",
+        "items": ["AWS"]
+      }
+    ],
+    "references": [
+      {
+        "name": "Abdüsselam Kösecik",
+        "title": "قائد فريق Arge",
+        "phone": "+90 542 819 80 69",
+        "linkedin": "https://www.linkedin.com/in/abdusselam-k%C3%B6secik-ab209327/"
+      },
+      {
+        "name": "Ferhat Balaban",
+        "title": "كبير مهندسي الكمبيوتر",
+        "phone": "+90 542 350 50 95",
+        "linkedin": "https://www.linkedin.com/in/balabanferhat/"
+      },
+      {
+        "name": "Emrah Türk",
+        "title": "كبير مطوري البرمجيات",
+        "phone": "+90 551 956 03 91",
+        "linkedin": "https://www.linkedin.com/in/emrah-t%C3%BCrk/"
+      }
+    ],
+    "languages": [
+      {
+        "name": "التركية",
+        "level": "اللغة الأم"
+      },
+      {
+        "name": "الإنجليزية",
+        "level": "B2"
+      }
+    ],
+    "contact": {
+      "form": {
+        "name_label": "الاسم",
+        "email_label": "البريد الإلكتروني",
+        "message_label": "الرسالة",
+        "submit_button": "إرسال"
+      },
+      "success_message": "تم إرسال رسالتك بنجاح!",
+      "error_message": "حدث خطأ. يرجى المحاولة مرة أخرى."
+    }
+  },
+  "language_info": {
+    "code": "ar",
+    "name": "العربية",
+    "flag": "🇸🇦",
+    "direction": "rtl"
+  }
+}

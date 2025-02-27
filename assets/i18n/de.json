@@ -1,0 +1,215 @@
+{
+  "app_name": "Yusuf İhsan Görgel - Portfolio",
+  "theme": {
+    "primary_color": "#3F51B5",
+    "secondary_color": "#FF4081",
+    "background_color": {
+      "light": "#FFFFFF",
+      "dark": "#121212"
+    },
+    "surface_color": {
+      "light": "#F5F5F5",
+      "dark": "#1E1E1E"
+    },
+    "text_color": {
+      "light": "#212121",
+      "dark": "#FFFFFF"
+    }
+  },
+  "navigation": {
+    "items": [
+      { "id": "home", "title": "Startseite" },
+      { "id": "about", "title": "Über mich" },
+      { "id": "experience", "title": "Erfahrung" },
+      { "id": "projects", "title": "Projekte" },
+      { "id": "skills", "title": "Fähigkeiten" },
+      { "id": "references", "title": "Referenzen" },
+      { "id": "contact", "title": "Kontakt" }
+    ]
+  },
+  "translations": {
+    "app_name": "Yusuf İhsan Görgel - Portfolio",
+    "home": "Startseite",
+    "about": "Über mich",
+    "experience": "Erfahrung",
+    "projects": "Projekte",
+    "skills": "Fähigkeiten",
+    "references": "Referenzen",
+    "contact": "Kontakt",
+    "explore_more": "Mehr entdecken",
+    "dark_mode": "Dunkelmodus",
+    "light_mode": "Hellmodus",
+    "personal_info": "Persönliche Informationen",
+    "education": "Bildung",
+    "languages": "Sprachen",
+    "name": "Name",
+    "email": "E-Mail",
+    "phone": "Telefon",
+    "location": "Standort",
+    "github": "GitHub",
+    "linkedin": "LinkedIn",
+    "send_message": "Nachricht senden",
+    "contact_me": "Kontaktieren Sie mich",
+    "your_name": "Ihr Name",
+    "your_email": "Ihre E-Mail",
+    "your_message": "Ihre Nachricht",
+    "send": "Senden",
+    "subject": "Betreff",
+    "portfolio_loading": "Portfolio wird geladen...",
+    "error_name": "Bitte geben Sie Ihren Namen ein",
+    "error_email": "Bitte geben Sie eine gültige E-Mail-Adresse ein",
+    "error_subject": "Bitte geben Sie einen Betreff ein",
+    "error_message": "Bitte geben Sie Ihre Nachricht ein"
+  },
+  "animations": {
+    "loading_animation": "assets/animations/loading.json",
+    "scroll_animation_duration": 500,
+    "page_transition_duration": 300
+  },
+  "social_links": {
+    "github": "https://github.com/Yusufihsangorgel",
+    "linkedin": "https://linkedin.com/in/yusuf-ihsan-görgel/"
+  },
+  "cv_data": {
+    "personal_info": {
+      "name": "Yusuf İhsan Görgel",
+      "title": "Software Engineer",
+      "phone": "+90 544 953 0128",
+      "email": "developeryusuf@icloud.com",
+      "github": "https://github.com/Yusufihsangorgel",
+      "linkedin": "https://linkedin.com/in/yusuf-ihsan-görgel/",
+      "bio": "Hallo, ich bin Yusuf İhsan, ein Software Engineering Student im letzten Jahr mit 4 Jahren Erfahrung. Ich begann in meinem zweiten Studienjahr als Freelancer zu arbeiten und habe seitdem Erfahrungen sowohl in Unternehmen als auch in Start-ups gesammelt. Ich habe 3 Jahre professionelle Erfahrung in der Entwicklung von Mobil-, ERP- und POS-Software mit Flutter. Ich habe auch als Backend- und DevOps-Entwickler in verschiedenen Freelance-Projekten gearbeitet. Ich löse leidenschaftlich gerne Probleme und gedeihe in kollaborativen Teamumgebungen. Ich habe fundierte Kenntnisse in der Verwendung von Atlassian-Jira für Projektmanagement, mit Erfahrung in täglichen Meetings, Sprints, Scrum und der Einhaltung enger Fristen."
+    },
+    "experiences": [
+      {
+        "title": "Full Stack Developer",
+        "company": "Juniustech",
+        "period": "Juni 2023 – Februar 2025",
+        "description": "Mobile Team Lead (Dorse Projekt), Entwicklung, Bereitstellung, Frontend, Backend und QA-Koordination."
+      },
+      {
+        "title": "Flutter Developer",
+        "company": "Uzman Adres",
+        "period": "März 2022 – Oktober 2024",
+        "description": "POS, Barcode-Verkauf, Buchhaltungsmanagementsysteme, ERP; Frontend des FugaSoft-Projekts, Socket-Technologie und komplexe SQL-Architekturen."
+      },
+      {
+        "title": "Flutter Developer",
+        "company": "Promob TR",
+        "period": "Oktober 2022 – Juni 2024",
+        "description": "Freelance-Projekte; Frontend der Projekte \"Aydınlık E-Newspaper\" und \"Bilim ve Ütopya E-Magazine\" (Backend: PHP-Laravel oder Node.js-Express.js-MongoDB)."
+      }
+    ],
+    "projects": [
+      {
+        "title": "FugaSoft (Pos - Verkaufsmanagementsoftware)",
+        "description": "Flutter Frontend, SQLite-Drift, GetX, i18n, reaktive Programmierung; Android/iOS-Tablet und Desktop (Linux, macOS, Windows); Mentor: Arge Team Lead Abdüsselam Kösecik",
+        "url": "https://fugasoft.com/",
+        "image": "assets/images/fugasoft.png"
+      },
+      {
+        "title": "Aydınlık E-Newspaper",
+        "description": "Flutter Frontend, GetX, Dio, MVVM; Mentor: Senior Ferhat Balaban",
+        "url": {
+          "google_play": "https://play.google.com/store/apps/details?id=com.aydinlikgazetesi.egazete&hl=tr",
+          "app_store": "https://apps.apple.com/us/app/ayd%C4%B1nl%C4%B1k-e-gazete/id1560103805"
+        },
+        "image": "assets/images/aydinlik.png"
+      },
+      {
+        "title": "Bilim ve Ütopya E-Magazine",
+        "description": "Flutter Frontend, GetX, Dio, MVVM; Mentor: Senior Ferhat Balaban",
+        "url": {
+          "google_play": "https://play.google.com/store/apps/details?id=com.aydinlikgazetesi.edergi_v1_bvu&pcampaignid=web_share",
+          "app_store": "https://apps.apple.com/tr/app/bilim-ve-%C3%BCtopya-e-dergi/id6478221195"
+        },
+        "image": "assets/images/bilim_utopya.png"
+      },
+      {
+        "title": "Dorse App",
+        "description": "Sowohl mobile Anwendung als auch Website; Mobil: Flutter; Web: HTML, CSS, JavaScript, React; Verwendete Technologien: RESTful API, SOLID, Google und Apple Maps Integration, WebSocket",
+        "url": {
+          "website": "https://dorseapp.com/",
+          "google_play": "https://play.google.com/store/apps/details?id=com.juniustech.dorse",
+          "app_store": "https://apps.apple.com/tr/app/dorse/id6670605686"
+        },
+        "image": "assets/images/dorse.png"
+      }
+    ],
+    "education": [
+      {
+        "school": "Mehmet Akif Ersoy University",
+        "degree": "Software Engineering",
+        "period": "2021-2025"
+      },
+      {
+        "school": "Dursun Yalım Science High School",
+        "period": "2015-2020"
+      }
+    ],
+    "skills": [
+      {
+        "category": "Mobile",
+        "items": ["Flutter", "Swift"]
+      },
+      {
+        "category": "Backend",
+        "items": ["Node.js", "Express.js", "MongoDB", "SQLite", "MSSQL"]
+      },
+      {
+        "category": "Frontend",
+        "items": ["HTML", "CSS", "JavaScript", "React"]
+      },
+      {
+        "category": "DevOps",
+        "items": ["AWS"]
+      }
+    ],
+    "references": [
+      {
+        "name": "Abdüsselam Kösecik",
+        "title": "Arge Team Lead",
+        "phone": "+90 542 819 80 69",
+        "linkedin": "https://www.linkedin.com/in/abdusselam-k%C3%B6secik-ab209327/"
+      },
+      {
+        "name": "Ferhat Balaban",
+        "title": "Senior Computer Engineer",
+        "phone": "+90 542 350 50 95",
+        "linkedin": "https://www.linkedin.com/in/balabanferhat/"
+      },
+      {
+        "name": "Emrah Türk",
+        "title": "Senior Software Developer",
+        "phone": "+90 551 956 03 91",
+        "linkedin": "https://www.linkedin.com/in/emrah-t%C3%BCrk/"
+      }
+    ],
+    "languages": [
+      {
+        "name": "Türkisch",
+        "level": "Muttersprache"
+      },
+      {
+        "name": "Englisch",
+        "level": "B2"
+      }
+    ],
+    "contact": {
+      "form": {
+        "name_label": "Name",
+        "email_label": "E-Mail",
+        "message_label": "Nachricht",
+        "submit_button": "Senden"
+      },
+      "success_message": "Ihre Nachricht wurde erfolgreich gesendet!",
+      "error_message": "Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut."
+    }
+  },
+  "language_info": {
+    "code": "de",
+    "name": "Deutsch",
+    "flag": "🇩🇪",
+    "direction": "ltr"
+  }
+}

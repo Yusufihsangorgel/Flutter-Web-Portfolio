@@ -1,0 +1,241 @@
+{
+  "app_name": "Yusuf İhsan Görgel - Portfolio",
+  "theme": {
+    "primary_color": "#3F51B5",
+    "secondary_color": "#FF4081",
+    "background_color": {
+      "light": "#FFFFFF",
+      "dark": "#121212"
+    },
+    "surface_color": {
+      "light": "#F5F5F5",
+      "dark": "#1E1E1E"
+    },
+    "text_color": {
+      "light": "#212121",
+      "dark": "#FFFFFF"
+    },
+    "light_mode": "Light Mode",
+    "dark_mode": "Dark Mode"
+  },
+  "navigation": {
+    "items": [
+      { "id": "home", "title": "Home" },
+      { "id": "about", "title": "About" },
+      { "id": "experience", "title": "Experience" },
+      { "id": "projects", "title": "Projects" },
+      { "id": "skills", "title": "Skills" },
+      { "id": "references", "title": "References" },
+      { "id": "contact", "title": "Contact" }
+    ]
+  },
+  "translations": {
+    "app_name": "Yusuf İhsan Görgel - Portfolio",
+    "home": "Home",
+    "about": "About",
+    "experience": "Experience",
+    "projects": "Projects",
+    "skills": "Skills",
+    "references": "References",
+    "contact": "Contact",
+    "explore_more": "Explore More",
+    "dark_mode": "Dark Mode",
+    "light_mode": "Light Mode",
+    "personal_info": "Personal Info",
+    "education": "Education",
+    "languages": "Languages",
+    "name": "Name",
+    "email": "Email",
+    "phone": "Phone",
+    "location": "Location",
+    "github": "GitHub",
+    "linkedin": "LinkedIn",
+    "send_message": "Send Message",
+    "contact_me": "Contact Me",
+    "your_name": "Your Name",
+    "your_email": "Your Email",
+    "your_message": "Your Message",
+    "send": "Send",
+    "subject": "Subject",
+    "portfolio_loading": "Portfolio Loading...",
+    "error_name": "Please enter your name",
+    "error_email": "Please enter a valid email address",
+    "error_subject": "Please enter a subject",
+    "error_message": "Please enter your message"
+  },
+  "animations": {
+    "loading_animation": "assets/animations/loading.json",
+    "scroll_animation_duration": 500,
+    "page_transition_duration": 300
+  },
+  "social_links": {
+    "github": "https://github.com/Yusufihsangorgel",
+    "linkedin": "https://linkedin.com/in/yusuf-ihsan-görgel/"
+  },
+  "cv_data": {
+    "personal_info": {
+      "name": "Yusuf İhsan Görgel",
+      "title": "Software Engineer",
+      "phone": "+90 544 953 0128",
+      "email": "developeryusuf@icloud.com",
+      "github": "https://github.com/Yusufihsangorgel",
+      "linkedin": "https://linkedin.com/in/yusuf-ihsan-görgel/",
+      "bio": "Hello, I'm Yusuf İhsan, a senior year Software Engineering student with 4 years of experience. I started freelancing in my sophomore year and have since gained experience in both corporate and start-up environments. I have 3 years of professional experience focusing on mobile, ERP, and POS software development using Flutter. I've also worked on Backend and DevOps roles in various freelance projects. I'm passionate about problem-solving and thrive in collaborative team environments. I have a solid background in using Atlassian-Jira for project management, with experience in daily meetings, sprints, scrum, and meeting tight deadlines."
+    },
+    "experiences": [
+      {
+        "title": "Full Stack Developer",
+        "company": "Juniustech",
+        "period": "June 2023 – February 2025",
+        "description": "Mobile Team Lead (Dorse project), development, deployment, frontend, backend, and QA coordination."
+      },
+      {
+        "title": "Flutter Developer",
+        "company": "Uzman Adres",
+        "period": "March 2022 – October 2024",
+        "description": "POS, Barcode Sales, accounting management systems, ERP; front-end of FugaSoft project, socket technology, and complex SQL architectures."
+      },
+      {
+        "title": "Flutter Developer",
+        "company": "Promob TR",
+        "period": "October 2022 – June 2024",
+        "description": "Freelance projects; front-end of \"Aydınlık E-Newspaper\" and \"Bilim ve Ütopya E-Magazine\" projects (backend: PHP-Laravel or Node.js-Express.js-MongoDB)."
+      }
+    ],
+    "projects": [
+      {
+        "title": "FugaSoft (Pos - Sales Management Software)",
+        "description": "Flutter front-end, SQLite-Drift, GetX, i18n, reactive programming; Android/iOS tablet and desktop (Linux, macOS, Windows); Mentor: Arge Team Lead Abdüsselam Kösecik",
+        "url": "https://fugasoft.com/",
+        "image": "assets/images/fugasoft.png"
+      },
+      {
+        "title": "Aydınlık E-Newspaper",
+        "description": "Flutter front-end, GetX, Dio, MVVM; Mentor: Senior Ferhat Balaban",
+        "url": {
+          "google_play": "https://play.google.com/store/apps/details?id=com.aydinlikgazetesi.egazete&hl=tr",
+          "app_store": "https://apps.apple.com/us/app/ayd%C4%B1nl%C4%B1k-e-gazete/id1560103805"
+        },
+        "image": "assets/images/aydinlik.png"
+      },
+      {
+        "title": "Bilim ve Ütopya E-Magazine",
+        "description": "Flutter front-end, GetX, Dio, MVVM; Mentor: Senior Ferhat Balaban",
+        "url": {
+          "google_play": "https://play.google.com/store/apps/details?id=com.aydinlikgazetesi.edergi_v1_bvu&pcampaignid=web_share",
+          "app_store": "https://apps.apple.com/tr/app/bilim-ve-%C3%BCtopya-e-dergi/id6478221195"
+        },
+        "image": "assets/images/bilim_utopya.png"
+      },
+      {
+        "title": "Dorse App",
+        "description": "Both mobile application and website; Mobile: Flutter; Web: HTML, CSS, JavaScript, React; Technologies used: RESTful API, SOLID, Google and Apple Maps integration, WebSocket",
+        "url": {
+          "website": "https://dorseapp.com/",
+          "google_play": "https://play.google.com/store/apps/details?id=com.juniustech.dorse",
+          "app_store": "https://apps.apple.com/tr/app/dorse/id6670605686"
+        },
+        "image": "assets/images/dorse.png"
+      }
+    ],
+    "education": [
+      {
+        "school": "Mehmet Akif Ersoy University",
+        "degree": "Software Engineering",
+        "period": "2021-2025"
+      },
+      {
+        "school": "Dursun Yalım Science High School",
+        "period": "2015-2020"
+      }
+    ],
+    "skills": [
+      {
+        "category": "Mobile",
+        "items": ["Flutter", "Swift"]
+      },
+      {
+        "category": "Backend",
+        "items": ["Node.js", "Express.js", "MongoDB", "SQLite", "MSSQL"]
+      },
+      {
+        "category": "Frontend",
+        "items": ["HTML", "CSS", "JavaScript", "React"]
+      },
+      {
+        "category": "DevOps",
+        "items": ["AWS"]
+      }
+    ],
+    "references": [
+      {
+        "name": "Abdüsselam Kösecik",
+        "title": "Arge Team Lead",
+        "phone": "+90 542 819 80 69",
+        "linkedin": "https://www.linkedin.com/in/abdusselam-k%C3%B6secik-ab209327/"
+      },
+      {
+        "name": "Ferhat Balaban",
+        "title": "Senior Computer Engineer",
+        "phone": "+90 542 350 50 95",
+        "linkedin": "https://www.linkedin.com/in/balabanferhat/"
+      },
+      {
+        "name": "Emrah Türk",
+        "title": "Senior Software Developer",
+        "phone": "+90 551 956 03 91",
+        "linkedin": "https://www.linkedin.com/in/emrah-t%C3%BCrk/"
+      }
+    ],
+    "languages": [
+      {
+        "name": "Turkish",
+        "level": "Native"
+      },
+      {
+        "name": "English",
+        "level": "B2"
+      }
+    ],
+    "contact": {
+      "form": {
+        "name_label": "Name",
+        "email_label": "Email",
+        "message_label": "Message",
+        "submit_button": "Send"
+      },
+      "success_message": "Your message has been sent successfully!",
+      "error_message": "An error occurred. Please try again."
+    }
+  },
+  "language_info": {
+    "code": "en",
+    "name": "English",
+    "flag": "🇬🇧",
+    "direction": "ltr"
+  },
+  "terminal": {
+    "title": "Terminal",
+    "welcome_title": "Yusuf İhsan Görgel - Terminal",
+    "welcome_text": "Welcome! Type 'help' to see available commands.",
+    "help_hint": "Tip: Type 'help' to see available commands",
+    "commands": {
+      "help": "Help - displays available commands",
+      "about": "About - shows personal information",
+      "skills": "Skills - displays technical skills",
+      "experience": "Experience - shows work experience",
+      "education": "Education - shows educational background",
+      "projects": "Projects - shows completed projects",
+      "contact": "Contact - shows contact information",
+      "social": "Social - displays social media accounts",
+      "download-cv": "Download CV - downloads my resume",
+      "clear": "Clear - clears the terminal screen"
+    },
+    "command_not_found": "Command '%s' not found. Type 'help' to see available commands.",
+    "prefix": "> ",
+    "type_command": "Type a command..."
+  },
+  "about_section": {
+    "title": "About Me"
+  }
+}
