@@ -5,6 +5,7 @@ import 'package:animate_do/animate_do.dart';
 import 'package:flutter_web_portfolio/app/controllers/language_controller.dart';
 import 'package:flutter_web_portfolio/app/controllers/theme_controller.dart';
 import 'package:flutter_web_portfolio/app/widgets/mouse_effects.dart';
+import 'package:flutter_web_portfolio/app/widgets/section_title.dart';
 
 class ExperienceSection extends StatelessWidget {
   const ExperienceSection({super.key});
@@ -23,21 +24,10 @@ class ExperienceSection extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Başlık
-          FadeInDown(
-            duration: const Duration(milliseconds: 600),
-            child: Obx(() {
-              final isEnglish = languageController.currentLanguage == 'en';
-              return ShimmeringText(
-                text: isEnglish ? 'Experience' : 'Deneyim',
-                baseColor: Colors.white,
-                highlightColor: themeController.primaryColor,
-                style: const TextStyle(
-                  fontSize: 32,
-                  fontWeight: FontWeight.bold,
-                ),
-              );
-            }),
-          ),
+          Obx(() {
+            final isEnglish = languageController.currentLanguage == 'en';
+            return SectionTitle(title: isEnglish ? 'Experience' : 'Deneyim');
+          }),
 
           const SizedBox(height: 60),
 

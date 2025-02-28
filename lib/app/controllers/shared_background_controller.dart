@@ -16,6 +16,18 @@ class SharedBackgroundController {
     Offset.zero,
   );
 
+  // Roketin rotasyon açısını tut - yumuşak geçişler için
+  static double? rocketRotation;
+
+  // Roketin pozisyonunu tut - teleport sorununu çözmek için
+  static double? rocketX;
+  static double? rocketY;
+
+  // Roketin hareket parametrelerini tut
+  static double? rocketParamA;
+  static double? rocketParamB;
+  static double? rocketParamDelta;
+
   // Animasyon controllerine erişim için getter
   static AnimationController? get animationController => _animationController;
 

@@ -211,5 +211,66 @@
     "name": "Deutsch",
     "flag": "🇩🇪",
     "direction": "ltr"
+  },
+  "terminal": {
+    "title": "Terminal",
+    "welcome_title": "Yusuf İhsan Görgel - Terminal",
+    "welcome_text": "Willkommen! Geben Sie 'help' ein, um verfügbare Befehle zu sehen.",
+    "help_hint": "Tipp: Geben Sie 'help' ein, um verfügbare Befehle zu sehen",
+    "greeting": "Terminal",
+    "type_help": "Geben Sie 'help' ein, um verfügbare Befehle zu sehen",
+    "help_title": "Verfügbare Befehle:",
+    "cleared": "Terminal gelöscht...",
+    "command_not_found": "Befehl '%s' nicht gefunden. Geben Sie 'help' ein, um verfügbare Befehle zu sehen.",
+    "prefix": "> ",
+    "type_command": "Geben Sie einen Befehl ein...",
+    "url": {
+      "success": "Link wird im Browser geöffnet...",
+      "error": "Link konnte nicht geöffnet werden",
+      "error_with_details": "Fehler beim Öffnen der URL"
+    },
+    "download_cv_start": "CV-Download wird initiiert...",
+    "download_cv_success": "CV-Download wurde in Ihrem Browser gestartet.",
+    "download_cv_error": "Fehler beim Herunterladen des Lebenslaufs. Bitte versuchen Sie es später erneut.",
+    "commands": {
+      "help": "zeigt verfügbare Befehle an",
+      "about": "zeigt persönliche Informationen",
+      "skills": "zeigt technische Fähigkeiten",
+      "experience": "zeigt Berufserfahrung",
+      "education": "zeigt Bildungshintergrund",
+      "projects": "zeigt abgeschlossene Projekte",
+      "contact": "zeigt Kontaktinformationen",
+      "social": "zeigt Social-Media-Konten",
+      "download_cv": "lädt meinen Lebenslauf herunter",
+      "clear": "löscht den Terminalbildschirm",
+      "help_cmd": "hilfe",
+      "about_cmd": "über",
+      "skills_cmd": "fähigkeiten",
+      "experience_cmd": "erfahrung",
+      "education_cmd": "bildung",
+      "projects_cmd": "projekte",
+      "contact_cmd": "kontakt",
+      "social_cmd": "sozial",
+      "download_cv_cmd": "lebenslauf-herunterladen",
+      "clear_cmd": "löschen"
+    },
+    "projects": {
+      "title": "MEINE PROJEKTE",
+      "untitled": "Unbenanntes Projekt",
+      "not_found": "Keine Projekte gefunden."
+    },
+    "contact": {
+      "email": "E-Mail",
+      "phone": "Telefon",
+      "location": "Standort"
+    },
+    "social": {
+      "github": "GitHub",
+      "linkedin": "LinkedIn",
+      "twitter": "Twitter"
+    }
+  },
+  "about_section": {
+    "title": "Über Mich"
   }
 }

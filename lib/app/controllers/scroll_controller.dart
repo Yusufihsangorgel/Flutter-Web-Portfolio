@@ -11,7 +11,6 @@ class AppScrollController extends GetxController {
   final experienceKey = GlobalKey();
   final projectsKey = GlobalKey();
   final skillsKey = GlobalKey();
-  final referencesKey = GlobalKey();
   final contactKey = GlobalKey();
 
   // Scroll Controller
@@ -63,7 +62,6 @@ class AppScrollController extends GetxController {
     _updateKeyInfo('experience', experienceKey);
     _updateKeyInfo('projects', projectsKey);
     _updateKeyInfo('skills', skillsKey);
-    _updateKeyInfo('references', referencesKey);
     _updateKeyInfo('contact', contactKey);
   }
 
@@ -96,7 +94,7 @@ class AppScrollController extends GetxController {
     });
   }
 
-  /// Görünür bölüme göre aktif bölümü güncelle (geliştirilmiş algoritma)
+  /// Görünür bölüme göre aktif bölümü güncelle
   void _detectActiveSection() {
     if (!scrollController.hasClients || _sectionOffsets.isEmpty) return;
 
@@ -216,9 +214,6 @@ class AppScrollController extends GetxController {
       case 'skills':
         sectionKey = skillsKey;
         break;
-      case 'references':
-        sectionKey = referencesKey;
-        break;
       case 'contact':
         sectionKey = contactKey;
         break;
@@ -276,7 +271,7 @@ class AppScrollController extends GetxController {
           )
           .then((_) {
             // Kaydırma tamamlandıktan sonra manuel scroll modunu kapat
-            Future.delayed(const Duration(milliseconds: 1000), () {
+            Future.delayed(const Duration(milliseconds: 500), () {
               _isManualScrolling = false;
               // Bölüm bilgilerini güncelle
               _updateSectionInfo();

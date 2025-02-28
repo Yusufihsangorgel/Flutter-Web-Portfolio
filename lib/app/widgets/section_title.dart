@@ -1,0 +1,85 @@
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:flutter_web_portfolio/app/controllers/theme_controller.dart';
+import 'package:animate_do/animate_do.dart';
+
+/// Tüm bölümler için tutarlı başlık widget'ı
+class SectionTitle extends StatelessWidget {
+  final String title;
+  final String? subtitle;
+  final TextStyle? titleStyle;
+  final TextStyle? subtitleStyle;
+  final EdgeInsetsGeometry padding;
+  final CrossAxisAlignment alignment;
+  final bool useGlow;
+
+  const SectionTitle({
+    super.key,
+    required this.title,
+    this.subtitle,
+    this.titleStyle,
+    this.subtitleStyle,
+    this.padding = const EdgeInsets.only(bottom: 20),
+    this.alignment = CrossAxisAlignment.start,
+    this.useGlow = true,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final themeController = Get.find<ThemeController>();
+
+    return Padding(
+      padding: padding,
+      child: Column(
+        crossAxisAlignment: alignment,
+        children: [
+          // Başlık
+          FadeInDown(
+            duration: const Duration(milliseconds: 600),
+            child: Text(
+              title,
+              style:
+                  titleStyle ??
+                  TextStyle(
+                    fontSize: 36,
+                    fontWeight: FontWeight.bold,
+                    color: themeController.primaryColor,
+                    shadows:
+                        useGlow
+                            ? [
+                              Shadow(
+                                color: themeController.primaryColor.withOpacity(
+                                  0.5,
+                                ),
+                                blurRadius: 10,
+                              ),
+                            ]
+                            : null,
+                  ),
+            ),
+          ),
+
+          // Alt başlık (varsa)
+          if (subtitle != null) ...[
+            const SizedBox(height: 16),
+            FadeInDown(
+              duration: const Duration(milliseconds: 700),
+              child: Text(
+                subtitle!,
+                style:
+                    subtitleStyle ??
+                    TextStyle(
+                      fontSize: 18,
+                      color:
+                          themeController.isDarkMode
+                              ? Colors.white70
+                              : Colors.black87,
+                    ),
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}

@@ -221,5 +221,66 @@
     "name": "Français",
     "flag": "🇫🇷",
     "direction": "ltr"
+  },
+  "terminal": {
+    "title": "Terminal",
+    "welcome_title": "Yusuf İhsan Görgel - Terminal",
+    "welcome_text": "Bienvenue ! Tapez 'help' pour voir les commandes disponibles.",
+    "help_hint": "Astuce : Tapez 'help' pour voir les commandes disponibles",
+    "greeting": "Terminal",
+    "type_help": "Tapez \"help\" pour voir les commandes disponibles",
+    "help_title": "Commandes disponibles :",
+    "cleared": "Terminal effacé...",
+    "command_not_found": "Commande '%s' introuvable. Tapez 'help' pour voir les commandes disponibles.",
+    "prefix": "> ",
+    "type_command": "Tapez une commande...",
+    "url": {
+      "success": "Ouverture du lien dans le navigateur...",
+      "error": "Impossible d'ouvrir le lien",
+      "error_with_details": "Erreur lors de l'ouverture de l'URL"
+    },
+    "download_cv_start": "Démarrage du téléchargement du CV...",
+    "download_cv_success": "Le téléchargement du CV a démarré dans votre navigateur.",
+    "download_cv_error": "Erreur lors du téléchargement du CV. Veuillez réessayer plus tard.",
+    "commands": {
+      "help": "Aide - affiche les commandes disponibles",
+      "about": "À propos - affiche les informations personnelles",
+      "skills": "Compétences - affiche les compétences techniques",
+      "experience": "Expérience - affiche l'expérience professionnelle",
+      "education": "Éducation - affiche le parcours éducatif",
+      "projects": "Projets - affiche les projets terminés",
+      "contact": "Contact - affiche les informations de contact",
+      "social": "Social - affiche les comptes de médias sociaux",
+      "download_cv": "Télécharger CV - télécharge mon CV",
+      "clear": "Effacer - efface l'écran du terminal",
+      "help_cmd": "aide",
+      "about_cmd": "apropos",
+      "skills_cmd": "competences",
+      "experience_cmd": "experience",
+      "education_cmd": "education",
+      "projects_cmd": "projets",
+      "contact_cmd": "contact",
+      "social_cmd": "social",
+      "download_cv_cmd": "telecharger-cv",
+      "clear_cmd": "effacer"
+    },
+    "projects": {
+      "title": "MES PROJETS",
+      "untitled": "Projet sans titre",
+      "not_found": "Aucun projet trouvé."
+    },
+    "contact": {
+      "email": "Email",
+      "phone": "Téléphone",
+      "location": "Emplacement"
+    },
+    "social": {
+      "github": "GitHub",
+      "linkedin": "LinkedIn",
+      "twitter": "Twitter"
+    }
+  },
+  "about_section": {
+    "title": "À Propos de Moi"
   }
 }

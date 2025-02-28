@@ -25,9 +25,16 @@
       { "id": "experience", "title": "Deneyim" },
       { "id": "projects", "title": "Projeler" },
       { "id": "skills", "title": "Yetenekler" },
-      { "id": "references", "title": "Referanslar" },
       { "id": "contact", "title": "İletişim" }
     ]
+  },
+  "nav": {
+    "home": "Ana Sayfa",
+    "about": "Hakkımda",
+    "skills": "Yetenekler",
+    "experience": "Deneyim",
+    "projects": "Projeler",
+    "contact": "İletişim"
   },
   "translations": {
     "app_name": "Yusuf İhsan Görgel - Portföy",
@@ -36,7 +43,6 @@
     "experience": "Deneyim",
     "projects": "Projeler",
     "skills": "Yetenekler",
-    "references": "Referanslar",
     "contact": "İletişim",
     "explore_more": "Daha Fazla Keşfet",
     "dark_mode": "Karanlık Mod",
@@ -167,26 +173,6 @@
         "items": ["AWS"]
       }
     ],
-    "references": [
-      {
-        "name": "Abdüsselam Kösecik",
-        "title": "Arge Team Lead",
-        "phone": "+90 542 819 80 69",
-        "linkedin": "https://www.linkedin.com/in/abdusselam-k%C3%B6secik-ab209327/"
-      },
-      {
-        "name": "Ferhat Balaban",
-        "title": "Senior Computer Engineer",
-        "phone": "+90 542 350 50 95",
-        "linkedin": "https://www.linkedin.com/in/balabanferhat/"
-      },
-      {
-        "name": "Emrah Türk",
-        "title": "Senior Software Developer",
-        "phone": "+90 551 956 03 91",
-        "linkedin": "https://www.linkedin.com/in/emrah-t%C3%BCrk/"
-      }
-    ],
     "languages": [
       {
         "name": "Türkçe",
@@ -216,26 +202,68 @@
   },
   "terminal": {
     "title": "Terminal",
+    "welcome": "Interactive terminal portföyüme hoş geldiniz!",
     "welcome_title": "Yusuf İhsan Görgel - Terminal",
     "welcome_text": "Hoş geldiniz! Kullanılabilir komutları görmek için 'help' yazın.",
     "help_hint": "İpucu: Kullanılabilir komutları görmek için 'help' yazın",
-    "commands": {
-      "help": "Yardım - kullanılabilir komutları gösterir",
-      "about": "Hakkımda - kişisel bilgilerimi gösterir",
-      "skills": "Yetenekler - teknik yeteneklerimi gösterir",
-      "experience": "Deneyim - iş deneyimlerimi gösterir",
-      "education": "Eğitim - eğitim geçmişimi gösterir",
-      "projects": "Projeler - tamamlanmış projelerimi gösterir",
-      "contact": "İletişim - iletişim bilgilerimi gösterir",
-      "social": "Sosyal - sosyal medya hesaplarımı gösterir",
-      "download-cv": "CV İndir - özgeçmişimi indirir",
-      "clear": "Temizle - terminal ekranını temizler"
-    },
+    "greeting": "Terminal",
+    "type_help": "Kullanılabilir komutları görmek için 'help' yazın.",
+    "help_title": "Kullanılabilir Komutlar:",
+    "cleared": "Terminal temizlendi...",
     "command_not_found": "'%s' komutu bulunamadı. Kullanılabilir komutları görmek için 'help' yazın.",
     "prefix": "> ",
-    "type_command": "Bir komut yazın..."
+    "type_command": "Bir komut yazın...",
+    "url": {
+      "success": "Bağlantı tarayıcıda açılıyor...",
+      "error": "Bağlantı açılamadı",
+      "error_with_details": "Bağlantı açılırken hata oluştu"
+    },
+    "download_cv_start": "CV indirme başlatılıyor...",
+    "download_cv_success": "CV indirme tarayıcınızda başlatıldı.",
+    "download_cv_error": "CV indirilirken hata oluştu. Lütfen daha sonra tekrar deneyin.",
+    "commands": {
+      "help": "kullanılabilir komutları gösterir",
+      "about": "kişisel bilgilerimi gösterir",
+      "skills": "teknik yeteneklerimi gösterir",
+      "experience": "iş deneyimlerimi gösterir",
+      "education": "eğitim geçmişimi gösterir",
+      "projects": "tamamlanmış projelerimi gösterir",
+      "contact": "iletişim bilgilerimi gösterir",
+      "social": "sosyal medya hesaplarımı gösterir",
+      "download_cv": "özgeçmişimi indirir",
+      "clear": "terminal ekranını temizler",
+      "help_cmd": "yardım",
+      "about_cmd": "hakkımda",
+      "skills_cmd": "yetenekler",
+      "experience_cmd": "deneyim",
+      "education_cmd": "eğitim",
+      "projects_cmd": "projeler",
+      "contact_cmd": "iletişim",
+      "social_cmd": "sosyal",
+      "download_cv_cmd": "cv-indir",
+      "clear_cmd": "temizle"
+    },
+    "projects": {
+      "title": "PROJELERİM",
+      "untitled": "İsimsiz Proje",
+      "not_found": "Proje bulunamadı."
+    },
+    "contact": {
+      "email": "E-posta",
+      "phone": "Telefon",
+      "location": "Konum"
+    },
+    "social": {
+      "github": "GitHub",
+      "linkedin": "LinkedIn",
+      "twitter": "Twitter"
+    }
   },
   "about_section": {
     "title": "Hakkımda"
+  },
+  "projects_section": {
+    "title": "Projelerim",
+    "description": "Tamamladığım başlıca projeler ve çalışmalarım"
   }
 }

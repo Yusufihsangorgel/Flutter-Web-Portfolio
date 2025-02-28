@@ -21,8 +21,11 @@ class HomeSection extends StatelessWidget {
 
     return Container(
       width: double.infinity,
-      height: screenHeight,
-      constraints: BoxConstraints(minHeight: 600, maxHeight: screenHeight),
+      // Tam ekran yüksekliği, alt kısımda herhangi bir boşluk kalmaması için
+      height: screenHeight - 80, // AppBar yüksekliği çıkarıldı
+      // Minimum yükseklik kısıtlamasını kaldırıyoruz, böylece tam ekran yüksekliğini alacak
+      constraints: BoxConstraints(maxHeight: screenHeight - 80),
+      // Tamamen şeffaf
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: screenWidth > 800 ? 100 : 30),
         child: Column(
@@ -76,7 +79,9 @@ class HomeSection extends StatelessWidget {
               child: Obx(() {
                 final isEnglish = languageController.currentLanguage == 'en';
                 return Text(
-                  isEnglish ? 'I\'m Yusuf Demirci' : 'Ben Yusuf Demirci',
+                  isEnglish
+                      ? 'I\'m Yusuf İhsan Görgel'
+                      : 'Ben Yusuf İhsan Görgel',
                   style: TextStyle(
                     fontSize: screenWidth > 600 ? 60 : 40,
                     fontWeight: FontWeight.bold,
@@ -118,47 +123,52 @@ class HomeSection extends StatelessWidget {
 
             const SizedBox(height: 40),
 
-            // Butonlar
-            FadeInDown(
-              delay: const Duration(milliseconds: 900),
-              duration: const Duration(milliseconds: 800),
-              child: Row(
-                children: [
-                  // CV indirme butonu
-                  _buildButton(
-                    context,
-                    icon: Icons.download_outlined,
-                    text: Obx(() {
-                      final isEnglish =
-                          languageController.currentLanguage == 'en';
-                      return Text(isEnglish ? 'Download CV' : 'CV İndir');
-                    }),
-                    onTap: () {
-                      _downloadCV();
-                    },
-                    isPrimary: true,
-                    themeController: themeController,
-                  ),
+            // Son içerik kısmında alt boşluğu kaldırıyoruz
+            Padding(
+              // Alt kısımda about section'a doğru uzanan extra padding
+              padding: const EdgeInsets.only(bottom: 10),
+              child: FadeInDown(
+                delay: const Duration(milliseconds: 900),
+                duration: const Duration(milliseconds: 800),
+                child: Row(
+                  children: [
+                    // CV indirme butonu
+                    _buildButton(
+                      context,
+                      icon: Icons.download_outlined,
+                      text: Obx(() {
+                        final isEnglish =
+                            languageController.currentLanguage == 'en';
+                        return Text(isEnglish ? 'Download CV' : 'CV İndir');
+                      }),
+                      onTap: () {
+                        _downloadCV();
+                      },
+                      isPrimary: true,
+                      themeController: themeController,
+                    ),
 
-                  const SizedBox(width: 16),
+                    const SizedBox(width: 16),
 
-                  // İletişim butonu
-                  _buildButton(
-                    context,
-                    icon: Icons.mail_outline,
-                    text: Obx(() {
-                      final isEnglish =
-                          languageController.currentLanguage == 'en';
-                      return Text(isEnglish ? 'Contact' : 'İletişim');
-                    }),
-                    onTap: () {
-                      final scrollController = Get.find<AppScrollController>();
-                      scrollController.scrollToSection('contact');
-                    },
-                    isPrimary: false,
-                    themeController: themeController,
-                  ),
-                ],
+                    // İletişim butonu
+                    _buildButton(
+                      context,
+                      icon: Icons.mail_outline,
+                      text: Obx(() {
+                        final isEnglish =
+                            languageController.currentLanguage == 'en';
+                        return Text(isEnglish ? 'Contact' : 'İletişim');
+                      }),
+                      onTap: () {
+                        final scrollController =
+                            Get.find<AppScrollController>();
+                        scrollController.scrollToSection('contact');
+                      },
+                      isPrimary: false,
+                      themeController: themeController,
+                    ),
+                  ],
+                ),
               ),
             ),
           ],

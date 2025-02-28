@@ -6,6 +6,7 @@ import 'package:flutter_web_portfolio/app/controllers/language_controller.dart';
 import 'package:flutter_web_portfolio/app/controllers/theme_controller.dart';
 import 'package:flutter_web_portfolio/app/widgets/mouse_effects.dart';
 import 'package:flutter_web_portfolio/app/controllers/shared_background_controller.dart';
+import 'package:flutter_web_portfolio/app/widgets/section_title.dart';
 
 class SkillsSection extends StatefulWidget {
   const SkillsSection({super.key});
@@ -24,7 +25,7 @@ class _SkillsSectionState extends State<SkillsSection> {
     final screenHeight = MediaQuery.of(context).size.height;
 
     // Tam ekran bir bölüm yaratacağız
-    final galaxySize = math.min(screenWidth * 0.9, 900.0);
+    final galaxySize = math.min(screenWidth * 0.85, 800.0);
     final centralPlanetSize = galaxySize * 0.2; // Merkez gezegen boyutu
 
     return Container(
@@ -35,28 +36,15 @@ class _SkillsSectionState extends State<SkillsSection> {
         mainAxisSize: MainAxisSize.min,
         children: [
           // Başlık
-          FadeInDown(
-            duration: const Duration(milliseconds: 600),
-            child: Padding(
-              padding: const EdgeInsets.only(top: 60, bottom: 30),
-              child: Obx(() {
-                final isEnglish = languageController.currentLanguage == 'en';
-                return Text(
-                  isEnglish ? 'Skills' : 'Beceriler',
-                  style: TextStyle(
-                    fontSize: 36,
-                    fontWeight: FontWeight.bold,
-                    color: themeController.primaryColor,
-                    shadows: [
-                      Shadow(
-                        color: themeController.primaryColor.withOpacity(0.5),
-                        blurRadius: 10,
-                      ),
-                    ],
-                  ),
-                );
-              }),
-            ),
+          Padding(
+            padding: const EdgeInsets.only(top: 60, bottom: 30),
+            child: Obx(() {
+              final isEnglish = languageController.currentLanguage == 'en';
+              return SectionTitle(
+                title: isEnglish ? 'Skills' : 'Beceriler',
+                alignment: CrossAxisAlignment.center,
+              );
+            }),
           ),
 
           // Galaksi görünümü
@@ -84,7 +72,7 @@ class _SkillsSectionState extends State<SkillsSection> {
   }
 }
 
-class GalaxyView extends StatelessWidget {
+class GalaxyView extends StatefulWidget {
   final double galaxySize;
   final double centralPlanetSize;
   final List<dynamic> skillCategories;
@@ -97,18 +85,144 @@ class GalaxyView extends StatelessWidget {
   }) : super(key: key);
 
   @override
+  State<GalaxyView> createState() => _GalaxyViewState();
+}
+
+class _GalaxyViewState extends State<GalaxyView> {
+  // Sürüklenen gezegenin takibi için
+  int? _draggedPlanetIndex;
+  List<Offset> _planetPositions = [];
+  List<Map<String, dynamic>> _skills = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _skills = _extractMainSkills();
+    _initializePlanetPositions();
+  }
+
+  void _initializePlanetPositions() {
+    // Her gezegen için bir başlangıç konumu ata
+    setState(() {
+      _planetPositions = List.generate(_skills.length, (i) {
+        // Hangi yörüngede olduğunu belirle
+        final orbitIndex = i % 3;
+        final orbitRadius = widget.galaxySize * (0.28 + orbitIndex * 0.1);
+
+        // Yörüngedeki pozisyonu hesapla
+        final skillsInThisOrbit = (_skills.length / 3).ceil();
+        final orbitPositionIndex = (i / 3).floor();
+        final angle = 2 * math.pi * orbitPositionIndex / skillsInThisOrbit;
+
+        // X ve Y koordinatları
+        final x = widget.galaxySize / 2 + orbitRadius * math.cos(angle);
+        final y = widget.galaxySize / 2 + orbitRadius * math.sin(angle);
+
+        return Offset(x, y);
+      });
+    });
+  }
+
+  // Tüm beceri türlerinden önemli becerileri seç - sadece ana teknolojileri alır
+  List<Map<String, dynamic>> _extractMainSkills() {
+    final List<Map<String, dynamic>> mainSkills = [];
+
+    try {
+      // Kategoriler ve renkler için eşleştirme
+      final Map<String, Color> categoryColors = {
+        'Mobile': Colors.blue[400]!,
+        'Frontend': Colors.orange[400]!,
+        'Backend': Colors.green[500]!,
+        'DevOps': Colors.purple[400]!,
+        'Database': Colors.teal[400]!,
+      };
+
+      // JSON'dan verileri al
+      for (final skillCategory in widget.skillCategories) {
+        final String category = skillCategory['category'] ?? '';
+        final List<dynamic> items = skillCategory['items'] ?? [];
+
+        // Her kategoriden en fazla 4 beceri al (galaksi görünümünü aşırı doldurmamak için)
+        final int maxItemsPerCategory = 4;
+        final int itemsToTake = math.min(items.length, maxItemsPerCategory);
+
+        for (int i = 0; i < itemsToTake; i++) {
+          final skill = items[i];
+          if (skill is String) {
+            mainSkills.add({
+              "name": skill,
+              "category": category,
+              "color": categoryColors[category] ?? Colors.grey[400]!,
+              "orbit": mainSkills.length % 3, // 3 farklı yörünge (0, 1, 2)
+            });
+          }
+        }
+      }
+
+      // En fazla 12 beceri göster
+      if (mainSkills.length > 12) {
+        mainSkills.shuffle(); // Rastgele bir seçim yap
+        return mainSkills.sublist(0, 12);
+      }
+    } catch (e) {
+      debugPrint('Error extracting skills: $e');
+      // Hata durumunda fallback olarak sabit becerileri göster
+      return [
+        {
+          "name": "Flutter",
+          "category": "Mobile",
+          "color": Colors.blue[400]!,
+          "orbit": 0,
+        },
+        {
+          "name": "React",
+          "category": "Frontend",
+          "color": Colors.orange[400]!,
+          "orbit": 1,
+        },
+        {
+          "name": "Node.js",
+          "category": "Backend",
+          "color": Colors.green[500]!,
+          "orbit": 2,
+        },
+        {
+          "name": "JavaScript",
+          "category": "Frontend",
+          "color": Colors.orange[400]!,
+          "orbit": 0,
+        },
+        {
+          "name": "HTML",
+          "category": "Frontend",
+          "color": Colors.orange[400]!,
+          "orbit": 1,
+        },
+        {
+          "name": "CSS",
+          "category": "Frontend",
+          "color": Colors.orange[400]!,
+          "orbit": 2,
+        },
+      ];
+    }
+
+    return mainSkills;
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Center(
       child: SizedBox(
-        width: galaxySize,
-        height: galaxySize,
+        width: widget.galaxySize,
+        height: widget.galaxySize,
         child: Stack(
           alignment: Alignment.center,
           children: [
             // Arka plandaki galaksi halkası
             Positioned.fill(
               child: CustomPaint(
-                painter: GalaxyRingsPainter(galaxySize: galaxySize),
+                painter: GalaxyRingsPainter(galaxySize: widget.galaxySize),
               ),
             ),
 
@@ -117,8 +231,8 @@ class GalaxyView extends StatelessWidget {
               child: HoverAnimatedWidget(
                 hoverScale: 1.05,
                 child: Container(
-                  width: centralPlanetSize,
-                  height: centralPlanetSize,
+                  width: widget.centralPlanetSize,
+                  height: widget.centralPlanetSize,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     gradient: RadialGradient(
@@ -140,7 +254,7 @@ class GalaxyView extends StatelessWidget {
                   child: Center(
                     child: Icon(
                       Icons.code,
-                      size: centralPlanetSize * 0.5,
+                      size: widget.centralPlanetSize * 0.5,
                       color: Colors.white.withOpacity(0.9),
                     ),
                   ),
@@ -149,161 +263,121 @@ class GalaxyView extends StatelessWidget {
             ),
 
             // Dönen gezegenler (beceriler)
-            ...generateOrbitingPlanets(),
+            ...List.generate(_skills.length, (i) => _buildDraggablePlanet(i)),
           ],
         ),
       ),
     );
   }
 
-  // Tüm beceri türlerinden önemli becerileri seç - sadece ana teknolojileri alır
-  List<Map<String, dynamic>> _extractMainSkills() {
-    final List<Map<String, dynamic>> mainSkills = [];
-
-    try {
-      // Kategoriler ve renkler için eşleştirme
-      final Map<String, Color> categoryColors = {
-        'Mobile': Colors.blue[400]!,
-        'Frontend': Colors.orange[400]!,
-        'Backend': Colors.green[500]!,
-        'DevOps': Colors.purple[400]!,
-        'Database': Colors.teal[400]!,
-      };
-
-      // JSON'dan verileri al
-      for (final skillCategory in skillCategories) {
-        final String category = skillCategory['category'] ?? '';
-        final List<dynamic> items = skillCategory['items'] ?? [];
-
-        // Her kategoriden en fazla 4 beceri al (galaksi görünümünü aşırı doldurmamak için)
-        final int maxItemsPerCategory = 4;
-        final int itemsToTake = math.min(items.length, maxItemsPerCategory);
-
-        for (int i = 0; i < itemsToTake; i++) {
-          final skill = items[i];
-          if (skill is String) {
-            mainSkills.add({
-              "name": skill,
-              "category": category,
-              "color": categoryColors[category] ?? Colors.grey[400]!,
-            });
-          }
-        }
-      }
-
-      // En fazla 12 beceri göster
-      if (mainSkills.length > 12) {
-        mainSkills.shuffle(); // Rastgele bir seçim yap
-        return mainSkills.sublist(0, 12);
-      }
-    } catch (e) {
-      debugPrint('Error extracting skills: $e');
-      // Hata durumunda fallback olarak sabit becerileri göster
-      return [
-        {"name": "Flutter", "category": "Mobile", "color": Colors.blue[400]!},
-        {"name": "React", "category": "Frontend", "color": Colors.orange[400]!},
-        {"name": "Node.js", "category": "Backend", "color": Colors.green[500]!},
-        {
-          "name": "JavaScript",
-          "category": "Frontend",
-          "color": Colors.orange[400]!,
-        },
-        {"name": "HTML", "category": "Frontend", "color": Colors.orange[400]!},
-        {"name": "CSS", "category": "Frontend", "color": Colors.orange[400]!},
-      ];
+  Widget _buildDraggablePlanet(int index) {
+    if (index >= _skills.length || index >= _planetPositions.length) {
+      return const SizedBox.shrink();
     }
 
-    return mainSkills;
-  }
+    final skill = _skills[index];
+    final String skillName = skill['name'] as String;
+    final Color skillColor = skill['color'] as Color;
+    final int orbitIndex = skill['orbit'] as int;
 
-  List<Widget> generateOrbitingPlanets() {
-    final List<Widget> planets = [];
-    final skills = _extractMainSkills();
-    final int skillCount = skills.length;
+    // Gezegen boyutu - farklı yörüngeler için farklı boyutlar
+    final double planetSizeFactor = 1.0 - (orbitIndex * 0.1);
+    final double planetSize = widget.galaxySize * 0.08 * planetSizeFactor;
 
-    if (skillCount == 0) return planets;
+    // Gezegenin mevcut pozisyonu
+    final position = _planetPositions[index];
 
-    for (int i = 0; i < skillCount; i++) {
-      final skill = skills[i];
-      final String skillName = skill['name'] as String;
-      final Color skillColor = skill['color'] as Color;
+    return Positioned(
+      left: position.dx - planetSize / 2,
+      top: position.dy - planetSize / 2,
+      child: GestureDetector(
+        onPanStart: (details) {
+          setState(() {
+            _draggedPlanetIndex = index;
+          });
+        },
+        onPanUpdate: (details) {
+          if (_draggedPlanetIndex == index) {
+            setState(() {
+              // Merkeze olan mesafeyi hesapla
+              final center = Offset(
+                widget.galaxySize / 2,
+                widget.galaxySize / 2,
+              );
+              final newPos = Offset(
+                position.dx + details.delta.dx,
+                position.dy + details.delta.dy,
+              );
 
-      // Her beceri için eşit aralıklı açı
-      final double angle = 2 * math.pi * i / skillCount;
-      final double orbitRadius = galaxySize * 0.35; // Yörünge yarıçapı
-      final double planetSize = galaxySize * 0.08;
+              // Mesafe ve açı hesapla
+              final distance = (newPos - center).distance;
+              final angle = math.atan2(
+                newPos.dy - center.dy,
+                newPos.dx - center.dx,
+              );
 
-      // Yörüngedeki gezegen konumu
-      planets.add(
-        AnimatedBuilder(
-          animation:
-              SharedBackgroundController.animationController ??
-              const AlwaysStoppedAnimation(0.0),
-          builder: (context, child) {
-            // Farklı hızlar için ekstra çarpan
-            final speedMultiplier = 1.0 + (i % 3) * 0.15;
-            final animValue =
-                SharedBackgroundController.animationController?.value ?? 0.0;
-            final double rotationAngle =
-                angle + (animValue * 2 * math.pi * speedMultiplier);
+              // Yörünge yarıçapı - sabit tut
+              final orbitRadius = widget.galaxySize * (0.28 + orbitIndex * 0.1);
 
-            return Positioned(
-              left:
-                  galaxySize / 2 +
-                  orbitRadius * math.cos(rotationAngle) -
-                  planetSize / 2,
-              top:
-                  galaxySize / 2 +
-                  orbitRadius * math.sin(rotationAngle) -
-                  planetSize / 2,
-              child: HoverAnimatedWidget(
-                hoverScale: 1.2,
-                child: Container(
-                  width: planetSize,
-                  height: planetSize,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: skillColor,
-                    boxShadow: [
-                      BoxShadow(
-                        color: skillColor.withOpacity(0.5),
-                        blurRadius: 10,
-                        spreadRadius: 2,
+              // Yeni pozisyonu, aynı yörüngede kalacak şekilde hesapla
+              _planetPositions[index] = Offset(
+                center.dx + orbitRadius * math.cos(angle),
+                center.dy + orbitRadius * math.sin(angle),
+              );
+            });
+          }
+        },
+        onPanEnd: (details) {
+          setState(() {
+            _draggedPlanetIndex = null;
+          });
+        },
+        child: MouseRegion(
+          cursor: SystemMouseCursors.grab,
+          child: HoverAnimatedWidget(
+            hoverScale: 1.2,
+            child: Container(
+              width: planetSize,
+              height: planetSize,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: skillColor,
+                boxShadow: [
+                  BoxShadow(
+                    color: skillColor.withOpacity(0.5),
+                    blurRadius: 10,
+                    spreadRadius: 2,
+                  ),
+                ],
+              ),
+              child: Center(
+                child: Tooltip(
+                  message: skillName,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      _buildSkillIcon(skillName, planetSize * 0.4),
+                      const SizedBox(height: 2),
+                      Text(
+                        _getSkillDisplayName(skillName),
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: planetSize * 0.18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        textAlign: TextAlign.center,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ],
                   ),
-                  child: Center(
-                    child: Tooltip(
-                      message: skillName,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          _buildSkillIcon(skillName, planetSize * 0.4),
-                          const SizedBox(height: 2),
-                          Text(
-                            _getSkillDisplayName(skillName),
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: planetSize * 0.18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                            textAlign: TextAlign.center,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
                 ),
               ),
-            );
-          },
+            ),
+          ),
         ),
-      );
-    }
-
-    return planets;
+      ),
+    );
   }
 
   // PNG ikon widget'ı oluştur
@@ -544,8 +618,8 @@ class GalaxyRingsPainter extends CustomPainter {
       final Paint ringPaint =
           Paint()
             ..style = PaintingStyle.stroke
-            ..strokeWidth = 1.2
-            ..color = Colors.blue[400]!.withOpacity(0.2 - i * 0.03);
+            ..strokeWidth = 1.0
+            ..color = Colors.white.withOpacity(0.2);
 
       canvas.drawCircle(
         Offset(size.width / 2, size.height / 2),
@@ -554,19 +628,7 @@ class GalaxyRingsPainter extends CustomPainter {
       );
     }
 
-    // Yıldızlar
-    final random = math.Random(42); // Sabit seed
-    for (int i = 0; i < 200; i++) {
-      final double starX = random.nextDouble() * size.width;
-      final double starY = random.nextDouble() * size.height;
-      final double starSize = random.nextDouble() * 1.8 + 0.5;
-
-      final Paint starPaint =
-          Paint()
-            ..color = Colors.white.withOpacity(random.nextDouble() * 0.6 + 0.3);
-
-      canvas.drawCircle(Offset(starX, starY), starSize, starPaint);
-    }
+    // Yıldız çizimlerini kaldırdım - CosmicBackground'a dayanıyor
   }
 
   @override

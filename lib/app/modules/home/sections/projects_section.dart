@@ -1,10 +1,14 @@
+import 'dart:async';
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
 import 'package:get/get.dart';
 import 'package:animate_do/animate_do.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_web_portfolio/app/controllers/language_controller.dart';
 import 'package:flutter_web_portfolio/app/controllers/theme_controller.dart';
 import 'package:flutter_web_portfolio/app/widgets/mouse_effects.dart';
+import 'package:flutter_web_portfolio/app/widgets/section_title.dart';
 
 class ProjectsSection extends StatefulWidget {
   const ProjectsSection({super.key});
@@ -13,260 +17,323 @@ class ProjectsSection extends StatefulWidget {
   State<ProjectsSection> createState() => _ProjectsSectionState();
 }
 
-class _ProjectsSectionState extends State<ProjectsSection> {
+class _ProjectsSectionState extends State<ProjectsSection>
+    with SingleTickerProviderStateMixin {
   final LanguageController languageController = Get.find<LanguageController>();
   final ThemeController themeController = Get.find<ThemeController>();
-  final RxList<ProjectWindow> _openWindows = <ProjectWindow>[].obs;
-  final RxInt _activeWindowIndex = (-1).obs;
+  final RxList<ProjectWindowModel> _projects = <ProjectWindowModel>[].obs;
+  final RxList<ProjectWindowModel> _openProjects = <ProjectWindowModel>[].obs;
+  int _currentDesktopIndex = 0;
+  DateTime _lastTimeCheck = DateTime.now();
+  bool _showClock = true;
+  Timer? _clockTimer;
+  Timer? _projectOpenTimer;
+  int _openProjectIndex = -1;
 
   @override
   void initState() {
     super.initState();
-    // 1 saniye sonra pencere açma başlat (sayfa yüklendikten sonra)
-    Future.delayed(const Duration(seconds: 1), () {
-      _scheduleWindowOpenings();
+    _initializeProjects();
+
+    // Update clock every second
+    _clockTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      setState(() {
+        _lastTimeCheck = DateTime.now();
+      });
     });
   }
 
-  void _scheduleWindowOpenings() {
-    final projects = languageController.cvData['projects'] ?? [];
-    if (projects.isEmpty) return;
+  @override
+  void dispose() {
+    _clockTimer?.cancel();
+    _projectOpenTimer?.cancel();
+    super.dispose();
+  }
 
-    // İlk 3 projeyi otomatik olarak aç (1'er saniye arayla)
-    for (int i = 0; i < math.min(3, projects.length); i++) {
-      Future.delayed(Duration(seconds: i), () {
-        if (i < projects.length) {
-          _openProjectWindow(
-            projects[i],
-            initialPosition: _getRandomPosition(i),
-          );
+  void _initializeProjects() {
+    // Load projects from languageController
+    final projectsData = languageController.cvData['projects'] ?? [];
+
+    _projects.clear();
+
+    for (var project in projectsData) {
+      _projects.add(
+        ProjectWindowModel(
+          id: project['id'] ?? UniqueKey().toString(),
+          title: project['title'] ?? 'Project',
+          description: project['description'] ?? '',
+          technologies: List<String>.from(project['technologies'] ?? []),
+          imageUrl: project['image'] ?? '',
+          url: _extractUrl(project),
+          windowPosition: Offset(
+            100 + (math.Random().nextDouble() * 100),
+            100 + (math.Random().nextDouble() * 100),
+          ),
+          windowSize: const Size(600, 400),
+          isOpen: false,
+          isMinimized: false,
+          zIndex: 0,
+        ),
+      );
+    }
+  }
+
+  String _extractUrl(Map<dynamic, dynamic> project) {
+    if (project['url'] is String) {
+      return project['url'] as String;
+    } else if (project['url'] is Map) {
+      final urls = project['url'] as Map;
+      for (final key in ['website', 'google_play', 'app_store']) {
+        if (urls.containsKey(key)) {
+          return urls[key] as String;
         }
+      }
+    }
+    return '';
+  }
+
+  void _openProject(ProjectWindowModel project) {
+    setState(() {
+      if (!_openProjects.contains(project)) {
+        // Find max zIndex to put this window on top
+        int maxZIndex = 0;
+        for (var openProject in _openProjects) {
+          if (openProject.zIndex > maxZIndex) {
+            maxZIndex = openProject.zIndex;
+          }
+        }
+
+        project.isOpen = true;
+        project.isMinimized = false;
+        project.zIndex = maxZIndex + 1;
+        _openProjects.add(project);
+      } else if (project.isMinimized) {
+        project.isMinimized = false;
+        _bringToFront(project);
+      } else {
+        _bringToFront(project);
+      }
+    });
+  }
+
+  void _minimizeProject(ProjectWindowModel project) {
+    setState(() {
+      project.isMinimized = true;
+    });
+  }
+
+  void _closeProject(ProjectWindowModel project) {
+    setState(() {
+      _openProjects.remove(project);
+      project.isOpen = false;
+      project.isMinimized = false;
+    });
+  }
+
+  void _bringToFront(ProjectWindowModel project) {
+    if (!_openProjects.contains(project)) return;
+
+    setState(() {
+      // Find the max zIndex
+      int maxZIndex = 0;
+      for (var p in _openProjects) {
+        if (p.zIndex > maxZIndex) {
+          maxZIndex = p.zIndex;
+        }
+      }
+
+      // Only update if not already on top
+      if (project.zIndex != maxZIndex) {
+        project.zIndex = maxZIndex + 1;
+      }
+    });
+  }
+
+  void _sequentiallyOpenProjects() {
+    // Reset all projects
+    for (var project in _projects) {
+      project.isOpen = false;
+      project.isMinimized = false;
+    }
+    _openProjects.clear();
+
+    // Start opening sequence
+    _openProjectIndex = -1;
+    _projectOpenTimer?.cancel();
+
+    _projectOpenTimer = Timer.periodic(const Duration(milliseconds: 300), (
+      timer,
+    ) {
+      setState(() {
+        _openProjectIndex++;
+
+        if (_openProjectIndex >= _projects.length) {
+          timer.cancel();
+          return;
+        }
+
+        _openProject(_projects[_openProjectIndex]);
       });
-    }
+    });
   }
 
-  Offset _getRandomPosition(int index) {
-    final random = math.Random();
-    // Ekranın farklı bölgelerine dağıt
-    double x = 100 + (random.nextDouble() * 200) + (index * 50);
-    double y = 150 + (random.nextDouble() * 100) + (index * 30);
-    return Offset(x, y);
-  }
+  Future<void> _launchProjectUrl(String url) async {
+    if (url.isEmpty) return;
 
-  void _openProjectWindow(
-    Map<String, dynamic> project, {
-    Offset? initialPosition,
-  }) {
-    final newWindowIndex = _openWindows.length;
-    final window = ProjectWindow(
-      project: project,
-      initialPosition: initialPosition ?? const Offset(100, 150),
-      windowIndex: newWindowIndex,
-      onClose: () => _closeWindow(newWindowIndex),
-      onActivate: () => _activateWindow(newWindowIndex),
-    );
-
-    _openWindows.add(window);
-    _activateWindow(newWindowIndex);
-  }
-
-  void _closeWindow(int index) {
-    if (index < _openWindows.length) {
-      _openWindows.removeAt(index);
-
-      // Pencere indekslerini yeniden düzenle
-      for (int i = 0; i < _openWindows.length; i++) {
-        _openWindows[i] = _openWindows[i].copyWith(windowIndex: i);
+    try {
+      // Ensure url has proper scheme
+      String urlString = url;
+      if (!urlString.startsWith('http://') &&
+          !urlString.startsWith('https://')) {
+        urlString = 'https://$urlString';
       }
 
-      // Aktif pencereyi güncelle
-      if (_activeWindowIndex.value >= _openWindows.length) {
-        _activeWindowIndex.value =
-            _openWindows.isEmpty ? -1 : _openWindows.length - 1;
+      final uri = Uri.parse(urlString);
+
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
+      } else {
+        debugPrint('Could not launch $urlString');
       }
-    }
-  }
-
-  void _activateWindow(int index) {
-    if (index >= 0 && index < _openWindows.length) {
-      _activeWindowIndex.value = index;
-
-      // Aktif pencereyi listeye en son ekleyerek en üste getir
-      final window = _openWindows[index];
-      _openWindows.removeAt(index);
-      _openWindows.add(window);
-
-      // Pencere indekslerini yeniden düzenle
-      for (int i = 0; i < _openWindows.length; i++) {
-        _openWindows[i] = _openWindows[i].copyWith(windowIndex: i);
-      }
-
-      _activeWindowIndex.value = _openWindows.length - 1;
+    } catch (e) {
+      debugPrint('Error launching URL: $e');
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
-    final isMobile = screenWidth < 800;
+    final screenHeight = MediaQuery.of(context).size.height;
+    final bool isWideScreen = screenWidth > 800;
 
     return Container(
-      constraints: BoxConstraints(minHeight: screenHeight - 80),
-      height: screenHeight - 80,
-      child: Stack(
-        fit: StackFit.expand,
-        clipBehavior: Clip.none,
-        children: [
-          // Masaüstü arkaplanı
-          Positioned.fill(
-            child: DesktopBackground(themeController: themeController),
-          ),
-
-          // Masaüstü alanı (projelerin sürüklenebileceği alan)
-          Positioned.fill(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Başlık
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 80, 20, 0),
-                  child: FadeInDown(
-                    duration: const Duration(milliseconds: 600),
-                    child: Obx(() {
-                      final isEnglish =
-                          languageController.currentLanguage == 'en';
-                      return ShimmeringText(
-                        text: isEnglish ? 'Projects' : 'Projeler',
-                        baseColor: Colors.white,
-                        highlightColor: themeController.primaryColor,
-                        style: TextStyle(
-                          fontSize: 32,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      );
-                    }),
-                  ),
-                ),
-
-                const SizedBox(height: 30),
-
-                // Proje pencerelerinin alanı
-                Expanded(
-                  child: Stack(
-                    fit: StackFit.expand,
-                    clipBehavior: Clip.none,
-                    children: [
-                      // Proje simgeleri
-                      Padding(
-                        padding: const EdgeInsets.all(20),
-                        child: _buildProjectIcons(isMobile),
-                      ),
-
-                      // Açık pencereler
-                      ..._buildOpenWindows(),
-                    ],
-                  ),
-                ),
-
-                // Alt bilgi çubuğu (taskbar)
-                isMobile
-                    ? const SizedBox.shrink()
-                    : TaskBar(
-                      openWindows: _openWindows,
-                      activeWindowIndex: _activeWindowIndex.value,
-                      onTaskClicked: _activateWindow,
-                    ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildProjectIcons(bool isMobile) {
-    return Obx(() {
-      final projects = languageController.cvData['projects'] ?? [];
-
-      return Wrap(
-        spacing: 20,
-        runSpacing: 20,
-        children: List.generate(projects.length, (index) {
-          final project = projects[index];
-          return DesktopIcon(
-            title: project['title'] ?? '',
-            icon: Icons.folder,
-            color: themeController.primaryColor,
-            onDoubleTap: () => _openProjectWindow(project),
-          );
-        }),
-      );
-    });
-  }
-
-  List<Widget> _buildOpenWindows() {
-    return List.generate(_openWindows.length, (index) {
-      final window = _openWindows[index];
-      final isActive = index == _activeWindowIndex.value;
-
-      return Positioned(
-        left: 0,
-        top: 0,
-        right: 0,
-        bottom: 0,
-        child: window.copyWith(isActive: isActive),
-      );
-    });
-  }
-}
-
-// Masaüstü Simgesi
-class DesktopIcon extends StatelessWidget {
-  final String title;
-  final IconData icon;
-  final Color color;
-  final VoidCallback onDoubleTap;
-
-  const DesktopIcon({
-    Key? key,
-    required this.title,
-    required this.icon,
-    required this.color,
-    required this.onDoubleTap,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return HoverAnimatedWidget(
-      hoverScale: 1.05,
-      child: GestureDetector(
-        onDoubleTap: onDoubleTap,
+      width: double.infinity,
+      constraints: BoxConstraints(minHeight: screenHeight * 0.8),
+      child: Padding(
+        padding: EdgeInsets.symmetric(
+          horizontal: isWideScreen ? 100 : 20,
+          vertical: 80,
+        ),
         child: Column(
-          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
-              width: 60,
-              height: 60,
-              decoration: BoxDecoration(
-                color: color.withOpacity(0.2),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: color.withOpacity(0.3), width: 1),
+            // Title
+            SectionTitle(
+              title: languageController.getText(
+                'projects_section.title',
+                defaultValue: 'Projects',
               ),
-              child: Icon(icon, color: color, size: 32),
+              subtitle: languageController.getText(
+                'projects_section.description',
+                defaultValue: 'Take a look at some of my projects.',
+              ),
             ),
-            const SizedBox(height: 8),
-            SizedBox(
-              width: 80,
-              child: Text(
-                title,
-                textAlign: TextAlign.center,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.white,
+
+            const SizedBox(height: 20),
+
+            // Desktop-like interface
+            Center(
+              child: FadeInUp(
+                duration: const Duration(milliseconds: 800),
+                child: Container(
+                  width: isWideScreen ? screenWidth * 0.8 : screenWidth,
+                  height: 600,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF1A1D21),
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.3),
+                        blurRadius: 20,
+                        offset: const Offset(0, 5),
+                      ),
+                    ],
+                    border: Border.all(
+                      color: Colors.grey.withOpacity(0.2),
+                      width: 1,
+                    ),
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: Column(
+                      children: [
+                        // Desktop taskbar
+                        TaskBar(
+                          onMenuPressed: _sequentiallyOpenProjects,
+                          time: _lastTimeCheck,
+                          showClock: _showClock,
+                          openProjects: _openProjects,
+                          onProjectSelected: (project) {
+                            if (project.isMinimized) {
+                              _openProject(project);
+                            }
+                          },
+                        ),
+
+                        // Desktop content
+                        Expanded(
+                          child: Stack(
+                            fit: StackFit.expand,
+                            children: [
+                              // Desktop background
+                              DesktopBackground(
+                                currentIndex: _currentDesktopIndex,
+                              ),
+
+                              // Desktop icons
+                              Positioned(
+                                left: 20,
+                                top: 20,
+                                child: Column(
+                                  children:
+                                      _projects
+                                          .map(
+                                            (project) => DesktopIcon(
+                                              title: project.title,
+                                              iconData: Icons.folder,
+                                              onTap:
+                                                  () => _openProject(project),
+                                            ),
+                                          )
+                                          .toList(),
+                                ),
+                              ),
+
+                              // Project windows
+                              ..._openProjects.map((project) {
+                                return Positioned(
+                                  left: project.windowPosition.dx,
+                                  top: project.windowPosition.dy,
+                                  child: Visibility(
+                                    visible: !project.isMinimized,
+                                    maintainState: true,
+                                    maintainAnimation: true,
+                                    maintainSize: true,
+                                    child: ProjectWindow(
+                                      key: ValueKey('project-${project.id}'),
+                                      project: project,
+                                      onWindowPositionChanged: (position) {
+                                        setState(() {
+                                          project.windowPosition = position;
+                                        });
+                                      },
+                                      onClose: () => _closeProject(project),
+                                      onMinimize:
+                                          () => _minimizeProject(project),
+                                      onTap: () => _bringToFront(project),
+                                      onOpenLink:
+                                          () => _launchProjectUrl(project.url),
+                                      zIndex: project.zIndex,
+                                    ),
+                                  ),
+                                );
+                              }).toList(),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -277,683 +344,457 @@ class DesktopIcon extends StatelessWidget {
   }
 }
 
-// Taskbar
 class TaskBar extends StatelessWidget {
-  final List<ProjectWindow> openWindows;
-  final int activeWindowIndex;
-  final Function(int) onTaskClicked;
+  final VoidCallback onMenuPressed;
+  final DateTime time;
+  final bool showClock;
+  final List<ProjectWindowModel> openProjects;
+  final Function(ProjectWindowModel) onProjectSelected;
 
   const TaskBar({
     Key? key,
-    required this.openWindows,
-    required this.activeWindowIndex,
-    required this.onTaskClicked,
+    required this.onMenuPressed,
+    required this.time,
+    required this.showClock,
+    required this.openProjects,
+    required this.onProjectSelected,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 50,
-      width: double.infinity,
+      height: 48,
+      padding: const EdgeInsets.symmetric(horizontal: 10),
       decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.7),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.3),
-            blurRadius: 10,
-            spreadRadius: 1,
-          ),
-        ],
+        color: const Color(0xFF2A2D31),
+        border: Border(
+          bottom: BorderSide(color: Colors.black.withOpacity(0.3), width: 1),
+        ),
       ),
       child: Row(
         children: [
-          // Başlangıç butonu
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10),
-            child: IconButton(
-              icon: const Icon(Icons.menu, color: Colors.white),
-              onPressed: () {},
-            ),
+          // Start Button
+          IconButton(
+            icon: const Icon(Icons.grid_view_rounded, color: Colors.white70),
+            tooltip: 'Show All Projects',
+            onPressed: onMenuPressed,
           ),
 
-          // Açık uygulamalar
+          const SizedBox(width: 10),
+
+          // Open project tabs
           Expanded(
             child: SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(
-                children: List.generate(openWindows.length, (index) {
-                  final window = openWindows[index];
-                  final isActive = index == activeWindowIndex;
-
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 4,
-                      vertical: 8,
-                    ),
-                    child: HoverAnimatedWidget(
-                      hoverScale: 1.05,
-                      child: InkWell(
-                        onTap: () => onTaskClicked(window.windowIndex),
-                        child: Container(
-                          height: 34,
-                          padding: const EdgeInsets.symmetric(horizontal: 12),
-                          decoration: BoxDecoration(
-                            color:
-                                isActive
-                                    ? Colors.white.withOpacity(0.3)
-                                    : Colors.white.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(6),
-                            border: Border.all(
-                              color: Colors.white.withOpacity(0.2),
-                              width: 1,
+                children:
+                    openProjects.map((project) {
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 4),
+                        child: InkWell(
+                          onTap: () => onProjectSelected(project),
+                          child: Container(
+                            height: 36,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 8,
+                            ),
+                            decoration: BoxDecoration(
+                              color:
+                                  project.isMinimized
+                                      ? const Color(0xFF3A3D41)
+                                      : const Color(0xFF4A4D51),
+                              borderRadius: BorderRadius.circular(4),
+                              border: Border.all(
+                                color: Colors.black.withOpacity(0.3),
+                                width: 1,
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.folder_open,
+                                  color: Colors.white70,
+                                  size: 18,
+                                ),
+                                const SizedBox(width: 8),
+                                Text(
+                                  project.title,
+                                  style: const TextStyle(
+                                    color: Colors.white70,
+                                    fontSize: 13,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const Icon(
-                                Icons.folder,
-                                size: 16,
-                                color: Colors.white,
-                              ),
-                              const SizedBox(width: 8),
-                              Text(
-                                window.project['title'] ?? '',
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 12,
-                                ),
-                              ),
-                            ],
-                          ),
                         ),
-                      ),
-                    ),
-                  );
-                }),
+                      );
+                    }).toList(),
               ),
             ),
           ),
 
-          // Saat
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: TimeDisplay(),
-          ),
+          const SizedBox(width: 10),
+
+          // Clock
+          if (showClock)
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+              child: Text(
+                '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}',
+                style: const TextStyle(color: Colors.white70, fontSize: 14),
+              ),
+            ),
         ],
       ),
     );
   }
 }
 
-// Saat gösterimi
-class TimeDisplay extends StatefulWidget {
-  const TimeDisplay({Key? key}) : super(key: key);
-
-  @override
-  State<TimeDisplay> createState() => _TimeDisplayState();
-}
-
-class _TimeDisplayState extends State<TimeDisplay> {
-  late DateTime _currentTime;
-  late Timer _timer;
-
-  @override
-  void initState() {
-    super.initState();
-    _currentTime = DateTime.now();
-    _updateTime();
-  }
-
-  void _updateTime() {
-    _timer = Timer(const Duration(seconds: 1), () {
-      if (mounted) {
-        setState(() {
-          _currentTime = DateTime.now();
-        });
-        _updateTime();
-      }
-    });
-  }
-
-  @override
-  void dispose() {
-    _timer.cancel();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Text(
-      '${_currentTime.hour.toString().padLeft(2, '0')}:${_currentTime.minute.toString().padLeft(2, '0')}',
-      style: const TextStyle(color: Colors.white, fontSize: 14),
-    );
-  }
-}
-
-// Masaüstü Arkaplanı
 class DesktopBackground extends StatelessWidget {
-  final ThemeController themeController;
+  final int currentIndex;
 
-  const DesktopBackground({Key? key, required this.themeController})
+  const DesktopBackground({Key? key, required this.currentIndex})
     : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      fit: StackFit.expand,
-      children: [
-        // Ana arkaplan
-        Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [const Color(0xFF1A2237), const Color(0xFF0D1425)],
-            ),
-          ),
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: const [
+            Colors.transparent, // Tamamen şeffaf, CosmicBackground görünecek
+            Colors.transparent, // Tamamen şeffaf, CosmicBackground görünecek
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
         ),
-
-        // Doku/Izgara
-        CustomPaint(
-          painter: GridPainter(
-            lineColor: themeController.primaryColor.withOpacity(0.15),
-            gridSize: 30,
-          ),
-        ),
-
-        // Parlama efektleri
-        Positioned(
-          top: -100,
-          right: -100,
-          child: Container(
-            width: 300,
-            height: 300,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              gradient: RadialGradient(
-                colors: [
-                  themeController.primaryColor.withOpacity(0.3),
-                  themeController.primaryColor.withOpacity(0),
-                ],
-                stops: const [0.2, 1.0],
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: themeController.primaryColor.withOpacity(0.2),
-                  blurRadius: 50,
-                  spreadRadius: 20,
-                ),
-              ],
-            ),
-          ),
-        ),
-
-        Positioned(
-          bottom: -50,
-          left: -50,
-          child: Container(
-            width: 200,
-            height: 200,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              gradient: RadialGradient(
-                colors: [
-                  themeController.secondaryColor.withOpacity(0.3),
-                  themeController.secondaryColor.withOpacity(0),
-                ],
-                stops: const [0.2, 1.0],
-              ),
-            ),
-          ),
-        ),
-      ],
+      ),
+      child: const SizedBox.expand(), // Yıldızları kaldırdık
     );
   }
 }
 
-// Izgara
-class GridPainter extends CustomPainter {
-  final Color lineColor;
-  final double gridSize;
+class DesktopIcon extends StatelessWidget {
+  final String title;
+  final IconData iconData;
+  final VoidCallback onTap;
 
-  GridPainter({required this.lineColor, required this.gridSize});
+  const DesktopIcon({
+    Key? key,
+    required this.title,
+    required this.iconData,
+    required this.onTap,
+  }) : super(key: key);
 
   @override
-  void paint(Canvas canvas, Size size) {
-    final paint =
-        Paint()
-          ..color = lineColor
-          ..strokeWidth = 0.5;
-
-    // Yatay çizgiler
-    for (double y = 0; y < size.height; y += gridSize) {
-      canvas.drawLine(Offset(0, y), Offset(size.width, y), paint);
-    }
-
-    // Dikey çizgiler
-    for (double x = 0; x < size.width; x += gridSize) {
-      canvas.drawLine(Offset(x, 0), Offset(x, size.height), paint);
-    }
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      onDoubleTap: onTap, // Usually desktop icons are opened with double-click
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 16),
+        width: 80,
+        child: Column(
+          children: [
+            Container(
+              height: 48,
+              width: 48,
+              decoration: BoxDecoration(
+                color: Colors.amber.withOpacity(0.8),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(iconData, color: Colors.white, size: 28),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              title,
+              textAlign: TextAlign.center,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 12,
+                shadows: [
+                  Shadow(
+                    color: Colors.black,
+                    blurRadius: 2,
+                    offset: Offset(1, 1),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
-// Proje Penceresi
-class ProjectWindow extends StatefulWidget {
-  final Map<String, dynamic> project;
-  final Offset initialPosition;
-  final int windowIndex;
-  final bool isActive;
+class ProjectWindow extends StatelessWidget {
+  final ProjectWindowModel project;
+  final Function(Offset) onWindowPositionChanged;
   final VoidCallback onClose;
-  final VoidCallback onActivate;
+  final VoidCallback onMinimize;
+  final VoidCallback onTap;
+  final VoidCallback onOpenLink;
+  final int zIndex;
 
   const ProjectWindow({
     Key? key,
     required this.project,
-    required this.initialPosition,
-    required this.windowIndex,
-    this.isActive = true,
+    required this.onWindowPositionChanged,
     required this.onClose,
-    required this.onActivate,
+    required this.onMinimize,
+    required this.onTap,
+    required this.onOpenLink,
+    required this.zIndex,
   }) : super(key: key);
-
-  ProjectWindow copyWith({
-    Map<String, dynamic>? project,
-    Offset? initialPosition,
-    int? windowIndex,
-    bool? isActive,
-    VoidCallback? onClose,
-    VoidCallback? onActivate,
-  }) {
-    return ProjectWindow(
-      project: project ?? this.project,
-      initialPosition: initialPosition ?? this.initialPosition,
-      windowIndex: windowIndex ?? this.windowIndex,
-      isActive: isActive ?? this.isActive,
-      onClose: onClose ?? this.onClose,
-      onActivate: onActivate ?? this.onActivate,
-    );
-  }
-
-  @override
-  State<ProjectWindow> createState() => _ProjectWindowState();
-}
-
-class _ProjectWindowState extends State<ProjectWindow>
-    with SingleTickerProviderStateMixin {
-  late Offset _position;
-  late Size _size;
-  bool _isDragging = false;
-  late AnimationController _animationController;
-  late Animation<double> _scaleAnimation;
-
-  @override
-  void initState() {
-    super.initState();
-    _position = widget.initialPosition;
-    _size = const Size(450, 350);
-
-    // Açılış animasyonu
-    _animationController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 300),
-    );
-
-    _scaleAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(
-      CurvedAnimation(parent: _animationController, curve: Curves.easeOutBack),
-    );
-
-    _animationController.forward();
-  }
-
-  @override
-  void dispose() {
-    _animationController.dispose();
-    super.dispose();
-  }
-
-  void _updatePosition(Offset delta) {
-    setState(() {
-      _position = _position.translate(delta.dx, delta.dy);
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _animationController,
-      builder: (context, child) {
-        return Positioned(
-          left: _position.dx,
-          top: _position.dy,
-          child: Transform.scale(
-            scale: _scaleAnimation.value,
-            child: GestureDetector(
-              onTap: widget.onActivate,
-              onPanStart: (details) {
-                if (!widget.isActive) {
-                  widget.onActivate();
-                  return;
-                }
-                setState(() {
-                  _isDragging = true;
-                });
-              },
-              onPanUpdate: (details) {
-                if (_isDragging) {
-                  _updatePosition(details.delta);
-                }
-              },
-              onPanEnd: (details) {
-                setState(() {
-                  _isDragging = false;
-                });
-              },
-              child: AnimatedOpacity(
-                duration: const Duration(milliseconds: 200),
-                opacity: widget.isActive ? 1.0 : 0.8,
-                child: Container(
-                  height: _size.height,
-                  width: _size.width,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF2A2A2A),
-                    borderRadius: BorderRadius.circular(8),
-                    boxShadow:
-                        widget.isActive
-                            ? [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.3),
-                                blurRadius: 15,
-                                spreadRadius: 2,
-                              ),
-                            ]
-                            : [],
-                    border: Border.all(
-                      color:
-                          widget.isActive
-                              ? Colors.white.withOpacity(0.3)
-                              : Colors.white.withOpacity(0.1),
-                      width: 1,
-                    ),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Pencere başlık çubuğu
-                      Container(
-                        height: 36,
-                        padding: const EdgeInsets.symmetric(horizontal: 12),
-                        decoration: BoxDecoration(
-                          color:
-                              widget.isActive
-                                  ? const Color(0xFF3A3A3A)
-                                  : const Color(0xFF333333),
-                          borderRadius: const BorderRadius.vertical(
-                            top: Radius.circular(8),
-                          ),
-                          border: Border(
-                            bottom: BorderSide(
-                              color: Colors.black.withOpacity(0.2),
-                              width: 1,
-                            ),
-                          ),
+    return GestureDetector(
+      onTap: onTap,
+      child: Stack(
+        children: [
+          Container(
+            width: project.windowSize.width,
+            height: project.windowSize.height,
+            decoration: BoxDecoration(
+              color: const Color(0xFF282C34),
+              borderRadius: BorderRadius.circular(8),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.5),
+                  blurRadius: 15,
+                  offset: const Offset(0, 5),
+                ),
+              ],
+            ),
+            child: Column(
+              children: [
+                // Window title bar
+                GestureDetector(
+                  onPanUpdate: (details) {
+                    final newPosition = Offset(
+                      project.windowPosition.dx + details.delta.dx,
+                      project.windowPosition.dy + details.delta.dy,
+                    );
+
+                    // Keep window within desktop bounds
+                    final screenSize = MediaQuery.of(context).size;
+                    final windowWidth = project.windowSize.width;
+                    final windowHeight = project.windowSize.height;
+
+                    final x = newPosition.dx.clamp(
+                      0.0,
+                      screenSize.width - 100.0,
+                    );
+                    final y = newPosition.dy.clamp(
+                      0.0,
+                      screenSize.height - 100.0,
+                    );
+
+                    onWindowPositionChanged(Offset(x, y));
+                  },
+                  child: Container(
+                    height: 32,
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF21252B),
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(8),
+                        topRight: Radius.circular(8),
+                      ),
+                      border: Border(
+                        bottom: BorderSide(
+                          color: Colors.black.withOpacity(0.3),
+                          width: 1,
                         ),
-                        child: Row(
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        // Window controls
+                        Row(
                           children: [
-                            // Kapat butonu
-                            GestureDetector(
-                              onTap: widget.onClose,
-                              child: Container(
-                                width: 14,
-                                height: 14,
-                                decoration: const BoxDecoration(
-                                  color: Color(0xFFFF5F57),
-                                  shape: BoxShape.circle,
-                                ),
+                            // Close button
+                            IconButton(
+                              padding: EdgeInsets.zero,
+                              constraints: const BoxConstraints(),
+                              icon: const Icon(
+                                Icons.close,
+                                color: Colors.white70,
+                                size: 18,
                               ),
+                              onPressed: onClose,
                             ),
                             const SizedBox(width: 8),
-                            // Küçült butonu
-                            Container(
-                              width: 14,
-                              height: 14,
-                              decoration: const BoxDecoration(
-                                color: Color(0xFFFFBD2E),
-                                shape: BoxShape.circle,
+                            // Minimize button
+                            IconButton(
+                              padding: EdgeInsets.zero,
+                              constraints: const BoxConstraints(),
+                              icon: const Icon(
+                                Icons.minimize,
+                                color: Colors.white70,
+                                size: 18,
                               ),
+                              onPressed: onMinimize,
                             ),
-                            const SizedBox(width: 8),
-                            // Tam ekran butonu
-                            Container(
-                              width: 14,
-                              height: 14,
-                              decoration: const BoxDecoration(
-                                color: Color(0xFF28C841),
-                                shape: BoxShape.circle,
-                              ),
-                            ),
-                            const SizedBox(width: 16),
-                            // Pencere başlığı
-                            Expanded(
-                              child: Text(
-                                widget.project['title'] ?? '',
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                            ),
-                            const SizedBox(width: 48),
                           ],
                         ),
-                      ),
 
-                      // Proje içeriği
-                      Expanded(
-                        child: Container(
-                          width: double.infinity,
-                          padding: const EdgeInsets.all(16),
-                          child: SingleChildScrollView(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                // Proje görüntüsü
-                                Container(
-                                  height: 180,
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xFF1A1A1A),
-                                    borderRadius: BorderRadius.circular(8),
-                                    border: Border.all(
-                                      color: Colors.white.withOpacity(0.1),
-                                      width: 1,
-                                    ),
-                                  ),
-                                  child: Center(
-                                    child: Icon(
-                                      Icons.insert_photo,
-                                      size: 48,
-                                      color: Colors.white.withOpacity(0.5),
-                                    ),
-                                  ),
-                                ),
+                        const SizedBox(width: 12),
 
-                                const SizedBox(height: 16),
-
-                                // Proje bilgileri
-                                _buildProjectDetail(
-                                  title: 'Description:',
-                                  content: widget.project['description'] ?? '',
-                                ),
-
-                                const SizedBox(height: 12),
-
-                                // Kullanılan teknolojiler
-                                _buildProjectDetail(
-                                  title: 'Technologies:',
-                                  content: widget.project['technologies'] ?? '',
-                                ),
-
-                                const SizedBox(height: 16),
-
-                                // Proje linki
-                                if (widget.project['link'] != null)
-                                  Center(
-                                    child: ElevatedButton.icon(
-                                      icon: const Icon(Icons.link),
-                                      label: const Text('Visit Project'),
-                                      style: ElevatedButton.styleFrom(
-                                        foregroundColor: Colors.white,
-                                        backgroundColor: const Color(
-                                          0xFF007AFF,
-                                        ),
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 16,
-                                          vertical: 10,
-                                        ),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(
-                                            8,
-                                          ),
-                                        ),
-                                      ),
-                                      onPressed: () {},
-                                    ),
-                                  ),
-                              ],
+                        // Window title
+                        Expanded(
+                          child: Text(
+                            project.title,
+                            style: const TextStyle(
+                              color: Colors.white70,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
                             ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
-              ),
+
+                // Window content
+                Expanded(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF282C34),
+                      borderRadius: const BorderRadius.only(
+                        bottomLeft: Radius.circular(8),
+                        bottomRight: Radius.circular(8),
+                      ),
+                    ),
+                    child: SingleChildScrollView(
+                      padding: const EdgeInsets.all(16),
+                      child: _buildProjectDetail(),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
-        );
-      },
+        ],
+      ),
     );
   }
 
-  Widget _buildProjectDetail({required String title, required String content}) {
+  Widget _buildProjectDetail() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          title,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 14,
-            fontWeight: FontWeight.bold,
+        // Project image
+        if (project.imageUrl.isNotEmpty)
+          Container(
+            height: 160,
+            width: double.infinity,
+            margin: const EdgeInsets.only(bottom: 16),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8),
+              color: Colors.grey[800],
+              image: DecorationImage(
+                image: NetworkImage(project.imageUrl),
+                fit: BoxFit.cover,
+              ),
+            ),
           ),
-        ),
-        const SizedBox(height: 4),
+
+        // Project description
         Text(
-          content,
-          style: TextStyle(
-            color: Colors.white.withOpacity(0.7),
-            fontSize: 13,
+          project.description,
+          style: const TextStyle(
+            color: Colors.white70,
+            fontSize: 14,
             height: 1.5,
           ),
         ),
+
+        const SizedBox(height: 16),
+
+        // Technologies used
+        if (project.technologies.isNotEmpty) ...[
+          const Text(
+            'Technologies',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children:
+                project.technologies
+                    .map(
+                      (tech) => Chip(
+                        backgroundColor: const Color(0xFF3A3D41),
+                        label: Text(
+                          tech,
+                          style: const TextStyle(
+                            color: Colors.white70,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ),
+                    )
+                    .toList(),
+          ),
+          const SizedBox(height: 16),
+        ],
+
+        // Project link
+        if (project.url.isNotEmpty)
+          ElevatedButton.icon(
+            onPressed: onOpenLink,
+            icon: const Icon(Icons.open_in_new),
+            label: const Text('Open Project'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.blue,
+              foregroundColor: Colors.white,
+              textStyle: const TextStyle(fontSize: 14),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            ),
+          ),
       ],
     );
   }
 }
 
-// Parlayan metin
-class ShimmeringText extends StatefulWidget {
-  final String text;
-  final Color baseColor;
-  final Color highlightColor;
-  final TextStyle style;
+class ProjectWindowModel {
+  final String id;
+  final String title;
+  final String description;
+  final List<String> technologies;
+  final String imageUrl;
+  final String url;
+  Offset windowPosition;
+  final Size windowSize;
+  bool isOpen;
+  bool isMinimized;
+  int zIndex;
 
-  const ShimmeringText({
-    Key? key,
-    required this.text,
-    required this.baseColor,
-    required this.highlightColor,
-    required this.style,
-  }) : super(key: key);
-
-  @override
-  State<ShimmeringText> createState() => _ShimmeringTextState();
-}
-
-class _ShimmeringTextState extends State<ShimmeringText>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _shimmerController;
-
-  @override
-  void initState() {
-    super.initState();
-    _shimmerController = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 2),
-    )..repeat();
-  }
-
-  @override
-  void dispose() {
-    _shimmerController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _shimmerController,
-      builder: (context, child) {
-        return ShaderMask(
-          blendMode: BlendMode.srcIn,
-          shaderCallback: (bounds) {
-            return LinearGradient(
-              colors: [
-                widget.baseColor,
-                widget.highlightColor,
-                widget.baseColor,
-              ],
-              stops: const [0.0, 0.5, 1.0],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              transform: _SlidingGradientTransform(
-                slidePercent: _shimmerController.value,
-              ),
-            ).createShader(bounds);
-          },
-          child: Text(widget.text, style: widget.style),
-        );
-      },
-    );
-  }
-}
-
-// Shader transformasyonu
-class _SlidingGradientTransform extends GradientTransform {
-  final double slidePercent;
-
-  const _SlidingGradientTransform({required this.slidePercent});
-
-  @override
-  Matrix4? transform(Rect bounds, {TextDirection? textDirection}) {
-    return Matrix4.translationValues(
-      bounds.width * (slidePercent * 3 - 1.0),
-      0.0,
-      0.0,
-    );
-  }
-}
-
-class Timer {
-  final Duration duration;
-  final VoidCallback callback;
-
-  Timer(this.duration, this.callback);
-
-  void cancel() {}
+  ProjectWindowModel({
+    required this.id,
+    required this.title,
+    required this.description,
+    required this.technologies,
+    required this.imageUrl,
+    required this.url,
+    required this.windowPosition,
+    required this.windowSize,
+    required this.isOpen,
+    required this.isMinimized,
+    required this.zIndex,
+  });
 }

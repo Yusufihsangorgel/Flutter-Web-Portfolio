@@ -221,5 +221,63 @@
     "name": "हिन्दी",
     "flag": "🇮🇳",
     "direction": "ltr"
+  },
+  "terminal": {
+    "title": "टर्मिनल",
+    "welcome_title": "युसुफ इहसान गोरगेल - टर्मिनल",
+    "welcome_text": "स्वागत है! उपलब्ध कमांड देखने के लिए 'help' टाइप करें।",
+    "help_hint": "सुझाव: उपलब्ध कमांड देखने के लिए 'help' टाइप करें",
+    "greeting": "टर्मिनल",
+    "type_help": "उपलब्ध कमांड देखने के लिए 'help' टाइप करें।",
+    "help_title": "उपलब्ध कमांड:",
+    "cleared": "टर्मिनल साफ़ किया गया...",
+    "command_not_found": "'%s' कमांड नहीं मिला। उपलब्ध कमांड देखने के लिए 'help' टाइप करें।",
+    "prefix": "> ",
+    "type_command": "एक कमांड टाइप करें...",
+    "url": {
+      "success": "लिंक ब्राउज़र में खुल रहा है...",
+      "error": "लिंक नहीं खुल सका",
+      "error_with_details": "लिंक खोलने में त्रुटि हुई"
+    },
+    "download_cv_start": "सीवी डाउनलोड शुरू हो रहा है...",
+    "download_cv_success": "सीवी डाउनलोड आपके ब्राउज़र में शुरू हो गया है।",
+    "download_cv_error": "सीवी डाउनलोड करने में त्रुटि हुई। कृपया बाद में पुनः प्रयास करें।",
+    "commands": {
+      "help": "उपलब्ध कमांड दिखाता है",
+      "about": "मेरी व्यक्तिगत जानकारी दिखाता है",
+      "skills": "मेरे तकनीकी कौशल दिखाता है",
+      "experience": "मेरा कार्य अनुभव दिखाता है",
+      "education": "मेरी शैक्षिक पृष्ठभूमि दिखाता है",
+      "projects": "मेरे पूर्ण किए गए प्रोजेक्ट्स दिखाता है",
+      "contact": "मेरी संपर्क जानकारी दिखाता है",
+      "social": "मेरे सोशल मीडिया अकाउंट्स दिखाता है",
+      "download_cv": "मेरा रेज्यूमे डाउनलोड करता है",
+      "clear": "टर्मिनल स्क्रीन साफ़ करता है",
+      "help_cmd": "help",
+      "about_cmd": "about",
+      "skills_cmd": "skills",
+      "experience_cmd": "experience",
+      "education_cmd": "education",
+      "projects_cmd": "projects",
+      "contact_cmd": "contact",
+      "social_cmd": "social",
+      "download_cv_cmd": "download-cv",
+      "clear_cmd": "clear"
+    },
+    "projects": {
+      "title": "मेरी परियोजनाएँ",
+      "untitled": "अनामांकित प्रोजेक्ट",
+      "not_found": "कोई प्रोजेक्ट नहीं मिला।"
+    },
+    "contact": {
+      "email": "ईमेल",
+      "phone": "फोन",
+      "location": "स्थान"
+    },
+    "social": {
+      "github": "GitHub",
+      "linkedin": "LinkedIn",
+      "twitter": "Twitter"
+    }
   }
 }

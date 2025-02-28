@@ -25,7 +25,6 @@
       { "id": "experience", "title": "Experience" },
       { "id": "projects", "title": "Projects" },
       { "id": "skills", "title": "Skills" },
-      { "id": "references", "title": "References" },
       { "id": "contact", "title": "Contact" }
     ]
   },
@@ -36,7 +35,6 @@
     "experience": "Experience",
     "projects": "Projects",
     "skills": "Skills",
-    "references": "References",
     "contact": "Contact",
     "explore_more": "Explore More",
     "dark_mode": "Dark Mode",
@@ -59,7 +57,7 @@
     "subject": "Subject",
     "portfolio_loading": "Portfolio Loading...",
     "error_name": "Please enter your name",
-    "error_email": "Please enter a valid email address",
+    "error_email": "Please enter a valid email",
     "error_subject": "Please enter a subject",
     "error_message": "Please enter your message"
   },
@@ -167,26 +165,6 @@
         "items": ["AWS"]
       }
     ],
-    "references": [
-      {
-        "name": "Abdüsselam Kösecik",
-        "title": "Arge Team Lead",
-        "phone": "+90 542 819 80 69",
-        "linkedin": "https://www.linkedin.com/in/abdusselam-k%C3%B6secik-ab209327/"
-      },
-      {
-        "name": "Ferhat Balaban",
-        "title": "Senior Computer Engineer",
-        "phone": "+90 542 350 50 95",
-        "linkedin": "https://www.linkedin.com/in/balabanferhat/"
-      },
-      {
-        "name": "Emrah Türk",
-        "title": "Senior Software Developer",
-        "phone": "+90 551 956 03 91",
-        "linkedin": "https://www.linkedin.com/in/emrah-t%C3%BCrk/"
-      }
-    ],
     "languages": [
       {
         "name": "Turkish",
@@ -219,21 +197,58 @@
     "welcome_title": "Yusuf İhsan Görgel - Terminal",
     "welcome_text": "Welcome! Type 'help' to see available commands.",
     "help_hint": "Tip: Type 'help' to see available commands",
-    "commands": {
-      "help": "Help - displays available commands",
-      "about": "About - shows personal information",
-      "skills": "Skills - displays technical skills",
-      "experience": "Experience - shows work experience",
-      "education": "Education - shows educational background",
-      "projects": "Projects - shows completed projects",
-      "contact": "Contact - shows contact information",
-      "social": "Social - displays social media accounts",
-      "download-cv": "Download CV - downloads my resume",
-      "clear": "Clear - clears the terminal screen"
-    },
+    "greeting": "Terminal",
+    "type_help": "Type 'help' to see available commands",
+    "help_title": "Available Commands:",
+    "cleared": "Terminal cleared...",
     "command_not_found": "Command '%s' not found. Type 'help' to see available commands.",
     "prefix": "> ",
-    "type_command": "Type a command..."
+    "type_command": "Type a command...",
+    "url": {
+      "success": "Opening link in browser...",
+      "error": "Could not launch link",
+      "error_with_details": "Error launching URL"
+    },
+    "download_cv_start": "Initiating CV download...",
+    "download_cv_success": "CV download started in your browser.",
+    "download_cv_error": "Error downloading CV. Please try again later.",
+    "commands": {
+      "help": "displays available commands",
+      "about": "shows personal information",
+      "skills": "displays technical skills",
+      "experience": "shows work experience",
+      "education": "shows educational background",
+      "projects": "shows completed projects",
+      "contact": "shows contact information",
+      "social": "displays social media accounts",
+      "download_cv": "downloads my resume",
+      "clear": "clears the terminal screen",
+      "help_cmd": "help",
+      "about_cmd": "about",
+      "skills_cmd": "skills",
+      "experience_cmd": "experience",
+      "education_cmd": "education",
+      "projects_cmd": "projects",
+      "contact_cmd": "contact",
+      "social_cmd": "social",
+      "download_cv_cmd": "download-cv",
+      "clear_cmd": "clear"
+    },
+    "projects": {
+      "title": "MY PROJECTS",
+      "untitled": "Untitled Project",
+      "not_found": "No projects found."
+    },
+    "contact": {
+      "email": "Email",
+      "phone": "Phone",
+      "location": "Location"
+    },
+    "social": {
+      "github": "GitHub",
+      "linkedin": "LinkedIn",
+      "twitter": "Twitter"
+    }
   },
   "about_section": {
     "title": "About Me"

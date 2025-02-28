@@ -6,6 +6,7 @@ import 'package:flutter_web_portfolio/app/controllers/language_controller.dart';
 import 'package:flutter_web_portfolio/app/controllers/theme_controller.dart';
 import 'package:flutter_web_portfolio/app/widgets/mouse_effects.dart';
 import 'package:flutter_web_portfolio/app/controllers/shared_background_controller.dart';
+import 'package:flutter_web_portfolio/app/widgets/section_title.dart';
 
 class ContactSection extends StatefulWidget {
   const ContactSection({Key? key}) : super(key: key);
@@ -124,22 +125,16 @@ class _ContactSectionState extends State<ContactSection> {
         constraints: BoxConstraints(
           minHeight: MediaQuery.of(context).size.height - 80,
         ),
+        // NOT: Burada herhangi bir arkaplan rengi veya gradient olmayacak
+        // Cosmic Background sayesinde arka plan otomatik olarak sağlanacak
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Başlık
-            FadeInDown(
-              duration: const Duration(milliseconds: 600),
-              child: Obx(() {
-                final isEnglish = languageController.currentLanguage == 'en';
-                return ShimmeringText(
-                  text: isEnglish ? 'Contact Me' : 'İletişim',
-                  baseColor: Colors.white,
-                  highlightColor: themeController.primaryColor,
-                  style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
-                );
-              }),
-            ),
+            Obx(() {
+              final isEnglish = languageController.currentLanguage == 'en';
+              return SectionTitle(title: isEnglish ? 'Contact Me' : 'İletişim');
+            }),
 
             const SizedBox(height: 40),
 

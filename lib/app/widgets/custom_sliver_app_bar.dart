@@ -1,20 +1,18 @@
 import 'package:flutter/material.dart';
+import 'dart:ui';
 import 'package:get/get.dart';
 import 'package:flutter_web_portfolio/app/controllers/language_controller.dart';
-import 'package:flutter_web_portfolio/app/controllers/theme_controller.dart';
 import 'package:flutter_web_portfolio/app/controllers/scroll_controller.dart';
 
 /// Özel SliverAppBar widget'ı
 class CustomSliverAppBar extends StatelessWidget {
   final LanguageController languageController;
-  final ThemeController themeController;
   final AppScrollController scrollController;
   final List<Widget>? actions;
 
   const CustomSliverAppBar({
     super.key,
     required this.languageController,
-    required this.themeController,
     required this.scrollController,
     this.actions,
   });
@@ -25,109 +23,100 @@ class CustomSliverAppBar extends StatelessWidget {
     final bool isMobile = screenWidth < 800;
 
     return SliverAppBar(
-      floating: true,
+      floating: false,
       pinned: true,
       snap: false,
-      backgroundColor: Colors.transparent, // Şeffaf arka plan
-      elevation: 0, // Gölge yok
+      backgroundColor: Colors.transparent, // Tamamen şeffaf
+      elevation: 0,
       centerTitle: false,
-      expandedHeight: 80,
+      expandedHeight: 0,
       toolbarHeight: 80,
-      title: Padding(
-        padding: const EdgeInsets.only(left: 16.0),
-        child: _buildLogo(),
-      ),
-      actions: actions,
-    );
-  }
-
-  // Logo widget'ı
-  Widget _buildLogo() {
-    return Text(
-      'Yusuf.',
-      style: TextStyle(
-        color: Colors.white,
-        fontWeight: FontWeight.bold,
-        fontSize: 24,
-      ),
+      // Arka plan filtresini kaldır
+      flexibleSpace: Container(color: Colors.transparent),
+      title: const SizedBox.shrink(), // Başlık kısmını boş bırak
+      actions:
+          isMobile
+              ? [
+                // Mobil modda hamburger menü
+                IconButton(
+                  icon: const Icon(Icons.menu, color: Colors.white),
+                  onPressed: () => _showMobileMenu(context),
+                ),
+                // Sağdaki aksiyonlar
+                if (actions != null) ...actions!,
+              ]
+              : null,
+      bottom:
+          isMobile
+              ? null
+              : PreferredSize(
+                preferredSize: const Size.fromHeight(0),
+                child: Container(
+                  padding: const EdgeInsets.only(right: 16.0),
+                  alignment: Alignment.centerRight,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Flexible(child: _buildDesktopNavItems(context)),
+                      // Sağdaki aksiyonlar
+                      if (actions != null) ...actions!,
+                    ],
+                  ),
+                ),
+              ),
     );
   }
 
   // Masaüstü navigasyon öğeleri
   Widget _buildDesktopNavItems(BuildContext context) {
-    return Expanded(
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          _buildNavItem('Home', 'home'),
-          _buildNavItem('About', 'about'),
-          _buildNavItem('Experience', 'experience'),
-          _buildNavItem('Projects', 'projects'),
-          _buildNavItem('Skills', 'skills'),
-          _buildNavItem('References', 'references'),
-          _buildNavItem('Contact', 'contact'),
-          const SizedBox(width: 24),
-        ],
-      ),
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: [
+        _buildNavItem(context, 'home'),
+        _buildNavItem(context, 'about'),
+        _buildNavItem(context, 'skills'),
+        _buildNavItem(context, 'experience'),
+        _buildNavItem(context, 'projects'),
+        _buildNavItem(context, 'contact'),
+        const SizedBox(width: 24),
+      ],
     );
   }
 
-  // Tekil navigasyon öğesi
-  Widget _buildNavItem(String title, String sectionId) {
-    return Obx(() {
-      final isActive = scrollController.activeSection.value == sectionId;
+  // Tekil navigasyon öğesi - seçili olma özelliği kaldırıldı
+  Widget _buildNavItem(BuildContext context, String sectionId) {
+    final title = languageController.getText(
+      'nav.$sectionId',
+      defaultValue: sectionId.capitalize ?? sectionId,
+    );
 
-      return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12.0),
-        child: Material(
-          color: Colors.transparent,
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 6.0),
+      child: Material(
+        color: Colors.transparent,
+        borderRadius: BorderRadius.circular(6),
+        child: InkWell(
           borderRadius: BorderRadius.circular(6),
-          child: InkWell(
-            borderRadius: BorderRadius.circular(6),
-            hoverColor: themeController.primaryColor.withOpacity(0.1),
-            splashColor: themeController.primaryColor.withOpacity(0.2),
-            onTap: () {
-              // Aktif bölümü HEMEN değiştir (UI yanıt versin)
-              scrollController.activeSection.value = sectionId;
-
-              // Hemen ardından bölüme kaydır
-              scrollController.scrollToSection(sectionId);
-            },
-            child: Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 8.0,
-                vertical: 8.0,
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    title,
-                    style: TextStyle(
-                      color:
-                          isActive
-                              ? themeController.primaryColor
-                              : Colors.white,
-                      fontWeight: isActive ? FontWeight.w600 : FontWeight.w400,
-                      fontSize: 16,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  // Aktif indikatör
-                  AnimatedContainer(
-                    duration: const Duration(milliseconds: 200),
-                    height: 2,
-                    width: isActive ? 32 : 0,
-                    curve: Curves.easeInOut,
-                    color: themeController.primaryColor,
-                  ),
-                ],
+          hoverColor: Colors.purple.withOpacity(0.1),
+          splashColor: Colors.purple.withOpacity(0.2),
+          onTap: () {
+            // AppScrollController'ın kendi scrollToSection metodunu kullan
+            scrollController.scrollToSection(sectionId);
+          },
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
+            child: Text(
+              title,
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w400,
+                fontSize: 14,
               ),
             ),
           ),
         ),
-      );
-    });
+      ),
+    );
   }
 
   // Mobil menü
@@ -145,13 +134,12 @@ class CustomSliverAppBar extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              _buildMobileNavItem('Home', 'home'),
-              _buildMobileNavItem('About', 'about'),
-              _buildMobileNavItem('Experience', 'experience'),
-              _buildMobileNavItem('Projects', 'projects'),
-              _buildMobileNavItem('Skills', 'skills'),
-              _buildMobileNavItem('References', 'references'),
-              _buildMobileNavItem('Contact', 'contact'),
+              _buildMobileNavItem(context, 'home'),
+              _buildMobileNavItem(context, 'about'),
+              _buildMobileNavItem(context, 'skills'),
+              _buildMobileNavItem(context, 'experience'),
+              _buildMobileNavItem(context, 'projects'),
+              _buildMobileNavItem(context, 'contact'),
               const SizedBox(height: 16),
             ],
           ),
@@ -160,42 +148,33 @@ class CustomSliverAppBar extends StatelessWidget {
     );
   }
 
-  // Mobil navigasyon öğesi
-  Widget _buildMobileNavItem(String title, String sectionId) {
-    return Obx(() {
-      final isActive = scrollController.activeSection.value == sectionId;
+  // Mobil navigasyon öğesi - seçili olma özelliği kaldırıldı
+  Widget _buildMobileNavItem(BuildContext context, String sectionId) {
+    final title = languageController.getText(
+      'nav.$sectionId',
+      defaultValue: sectionId.capitalize ?? sectionId,
+    );
 
-      return ListTile(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 4),
-        title: Text(
-          title,
-          style: TextStyle(
-            color: isActive ? themeController.primaryColor : Colors.white,
-            fontWeight: isActive ? FontWeight.w600 : FontWeight.w400,
-            fontSize: 18,
-          ),
+    return ListTile(
+      contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 4),
+      title: Text(
+        title,
+        style: const TextStyle(
+          color: Colors.white,
+          fontWeight: FontWeight.w400,
+          fontSize: 18,
         ),
-        onTap: () {
-          // Önce menüyü kapat
-          Navigator.pop(Get.context!);
+      ),
+      onTap: () {
+        // Önce menüyü kapat
+        Navigator.pop(context);
 
-          // Aktif bölümü HEMEN değiştir (UI yanıt versin)
-          scrollController.activeSection.value = sectionId;
-
-          // Ardından bölüme kaydır
-          scrollController.scrollToSection(sectionId);
-        },
-        leading: Icon(
-          isActive ? Icons.arrow_right : Icons.circle,
-          color: isActive ? themeController.primaryColor : Colors.white54,
-          size: isActive ? 28 : 12,
-        ),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-        tileColor:
-            isActive
-                ? themeController.primaryColor.withOpacity(0.1)
-                : Colors.transparent,
-      );
-    });
+        // AppScrollController kullan
+        scrollController.scrollToSection(sectionId);
+      },
+      leading: const Icon(Icons.circle, color: Colors.white54, size: 12),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      tileColor: Colors.transparent,
+    );
   }
 }

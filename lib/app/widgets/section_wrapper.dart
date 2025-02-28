@@ -15,6 +15,7 @@ class SectionWrapper extends StatefulWidget {
   final Color? backgroundColor;
   final bool useHoverLight;
   final EdgeInsetsGeometry padding;
+  final bool noBackground;
 
   const SectionWrapper({
     Key? key,
@@ -23,7 +24,8 @@ class SectionWrapper extends StatefulWidget {
     required this.sectionId,
     this.backgroundColor,
     this.useHoverLight = true,
-    this.padding = const EdgeInsets.symmetric(vertical: 80, horizontal: 24),
+    this.padding = const EdgeInsets.symmetric(vertical: 40, horizontal: 24),
+    this.noBackground = false,
   }) : super(key: key);
 
   @override
@@ -32,43 +34,95 @@ class SectionWrapper extends StatefulWidget {
 
 class _SectionWrapperState extends State<SectionWrapper>
     with SingleTickerProviderStateMixin {
+  // Hover durumunu izlemek için
+  bool _isHovered = false;
+
   @override
   void initState() {
     super.initState();
     // İlk bölüm için SharedBackgroundController'ı başlat
-    SharedBackgroundController.init(this);
+    if (!SharedBackgroundController.isInitialized) {
+      SharedBackgroundController.init(this);
+    }
+  }
+
+  // Fare pozisyonunu güncelle
+  void _updateMousePosition(PointerEvent event) {
+    SharedBackgroundController.updateMousePosition(event.localPosition);
   }
 
   @override
   Widget build(BuildContext context) {
     final themeController = Get.find<ThemeController>();
     final screenHeight = MediaQuery.of(context).size.height;
-    final screenWidth = MediaQuery.of(context).size.width;
 
     // Temel container
     return MouseRegion(
       onHover: (event) {
-        SharedBackgroundController.updateMousePosition(event.localPosition);
+        _updateMousePosition(event);
+        if (!_isHovered) {
+          setState(() {
+            _isHovered = true;
+          });
+        }
+      },
+      onExit: (_) {
+        if (_isHovered) {
+          setState(() {
+            _isHovered = false;
+          });
+        }
       },
       child: Container(
         key: widget.sectionKey,
+        // Section'lar arasında kesinlikle boşluk olmaması için margin yok
+        margin: EdgeInsets.zero,
         constraints: BoxConstraints(
-          minHeight: screenHeight - 80, // AppBar yüksekliği çıkarılmış
+          minHeight:
+              widget.sectionId == 'home'
+                  ? screenHeight - 80
+                  : (widget.sectionId == 'about'
+                      ? screenHeight -
+                          80 // About section için de aynı yükseklik
+                      : screenHeight * 0.7),
         ),
+        // Arkaplan tamamen şeffaf olmalı
+        color: Colors.transparent,
         child: Stack(
           children: [
-            // Kozmik arka plan - artık ortak controller kullanıyor
-            Positioned.fill(
-              child: CosmicBackground(
-                animationController:
-                    SharedBackgroundController.animationController,
-                scrollController: null,
-                pageHeight: screenHeight,
+            // Hover efekti - Çok hafif ve şeffaf (noBackground true ise gizlenir)
+            if (!widget.noBackground)
+              AnimatedOpacity(
+                opacity: _isHovered ? 0.5 : 0.0, // Opaklığı azalttık
+                duration: const Duration(milliseconds: 600),
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: RadialGradient(
+                      center: Alignment.center,
+                      radius: 1.0,
+                      colors: [
+                        themeController.primaryColor.withOpacity(0.05),
+                        Colors.transparent,
+                      ],
+                    ),
+                  ),
+                ),
               ),
-            ),
 
-            // İçerik
-            Padding(padding: widget.padding, child: widget.child),
+            // İçerik - Home ve About için daha sıkı padding ve geçiş
+            Padding(
+              padding:
+                  widget.sectionId == 'home'
+                      ? const EdgeInsets.only(
+                        bottom: 0,
+                      ) // Home section için alt padding 0
+                      : (widget.sectionId == 'about'
+                          ? const EdgeInsets.only(
+                            top: 0,
+                          ) // About section için üst padding 0
+                          : widget.padding),
+              child: widget.child,
+            ),
           ],
         ),
       ),
