@@ -56,19 +56,33 @@ class _ProjectsSectionState extends State<ProjectsSection>
 
     _projects.clear();
 
+    if (projectsData.isEmpty) {
+      debugPrint('Uyarı: Proje verileri boş');
+      return;
+    }
+
     for (var project in projectsData) {
+      final String title =
+          project['title'] ??
+          languageController.getText(
+            'projects_section.untitled_project',
+            defaultValue: 'Project',
+          );
+
+      final String description = project['description'] ?? '';
+      final List<String> technologies = _extractTechnologies(project);
+      final String imageUrl = project['image'] ?? '';
+      final String url = _extractUrl(project);
+
       _projects.add(
         ProjectWindowModel(
           id: project['id'] ?? UniqueKey().toString(),
-          title: project['title'] ?? 'Project',
-          description: project['description'] ?? '',
-          technologies: List<String>.from(project['technologies'] ?? []),
-          imageUrl: project['image'] ?? '',
-          url: _extractUrl(project),
-          windowPosition: Offset(
-            100 + (math.Random().nextDouble() * 100),
-            100 + (math.Random().nextDouble() * 100),
-          ),
+          title: title,
+          description: description,
+          technologies: technologies,
+          imageUrl: imageUrl,
+          url: url,
+          windowPosition: _generateRandomPosition(),
           windowSize: const Size(600, 400),
           isOpen: false,
           isMinimized: false,
@@ -78,11 +92,66 @@ class _ProjectsSectionState extends State<ProjectsSection>
     }
   }
 
+  // Proje için teknolojileri çıkarır
+  List<String> _extractTechnologies(Map<dynamic, dynamic> project) {
+    if (project.containsKey('technologies') &&
+        project['technologies'] is List) {
+      return List<String>.from(project['technologies']);
+    }
+
+    // Açıklamadan teknolojileri çıkarmaya çalış
+    if (project.containsKey('description') &&
+        project['description'] is String) {
+      final String desc = project['description'];
+      final List<String> possibleTechs = [];
+
+      // Yaygın teknolojileri kontrol et
+      final techKeywords = [
+        'Flutter',
+        'React',
+        'Node.js',
+        'JavaScript',
+        'TypeScript',
+        'HTML',
+        'CSS',
+        'MongoDB',
+        'Express',
+        'Firebase',
+        'AWS',
+        'REST',
+        'API',
+        'GetX',
+        'MVVM',
+        'SQLite',
+        'Drift',
+      ];
+
+      for (final tech in techKeywords) {
+        if (desc.contains(tech)) {
+          possibleTechs.add(tech);
+        }
+      }
+
+      return possibleTechs;
+    }
+
+    return [];
+  }
+
+  // Rastgele bir pencere pozisyonu oluşturur
+  Offset _generateRandomPosition() {
+    return Offset(
+      100 + (math.Random().nextDouble() * 100),
+      100 + (math.Random().nextDouble() * 100),
+    );
+  }
+
   String _extractUrl(Map<dynamic, dynamic> project) {
     if (project['url'] is String) {
       return project['url'] as String;
     } else if (project['url'] is Map) {
       final urls = project['url'] as Map;
+      // Öncelik sırası: website > google_play > app_store
       for (final key in ['website', 'google_play', 'app_store']) {
         if (urls.containsKey(key)) {
           return urls[key] as String;
@@ -221,11 +290,11 @@ class _ProjectsSectionState extends State<ProjectsSection>
             SectionTitle(
               title: languageController.getText(
                 'projects_section.title',
-                defaultValue: 'Projects',
+                defaultValue: 'My Projects',
               ),
               subtitle: languageController.getText(
                 'projects_section.description',
-                defaultValue: 'Take a look at some of my projects.',
+                defaultValue: 'Major projects and works I\'ve completed',
               ),
             ),
 
@@ -324,6 +393,7 @@ class _ProjectsSectionState extends State<ProjectsSection>
                                       onOpenLink:
                                           () => _launchProjectUrl(project.url),
                                       zIndex: project.zIndex,
+                                      languageController: languageController,
                                     ),
                                   ),
                                 );
@@ -541,6 +611,7 @@ class ProjectWindow extends StatelessWidget {
   final VoidCallback onTap;
   final VoidCallback onOpenLink;
   final int zIndex;
+  final LanguageController languageController;
 
   const ProjectWindow({
     Key? key,
@@ -551,6 +622,7 @@ class ProjectWindow extends StatelessWidget {
     required this.onTap,
     required this.onOpenLink,
     required this.zIndex,
+    required this.languageController,
   }) : super(key: key);
 
   @override
@@ -722,9 +794,12 @@ class ProjectWindow extends StatelessWidget {
 
         // Technologies used
         if (project.technologies.isNotEmpty) ...[
-          const Text(
-            'Technologies',
-            style: TextStyle(
+          Text(
+            languageController.getText(
+              'projects_section.technologies',
+              defaultValue: 'Technologies',
+            ),
+            style: const TextStyle(
               color: Colors.white,
               fontSize: 16,
               fontWeight: FontWeight.bold,
@@ -758,7 +833,12 @@ class ProjectWindow extends StatelessWidget {
           ElevatedButton.icon(
             onPressed: onOpenLink,
             icon: const Icon(Icons.open_in_new),
-            label: const Text('Open Project'),
+            label: Text(
+              languageController.getText(
+                'projects_section.open_project',
+                defaultValue: 'Open Project',
+              ),
+            ),
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.blue,
               foregroundColor: Colors.white,

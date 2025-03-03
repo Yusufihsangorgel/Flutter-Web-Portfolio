@@ -38,13 +38,13 @@ class _SkillsSectionState extends State<SkillsSection> {
           // Başlık
           Padding(
             padding: const EdgeInsets.only(top: 60, bottom: 30),
-            child: Obx(() {
-              final isEnglish = languageController.currentLanguage == 'en';
-              return SectionTitle(
-                title: isEnglish ? 'Skills' : 'Beceriler',
-                alignment: CrossAxisAlignment.center,
-              );
-            }),
+            child: SectionTitle(
+              title: languageController.getText(
+                'skills_section.title',
+                defaultValue: 'Beceriler',
+              ),
+              alignment: CrossAxisAlignment.center,
+            ),
           ),
 
           // Galaksi görünümü
@@ -138,9 +138,24 @@ class _GalaxyViewState extends State<GalaxyView> {
       };
 
       // JSON'dan verileri al
+      if (widget.skillCategories.isEmpty) {
+        debugPrint('Uyarı: Beceri kategorileri boş');
+        return _getFallbackSkills();
+      }
+
       for (final skillCategory in widget.skillCategories) {
         final String category = skillCategory['category'] ?? '';
         final List<dynamic> items = skillCategory['items'] ?? [];
+
+        if (category.isEmpty) {
+          debugPrint('Uyarı: Kategori adı boş');
+          continue;
+        }
+
+        if (items.isEmpty) {
+          debugPrint('Uyarı: "$category" kategorisinde beceri yok');
+          continue;
+        }
 
         // Her kategoriden en fazla 4 beceri al (galaksi görünümünü aşırı doldurmamak için)
         final int maxItemsPerCategory = 4;
@@ -164,50 +179,62 @@ class _GalaxyViewState extends State<GalaxyView> {
         mainSkills.shuffle(); // Rastgele bir seçim yap
         return mainSkills.sublist(0, 12);
       }
-    } catch (e) {
-      debugPrint('Error extracting skills: $e');
-      // Hata durumunda fallback olarak sabit becerileri göster
-      return [
-        {
-          "name": "Flutter",
-          "category": "Mobile",
-          "color": Colors.blue[400]!,
-          "orbit": 0,
-        },
-        {
-          "name": "React",
-          "category": "Frontend",
-          "color": Colors.orange[400]!,
-          "orbit": 1,
-        },
-        {
-          "name": "Node.js",
-          "category": "Backend",
-          "color": Colors.green[500]!,
-          "orbit": 2,
-        },
-        {
-          "name": "JavaScript",
-          "category": "Frontend",
-          "color": Colors.orange[400]!,
-          "orbit": 0,
-        },
-        {
-          "name": "HTML",
-          "category": "Frontend",
-          "color": Colors.orange[400]!,
-          "orbit": 1,
-        },
-        {
-          "name": "CSS",
-          "category": "Frontend",
-          "color": Colors.orange[400]!,
-          "orbit": 2,
-        },
-      ];
-    }
 
-    return mainSkills;
+      // Eğer hiç beceri bulunamadıysa varsayılan becerileri göster
+      if (mainSkills.isEmpty) {
+        debugPrint(
+          'Uyarı: Hiç beceri bulunamadı, varsayılan beceriler gösteriliyor',
+        );
+        return _getFallbackSkills();
+      }
+
+      return mainSkills;
+    } catch (e) {
+      debugPrint('Hata: Beceriler yüklenirken hata oluştu: $e');
+      return _getFallbackSkills();
+    }
+  }
+
+  // Varsayılan beceriler - JSON verisi yüklenemediğinde kullanılır
+  List<Map<String, dynamic>> _getFallbackSkills() {
+    return [
+      {
+        "name": "Flutter",
+        "category": "Mobile",
+        "color": Colors.blue[400]!,
+        "orbit": 0,
+      },
+      {
+        "name": "React",
+        "category": "Frontend",
+        "color": Colors.orange[400]!,
+        "orbit": 1,
+      },
+      {
+        "name": "Node.js",
+        "category": "Backend",
+        "color": Colors.green[500]!,
+        "orbit": 2,
+      },
+      {
+        "name": "JavaScript",
+        "category": "Frontend",
+        "color": Colors.orange[400]!,
+        "orbit": 0,
+      },
+      {
+        "name": "HTML",
+        "category": "Frontend",
+        "color": Colors.orange[400]!,
+        "orbit": 1,
+      },
+      {
+        "name": "CSS",
+        "category": "Frontend",
+        "color": Colors.orange[400]!,
+        "orbit": 2,
+      },
+    ];
   }
 
   @override

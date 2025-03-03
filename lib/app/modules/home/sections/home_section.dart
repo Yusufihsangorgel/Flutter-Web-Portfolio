@@ -6,6 +6,7 @@ import 'package:flutter_web_portfolio/app/controllers/language_controller.dart';
 import 'package:flutter_web_portfolio/app/controllers/theme_controller.dart';
 import 'package:flutter_web_portfolio/app/controllers/scroll_controller.dart';
 import 'package:flutter_web_portfolio/app/widgets/mouse_effects.dart';
+import 'package:flutter_web_portfolio/app/utils/responsive_utils.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 /// Ana sayfa karşılama bölümü
@@ -19,15 +20,52 @@ class HomeSection extends StatelessWidget {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
 
+    // AppBar yüksekliği (responsive)
+    final appBarHeight = ResponsiveUtils.getValueForScreenType<double>(
+      context: context,
+      mobile: 60,
+      tablet: 70,
+      desktop: 80,
+    );
+
+    // Responsive padding değerleri
+    final horizontalPadding = ResponsiveUtils.getValueForScreenType<double>(
+      context: context,
+      mobile: 20,
+      tablet: 40,
+      desktop: 80,
+      largeDesktop: 100,
+    );
+
+    // Responsive yazı boyutları
+    final titleFontSize = ResponsiveUtils.getValueForScreenType<double>(
+      context: context,
+      mobile: 32,
+      tablet: 40,
+      desktop: 50,
+      largeDesktop: 60,
+    );
+
+    final subtitleFontSize = ResponsiveUtils.getValueForScreenType<double>(
+      context: context,
+      mobile: 18,
+      tablet: 20,
+      desktop: 22,
+      largeDesktop: 24,
+    );
+
+    // Butonların yatay/dikey olarak düzenlenmesi
+    final isVerticalLayout = ResponsiveUtils.isMobile(context);
+
     return Container(
       width: double.infinity,
       // Tam ekran yüksekliği, alt kısımda herhangi bir boşluk kalmaması için
-      height: screenHeight - 80, // AppBar yüksekliği çıkarıldı
+      height: screenHeight - appBarHeight, // AppBar yüksekliği çıkarıldı
       // Minimum yükseklik kısıtlamasını kaldırıyoruz, böylece tam ekran yüksekliğini alacak
-      constraints: BoxConstraints(maxHeight: screenHeight - 80),
+      constraints: BoxConstraints(maxHeight: screenHeight - appBarHeight),
       // Tamamen şeffaf
       child: Container(
-        padding: EdgeInsets.symmetric(horizontal: screenWidth > 800 ? 100 : 30),
+        padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -51,22 +89,25 @@ class HomeSection extends StatelessWidget {
                     width: 2,
                   ),
                 ),
-                child: Obx(() {
-                  final isEnglish = languageController.currentLanguage == 'en';
-                  return Text(
-                    isEnglish
-                        ? 'Welcome to my portfolio'
-                        : 'Portfolyoma hoş geldiniz',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                      color:
-                          themeController.isDarkMode
-                              ? Colors.white70
-                              : Colors.black87,
+                child: Text(
+                  languageController.getText(
+                    'home_section.welcome',
+                    defaultValue: 'Portfolyoma hoş geldiniz',
+                  ),
+                  style: TextStyle(
+                    fontSize: ResponsiveUtils.getValueForScreenType<double>(
+                      context: context,
+                      mobile: 14,
+                      tablet: 15,
+                      desktop: 16,
                     ),
-                  );
-                }),
+                    fontWeight: FontWeight.w500,
+                    color:
+                        themeController.isDarkMode
+                            ? Colors.white70
+                            : Colors.black87,
+                  ),
+                ),
               ),
             ),
 
@@ -76,25 +117,23 @@ class HomeSection extends StatelessWidget {
             FadeInDown(
               delay: const Duration(milliseconds: 300),
               duration: const Duration(milliseconds: 800),
-              child: Obx(() {
-                final isEnglish = languageController.currentLanguage == 'en';
-                return Text(
-                  isEnglish
-                      ? 'I\'m Yusuf İhsan Görgel'
-                      : 'Ben Yusuf İhsan Görgel',
-                  style: TextStyle(
-                    fontSize: screenWidth > 600 ? 60 : 40,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                    shadows: [
-                      Shadow(
-                        color: themeController.primaryColor.withOpacity(0.5),
-                        blurRadius: 10,
-                      ),
-                    ],
-                  ),
-                );
-              }),
+              child: Text(
+                languageController.getText(
+                  'home_section.title',
+                  defaultValue: 'Ben Yusuf İhsan Görgel',
+                ),
+                style: TextStyle(
+                  fontSize: titleFontSize,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                  shadows: [
+                    Shadow(
+                      color: themeController.primaryColor.withOpacity(0.5),
+                      blurRadius: 10,
+                    ),
+                  ],
+                ),
+              ),
             ),
 
             const SizedBox(height: 16),
@@ -103,22 +142,20 @@ class HomeSection extends StatelessWidget {
             FadeInDown(
               delay: const Duration(milliseconds: 600),
               duration: const Duration(milliseconds: 800),
-              child: Obx(() {
-                final isEnglish = languageController.currentLanguage == 'en';
-                return Text(
-                  isEnglish
-                      ? 'Software Developer & UI/UX Designer'
-                      : 'Yazılım Geliştirici & UI/UX Tasarımcı',
-                  style: TextStyle(
-                    fontSize: screenWidth > 600 ? 24 : 20,
-                    fontWeight: FontWeight.w300,
-                    color:
-                        themeController.isDarkMode
-                            ? Colors.white70
-                            : Colors.black87,
-                  ),
-                );
-              }),
+              child: Text(
+                languageController.getText(
+                  'home_section.subtitle',
+                  defaultValue: 'Yazılım Geliştirici & UI/UX Tasarımcı',
+                ),
+                style: TextStyle(
+                  fontSize: subtitleFontSize,
+                  fontWeight: FontWeight.w300,
+                  color:
+                      themeController.isDarkMode
+                          ? Colors.white70
+                          : Colors.black87,
+                ),
+              ),
             ),
 
             const SizedBox(height: 40),
@@ -130,45 +167,94 @@ class HomeSection extends StatelessWidget {
               child: FadeInDown(
                 delay: const Duration(milliseconds: 900),
                 duration: const Duration(milliseconds: 800),
-                child: Row(
-                  children: [
-                    // CV indirme butonu
-                    _buildButton(
-                      context,
-                      icon: Icons.download_outlined,
-                      text: Obx(() {
-                        final isEnglish =
-                            languageController.currentLanguage == 'en';
-                        return Text(isEnglish ? 'Download CV' : 'CV İndir');
-                      }),
-                      onTap: () {
-                        _downloadCV();
-                      },
-                      isPrimary: true,
-                      themeController: themeController,
-                    ),
+                child:
+                    isVerticalLayout
+                        ? Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            // CV indirme butonu
+                            _buildButton(
+                              context,
+                              icon: Icons.download_outlined,
+                              text: Text(
+                                languageController.getText(
+                                  'home_section.download_cv',
+                                  defaultValue: 'CV İndir',
+                                ),
+                              ),
+                              onTap: () {
+                                _downloadCV();
+                              },
+                              isPrimary: true,
+                              themeController: themeController,
+                              isFullWidth: true,
+                            ),
 
-                    const SizedBox(width: 16),
+                            const SizedBox(height: 16),
 
-                    // İletişim butonu
-                    _buildButton(
-                      context,
-                      icon: Icons.mail_outline,
-                      text: Obx(() {
-                        final isEnglish =
-                            languageController.currentLanguage == 'en';
-                        return Text(isEnglish ? 'Contact' : 'İletişim');
-                      }),
-                      onTap: () {
-                        final scrollController =
-                            Get.find<AppScrollController>();
-                        scrollController.scrollToSection('contact');
-                      },
-                      isPrimary: false,
-                      themeController: themeController,
-                    ),
-                  ],
-                ),
+                            // İletişim butonu
+                            _buildButton(
+                              context,
+                              icon: Icons.mail_outline,
+                              text: Text(
+                                languageController.getText(
+                                  'home_section.contact',
+                                  defaultValue: 'İletişim',
+                                ),
+                              ),
+                              onTap: () {
+                                final scrollController =
+                                    Get.find<AppScrollController>();
+                                scrollController.scrollToSection('contact');
+                              },
+                              isPrimary: false,
+                              themeController: themeController,
+                              isFullWidth: true,
+                            ),
+                          ],
+                        )
+                        : Row(
+                          children: [
+                            // CV indirme butonu
+                            _buildButton(
+                              context,
+                              icon: Icons.download_outlined,
+                              text: Text(
+                                languageController.getText(
+                                  'home_section.download_cv',
+                                  defaultValue: 'CV İndir',
+                                ),
+                              ),
+                              onTap: () {
+                                _downloadCV();
+                              },
+                              isPrimary: true,
+                              themeController: themeController,
+                            ),
+
+                            const SizedBox(width: 16),
+
+                            // İletişim butonu
+                            _buildButton(
+                              context,
+                              icon: Icons.mail_outline,
+                              text: Text(
+                                languageController.getText(
+                                  'home_section.contact',
+                                  defaultValue: 'İletişim',
+                                ),
+                              ),
+                              onTap: () {
+                                final scrollController =
+                                    Get.find<AppScrollController>();
+                                scrollController.scrollToSection('contact');
+                              },
+                              isPrimary: false,
+                              themeController: themeController,
+                            ),
+                          ],
+                        ),
               ),
             ),
           ],
@@ -199,29 +285,57 @@ class HomeSection extends StatelessWidget {
     required VoidCallback onTap,
     required bool isPrimary,
     required ThemeController themeController,
+    bool isFullWidth = false,
   }) {
+    // Responsive buton boyutları
+    final horizontalPadding = ResponsiveUtils.getValueForScreenType<double>(
+      context: context,
+      mobile: 16,
+      tablet: 20,
+      desktop: 24,
+    );
+
+    final verticalPadding = ResponsiveUtils.getValueForScreenType<double>(
+      context: context,
+      mobile: 12,
+      tablet: 14,
+      desktop: 16,
+    );
+
     return MouseLight(
       lightColor: themeController.primaryColor,
       lightSize: 150,
       intensity: 0.2,
-      child: ElevatedButton.icon(
-        onPressed: onTap,
-        icon: Icon(
-          icon,
-          color: isPrimary ? Colors.white : themeController.primaryColor,
-        ),
-        label: text,
-        style: ElevatedButton.styleFrom(
-          foregroundColor:
-              isPrimary ? Colors.white : themeController.primaryColor,
-          backgroundColor:
-              isPrimary ? themeController.primaryColor : Colors.transparent,
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(30),
-            side: BorderSide(color: themeController.primaryColor, width: 2),
+      child: SizedBox(
+        width: isFullWidth ? double.infinity : null,
+        child: ElevatedButton.icon(
+          onPressed: onTap,
+          icon: Icon(
+            icon,
+            color: isPrimary ? Colors.white : themeController.primaryColor,
+            size: ResponsiveUtils.getValueForScreenType<double>(
+              context: context,
+              mobile: 18,
+              tablet: 20,
+              desktop: 24,
+            ),
           ),
-          elevation: 0,
+          label: text,
+          style: ElevatedButton.styleFrom(
+            foregroundColor:
+                isPrimary ? Colors.white : themeController.primaryColor,
+            backgroundColor:
+                isPrimary ? themeController.primaryColor : Colors.transparent,
+            padding: EdgeInsets.symmetric(
+              horizontal: horizontalPadding,
+              vertical: verticalPadding,
+            ),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(30),
+              side: BorderSide(color: themeController.primaryColor, width: 2),
+            ),
+            elevation: 0,
+          ),
         ),
       ),
     );

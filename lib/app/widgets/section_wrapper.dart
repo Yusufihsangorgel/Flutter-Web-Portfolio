@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_web_portfolio/app/widgets/cosmic_background.dart';
 import 'package:get/get.dart';
 import 'package:flutter_web_portfolio/app/controllers/theme_controller.dart';
+import 'package:flutter_web_portfolio/app/controllers/shared_background_controller.dart';
 import 'package:flutter_web_portfolio/app/widgets/mouse_effects.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
-import 'package:flutter_web_portfolio/app/modules/home/sections/home_section.dart';
-import 'package:flutter_web_portfolio/app/controllers/shared_background_controller.dart';
 
-/// Bölümleri hover animasyonları ve kozmik arka plan ile sarmalayan widget
+/// Widget that wraps sections with hover animations and cosmic background
 class SectionWrapper extends StatefulWidget {
   final Widget child;
   final GlobalKey sectionKey;
@@ -16,6 +14,7 @@ class SectionWrapper extends StatefulWidget {
   final bool useHoverLight;
   final EdgeInsetsGeometry padding;
   final bool noBackground;
+  final double? minHeight;
 
   const SectionWrapper({
     Key? key,
@@ -26,6 +25,7 @@ class SectionWrapper extends StatefulWidget {
     this.useHoverLight = true,
     this.padding = const EdgeInsets.symmetric(vertical: 40, horizontal: 24),
     this.noBackground = false,
+    this.minHeight,
   }) : super(key: key);
 
   @override
@@ -34,21 +34,24 @@ class SectionWrapper extends StatefulWidget {
 
 class _SectionWrapperState extends State<SectionWrapper>
     with SingleTickerProviderStateMixin {
-  // Hover durumunu izlemek için
+  // For tracking hover state
   bool _isHovered = false;
 
   @override
   void initState() {
     super.initState();
-    // İlk bölüm için SharedBackgroundController'ı başlat
-    if (!SharedBackgroundController.isInitialized) {
+    // Initialize SharedBackgroundController for the first section
+    if (widget.sectionId == 'home' &&
+        !SharedBackgroundController.isInitialized) {
       SharedBackgroundController.init(this);
     }
   }
 
-  // Fare pozisyonunu güncelle
   void _updateMousePosition(PointerEvent event) {
-    SharedBackgroundController.updateMousePosition(event.localPosition);
+    // Update mouse position
+    if (widget.sectionId == 'home') {
+      SharedBackgroundController.updateMousePosition(event.localPosition);
+    }
   }
 
   @override
@@ -56,7 +59,7 @@ class _SectionWrapperState extends State<SectionWrapper>
     final themeController = Get.find<ThemeController>();
     final screenHeight = MediaQuery.of(context).size.height;
 
-    // Temel container
+    // Base container
     return MouseRegion(
       onHover: (event) {
         _updateMousePosition(event);
@@ -75,25 +78,26 @@ class _SectionWrapperState extends State<SectionWrapper>
       },
       child: Container(
         key: widget.sectionKey,
-        // Section'lar arasında kesinlikle boşluk olmaması için margin yok
+        // No margin to ensure no gaps between sections
         margin: EdgeInsets.zero,
         constraints: BoxConstraints(
           minHeight:
-              widget.sectionId == 'home'
+              widget.minHeight ??
+              (widget.sectionId == 'home'
                   ? screenHeight - 80
                   : (widget.sectionId == 'about'
                       ? screenHeight -
-                          80 // About section için de aynı yükseklik
-                      : screenHeight * 0.7),
+                          80 // Same height for about section
+                      : screenHeight * 0.7)),
         ),
-        // Arkaplan tamamen şeffaf olmalı
+        // Background should be completely transparent
         color: Colors.transparent,
         child: Stack(
           children: [
-            // Hover efekti - Çok hafif ve şeffaf (noBackground true ise gizlenir)
+            // Hover effect - Very light and transparent (hidden if noBackground is true)
             if (!widget.noBackground)
               AnimatedOpacity(
-                opacity: _isHovered ? 0.5 : 0.0, // Opaklığı azalttık
+                opacity: _isHovered ? 0.5 : 0.0, // Reduced opacity
                 duration: const Duration(milliseconds: 600),
                 child: Container(
                   decoration: BoxDecoration(
@@ -109,17 +113,17 @@ class _SectionWrapperState extends State<SectionWrapper>
                 ),
               ),
 
-            // İçerik - Home ve About için daha sıkı padding ve geçiş
+            // Content - tighter padding and transition for Home and About
             Padding(
               padding:
                   widget.sectionId == 'home'
                       ? const EdgeInsets.only(
                         bottom: 0,
-                      ) // Home section için alt padding 0
+                      ) // No bottom padding for home section
                       : (widget.sectionId == 'about'
                           ? const EdgeInsets.only(
                             top: 0,
-                          ) // About section için üst padding 0
+                          ) // No top padding for about section
                           : widget.padding),
               child: widget.child,
             ),

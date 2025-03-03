@@ -1,10 +1,14 @@
 import 'dart:async';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
 
-/// Uygulama scroll davranışlarını yöneten controller sınıfı
+/// Uygulama genelinde kaydırma işlemlerini yöneten controller sınıfı.
+/// Bölümler arası geçişleri ve animasyonlu kaydırma işlemlerini yönetir.
 class AppScrollController extends GetxController {
+  static AppScrollController get to => Get.find();
+
   // Bölüm anahtarları
   final homeKey = GlobalKey();
   final aboutKey = GlobalKey();
@@ -94,7 +98,7 @@ class AppScrollController extends GetxController {
     });
   }
 
-  /// Görünür bölüme göre aktif bölümü güncelle
+  /// Görünür bölüme göre aktif bölümü günceller
   void _detectActiveSection() {
     if (!scrollController.hasClients || _sectionOffsets.isEmpty) return;
 
@@ -194,95 +198,121 @@ class AppScrollController extends GetxController {
     }
   }
 
-  /// Belirli bir bölüme kaydır
+  /// Belirli bir bölüme kaydırır
   void scrollToSection(String sectionId) {
-    // Doğru GlobalKey'i bul
-    GlobalKey sectionKey;
-    switch (sectionId) {
-      case 'home':
-        sectionKey = homeKey;
-        break;
-      case 'about':
-        sectionKey = aboutKey;
-        break;
-      case 'experience':
-        sectionKey = experienceKey;
-        break;
-      case 'projects':
-        sectionKey = projectsKey;
-        break;
-      case 'skills':
-        sectionKey = skillsKey;
-        break;
-      case 'contact':
-        sectionKey = contactKey;
-        break;
-      default:
-        debugPrint('Geçersiz bölüm ID: $sectionId');
-        return; // Geçersiz ID
-    }
-
-    // Context kontrolü
-    if (sectionKey.currentContext == null) {
-      debugPrint('$sectionId bölümü bulunamadı');
-
-      // Biraz bekle ve tekrar dene
-      Future.delayed(const Duration(milliseconds: 300), () {
-        scrollToSection(sectionId);
-      });
-      return;
-    }
-
-    // ScrollController kontrolü
-    if (!scrollController.hasClients) {
-      debugPrint('ScrollController hazır değil');
-
-      // Biraz bekle ve tekrar dene
-      Future.delayed(const Duration(milliseconds: 300), () {
-        scrollToSection(sectionId);
-      });
-      return;
-    }
-
     try {
+      // ScrollController kontrolü
+      if (!scrollController.hasClients) {
+        debugPrint('ScrollController hazır değil');
+        return;
+      }
+
+      // Doğru GlobalKey'i bul
+      GlobalKey? sectionKey;
+      switch (sectionId) {
+        case 'home':
+          sectionKey = homeKey;
+          break;
+        case 'about':
+          sectionKey = aboutKey;
+          break;
+        case 'experience':
+          sectionKey = experienceKey;
+          break;
+        case 'projects':
+          sectionKey = projectsKey;
+          break;
+        case 'skills':
+          sectionKey = skillsKey;
+          break;
+        case 'contact':
+          sectionKey = contactKey;
+          break;
+        default:
+          debugPrint('Geçersiz bölüm ID: $sectionId');
+          return;
+      }
+
+      // Context kontrolü
+      if (sectionKey.currentContext == null) {
+        debugPrint('$sectionId bölümü bulunamadı');
+        return;
+      }
+
       // Manuel scroll başlat
       _isManualScrolling = true;
 
       // Hemen aktif bölümü güncelle (UI yanıt versin)
       activeSection.value = sectionId;
 
-      // Bölümün pozisyonunu hesapla
+      // Daha doğru bir yaklaşımla bölüm pozisyonunu hesapla
       final RenderBox renderBox =
           sectionKey.currentContext!.findRenderObject() as RenderBox;
+      final Size screenSize = Get.size;
+
+      // AppBar yüksekliği
+      const appBarHeight = 80.0;
+
+      // Bölümün global pozisyonu
       final position = renderBox.localToGlobal(Offset.zero);
 
-      // AppBar yüksekliği için düzeltme
-      const appBarHeight = 80.0;
-      final scrollPosition = position.dy - appBarHeight;
+      // Bölümün boyutu
+      final size = renderBox.size;
 
-      debugPrint('$sectionId bölümüne kaydırılıyor: $scrollPosition');
+      // Mevcut scroll pozisyonu
+      final currentScrollPosition = scrollController.offset;
+
+      // Ekran yüksekliği (AppBar'ı çıkararak)
+      final viewportHeight = screenSize.height - appBarHeight;
+
+      // Bölümün şu anki global y pozisyonu (AppBar'ı hesaba katarak)
+      final currentGlobalY = position.dy;
+
+      // Bölümün olması gereken pozisyon hesaplaması - ekranın ortasında olacak şekilde
+      final targetGlobalY = appBarHeight + (viewportHeight - size.height) / 2;
+
+      // Scroll miktarını hesapla
+      // (Mevcut global pozisyon) - (Olması gereken global pozisyon) + (Mevcut scroll)
+      double targetScrollOffset =
+          currentGlobalY - targetGlobalY + currentScrollPosition;
+
+      // Scroll sınırları içinde kaldığından emin ol
+      targetScrollOffset = math.max(0, targetScrollOffset);
+
+      if (scrollController.position.maxScrollExtent > 0) {
+        targetScrollOffset = math.min(
+          targetScrollOffset,
+          scrollController.position.maxScrollExtent,
+        );
+      }
+
+      debugPrint('$sectionId bölümüne kaydırılıyor: $targetScrollOffset');
 
       // Animasyonlu kaydırma
       scrollController
           .animateTo(
-            scrollPosition,
-            duration: const Duration(milliseconds: 500),
+            targetScrollOffset,
+            duration: const Duration(milliseconds: 800),
             curve: Curves.easeInOut,
           )
           .then((_) {
-            // Kaydırma tamamlandıktan sonra manuel scroll modunu kapat
-            Future.delayed(const Duration(milliseconds: 500), () {
-              _isManualScrolling = false;
-              // Bölüm bilgilerini güncelle
-              _updateSectionInfo();
-              // Aktif bölümü tekrar kontrol et
-              _detectActiveSection();
-              debugPrint('$sectionId bölümüne kaydırma tamamlandı');
-            });
+            _finishScrolling();
           });
     } catch (e) {
       debugPrint('Scroll hatası: $e');
       _isManualScrolling = false;
     }
+  }
+
+  // Kaydırma işlemini tamamla
+  void _finishScrolling() {
+    Future.delayed(const Duration(milliseconds: 500), () {
+      _isManualScrolling = false;
+      // Bölüm bilgilerini güncelle
+      _updateSectionInfo();
+      // Aktif bölümü tekrar kontrol et
+      _detectActiveSection();
+      debugPrint('Kaydırma tamamlandı');
+    });
   }
 }

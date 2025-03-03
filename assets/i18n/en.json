@@ -252,5 +252,23 @@
   },
   "about_section": {
     "title": "About Me"
+  },
+  "projects_section": {
+    "title": "My Projects",
+    "description": "Major projects and works I've completed",
+    "untitled_project": "Untitled Project",
+    "technologies": "Technologies",
+    "open_project": "Open Project"
+  },
+  "home_section": {
+    "welcome": "Welcome to my portfolio",
+    "title": "I'm Yusuf İhsan Görgel",
+    "subtitle": "Software Developer & UI/UX Designer",
+    "download_cv": "Download CV",
+    "contact": "Contact"
+  },
+  "skills_section": {
+    "title": "Skills",
+    "description": "My technical skills and areas of expertise"
   }
 }

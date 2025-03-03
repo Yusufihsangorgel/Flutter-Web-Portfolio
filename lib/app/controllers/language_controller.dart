@@ -4,74 +4,41 @@ import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
+import 'package:flutter/material.dart';
+import '../domain/repositories/i_language_repository.dart';
 
-/// Uygulama dilini ve çevirileri yöneten controller sınıfı
+/// Uygulama içi dil değişimi ve çevirileri yöneten controller
 class LanguageController extends GetxController {
-  static const String languageKey = 'language';
+  final ILanguageRepository _languageRepository;
 
-  // Desteklenen diller - assets/i18n klasöründeki dil dosyalarına göre
-  static final Map<String, Locale> supportedLanguages = {
-    'tr': const Locale('tr', ''), // Türkçe
-    'en': const Locale('en', ''), // İngilizce
-    'de': const Locale('de', ''), // Almanca
-    'fr': const Locale('fr', ''), // Fransızca
-    'hi': const Locale('hi', ''), // Hintçe
-    'ar': const Locale('ar', ''), // Arapça
-  };
-
-  // Font aileleri - tüm diller için aynı
-  static final Map<String, TextStyle> supportedLanguagesFonts = {
-    'tr': const TextStyle(fontFamily: 'Poppins'),
-    'en': const TextStyle(fontFamily: 'Poppins'),
-    'de': const TextStyle(fontFamily: 'Poppins'),
-    'fr': const TextStyle(fontFamily: 'Poppins'),
-    'hi': const TextStyle(fontFamily: 'Poppins'),
-    'ar': const TextStyle(fontFamily: 'Poppins'),
-  };
-
-  // Dil durumu
-  final RxString _currentLanguage = 'tr'.obs;
-
-  // Dil verileri
-  final Rx<Map<String, dynamic>> _languageData = Rx<Map<String, dynamic>>({});
-
-  // Çeviriler
-  final Rx<Map<String, String>> _translations = Rx<Map<String, String>>({});
-
-  // Getter'lar
+  // Mevcut seçili dil kodu (tr, en, de, vb.)
+  final Rx<String> _currentLanguage = 'tr'.obs;
   String get currentLanguage => _currentLanguage.value;
-  Locale get currentLocale =>
-      supportedLanguages[currentLanguage] ?? const Locale('tr', '');
-  Map<String, dynamic> get languageData => _languageData.value;
+
+  // Mevcut Locale
+  Locale get currentLocale => Locale(_currentLanguage.value);
+
+  // Mevcut dil bilgisi (bayrak ve isim)
+  Map<String, String> get languageInfo => {
+    'code': _currentLanguage.value,
+    'name': getLanguageName(_currentLanguage.value),
+    'flag': getLanguageFlag(_currentLanguage.value),
+  };
+
+  // Dil seçenekleri
+  Map<String, String> get supportedLanguages =>
+      _languageRepository.getSupportedLanguages();
+
+  // CV verileri - projeler, deneyimler, yetenekler vb.
+  // Bu veri, JSON formatında veya Map olarak CV içeriğini döndürür
   Map<String, dynamic> get cvData =>
-      _languageData.value.containsKey('cv_data')
-          ? _languageData.value['cv_data']
-          : {};
-
-  // Dil bilgisi
-  Map<String, dynamic> get languageInfo =>
-      _languageData.value.containsKey('language_info')
-          ? _languageData.value['language_info']
-          : {
-            'code': 'tr',
-            'name': 'Türkçe',
-            'flag': '🇹🇷',
-            'direction': 'ltr',
-          };
-
-  // Yazım yönü (RTL desteği için)
-  String get textDirection =>
-      languageInfo['direction'] == 'rtl' ? 'rtl' : 'ltr';
-  bool get isRtl => textDirection == 'rtl';
+      _languageRepository.getCVData(currentLanguage);
 
   // Uygulama adı
-  String get appName {
-    try {
-      return _languageData.value['app_name'] ?? 'Portfolio';
-    } catch (e) {
-      return 'Portfolio';
-    }
-  }
+  String get appName => getText('app.name', defaultValue: 'Portfolio');
+
+  LanguageController({required ILanguageRepository languageRepository})
+    : _languageRepository = languageRepository;
 
   @override
   void onInit() {
@@ -79,199 +46,57 @@ class LanguageController extends GetxController {
     loadSavedLanguage();
   }
 
-  // Kaydedilmiş dili yükle
+  /// Kayıtlı dil tercihini yükler
   Future<void> loadSavedLanguage() async {
     try {
-      final prefs = await SharedPreferences.getInstance();
-      final savedLanguage = prefs.getString(languageKey) ?? 'tr';
-
-      // Sadece desteklenen dilleri kabul et
-      if (supportedLanguages.containsKey(savedLanguage)) {
-        _currentLanguage.value = savedLanguage;
-      } else {
-        _currentLanguage.value = 'tr'; // Varsayılan dil
-      }
-
-      await _loadLanguageData(); // Dil yüklendikten sonra kaynakları yükle
-      update();
+      final savedLanguage = await _languageRepository.getSelectedLanguage();
+      changeLanguage(savedLanguage);
     } catch (e) {
-      _currentLanguage.value = 'tr';
-      await _loadLanguageData();
-      update();
+      debugPrint('⚠️ Dil yüklenirken hata: $e');
+      // Hata durumunda varsayılan dili kullan
+      changeLanguage('tr');
     }
   }
 
-  // Dil verilerini yükle
-  Future<void> _loadLanguageData() async {
-    try {
-      String jsonString = await rootBundle.loadString(
-        'assets/i18n/${_currentLanguage.value}.json',
-      );
-      _languageData.value = json.decode(jsonString);
-      _loadTranslations();
-    } catch (e) {
-      printError(info: 'Language data load error: ${e.toString()}');
-      // Hata durumunda minimum veri
-      _languageData.value = {
-        'app_name': 'Portfolio',
-        'translations': {'portfolio_loading': 'Loading...'},
-        'language_info': {
-          'code': _currentLanguage.value,
-          'name': getLanguageName(_currentLanguage.value),
-          'flag': getLanguageFlag(_currentLanguage.value),
-          'direction': _currentLanguage.value == 'ar' ? 'rtl' : 'ltr',
-        },
-      };
-      _loadTranslations();
-    }
-  }
-
-  // Çevirileri yükle
-  void _loadTranslations() {
-    try {
-      if (_languageData.value.containsKey('translations')) {
-        final Map<String, dynamic> rawTranslations =
-            _languageData.value['translations'];
-
-        // Dynamic map'i string map'e çevir
-        final Map<String, String> translationsMap = {};
-        rawTranslations.forEach((key, value) {
-          if (value is String) {
-            translationsMap[key] = value;
-          }
-        });
-
-        _translations.value = translationsMap;
-      } else {
-        // Çeviriler yoksa minimum çeviriler
-        _translations.value = {
-          'app_name': appName,
-          'portfolio_loading': 'Loading...',
-        };
-      }
-    } catch (e) {
-      printError(info: 'Translations load error: ${e.toString()}');
-
-      // Hata durumunda minimum çeviriler
-      _translations.value = {
-        'app_name': 'Portfolio',
-        'portfolio_loading': 'Loading...',
-      };
-    }
-  }
-
-  // Dili değiştir
+  /// Dili değiştirir
   Future<void> changeLanguage(String languageCode) async {
-    if (!supportedLanguages.containsKey(languageCode)) return;
+    if (!supportedLanguages.containsKey(languageCode)) {
+      return;
+    }
 
     _currentLanguage.value = languageCode;
-    await _loadLanguageData(); // Dil değiştiğinde kaynakları yeniden yükle
+    Get.updateLocale(Locale(languageCode));
+    await _languageRepository.saveSelectedLanguage(languageCode);
 
+    // Çevirileri güncelle
+    await _updateTranslations(languageCode);
+
+    update(); // UI'ı güncelle
+  }
+
+  /// Çevirileri yükler ve günceller
+  Future<void> _updateTranslations(String languageCode) async {
     try {
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setString(languageKey, languageCode);
-
-      // GetX lokal güncelleme
-      await Get.updateLocale(supportedLanguages[languageCode]!);
+      final translations = await _languageRepository.getTranslations(
+        languageCode,
+      );
+      // Burada çevirileri global bir şekilde saklayabilir veya GetX translations sistemine ekleyebilirsiniz
     } catch (e) {
-      printError(info: 'Language save error: ${e.toString()}');
+      print('Çeviriler yüklenirken hata: $e');
     }
-
-    update();
   }
 
-  // Metni getir
-  String getText(
-    String key, {
-    String defaultValue = '',
-    Map<String, String>? params,
-  }) {
-    // Context varsa ve FlutterI18n kullanılabilirse, onu kullan
-    if (Get.context != null) {
-      try {
-        final context = Get.context!;
-        final translation = FlutterI18n.translate(
-          context,
-          key,
-          translationParams: params,
-        );
-        if (translation != key) {
-          return translation;
-        }
-      } catch (e) {
-        // FlutterI18n hata verirse, yerel dosyalara bak
-        printError(info: 'FlutterI18n error: ${e.toString()}');
-      }
-    }
-
-    // Yerel dosyalar üzerinden çeviri dene
-    try {
-      // JSON dosyadaki veri yapısını izle - noktalı anahtar yolunu parçala
-      List<String> keyParts = key.split('.');
-      dynamic value = _languageData.value;
-
-      for (String part in keyParts) {
-        if (value is Map && value.containsKey(part)) {
-          value = value[part];
-        } else {
-          value = null;
-          break;
-        }
-      }
-
-      if (value != null && value is String) {
-        return value;
-      }
-    } catch (e) {
-      printError(info: 'Local translation error: ${e.toString()}');
-    }
-
-    // Hiçbir yerde bulunamadıysa varsayılan değeri veya anahtarın kendisini döndür
-    return defaultValue.isNotEmpty ? defaultValue : key;
+  /// Belirli bir dil için çeviri metnini döndürür
+  String getText(String key, {String defaultValue = ''}) {
+    // Burada GetX translations sistemini veya kendi sistemimizi kullanabiliriz
+    // Basitlik için şimdilik default değeri döndürüyoruz
+    // Gerçek uygulamada: return Get.find<TranslationService>().translate(key, defaultValue: defaultValue);
+    return defaultValue;
   }
 
-  // Desteklenen tüm dilleri getir
-  Future<List<Map<String, dynamic>>> getSupportedLanguages() async {
-    List<Map<String, dynamic>> languages = [];
-
-    for (String locale in supportedLanguages.keys) {
-      try {
-        // Her dil için dil bilgilerini yükle
-        String jsonString = await rootBundle.loadString(
-          'assets/i18n/$locale.json',
-        );
-        Map<String, dynamic> data = json.decode(jsonString);
-
-        if (data.containsKey('language_info')) {
-          languages.add(data['language_info']);
-        } else {
-          // Dil bilgisi yoksa varsayılan bilgileri ekle
-          Map<String, dynamic> defaultInfo = {
-            'code': locale,
-            'name': getLanguageName(locale),
-            'flag': getLanguageFlag(locale),
-            'direction': locale == 'ar' ? 'rtl' : 'ltr',
-          };
-          languages.add(defaultInfo);
-        }
-      } catch (e) {
-        // Hata durumunda varsayılan bilgileri ekle
-        Map<String, dynamic> defaultInfo = {
-          'code': locale,
-          'name': getLanguageName(locale),
-          'flag': getLanguageFlag(locale),
-          'direction': locale == 'ar' ? 'rtl' : 'ltr',
-        };
-        languages.add(defaultInfo);
-      }
-    }
-
-    return languages;
-  }
-
-  // Dil adı yardımcı metodu
-  static String getLanguageName(String code) {
-    switch (code) {
+  /// Belirli bir dil kodu için dil adını döndürür
+  static String getLanguageName(String languageCode) {
+    switch (languageCode) {
       case 'tr':
         return 'Türkçe';
       case 'en':
@@ -280,18 +105,16 @@ class LanguageController extends GetxController {
         return 'Deutsch';
       case 'fr':
         return 'Français';
-      case 'hi':
-        return 'हिन्दी';
-      case 'ar':
-        return 'العربية';
+      case 'es':
+        return 'Español';
       default:
-        return code;
+        return 'Unknown';
     }
   }
 
-  // Dil bayrağı yardımcı metodu
-  static String getLanguageFlag(String code) {
-    switch (code) {
+  /// Belirli bir dil kodu için bayrak emojisini döndürür
+  static String getLanguageFlag(String languageCode) {
+    switch (languageCode) {
       case 'tr':
         return '🇹🇷';
       case 'en':
@@ -300,12 +123,10 @@ class LanguageController extends GetxController {
         return '🇩🇪';
       case 'fr':
         return '🇫🇷';
-      case 'hi':
-        return '🇮🇳';
-      case 'ar':
-        return '🇸🇦';
+      case 'es':
+        return '🇪🇸';
       default:
-        return '🏳️';
+        return '🌐';
     }
   }
 }

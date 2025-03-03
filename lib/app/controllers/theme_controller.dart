@@ -3,7 +3,8 @@ import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-/// Uygulama temasını yöneten controller sınıfı
+/// Uygulama temasını yöneten controller sınıfı.
+/// Koyu mavi-siyah renk şeması üzerine kurulu, modern bir tema sağlar.
 class ThemeController extends GetxController {
   static const String themeKey = 'dark_mode';
 
@@ -17,14 +18,15 @@ class ThemeController extends GetxController {
 
   // Getter'lar
   bool get isDarkMode => true; // Her zaman true döndür
-  Color get backgroundColor => const Color(0xFF00101F);
-  Color get cardColor => const Color(0xFF001628);
+  Color get backgroundColor =>
+      const Color(0xFF00101F); // Koyu mavi-siyah arka plan
+  Color get cardColor => const Color(0xFF001628); // Koyu mavi kart rengi
   Color get surfaceColor => const Color(0xFF01162D); // Bölüm arka plan rengi
-  Color get primaryTextColor => Colors.white;
-  Color get secondaryTextColor => Colors.white70;
-  Color get primaryColor => const Color(0xFF00A3FF); // Mavi
-  Color get accentColor => const Color(0xFF00A3FF); // Mavi aksan
-  Color get secondaryColor => const Color(0xFF00A3FF); // Mavi - accent ile aynı
+  Color get primaryTextColor => Colors.white; // Ana metin rengi
+  Color get secondaryTextColor => Colors.white70; // İkincil metin rengi
+  Color get primaryColor => const Color(0xFF00A3FF); // Mavi ana renk
+  Color get accentColor => const Color(0xFF00A3FF); // Mavi aksan rengi
+  Color get secondaryColor => const Color(0xFF00A3FF); // İkincil renk
 
   @override
   void onInit() {
@@ -32,36 +34,36 @@ class ThemeController extends GetxController {
     _initializeTheme();
   }
 
-  // Temayı başlat
+  /// Temayı başlatır ve yapılandırır
   void _initializeTheme() {
     final ColorScheme darkColorScheme = ColorScheme.fromSeed(
       seedColor: primaryColor,
       brightness: Brightness.dark,
       secondary: accentColor,
-      background: const Color(0xFF00101F), // Koyu mavi-siyah arka plan
-      surface: const Color(0xFF001628), // Koyu mavi kart rengi
-      onSurface: Colors.white,
+      background: backgroundColor,
+      surface: surfaceColor,
+      onSurface: primaryTextColor,
     );
 
-    // Dark tema
+    // Koyu tema yapılandırması
     darkTheme = ThemeData(
       useMaterial3: true,
       colorScheme: darkColorScheme,
       brightness: Brightness.dark,
       appBarTheme: AppBarTheme(
         elevation: 0,
-        backgroundColor: const Color(0xFF00101F), // Koyu mavi-siyah
-        foregroundColor: Colors.white,
+        backgroundColor: backgroundColor,
+        foregroundColor: primaryTextColor,
       ),
       cardTheme: CardTheme(
         elevation: 2,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
-      scaffoldBackgroundColor: const Color(0xFF00101F), // Koyu mavi-siyah
+      scaffoldBackgroundColor: backgroundColor,
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           elevation: 0,
-          backgroundColor: const Color(0xFF00A3FF), // Mavi
+          backgroundColor: primaryColor,
           foregroundColor: Colors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(30),
@@ -70,13 +72,14 @@ class ThemeController extends GetxController {
         ),
       ),
       textButtonTheme: TextButtonThemeData(
-        style: TextButton.styleFrom(foregroundColor: const Color(0xFF00A3FF)),
+        style: TextButton.styleFrom(foregroundColor: primaryColor),
       ),
       textTheme: GoogleFonts.poppinsTextTheme(ThemeData.dark().textTheme),
     );
   }
 
-  // Tema değiştirme fonksiyonu - artık işlevsiz, sadece uyumluluk için
+  /// Tema değiştirme fonksiyonu - uyumluluk için korunmuştur
+  /// Bu uygulama her zaman koyu tema kullanır
   Future<void> toggleTheme() async {
     // Hiçbir şey yapma, her zaman koyu mod
     update();

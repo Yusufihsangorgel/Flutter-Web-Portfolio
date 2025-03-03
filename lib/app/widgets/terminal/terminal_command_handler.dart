@@ -667,7 +667,7 @@ class TerminalCommandHandler {
     };
 
     socialProfiles.forEach((platform, url) {
-      if (url.isNotEmpty) {
+      if (url != null && url.isNotEmpty) {
         addOutput(
           TerminalOutputModel(
             content: '◆ $platform : $url',
@@ -677,7 +677,7 @@ class TerminalCommandHandler {
             isTyping: false,
             isCompleted: true,
             currentIndex: '◆ $platform : $url'.length,
-            onTap: () => _launchUrl(url),
+            onTap: () => _launchUrl(url as String),
           ),
         );
       }

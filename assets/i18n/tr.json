@@ -264,6 +264,20 @@
   },
   "projects_section": {
     "title": "Projelerim",
-    "description": "Tamamladığım başlıca projeler ve çalışmalarım"
+    "description": "Tamamladığım başlıca projeler ve çalışmalarım",
+    "untitled_project": "İsimsiz Proje",
+    "technologies": "Teknolojiler",
+    "open_project": "Projeyi Aç"
+  },
+  "home_section": {
+    "welcome": "Portfolyoma hoş geldiniz",
+    "title": "Ben Yusuf İhsan Görgel",
+    "subtitle": "Yazılım Geliştirici & UI/UX Tasarımcı",
+    "download_cv": "CV İndir",
+    "contact": "İletişim"
+  },
+  "skills_section": {
+    "title": "Beceriler",
+    "description": "Teknik yeteneklerim ve uzmanlık alanlarım"
   }
 }
