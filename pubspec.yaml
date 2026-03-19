@@ -26,7 +26,6 @@ dependencies:
   lottie: ^3.1.0
 
   # Animations
-  animate_do: ^3.3.0
   percent_indicator: ^4.2.3
   timeline_tile: ^2.0.0
 

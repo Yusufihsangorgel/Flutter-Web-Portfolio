@@ -3,7 +3,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:animate_do/animate_do.dart';
+import 'package:flutter_web_portfolio/app/widgets/animated_entrance.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_web_portfolio/app/controllers/language_controller.dart';
 import 'package:flutter_web_portfolio/app/controllers/theme_controller.dart';
@@ -302,7 +302,7 @@ class _ProjectsSectionState extends State<ProjectsSection>
 
             // Desktop-like interface
             Center(
-              child: FadeInUp(
+              child: AnimatedEntrance.fadeInUp(
                 duration: const Duration(milliseconds: 800),
                 child: Container(
                   width: isWideScreen ? screenWidth * 0.8 : screenWidth,

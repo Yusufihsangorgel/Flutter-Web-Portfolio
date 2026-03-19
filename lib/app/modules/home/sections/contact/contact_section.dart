@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:animate_do/animate_do.dart';
+import 'package:flutter_web_portfolio/app/widgets/animated_entrance.dart';
 import 'package:flutter_web_portfolio/app/controllers/language_controller.dart';
 import 'package:flutter_web_portfolio/app/controllers/shared_background_controller.dart';
 import 'package:flutter_web_portfolio/app/widgets/section_title.dart';
@@ -62,7 +62,7 @@ class ContactSection extends StatelessWidget {
                     // Contact form
                     Expanded(
                       flex: 3,
-                      child: FadeInLeft(
+                      child: AnimatedEntrance.fadeInLeft(
                         duration: const Duration(milliseconds: 800),
                         child: ContactForm(isWideLayout: screenWidth > 800),
                       ),
@@ -74,7 +74,7 @@ class ContactSection extends StatelessWidget {
                       // Contact info panel (side column)
                       Expanded(
                         flex: 2,
-                        child: FadeInRight(
+                        child: AnimatedEntrance.fadeInRight(
                           duration: const Duration(milliseconds: 800),
                           child: ContactInfoPanel(),
                         ),
@@ -88,7 +88,7 @@ class ContactSection extends StatelessWidget {
             // Contact info panel below the form on narrow screens
             if (screenWidth <= 800) ...[
               const SizedBox(height: 40),
-              FadeInUp(
+              AnimatedEntrance.fadeInUp(
                 duration: const Duration(milliseconds: 800),
                 child: ContactInfoPanel(),
               ),

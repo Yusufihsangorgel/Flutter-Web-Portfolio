@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:get/get.dart';
-import 'package:animate_do/animate_do.dart';
+import 'package:flutter_web_portfolio/app/widgets/animated_entrance.dart';
 import 'package:flutter_web_portfolio/app/controllers/language_controller.dart';
 import 'package:flutter_web_portfolio/app/controllers/theme_controller.dart';
 import 'package:flutter_web_portfolio/app/models/terminal_output_model.dart';
@@ -187,9 +187,8 @@ class _AboutSectionState extends State<AboutSection>
   }
 
   @override
-  Widget build(BuildContext context) => FadeInUp(
+  Widget build(BuildContext context) => AnimatedEntrance.fadeInUp(
       duration: const Duration(milliseconds: 800),
-      from: 50,
       child: SizedBox(
         width: double.infinity,
         // Screen height minus AppBar height

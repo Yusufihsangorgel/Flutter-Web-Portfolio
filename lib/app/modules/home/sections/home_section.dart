@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:animate_do/animate_do.dart';
+import 'package:flutter_web_portfolio/app/widgets/animated_entrance.dart';
 import 'package:flutter_web_portfolio/app/controllers/language_controller.dart';
 import 'package:flutter_web_portfolio/app/controllers/theme_controller.dart';
 import 'package:flutter_web_portfolio/app/controllers/scroll_controller.dart';
@@ -77,7 +77,7 @@ class HomeSection extends StatelessWidget {
       const SizedBox(width: 40),
       Expanded(
         flex: 2,
-        child: FadeInRight(
+        child: AnimatedEntrance.fadeInRight(
           duration: const Duration(milliseconds: 1000),
           delay: const Duration(milliseconds: 500),
           child: _buildProfileImage(themeController),
@@ -95,7 +95,7 @@ class HomeSection extends StatelessWidget {
   ) => Column(
     mainAxisAlignment: MainAxisAlignment.center,
     children: [
-      FadeInDown(
+      AnimatedEntrance.fadeInDown(
         duration: const Duration(milliseconds: 800),
         child: _buildProfileImage(themeController, size: 120),
       ),
@@ -148,7 +148,7 @@ class HomeSection extends StatelessWidget {
       crossAxisAlignment: alignment,
       mainAxisSize: MainAxisSize.min,
       children: [
-        FadeInDown(
+        AnimatedEntrance.fadeInDown(
           duration: const Duration(milliseconds: 800),
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -172,7 +172,7 @@ class HomeSection extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 24),
-        FadeInDown(
+        AnimatedEntrance.fadeInDown(
           delay: const Duration(milliseconds: 300),
           duration: const Duration(milliseconds: 800),
           child: Text(
@@ -191,7 +191,7 @@ class HomeSection extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 12),
-        FadeInDown(
+        AnimatedEntrance.fadeInDown(
           delay: const Duration(milliseconds: 600),
           duration: const Duration(milliseconds: 800),
           child: Text(
@@ -206,7 +206,7 @@ class HomeSection extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 40),
-        FadeInDown(
+        AnimatedEntrance.fadeInDown(
           delay: const Duration(milliseconds: 900),
           duration: const Duration(milliseconds: 800),
           child: Wrap(

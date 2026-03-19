@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_web_portfolio/app/controllers/theme_controller.dart';
-import 'package:animate_do/animate_do.dart';
+import 'package:flutter_web_portfolio/app/widgets/animated_entrance.dart';
 
 /// Consistent section title widget used across all sections
 class SectionTitle extends StatelessWidget {
@@ -33,7 +33,7 @@ class SectionTitle extends StatelessWidget {
       child: Column(
         crossAxisAlignment: alignment,
         children: [
-          FadeInDown(
+          AnimatedEntrance.fadeInDown(
             duration: const Duration(milliseconds: 600),
             child: Text(
               title,
@@ -59,7 +59,7 @@ class SectionTitle extends StatelessWidget {
           ),
           if (subtitle != null) ...[
             const SizedBox(height: 16),
-            FadeInDown(
+            AnimatedEntrance.fadeInDown(
               duration: const Duration(milliseconds: 700),
               child: Text(
                 subtitle!,
