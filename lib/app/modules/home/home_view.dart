@@ -74,11 +74,17 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
       ),
     );
 
+  EdgeInsets _sectionPadding(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
+    final horizontal = width > 1400 ? 120.0 : (width > 900 ? 60.0 : 24.0);
+    return EdgeInsets.symmetric(vertical: 60, horizontal: horizontal);
+  }
+
   SliverToBoxAdapter _sliverSection(GlobalKey key, Widget child) =>
       SliverToBoxAdapter(
         child: Container(
           key: key,
-          padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 24),
+          padding: _sectionPadding(context),
           child: child,
         ),
       );
@@ -87,7 +93,7 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
       SliverToBoxAdapter(
         child: Container(
           key: key,
-          padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 24),
+          padding: _sectionPadding(context),
           child: ScrollFadeIn(
             delay: delay,
             child: child,
