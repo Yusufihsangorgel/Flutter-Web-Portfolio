@@ -7,14 +7,6 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 
 /// Widget that wraps sections with hover animations and cosmic background
 class SectionWrapper extends StatefulWidget {
-  final Widget child;
-  final GlobalKey sectionKey;
-  final String sectionId;
-  final Color? backgroundColor;
-  final bool useHoverLight;
-  final EdgeInsetsGeometry padding;
-  final bool noBackground;
-  final double? minHeight;
 
   const SectionWrapper({
     super.key,
@@ -27,6 +19,14 @@ class SectionWrapper extends StatefulWidget {
     this.noBackground = false,
     this.minHeight,
   });
+  final Widget child;
+  final GlobalKey sectionKey;
+  final String sectionId;
+  final Color? backgroundColor;
+  final bool useHoverLight;
+  final EdgeInsetsGeometry padding;
+  final bool noBackground;
+  final double? minHeight;
 
   @override
   State<SectionWrapper> createState() => _SectionWrapperState();
@@ -97,7 +97,7 @@ class _SectionWrapperState extends State<SectionWrapper>
                       center: Alignment.center,
                       radius: 1.0,
                       colors: [
-                        themeController.primaryColor.withOpacity(0.05),
+                        themeController.primaryColor.withValues(alpha:0.05),
                         Colors.transparent,
                       ],
                     ),
@@ -122,14 +122,6 @@ class _SectionWrapperState extends State<SectionWrapper>
 
 /// Adds hover animation to card-style widgets
 class AnimatedCardWrapper extends StatelessWidget {
-  final Widget child;
-  final double elevation;
-  final BorderRadius borderRadius;
-  final Color? backgroundColor;
-  final double hoverScale;
-  final Duration duration;
-  final EdgeInsetsGeometry margin;
-  final EdgeInsetsGeometry padding;
 
   const AnimatedCardWrapper({
     super.key,
@@ -142,12 +134,19 @@ class AnimatedCardWrapper extends StatelessWidget {
     this.margin = const EdgeInsets.all(8),
     this.padding = const EdgeInsets.all(16),
   });
+  final Widget child;
+  final double elevation;
+  final BorderRadius borderRadius;
+  final Color? backgroundColor;
+  final double hoverScale;
+  final Duration duration;
+  final EdgeInsetsGeometry margin;
+  final EdgeInsetsGeometry padding;
 
   @override
   Widget build(BuildContext context) {
-    final themeController = Get.find<ThemeController>();
     final actualBgColor =
-        backgroundColor ?? const Color(0xFF001628).withOpacity(0.7);
+        backgroundColor ?? const Color(0xFF001628).withValues(alpha:0.7);
 
     // Skip hover effect on non-web platforms
     if (!kIsWeb) {
@@ -176,12 +175,6 @@ class AnimatedCardWrapper extends StatelessWidget {
 
 /// Adds hover animation to buttons
 class AnimatedButtonWrapper extends StatelessWidget {
-  final Widget child;
-  final VoidCallback onTap;
-  final double hoverScale;
-  final Color? hoverColor;
-  final BorderRadius borderRadius;
-  final Duration duration;
 
   const AnimatedButtonWrapper({
     super.key,
@@ -192,12 +185,18 @@ class AnimatedButtonWrapper extends StatelessWidget {
     this.borderRadius = const BorderRadius.all(Radius.circular(8)),
     this.duration = const Duration(milliseconds: 150),
   });
+  final Widget child;
+  final VoidCallback onTap;
+  final double hoverScale;
+  final Color? hoverColor;
+  final BorderRadius borderRadius;
+  final Duration duration;
 
   @override
   Widget build(BuildContext context) {
     final themeController = Get.find<ThemeController>();
     final effectiveHoverColor =
-        hoverColor ?? themeController.primaryColor.withOpacity(0.1);
+        hoverColor ?? themeController.primaryColor.withValues(alpha:0.1);
 
     // Skip hover effect on non-web platforms
     if (!kIsWeb) {

@@ -5,9 +5,9 @@ import 'mouse_effects.dart';
 
 /// Wrapper widget that manages mouse interactions
 class MouseInteractionWrapper extends StatelessWidget {
-  final Widget child;
 
   const MouseInteractionWrapper({super.key, required this.child});
+  final Widget child;
 
   @override
   Widget build(BuildContext context) {

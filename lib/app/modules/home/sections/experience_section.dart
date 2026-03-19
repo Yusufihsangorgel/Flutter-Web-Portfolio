@@ -42,9 +42,9 @@ class ExperienceSection extends StatelessWidget {
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
                           colors: [
-                            themeController.primaryColor.withOpacity(0.3),
+                            themeController.primaryColor.withValues(alpha:0.3),
                             themeController.primaryColor,
-                            themeController.primaryColor.withOpacity(0.3),
+                            themeController.primaryColor.withValues(alpha:0.3),
                           ],
                           begin: Alignment.centerLeft,
                           end: Alignment.centerRight,
@@ -100,8 +100,7 @@ class ExperienceSection extends StatelessWidget {
     int index,
     ThemeController themeController,
     bool isEnglish,
-  ) {
-    return Column(
+  ) => Column(
       children: [
         _timelineDot(themeController),
         _timelineLine(themeController, height: 30),
@@ -110,7 +109,6 @@ class ExperienceSection extends StatelessWidget {
           _timelineLine(themeController, height: 30),
       ],
     );
-  }
 
   Widget _buildDesktopItem(
     Map<String, dynamic> experience,
@@ -118,8 +116,7 @@ class ExperienceSection extends StatelessWidget {
     bool isEven,
     ThemeController themeController,
     bool isEnglish,
-  ) {
-    return Row(
+  ) => Row(
       children: [
         Expanded(
           child: isEven
@@ -139,7 +136,6 @@ class ExperienceSection extends StatelessWidget {
         ),
       ],
     );
-  }
 
   Widget _timelineDot(ThemeController themeController) => Container(
     width: 20,
@@ -149,7 +145,7 @@ class ExperienceSection extends StatelessWidget {
       shape: BoxShape.circle,
       boxShadow: [
         BoxShadow(
-          color: themeController.primaryColor.withOpacity(0.5),
+          color: themeController.primaryColor.withValues(alpha:0.5),
           blurRadius: 10,
           spreadRadius: 2,
         ),
@@ -161,22 +157,21 @@ class ExperienceSection extends StatelessWidget {
       Container(
         width: 2,
         height: height,
-        color: themeController.primaryColor.withOpacity(0.5),
+        color: themeController.primaryColor.withValues(alpha:0.5),
       );
 
   Widget _experienceCard(
     Map<String, dynamic> experience,
     ThemeController themeController,
     bool isEnglish,
-  ) {
-    return Card(
+  ) => Card(
       elevation: 5,
       margin: const EdgeInsets.all(10),
-      color: AppColors.surface.withOpacity(0.7),
+      color: AppColors.surface.withValues(alpha:0.7),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(15),
         side: BorderSide(
-          color: themeController.primaryColor.withOpacity(0.3),
+          color: themeController.primaryColor.withValues(alpha:0.3),
           width: 1,
         ),
       ),
@@ -221,28 +216,21 @@ class ExperienceSection extends StatelessWidget {
               Wrap(
                 spacing: 8,
                 runSpacing: 8,
-                children: (experience['technologies'] as List).map((tech) {
-                  return Chip(
+                children: (experience['technologies'] as List).map((tech) => Chip(
                     label: Text(tech, style: const TextStyle(fontSize: 12)),
-                    backgroundColor: themeController.primaryColor.withOpacity(0.2),
+                    backgroundColor: themeController.primaryColor.withValues(alpha:0.2),
                     side: BorderSide(
-                      color: themeController.primaryColor.withOpacity(0.5),
+                      color: themeController.primaryColor.withValues(alpha:0.5),
                     ),
-                  );
-                }).toList(),
+                  )).toList(),
               ),
           ],
         ),
       ),
     );
-  }
 }
 
 class ShimmeringText extends StatefulWidget {
-  final String text;
-  final TextStyle style;
-  final Color baseColor;
-  final Color highlightColor;
 
   const ShimmeringText({
     super.key,
@@ -251,6 +239,10 @@ class ShimmeringText extends StatefulWidget {
     required this.highlightColor,
     required this.style,
   });
+  final String text;
+  final TextStyle style;
+  final Color baseColor;
+  final Color highlightColor;
 
   @override
   State<ShimmeringText> createState() => _ShimmeringTextState();
@@ -278,14 +270,11 @@ class _ShimmeringTextState extends State<ShimmeringText>
   }
 
   @override
-  Widget build(BuildContext context) {
-    return AnimatedBuilder(
+  Widget build(BuildContext context) => AnimatedBuilder(
       animation: _animation,
-      builder: (context, child) {
-        return ShaderMask(
+      builder: (context, child) => ShaderMask(
           blendMode: BlendMode.srcIn,
-          shaderCallback: (bounds) {
-            return LinearGradient(
+          shaderCallback: (bounds) => LinearGradient(
               colors: [
                 widget.baseColor,
                 widget.highlightColor,
@@ -299,11 +288,8 @@ class _ShimmeringTextState extends State<ShimmeringText>
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               tileMode: TileMode.repeated,
-            ).createShader(bounds);
-          },
+            ).createShader(bounds),
           child: Text(widget.text, style: widget.style),
-        );
-      },
+        ),
     );
-  }
 }

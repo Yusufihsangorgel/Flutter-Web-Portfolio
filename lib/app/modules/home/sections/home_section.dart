@@ -8,7 +8,7 @@ import 'package:flutter_web_portfolio/app/widgets/mouse_effects.dart';
 import 'package:flutter_web_portfolio/app/utils/responsive_utils.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-/// Ana sayfa karşılama bölümü
+/// Home page welcome section
 class HomeSection extends StatelessWidget {
   const HomeSection({super.key});
 
@@ -16,10 +16,9 @@ class HomeSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final languageController = Get.find<LanguageController>();
     final themeController = Get.find<ThemeController>();
-    final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
 
-    // AppBar yüksekliği (responsive)
+    // AppBar height (responsive)
     final appBarHeight = ResponsiveUtils.getValueForScreenType<double>(
       context: context,
       mobile: 60,
@@ -27,7 +26,7 @@ class HomeSection extends StatelessWidget {
       desktop: 80,
     );
 
-    // Responsive padding değerleri
+    // Responsive padding values
     final horizontalPadding = ResponsiveUtils.getValueForScreenType<double>(
       context: context,
       mobile: 20,
@@ -36,7 +35,7 @@ class HomeSection extends StatelessWidget {
       largeDesktop: 100,
     );
 
-    // Responsive yazı boyutları
+    // Responsive font sizes
     final titleFontSize = ResponsiveUtils.getValueForScreenType<double>(
       context: context,
       mobile: 32,
@@ -53,23 +52,20 @@ class HomeSection extends StatelessWidget {
       largeDesktop: 24,
     );
 
-    // Butonların yatay/dikey olarak düzenlenmesi
+    // Horizontal/vertical button layout
     final isVerticalLayout = ResponsiveUtils.isMobile(context);
 
     return Container(
       width: double.infinity,
-      // Tam ekran yüksekliği, alt kısımda herhangi bir boşluk kalmaması için
-      height: screenHeight - appBarHeight, // AppBar yüksekliği çıkarıldı
-      // Minimum yükseklik kısıtlamasını kaldırıyoruz, böylece tam ekran yüksekliğini alacak
+      height: screenHeight - appBarHeight,
       constraints: BoxConstraints(maxHeight: screenHeight - appBarHeight),
-      // Tamamen şeffaf
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Animasyonlu giriş metni
+            // Animated intro text
             FadeInDown(
               duration: const Duration(milliseconds: 800),
               child: Container(
@@ -80,11 +76,11 @@ class HomeSection extends StatelessWidget {
                 decoration: BoxDecoration(
                   color:
                       themeController.isDarkMode
-                          ? Colors.white.withOpacity(0.1)
-                          : Colors.black.withOpacity(0.1),
+                          ? Colors.white.withValues(alpha:0.1)
+                          : Colors.black.withValues(alpha:0.1),
                   borderRadius: BorderRadius.circular(30),
                   border: Border.all(
-                    color: themeController.primaryColor.withOpacity(0.3),
+                    color: themeController.primaryColor.withValues(alpha:0.3),
                     width: 2,
                   ),
                 ),
@@ -112,7 +108,7 @@ class HomeSection extends StatelessWidget {
 
             const SizedBox(height: 24),
 
-            // Ana başlık
+            // Main title
             FadeInDown(
               delay: const Duration(milliseconds: 300),
               duration: const Duration(milliseconds: 800),
@@ -127,7 +123,7 @@ class HomeSection extends StatelessWidget {
                   color: Colors.white,
                   shadows: [
                     Shadow(
-                      color: themeController.primaryColor.withOpacity(0.5),
+                      color: themeController.primaryColor.withValues(alpha:0.5),
                       blurRadius: 10,
                     ),
                   ],
@@ -137,7 +133,7 @@ class HomeSection extends StatelessWidget {
 
             const SizedBox(height: 16),
 
-            // Alt başlık
+            // Subtitle
             FadeInDown(
               delay: const Duration(milliseconds: 600),
               duration: const Duration(milliseconds: 800),
@@ -159,9 +155,7 @@ class HomeSection extends StatelessWidget {
 
             const SizedBox(height: 40),
 
-            // Son içerik kısmında alt boşluğu kaldırıyoruz
             Padding(
-              // Alt kısımda about section'a doğru uzanan extra padding
               padding: const EdgeInsets.only(bottom: 10),
               child: FadeInDown(
                 delay: const Duration(milliseconds: 900),
@@ -172,7 +166,6 @@ class HomeSection extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            // CV indirme butonu
                             _buildButton(
                               context,
                               icon: Icons.download_outlined,
@@ -182,9 +175,7 @@ class HomeSection extends StatelessWidget {
                                   defaultValue: 'CV İndir',
                                 ),
                               ),
-                              onTap: () {
-                                _downloadCV();
-                              },
+                              onTap: _downloadCV,
                               isPrimary: true,
                               themeController: themeController,
                               isFullWidth: true,
@@ -192,7 +183,6 @@ class HomeSection extends StatelessWidget {
 
                             const SizedBox(height: 16),
 
-                            // İletişim butonu
                             _buildButton(
                               context,
                               icon: Icons.mail_outline,
@@ -215,7 +205,6 @@ class HomeSection extends StatelessWidget {
                         )
                         : Row(
                           children: [
-                            // CV indirme butonu
                             _buildButton(
                               context,
                               icon: Icons.download_outlined,
@@ -225,16 +214,13 @@ class HomeSection extends StatelessWidget {
                                   defaultValue: 'CV İndir',
                                 ),
                               ),
-                              onTap: () {
-                                _downloadCV();
-                              },
+                              onTap: _downloadCV,
                               isPrimary: true,
                               themeController: themeController,
                             ),
 
                             const SizedBox(width: 16),
 
-                            // İletişim butonu
                             _buildButton(
                               context,
                               icon: Icons.mail_outline,
@@ -262,21 +248,21 @@ class HomeSection extends StatelessWidget {
     );
   }
 
-  // CV İndirme fonksiyonu
+  // CV download handler
   Future<void> _downloadCV() async {
     const cvUrl = '/assets/data/cv.pdf';
 
     if (await canLaunchUrl(Uri.parse(cvUrl))) {
       await launchUrl(Uri.parse(cvUrl));
     } else {
-      // Fallback yöntemi - tarayıcıda açma
+      // Fallback: open in browser
       final baseUrl = Uri.base.toString();
       final fullUrl = baseUrl + cvUrl;
       await launchUrl(Uri.parse(fullUrl));
     }
   }
 
-  // Buton widget'ı
+  // Button builder
   Widget _buildButton(
     BuildContext context, {
     required IconData icon,
@@ -286,7 +272,7 @@ class HomeSection extends StatelessWidget {
     required ThemeController themeController,
     bool isFullWidth = false,
   }) {
-    // Responsive buton boyutları
+    // Responsive button dimensions
     final horizontalPadding = ResponsiveUtils.getValueForScreenType<double>(
       context: context,
       mobile: 16,

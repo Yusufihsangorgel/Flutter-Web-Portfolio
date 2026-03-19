@@ -3,14 +3,14 @@ import 'package:flutter_web_portfolio/app/models/terminal_output_model.dart';
 
 /// Widget that renders terminal output entries
 class TerminalOutputWidget extends StatelessWidget {
-  final TerminalOutputModel output;
-  final String terminalPrefix;
 
   const TerminalOutputWidget({
     super.key,
     required this.output,
     this.terminalPrefix = '>',
   });
+  final TerminalOutputModel output;
+  final String terminalPrefix;
 
   @override
   Widget build(BuildContext context) {
@@ -45,8 +45,7 @@ class TerminalOutputWidget extends StatelessWidget {
   }
 
   /// Renders a command-type output with the terminal prefix
-  Widget _buildCommandOutput() {
-    return Padding(
+  Widget _buildCommandOutput() => Padding(
       padding: const EdgeInsets.only(bottom: 4.0),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -77,5 +76,4 @@ class TerminalOutputWidget extends StatelessWidget {
         ],
       ),
     );
-  }
 }

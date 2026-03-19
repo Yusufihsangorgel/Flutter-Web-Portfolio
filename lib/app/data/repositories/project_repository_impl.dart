@@ -5,11 +5,11 @@ import '../models/project_model.dart';
 import '../providers/assets_provider.dart';
 
 final class ProjectRepositoryImpl implements IProjectRepository {
-  final AssetsProvider _assetsProvider;
-  final RxList<ProjectModel> _cache = <ProjectModel>[].obs;
 
   ProjectRepositoryImpl({required AssetsProvider assetsProvider})
     : _assetsProvider = assetsProvider;
+  final AssetsProvider _assetsProvider;
+  final RxList<ProjectModel> _cache = <ProjectModel>[].obs;
 
   @override
   Future<List<Project>> getProjects() async {

@@ -7,9 +7,6 @@ import 'package:flutter_web_portfolio/app/utils/responsive_utils.dart';
 
 /// Custom SliverAppBar widget
 class CustomSliverAppBar extends StatelessWidget {
-  final LanguageController languageController;
-  final AppScrollController scrollController;
-  final List<Widget>? actions;
 
   const CustomSliverAppBar({
     super.key,
@@ -17,6 +14,9 @@ class CustomSliverAppBar extends StatelessWidget {
     required this.scrollController,
     this.actions,
   });
+  final LanguageController languageController;
+  final AppScrollController scrollController;
+  final List<Widget>? actions;
 
   @override
   Widget build(BuildContext context) {
@@ -62,8 +62,7 @@ class CustomSliverAppBar extends StatelessWidget {
     );
   }
 
-  Widget _buildNavItems(BuildContext context) {
-    return SingleChildScrollView(
+  Widget _buildNavItems(BuildContext context) => SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.end,
@@ -77,7 +76,6 @@ class CustomSliverAppBar extends StatelessWidget {
         ],
       ),
     );
-  }
 
   Widget _buildNavItem(BuildContext context, String sectionId) {
     final title = languageController.getText(
@@ -108,8 +106,8 @@ class CustomSliverAppBar extends StatelessWidget {
         borderRadius: BorderRadius.circular(6),
         child: InkWell(
           borderRadius: BorderRadius.circular(6),
-          hoverColor: Colors.purple.withOpacity(0.1),
-          splashColor: Colors.purple.withOpacity(0.2),
+          hoverColor: Colors.purple.withValues(alpha:0.1),
+          splashColor: Colors.purple.withValues(alpha:0.2),
           onTap: () {
             scrollController.scrollToSection(sectionId);
           },
@@ -138,14 +136,12 @@ class CustomSliverAppBar extends StatelessWidget {
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
       elevation: 8,
-      builder: (context) {
-        return DraggableScrollableSheet(
+      builder: (context) => DraggableScrollableSheet(
           initialChildSize: 0.5,
           minChildSize: 0.3,
           maxChildSize: 0.9,
           expand: false,
-          builder: (context, scrollController) {
-            return SingleChildScrollView(
+          builder: (context, scrollController) => SingleChildScrollView(
               controller: scrollController,
               child: Container(
                 padding: const EdgeInsets.symmetric(vertical: 24),
@@ -173,7 +169,7 @@ class CustomSliverAppBar extends StatelessWidget {
                         width: 40,
                         margin: const EdgeInsets.only(bottom: 16),
                         decoration: BoxDecoration(
-                          color: Colors.grey.withOpacity(0.3),
+                          color: Colors.grey.withValues(alpha:0.3),
                           borderRadius: BorderRadius.circular(2),
                         ),
                       ),
@@ -188,10 +184,8 @@ class CustomSliverAppBar extends StatelessWidget {
                   ),
                 ),
               ),
-            );
-          },
-        );
-      },
+            ),
+        ),
     );
   }
 

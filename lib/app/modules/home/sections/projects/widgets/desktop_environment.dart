@@ -4,16 +4,15 @@ import 'package:flutter/material.dart';
 /// Renders a fully transparent gradient so the CosmicBackground behind it
 /// remains visible.
 class DesktopBackground extends StatelessWidget {
-  final int currentIndex;
 
   const DesktopBackground({super.key, required this.currentIndex});
+  final int currentIndex;
 
   @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
+  Widget build(BuildContext context) => Container(
+      decoration: const BoxDecoration(
         gradient: LinearGradient(
-          colors: const [
+          colors: [
             Colors.transparent, // Fully transparent so CosmicBackground shows
             Colors.transparent, // Fully transparent so CosmicBackground shows
           ],
@@ -23,14 +22,10 @@ class DesktopBackground extends StatelessWidget {
       ),
       child: const SizedBox.expand(),
     );
-  }
 }
 
 /// A single desktop icon that can be tapped or double-tapped to open.
 class DesktopIcon extends StatelessWidget {
-  final String title;
-  final IconData iconData;
-  final VoidCallback onTap;
 
   const DesktopIcon({
     super.key,
@@ -38,10 +33,12 @@ class DesktopIcon extends StatelessWidget {
     required this.iconData,
     required this.onTap,
   });
+  final String title;
+  final IconData iconData;
+  final VoidCallback onTap;
 
   @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
+  Widget build(BuildContext context) => GestureDetector(
       onTap: onTap,
       onDoubleTap: onTap, // Usually desktop icons are opened with double-click
       child: Container(
@@ -53,7 +50,7 @@ class DesktopIcon extends StatelessWidget {
               height: 48,
               width: 48,
               decoration: BoxDecoration(
-                color: Colors.amber.withOpacity(0.8),
+                color: Colors.amber.withValues(alpha:0.8),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Icon(iconData, color: Colors.white, size: 28),
@@ -80,5 +77,4 @@ class DesktopIcon extends StatelessWidget {
         ),
       ),
     );
-  }
 }

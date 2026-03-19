@@ -70,9 +70,7 @@ class AppScrollController extends GetxController {
     if (!scrollController.hasClients) return;
 
     _debounceTimer?.cancel();
-    _debounceTimer = Timer(const Duration(milliseconds: 100), () {
-      _detectActiveSection();
-    });
+    _debounceTimer = Timer(const Duration(milliseconds: 100), _detectActiveSection);
   }
 
   void _detectActiveSection() {

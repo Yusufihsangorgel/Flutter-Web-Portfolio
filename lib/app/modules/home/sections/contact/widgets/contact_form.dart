@@ -10,9 +10,9 @@ import 'holographic_painters.dart';
 /// holographic styling. Handles form validation, submission simulation,
 /// and displays a success message after sending.
 class ContactForm extends StatefulWidget {
-  final bool isWideLayout;
 
   const ContactForm({super.key, required this.isWideLayout});
+  final bool isWideLayout;
 
   @override
   State<ContactForm> createState() => _ContactFormState();
@@ -109,8 +109,7 @@ class _ContactFormState extends State<ContactForm> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return HolographicContainer(
+  Widget build(BuildContext context) => HolographicContainer(
       child: Padding(
         padding: const EdgeInsets.all(30.0),
         child: Obx(() {
@@ -216,11 +215,9 @@ class _ContactFormState extends State<ContactForm> {
         }),
       ),
     );
-  }
 
   // Success message displayed after form submission
-  Widget _buildSuccessMessage() {
-    return SizedBox(
+  Widget _buildSuccessMessage() => SizedBox(
       height: 300,
       child: Center(
         child: Column(
@@ -231,7 +228,7 @@ class _ContactFormState extends State<ContactForm> {
               width: 80,
               height: 80,
               decoration: BoxDecoration(
-                color: Colors.green.withOpacity(0.2),
+                color: Colors.green.withValues(alpha:0.2),
                 shape: BoxShape.circle,
               ),
               child: const Icon(Icons.check, color: Colors.green, size: 50),
@@ -260,7 +257,7 @@ class _ContactFormState extends State<ContactForm> {
                   : 'En kısa sürede size dönüş yapacağım.',
               style: TextStyle(
                 fontSize: 16,
-                color: Colors.white.withOpacity(0.7),
+                color: Colors.white.withValues(alpha:0.7),
               ),
               textAlign: TextAlign.center,
             ),
@@ -268,7 +265,6 @@ class _ContactFormState extends State<ContactForm> {
         ),
       ),
     );
-  }
 
   // Holographic styled text field
   Widget _buildHolographicTextField({
@@ -278,27 +274,26 @@ class _ContactFormState extends State<ContactForm> {
     required IconData prefixIcon,
     bool isActive = false,
     int maxLines = 1,
-  }) {
-    return AnimatedContainer(
+  }) => AnimatedContainer(
       duration: const Duration(milliseconds: 300),
       decoration: BoxDecoration(
         color:
             isActive
-                ? Colors.black.withOpacity(0.3)
-                : Colors.black.withOpacity(0.2),
+                ? Colors.black.withValues(alpha:0.3)
+                : Colors.black.withValues(alpha:0.2),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color:
               isActive
                   ? themeController.primaryColor
-                  : Colors.white.withOpacity(0.2),
+                  : Colors.white.withValues(alpha:0.2),
           width: isActive ? 2 : 1,
         ),
         boxShadow:
             isActive
                 ? [
                   BoxShadow(
-                    color: themeController.primaryColor.withOpacity(0.5),
+                    color: themeController.primaryColor.withValues(alpha:0.5),
                     blurRadius: 10,
                     spreadRadius: 1,
                   ),
@@ -312,7 +307,7 @@ class _ContactFormState extends State<ContactForm> {
         maxLines: maxLines,
         decoration: InputDecoration(
           hintText: hintText,
-          hintStyle: TextStyle(color: Colors.white.withOpacity(0.5)),
+          hintStyle: TextStyle(color: Colors.white.withValues(alpha:0.5)),
           contentPadding: const EdgeInsets.symmetric(
             horizontal: 20,
             vertical: 16,
@@ -323,10 +318,9 @@ class _ContactFormState extends State<ContactForm> {
             color:
                 isActive
                     ? themeController.primaryColor
-                    : Colors.white.withOpacity(0.5),
+                    : Colors.white.withValues(alpha:0.5),
           ),
         ),
       ),
     );
-  }
 }

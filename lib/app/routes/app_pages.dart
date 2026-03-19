@@ -4,19 +4,15 @@ import 'package:get/get.dart';
 
 part 'app_routes.dart';
 
-/// Class defining application routes
 class AppPages {
-  /// Initial route for application launch
-  static const INITIAL = Routes.HOME;
+  static const initial = Routes.home;
 
-  /// All application routes
   static final routes = [
     GetPage(
-      name: Routes.HOME,
+      name: Routes.home,
       page: () => const HomeView(),
       binding: HomeBinding(),
       transition: Transition.fadeIn,
     ),
-    // Additional routes can be added here in the future
   ];
 }

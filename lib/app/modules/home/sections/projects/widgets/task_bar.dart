@@ -5,11 +5,6 @@ import '../models/project_window_model.dart';
 /// The taskbar displayed at the top of the desktop environment.
 /// Contains a menu button, tabs for open projects, and a clock.
 class TaskBar extends StatelessWidget {
-  final VoidCallback onMenuPressed;
-  final DateTime time;
-  final bool showClock;
-  final List<ProjectWindowModel> openProjects;
-  final Function(ProjectWindowModel) onProjectSelected;
 
   const TaskBar({
     super.key,
@@ -19,16 +14,20 @@ class TaskBar extends StatelessWidget {
     required this.openProjects,
     required this.onProjectSelected,
   });
+  final VoidCallback onMenuPressed;
+  final DateTime time;
+  final bool showClock;
+  final List<ProjectWindowModel> openProjects;
+  final Function(ProjectWindowModel) onProjectSelected;
 
   @override
-  Widget build(BuildContext context) {
-    return Container(
+  Widget build(BuildContext context) => Container(
       height: 48,
       padding: const EdgeInsets.symmetric(horizontal: 10),
       decoration: BoxDecoration(
         color: const Color(0xFF2A2D31),
         border: Border(
-          bottom: BorderSide(color: Colors.black.withOpacity(0.3), width: 1),
+          bottom: BorderSide(color: Colors.black.withValues(alpha:0.3), width: 1),
         ),
       ),
       child: Row(
@@ -48,8 +47,7 @@ class TaskBar extends StatelessWidget {
               scrollDirection: Axis.horizontal,
               child: Row(
                 children:
-                    openProjects.map((project) {
-                      return Padding(
+                    openProjects.map((project) => Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 4),
                         child: InkWell(
                           onTap: () => onProjectSelected(project),
@@ -66,14 +64,14 @@ class TaskBar extends StatelessWidget {
                                       : const Color(0xFF4A4D51),
                               borderRadius: BorderRadius.circular(4),
                               border: Border.all(
-                                color: Colors.black.withOpacity(0.3),
+                                color: Colors.black.withValues(alpha:0.3),
                                 width: 1,
                               ),
                             ),
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Icon(
+                                const Icon(
                                   Icons.folder_open,
                                   color: Colors.white70,
                                   size: 18,
@@ -90,8 +88,7 @@ class TaskBar extends StatelessWidget {
                             ),
                           ),
                         ),
-                      );
-                    }).toList(),
+                      )).toList(),
               ),
             ),
           ),
@@ -110,5 +107,4 @@ class TaskBar extends StatelessWidget {
         ],
       ),
     );
-  }
 }

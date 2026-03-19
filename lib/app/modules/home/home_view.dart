@@ -56,8 +56,7 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
+  Widget build(BuildContext context) => Scaffold(
       backgroundColor: Colors.transparent,
       body: LayoutBuilder(
         builder: (context, constraints) {
@@ -95,7 +94,6 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
         },
       ),
     );
-  }
 
   SliverToBoxAdapter _section(GlobalKey key, String id, double minHeight, Widget child) =>
       SliverToBoxAdapter(

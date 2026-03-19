@@ -27,9 +27,9 @@ class _ProjectsSectionState extends State<ProjectsSection>
   final ThemeController themeController = Get.find<ThemeController>();
   final RxList<ProjectWindowModel> _projects = <ProjectWindowModel>[].obs;
   final RxList<ProjectWindowModel> _openProjects = <ProjectWindowModel>[].obs;
-  int _currentDesktopIndex = 0;
+  final int _currentDesktopIndex = 0;
   DateTime _lastTimeCheck = DateTime.now();
-  bool _showClock = true;
+  final bool _showClock = true;
   Timer? _clockTimer;
   Timer? _projectOpenTimer;
   int _openProjectIndex = -1;
@@ -143,12 +143,10 @@ class _ProjectsSectionState extends State<ProjectsSection>
   }
 
   /// Generates a random window position.
-  Offset _generateRandomPosition() {
-    return Offset(
+  Offset _generateRandomPosition() => Offset(
       100 + (math.Random().nextDouble() * 100),
       100 + (math.Random().nextDouble() * 100),
     );
-  }
 
   String _extractUrl(Map<dynamic, dynamic> project) {
     if (project['url'] is String) {
@@ -314,13 +312,13 @@ class _ProjectsSectionState extends State<ProjectsSection>
                     borderRadius: BorderRadius.circular(12),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.3),
+                        color: Colors.black.withValues(alpha:0.3),
                         blurRadius: 20,
                         offset: const Offset(0, 5),
                       ),
                     ],
                     border: Border.all(
-                      color: Colors.grey.withOpacity(0.2),
+                      color: Colors.grey.withValues(alpha:0.2),
                       width: 1,
                     ),
                   ),
@@ -371,8 +369,7 @@ class _ProjectsSectionState extends State<ProjectsSection>
                               ),
 
                               // Project windows
-                              ..._openProjects.map((project) {
-                                return Positioned(
+                              ..._openProjects.map((project) => Positioned(
                                   left: project.windowPosition.dx,
                                   top: project.windowPosition.dy,
                                   child: Visibility(
@@ -398,8 +395,7 @@ class _ProjectsSectionState extends State<ProjectsSection>
                                       languageController: languageController,
                                     ),
                                   ),
-                                );
-                              }).toList(),
+                                )),
                             ],
                           ),
                         ),

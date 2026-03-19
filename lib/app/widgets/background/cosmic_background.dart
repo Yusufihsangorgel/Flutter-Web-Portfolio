@@ -11,9 +11,6 @@ import 'painters/moon_surface_painter.dart';
 import 'widgets/rocket_widget.dart';
 
 class CosmicBackground extends StatefulWidget {
-  final ScrollController? scrollController;
-  final double pageHeight;
-  final AnimationController? animationController;
 
   const CosmicBackground({
     super.key,
@@ -21,6 +18,9 @@ class CosmicBackground extends StatefulWidget {
     this.pageHeight = 0,
     this.animationController,
   });
+  final ScrollController? scrollController;
+  final double pageHeight;
+  final AnimationController? animationController;
 
   @override
   State<CosmicBackground> createState() => _CosmicBackgroundState();
@@ -37,18 +37,16 @@ class _CosmicBackgroundState extends State<CosmicBackground>
   void initState() {
     super.initState();
 
-    rocketPosition = Offset(0, 0);
+    rocketPosition = const Offset(0, 0);
     rocketVelocity = Offset(
       0.6 + math.Random().nextDouble() * 1.2,
       0.3 + math.Random().nextDouble() * 1.0,
     );
     rocketRotation = math.pi / 2;
 
-    rocketTimer = Timer.periodic(Duration(milliseconds: 20), (timer) {
+    rocketTimer = Timer.periodic(const Duration(milliseconds: 20), (timer) {
       if (mounted) {
-        setState(() {
-          _updateRocketPosition();
-        });
+        setState(_updateRocketPosition);
       }
     });
   }
@@ -69,7 +67,7 @@ class _CosmicBackgroundState extends State<CosmicBackground>
 
     // --- ORBITAL PHYSICS ALGORITHM ---
 
-    final dt = 1.0 / 90.0;
+    const dt = 1.0 / 90.0;
 
     // Multiple gravity attractors for complex orbital motion
     final List<Offset> attractors = [
@@ -133,8 +131,8 @@ class _CosmicBackgroundState extends State<CosmicBackground>
     Offset newPosition = rocketPosition + rocketVelocity * dt * 60;
 
     // Smooth deceleration near edges for natural boundary behavior
-    final edgeProximity = 20.0;
-    final slowdownFactor = 0.95;
+    const edgeProximity = 20.0;
+    const slowdownFactor = 0.95;
 
     if (newPosition.dx < minX + edgeProximity) {
       if (rocketVelocity.dx < 0) {
@@ -230,7 +228,7 @@ class _CosmicBackgroundState extends State<CosmicBackground>
     return LayoutBuilder(
       builder: (context, constraints) {
         // Center the rocket on first layout
-        if (rocketPosition == Offset(0, 0)) {
+        if (rocketPosition == const Offset(0, 0)) {
           rocketPosition = Offset(
             constraints.maxWidth / 2,
             constraints.maxHeight / 2,
@@ -285,14 +283,12 @@ class _CosmicBackgroundState extends State<CosmicBackground>
               RepaintBoundary(
                 child: AnimatedBuilder(
                   animation: animController,
-                  builder: (context, child) {
-                    return CustomPaint(
+                  builder: (context, child) => CustomPaint(
                       painter: ShootingStarPainter(
                         time: animController.value,
                         mousePosition: mousePosition.value,
                       ),
-                    );
-                  },
+                    ),
                 ),
               ),
 
@@ -308,8 +304,7 @@ class _CosmicBackgroundState extends State<CosmicBackground>
     );
   }
 
-  Widget _buildMoon(AnimationController animController) {
-    return Positioned(
+  Widget _buildMoon(AnimationController animController) => Positioned(
       top: 120,
       right: 120,
       child: AnimatedBuilder(
@@ -375,7 +370,7 @@ class _CosmicBackgroundState extends State<CosmicBackground>
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.white.withOpacity(0.1),
+                      color: Colors.white.withValues(alpha:0.1),
                       blurRadius: 15,
                       spreadRadius: 1,
                     ),
@@ -391,14 +386,12 @@ class _CosmicBackgroundState extends State<CosmicBackground>
         },
       ),
     );
-  }
 
   // Scroll-based rocket movement with physics-based smoothing
   Widget _buildScrollBasedRocket(
     BoxConstraints constraints,
     AnimationController animController,
-  ) {
-    return AnimatedBuilder(
+  ) => AnimatedBuilder(
       animation: Listenable.merge([animController, widget.scrollController!]),
       builder: (context, child) {
         // Normalized scroll progress (0.0 - 1.0)
@@ -412,7 +405,7 @@ class _CosmicBackgroundState extends State<CosmicBackground>
         final rocketY = constraints.maxHeight * scrollProgress;
 
         // Divide scroll range into sections for varied flight paths
-        final sectionCount = 5;
+        const sectionCount = 5;
         final sectionIndex = (scrollProgress * sectionCount).floor();
         final sectionProgress = (scrollProgress * sectionCount) - sectionIndex;
 
@@ -473,7 +466,7 @@ class _CosmicBackgroundState extends State<CosmicBackground>
 
         final lastXPos = SharedBackgroundController.rocketX ?? targetXPos;
 
-        final maxPositionChange = 1.5;
+        const maxPositionChange = 1.5;
         final xDiff = targetXPos - lastXPos;
         final limitedXDiff = xDiff.clamp(-maxPositionChange, maxPositionChange);
         final smoothXPos = lastXPos + limitedXDiff;
@@ -483,7 +476,7 @@ class _CosmicBackgroundState extends State<CosmicBackground>
 
         final lastAngle =
             SharedBackgroundController.rocketRotation ?? targetAngle;
-        final maxAngleChange = 0.01;
+        const maxAngleChange = 0.01;
         final angleDiff = (targetAngle - lastAngle);
         final normalizedDiff =
             angleDiff > math.pi
@@ -507,7 +500,6 @@ class _CosmicBackgroundState extends State<CosmicBackground>
         );
       },
     );
-  }
 
   // Free-roaming rocket driven by the physics simulation in _updateRocketPosition
   Widget _buildFreeRoamingRocket(
@@ -527,9 +519,7 @@ class _CosmicBackgroundState extends State<CosmicBackground>
     );
   }
 
-  double _easeInOut(double t) {
-    return t < 0.5 ? 4 * t * t * t : (t - 1) * (2 * t - 2) * (2 * t - 2) + 1;
-  }
+  double _easeInOut(double t) => t < 0.5 ? 4 * t * t * t : (t - 1) * (2 * t - 2) * (2 * t - 2) + 1;
 
   // Interpolates between two angles via the shortest arc
   double _smoothAngle(
@@ -538,8 +528,12 @@ class _CosmicBackgroundState extends State<CosmicBackground>
     double smoothFactor,
   ) {
     var angleDiff = targetAngle - currentAngle;
-    while (angleDiff > math.pi) angleDiff -= 2 * math.pi;
-    while (angleDiff < -math.pi) angleDiff += 2 * math.pi;
+    while (angleDiff > math.pi) {
+      angleDiff -= 2 * math.pi;
+    }
+    while (angleDiff < -math.pi) {
+      angleDiff += 2 * math.pi;
+    }
     return currentAngle + angleDiff * smoothFactor;
   }
 }

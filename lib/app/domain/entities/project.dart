@@ -1,11 +1,4 @@
 base class Project {
-  final String id;
-  final String title;
-  final String description;
-  final List<String> technologies;
-  final String imageUrl;
-  final String liveUrl;
-  final String githubUrl;
 
   const Project({
     required this.id,
@@ -16,4 +9,11 @@ base class Project {
     this.liveUrl = '',
     this.githubUrl = '',
   });
+  final String id;
+  final String title;
+  final String description;
+  final List<String> technologies;
+  final String imageUrl;
+  final String liveUrl;
+  final String githubUrl;
 }

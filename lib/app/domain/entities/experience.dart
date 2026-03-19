@@ -1,11 +1,4 @@
 final class Experience {
-  final String id;
-  final String title;
-  final String company;
-  final String period;
-  final String location;
-  final List<String> responsibilities;
-  final List<String> technologies;
 
   const Experience({
     required this.id,
@@ -16,4 +9,11 @@ final class Experience {
     required this.responsibilities,
     required this.technologies,
   });
+  final String id;
+  final String title;
+  final String company;
+  final String period;
+  final String location;
+  final List<String> responsibilities;
+  final List<String> technologies;
 }

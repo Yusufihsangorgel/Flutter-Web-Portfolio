@@ -5,6 +5,18 @@ enum TerminalOutputType { text, command, error, system }
 
 /// Model class representing a terminal output entry
 class TerminalOutputModel {
+
+  TerminalOutputModel({
+    required this.content,
+    this.type = TerminalOutputType.text,
+    this.color = Colors.white,
+    this.prefix = '',
+    this.isBold = false,
+    this.isTyping = false,
+    this.isCompleted = false,
+    this.currentIndex = 0,
+    this.onTap,
+  });
   String content;
   final TerminalOutputType type;
   final Color color;
@@ -20,16 +32,4 @@ class TerminalOutputModel {
 
   /// Current character index for the typing animation
   int currentIndex;
-
-  TerminalOutputModel({
-    required this.content,
-    this.type = TerminalOutputType.text,
-    this.color = Colors.white,
-    this.prefix = '',
-    this.isBold = false,
-    this.isTyping = false,
-    this.isCompleted = false,
-    this.currentIndex = 0,
-    this.onTap,
-  });
 }

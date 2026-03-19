@@ -6,13 +6,6 @@ import 'package:get/get.dart';
 
 /// Widget that displays the terminal screen
 class TerminalWidget extends StatelessWidget {
-  final List<TerminalOutputModel> outputs;
-  final ScrollController scrollController;
-  final String title;
-  final String terminalPrefix;
-  final TextEditingController commandController;
-  final FocusNode terminalFocus;
-  final Function(String) onSubmitCommand;
 
   const TerminalWidget({
     super.key,
@@ -24,6 +17,13 @@ class TerminalWidget extends StatelessWidget {
     required this.terminalFocus,
     required this.onSubmitCommand,
   });
+  final List<TerminalOutputModel> outputs;
+  final ScrollController scrollController;
+  final String title;
+  final String terminalPrefix;
+  final TextEditingController commandController;
+  final FocusNode terminalFocus;
+  final Function(String) onSubmitCommand;
 
   @override
   Widget build(BuildContext context) {
@@ -33,12 +33,12 @@ class TerminalWidget extends StatelessWidget {
       decoration: BoxDecoration(
         color:
             themeController.isDarkMode
-                ? Colors.black.withOpacity(0.8)
+                ? Colors.black.withValues(alpha:0.8)
                 : Colors.black87,
         borderRadius: BorderRadius.circular(10),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.3),
+            color: Colors.black.withValues(alpha:0.3),
             blurRadius: 10,
             offset: const Offset(0, 5),
           ),
@@ -46,8 +46,8 @@ class TerminalWidget extends StatelessWidget {
         border: Border.all(
           color:
               themeController.isDarkMode
-                  ? Colors.white.withOpacity(0.1)
-                  : Colors.black.withOpacity(0.2),
+                  ? Colors.white.withValues(alpha:0.1)
+                  : Colors.black.withValues(alpha:0.2),
         ),
       ),
       child: Column(
@@ -62,8 +62,7 @@ class TerminalWidget extends StatelessWidget {
   }
 
   /// Builds the terminal title bar
-  Widget _buildTerminalHeader() {
-    return Container(
+  Widget _buildTerminalHeader() => Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
         color:
@@ -113,7 +112,7 @@ class TerminalWidget extends StatelessWidget {
               child: Text(
                 title,
                 style: TextStyle(
-                  color: Colors.white.withOpacity(0.8),
+                  color: Colors.white.withValues(alpha:0.8),
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -123,12 +122,10 @@ class TerminalWidget extends StatelessWidget {
         ],
       ),
     );
-  }
 
   /// Builds the terminal content area
-  Widget _buildTerminalContent() {
-    return GestureDetector(
-      onTap: () => terminalFocus.requestFocus(),
+  Widget _buildTerminalContent() => GestureDetector(
+      onTap: terminalFocus.requestFocus,
       child: Container(
         padding: const EdgeInsets.all(16),
         child: SingleChildScrollView(
@@ -164,7 +161,7 @@ class TerminalWidget extends StatelessWidget {
                     terminalPrefix: terminalPrefix,
                   );
                 }
-              }).toList(),
+              }),
 
               // Active command input
               Row(
@@ -207,5 +204,4 @@ class TerminalWidget extends StatelessWidget {
         ),
       ),
     );
-  }
 }

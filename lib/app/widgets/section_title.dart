@@ -5,13 +5,6 @@ import 'package:animate_do/animate_do.dart';
 
 /// Consistent section title widget used across all sections
 class SectionTitle extends StatelessWidget {
-  final String title;
-  final String? subtitle;
-  final TextStyle? titleStyle;
-  final TextStyle? subtitleStyle;
-  final EdgeInsetsGeometry padding;
-  final CrossAxisAlignment alignment;
-  final bool useGlow;
 
   const SectionTitle({
     super.key,
@@ -23,6 +16,13 @@ class SectionTitle extends StatelessWidget {
     this.alignment = CrossAxisAlignment.start,
     this.useGlow = true,
   });
+  final String title;
+  final String? subtitle;
+  final TextStyle? titleStyle;
+  final TextStyle? subtitleStyle;
+  final EdgeInsetsGeometry padding;
+  final CrossAxisAlignment alignment;
+  final bool useGlow;
 
   @override
   Widget build(BuildContext context) {
@@ -47,7 +47,7 @@ class SectionTitle extends StatelessWidget {
                         useGlow
                             ? [
                               Shadow(
-                                color: themeController.primaryColor.withOpacity(
+                                color: themeController.primaryColor.withValues(alpha:
                                   0.5,
                                 ),
                                 blurRadius: 10,

@@ -4,13 +4,13 @@ import 'dart:ui' show PointMode;
 
 // Star field painter - twinkling and glowing stars
 class StarFieldPainter extends CustomPainter {
+
+  StarFieldPainter({required this.animController, this.scrollOffset = 0});
   final AnimationController animController;
   final double scrollOffset;
 
   static List<Star>? _cachedStars;
   static final _random = math.Random(42);
-
-  StarFieldPainter({required this.animController, this.scrollOffset = 0});
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -70,7 +70,7 @@ class StarFieldPainter extends CustomPainter {
             0.3 + (math.sin(time * twinkleSpeed + star.phase) + 1) / 2 * 0.6;
       }
 
-      double x =
+      final double x =
           star.x +
           math.sin(time * star.movementSpeed + star.phase) *
               star.movementAmplitude;
@@ -86,11 +86,11 @@ class StarFieldPainter extends CustomPainter {
       // Wrap stars that scroll off-screen
       y = y % size.height;
 
-      double starSize = star.size;
+      final double starSize = star.size;
 
       final paint =
           Paint()
-            ..color = Colors.white.withOpacity(brightness)
+            ..color = Colors.white.withValues(alpha:brightness)
             ..strokeWidth = starSize
             ..strokeCap = StrokeCap.round;
 
@@ -100,7 +100,7 @@ class StarFieldPainter extends CustomPainter {
       if (brightness > 0.6) {
         final glowPaint =
             Paint()
-              ..color = Colors.white.withOpacity(brightness * 0.15)
+              ..color = Colors.white.withValues(alpha:brightness * 0.15)
               ..strokeWidth = starSize * 2.5
               ..strokeCap = StrokeCap.round;
 
@@ -110,21 +110,11 @@ class StarFieldPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant StarFieldPainter oldDelegate) {
-    return oldDelegate.animController.value != animController.value ||
+  bool shouldRepaint(covariant StarFieldPainter oldDelegate) => oldDelegate.animController.value != animController.value ||
         oldDelegate.scrollOffset != scrollOffset;
-  }
 }
 
 class Star {
-  final double x, y;
-  final double size;
-  final bool isTwinkler;
-  final bool isBright;
-  final double movementAmplitude;
-  final double movementSpeed;
-  final double phase;
-  final double layer;
 
   Star({
     required this.x,
@@ -137,4 +127,12 @@ class Star {
     required this.phase,
     required this.layer,
   });
+  final double x, y;
+  final double size;
+  final bool isTwinkler;
+  final bool isBright;
+  final double movementAmplitude;
+  final double movementSpeed;
+  final double phase;
+  final double layer;
 }

@@ -10,14 +10,13 @@ import 'holographic_painters.dart';
 /// Displays contact information (email, phone, location) and
 /// social media buttons inside a holographic container.
 class ContactInfoPanel extends StatelessWidget {
+
+  ContactInfoPanel({super.key});
   final LanguageController languageController = Get.find<LanguageController>();
   final ThemeController themeController = Get.find<ThemeController>();
 
-  ContactInfoPanel({super.key});
-
   @override
-  Widget build(BuildContext context) {
-    return HolographicContainer(
+  Widget build(BuildContext context) => HolographicContainer(
       child: Padding(
         padding: const EdgeInsets.all(30.0),
         child: Obx(() {
@@ -92,18 +91,16 @@ class ContactInfoPanel extends StatelessWidget {
         }),
       ),
     );
-  }
 
   // Contact info item row
-  Widget _buildContactInfoItem(IconData icon, String label, String value) {
-    return Row(
+  Widget _buildContactInfoItem(IconData icon, String label, String value) => Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Container(
           width: 40,
           height: 40,
           decoration: BoxDecoration(
-            color: themeController.primaryColor.withOpacity(0.2),
+            color: themeController.primaryColor.withValues(alpha:0.2),
             borderRadius: BorderRadius.circular(8),
           ),
           child: Icon(icon, color: themeController.primaryColor),
@@ -119,7 +116,7 @@ class ContactInfoPanel extends StatelessWidget {
                 label,
                 style: TextStyle(
                   fontSize: 14,
-                  color: Colors.white.withOpacity(0.7),
+                  color: Colors.white.withValues(alpha:0.7),
                 ),
               ),
 
@@ -134,15 +131,13 @@ class ContactInfoPanel extends StatelessWidget {
         ),
       ],
     );
-  }
 
   // Social media button
   Widget _buildSocialButton(
     IconData icon,
     String tooltip,
     VoidCallback onPressed,
-  ) {
-    return HoverAnimatedWidget(
+  ) => HoverAnimatedWidget(
       hoverScale: 1.1,
       child: Tooltip(
         message: tooltip,
@@ -152,10 +147,10 @@ class ContactInfoPanel extends StatelessWidget {
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              color: Colors.black.withOpacity(0.3),
+              color: Colors.black.withValues(alpha:0.3),
               borderRadius: BorderRadius.circular(8),
               border: Border.all(
-                color: Colors.white.withOpacity(0.2),
+                color: Colors.white.withValues(alpha:0.2),
                 width: 1,
               ),
             ),
@@ -164,5 +159,4 @@ class ContactInfoPanel extends StatelessWidget {
         ),
       ),
     );
-  }
 }

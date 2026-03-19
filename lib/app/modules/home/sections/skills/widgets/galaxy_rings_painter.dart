@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 
 /// Custom painter that draws the galaxy rings background effect.
 class GalaxyRingsPainter extends CustomPainter {
-  final double galaxySize;
 
   const GalaxyRingsPainter({required this.galaxySize});
+  final double galaxySize;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -13,9 +13,9 @@ class GalaxyRingsPainter extends CustomPainter {
         Paint()
           ..shader = RadialGradient(
             colors: [
-              Colors.blue[400]!.withOpacity(0.2),
-              Colors.blue[400]!.withOpacity(0.1),
-              Colors.blue[400]!.withOpacity(0.05),
+              Colors.blue[400]!.withValues(alpha:0.2),
+              Colors.blue[400]!.withValues(alpha:0.1),
+              Colors.blue[400]!.withValues(alpha:0.05),
               Colors.transparent,
             ],
             stops: const [0.2, 0.5, 0.8, 1.0],
@@ -39,7 +39,7 @@ class GalaxyRingsPainter extends CustomPainter {
         Paint()
           ..style = PaintingStyle.stroke
           ..strokeWidth = 2.0
-          ..color = Colors.blue[400]!.withOpacity(0.5);
+          ..color = Colors.blue[400]!.withValues(alpha:0.5);
 
     canvas.drawCircle(
       Offset(size.width / 2, size.height / 2),
@@ -66,7 +66,7 @@ class GalaxyRingsPainter extends CustomPainter {
           Paint()
             ..style = PaintingStyle.stroke
             ..strokeWidth = 1.0
-            ..color = Colors.white.withOpacity(0.2);
+            ..color = Colors.white.withValues(alpha:0.2);
 
       canvas.drawCircle(
         Offset(size.width / 2, size.height / 2),

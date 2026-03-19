@@ -5,6 +5,12 @@ import '../providers/assets_provider.dart';
 import '../providers/local_storage_provider.dart';
 
 class LanguageRepositoryImpl implements ILanguageRepository {
+
+  LanguageRepositoryImpl({
+    required AssetsProvider assetsProvider,
+    required LocalStorageProvider localStorageProvider,
+  }) : _assetsProvider = assetsProvider,
+       _localStorageProvider = localStorageProvider;
   final AssetsProvider _assetsProvider;
   final LocalStorageProvider _localStorageProvider;
 
@@ -17,12 +23,6 @@ class LanguageRepositoryImpl implements ILanguageRepository {
     'fr': '\u{1F1EB}\u{1F1F7}',
     'es': '\u{1F1EA}\u{1F1F8}',
   };
-
-  LanguageRepositoryImpl({
-    required AssetsProvider assetsProvider,
-    required LocalStorageProvider localStorageProvider,
-  }) : _assetsProvider = assetsProvider,
-       _localStorageProvider = localStorageProvider;
 
   @override
   Map<String, String> getSupportedLanguages() => _supportedLanguages;
@@ -48,9 +48,7 @@ class LanguageRepositoryImpl implements ILanguageRepository {
   }
 
   @override
-  Future<Map<String, dynamic>> getTranslations(String languageCode) async {
-    return _assetsProvider.loadTranslations(languageCode);
-  }
+  Future<Map<String, dynamic>> getTranslations(String languageCode) async => _assetsProvider.loadTranslations(languageCode);
 
   @override
   Map<String, dynamic> getCVData(String languageCode) {

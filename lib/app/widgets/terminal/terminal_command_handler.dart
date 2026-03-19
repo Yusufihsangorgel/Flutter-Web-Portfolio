@@ -5,10 +5,6 @@ import 'package:flutter_web_portfolio/app/utils/url_launcher_utils.dart';
 
 /// Handles terminal command processing
 class TerminalCommandHandler {
-  final LanguageController _languageController;
-  final Function(TerminalOutputModel) addOutput;
-  final VoidCallback clearTerminal;
-  final VoidCallback scrollToBottom;
 
   TerminalCommandHandler({
     required LanguageController languageController,
@@ -16,6 +12,10 @@ class TerminalCommandHandler {
     required this.clearTerminal,
     required this.scrollToBottom,
   }) : _languageController = languageController;
+  final LanguageController _languageController;
+  final Function(TerminalOutputModel) addOutput;
+  final VoidCallback clearTerminal;
+  final VoidCallback scrollToBottom;
 
   /// Processes a command and produces the appropriate response
   void handleCommand(String command) {
@@ -61,8 +61,7 @@ class TerminalCommandHandler {
   }
 
   /// Returns localized command names
-  Map<String, String> _getLocalizedCommands() {
-    return {
+  Map<String, String> _getLocalizedCommands() => {
       'help':
           _languageController
               .getText('terminal.commands.help_cmd', defaultValue: 'help')
@@ -125,7 +124,6 @@ class TerminalCommandHandler {
               .getText('terminal.commands.clear_cmd', defaultValue: 'clear')
               .toLowerCase(),
     };
-  }
 
   void _showHelp() {
     final commands = _getLocalizedCommands();
@@ -201,7 +199,7 @@ class TerminalCommandHandler {
 
   void _showAbout() {
     final cvData = _languageController.cvData;
-    if (cvData == null || cvData['personal_info'] == null) {
+    if (cvData['personal_info'] == null) {
       addOutput(
         TerminalOutputModel(
           content: 'No about information available',

@@ -10,7 +10,7 @@ import 'package:flutter_web_portfolio/app/widgets/terminal/terminal_widget.dart'
 import 'package:flutter_web_portfolio/app/widgets/terminal/typing_animation.dart';
 import 'package:flutter_web_portfolio/app/widgets/section_title.dart';
 
-/// Hakkımda bölümü - Terminal arayüzü ile kullanıcı etkileşimi sağlar
+/// About section - provides user interaction via a terminal interface
 class AboutSection extends StatefulWidget {
   const AboutSection({super.key});
 
@@ -20,24 +20,24 @@ class AboutSection extends StatefulWidget {
 
 class _AboutSectionState extends State<AboutSection>
     with SingleTickerProviderStateMixin {
-  // Kontrolcüler
+  // Controllers
   final LanguageController _languageController = Get.find<LanguageController>();
   final ThemeController _themeController = Get.find<ThemeController>();
 
-  // Terminal durumu
+  // Terminal state
   final List<TerminalOutputModel> _outputs = [];
   final ScrollController _scrollController = ScrollController();
   final TextEditingController _commandController = TextEditingController();
   final FocusNode _terminalFocus = FocusNode();
 
-  // Yardımcı sınıflar
+  // Helper classes
   late final TerminalCommandHandler _commandHandler;
   final TypingAnimation _typingAnimation = TypingAnimation();
 
-  // Animasyon kontrolcüsü
+  // Animation controller
   late final AnimationController _animationController;
 
-  // Terminal başlığı ve öneki
+  // Terminal title and prefix
   String _terminalTitle = '';
   String _terminalPrefix = '>';
 
@@ -49,9 +49,9 @@ class _AboutSectionState extends State<AboutSection>
     _showWelcomeMessage();
   }
 
-  /// Terminal bileşenlerini başlatır
+  /// Initializes terminal components
   void _initializeTerminal() {
-    // Komut işleyiciyi oluştur
+    // Create command handler
     _commandHandler = TerminalCommandHandler(
       languageController: _languageController,
       addOutput: _addOutput,
@@ -59,7 +59,7 @@ class _AboutSectionState extends State<AboutSection>
       scrollToBottom: _scrollToBottom,
     );
 
-    // Terminal başlığını ayarla
+    // Set terminal title
     _terminalTitle = _languageController.getText(
       'terminal.title',
       defaultValue: 'Terminal',
@@ -71,7 +71,7 @@ class _AboutSectionState extends State<AboutSection>
     );
   }
 
-  /// Animasyonları başlatır
+  /// Initializes animations
   void _initializeAnimations() {
     _animationController = AnimationController(
       vsync: this,
@@ -81,9 +81,9 @@ class _AboutSectionState extends State<AboutSection>
     _animationController.forward();
   }
 
-  /// Karşılama mesajını gösterir
+  /// Displays the welcome message
   void _showWelcomeMessage() {
-    // Karşılama mesajını al
+    // Get welcome message
     final welcomeMessage = _languageController.getText(
       'terminal.welcome',
       defaultValue: 'Interactive terminal portföyüme hoş geldiniz!',
@@ -94,7 +94,7 @@ class _AboutSectionState extends State<AboutSection>
       defaultValue: 'Kullanılabilir komutları görmek için "help" yazın.',
     );
 
-    // Karşılama mesajını ekle
+    // Add welcome message
     _addOutput(
       TerminalOutputModel(
         content: welcomeMessage,
@@ -107,7 +107,7 @@ class _AboutSectionState extends State<AboutSection>
       ),
     );
 
-    // Yardım ipucunu ekle
+    // Add help hint
     _addOutput(
       TerminalOutputModel(
         content: helpHint,
@@ -120,12 +120,12 @@ class _AboutSectionState extends State<AboutSection>
     );
   }
 
-  /// Terminal çıktısı ekler
+  /// Adds terminal output
   void _addOutput(TerminalOutputModel output) {
     setState(() {
       _outputs.add(output);
 
-      // Yazma animasyonu varsa başlat
+      // Start typing animation if enabled
       if (output.isTyping) {
         _typingAnimation.simulateTyping(
           output: output,
@@ -138,14 +138,12 @@ class _AboutSectionState extends State<AboutSection>
     });
   }
 
-  /// Terminal ekranını temizler
+  /// Clears the terminal screen
   void _clearTerminal() {
-    setState(() {
-      _outputs.clear();
-    });
+    setState(_outputs.clear);
   }
 
-  /// Ekranı en alta kaydırır
+  /// Scrolls to the bottom of the terminal
   void _scrollToBottom() {
     if (_scrollController.hasClients) {
       Future.delayed(const Duration(milliseconds: 50), () {
@@ -158,15 +156,13 @@ class _AboutSectionState extends State<AboutSection>
     }
   }
 
-  /// Komut gönderildiğinde çalışır
+  /// Handles command submission
   void _handleCommandSubmit(String command) {
-    // Komut kontrolcüsünü temizle
     _commandController.clear();
 
-    // Boş komut kontrolü
     if (command.trim().isEmpty) return;
 
-    // Komutu çıktılara ekle
+    // Add command to output
     _addOutput(
       TerminalOutputModel(
         content: command,
@@ -177,10 +173,7 @@ class _AboutSectionState extends State<AboutSection>
       ),
     );
 
-    // Komutu işle
     _commandHandler.handleCommand(command);
-
-    // Terminale odaklan
     _terminalFocus.requestFocus();
   }
 
@@ -194,26 +187,22 @@ class _AboutSectionState extends State<AboutSection>
   }
 
   @override
-  Widget build(BuildContext context) {
-    return FadeInUp(
+  Widget build(BuildContext context) => FadeInUp(
       duration: const Duration(milliseconds: 800),
       from: 50,
       child: SizedBox(
         width: double.infinity,
-        // Ekran yüksekliği - AppBar yüksekliği
+        // Screen height minus AppBar height
         height: MediaQuery.of(context).size.height - 80,
-        // Üst ve alt padding'i azaltıyoruz - özellikle üst kısımdaki padding'i
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Bölüm başlığı
               _buildSectionTitle(),
 
-              const SizedBox(height: 16), // Daha az boşluk
-              // Terminal arayüzü
+              const SizedBox(height: 16),
               Flexible(
                 child: TerminalWidget(
                   outputs: _outputs,
@@ -230,11 +219,9 @@ class _AboutSectionState extends State<AboutSection>
         ),
       ),
     );
-  }
 
-  /// Bölüm başlığını oluşturur
-  Widget _buildSectionTitle() {
-    return SectionTitle(
+  /// Builds the section title
+  Widget _buildSectionTitle() => SectionTitle(
       title: _languageController.getText(
         'about_section.title',
         defaultValue: 'Hakkımda',
@@ -247,5 +234,4 @@ class _AboutSectionState extends State<AboutSection>
         color: _themeController.isDarkMode ? Colors.white : Colors.black,
       ),
     );
-  }
 }

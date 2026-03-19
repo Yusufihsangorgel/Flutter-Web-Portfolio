@@ -4,10 +4,6 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 
 /// Mouse-tracking light effect widget
 class MouseLight extends StatefulWidget {
-  final Widget child;
-  final Color lightColor;
-  final double lightSize;
-  final double intensity;
 
   const MouseLight({
     super.key,
@@ -16,6 +12,10 @@ class MouseLight extends StatefulWidget {
     this.lightSize = 300,
     this.intensity = 0.3,
   });
+  final Widget child;
+  final Color lightColor;
+  final double lightSize;
+  final double intensity;
 
   @override
   State<MouseLight> createState() => _MouseLightState();
@@ -73,10 +73,6 @@ class _MouseLightState extends State<MouseLight> {
 
 /// CustomPainter for the light effect
 class _LightPainter extends CustomPainter {
-  final Offset mousePosition;
-  final Color lightColor;
-  final double lightSize;
-  final double intensity;
 
   _LightPainter({
     required this.mousePosition,
@@ -84,6 +80,10 @@ class _LightPainter extends CustomPainter {
     required this.lightSize,
     required this.intensity,
   });
+  final Offset mousePosition;
+  final Color lightColor;
+  final double lightSize;
+  final double intensity;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -92,7 +92,7 @@ class _LightPainter extends CustomPainter {
     final Paint paint = Paint();
     try {
       paint.shader = ui.Gradient.radial(mousePosition, lightSize, [
-        lightColor.withOpacity(intensity),
+        lightColor.withValues(alpha:intensity),
         Colors.transparent,
       ]);
       canvas.drawRect(Rect.fromLTWH(0, 0, size.width, size.height), paint);
@@ -102,19 +102,11 @@ class _LightPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(_LightPainter oldDelegate) {
-    return mousePosition != oldDelegate.mousePosition;
-  }
+  bool shouldRepaint(_LightPainter oldDelegate) => mousePosition != oldDelegate.mousePosition;
 }
 
 /// Hover animation widget
 class HoverAnimatedWidget extends StatefulWidget {
-  final Widget child;
-  final double hoverScale;
-  final Duration duration;
-  final Color? hoverColor;
-  final BorderRadius? borderRadius;
-  final EdgeInsetsGeometry? padding;
 
   const HoverAnimatedWidget({
     super.key,
@@ -125,6 +117,12 @@ class HoverAnimatedWidget extends StatefulWidget {
     this.borderRadius,
     this.padding,
   });
+  final Widget child;
+  final double hoverScale;
+  final Duration duration;
+  final Color? hoverColor;
+  final BorderRadius? borderRadius;
+  final EdgeInsetsGeometry? padding;
 
   @override
   State<HoverAnimatedWidget> createState() => _HoverAnimatedWidgetState();
@@ -145,7 +143,7 @@ class _HoverAnimatedWidgetState extends State<HoverAnimatedWidget> {
         duration: widget.duration,
         curve: Curves.easeOutCubic,
         transform:
-            Matrix4.identity()..scale(_isHovered ? widget.hoverScale : 1.0),
+            Matrix4.identity()..scale(_isHovered ? widget.hoverScale : 1.0), // ignore: deprecated_member_use
         padding: widget.padding,
         decoration:
             widget.hoverColor != null
@@ -153,7 +151,7 @@ class _HoverAnimatedWidgetState extends State<HoverAnimatedWidget> {
                   color:
                       _isHovered
                           ? widget.hoverColor
-                          : widget.hoverColor!.withOpacity(0),
+                          : widget.hoverColor!.withValues(alpha:0),
                   borderRadius: widget.borderRadius,
                 )
                 : null,
@@ -165,10 +163,6 @@ class _HoverAnimatedWidgetState extends State<HoverAnimatedWidget> {
 
 /// 360-degree rotatable widget
 class RotatableWidget extends StatefulWidget {
-  final Widget child;
-  final double size;
-  final Color? backgroundColor;
-  final BorderRadius? borderRadius;
 
   const RotatableWidget({
     super.key,
@@ -177,6 +171,10 @@ class RotatableWidget extends StatefulWidget {
     this.backgroundColor,
     this.borderRadius,
   });
+  final Widget child;
+  final double size;
+  final Color? backgroundColor;
+  final BorderRadius? borderRadius;
 
   @override
   State<RotatableWidget> createState() => _RotatableWidgetState();

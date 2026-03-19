@@ -15,9 +15,9 @@ class MoonSurfacePainter extends CustomPainter {
             center: const Alignment(-0.3, -0.3),
             radius: 1.0,
             colors: [
-              Colors.white.withOpacity(0.05),
-              Colors.grey[300]!.withOpacity(0.03),
-              Colors.grey[400]!.withOpacity(0.02),
+              Colors.white.withValues(alpha:0.05),
+              Colors.grey[300]!.withValues(alpha:0.03),
+              Colors.grey[400]!.withValues(alpha:0.02),
               Colors.transparent,
             ],
             stops: const [0.0, 0.3, 0.7, 1.0],
@@ -45,14 +45,14 @@ class MoonSurfacePainter extends CustomPainter {
 
       final marePaint =
           Paint()
-            ..color = const Color(0xFF9E9E9E).withOpacity(0.1)
+            ..color = const Color(0xFF9E9E9E).withValues(alpha:0.1)
             ..style = PaintingStyle.fill;
 
       canvas.drawCircle(position, mareSize, marePaint);
 
       final mareEdgePaint =
           Paint()
-            ..color = const Color(0xFF9E9E9E).withOpacity(0.05)
+            ..color = const Color(0xFF9E9E9E).withValues(alpha:0.05)
             ..style = PaintingStyle.stroke
             ..strokeWidth = mareSize * 0.2;
 
@@ -61,7 +61,7 @@ class MoonSurfacePainter extends CustomPainter {
   }
 
   void _drawCraters(Canvas canvas, Size size, math.Random random) {
-    final largeCraterCount = 5;
+    const largeCraterCount = 5;
     for (int i = 0; i < largeCraterCount; i++) {
       final x = random.nextDouble() * size.width;
       final y = random.nextDouble() * size.height;
@@ -69,7 +69,7 @@ class MoonSurfacePainter extends CustomPainter {
       _drawCrater(canvas, Offset(x, y), craterSize, random);
     }
 
-    final mediumCraterCount = 12;
+    const mediumCraterCount = 12;
     for (int i = 0; i < mediumCraterCount; i++) {
       final x = random.nextDouble() * size.width;
       final y = random.nextDouble() * size.height;
@@ -77,7 +77,7 @@ class MoonSurfacePainter extends CustomPainter {
       _drawCrater(canvas, Offset(x, y), craterSize, random);
     }
 
-    final smallCraterCount = 25;
+    const smallCraterCount = 25;
     for (int i = 0; i < smallCraterCount; i++) {
       final x = random.nextDouble() * size.width;
       final y = random.nextDouble() * size.height;
@@ -94,7 +94,7 @@ class MoonSurfacePainter extends CustomPainter {
   ) {
     final craterPaint =
         Paint()
-          ..color = const Color(0xFF9E9E9E).withOpacity(0.15)
+          ..color = const Color(0xFF9E9E9E).withValues(alpha:0.15)
           ..style = PaintingStyle.fill;
 
     canvas.drawCircle(position, size, craterPaint);
@@ -102,7 +102,7 @@ class MoonSurfacePainter extends CustomPainter {
     // Raised crater rim
     final rimPaint =
         Paint()
-          ..color = Colors.white.withOpacity(0.1)
+          ..color = Colors.white.withValues(alpha:0.1)
           ..style = PaintingStyle.stroke
           ..strokeWidth = size * 0.3;
 
@@ -111,7 +111,7 @@ class MoonSurfacePainter extends CustomPainter {
     // Shadow cast by the rim based on light direction
     final shadowPaint =
         Paint()
-          ..color = Colors.black.withOpacity(0.1)
+          ..color = Colors.black.withValues(alpha:0.1)
           ..style = PaintingStyle.fill;
 
     final shadowOffset = Offset(size * 0.3, size * 0.3);
@@ -119,7 +119,7 @@ class MoonSurfacePainter extends CustomPainter {
   }
 
   void _drawRilles(Canvas canvas, Size size, math.Random random) {
-    final rilleCount = 3;
+    const rilleCount = 3;
 
     for (int i = 0; i < rilleCount; i++) {
       final startX = random.nextDouble() * size.width;
@@ -132,7 +132,7 @@ class MoonSurfacePainter extends CustomPainter {
 
       final rillePaint =
           Paint()
-            ..color = const Color(0xFF9E9E9E).withOpacity(0.1)
+            ..color = const Color(0xFF9E9E9E).withValues(alpha:0.1)
             ..strokeWidth = 0.5
             ..style = PaintingStyle.stroke;
 

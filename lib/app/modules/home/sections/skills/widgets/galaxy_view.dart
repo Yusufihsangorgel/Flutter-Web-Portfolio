@@ -6,9 +6,6 @@ import 'skill_planet.dart';
 
 /// Interactive galaxy view that displays skill planets orbiting a central hub.
 class GalaxyView extends StatefulWidget {
-  final double galaxySize;
-  final double centralPlanetSize;
-  final List<dynamic> skillCategories;
 
   const GalaxyView({
     super.key,
@@ -16,6 +13,9 @@ class GalaxyView extends StatefulWidget {
     required this.centralPlanetSize,
     required this.skillCategories,
   });
+  final double galaxySize;
+  final double centralPlanetSize;
+  final List<dynamic> skillCategories;
 
   @override
   State<GalaxyView> createState() => _GalaxyViewState();
@@ -83,17 +83,17 @@ class _GalaxyViewState extends State<GalaxyView> {
         if (items.isEmpty) continue;
 
         // Take at most 4 skills per category (to avoid overcrowding the galaxy view)
-        final int maxItemsPerCategory = 4;
+        const int maxItemsPerCategory = 4;
         final int itemsToTake = math.min(items.length, maxItemsPerCategory);
 
         for (int i = 0; i < itemsToTake; i++) {
           final skill = items[i];
           if (skill is String) {
             mainSkills.add({
-              "name": skill,
-              "category": category,
-              "color": categoryColors[category] ?? Colors.grey[400]!,
-              "orbit": mainSkills.length % 3, // 3 different orbits (0, 1, 2)
+              'name': skill,
+              'category': category,
+              'color': categoryColors[category] ?? Colors.grey[400]!,
+              'orbit': mainSkills.length % 3, // 3 different orbits (0, 1, 2)
             });
           }
         }
@@ -117,50 +117,47 @@ class _GalaxyViewState extends State<GalaxyView> {
   }
 
   /// Fallback skills used when JSON data cannot be loaded.
-  List<Map<String, dynamic>> _getFallbackSkills() {
-    return [
+  List<Map<String, dynamic>> _getFallbackSkills() => [
       {
-        "name": "Flutter",
-        "category": "Mobile",
-        "color": Colors.blue[400]!,
-        "orbit": 0,
+        'name': 'Flutter',
+        'category': 'Mobile',
+        'color': Colors.blue[400]!,
+        'orbit': 0,
       },
       {
-        "name": "React",
-        "category": "Frontend",
-        "color": Colors.orange[400]!,
-        "orbit": 1,
+        'name': 'React',
+        'category': 'Frontend',
+        'color': Colors.orange[400]!,
+        'orbit': 1,
       },
       {
-        "name": "Node.js",
-        "category": "Backend",
-        "color": Colors.green[500]!,
-        "orbit": 2,
+        'name': 'Node.js',
+        'category': 'Backend',
+        'color': Colors.green[500]!,
+        'orbit': 2,
       },
       {
-        "name": "JavaScript",
-        "category": "Frontend",
-        "color": Colors.orange[400]!,
-        "orbit": 0,
+        'name': 'JavaScript',
+        'category': 'Frontend',
+        'color': Colors.orange[400]!,
+        'orbit': 0,
       },
       {
-        "name": "HTML",
-        "category": "Frontend",
-        "color": Colors.orange[400]!,
-        "orbit": 1,
+        'name': 'HTML',
+        'category': 'Frontend',
+        'color': Colors.orange[400]!,
+        'orbit': 1,
       },
       {
-        "name": "CSS",
-        "category": "Frontend",
-        "color": Colors.orange[400]!,
-        "orbit": 2,
+        'name': 'CSS',
+        'category': 'Frontend',
+        'color': Colors.orange[400]!,
+        'orbit': 2,
       },
     ];
-  }
 
   @override
-  Widget build(BuildContext context) {
-    return Center(
+  Widget build(BuildContext context) => Center(
       child: SizedBox(
         width: widget.galaxySize,
         height: widget.galaxySize,
@@ -186,14 +183,14 @@ class _GalaxyViewState extends State<GalaxyView> {
                     gradient: RadialGradient(
                       colors: [
                         Colors.blue[400]!,
-                        Colors.blue[400]!.withOpacity(0.7),
-                        Colors.blue[400]!.withOpacity(0.3),
+                        Colors.blue[400]!.withValues(alpha:0.7),
+                        Colors.blue[400]!.withValues(alpha:0.3),
                       ],
                       stops: const [0.2, 0.5, 1.0],
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.blue[400]!.withOpacity(0.5),
+                        color: Colors.blue[400]!.withValues(alpha:0.5),
                         blurRadius: 20,
                         spreadRadius: 3,
                       ),
@@ -203,7 +200,7 @@ class _GalaxyViewState extends State<GalaxyView> {
                     child: Icon(
                       Icons.code,
                       size: widget.centralPlanetSize * 0.5,
-                      color: Colors.white.withOpacity(0.9),
+                      color: Colors.white.withValues(alpha:0.9),
                     ),
                   ),
                 ),
@@ -213,13 +210,12 @@ class _GalaxyViewState extends State<GalaxyView> {
             // Orbiting planets (skills)
             ...List.generate(
               _skills.length,
-              (i) => _buildDraggablePlanet(i),
+              _buildDraggablePlanet,
             ),
           ],
         ),
       ),
     );
-  }
 
   Widget _buildDraggablePlanet(int index) {
     if (index >= _skills.length || index >= _planetPositions.length) {
@@ -263,8 +259,7 @@ class _GalaxyViewState extends State<GalaxyView> {
                 position.dy + details.delta.dy,
               );
 
-              // Calculate distance and angle
-              final distance = (newPos - center).distance;
+              // Calculate angle from center to new position
               final angle = math.atan2(
                 newPos.dy - center.dy,
                 newPos.dx - center.dx,

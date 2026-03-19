@@ -3,18 +3,17 @@ import 'package:flutter/material.dart';
 import '../painters/rocket_light_reflection_painter.dart';
 
 class RocketWidget extends StatelessWidget {
-  final AnimationController animController;
-  final bool isDragging;
 
   const RocketWidget({
     super.key,
     required this.animController,
     this.isDragging = false,
   });
+  final AnimationController animController;
+  final bool isDragging;
 
   @override
-  Widget build(BuildContext context) {
-    return AnimatedBuilder(
+  Widget build(BuildContext context) => AnimatedBuilder(
       animation: animController,
       builder: (context, child) {
         final perspectiveAngle = math.sin(animController.value * math.pi) * 0.1;
@@ -63,8 +62,8 @@ class RocketWidget extends StatelessWidget {
                         BoxShadow(
                           color:
                               isDragging
-                                  ? Colors.blue.withOpacity(0.5)
-                                  : Colors.black.withOpacity(0.5),
+                                  ? Colors.blue.withValues(alpha:0.5)
+                                  : Colors.black.withValues(alpha:0.5),
                           blurRadius: isDragging ? 8 : 5,
                           offset: const Offset(3, 3),
                         ),
@@ -119,7 +118,7 @@ class RocketWidget extends StatelessWidget {
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.3),
+                          color: Colors.black.withValues(alpha:0.3),
                           blurRadius: 3,
                           offset: const Offset(1, 1),
                         ),
@@ -133,7 +132,7 @@ class RocketWidget extends StatelessWidget {
                         height: 5,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: Colors.white.withOpacity(0.7),
+                          color: Colors.white.withValues(alpha:0.7),
                         ),
                       ),
                     ),
@@ -160,7 +159,7 @@ class RocketWidget extends StatelessWidget {
                       border: Border.all(color: Colors.white70, width: 2),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.lightBlue.shade200.withOpacity(0.5),
+                          color: Colors.lightBlue.shade200.withValues(alpha:0.5),
                           blurRadius: 5,
                           spreadRadius: 1,
                         ),
@@ -173,7 +172,7 @@ class RocketWidget extends StatelessWidget {
                         height: 4,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: Colors.white.withOpacity(0.8),
+                          color: Colors.white.withValues(alpha:0.8),
                         ),
                       ),
                     ),
@@ -205,7 +204,7 @@ class RocketWidget extends StatelessWidget {
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.5),
+                            color: Colors.black.withValues(alpha:0.5),
                             blurRadius: 3,
                             offset: const Offset(-1, 2),
                           ),
@@ -240,7 +239,7 @@ class RocketWidget extends StatelessWidget {
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.5),
+                            color: Colors.black.withValues(alpha:0.5),
                             blurRadius: 3,
                             offset: const Offset(1, 2),
                           ),
@@ -272,7 +271,7 @@ class RocketWidget extends StatelessWidget {
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.3),
+                          color: Colors.black.withValues(alpha:0.3),
                           blurRadius: 2,
                           offset: const Offset(0, 1),
                         ),
@@ -284,8 +283,7 @@ class RocketWidget extends StatelessWidget {
                 // Light reflection overlay
                 Positioned.fill(
                   child: LayoutBuilder(
-                    builder: (context, constraints) {
-                      return CustomPaint(
+                    builder: (context, constraints) => CustomPaint(
                         painter: RocketLightReflectionPainter(
                           time: animController.value,
                           lightX: lightX,
@@ -293,8 +291,7 @@ class RocketWidget extends StatelessWidget {
                           isDragging: isDragging,
                         ),
                         size: Size(constraints.maxWidth, constraints.maxHeight),
-                      );
-                    },
+                      ),
                   ),
                 ),
               ],
@@ -303,5 +300,4 @@ class RocketWidget extends StatelessWidget {
         );
       },
     );
-  }
 }

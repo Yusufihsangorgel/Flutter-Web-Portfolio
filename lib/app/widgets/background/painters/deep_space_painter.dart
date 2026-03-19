@@ -3,12 +3,12 @@ import 'package:flutter/material.dart';
 
 // Deep space painter - distant galaxies and nebulae with slow drift
 class DeepSpacePainter extends CustomPainter {
+
+  DeepSpacePainter({required this.time});
   final double time;
 
   static List<Nebula>? _cachedNebulas;
   static final _random = math.Random(42);
-
-  DeepSpacePainter({required this.time});
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -33,25 +33,25 @@ class DeepSpacePainter extends CustomPainter {
       switch (colorType) {
         case 0: // Purple/blue nebula
           colors = [
-            const Color(0xFF9C27B0).withOpacity(0.01),
-            const Color(0xFF3F51B5).withOpacity(0.008),
-            const Color(0xFF673AB7).withOpacity(0.005),
+            const Color(0xFF9C27B0).withValues(alpha:0.01),
+            const Color(0xFF3F51B5).withValues(alpha:0.008),
+            const Color(0xFF673AB7).withValues(alpha:0.005),
             Colors.transparent,
           ];
           break;
         case 1: // Pink/red nebula
           colors = [
-            const Color(0xFFE91E63).withOpacity(0.01),
-            const Color(0xFFF44336).withOpacity(0.008),
-            const Color(0xFFFF9800).withOpacity(0.005),
+            const Color(0xFFE91E63).withValues(alpha:0.01),
+            const Color(0xFFF44336).withValues(alpha:0.008),
+            const Color(0xFFFF9800).withValues(alpha:0.005),
             Colors.transparent,
           ];
           break;
         default: // Teal/green nebula
           colors = [
-            const Color(0xFF009688).withOpacity(0.01),
-            const Color(0xFF4CAF50).withOpacity(0.008),
-            const Color(0xFF00BCD4).withOpacity(0.005),
+            const Color(0xFF009688).withValues(alpha:0.01),
+            const Color(0xFF4CAF50).withValues(alpha:0.008),
+            const Color(0xFF00BCD4).withValues(alpha:0.005),
             Colors.transparent,
           ];
       }
@@ -83,8 +83,8 @@ class DeepSpacePainter extends CustomPainter {
         final nebulaSize = 10.0 + _random.nextDouble() * 20.0;
 
         final colors = [
-          Colors.white.withOpacity(0.008),
-          Colors.white.withOpacity(0.005),
+          Colors.white.withValues(alpha:0.008),
+          Colors.white.withValues(alpha:0.005),
           Colors.transparent,
         ];
 
@@ -159,21 +159,10 @@ class DeepSpacePainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(DeepSpacePainter oldDelegate) {
-    return oldDelegate.time != time;
-  }
+  bool shouldRepaint(DeepSpacePainter oldDelegate) => oldDelegate.time != time;
 }
 
 class Nebula {
-  final double x, y;
-  final double size;
-  final List<Color> colors;
-  final double movementSpeed;
-  final double movementAmplitude;
-  final double innerSpeed;
-  final double innerAmplitude;
-  final double phase;
-  final bool isDistant;
 
   Nebula({
     required this.x,
@@ -187,4 +176,13 @@ class Nebula {
     required this.phase,
     this.isDistant = false,
   });
+  final double x, y;
+  final double size;
+  final List<Color> colors;
+  final double movementSpeed;
+  final double movementAmplitude;
+  final double innerSpeed;
+  final double innerAmplitude;
+  final double phase;
+  final bool isDistant;
 }

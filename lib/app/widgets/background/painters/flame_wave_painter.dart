@@ -3,21 +3,21 @@ import 'package:flutter/material.dart';
 
 // Flame wave effect painter
 class FlameWavePainter extends CustomPainter {
-  final double time;
-  final double flameWidth;
-  final double flameHeight;
 
   FlameWavePainter({
     required this.time,
     required this.flameWidth,
     required this.flameHeight,
   });
+  final double time;
+  final double flameWidth;
+  final double flameHeight;
 
   @override
   void paint(Canvas canvas, Size size) {
     final path = Path();
 
-    final waveCount = 8;
+    const waveCount = 8;
     final amplitude = flameWidth * 0.3;
 
     path.moveTo(0, 0);
@@ -63,11 +63,11 @@ class FlameWavePainter extends CustomPainter {
       begin: Alignment.topCenter,
       end: Alignment.bottomCenter,
       colors: [
-        Colors.white.withOpacity(0.8),
-        Colors.yellow.withOpacity(0.7),
-        Colors.amber.withOpacity(0.6),
-        Colors.orange.withOpacity(0.4),
-        Colors.deepOrange.withOpacity(0.2),
+        Colors.white.withValues(alpha:0.8),
+        Colors.yellow.withValues(alpha:0.7),
+        Colors.amber.withValues(alpha:0.6),
+        Colors.orange.withValues(alpha:0.4),
+        Colors.deepOrange.withValues(alpha:0.2),
         Colors.transparent,
       ],
       stops: const [0.0, 0.15, 0.3, 0.5, 0.7, 1.0],
@@ -83,9 +83,7 @@ class FlameWavePainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(FlameWavePainter oldDelegate) {
-    return oldDelegate.time != time ||
+  bool shouldRepaint(FlameWavePainter oldDelegate) => oldDelegate.time != time ||
         oldDelegate.flameWidth != flameWidth ||
         oldDelegate.flameHeight != flameHeight;
-  }
 }

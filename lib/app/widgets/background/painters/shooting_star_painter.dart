@@ -4,11 +4,6 @@ import 'dart:ui' show PointMode;
 
 // Shooting star painter - astronomical meteor shower simulation
 class ShootingStarPainter extends CustomPainter {
-  final double time;
-  final Offset mousePosition;
-  final List<ShootingStar> shootingStars = [];
-
-  static List<ShootingStar>? _cachedShootingStars;
 
   ShootingStarPainter({required this.time, required this.mousePosition}) {
     if (_cachedShootingStars == null || _cachedShootingStars!.isEmpty) {
@@ -19,14 +14,17 @@ class ShootingStarPainter extends CustomPainter {
       shootingStars.addAll(_cachedShootingStars!);
     }
   }
+  final double time;
+  final Offset mousePosition;
+  final List<ShootingStar> shootingStars = [];
+
+  static List<ShootingStar>? _cachedShootingStars;
 
   void _initializeStars() {
     final random = math.Random(42);
 
-    // Leonids meteor shower parameters
+    // Leonids meteor shower radiant right ascension
     const radiantRA = 152.0;
-    const radiantDec = 22.0;
-    const zhr = 15.0;
 
     _cachedShootingStars = List.generate(20, (i) {
       final dispersionAngle = math.pi / 12 + random.nextDouble() * math.pi / 12;
@@ -37,7 +35,7 @@ class ShootingStarPainter extends CustomPainter {
       final startY = random.nextDouble() * 0.5;
 
       // Meteor trajectory angle derived from radiant point
-      final baseAngle = (radiantRA * math.pi / 180) + math.pi;
+      const baseAngle = (radiantRA * math.pi / 180) + math.pi;
       final angle = baseAngle + (random.nextDouble() - 0.5) * dispersionAngle;
 
       // Power-law brightness distribution: most meteors are faint
@@ -111,7 +109,7 @@ class ShootingStarPainter extends CustomPainter {
           points.add(Offset(currentX, currentY));
           pointPaints.add(
             Paint()
-              ..color = Colors.white.withOpacity(
+              ..color = Colors.white.withValues(alpha:
                 (baseOpacity * 1.5).clamp(0.0, 1.0),
               )
               ..strokeWidth = star.size * 1.2
@@ -138,7 +136,7 @@ class ShootingStarPainter extends CustomPainter {
 
             pointPaints.add(
               Paint()
-                ..color = Colors.white.withOpacity(particleOpacity)
+                ..color = Colors.white.withValues(alpha:particleOpacity)
                 ..strokeWidth = particleSize
                 ..strokeCap = StrokeCap.round,
             );
@@ -155,9 +153,7 @@ class ShootingStarPainter extends CustomPainter {
   }
 
   // Custom physics function for meteor motion - atmospheric drag + gravity
-  double _meteorMotion(double t) {
-    return 4 * t * (1 - t) * math.sin(t * math.pi * 0.8) + t;
-  }
+  double _meteorMotion(double t) => 4 * t * (1 - t) * math.sin(t * math.pi * 0.8) + t;
 
   // Brightness curve: meteor brightens on entry then fades
   double _calculateMeteorBrightness(double progress, double magnitude) {
@@ -167,24 +163,10 @@ class ShootingStarPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(ShootingStarPainter oldDelegate) {
-    return oldDelegate.time != time;
-  }
+  bool shouldRepaint(ShootingStarPainter oldDelegate) => oldDelegate.time != time;
 }
 
 class ShootingStar {
-  final double startX;
-  final double startY;
-  final double angle;
-  final double speed;
-  final double tailLength;
-  double delay;
-  final double maxDistance;
-  final double size;
-  final double magnitude;
-  bool active;
-  double progress = 0.0;
-  double lastActivationTime;
 
   ShootingStar({
     required this.startX,
@@ -199,4 +181,16 @@ class ShootingStar {
     required this.lastActivationTime,
     required this.magnitude,
   });
+  final double startX;
+  final double startY;
+  final double angle;
+  final double speed;
+  final double tailLength;
+  double delay;
+  final double maxDistance;
+  final double size;
+  final double magnitude;
+  bool active;
+  double progress = 0.0;
+  double lastActivationTime;
 }

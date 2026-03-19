@@ -40,8 +40,7 @@ class _LoadingAnimationState extends State<LoadingAnimation>
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
+  Widget build(BuildContext context) => Scaffold(
       backgroundColor: _themeController.backgroundColor,
       body: Center(
         child: Column(
@@ -58,10 +57,8 @@ class _LoadingAnimationState extends State<LoadingAnimation>
         ),
       ),
     );
-  }
 
-  Widget _buildLogoAnimation() {
-    return FadeTransition(
+  Widget _buildLogoAnimation() => FadeTransition(
       opacity: _opacityAnimation,
       child: Container(
         width: 120,
@@ -83,28 +80,24 @@ class _LoadingAnimationState extends State<LoadingAnimation>
         ),
       ),
     );
-  }
 }
 
 /// Loading text widget
 class _LoadingText extends StatelessWidget {
-  final String text;
-  final ThemeController themeController;
-  final AnimationController animationController;
 
   const _LoadingText({
-    super.key,
     required this.text,
     required this.themeController,
     required this.animationController,
   });
+  final String text;
+  final ThemeController themeController;
+  final AnimationController animationController;
 
   @override
-  Widget build(BuildContext context) {
-    return AnimatedBuilder(
+  Widget build(BuildContext context) => AnimatedBuilder(
       animation: animationController,
-      builder: (context, child) {
-        return Opacity(
+      builder: (context, child) => Opacity(
           opacity: animationController.value,
           child: Text(
             text,
@@ -114,8 +107,6 @@ class _LoadingText extends StatelessWidget {
               fontWeight: FontWeight.w500,
             ),
           ),
-        );
-      },
+        ),
     );
-  }
 }

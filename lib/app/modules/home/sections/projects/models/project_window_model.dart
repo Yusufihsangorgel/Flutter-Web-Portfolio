@@ -1,17 +1,6 @@
 import 'dart:ui';
 
 class ProjectWindowModel {
-  final String id;
-  final String title;
-  final String description;
-  final List<String> technologies;
-  final String imageUrl;
-  final String url;
-  Offset windowPosition;
-  final Size windowSize;
-  bool isOpen;
-  bool isMinimized;
-  int zIndex;
 
   ProjectWindowModel({
     required this.id,
@@ -26,4 +15,15 @@ class ProjectWindowModel {
     required this.isMinimized,
     required this.zIndex,
   });
+  final String id;
+  final String title;
+  final String description;
+  final List<String> technologies;
+  final String imageUrl;
+  final String url;
+  Offset windowPosition;
+  final Size windowSize;
+  bool isOpen;
+  bool isMinimized;
+  int zIndex;
 }

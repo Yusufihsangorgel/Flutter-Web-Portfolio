@@ -8,22 +8,21 @@ import 'package:flutter_web_portfolio/app/controllers/theme_controller.dart';
 /// A background composed of a gradient, a holographic grid,
 /// and holographic particles.
 class HolographicBackground extends StatelessWidget {
-  final Color baseColor;
 
   const HolographicBackground({super.key, required this.baseColor});
+  final Color baseColor;
 
   @override
-  Widget build(BuildContext context) {
-    return Stack(
+  Widget build(BuildContext context) => Stack(
       fit: StackFit.expand,
       children: [
         // Gradient background
         Container(
-          decoration: BoxDecoration(
+          decoration: const BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [const Color(0xFF0A0A1E), const Color(0xFF070720)],
+              colors: [Color(0xFF0A0A1E), Color(0xFF070720)],
             ),
           ),
         ),
@@ -35,7 +34,6 @@ class HolographicBackground extends StatelessWidget {
         CustomPaint(painter: HolographicParticlesPainter(baseColor: baseColor)),
       ],
     );
-  }
 }
 
 /// Holographic Grid Painter
@@ -43,16 +41,16 @@ class HolographicBackground extends StatelessWidget {
 /// Draws a grid of lines that glow brighter near the center of the canvas,
 /// creating a holographic effect.
 class HolographicGridPainter extends CustomPainter {
-  final Color baseColor;
 
   HolographicGridPainter({required this.baseColor});
+  final Color baseColor;
 
   @override
   void paint(Canvas canvas, Size size) {
     final center = Offset(size.width / 2, size.height / 2);
 
     // Grid line spacing
-    final gridSize = 40.0;
+    const gridSize = 40.0;
 
     final paint =
         Paint()
@@ -63,7 +61,7 @@ class HolographicGridPainter extends CustomPainter {
     for (double y = 0; y < size.height; y += gridSize) {
       final distanceRatio = 1 - ((y - center.dy).abs() / (size.height / 2));
 
-      paint.color = baseColor.withOpacity(
+      paint.color = baseColor.withValues(alpha:
         0.1 + (distanceRatio * 0.2) + (math.sin(math.pi + y * 0.01) * 0.05),
       );
 
@@ -74,7 +72,7 @@ class HolographicGridPainter extends CustomPainter {
     for (double x = 0; x < size.width; x += gridSize) {
       final distanceRatio = 1 - ((x - center.dx).abs() / (size.width / 2));
 
-      paint.color = baseColor.withOpacity(
+      paint.color = baseColor.withValues(alpha:
         0.1 + (distanceRatio * 0.2) + (math.sin(math.pi + x * 0.01) * 0.05),
       );
 
@@ -83,23 +81,21 @@ class HolographicGridPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant HolographicGridPainter oldDelegate) {
-    return oldDelegate.baseColor != baseColor;
-  }
+  bool shouldRepaint(covariant HolographicGridPainter oldDelegate) => oldDelegate.baseColor != baseColor;
 }
 
 /// Holographic Particles Painter
 ///
 /// Draws randomly positioned particles with a subtle shimmer effect.
 class HolographicParticlesPainter extends CustomPainter {
-  final Color baseColor;
 
   HolographicParticlesPainter({required this.baseColor});
+  final Color baseColor;
 
   @override
   void paint(Canvas canvas, Size size) {
     final random = math.Random(42); // Fixed seed for deterministic output
-    final particleCount = 100;
+    const particleCount = 100;
 
     for (int i = 0; i < particleCount; i++) {
       // Random position and size for each particle
@@ -116,7 +112,7 @@ class HolographicParticlesPainter extends CustomPainter {
 
       final paint =
           Paint()
-            ..color = baseColor.withOpacity(opacity)
+            ..color = baseColor.withValues(alpha:opacity)
             ..style = PaintingStyle.fill;
 
       canvas.drawCircle(Offset(x + xOffset, y + yOffset), particleSize, paint);
@@ -124,9 +120,7 @@ class HolographicParticlesPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant HolographicParticlesPainter oldDelegate) {
-    return oldDelegate.baseColor != baseColor;
-  }
+  bool shouldRepaint(covariant HolographicParticlesPainter oldDelegate) => oldDelegate.baseColor != baseColor;
 }
 
 /// Holographic Container
@@ -134,20 +128,19 @@ class HolographicParticlesPainter extends CustomPainter {
 /// A styled container with a dark semi-transparent background,
 /// rounded corners, a subtle border, and a blue glow shadow.
 class HolographicContainer extends StatelessWidget {
-  final Widget child;
 
   const HolographicContainer({super.key, required this.child});
+  final Widget child;
 
   @override
-  Widget build(BuildContext context) {
-    return Container(
+  Widget build(BuildContext context) => Container(
       decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.15),
+        color: Colors.black.withValues(alpha:0.15),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withOpacity(0.2), width: 1),
+        border: Border.all(color: Colors.white.withValues(alpha:0.2), width: 1),
         boxShadow: [
           BoxShadow(
-            color: Colors.blue.withOpacity(0.1),
+            color: Colors.blue.withValues(alpha:0.1),
             blurRadius: 20,
             spreadRadius: 5,
           ),
@@ -155,7 +148,6 @@ class HolographicContainer extends StatelessWidget {
       ),
       child: child,
     );
-  }
 }
 
 /// Holographic Button
@@ -163,14 +155,14 @@ class HolographicContainer extends StatelessWidget {
 /// A button that glows and changes color on hover, styled with the
 /// current theme's primary color.
 class HolographicButton extends StatefulWidget {
-  final VoidCallback? onPressed;
-  final Widget child;
 
   const HolographicButton({
     super.key,
     required this.onPressed,
     required this.child,
   });
+  final VoidCallback? onPressed;
+  final Widget child;
 
   @override
   State<HolographicButton> createState() => _HolographicButtonState();
@@ -194,14 +186,14 @@ class _HolographicButtonState extends State<HolographicButton> {
             color:
                 _isHovered
                     ? themeController.primaryColor
-                    : themeController.primaryColor.withOpacity(0.7),
+                    : themeController.primaryColor.withValues(alpha:0.7),
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.white.withOpacity(0.3), width: 1),
+            border: Border.all(color: Colors.white.withValues(alpha:0.3), width: 1),
             boxShadow:
                 _isHovered
                     ? [
                       BoxShadow(
-                        color: themeController.primaryColor.withOpacity(0.5),
+                        color: themeController.primaryColor.withValues(alpha:0.5),
                         blurRadius: 10,
                         spreadRadius: 2,
                       ),
@@ -219,10 +211,6 @@ class _HolographicButtonState extends State<HolographicButton> {
 ///
 /// Text that displays a sliding gradient shimmer animation.
 class ShimmeringText extends StatefulWidget {
-  final String text;
-  final Color baseColor;
-  final Color highlightColor;
-  final TextStyle style;
 
   const ShimmeringText({
     super.key,
@@ -231,6 +219,10 @@ class ShimmeringText extends StatefulWidget {
     required this.highlightColor,
     required this.style,
   });
+  final String text;
+  final Color baseColor;
+  final Color highlightColor;
+  final TextStyle style;
 
   @override
   State<ShimmeringText> createState() => _ShimmeringTextState();
@@ -256,14 +248,11 @@ class _ShimmeringTextState extends State<ShimmeringText>
   }
 
   @override
-  Widget build(BuildContext context) {
-    return AnimatedBuilder(
+  Widget build(BuildContext context) => AnimatedBuilder(
       animation: _shimmerController,
-      builder: (context, child) {
-        return ShaderMask(
+      builder: (context, child) => ShaderMask(
           blendMode: BlendMode.srcIn,
-          shaderCallback: (bounds) {
-            return LinearGradient(
+          shaderCallback: (bounds) => LinearGradient(
               colors: [
                 widget.baseColor,
                 widget.highlightColor,
@@ -275,13 +264,10 @@ class _ShimmeringTextState extends State<ShimmeringText>
               transform: _SlidingGradientTransform(
                 slidePercent: _shimmerController.value,
               ),
-            ).createShader(bounds);
-          },
+            ).createShader(bounds),
           child: Text(widget.text, style: widget.style),
-        );
-      },
+        ),
     );
-  }
 }
 
 /// Sliding Gradient Transform
@@ -289,16 +275,14 @@ class _ShimmeringTextState extends State<ShimmeringText>
 /// A [GradientTransform] that slides the gradient horizontally
 /// based on a percentage value, used by [ShimmeringText].
 class _SlidingGradientTransform extends GradientTransform {
-  final double slidePercent;
 
   const _SlidingGradientTransform({required this.slidePercent});
+  final double slidePercent;
 
   @override
-  Matrix4? transform(Rect bounds, {TextDirection? textDirection}) {
-    return Matrix4.translationValues(
+  Matrix4? transform(Rect bounds, {TextDirection? textDirection}) => Matrix4.translationValues(
       bounds.width * (slidePercent * 3 - 1.0),
       0.0,
       0.0,
     );
-  }
 }

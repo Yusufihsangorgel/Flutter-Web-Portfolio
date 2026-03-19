@@ -6,14 +6,6 @@ import '../models/project_window_model.dart';
 /// A draggable window that displays project details inside the desktop
 /// environment.
 class ProjectWindow extends StatelessWidget {
-  final ProjectWindowModel project;
-  final Function(Offset) onWindowPositionChanged;
-  final VoidCallback onClose;
-  final VoidCallback onMinimize;
-  final VoidCallback onTap;
-  final VoidCallback onOpenLink;
-  final int zIndex;
-  final LanguageController languageController;
 
   const ProjectWindow({
     super.key,
@@ -26,10 +18,17 @@ class ProjectWindow extends StatelessWidget {
     required this.zIndex,
     required this.languageController,
   });
+  final ProjectWindowModel project;
+  final Function(Offset) onWindowPositionChanged;
+  final VoidCallback onClose;
+  final VoidCallback onMinimize;
+  final VoidCallback onTap;
+  final VoidCallback onOpenLink;
+  final int zIndex;
+  final LanguageController languageController;
 
   @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
+  Widget build(BuildContext context) => GestureDetector(
       onTap: onTap,
       child: Stack(
         children: [
@@ -41,7 +40,7 @@ class ProjectWindow extends StatelessWidget {
               borderRadius: BorderRadius.circular(8),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.5),
+                  color: Colors.black.withValues(alpha:0.5),
                   blurRadius: 15,
                   offset: const Offset(0, 5),
                 ),
@@ -82,7 +81,7 @@ class ProjectWindow extends StatelessWidget {
                       ),
                       border: Border(
                         bottom: BorderSide(
-                          color: Colors.black.withOpacity(0.3),
+                          color: Colors.black.withValues(alpha:0.3),
                           width: 1,
                         ),
                       ),
@@ -139,9 +138,9 @@ class ProjectWindow extends StatelessWidget {
                 // Window content
                 Expanded(
                   child: Container(
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF282C34),
-                      borderRadius: const BorderRadius.only(
+                    decoration: const BoxDecoration(
+                      color: Color(0xFF282C34),
+                      borderRadius: BorderRadius.only(
                         bottomLeft: Radius.circular(8),
                         bottomRight: Radius.circular(8),
                       ),
@@ -158,10 +157,8 @@ class ProjectWindow extends StatelessWidget {
         ],
       ),
     );
-  }
 
-  Widget _buildProjectDetail() {
-    return Column(
+  Widget _buildProjectDetail() => Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Project image
@@ -248,5 +245,4 @@ class ProjectWindow extends StatelessWidget {
           ),
       ],
     );
-  }
 }

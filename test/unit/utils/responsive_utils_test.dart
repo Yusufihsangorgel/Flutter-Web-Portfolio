@@ -3,12 +3,10 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_web_portfolio/app/utils/responsive_utils.dart';
 import 'package:flutter_web_portfolio/app/core/constants/breakpoints.dart';
 
-Widget _wrapWithMediaQuery({required double width, required Widget child}) {
-  return MediaQuery(
+Widget _wrapWithMediaQuery({required double width, required Widget child}) => MediaQuery(
     data: MediaQueryData(size: Size(width, 800)),
     child: MaterialApp(home: Builder(builder: (context) => child)),
   );
-}
 
 void main() {
   group('ResponsiveUtils', () {

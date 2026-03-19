@@ -6,10 +6,10 @@ import 'package:flutter_i18n/flutter_i18n.dart';
 import '../domain/repositories/i_language_repository.dart';
 
 class LanguageController extends GetxController {
-  final ILanguageRepository _languageRepository;
 
   LanguageController({required ILanguageRepository languageRepository})
     : _languageRepository = languageRepository;
+  final ILanguageRepository _languageRepository;
 
   final Rx<String> _currentLanguage = 'tr'.obs;
   String get currentLanguage => _currentLanguage.value;

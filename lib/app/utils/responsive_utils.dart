@@ -63,10 +63,6 @@ class ResponsiveUtils {
 }
 
 class ResponsiveBuilder extends StatelessWidget {
-  final Widget mobile;
-  final Widget tablet;
-  final Widget desktop;
-  final Widget largeDesktop;
 
   const ResponsiveBuilder({
     super.key,
@@ -75,6 +71,10 @@ class ResponsiveBuilder extends StatelessWidget {
     required this.desktop,
     required this.largeDesktop,
   });
+  final Widget mobile;
+  final Widget tablet;
+  final Widget desktop;
+  final Widget largeDesktop;
 
   @override
   Widget build(BuildContext context) {

@@ -1,9 +1,4 @@
 final class Skill {
-  final String id;
-  final String name;
-  final String category;
-  final double proficiency;
-  final String iconPath;
 
   const Skill({
     required this.id,
@@ -12,4 +7,9 @@ final class Skill {
     required this.proficiency,
     this.iconPath = '',
   });
+  final String id;
+  final String name;
+  final String category;
+  final double proficiency;
+  final String iconPath;
 }

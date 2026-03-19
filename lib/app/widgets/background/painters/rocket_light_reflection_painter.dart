@@ -3,10 +3,6 @@ import 'package:flutter/material.dart';
 
 // Light reflection effect on the rocket surface
 class RocketLightReflectionPainter extends CustomPainter {
-  final double time;
-  final double lightX;
-  final double lightY;
-  final bool isDragging;
 
   RocketLightReflectionPainter({
     required this.time,
@@ -14,16 +10,15 @@ class RocketLightReflectionPainter extends CustomPainter {
     this.lightY = 0.0,
     this.isDragging = false,
   });
+  final double time;
+  final double lightX;
+  final double lightY;
+  final bool isDragging;
 
   @override
   void paint(Canvas canvas, Size size) {
     final width = size.width;
     final height = size.height;
-
-    final paint =
-        Paint()
-          ..style = PaintingStyle.fill
-          ..strokeWidth = 1.0;
 
     // Body reflection highlight
     final bodyReflectionPath = Path();
@@ -41,8 +36,8 @@ class RocketLightReflectionPainter extends CustomPainter {
       begin: Alignment(lightX, lightY),
       end: Alignment(-lightX, -lightY),
       colors: [
-        Colors.white.withOpacity(isDragging ? 0.7 : 0.4),
-        Colors.white.withOpacity(0.0),
+        Colors.white.withValues(alpha:isDragging ? 0.7 : 0.4),
+        Colors.white.withValues(alpha:0.0),
       ],
     );
 
@@ -62,9 +57,9 @@ class RocketLightReflectionPainter extends CustomPainter {
       center: Alignment(lightX * 0.5, lightY * 0.5),
       radius: 0.5,
       colors: [
-        Colors.white.withOpacity(isDragging ? 0.9 : 0.7),
-        Colors.white.withOpacity(isDragging ? 0.5 : 0.3),
-        Colors.white.withOpacity(0.0),
+        Colors.white.withValues(alpha:isDragging ? 0.9 : 0.7),
+        Colors.white.withValues(alpha:isDragging ? 0.5 : 0.3),
+        Colors.white.withValues(alpha:0.0),
       ],
       stops: const [0.0, 0.5, 1.0],
     );
@@ -88,8 +83,8 @@ class RocketLightReflectionPainter extends CustomPainter {
         center: const Alignment(0, 0),
         radius: 1.0,
         colors: [
-          Colors.blue.withOpacity(0.3),
-          Colors.blue.withOpacity(0.1),
+          Colors.blue.withValues(alpha:0.3),
+          Colors.blue.withValues(alpha:0.1),
           Colors.transparent,
         ],
         stops: const [0.0, 0.5, 1.0],
@@ -106,7 +101,7 @@ class RocketLightReflectionPainter extends CustomPainter {
       // Speed lines
       final speedLinesPaint =
           Paint()
-            ..color = Colors.white.withOpacity(0.4)
+            ..color = Colors.white.withValues(alpha:0.4)
             ..strokeWidth = 1.0
             ..strokeCap = StrokeCap.round;
 
@@ -126,10 +121,8 @@ class RocketLightReflectionPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(RocketLightReflectionPainter oldDelegate) {
-    return oldDelegate.time != time ||
+  bool shouldRepaint(RocketLightReflectionPainter oldDelegate) => oldDelegate.time != time ||
         oldDelegate.lightX != lightX ||
         oldDelegate.lightY != lightY ||
         oldDelegate.isDragging != isDragging;
-  }
 }

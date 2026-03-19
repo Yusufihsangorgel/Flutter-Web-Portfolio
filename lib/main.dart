@@ -8,7 +8,6 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:flutter_i18n/loaders/decoders/json_decode_strategy.dart';
-import 'package:flutter_i18n/loaders/file_translation_loader.dart';
 import 'package:get/get.dart';
 
 import 'package:flutter_web_portfolio/app/bindings/app_bindings.dart';
@@ -135,7 +134,7 @@ class MyApp extends StatelessWidget {
           Locale('es'),
         ],
         getPages: AppPages.routes,
-        initialRoute: AppPages.INITIAL,
+        initialRoute: AppPages.initial,
         defaultTransition: Transition.fadeIn,
         builder: (context, child) {
           final wrappedApp = FlutterI18n.rootAppBuilder()(context, child);
@@ -156,8 +155,7 @@ class MyApp extends StatelessWidget {
     });
   }
 
-  Widget _buildResponsiveWrapper(BuildContext context, Widget? child) {
-    return MediaQuery(
+  Widget _buildResponsiveWrapper(BuildContext context, Widget? child) => MediaQuery(
       data: MediaQuery.of(context).copyWith(
         textScaler: TextScaler.linear(
           MediaQuery.of(context).size.width <= 600 ? 0.9 : 1.0,
@@ -165,5 +163,4 @@ class MyApp extends StatelessWidget {
       ),
       child: child ?? const SizedBox.shrink(),
     );
-  }
 }

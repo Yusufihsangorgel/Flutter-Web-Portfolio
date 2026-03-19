@@ -55,7 +55,7 @@ class ContactSection extends StatelessWidget {
             // Contact form and info panel
             Center(
               child: ConstrainedBox(
-                constraints: BoxConstraints(maxWidth: 1000),
+                constraints: const BoxConstraints(maxWidth: 1000),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [

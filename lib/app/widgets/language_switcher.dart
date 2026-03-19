@@ -10,8 +10,7 @@ class LanguageSwitcher extends StatelessWidget {
     try {
       final languageController = Get.find<LanguageController>();
 
-      return Obx(() {
-        return PopupMenuButton<String>(
+      return Obx(() => PopupMenuButton<String>(
           offset: const Offset(0, 40),
           icon: Row(
             mainAxisSize: MainAxisSize.min,
@@ -25,11 +24,8 @@ class LanguageSwitcher extends StatelessWidget {
             ],
           ),
           color: Colors.grey[900],
-          onSelected: (String languageCode) {
-            languageController.changeLanguage(languageCode);
-          },
-          itemBuilder: (BuildContext context) {
-            return languageController.supportedLanguages.keys.map((
+          onSelected: languageController.changeLanguage,
+          itemBuilder: (BuildContext context) => languageController.supportedLanguages.keys.map((
               String languageCode,
             ) {
               final languageName = LanguageController.getLanguageName(
@@ -56,10 +52,8 @@ class LanguageSwitcher extends StatelessWidget {
                   ],
                 ),
               );
-            }).toList();
-          },
-        );
-      });
+            }).toList(),
+        ));
     } catch (_) {
       return const SizedBox.shrink();
     }

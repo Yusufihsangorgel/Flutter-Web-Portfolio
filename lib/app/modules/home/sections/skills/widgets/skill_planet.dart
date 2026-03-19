@@ -3,12 +3,6 @@ import 'package:flutter_web_portfolio/app/widgets/mouse_effects.dart';
 
 /// A draggable skill planet widget displayed within the galaxy view.
 class SkillPlanet extends StatelessWidget {
-  final String skillName;
-  final Color skillColor;
-  final double planetSize;
-  final VoidCallback onDragStart;
-  final ValueChanged<DragUpdateDetails> onDragUpdate;
-  final VoidCallback onDragEnd;
 
   const SkillPlanet({
     super.key,
@@ -19,10 +13,15 @@ class SkillPlanet extends StatelessWidget {
     required this.onDragUpdate,
     required this.onDragEnd,
   });
+  final String skillName;
+  final Color skillColor;
+  final double planetSize;
+  final VoidCallback onDragStart;
+  final ValueChanged<DragUpdateDetails> onDragUpdate;
+  final VoidCallback onDragEnd;
 
   @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
+  Widget build(BuildContext context) => GestureDetector(
       onPanStart: (_) => onDragStart(),
       onPanUpdate: onDragUpdate,
       onPanEnd: (_) => onDragEnd(),
@@ -38,7 +37,7 @@ class SkillPlanet extends StatelessWidget {
               color: skillColor,
               boxShadow: [
                 BoxShadow(
-                  color: skillColor.withOpacity(0.5),
+                  color: skillColor.withValues(alpha:0.5),
                   blurRadius: 10,
                   spreadRadius: 2,
                 ),
@@ -71,7 +70,6 @@ class SkillPlanet extends StatelessWidget {
         ),
       ),
     );
-  }
 
   /// Build a PNG icon widget for the skill.
   Widget _buildSkillIcon(String skillName, double size) {
@@ -94,7 +92,7 @@ class SkillPlanet extends StatelessWidget {
 
           // Try alternative icons for special cases
           if (iconPath.contains('skills/')) {
-            final String basePath = 'assets/icons/';
+            const String basePath = 'assets/icons/';
             final String fileName = iconPath.split('/').last;
 
             // Try a file with the same name in the general icons directory
@@ -119,10 +117,10 @@ class SkillPlanet extends StatelessWidget {
   /// Get a short display name for the skill, abbreviating if needed.
   String _getSkillDisplayName(String skill) {
     final Map<String, String> shortNames = {
-      "JavaScript": "JS",
-      "TypeScript": "TS",
-      "Express.js": "Express",
-      "RESTful API": "REST API",
+      'JavaScript': 'JS',
+      'TypeScript': 'TS',
+      'Express.js': 'Express',
+      'RESTful API': 'REST API',
     };
 
     return shortNames[skill] ?? skill;
@@ -142,27 +140,27 @@ class SkillPlanet extends StatelessWidget {
 
     // Special case mappings
     final Map<String, String> specialCases = {
-      "nodejs": "nodejs",
-      "expressjs": "express",
-      "javascript": "javascript",
-      "typescript": "typescript",
-      "html": "html5",
-      "css": "css3",
-      "mongodb": "mongodb",
-      "mssql": "mssql",
-      "sqlite": "sqlite",
-      "aws": "aws",
-      "awss3bucket": "aws", // Use the AWS icon for AWS S3 Bucket
-      "react": "react",
-      "flutter": "flutter",
-      "restfulapi": "api", // Use a generic API icon for RESTful API
-      "websocket": "websocket",
-      "statemanagementgetxproviderbloc":
-          "flutter", // Use the Flutter icon for state management
+      'nodejs': 'nodejs',
+      'expressjs': 'express',
+      'javascript': 'javascript',
+      'typescript': 'typescript',
+      'html': 'html5',
+      'css': 'css3',
+      'mongodb': 'mongodb',
+      'mssql': 'mssql',
+      'sqlite': 'sqlite',
+      'aws': 'aws',
+      'awss3bucket': 'aws', // Use the AWS icon for AWS S3 Bucket
+      'react': 'react',
+      'flutter': 'flutter',
+      'restfulapi': 'api', // Use a generic API icon for RESTful API
+      'websocket': 'websocket',
+      'statemanagementgetxproviderbloc':
+          'flutter', // Use the Flutter icon for state management
     };
 
     // Check for special cases
-    String iconName = specialCases[normalizedSkill] ?? normalizedSkill;
+    final String iconName = specialCases[normalizedSkill] ?? normalizedSkill;
 
     // Build the file path
     final String iconPath = 'assets/icons/skills/$iconName.png';
@@ -178,7 +176,7 @@ class SkillPlanet extends StatelessWidget {
       width: size,
       height: size,
       decoration: BoxDecoration(
-        color: iconColor.withOpacity(0.2),
+        color: iconColor.withValues(alpha:0.2),
         shape: BoxShape.circle,
       ),
       child: Center(

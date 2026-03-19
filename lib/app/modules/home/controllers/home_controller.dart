@@ -5,14 +5,14 @@ import '../../../domain/entities/project.dart';
 import '../../../domain/repositories/i_project_repository.dart';
 
 class HomeController extends GetxController {
+
+  HomeController({required IProjectRepository projectRepository})
+    : _projectRepository = projectRepository;
   final IProjectRepository _projectRepository;
 
   final RxList<Project> projects = <Project>[].obs;
   final RxBool isLoading = false.obs;
   final RxString error = ''.obs;
-
-  HomeController({required IProjectRepository projectRepository})
-    : _projectRepository = projectRepository;
 
   @override
   void onInit() {
