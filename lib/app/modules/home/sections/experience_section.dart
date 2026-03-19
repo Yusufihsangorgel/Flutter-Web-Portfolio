@@ -137,20 +137,8 @@ class ExperienceSection extends StatelessWidget {
       ],
     );
 
-  Widget _timelineDot(ThemeController themeController) => Container(
-    width: 20,
-    height: 20,
-    decoration: BoxDecoration(
-      color: themeController.primaryColor,
-      shape: BoxShape.circle,
-      boxShadow: [
-        BoxShadow(
-          color: themeController.primaryColor.withValues(alpha:0.5),
-          blurRadius: 10,
-          spreadRadius: 2,
-        ),
-      ],
-    ),
+  Widget _timelineDot(ThemeController themeController) => _PulsingDot(
+    color: themeController.primaryColor,
   );
 
   Widget _timelineLine(ThemeController themeController, {required double height}) =>
@@ -292,4 +280,53 @@ class _ShimmeringTextState extends State<ShimmeringText>
           child: Text(widget.text, style: widget.style),
         ),
     );
+}
+
+class _PulsingDot extends StatefulWidget {
+  const _PulsingDot({required this.color});
+
+  final Color color;
+
+  @override
+  State<_PulsingDot> createState() => _PulsingDotState();
+}
+
+class _PulsingDotState extends State<_PulsingDot>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1500),
+    )..repeat(reverse: true);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => AnimatedBuilder(
+    animation: _controller,
+    builder: (_, __) => Container(
+      width: 20,
+      height: 20,
+      decoration: BoxDecoration(
+        color: widget.color,
+        shape: BoxShape.circle,
+        boxShadow: [
+          BoxShadow(
+            color: widget.color.withValues(alpha: 0.3 + _controller.value * 0.4),
+            blurRadius: 8 + _controller.value * 12,
+            spreadRadius: 1 + _controller.value * 3,
+          ),
+        ],
+      ),
+    ),
+  );
 }

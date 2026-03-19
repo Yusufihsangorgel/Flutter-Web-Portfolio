@@ -12,6 +12,7 @@ import 'package:flutter_web_portfolio/app/widgets/custom_sliver_app_bar.dart';
 import 'package:flutter_web_portfolio/app/controllers/shared_background_controller.dart';
 import 'package:flutter_web_portfolio/app/widgets/background/cosmic_background.dart';
 import 'package:flutter_web_portfolio/app/widgets/footer.dart';
+import 'package:flutter_web_portfolio/app/widgets/scroll_fade_in.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -59,12 +60,14 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
                 scrollController: scrollController,
                 languageController: languageController,
               ),
+              // Home section — no scroll fade (already has FadeInDown)
               _sliverSection(scrollController.homeKey, const HomeSection()),
-              _sliverSection(scrollController.aboutKey, const AboutSection()),
-              _sliverSection(scrollController.skillsKey, const SkillsSection()),
-              _sliverSection(scrollController.experienceKey, const ExperienceSection()),
-              _sliverSection(scrollController.projectsKey, const ProjectsSection()),
-              _sliverSection(scrollController.contactKey, const ContactSection()),
+              // Remaining sections with scroll-triggered fade-in
+              _animatedSection(scrollController.aboutKey, const AboutSection()),
+              _animatedSection(scrollController.skillsKey, const SkillsSection(), delay: const Duration(milliseconds: 100)),
+              _animatedSection(scrollController.experienceKey, const ExperienceSection(), delay: const Duration(milliseconds: 100)),
+              _animatedSection(scrollController.projectsKey, const ProjectsSection(), delay: const Duration(milliseconds: 100)),
+              _animatedSection(scrollController.contactKey, const ContactSection(), delay: const Duration(milliseconds: 100)),
               const SliverToBoxAdapter(child: PortfolioFooter()),
             ],
           ),
@@ -79,6 +82,18 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
           key: key,
           padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 24),
           child: child,
+        ),
+      );
+
+  SliverToBoxAdapter _animatedSection(GlobalKey key, Widget child, {Duration delay = Duration.zero}) =>
+      SliverToBoxAdapter(
+        child: Container(
+          key: key,
+          padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 24),
+          child: ScrollFadeIn(
+            delay: delay,
+            child: child,
+          ),
         ),
       );
 }
