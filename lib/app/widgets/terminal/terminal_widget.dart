@@ -4,27 +4,14 @@ import 'package:flutter_web_portfolio/app/models/terminal_output_model.dart';
 import 'package:flutter_web_portfolio/app/widgets/terminal/terminal_output_widget.dart';
 import 'package:get/get.dart';
 
-/// Terminal ekranını gösteren widget
+/// Widget that displays the terminal screen
 class TerminalWidget extends StatelessWidget {
-  /// Terminal çıktıları
   final List<TerminalOutputModel> outputs;
-
-  /// ScrollController for auto-scrolling
   final ScrollController scrollController;
-
-  /// Terminal ekranının başlığı
   final String title;
-
-  /// Terminal komut öneki
   final String terminalPrefix;
-
-  /// Aktif komut için TextEditingController
   final TextEditingController commandController;
-
-  /// Terminal girişi için FocusNode
   final FocusNode terminalFocus;
-
-  /// Komut çalıştırma fonksiyonu
   final Function(String) onSubmitCommand;
 
   const TerminalWidget({
@@ -74,7 +61,7 @@ class TerminalWidget extends StatelessWidget {
     );
   }
 
-  /// Terminal başlığını oluşturur
+  /// Builds the terminal title bar
   Widget _buildTerminalHeader() {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -90,7 +77,7 @@ class TerminalWidget extends StatelessWidget {
       ),
       child: Row(
         children: [
-          // Terminal kontrol butonları
+          // Traffic light buttons
           Row(
             children: [
               Container(
@@ -132,31 +119,28 @@ class TerminalWidget extends StatelessWidget {
               ),
             ),
           ),
-          // Sağa boşluk
           const SizedBox(width: 36),
         ],
       ),
     );
   }
 
-  /// Terminal içeriğini oluşturur
+  /// Builds the terminal content area
   Widget _buildTerminalContent() {
     return GestureDetector(
       onTap: () => terminalFocus.requestFocus(),
       child: Container(
         padding: const EdgeInsets.all(16),
-        child: // Terminal çıktıları
-            SingleChildScrollView(
+        child: SingleChildScrollView(
           controller: scrollController,
           physics: const BouncingScrollPhysics(),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              // Önceki çıktılar
               ...outputs.map((output) {
                 if (output.isTyping) {
-                  // Animasyon devam ederken sadece görünen kısmı göster
+                  // Show only the visible portion while animation is in progress
                   final visibleContent = output.content.substring(
                     0,
                     output.currentIndex,
@@ -182,7 +166,7 @@ class TerminalWidget extends StatelessWidget {
                 }
               }).toList(),
 
-              // Aktif komut girişi
+              // Active command input
               Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [

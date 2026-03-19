@@ -1,13 +1,7 @@
 import '../entities/skill.dart';
 
-/// Beceri verilerine erişim için repository interface
-abstract class ISkillRepository {
-  /// Tüm becerileri getirir
+abstract interface class ISkillRepository {
   Future<List<Skill>> getSkills();
-
-  /// Kategori bazında becerileri getirir
   Future<List<Skill>> getSkillsByCategory(String category);
-
-  /// Beceri kategorilerini getirir
   Future<List<String>> getSkillCategories();
 }

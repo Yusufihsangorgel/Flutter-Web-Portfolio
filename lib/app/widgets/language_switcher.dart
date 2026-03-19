@@ -2,13 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/language_controller.dart';
 
-/// Dil seçme widget'ı
 class LanguageSwitcher extends StatelessWidget {
-  const LanguageSwitcher({Key? key}) : super(key: key);
+  const LanguageSwitcher({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // LanguageController try-catch ile alınarak hata durumuna karşı koruma sağlıyoruz
     try {
       final languageController = Get.find<LanguageController>();
 
@@ -19,7 +17,7 @@ class LanguageSwitcher extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                languageController.languageInfo['flag'] ?? '🌐',
+                languageController.languageInfo['flag'] ?? '',
                 style: const TextStyle(fontSize: 24),
               ),
               const SizedBox(width: 8),
@@ -42,7 +40,6 @@ class LanguageSwitcher extends StatelessWidget {
               return PopupMenuItem<String>(
                 value: languageCode,
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     Text(flag, style: const TextStyle(fontSize: 24)),
                     const SizedBox(width: 12),
@@ -63,9 +60,7 @@ class LanguageSwitcher extends StatelessWidget {
           },
         );
       });
-    } catch (e) {
-      // Hata durumunda boş bir container döndür
-      debugPrint('LanguageSwitcher hatası: $e');
+    } catch (_) {
       return const SizedBox.shrink();
     }
   }

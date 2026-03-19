@@ -3,18 +3,17 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_web_portfolio/app/models/terminal_output_model.dart';
 
-/// Terminal yazı animasyonu yardımcısı
+/// Helper class for terminal typing animation
 class TypingAnimation {
-  /// Rastgele değerler için Random nesnesi
   final math.Random _random = math.Random();
 
-  /// Terminal çıktısını yazı yazma efektiyle gösterir
+  /// Displays terminal output with a typewriter effect
   ///
-  /// [output] Animasyon uygulanacak çıktı
-  /// [onComplete] Animasyon tamamlandığında çalıştırılacak fonksiyon
-  /// [setState] Durumu güncellemek için kullanılacak fonksiyon
-  /// [baseDuration] Her karakter arasındaki temel bekleme süresi (ms)
-  /// [randomVariation] Bekleme süresine eklenecek rastgele değişim (ms)
+  /// [output] The output to animate
+  /// [onComplete] Callback invoked when the animation finishes
+  /// [setState] Function used to trigger UI updates
+  /// [baseDuration] Base delay between characters (ms)
+  /// [randomVariation] Random variation added to the delay (ms)
   void simulateTyping({
     required TerminalOutputModel output,
     required VoidCallback onComplete,
@@ -31,21 +30,17 @@ class TypingAnimation {
       return;
     }
 
-    // Rastgele yazma hızı hesapla
     final typingDelay = baseDuration + _random.nextInt(randomVariation);
 
-    // Bir karakteri göster ve sonraki karaktere geç
     Future.delayed(Duration(milliseconds: typingDelay), () {
       setState(() {
         output.currentIndex++;
 
-        // Animasyon tamamlandı mı kontrol et
         if (output.currentIndex >= output.content.length) {
           output.isTyping = false;
           output.isCompleted = true;
           onComplete();
         } else {
-          // Devam et
           simulateTyping(
             output: output,
             onComplete: onComplete,

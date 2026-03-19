@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_web_portfolio/app/models/terminal_output_model.dart';
 
-/// Terminal çıktılarını gösteren widget
+/// Widget that renders terminal output entries
 class TerminalOutputWidget extends StatelessWidget {
-  /// Gösterilecek terminal çıktısı
   final TerminalOutputModel output;
-
-  /// Terminal komut öneki ('>' gibi)
   final String terminalPrefix;
 
   const TerminalOutputWidget({
@@ -17,12 +14,10 @@ class TerminalOutputWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Komut çıktısı ise özel gösterim
     if (output.type == TerminalOutputType.command) {
       return _buildCommandOutput();
     }
 
-    // Normal çıktı gösterimi
     return output.content.isEmpty
         ? const SizedBox(height: 8)
         : Padding(
@@ -49,7 +44,7 @@ class TerminalOutputWidget extends StatelessWidget {
         );
   }
 
-  /// Komut çıktısını özel olarak gösterir
+  /// Renders a command-type output with the terminal prefix
   Widget _buildCommandOutput() {
     return Padding(
       padding: const EdgeInsets.only(bottom: 4.0),

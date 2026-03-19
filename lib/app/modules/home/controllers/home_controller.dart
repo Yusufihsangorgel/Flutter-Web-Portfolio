@@ -1,12 +1,12 @@
+import 'dart:developer' as dev;
+
 import 'package:get/get.dart';
 import '../../../domain/entities/project.dart';
 import '../../../domain/repositories/i_project_repository.dart';
 
-/// Ana sayfa controller'ı
 class HomeController extends GetxController {
   final IProjectRepository _projectRepository;
 
-  // Observable state değişkenleri
   final RxList<Project> projects = <Project>[].obs;
   final RxBool isLoading = false.obs;
   final RxString error = ''.obs;
@@ -20,7 +20,6 @@ class HomeController extends GetxController {
     loadProjects();
   }
 
-  /// Projeleri yükler
   Future<void> loadProjects() async {
     isLoading.value = true;
     error.value = '';
@@ -29,15 +28,12 @@ class HomeController extends GetxController {
       final projectList = await _projectRepository.getProjects();
       projects.value = projectList;
     } catch (e) {
-      error.value = 'Projeler yüklenirken hata oluştu: $e';
-      print(error.value);
+      error.value = 'Failed to load projects: $e';
+      dev.log(error.value, name: 'HomeController', error: e);
     } finally {
       isLoading.value = false;
     }
   }
 
-  /// Projeleri yeniden yükler
-  Future<void> refreshProjects() async {
-    await loadProjects();
-  }
+  Future<void> refreshProjects() async => loadProjects();
 }

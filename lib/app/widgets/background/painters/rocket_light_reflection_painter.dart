@@ -1,7 +1,7 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
-// Roket üzerindeki ışık yansıması efekti
+// Light reflection effect on the rocket surface
 class RocketLightReflectionPainter extends CustomPainter {
   final double time;
   final double lightX;
@@ -20,13 +20,12 @@ class RocketLightReflectionPainter extends CustomPainter {
     final width = size.width;
     final height = size.height;
 
-    // Işık yansıması için paint
     final paint =
         Paint()
           ..style = PaintingStyle.fill
           ..strokeWidth = 1.0;
 
-    // Roket gövdesi üzerindeki ışık yansıması
+    // Body reflection highlight
     final bodyReflectionPath = Path();
     bodyReflectionPath.moveTo(width * 0.4, height * 0.3);
     bodyReflectionPath.quadraticBezierTo(
@@ -37,7 +36,7 @@ class RocketLightReflectionPainter extends CustomPainter {
     );
     bodyReflectionPath.close();
 
-    // Sürükleme sırasında daha parlak yansıma
+    // Brighter reflection while dragging
     final bodyGradient = LinearGradient(
       begin: Alignment(lightX, lightY),
       end: Alignment(-lightX, -lightY),
@@ -55,11 +54,10 @@ class RocketLightReflectionPainter extends CustomPainter {
 
     canvas.drawPath(bodyReflectionPath, bodyReflectionPaint);
 
-    // Roket penceresi üzerindeki ışık yansıması
+    // Window reflection
     final windowCenter = Offset(width * 0.35, height * 0.35);
     final windowRadius = width * 0.1;
 
-    // Sürükleme sırasında daha parlak pencere yansıması
     final windowGradient = RadialGradient(
       center: Alignment(lightX * 0.5, lightY * 0.5),
       radius: 0.5,
@@ -84,9 +82,8 @@ class RocketLightReflectionPainter extends CustomPainter {
 
     canvas.drawCircle(windowCenter, windowRadius * 0.7, windowReflectionPaint);
 
-    // Sürükleme sırasında ekstra parıltı efektleri
+    // Extra sparkle effects while dragging
     if (isDragging) {
-      // Roket etrafında parıltı efekti
       final glowGradient = RadialGradient(
         center: const Alignment(0, 0),
         radius: 1.0,
@@ -106,14 +103,14 @@ class RocketLightReflectionPainter extends CustomPainter {
 
       canvas.drawRect(Rect.fromLTWH(0, 0, width, height), glowPaint);
 
-      // Hız çizgileri
+      // Speed lines
       final speedLinesPaint =
           Paint()
             ..color = Colors.white.withOpacity(0.4)
             ..strokeWidth = 1.0
             ..strokeCap = StrokeCap.round;
 
-      final random = math.Random(42); // Sabit seed ile rastgele sayılar
+      final random = math.Random(42);
       for (int i = 0; i < 5; i++) {
         final startX = width * (0.3 + random.nextDouble() * 0.4);
         final startY = height * (0.2 + random.nextDouble() * 0.6);

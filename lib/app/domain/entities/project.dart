@@ -1,5 +1,4 @@
-/// Proje detaylarını tutan entity sınıfı
-class Project {
+base class Project {
   final String id;
   final String title;
   final String description;
@@ -8,7 +7,7 @@ class Project {
   final String liveUrl;
   final String githubUrl;
 
-  Project({
+  const Project({
     required this.id,
     required this.title,
     required this.description,

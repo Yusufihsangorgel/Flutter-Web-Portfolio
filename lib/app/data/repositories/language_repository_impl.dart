@@ -1,23 +1,21 @@
+import 'dart:developer' as dev;
+
 import '../../domain/repositories/i_language_repository.dart';
 import '../providers/assets_provider.dart';
 import '../providers/local_storage_provider.dart';
-import 'package:flutter/foundation.dart';
 
-/// ILanguageRepository implementasyonu
 class LanguageRepositoryImpl implements ILanguageRepository {
   final AssetsProvider _assetsProvider;
   final LocalStorageProvider _localStorageProvider;
 
-  // Dil ayarı için storage anahtarı
-  static const String languageKey = 'selected_language';
+  static const String _languageKey = 'selected_language';
 
-  // Desteklenen diller ve bayrakları
-  static const Map<String, String> supportedLanguages = {
-    'tr': '🇹🇷',
-    'en': '🇬🇧',
-    'de': '🇩🇪',
-    'fr': '🇫🇷',
-    'es': '🇪🇸',
+  static const Map<String, String> _supportedLanguages = {
+    'tr': '\u{1F1F9}\u{1F1F7}',
+    'en': '\u{1F1EC}\u{1F1E7}',
+    'de': '\u{1F1E9}\u{1F1EA}',
+    'fr': '\u{1F1EB}\u{1F1F7}',
+    'es': '\u{1F1EA}\u{1F1F8}',
   };
 
   LanguageRepositoryImpl({
@@ -27,45 +25,37 @@ class LanguageRepositoryImpl implements ILanguageRepository {
        _localStorageProvider = localStorageProvider;
 
   @override
-  Map<String, String> getSupportedLanguages() {
-    return supportedLanguages;
-  }
+  Map<String, String> getSupportedLanguages() => _supportedLanguages;
 
   @override
   Future<String> getSelectedLanguage() async {
     try {
-      // Kayıtlı dil tercihini al, yoksa varsayılan olarak Türkçe
-      final savedLanguage = _localStorageProvider.getString(languageKey);
+      final savedLanguage = _localStorageProvider.getString(_languageKey);
       return savedLanguage ?? 'tr';
     } catch (e) {
-      debugPrint('⚠️ Dil tercihi yüklenirken hata: $e');
-      return 'tr'; // Hata durumunda varsayılan dil
+      dev.log('Failed to load language preference', name: 'LanguageRepository', error: e);
+      return 'tr';
     }
   }
 
   @override
   Future<void> saveSelectedLanguage(String languageCode) async {
     try {
-      await _localStorageProvider.setString(languageKey, languageCode);
+      await _localStorageProvider.setString(_languageKey, languageCode);
     } catch (e) {
-      debugPrint('⚠️ Dil tercihi kaydedilirken hata: $e');
-      // Hata durumunda sessizce devam et
+      dev.log('Failed to save language preference', name: 'LanguageRepository', error: e);
     }
   }
 
   @override
   Future<Map<String, dynamic>> getTranslations(String languageCode) async {
-    return await _assetsProvider.loadTranslations(languageCode);
+    return _assetsProvider.loadTranslations(languageCode);
   }
 
   @override
   Map<String, dynamic> getCVData(String languageCode) {
-    // CV verilerini dil koduna göre döndür
-    // Gerçek uygulamada bu veriler assetlerden veya API'dan yüklenebilir
-    // Şimdilik basit bir mock veri dönüyoruz
-
-    // Mock CV verileri (Örnek)
-    final Map<String, dynamic> mockData = {
+    // TODO: Load from assets/data/cv_{languageCode}.json
+    return {
       'skills': [
         {'name': 'Flutter', 'level': 90, 'category': 'Mobile'},
         {'name': 'Dart', 'level': 85, 'category': 'Programming'},
@@ -77,41 +67,39 @@ class LanguageRepositoryImpl implements ILanguageRepository {
           'company': 'ABC Tech',
           'position': 'Senior Developer',
           'period': '2020-2023',
-          'description': 'Mobil uygulama geliştirme',
+          'description': 'Mobile application development',
         },
         {
           'company': 'XYZ Software',
           'position': 'Developer',
           'period': '2018-2020',
-          'description': 'Web uygulamaları geliştirme',
+          'description': 'Web application development',
         },
       ],
       'projects': [
         {
           'name': 'E-Commerce App',
-          'description': 'Flutter ile geliştirilmiş e-ticaret uygulaması',
+          'description': 'E-commerce application built with Flutter',
           'technologies': ['Flutter', 'Firebase', 'GetX'],
         },
         {
           'name': 'Portfolio Website',
-          'description': 'Kişisel portföy web sitesi',
+          'description': 'Personal portfolio website',
           'technologies': ['React', 'Next.js', 'Tailwind CSS'],
         },
       ],
       'education': [
         {
-          'institution': 'ABC Üniversitesi',
-          'degree': 'Bilgisayar Mühendisliği',
+          'institution': 'ABC University',
+          'degree': 'Computer Engineering',
           'period': '2014-2018',
         },
       ],
       'languages': [
-        {'name': 'Türkçe', 'level': 'Ana dil'},
-        {'name': 'İngilizce', 'level': 'İleri Seviye'},
-        {'name': 'Almanca', 'level': 'Orta Seviye'},
+        {'name': 'Turkish', 'level': 'Native'},
+        {'name': 'English', 'level': 'Advanced'},
+        {'name': 'German', 'level': 'Intermediate'},
       ],
     };
-
-    return mockData;
   }
 }

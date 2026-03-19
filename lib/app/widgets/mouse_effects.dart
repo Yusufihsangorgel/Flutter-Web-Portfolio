@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:ui' as ui;
 import 'package:flutter/foundation.dart' show kIsWeb;
 
-/// Fare pozisyonunu takip eden ışık efekti widget'ı
+/// Mouse-tracking light effect widget
 class MouseLight extends StatefulWidget {
   final Widget child;
   final Color lightColor;
@@ -10,12 +10,12 @@ class MouseLight extends StatefulWidget {
   final double intensity;
 
   const MouseLight({
-    Key? key,
+    super.key,
     required this.child,
     this.lightColor = Colors.blue,
     this.lightSize = 300,
     this.intensity = 0.3,
-  }) : super(key: key);
+  });
 
   @override
   State<MouseLight> createState() => _MouseLightState();
@@ -27,7 +27,7 @@ class _MouseLightState extends State<MouseLight> {
 
   @override
   Widget build(BuildContext context) {
-    // Web platformu dışında bu efekti devre dışı bırak
+    // Disable this effect on non-web platforms
     if (!kIsWeb) return widget.child;
 
     return MouseRegion(
@@ -54,8 +54,8 @@ class _MouseLightState extends State<MouseLight> {
             Positioned.fill(
               child: IgnorePointer(
                 child: CustomPaint(
-                  isComplex: false, // Gereksiz yeniden çizimlerden kaçın
-                  willChange: false, // Gereksiz yeniden çizimlerden kaçın
+                  isComplex: false,
+                  willChange: false,
                   painter: _LightPainter(
                     mousePosition: _mousePosition,
                     lightColor: widget.lightColor,
@@ -71,7 +71,7 @@ class _MouseLightState extends State<MouseLight> {
   }
 }
 
-/// Işık efekti için CustomPainter
+/// CustomPainter for the light effect
 class _LightPainter extends CustomPainter {
   final Offset mousePosition;
   final Color lightColor;
@@ -87,7 +87,7 @@ class _LightPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    if (size.isEmpty) return; // Boş alanlara çizim yapma
+    if (size.isEmpty) return;
 
     final Paint paint = Paint();
     try {
@@ -96,9 +96,8 @@ class _LightPainter extends CustomPainter {
         Colors.transparent,
       ]);
       canvas.drawRect(Rect.fromLTWH(0, 0, size.width, size.height), paint);
-    } catch (e) {
-      // Shader oluşturma hatası olursa sessizce geç
-      debugPrint('Shader error: $e');
+    } catch (_) {
+      // Shader creation may fail on some platforms
     }
   }
 
@@ -108,7 +107,7 @@ class _LightPainter extends CustomPainter {
   }
 }
 
-/// Hover animasyonu widget'ı
+/// Hover animation widget
 class HoverAnimatedWidget extends StatefulWidget {
   final Widget child;
   final double hoverScale;
@@ -118,14 +117,14 @@ class HoverAnimatedWidget extends StatefulWidget {
   final EdgeInsetsGeometry? padding;
 
   const HoverAnimatedWidget({
-    Key? key,
+    super.key,
     required this.child,
     this.hoverScale = 1.05,
     this.duration = const Duration(milliseconds: 200),
     this.hoverColor,
     this.borderRadius,
     this.padding,
-  }) : super(key: key);
+  });
 
   @override
   State<HoverAnimatedWidget> createState() => _HoverAnimatedWidgetState();
@@ -136,7 +135,7 @@ class _HoverAnimatedWidgetState extends State<HoverAnimatedWidget> {
 
   @override
   Widget build(BuildContext context) {
-    // Web platformu dışında basit bir wrapper olarak davran
+    // Act as a simple wrapper on non-web platforms
     if (!kIsWeb) return widget.child;
 
     return MouseRegion(
@@ -164,7 +163,7 @@ class _HoverAnimatedWidgetState extends State<HoverAnimatedWidget> {
   }
 }
 
-/// 360 derece döndürülebilir widget
+/// 360-degree rotatable widget
 class RotatableWidget extends StatefulWidget {
   final Widget child;
   final double size;
@@ -172,12 +171,12 @@ class RotatableWidget extends StatefulWidget {
   final BorderRadius? borderRadius;
 
   const RotatableWidget({
-    Key? key,
+    super.key,
     required this.child,
     this.size = 200,
     this.backgroundColor,
     this.borderRadius,
-  }) : super(key: key);
+  });
 
   @override
   State<RotatableWidget> createState() => _RotatableWidgetState();
@@ -191,7 +190,7 @@ class _RotatableWidgetState extends State<RotatableWidget> {
 
   @override
   Widget build(BuildContext context) {
-    // Web platformu dışında sadece statik container göster
+    // Show static container on non-web platforms
     if (!kIsWeb) {
       return Container(
         width: widget.size,
@@ -214,9 +213,7 @@ class _RotatableWidgetState extends State<RotatableWidget> {
       onPanUpdate: (details) {
         if (_isDragging) {
           setState(() {
-            // Y ekseninde döndürme (x hareketi ile)
             _rotationY += (details.localPosition.dx - _startPosition.dx) / 100;
-            // X ekseninde döndürme (y hareketi ile, ters yönde)
             _rotationX -= (details.localPosition.dy - _startPosition.dy) / 100;
             _startPosition = details.localPosition;
           });
@@ -247,7 +244,7 @@ class _RotatableWidgetState extends State<RotatableWidget> {
                 alignment: Alignment.center,
                 transform:
                     Matrix4.identity()
-                      ..setEntry(3, 2, 0.001) // Perspektif
+                      ..setEntry(3, 2, 0.001)
                       ..rotateX(_rotationX)
                       ..rotateY(_rotationY),
                 child: widget.child,

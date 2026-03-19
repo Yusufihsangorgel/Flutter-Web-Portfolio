@@ -1,17 +1,14 @@
 import 'package:flutter/material.dart';
+import '../core/constants/breakpoints.dart';
 
-/// Responsive tasarım için yardımcı sınıf
 class ResponsiveUtils {
-  /// Ekran boyutu bilgileri
-  static const double mobileWidth = 576; // < 576px - Mobil
-  static const double tabletWidth = 992; // 576px - 992px - Tablet
-  static const double desktopWidth = 1200; // 992px - 1200px - Küçük Masaüstü
-  static const double largeDesktopWidth = 1400; // > 1200px - Büyük Masaüstü
+  static const double mobileWidth = Breakpoints.mobile;
+  static const double tabletWidth = Breakpoints.tablet;
+  static const double desktopWidth = Breakpoints.desktop;
+  static const double largeDesktopWidth = Breakpoints.wide;
 
-  /// Cihaz tipini kontrol eden metotlar
-  static bool isMobile(BuildContext context) {
-    return MediaQuery.of(context).size.width < mobileWidth;
-  }
+  static bool isMobile(BuildContext context) =>
+      MediaQuery.of(context).size.width < mobileWidth;
 
   static bool isTablet(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
@@ -23,11 +20,9 @@ class ResponsiveUtils {
     return width >= tabletWidth && width < desktopWidth;
   }
 
-  static bool isLargeDesktop(BuildContext context) {
-    return MediaQuery.of(context).size.width >= desktopWidth;
-  }
+  static bool isLargeDesktop(BuildContext context) =>
+      MediaQuery.of(context).size.width >= desktopWidth;
 
-  /// Cihaz tipine göre değer döndüren yardımcı metot
   static T getValueForScreenType<T>({
     required BuildContext context,
     required T mobile,
@@ -35,20 +30,17 @@ class ResponsiveUtils {
     T? desktop,
     T? largeDesktop,
   }) {
-    // Default değerler
-    final T tabletValue = tablet ?? mobile;
-    final T desktopValue = desktop ?? tabletValue;
-    final T largeDesktopValue = largeDesktop ?? desktopValue;
+    final tabletValue = tablet ?? mobile;
+    final desktopValue = desktop ?? tabletValue;
+    final largeDesktopValue = largeDesktop ?? desktopValue;
+    final width = MediaQuery.of(context).size.width;
 
-    if (isMobile(context)) {
-      return mobile;
-    } else if (isTablet(context)) {
-      return tabletValue;
-    } else if (isDesktop(context)) {
-      return desktopValue;
-    } else {
-      return largeDesktopValue;
-    }
+    return switch (width) {
+      < Breakpoints.mobile => mobile,
+      < Breakpoints.tablet => tabletValue,
+      < Breakpoints.desktop => desktopValue,
+      _ => largeDesktopValue,
+    };
   }
 
   static Widget responsive({
@@ -57,10 +49,9 @@ class ResponsiveUtils {
     Widget? desktop,
     Widget? largeDesktop,
   }) {
-    // Default değerler
-    tablet = tablet ?? mobile;
-    desktop = desktop ?? tablet;
-    largeDesktop = largeDesktop ?? desktop;
+    tablet ??= mobile;
+    desktop ??= tablet;
+    largeDesktop ??= desktop;
 
     return ResponsiveBuilder(
       mobile: mobile,
@@ -71,7 +62,6 @@ class ResponsiveUtils {
   }
 }
 
-/// Responsive ekran boyutuna göre widget döndüren builder
 class ResponsiveBuilder extends StatelessWidget {
   final Widget mobile;
   final Widget tablet;
@@ -79,26 +69,22 @@ class ResponsiveBuilder extends StatelessWidget {
   final Widget largeDesktop;
 
   const ResponsiveBuilder({
-    Key? key,
+    super.key,
     required this.mobile,
     required this.tablet,
     required this.desktop,
     required this.largeDesktop,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
-    // GetX reaktif ekran boyutu
     final screenWidth = MediaQuery.of(context).size.width;
 
-    if (screenWidth < ResponsiveUtils.mobileWidth) {
-      return mobile;
-    } else if (screenWidth < ResponsiveUtils.tabletWidth) {
-      return tablet;
-    } else if (screenWidth < ResponsiveUtils.desktopWidth) {
-      return desktop;
-    } else {
-      return largeDesktop;
-    }
+    return switch (screenWidth) {
+      < Breakpoints.mobile => mobile,
+      < Breakpoints.tablet => tablet,
+      < Breakpoints.desktop => desktop,
+      _ => largeDesktop,
+    };
   }
 }

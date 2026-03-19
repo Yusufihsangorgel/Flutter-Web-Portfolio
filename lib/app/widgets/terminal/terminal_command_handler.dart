@@ -1,21 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:flutter_web_portfolio/app/controllers/language_controller.dart';
 import 'package:flutter_web_portfolio/app/models/terminal_output_model.dart';
 import 'package:flutter_web_portfolio/app/utils/url_launcher_utils.dart';
 
-/// Terminal komutlarını işleyen sınıf
+/// Handles terminal command processing
 class TerminalCommandHandler {
-  /// Dil kontrolcüsü
   final LanguageController _languageController;
-
-  /// Terminal çıktılarını eklemek için callback
   final Function(TerminalOutputModel) addOutput;
-
-  /// Terminali temizlemek için callback
   final VoidCallback clearTerminal;
-
-  /// Ekranı aşağı kaydırmak için callback
   final VoidCallback scrollToBottom;
 
   TerminalCommandHandler({
@@ -25,17 +17,14 @@ class TerminalCommandHandler {
     required this.scrollToBottom,
   }) : _languageController = languageController;
 
-  /// Komutu işler ve uygun yanıtı döndürür
+  /// Processes a command and produces the appropriate response
   void handleCommand(String command) {
     if (command.isEmpty) return;
 
-    // Komutu küçük harfe çevir
     final lowercaseCommand = command.toLowerCase().trim();
-
-    // Komutlar için çevirileri al
     final commands = _getLocalizedCommands();
 
-    // Komut eşleşmelerini kontrol et (çeviriye göre ve İngilizce yedeklerle)
+    // Match against both localized and English fallback commands
     if (lowercaseCommand == commands['help'] || lowercaseCommand == 'help') {
       _showHelp();
     } else if (lowercaseCommand == commands['about'] ||
@@ -71,7 +60,7 @@ class TerminalCommandHandler {
     }
   }
 
-  /// Yerelleştirilmiş komut isimlerini alır
+  /// Returns localized command names
   Map<String, String> _getLocalizedCommands() {
     return {
       'help':
@@ -138,11 +127,9 @@ class TerminalCommandHandler {
     };
   }
 
-  /// Yardım komutunu gösterir
   void _showHelp() {
     final commands = _getLocalizedCommands();
 
-    // Komut açıklamalarını al
     final helpDesc = _languageController.getText(
       'terminal.commands.help',
       defaultValue: 'displays available commands',
@@ -186,11 +173,9 @@ class TerminalCommandHandler {
 
     String helpText = '';
 
-    // Add title
     helpText +=
         '${_languageController.getText('terminal.help_title', defaultValue: 'Available Commands:')}\n\n';
 
-    // Komutları ve açıklamalarını ekle
     helpText += '${commands['help']} - $helpDesc\n';
     helpText += '${commands['about']} - $aboutDesc\n';
     helpText += '${commands['skills']} - $skillsDesc\n';
@@ -214,7 +199,6 @@ class TerminalCommandHandler {
     );
   }
 
-  /// Hakkında komutunu gösterir
   void _showAbout() {
     final cvData = _languageController.cvData;
     if (cvData == null || cvData['personal_info'] == null) {
@@ -234,20 +218,17 @@ class TerminalCommandHandler {
     final personalInfo = cvData['personal_info'];
     String aboutText = '';
 
-    // Add name and title
     final name = personalInfo['name'];
     final title = personalInfo['title'];
     if (name != null && title != null) {
       aboutText += '$name - $title\n\n';
     }
 
-    // Add bio information
     final bio = personalInfo['bio'];
     if (bio != null) {
       aboutText += '$bio\n\n';
     }
 
-    // Add contact information
     final contactFields = {
       'email': 'translations.email',
       'phone': 'translations.phone',
@@ -278,7 +259,6 @@ class TerminalCommandHandler {
     );
   }
 
-  /// Beceriler komutunu gösterir
   void _showSkills() {
     final title = _languageController.getText(
       'about_section.skills_title',
@@ -327,7 +307,6 @@ class TerminalCommandHandler {
     );
   }
 
-  /// Deneyim komutunu gösterir
   void _showExperience() {
     final title = _languageController.getText(
       'about_section.experience_title',
@@ -373,7 +352,6 @@ class TerminalCommandHandler {
     );
   }
 
-  /// Eğitim komutunu gösterir
   void _showEducation() {
     final title = _languageController.getText(
       'about_section.education_title',
@@ -414,7 +392,6 @@ class TerminalCommandHandler {
     );
   }
 
-  /// Projeler komutunu gösterir
   void _showProjects() {
     final projects = _languageController.cvData['projects'] ?? [];
 
@@ -443,7 +420,6 @@ class TerminalCommandHandler {
         ),
       );
     } else {
-      // Önce başlığı ekle
       addOutput(
         TerminalOutputModel(
           content: '\n【 $title 】\n\n',
@@ -456,7 +432,6 @@ class TerminalCommandHandler {
         ),
       );
 
-      // Projeleri tek tek ekle
       for (final project in projects) {
         final title =
             project['title'] ??
@@ -467,7 +442,6 @@ class TerminalCommandHandler {
         final description = project['description'] ?? '';
         final url = _extractUrl(project);
 
-        // Proje başlığı
         addOutput(
           TerminalOutputModel(
             content: '◆ $title',
@@ -480,7 +454,6 @@ class TerminalCommandHandler {
           ),
         );
 
-        // Açıklama
         if (description.isNotEmpty) {
           addOutput(
             TerminalOutputModel(
@@ -495,7 +468,6 @@ class TerminalCommandHandler {
           );
         }
 
-        // URL
         if (url.isNotEmpty) {
           addOutput(
             TerminalOutputModel(
@@ -511,7 +483,6 @@ class TerminalCommandHandler {
           );
         }
 
-        // Boşluk
         addOutput(
           TerminalOutputModel(
             content: '',
@@ -527,7 +498,6 @@ class TerminalCommandHandler {
     }
   }
 
-  /// İletişim bilgilerini gösterir
   void _showContact() {
     final title = _languageController.getText(
       'about_section.contact_title',
@@ -536,7 +506,6 @@ class TerminalCommandHandler {
 
     final personalInfo = _languageController.cvData['personal_info'] ?? {};
 
-    // Başlık
     addOutput(
       TerminalOutputModel(
         content: '\n【 $title 】\n',
@@ -610,7 +579,6 @@ class TerminalCommandHandler {
       );
     }
 
-    // Boşluk
     addOutput(
       TerminalOutputModel(
         content: '',
@@ -624,7 +592,6 @@ class TerminalCommandHandler {
     );
   }
 
-  /// Sosyal medya profillerini gösterir
   void _showSocial() {
     final title = _languageController.getText(
       'about_section.social_title',
@@ -633,7 +600,6 @@ class TerminalCommandHandler {
 
     final personalInfo = _languageController.cvData['personal_info'] ?? {};
 
-    // Başlık
     addOutput(
       TerminalOutputModel(
         content: '\n【 $title 】\n',
@@ -683,7 +649,6 @@ class TerminalCommandHandler {
       }
     });
 
-    // Boşluk
     addOutput(
       TerminalOutputModel(
         content: '',
@@ -697,7 +662,6 @@ class TerminalCommandHandler {
     );
   }
 
-  /// CV indirme komutunu çalıştırır
   Future<void> _downloadCV() async {
     final startMessage = _languageController.getText(
       'terminal.download_cv_start',
@@ -775,7 +739,6 @@ class TerminalCommandHandler {
     }
   }
 
-  /// Komut bulunamadı mesajını gösterir
   void _showCommandNotFound(String command) {
     final errorMessage = _languageController
         .getText('terminal.command_not_found')
@@ -793,7 +756,6 @@ class TerminalCommandHandler {
     );
   }
 
-  /// URL'yi açar
   void _launchUrl(String url) {
     UrlLauncherUtils.openUrl(
       url: url,
@@ -834,7 +796,7 @@ class TerminalCommandHandler {
     );
   }
 
-  /// Projeden URL çıkarır
+  /// Extracts the best available URL from a project map
   String _extractUrl(Map<dynamic, dynamic> project) {
     if (project['url'] is String) {
       return project['url'] as String;

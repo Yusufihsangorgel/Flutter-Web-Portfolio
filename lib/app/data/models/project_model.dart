@@ -1,48 +1,33 @@
 import '../../domain/entities/project.dart';
 
-/// Proje entity'sinin veri modeli implementasyonu
-class ProjectModel extends Project {
-  ProjectModel({
-    required String id,
-    required String title,
-    required String description,
-    required List<String> technologies,
-    required String imageUrl,
-    String liveUrl = '',
-    String githubUrl = '',
-  }) : super(
-         id: id,
-         title: title,
-         description: description,
-         technologies: technologies,
-         imageUrl: imageUrl,
-         liveUrl: liveUrl,
-         githubUrl: githubUrl,
-       );
+final class ProjectModel extends Project {
+  const ProjectModel({
+    required super.id,
+    required super.title,
+    required super.description,
+    required super.technologies,
+    required super.imageUrl,
+    super.liveUrl,
+    super.githubUrl,
+  });
 
-  /// JSON'dan ProjectModel oluşturur
-  factory ProjectModel.fromJson(Map<String, dynamic> json) {
-    return ProjectModel(
-      id: json['id'],
-      title: json['title'],
-      description: json['description'],
-      technologies: List<String>.from(json['technologies']),
-      imageUrl: json['imageUrl'],
-      liveUrl: json['liveUrl'] ?? '',
-      githubUrl: json['githubUrl'] ?? '',
-    );
-  }
+  factory ProjectModel.fromJson(Map<String, dynamic> json) => ProjectModel(
+    id: json['id'] as String? ?? '',
+    title: json['title'] as String? ?? '',
+    description: json['description'] as String? ?? '',
+    technologies: List<String>.from(json['technologies'] ?? []),
+    imageUrl: json['imageUrl'] as String? ?? '',
+    liveUrl: json['liveUrl'] as String? ?? '',
+    githubUrl: json['githubUrl'] as String? ?? '',
+  );
 
-  /// ProjectModel'den JSON oluşturur
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'title': title,
-      'description': description,
-      'technologies': technologies,
-      'imageUrl': imageUrl,
-      'liveUrl': liveUrl,
-      'githubUrl': githubUrl,
-    };
-  }
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'title': title,
+    'description': description,
+    'technologies': technologies,
+    'imageUrl': imageUrl,
+    'liveUrl': liveUrl,
+    'githubUrl': githubUrl,
+  };
 }

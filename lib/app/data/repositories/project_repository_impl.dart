@@ -4,46 +4,30 @@ import '../../domain/repositories/i_project_repository.dart';
 import '../models/project_model.dart';
 import '../providers/assets_provider.dart';
 
-/// IProjectRepository implementasyonu
-class ProjectRepositoryImpl implements IProjectRepository {
+final class ProjectRepositoryImpl implements IProjectRepository {
   final AssetsProvider _assetsProvider;
-
-  // Projeleri önbelleğe almak için
-  final RxList<ProjectModel> _cachedProjects = <ProjectModel>[].obs;
+  final RxList<ProjectModel> _cache = <ProjectModel>[].obs;
 
   ProjectRepositoryImpl({required AssetsProvider assetsProvider})
     : _assetsProvider = assetsProvider;
 
   @override
   Future<List<Project>> getProjects() async {
-    // Önbellekte projeler varsa onları döndür
-    if (_cachedProjects.isNotEmpty) {
-      return _cachedProjects;
-    }
+    if (_cache.isNotEmpty) return _cache;
 
-    // Yoksa asset'ten yükle
     final data = await _assetsProvider.loadProjectsData();
-    _cachedProjects.value =
-        data.map((json) => ProjectModel.fromJson(json)).toList();
-    return _cachedProjects;
+    _cache.value = data.map(ProjectModel.fromJson).toList();
+    return _cache;
   }
 
   @override
   Future<Project> getProjectById(String id) async {
-    // Önce tüm projeleri al
     final projects = await getProjects();
-
-    // ID'ye göre projeyi bul
-    final project = projects.firstWhere(
+    return projects.firstWhere(
       (p) => p.id == id,
-      orElse: () => throw Exception('Proje bulunamadı: $id'),
+      orElse: () => throw Exception('Project not found: $id'),
     );
-
-    return project;
   }
 
-  /// Önbelleği temizler
-  void clearCache() {
-    _cachedProjects.clear();
-  }
+  void clearCache() => _cache.clear();
 }

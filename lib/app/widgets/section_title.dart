@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:flutter_web_portfolio/app/controllers/theme_controller.dart';
 import 'package:animate_do/animate_do.dart';
 
-/// Tüm bölümler için tutarlı başlık widget'ı
+/// Consistent section title widget used across all sections
 class SectionTitle extends StatelessWidget {
   final String title;
   final String? subtitle;
@@ -33,7 +33,6 @@ class SectionTitle extends StatelessWidget {
       child: Column(
         crossAxisAlignment: alignment,
         children: [
-          // Başlık
           FadeInDown(
             duration: const Duration(milliseconds: 600),
             child: Text(
@@ -58,8 +57,6 @@ class SectionTitle extends StatelessWidget {
                   ),
             ),
           ),
-
-          // Alt başlık (varsa)
           if (subtitle != null) ...[
             const SizedBox(height: 16),
             FadeInDown(

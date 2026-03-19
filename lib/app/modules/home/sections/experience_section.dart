@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-import 'dart:math' as math;
 import 'package:get/get.dart';
-import 'package:animate_do/animate_do.dart';
 import 'package:flutter_web_portfolio/app/controllers/language_controller.dart';
 import 'package:flutter_web_portfolio/app/controllers/theme_controller.dart';
-import 'package:flutter_web_portfolio/app/widgets/mouse_effects.dart';
+import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
 import 'package:flutter_web_portfolio/app/widgets/section_title.dart';
 
 class ExperienceSection extends StatelessWidget {
@@ -23,7 +21,6 @@ class ExperienceSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Başlık
           Obx(() {
             final isEnglish = languageController.currentLanguage == 'en';
             return SectionTitle(title: isEnglish ? 'Experience' : 'Deneyim');
@@ -31,7 +28,6 @@ class ExperienceSection extends StatelessWidget {
 
           const SizedBox(height: 60),
 
-          // Deneyim Zaman Çizgisi
           Center(
             child: SizedBox(
               width: isMobile ? screenWidth * 0.9 : screenWidth * 0.7,
@@ -41,7 +37,6 @@ class ExperienceSection extends StatelessWidget {
 
                 return Column(
                   children: [
-                    // Üst zaman çizgisi çubuğu
                     Container(
                       height: 4,
                       decoration: BoxDecoration(
@@ -56,18 +51,15 @@ class ExperienceSection extends StatelessWidget {
                         ),
                       ),
                     ),
-
-                    // Deneyim kartları
                     ListView.builder(
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
                       itemCount: experiences.length,
                       itemBuilder: (context, index) {
                         final experience = experiences[index];
-                        // Sıraya göre yerleşim
                         final isEven = index % 2 == 0;
 
-                        return _buildExperienceTimelineItem(
+                        return _buildTimelineItem(
                           experience,
                           index,
                           isEven,
@@ -87,8 +79,7 @@ class ExperienceSection extends StatelessWidget {
     );
   }
 
-  // Deneyim zaman çizgisi öğesi
-  Widget _buildExperienceTimelineItem(
+  Widget _buildTimelineItem(
     Map<String, dynamic> experience,
     int index,
     bool isEven,
@@ -98,28 +89,13 @@ class ExperienceSection extends StatelessWidget {
   ) {
     final isEnglish = languageController.currentLanguage == 'en';
 
-    // Mobil görünümde her zaman tek sütun
     if (isMobile) {
-      return _buildMobileTimelineItem(
-        experience,
-        index,
-        themeController,
-        isEnglish,
-      );
+      return _buildMobileItem(experience, index, themeController, isEnglish);
     }
-
-    // Masaüstü görünümde alternatif yerleşim
-    return _buildDesktopTimelineItem(
-      experience,
-      index,
-      isEven,
-      themeController,
-      isEnglish,
-    );
+    return _buildDesktopItem(experience, index, isEven, themeController, isEnglish);
   }
 
-  // Mobil için zaman çizgisi öğesi
-  Widget _buildMobileTimelineItem(
+  Widget _buildMobileItem(
     Map<String, dynamic> experience,
     int index,
     ThemeController themeController,
@@ -127,46 +103,16 @@ class ExperienceSection extends StatelessWidget {
   ) {
     return Column(
       children: [
-        // Zaman çizgisi noktası
-        Container(
-          width: 20,
-          height: 20,
-          decoration: BoxDecoration(
-            color: themeController.primaryColor,
-            shape: BoxShape.circle,
-            boxShadow: [
-              BoxShadow(
-                color: themeController.primaryColor.withOpacity(0.5),
-                blurRadius: 10,
-                spreadRadius: 2,
-              ),
-            ],
-          ),
-        ),
-
-        // Dikey çizgi
-        Container(
-          width: 2,
-          height: 30,
-          color: themeController.primaryColor.withOpacity(0.5),
-        ),
-
-        // Deneyim kartı
-        _buildExperienceCard(experience, themeController, isEnglish),
-
-        // Alt dikey çizgi (son öğe değilse)
-        if (index < 5) // Varsayılan olarak 5 deneyim olduğunu varsayıyorum
-          Container(
-            width: 2,
-            height: 30,
-            color: themeController.primaryColor.withOpacity(0.5),
-          ),
+        _timelineDot(themeController),
+        _timelineLine(themeController, height: 30),
+        _experienceCard(experience, themeController, isEnglish),
+        if (index < 5)
+          _timelineLine(themeController, height: 30),
       ],
     );
   }
 
-  // Masaüstü için zaman çizgisi öğesi
-  Widget _buildDesktopTimelineItem(
+  Widget _buildDesktopItem(
     Map<String, dynamic> experience,
     int index,
     bool isEven,
@@ -175,56 +121,50 @@ class ExperienceSection extends StatelessWidget {
   ) {
     return Row(
       children: [
-        // Sol taraf (çift indeksli öğeler için içerik)
         Expanded(
-          child:
-              isEven
-                  ? _buildExperienceCard(experience, themeController, isEnglish)
-                  : const SizedBox.shrink(),
+          child: isEven
+              ? _experienceCard(experience, themeController, isEnglish)
+              : const SizedBox.shrink(),
         ),
-
-        // Orta nokta
         Column(
           children: [
-            Container(
-              width: 20,
-              height: 20,
-              decoration: BoxDecoration(
-                color: themeController.primaryColor,
-                shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
-                    color: themeController.primaryColor.withOpacity(0.5),
-                    blurRadius: 10,
-                    spreadRadius: 2,
-                  ),
-                ],
-              ),
-            ),
-
-            // Dikey çizgi
-            if (index < 5) // Varsayılan olarak 5 deneyim olduğunu varsayıyorum
-              Container(
-                width: 2,
-                height: 100,
-                color: themeController.primaryColor.withOpacity(0.5),
-              ),
+            _timelineDot(themeController),
+            if (index < 5) _timelineLine(themeController, height: 100),
           ],
         ),
-
-        // Sağ taraf (tek indeksli öğeler için içerik)
         Expanded(
-          child:
-              !isEven
-                  ? _buildExperienceCard(experience, themeController, isEnglish)
-                  : const SizedBox.shrink(),
+          child: !isEven
+              ? _experienceCard(experience, themeController, isEnglish)
+              : const SizedBox.shrink(),
         ),
       ],
     );
   }
 
-  // Deneyim kartı
-  Widget _buildExperienceCard(
+  Widget _timelineDot(ThemeController themeController) => Container(
+    width: 20,
+    height: 20,
+    decoration: BoxDecoration(
+      color: themeController.primaryColor,
+      shape: BoxShape.circle,
+      boxShadow: [
+        BoxShadow(
+          color: themeController.primaryColor.withOpacity(0.5),
+          blurRadius: 10,
+          spreadRadius: 2,
+        ),
+      ],
+    ),
+  );
+
+  Widget _timelineLine(ThemeController themeController, {required double height}) =>
+      Container(
+        width: 2,
+        height: height,
+        color: themeController.primaryColor.withOpacity(0.5),
+      );
+
+  Widget _experienceCard(
     Map<String, dynamic> experience,
     ThemeController themeController,
     bool isEnglish,
@@ -232,7 +172,7 @@ class ExperienceSection extends StatelessWidget {
     return Card(
       elevation: 5,
       margin: const EdgeInsets.all(10),
-      color: const Color(0xFF001628).withOpacity(0.7),
+      color: AppColors.surface.withOpacity(0.7),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(15),
         side: BorderSide(
@@ -245,7 +185,6 @@ class ExperienceSection extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Şirket adı
             Text(
               experience['company'] ?? '',
               style: TextStyle(
@@ -254,10 +193,7 @@ class ExperienceSection extends StatelessWidget {
                 color: themeController.primaryColor,
               ),
             ),
-
             const SizedBox(height: 5),
-
-            // Pozisyon
             Text(
               isEnglish
                   ? experience['position'] ?? ''
@@ -268,43 +204,32 @@ class ExperienceSection extends StatelessWidget {
                 color: Colors.white,
               ),
             ),
-
             const SizedBox(height: 5),
-
-            // Tarih aralığı
             Text(
               '${experience['start_date'] ?? ''} - ${experience['end_date'] ?? 'Present'}',
               style: TextStyle(fontSize: 14, color: Colors.grey[400]),
             ),
-
             const SizedBox(height: 15),
-
-            // Açıklama
             Text(
               isEnglish
                   ? experience['description'] ?? ''
                   : experience['description_tr'] ?? '',
               style: const TextStyle(fontSize: 14, color: Colors.white70),
             ),
-
             const SizedBox(height: 10),
-
-            // Teknolojiler
             if (experience['technologies'] != null)
               Wrap(
                 spacing: 8,
                 runSpacing: 8,
-                children:
-                    (experience['technologies'] as List).map((tech) {
-                      return Chip(
-                        label: Text(tech, style: const TextStyle(fontSize: 12)),
-                        backgroundColor: themeController.primaryColor
-                            .withOpacity(0.2),
-                        side: BorderSide(
-                          color: themeController.primaryColor.withOpacity(0.5),
-                        ),
-                      );
-                    }).toList(),
+                children: (experience['technologies'] as List).map((tech) {
+                  return Chip(
+                    label: Text(tech, style: const TextStyle(fontSize: 12)),
+                    backgroundColor: themeController.primaryColor.withOpacity(0.2),
+                    side: BorderSide(
+                      color: themeController.primaryColor.withOpacity(0.5),
+                    ),
+                  );
+                }).toList(),
               ),
           ],
         ),
@@ -313,7 +238,6 @@ class ExperienceSection extends StatelessWidget {
   }
 }
 
-// Parıldayan metin efekti
 class ShimmeringText extends StatefulWidget {
   final String text;
   final TextStyle style;
@@ -321,12 +245,12 @@ class ShimmeringText extends StatefulWidget {
   final Color highlightColor;
 
   const ShimmeringText({
-    Key? key,
+    super.key,
     required this.text,
     required this.baseColor,
     required this.highlightColor,
     required this.style,
-  }) : super(key: key);
+  });
 
   @override
   State<ShimmeringText> createState() => _ShimmeringTextState();

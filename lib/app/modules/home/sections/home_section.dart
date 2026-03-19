@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'dart:math' as math;
 import 'package:get/get.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter_web_portfolio/app/controllers/language_controller.dart';

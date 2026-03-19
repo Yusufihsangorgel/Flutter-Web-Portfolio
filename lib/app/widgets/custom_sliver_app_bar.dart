@@ -12,11 +12,11 @@ class CustomSliverAppBar extends StatelessWidget {
   final List<Widget>? actions;
 
   const CustomSliverAppBar({
-    Key? key,
+    super.key,
     required this.languageController,
     required this.scrollController,
     this.actions,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +29,7 @@ class CustomSliverAppBar extends StatelessWidget {
       pinned: false,
       toolbarHeight: 80,
       expandedHeight: 0,
-      backgroundColor: Colors.transparent, // Completely transparent
+      backgroundColor: Colors.transparent,
       elevation: 0,
       automaticallyImplyLeading: false,
       flexibleSpace: ClipRect(
@@ -38,14 +38,12 @@ class CustomSliverAppBar extends StatelessWidget {
           child: Container(color: Colors.transparent),
         ),
       ),
-      // Remove background filter
       shadowColor: Colors.transparent,
-      title: const SizedBox.shrink(), // Empty title area
+      title: const SizedBox.shrink(),
       leadingWidth: 80,
       leading:
           isMobile
-              ? // Mobile hamburger menu
-              Builder(
+              ? Builder(
                 builder:
                     (context) => IconButton(
                       icon: const Icon(Icons.menu, color: Colors.white),
@@ -53,22 +51,17 @@ class CustomSliverAppBar extends StatelessWidget {
                     ),
               )
               : null,
-      // Right side actions
       actions: [
         if (!isMobile) ...[
-          // Display navigation items in a row for desktop
           _buildNavItems(context),
           const SizedBox(width: 24),
         ],
-
-        // Right side actions
         ...?actions,
         const SizedBox(width: 16),
       ],
     );
   }
 
-  // Masaüstü navigasyon öğeleri
   Widget _buildNavItems(BuildContext context) {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
@@ -86,14 +79,12 @@ class CustomSliverAppBar extends StatelessWidget {
     );
   }
 
-  // Tekil navigasyon öğesi - seçili olma özelliği kaldırıldı
   Widget _buildNavItem(BuildContext context, String sectionId) {
     final title = languageController.getText(
       'nav.$sectionId',
       defaultValue: sectionId.capitalize ?? sectionId,
     );
 
-    // Ekran genişliğine göre padding ve yazı boyutu
     final horizontalPadding = ResponsiveUtils.getValueForScreenType<double>(
       context: context,
       mobile: 4.0,
@@ -120,7 +111,6 @@ class CustomSliverAppBar extends StatelessWidget {
           hoverColor: Colors.purple.withOpacity(0.1),
           splashColor: Colors.purple.withOpacity(0.2),
           onTap: () {
-            // AppScrollController'ın kendi scrollToSection metodunu kullan
             scrollController.scrollToSection(sectionId);
           },
           child: Padding(
@@ -139,23 +129,21 @@ class CustomSliverAppBar extends StatelessWidget {
     );
   }
 
-  // Mobil menü
   void _showMobileMenu(BuildContext context) {
     showModalBottomSheet(
       context: context,
       backgroundColor: const Color(0xFF00101F),
-      isScrollControlled:
-          true, // Taşma hatasını düzeltmek için tam yüksekliği kullanma
+      isScrollControlled: true,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
       elevation: 8,
       builder: (context) {
         return DraggableScrollableSheet(
-          initialChildSize: 0.5, // Sayfa yüksekliğinin yarısı kadar açıl
-          minChildSize: 0.3, // En az sayfa yüksekliğinin 30%'u kadar
-          maxChildSize: 0.9, // En fazla sayfa yüksekliğinin 90%'u kadar
-          expand: false, // İçeriğin scroll edilebilmesi için
+          initialChildSize: 0.5,
+          minChildSize: 0.3,
+          maxChildSize: 0.9,
+          expand: false,
           builder: (context, scrollController) {
             return SingleChildScrollView(
               controller: scrollController,
@@ -165,7 +153,6 @@ class CustomSliverAppBar extends StatelessWidget {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      // Mobil menü başlığı
                       Padding(
                         padding: const EdgeInsets.only(bottom: 16.0),
                         child: Text(
@@ -180,7 +167,7 @@ class CustomSliverAppBar extends StatelessWidget {
                           ),
                         ),
                       ),
-                      // Kapatma çizgisi
+                      // Drag handle indicator
                       Container(
                         height: 4,
                         width: 40,
@@ -190,7 +177,6 @@ class CustomSliverAppBar extends StatelessWidget {
                           borderRadius: BorderRadius.circular(2),
                         ),
                       ),
-                      // Menü öğeleri
                       _buildMobileNavItem(context, 'home'),
                       _buildMobileNavItem(context, 'about'),
                       _buildMobileNavItem(context, 'skills'),
@@ -209,7 +195,6 @@ class CustomSliverAppBar extends StatelessWidget {
     );
   }
 
-  // Mobil navigasyon öğesi - seçili olma özelliği kaldırıldı
   Widget _buildMobileNavItem(BuildContext context, String sectionId) {
     final title = languageController.getText(
       'nav.$sectionId',
@@ -227,10 +212,7 @@ class CustomSliverAppBar extends StatelessWidget {
         ),
       ),
       onTap: () {
-        // Önce menüyü kapat
         Navigator.pop(context);
-
-        // AppScrollController kullan
         scrollController.scrollToSection(sectionId);
       },
       leading: const Icon(Icons.circle, color: Colors.white54, size: 12),

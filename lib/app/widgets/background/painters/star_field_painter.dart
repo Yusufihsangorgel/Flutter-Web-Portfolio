@@ -2,12 +2,11 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'dart:ui' show PointMode;
 
-// Yıldız Alanı Çizici - Yanıp sönen ve parlayan yıldızlar
+// Star field painter - twinkling and glowing stars
 class StarFieldPainter extends CustomPainter {
   final AnimationController animController;
   final double scrollOffset;
 
-  // Yıldız verisi için statik tutucular
   static List<Star>? _cachedStars;
   static final _random = math.Random(42);
 
@@ -15,44 +14,34 @@ class StarFieldPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    // Yıldızları ilk kez oluşturma veya ekran boyutu değiştiyse yeniden oluşturma
     if (_cachedStars == null) {
       _initializeStars(size);
     }
 
-    // Saniyeler cinsinden gerçek zaman - daha yavaş hareket için
-    final realTime = animController.value * 7200; // 2 saatlik bir döngü
-
-    // Yıldızları çiz
+    final realTime = animController.value * 7200;
     _drawStars(canvas, size, realTime);
   }
 
-  // Yıldızları tek seferde oluştur ve sakla
   void _initializeStars(Size size) {
-    const starCount = 1000; // Çok sayıda yıldız
+    const starCount = 1000;
     _cachedStars = List.generate(starCount, (i) {
-      // Farklı parlaklık tipleri
       final brightnessType = _random.nextInt(10);
-      final isTwinkler = brightnessType < 2; // %20'si yanıp sönen yıldız
-      final isVeryBright = brightnessType == 9; // %10'u çok parlak
+      final isTwinkler = brightnessType < 2;
+      final isVeryBright = brightnessType == 9;
 
-      // Farklı boyutlar - çoğunlukla küçük
       double starSize = _random.nextDouble() * 1.5 + 0.3;
       if (isVeryBright) starSize += 0.5;
 
-      // Yıldız hareketi için parametreler - çok küçük hareketler
-      final movementAmplitude = starSize * 0.3; // Daha küçük hareketler
-      final movementSpeed =
-          0.00005 + _random.nextDouble() * 0.0001; // Çok daha yavaş
+      final movementAmplitude = starSize * 0.3;
+      final movementSpeed = 0.00005 + _random.nextDouble() * 0.0001;
 
-      // Ekranda rastgele konum
       final x = _random.nextDouble() * size.width;
       final y = _random.nextDouble() * size.height;
 
-      // Her yıldız için özel faz değeri - böylece hepsi farklı zamanlarda yanıp söner
+      // Unique phase per star so they twinkle at different times
       final phase = _random.nextDouble() * math.pi * 2;
 
-      // Paralaks etkisi için katman - farklı katmanlarda yıldızlar farklı hızda hareket etsin
+      // Layer for parallax depth effect
       final layer = _random.nextDouble();
 
       return Star(
@@ -69,24 +58,18 @@ class StarFieldPainter extends CustomPainter {
     });
   }
 
-  // Tüm yıldızları çizme
   void _drawStars(Canvas canvas, Size size, double time) {
     if (_cachedStars == null) return;
 
     for (var star in _cachedStars!) {
-      // Yıldızın temel parlaklığı
       double brightness = star.isBright ? 0.8 : 0.4;
 
-      // Yanıp sönen yıldızlar için parlaklık modülasyonu
       if (star.isTwinkler) {
-        // Çok daha yavaş yanıp sönme - 10-20 saniyelik döngüler
         final twinkleSpeed = 0.05 + (star.size * 0.02);
         brightness *=
             0.3 + (math.sin(time * twinkleSpeed + star.phase) + 1) / 2 * 0.6;
       }
 
-      // Yıldızın pozisyonu - çok küçük hareketler
-      // Dikkat: Çok yavaş hareket - neredeyse fark edilmeyecek kadar
       double x =
           star.x +
           math.sin(time * star.movementSpeed + star.phase) *
@@ -96,19 +79,15 @@ class StarFieldPainter extends CustomPainter {
           math.cos(time * star.movementSpeed + star.phase) *
               star.movementAmplitude;
 
-      // Parallax etkisi - scroll ile yavaşça hareket
-      // Farklı katmanlar farklı hızda hareket etsin
-      final parallaxFactor = 0.1 + star.layer * 0.2; // 0.1 - 0.3 arası faktör
+      // Parallax: different layers scroll at different speeds
+      final parallaxFactor = 0.1 + star.layer * 0.2;
       y -= scrollOffset * parallaxFactor;
 
-      // Ekran dışına çıkan yıldızları ekranın diğer ucuna taşı
-      // Ama bu kaydırma çok sert olmasın - sürekli bir animasyon hissi için
+      // Wrap stars that scroll off-screen
       y = y % size.height;
 
-      // Yıldız boyutu - sabit
       double starSize = star.size;
 
-      // Yıldızı çiz
       final paint =
           Paint()
             ..color = Colors.white.withOpacity(brightness)
@@ -117,13 +96,11 @@ class StarFieldPainter extends CustomPainter {
 
       canvas.drawPoints(PointMode.points, [Offset(x, y)], paint);
 
-      // Parlak yıldızlar için hafif glow efekti
+      // Subtle glow for bright stars
       if (brightness > 0.6) {
         final glowPaint =
             Paint()
-              ..color = Colors.white.withOpacity(
-                brightness * 0.15,
-              ) // Daha hafif glow
+              ..color = Colors.white.withOpacity(brightness * 0.15)
               ..strokeWidth = starSize * 2.5
               ..strokeCap = StrokeCap.round;
 
@@ -139,7 +116,6 @@ class StarFieldPainter extends CustomPainter {
   }
 }
 
-// Yıldız veri sınıfı
 class Star {
   final double x, y;
   final double size;
@@ -148,7 +124,7 @@ class Star {
   final double movementAmplitude;
   final double movementSpeed;
   final double phase;
-  final double layer; // Parallax için katman (0-1)
+  final double layer;
 
   Star({
     required this.x,

@@ -2,13 +2,12 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'dart:ui' show PointMode;
 
-// Kayan yıldız çizici - profesyonel astronomik hesaplamalar
+// Shooting star painter - astronomical meteor shower simulation
 class ShootingStarPainter extends CustomPainter {
   final double time;
   final Offset mousePosition;
   final List<ShootingStar> shootingStars = [];
 
-  // Statik olarak yıldızları tutma
   static List<ShootingStar>? _cachedShootingStars;
 
   ShootingStarPainter({required this.time, required this.mousePosition}) {
@@ -24,54 +23,28 @@ class ShootingStarPainter extends CustomPainter {
   void _initializeStars() {
     final random = math.Random(42);
 
-    // Leonids meteor yağmuru parametreleri
-    const radiantRA = 152.0; // Radiant sağ açıklık (derece)
-    const radiantDec = 22.0; // Radiant yükselme (derece)
-    const zhr = 15.0; // Saatlik zenit meteor oranı
+    // Leonids meteor shower parameters
+    const radiantRA = 152.0;
+    const radiantDec = 22.0;
+    const zhr = 15.0;
 
-    // Daha fazla kayan yıldız - 20 adet (önceki 12 yerine)
     _cachedShootingStars = List.generate(20, (i) {
-      // Radiant noktasından yayılma açısı (15-30 derece arası)
       final dispersionAngle = math.pi / 12 + random.nextDouble() * math.pi / 12;
-
-      // Meteor hızı (71 km/s tipik Leonids hızı)
-      // Farklı hızlarda meteorlar için çeşitlilik ekle
-      final speedFactor =
-          0.7 + random.nextDouble() * 0.6; // 0.7x - 1.3x hız çarpanı
-
-      // Hızı artırdık - daha görünür olması için
+      final speedFactor = 0.7 + random.nextDouble() * 0.6;
       final speed = (0.0005 + random.nextDouble() * 0.0003) * speedFactor;
 
-      // Başlangıç pozisyonu - ekranın farklı bölgelerinden
-      // Daha geniş bir alandan başlasınlar
-      final startX = random.nextDouble(); // Tüm ekran genişliği
-      final startY =
-          random.nextDouble() * 0.5; // Üst yarım kısım - daha geniş alan
+      final startX = random.nextDouble();
+      final startY = random.nextDouble() * 0.5;
 
-      // Meteor yolu açısı - daha gerçekçi fizik için
-      // Yerçekimi etkisi altında düşen meteorlar gibi
-      final baseAngle =
-          (radiantRA * math.pi / 180) + math.pi; // Radiant'ın tersi yönü
+      // Meteor trajectory angle derived from radiant point
+      final baseAngle = (radiantRA * math.pi / 180) + math.pi;
       final angle = baseAngle + (random.nextDouble() - 0.5) * dispersionAngle;
 
-      // Meteor parlaklığı ve boyutu - daha gerçekçi dağılım
-      // Parlaklık dağılımı - çoğu meteor sönük, az sayıda parlak
-      final magnitude =
-          (math.pow(random.nextDouble(), 2) * 2 - 1)
-              as double; // Daha çok sönük meteor
-
-      // Boyutu artırdık - daha görünür olması için
-      final size = 1.0 + magnitude * 0.8; // Parlaklığa bağlı boyut - daha büyük
-
-      // Kuyruk uzunluğu - hıza ve parlaklığa bağlı
-      // Kuyruk uzunluğunu artırdık - daha görünür olması için
+      // Power-law brightness distribution: most meteors are faint
+      final magnitude = (math.pow(random.nextDouble(), 2) * 2 - 1) as double;
+      final size = 1.0 + magnitude * 0.8;
       final tailLength = (12 + magnitude * 5) * speedFactor;
-
-      // Gecikme - daha doğal görünüm için rastgele başlangıç zamanları
-      // Gecikmeyi azalttık - daha sık meteor yağmuru için
-      final delay =
-          random.nextDouble() *
-          20; // 20 saniye içinde rastgele başlangıç (önceki 40 yerine)
+      final delay = random.nextDouble() * 20;
 
       return ShootingStar(
         startX: startX,
@@ -80,7 +53,7 @@ class ShootingStarPainter extends CustomPainter {
         speed: speed,
         tailLength: tailLength,
         delay: delay,
-        maxDistance: 0.5 + random.nextDouble() * 0.4, // Daha uzun görünür yol
+        maxDistance: 0.5 + random.nextDouble() * 0.4,
         size: size,
         active: false,
         lastActivationTime: -100,
@@ -111,11 +84,7 @@ class ShootingStarPainter extends CustomPainter {
         if (star.progress >= 1.0) {
           star.active = false;
           star.lastActivationTime = currentTime;
-          // Daha kısa gecikme - daha sık meteor yağmuru
-          star.delay =
-              10 +
-              math.Random().nextDouble() *
-                  30; // 10-40 saniye arası (önceki 20-60 yerine)
+          star.delay = 10 + math.Random().nextDouble() * 30;
           continue;
         }
 
@@ -129,58 +98,43 @@ class ShootingStarPainter extends CustomPainter {
             (star.startY +
                 math.sin(star.angle) * star.maxDistance * easedProgress);
 
-        // Atmosferik perspektif ve parlaklık hesaplaması - daha gerçekçi
         final baseOpacity = _calculateMeteorBrightness(
           star.progress,
           star.magnitude,
         );
 
         if (baseOpacity > 0.01) {
-          // Meteor başı ve kuyruk noktaları
           final points = <Offset>[];
           final pointPaints = <Paint>[];
 
-          // Meteor başı - daha parlak
+          // Meteor head
           points.add(Offset(currentX, currentY));
           pointPaints.add(
             Paint()
               ..color = Colors.white.withOpacity(
-                (baseOpacity * 1.5).clamp(0.0, 1.0), // Daha parlak baş
+                (baseOpacity * 1.5).clamp(0.0, 1.0),
               )
-              ..strokeWidth =
-                  star.size *
-                  1.2 // Daha büyük baş
+              ..strokeWidth = star.size * 1.2
               ..strokeCap = StrokeCap.round,
           );
 
-          // Meteor kuyruğu - daha gerçekçi parçacık fiziği
-          // Parçacık sayısını artırdık - daha görünür kuyruk için
+          // Meteor tail with turbulence for natural motion
           final particleCount =
-              (star.tailLength * baseOpacity).round() +
-              5; // Daha fazla parçacık
+              (star.tailLength * baseOpacity).round() + 5;
           for (int i = 1; i <= particleCount; i++) {
             final t = i / particleCount;
-
-            // Türbülans - daha doğal kuyruk hareketi
             final turbulence =
                 math.sin(t * math.pi * 3 + currentTime * 0.1) * (1 - t) * 0.8;
 
-            // Kuyruk pozisyonu - daha doğal eğri
-            final tailX =
-                currentX - math.cos(star.angle) * (i * 3.0); // Daha uzun kuyruk
+            final tailX = currentX - math.cos(star.angle) * (i * 3.0);
             final tailY =
-                currentY -
-                math.sin(star.angle) * (i * 3.0) +
-                turbulence; // Daha uzun kuyruk
+                currentY - math.sin(star.angle) * (i * 3.0) + turbulence;
 
             points.add(Offset(tailX, tailY));
 
-            // Parçacık parlaklığı - daha doğal azalma
-            // Parlaklığı artırdık - daha görünür kuyruk için
             final particleOpacity = (baseOpacity * math.pow(1 - t, 1.5) * 0.9)
-                .clamp(0.0, 1.0); // Daha parlak kuyruk
-            final particleSize =
-                star.size * (1 - math.pow(t, 0.6)) * 1.1; // Daha büyük kuyruk
+                .clamp(0.0, 1.0);
+            final particleSize = star.size * (1 - math.pow(t, 0.6)) * 1.1;
 
             pointPaints.add(
               Paint()
@@ -190,7 +144,6 @@ class ShootingStarPainter extends CustomPainter {
             );
           }
 
-          // Meteor ve parçacıkları çiz
           for (int i = 0; i < points.length; i++) {
             canvas.drawPoints(PointMode.points, [points[i]], pointPaints[i]);
           }
@@ -201,18 +154,15 @@ class ShootingStarPainter extends CustomPainter {
     _cachedShootingStars = List.from(shootingStars);
   }
 
-  // Meteor hareketi için özel fizik fonksiyonu - daha gerçekçi
+  // Custom physics function for meteor motion - atmospheric drag + gravity
   double _meteorMotion(double t) {
-    // Atmosfer sürtünmesi ve yerçekimi etkisi - daha doğal hareket
     return 4 * t * (1 - t) * math.sin(t * math.pi * 0.8) + t;
   }
 
-  // Meteor parlaklığı hesaplama - daha gerçekçi
+  // Brightness curve: meteor brightens on entry then fades
   double _calculateMeteorBrightness(double progress, double magnitude) {
-    // Atmosferik sönümlenme ve parlaklık değişimi
-    // Meteor atmosfere girdikçe parlar, sonra söner
     final atmosphericEffect = math.sin(progress * math.pi) * 0.7 + 0.3;
-    final baseBrightness = 0.4 + (1 - magnitude) * 0.5; // Daha parlak meteorlar
+    final baseBrightness = 0.4 + (1 - magnitude) * 0.5;
     return (baseBrightness * atmosphericEffect).clamp(0.0, 1.0);
   }
 
@@ -231,7 +181,7 @@ class ShootingStar {
   double delay;
   final double maxDistance;
   final double size;
-  final double magnitude; // Yıldız parlaklığı (-1 ile 1 arası)
+  final double magnitude;
   bool active;
   double progress = 0.0;
   double lastActivationTime;

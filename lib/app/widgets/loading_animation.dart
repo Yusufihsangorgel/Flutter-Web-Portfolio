@@ -3,7 +3,7 @@ import 'package:flutter_web_portfolio/app/controllers/language_controller.dart';
 import 'package:flutter_web_portfolio/app/controllers/theme_controller.dart';
 import 'package:get/get.dart';
 
-/// Uygulama yüklenirken gösterilen animasyon widget'ı
+/// Animation widget displayed while the app is loading
 class LoadingAnimation extends StatefulWidget {
   const LoadingAnimation({super.key});
 
@@ -23,13 +23,11 @@ class _LoadingAnimationState extends State<LoadingAnimation>
   void initState() {
     super.initState();
 
-    // Animasyon controller'ı
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1500),
     )..repeat(reverse: true);
 
-    // Opaklık animasyonu
     _opacityAnimation = Tween<double>(begin: 0.5, end: 1.0).animate(
       CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
     );
@@ -49,12 +47,8 @@ class _LoadingAnimationState extends State<LoadingAnimation>
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // Logo animasyonu
             _buildLogoAnimation(),
-
             const SizedBox(height: 24),
-
-            // Yükleniyor metni
             _LoadingText(
               text: _languageController.getText('portfolio_loading'),
               themeController: _themeController,
@@ -66,7 +60,6 @@ class _LoadingAnimationState extends State<LoadingAnimation>
     );
   }
 
-  // Logo animasyonu widget'ı
   Widget _buildLogoAnimation() {
     return FadeTransition(
       opacity: _opacityAnimation,
@@ -74,7 +67,7 @@ class _LoadingAnimationState extends State<LoadingAnimation>
         width: 120,
         height: 120,
         decoration: BoxDecoration(
-          color: _themeController.primaryColor.withAlpha(51), // ~0.2 opaklık
+          color: _themeController.primaryColor.withAlpha(51),
           shape: BoxShape.circle,
         ),
         child: Center(
@@ -93,7 +86,7 @@ class _LoadingAnimationState extends State<LoadingAnimation>
   }
 }
 
-/// Yükleniyor metni widget'ı
+/// Loading text widget
 class _LoadingText extends StatelessWidget {
   final String text;
   final ThemeController themeController;

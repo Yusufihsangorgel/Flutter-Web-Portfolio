@@ -1,11 +1,10 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
-// Uzak galaksiler ve nebulalar çizici - sonsuz hareket
+// Deep space painter - distant galaxies and nebulae with slow drift
 class DeepSpacePainter extends CustomPainter {
   final double time;
 
-  // Nebula objelerini statik tut - sürekli yeniden oluşturulmasın
   static List<Nebula>? _cachedNebulas;
   static final _random = math.Random(42);
 
@@ -13,70 +12,54 @@ class DeepSpacePainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    // Nebula'ları ilk kez oluştur veya ekran boyutu değiştiyse yeniden oluştur
     if (_cachedNebulas == null) {
       _initializeNebulas(size);
     }
 
-    // Gerçek zamanı saniyelerle hesapla - çok daha yavaş hareket için
-    final realTime = time * 10000; // ~3 saatlik çok yavaş döngü
-
-    // Her bir nebulayı çiz
+    final realTime = time * 10000;
     _drawNebulas(canvas, size, realTime);
   }
 
-  // Nebula objelerini başlangıçta oluştur
   void _initializeNebulas(Size size) {
-    // Daha küçük ve daha az belirgin nebulalar - büyük şeffaf daireler yerine
     const nebulaCount = 3;
     _cachedNebulas = List.generate(nebulaCount, (i) {
-      // Rastgele özellikler
       final x = _random.nextDouble() * size.width;
       final y = _random.nextDouble() * size.height * 0.8;
+      final nebulaSize = 30.0 + _random.nextDouble() * 40.0;
 
-      // Daha küçük boyutlar - çok daha küçük
-      final nebulaSize =
-          30.0 + _random.nextDouble() * 40.0; // Boyutları küçülttük
-
-      // Daha düşük opaklık değerleri - çok daha az belirgin
       List<Color> colors;
       final colorType = _random.nextInt(3);
 
       switch (colorType) {
-        case 0: // Mor/mavi nebula
+        case 0: // Purple/blue nebula
           colors = [
-            const Color(0xFF9C27B0).withOpacity(0.01), // Opaklığı azalttık
-            const Color(0xFF3F51B5).withOpacity(0.008), // Opaklığı azalttık
-            const Color(0xFF673AB7).withOpacity(0.005), // Opaklığı azalttık
+            const Color(0xFF9C27B0).withOpacity(0.01),
+            const Color(0xFF3F51B5).withOpacity(0.008),
+            const Color(0xFF673AB7).withOpacity(0.005),
             Colors.transparent,
           ];
           break;
-        case 1: // Pembe/kırmızı nebula
+        case 1: // Pink/red nebula
           colors = [
-            const Color(0xFFE91E63).withOpacity(0.01), // Opaklığı azalttık
-            const Color(0xFFF44336).withOpacity(0.008), // Opaklığı azalttık
-            const Color(0xFFFF9800).withOpacity(0.005), // Opaklığı azalttık
+            const Color(0xFFE91E63).withOpacity(0.01),
+            const Color(0xFFF44336).withOpacity(0.008),
+            const Color(0xFFFF9800).withOpacity(0.005),
             Colors.transparent,
           ];
           break;
-        default: // Turkuaz/yeşil nebula
+        default: // Teal/green nebula
           colors = [
-            const Color(0xFF009688).withOpacity(0.01), // Opaklığı azalttık
-            const Color(0xFF4CAF50).withOpacity(0.008), // Opaklığı azalttık
-            const Color(0xFF00BCD4).withOpacity(0.005), // Opaklığı azalttık
+            const Color(0xFF009688).withOpacity(0.01),
+            const Color(0xFF4CAF50).withOpacity(0.008),
+            const Color(0xFF00BCD4).withOpacity(0.005),
             Colors.transparent,
           ];
       }
 
-      // Hareket parametreleri - çok yavaş hareket
       final movementSpeed = 0.00002 + _random.nextDouble() * 0.00005;
       final movementAmplitude = 15.0 + _random.nextDouble() * 10.0;
-
-      // İç hareket parametreleri - nebula içindeki dalgalanma
       final innerSpeed = 0.0001 + _random.nextDouble() * 0.0002;
       final innerAmplitude = 0.05 + _random.nextDouble() * 0.1;
-
-      // Faz farklılığı - aynı anda hareket etmesinler
       final phase = _random.nextDouble() * math.pi * 2;
 
       return Nebula(
@@ -92,33 +75,23 @@ class DeepSpacePainter extends CustomPainter {
       );
     });
 
-    // Daha küçük arka plan galaxiler - daha uzak hissi vermek için çok daha soluk ve sabit
+    // Smaller background galaxies for depth
     _cachedNebulas!.addAll(
       List.generate(12, (i) {
-        // Sayıyı artırdık, daha fazla küçük galaksi
         final x = _random.nextDouble() * size.width;
         final y = _random.nextDouble() * size.height * 0.9;
+        final nebulaSize = 10.0 + _random.nextDouble() * 20.0;
 
-        // Daha küçük boyutlar - çok daha küçük
-        final nebulaSize =
-            10.0 + _random.nextDouble() * 20.0; // Boyutları küçülttük
-
-        // Çok daha soluk renkler - uzakta gibi
         final colors = [
-          Colors.white.withOpacity(0.008), // Opaklığı azalttık
-          Colors.white.withOpacity(0.005), // Opaklığı azalttık
+          Colors.white.withOpacity(0.008),
+          Colors.white.withOpacity(0.005),
           Colors.transparent,
         ];
 
-        // Daha yavaş hareket - daha uzakta gibi
         final movementSpeed = 0.00001 + _random.nextDouble() * 0.00002;
         final movementAmplitude = 3.0 + _random.nextDouble() * 5.0;
-
-        // Daha az iç hareketlilik
         final innerSpeed = 0.00005 + _random.nextDouble() * 0.0001;
         final innerAmplitude = 0.02 + _random.nextDouble() * 0.05;
-
-        // Faz farklılığı
         final phase = _random.nextDouble() * math.pi * 2;
 
         return Nebula(
@@ -137,12 +110,10 @@ class DeepSpacePainter extends CustomPainter {
     );
   }
 
-  // Tüm nebulaları çiz
   void _drawNebulas(Canvas canvas, Size size, double time) {
     if (_cachedNebulas == null) return;
 
     for (var nebula in _cachedNebulas!) {
-      // Zamanla çok yavaş hareket
       final xOffset =
           math.sin(time * nebula.movementSpeed + nebula.phase) *
           nebula.movementAmplitude;
@@ -151,11 +122,10 @@ class DeepSpacePainter extends CustomPainter {
           nebula.movementAmplitude *
           0.5;
 
-      // Çizim pozisyonu
       final x = nebula.x + xOffset;
       final y = nebula.y + yOffset;
 
-      // İç şekil değişimi - nebula merkezinin zamanla hafifçe kayması
+      // Inner shape shift - nebula center drifts slightly over time
       final centerOffsetX =
           math.sin(time * nebula.innerSpeed + nebula.phase) *
           nebula.innerAmplitude;
@@ -163,29 +133,21 @@ class DeepSpacePainter extends CustomPainter {
           math.cos(time * nebula.innerSpeed * 1.1 + nebula.phase) *
           nebula.innerAmplitude;
 
-      // Dalgalı kenarlar için yarıçap modülasyonu
       final radiusModulation =
           1.0 + math.sin(time * nebula.innerSpeed * 0.5) * 0.05;
 
-      // Nebula gradyantı
       final gradient = RadialGradient(
         center: Alignment(centerOffsetX, centerOffsetY),
         radius: radiusModulation,
         colors: nebula.colors,
         stops:
             nebula.isDistant
-                ? [0.0, 0.5, 1.0] // Uzak nebulalar için daha basit degrade
-                : [
-                  0.0,
-                  0.3,
-                  0.6,
-                  1.0,
-                ], // Ana nebulalar için daha zengin degrade
+                ? [0.0, 0.5, 1.0]
+                : [0.0, 0.3, 0.6, 1.0],
       ).createShader(
         Rect.fromCircle(center: Offset(x, y), radius: nebula.size),
       );
 
-      // Nebula çizimi
       final paint =
           Paint()
             ..shader = gradient
@@ -193,8 +155,6 @@ class DeepSpacePainter extends CustomPainter {
             ..blendMode = BlendMode.screen;
 
       canvas.drawCircle(Offset(x, y), nebula.size, paint);
-
-      // Parlak noktaları kaldırdık - şeffaf baloncukları önlemek için
     }
   }
 
@@ -204,7 +164,6 @@ class DeepSpacePainter extends CustomPainter {
   }
 }
 
-// Nebula veri sınıfı
 class Nebula {
   final double x, y;
   final double size;

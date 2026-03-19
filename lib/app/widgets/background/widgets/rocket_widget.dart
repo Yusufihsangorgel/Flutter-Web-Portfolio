@@ -7,20 +7,17 @@ class RocketWidget extends StatelessWidget {
   final bool isDragging;
 
   const RocketWidget({
-    Key? key,
+    super.key,
     required this.animController,
     this.isDragging = false,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
       animation: animController,
       builder: (context, child) {
-        // 3D efekti için perspektif açısı
         final perspectiveAngle = math.sin(animController.value * math.pi) * 0.1;
-
-        // Işık açısı - zamanla değişen
         final lightAngle = animController.value * math.pi * 2;
         final lightX = math.cos(lightAngle) * 0.5;
         final lightY = math.sin(lightAngle) * 0.5;
@@ -28,7 +25,7 @@ class RocketWidget extends StatelessWidget {
         return Transform(
           transform:
               Matrix4.identity()
-                ..setEntry(3, 2, 0.001) // Perspektif efekti için
+                ..setEntry(3, 2, 0.001)
                 ..rotateX(perspectiveAngle)
                 ..rotateY(perspectiveAngle * 0.7),
           alignment: Alignment.center,
@@ -37,7 +34,7 @@ class RocketWidget extends StatelessWidget {
             width: 50,
             child: Stack(
               children: [
-                // Roket gövdesi - metalik görünüm
+                // Rocket body - metallic look
                 Positioned(
                   top: 20,
                   left: 10,
@@ -51,15 +48,15 @@ class RocketWidget extends StatelessWidget {
                         end: Alignment(-lightX, -lightY),
                         colors:
                             isDragging
-                                ? [
-                                  const Color(0xFFF5F5F5), // Daha parlak beyaz
-                                  const Color(0xFFE0E0E0), // Açık gri
-                                  const Color(0xFFBDBDBD), // Orta gri
+                                ? const [
+                                  Color(0xFFF5F5F5),
+                                  Color(0xFFE0E0E0),
+                                  Color(0xFFBDBDBD),
                                 ]
                                 : const [
-                                  Color(0xFFE0E0E0), // Açık gri
-                                  Color(0xFF9E9E9E), // Gri
-                                  Color(0xFFBDBDBD), // Orta gri
+                                  Color(0xFFE0E0E0),
+                                  Color(0xFF9E9E9E),
+                                  Color(0xFFBDBDBD),
                                 ],
                       ),
                       boxShadow: [
@@ -78,7 +75,6 @@ class RocketWidget extends StatelessWidget {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
-                          // Roket detayları - çizgiler
                           Container(
                             height: 2,
                             margin: const EdgeInsets.symmetric(horizontal: 5),
@@ -101,7 +97,7 @@ class RocketWidget extends StatelessWidget {
                   ),
                 ),
 
-                // Roket burnu - metalik koni
+                // Rocket nose cone
                 Positioned(
                   top: 0,
                   left: 10,
@@ -117,8 +113,8 @@ class RocketWidget extends StatelessWidget {
                         begin: Alignment(lightX, lightY),
                         end: Alignment(-lightX, -lightY),
                         colors: const [
-                          Color(0xFFE0E0E0), // Açık gri
-                          Color(0xFFBDBDBD), // Orta gri
+                          Color(0xFFE0E0E0),
+                          Color(0xFFBDBDBD),
                         ],
                       ),
                       boxShadow: [
@@ -129,7 +125,7 @@ class RocketWidget extends StatelessWidget {
                         ),
                       ],
                     ),
-                    // Burun üzerinde parlak nokta
+                    // Specular highlight on the nose
                     child: Align(
                       alignment: Alignment(lightX * 2, lightY * 2),
                       child: Container(
@@ -144,7 +140,7 @@ class RocketWidget extends StatelessWidget {
                   ),
                 ),
 
-                // Roket penceresi - parlak cam efekti
+                // Rocket window - glass effect
                 Positioned(
                   top: 30,
                   left: 15,
@@ -170,7 +166,6 @@ class RocketWidget extends StatelessWidget {
                         ),
                       ],
                     ),
-                    // Pencere üzerinde parlak nokta
                     child: Align(
                       alignment: Alignment(lightX, lightY),
                       child: Container(
@@ -185,7 +180,7 @@ class RocketWidget extends StatelessWidget {
                   ),
                 ),
 
-                // Roket kanatları - sol
+                // Left fin
                 Positioned(
                   bottom: 15,
                   left: 0,
@@ -200,8 +195,8 @@ class RocketWidget extends StatelessWidget {
                           begin: Alignment(lightX, lightY),
                           end: Alignment(-lightX, -lightY),
                           colors: const [
-                            Color(0xFFE53935), // Kırmızı
-                            Color(0xFFB71C1C), // Koyu kırmızı
+                            Color(0xFFE53935),
+                            Color(0xFFB71C1C),
                           ],
                         ),
                         borderRadius: const BorderRadius.only(
@@ -220,7 +215,7 @@ class RocketWidget extends StatelessWidget {
                   ),
                 ),
 
-                // Roket kanatları - sağ
+                // Right fin
                 Positioned(
                   bottom: 15,
                   right: 0,
@@ -235,8 +230,8 @@ class RocketWidget extends StatelessWidget {
                           begin: Alignment(lightX, lightY),
                           end: Alignment(-lightX, -lightY),
                           colors: const [
-                            Color(0xFFE53935), // Kırmızı
-                            Color(0xFFB71C1C), // Koyu kırmızı
+                            Color(0xFFE53935),
+                            Color(0xFFB71C1C),
                           ],
                         ),
                         borderRadius: const BorderRadius.only(
@@ -255,7 +250,7 @@ class RocketWidget extends StatelessWidget {
                   ),
                 ),
 
-                // Roket motor tabanı - ateşsiz
+                // Engine nozzle
                 Positioned(
                   bottom: 0,
                   left: 15,
@@ -271,8 +266,8 @@ class RocketWidget extends StatelessWidget {
                         begin: Alignment(lightX, lightY),
                         end: Alignment(-lightX, -lightY),
                         colors: const [
-                          Color(0xFF9E9E9E), // Gri
-                          Color(0xFF616161), // Koyu gri
+                          Color(0xFF9E9E9E),
+                          Color(0xFF616161),
                         ],
                       ),
                       boxShadow: [
@@ -286,7 +281,7 @@ class RocketWidget extends StatelessWidget {
                   ),
                 ),
 
-                // Işık yansıması efekti
+                // Light reflection overlay
                 Positioned.fill(
                   child: LayoutBuilder(
                     builder: (context, constraints) {

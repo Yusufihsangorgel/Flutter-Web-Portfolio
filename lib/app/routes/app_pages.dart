@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_web_portfolio/app/modules/home/bindings/home_binding.dart';
 import 'package:flutter_web_portfolio/app/modules/home/home_view.dart';
 import 'package:get/get.dart';

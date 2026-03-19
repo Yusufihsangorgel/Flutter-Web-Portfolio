@@ -17,7 +17,7 @@ class SectionWrapper extends StatefulWidget {
   final double? minHeight;
 
   const SectionWrapper({
-    Key? key,
+    super.key,
     required this.child,
     required this.sectionKey,
     required this.sectionId,
@@ -26,7 +26,7 @@ class SectionWrapper extends StatefulWidget {
     this.padding = const EdgeInsets.symmetric(vertical: 40, horizontal: 24),
     this.noBackground = false,
     this.minHeight,
-  }) : super(key: key);
+  });
 
   @override
   State<SectionWrapper> createState() => _SectionWrapperState();
@@ -34,13 +34,11 @@ class SectionWrapper extends StatefulWidget {
 
 class _SectionWrapperState extends State<SectionWrapper>
     with SingleTickerProviderStateMixin {
-  // For tracking hover state
   bool _isHovered = false;
 
   @override
   void initState() {
     super.initState();
-    // Initialize SharedBackgroundController for the first section
     if (widget.sectionId == 'home' &&
         !SharedBackgroundController.isInitialized) {
       SharedBackgroundController.init(this);
@@ -48,7 +46,6 @@ class _SectionWrapperState extends State<SectionWrapper>
   }
 
   void _updateMousePosition(PointerEvent event) {
-    // Update mouse position
     if (widget.sectionId == 'home') {
       SharedBackgroundController.updateMousePosition(event.localPosition);
     }
@@ -59,7 +56,6 @@ class _SectionWrapperState extends State<SectionWrapper>
     final themeController = Get.find<ThemeController>();
     final screenHeight = MediaQuery.of(context).size.height;
 
-    // Base container
     return MouseRegion(
       onHover: (event) {
         _updateMousePosition(event);
@@ -78,7 +74,6 @@ class _SectionWrapperState extends State<SectionWrapper>
       },
       child: Container(
         key: widget.sectionKey,
-        // No margin to ensure no gaps between sections
         margin: EdgeInsets.zero,
         constraints: BoxConstraints(
           minHeight:
@@ -86,18 +81,15 @@ class _SectionWrapperState extends State<SectionWrapper>
               (widget.sectionId == 'home'
                   ? screenHeight - 80
                   : (widget.sectionId == 'about'
-                      ? screenHeight -
-                          80 // Same height for about section
+                      ? screenHeight - 80
                       : screenHeight * 0.7)),
         ),
-        // Background should be completely transparent
         color: Colors.transparent,
         child: Stack(
           children: [
-            // Hover effect - Very light and transparent (hidden if noBackground is true)
             if (!widget.noBackground)
               AnimatedOpacity(
-                opacity: _isHovered ? 0.5 : 0.0, // Reduced opacity
+                opacity: _isHovered ? 0.5 : 0.0,
                 duration: const Duration(milliseconds: 600),
                 child: Container(
                   decoration: BoxDecoration(
@@ -112,18 +104,12 @@ class _SectionWrapperState extends State<SectionWrapper>
                   ),
                 ),
               ),
-
-            // Content - tighter padding and transition for Home and About
             Padding(
               padding:
                   widget.sectionId == 'home'
-                      ? const EdgeInsets.only(
-                        bottom: 0,
-                      ) // No bottom padding for home section
+                      ? const EdgeInsets.only(bottom: 0)
                       : (widget.sectionId == 'about'
-                          ? const EdgeInsets.only(
-                            top: 0,
-                          ) // No top padding for about section
+                          ? const EdgeInsets.only(top: 0)
                           : widget.padding),
               child: widget.child,
             ),
@@ -134,7 +120,7 @@ class _SectionWrapperState extends State<SectionWrapper>
   }
 }
 
-/// Card biçimindeki widget'lara hover animasyonu ekler
+/// Adds hover animation to card-style widgets
 class AnimatedCardWrapper extends StatelessWidget {
   final Widget child;
   final double elevation;
@@ -146,7 +132,7 @@ class AnimatedCardWrapper extends StatelessWidget {
   final EdgeInsetsGeometry padding;
 
   const AnimatedCardWrapper({
-    Key? key,
+    super.key,
     required this.child,
     this.elevation = 5,
     this.borderRadius = const BorderRadius.all(Radius.circular(16)),
@@ -155,7 +141,7 @@ class AnimatedCardWrapper extends StatelessWidget {
     this.duration = const Duration(milliseconds: 200),
     this.margin = const EdgeInsets.all(8),
     this.padding = const EdgeInsets.all(16),
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -163,7 +149,7 @@ class AnimatedCardWrapper extends StatelessWidget {
     final actualBgColor =
         backgroundColor ?? const Color(0xFF001628).withOpacity(0.7);
 
-    // Web platformu dışında hover efekti olmayan normal kart
+    // Skip hover effect on non-web platforms
     if (!kIsWeb) {
       return Card(
         margin: margin,
@@ -188,7 +174,7 @@ class AnimatedCardWrapper extends StatelessWidget {
   }
 }
 
-/// Butonlar için hover animasyonu ekler
+/// Adds hover animation to buttons
 class AnimatedButtonWrapper extends StatelessWidget {
   final Widget child;
   final VoidCallback onTap;
@@ -198,14 +184,14 @@ class AnimatedButtonWrapper extends StatelessWidget {
   final Duration duration;
 
   const AnimatedButtonWrapper({
-    Key? key,
+    super.key,
     required this.child,
     required this.onTap,
     this.hoverScale = 1.05,
     this.hoverColor,
     this.borderRadius = const BorderRadius.all(Radius.circular(8)),
     this.duration = const Duration(milliseconds: 150),
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -213,7 +199,7 @@ class AnimatedButtonWrapper extends StatelessWidget {
     final effectiveHoverColor =
         hoverColor ?? themeController.primaryColor.withOpacity(0.1);
 
-    // Web platformu dışında hover efekti olmayan normal buton
+    // Skip hover effect on non-web platforms
     if (!kIsWeb) {
       return Material(
         color: Colors.transparent,

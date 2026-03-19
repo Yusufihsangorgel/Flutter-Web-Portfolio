@@ -1,35 +1,24 @@
 import 'package:flutter/material.dart';
 
-/// Terminal çıktılarının türlerini belirten enum
+/// Enum representing terminal output types
 enum TerminalOutputType { text, command, error, system }
 
-/// Terminal çıktılarını temsil eden model sınıfı
+/// Model class representing a terminal output entry
 class TerminalOutputModel {
-  /// Çıktının metin içeriği
   String content;
-
-  /// Çıktının türü (text, command, error, system)
   final TerminalOutputType type;
-
-  /// Çıktının rengi
   final Color color;
-
-  /// Çıktının öneki (ör. '>')
   final String prefix;
-
-  /// Çıktının kalın yazılıp yazılmayacağı
   final bool isBold;
-
-  /// Çıktıya tıklandığında çalıştırılacak fonksiyon
   final VoidCallback? onTap;
 
-  /// Çıktı animasyonunun devam edip etmediği
+  /// Whether the typing animation is still in progress
   bool isTyping;
 
-  /// Çıktı animasyonunun tamamlanıp tamamlanmadığı
+  /// Whether the typing animation has finished
   bool isCompleted;
 
-  /// Animasyon için mevcut karakter indeksi
+  /// Current character index for the typing animation
   int currentIndex;
 
   TerminalOutputModel({

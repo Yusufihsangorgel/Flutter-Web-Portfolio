@@ -1,5 +1,4 @@
-/// Deneyim detaylarını tutan entity sınıfı
-class Experience {
+final class Experience {
   final String id;
   final String title;
   final String company;
@@ -8,7 +7,7 @@ class Experience {
   final List<String> responsibilities;
   final List<String> technologies;
 
-  Experience({
+  const Experience({
     required this.id,
     required this.title,
     required this.company,
