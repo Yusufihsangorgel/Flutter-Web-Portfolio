@@ -14,7 +14,7 @@ void main() {
     controller.onInit();
   });
 
-  tearDown(() => Get.reset());
+  tearDown(Get.reset);
 
   group('ThemeController', () {
     test('isDarkMode always returns true', () {

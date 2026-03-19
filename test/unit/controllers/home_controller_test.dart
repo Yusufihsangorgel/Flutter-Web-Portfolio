@@ -5,11 +5,11 @@ import 'package:flutter_web_portfolio/app/domain/entities/project.dart';
 import 'package:flutter_web_portfolio/app/domain/repositories/i_project_repository.dart';
 
 class _MockProjectRepository implements IProjectRepository {
-  final List<Project> _projects;
-  final bool shouldFail;
 
   _MockProjectRepository({List<Project>? projects, this.shouldFail = false})
     : _projects = projects ?? [];
+  final List<Project> _projects;
+  final bool shouldFail;
 
   @override
   Future<List<Project>> getProjects() async {
@@ -18,9 +18,7 @@ class _MockProjectRepository implements IProjectRepository {
   }
 
   @override
-  Future<Project> getProjectById(String id) async {
-    return _projects.firstWhere((p) => p.id == id);
-  }
+  Future<Project> getProjectById(String id) async => _projects.firstWhere((p) => p.id == id);
 }
 
 void main() {
@@ -30,7 +28,7 @@ void main() {
     Get.testMode = true;
   });
 
-  tearDown(() => Get.reset());
+  tearDown(Get.reset);
 
   group('HomeController', () {
     test('starts with empty projects and loading false after init', () async {

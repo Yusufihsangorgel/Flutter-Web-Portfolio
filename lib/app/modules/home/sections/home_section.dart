@@ -162,7 +162,7 @@ class HomeSection extends StatelessWidget {
             ),
             child: Text(
               languageController.getText('home_section.welcome', defaultValue: 'Welcome to my portfolio'),
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
                 color: Colors.white70,

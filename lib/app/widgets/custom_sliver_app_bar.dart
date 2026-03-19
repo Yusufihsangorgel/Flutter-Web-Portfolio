@@ -188,7 +188,7 @@ class CustomSliverAppBar extends StatelessWidget {
         Navigator.pop(context);
         scrollController.scrollToSection(sectionId);
       },
-      leading: Icon(Icons.arrow_forward_ios_rounded, color: AppColors.primary, size: 16),
+      leading: const Icon(Icons.arrow_forward_ios_rounded, color: AppColors.primary, size: 16),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       hoverColor: AppColors.primary.withValues(alpha: 0.05),
     );

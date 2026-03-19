@@ -23,7 +23,7 @@ class PortfolioFooter extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Row(
+          const Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               _SocialButton(
@@ -31,13 +31,13 @@ class PortfolioFooter extends StatelessWidget {
                 label: 'GitHub',
                 url: 'https://github.com/Yusufihsangorgel',
               ),
-              const SizedBox(width: 24),
+              SizedBox(width: 24),
               _SocialButton(
                 icon: Icons.work_outline,
                 label: 'LinkedIn',
                 url: 'https://linkedin.com/in/yusufihsangorgel',
               ),
-              const SizedBox(width: 24),
+              SizedBox(width: 24),
               _SocialButton(
                 icon: Icons.email_outlined,
                 label: 'Email',
