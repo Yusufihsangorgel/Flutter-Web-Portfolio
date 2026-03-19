@@ -1,23 +1,22 @@
-import 'dart:async';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_web_portfolio/app/controllers/shared_background_controller.dart';
 
 import 'painters/star_field_painter.dart';
 import 'painters/shooting_star_painter.dart';
 import 'painters/deep_space_painter.dart';
 import 'painters/moon_surface_painter.dart';
-
 import 'widgets/rocket_widget.dart';
 
 class CosmicBackground extends StatefulWidget {
-
   const CosmicBackground({
     super.key,
     this.scrollController,
     this.pageHeight = 0,
     this.animationController,
   });
+
   final ScrollController? scrollController;
   final double pageHeight;
   final AnimationController? animationController;
@@ -28,49 +27,51 @@ class CosmicBackground extends StatefulWidget {
 
 class _CosmicBackgroundState extends State<CosmicBackground>
     with SingleTickerProviderStateMixin {
-  late Offset rocketPosition;
-  late Offset rocketVelocity;
-  late double rocketRotation;
-  late Timer rocketTimer;
+  Offset _rocketPosition = Offset.zero;
+  Offset _rocketVelocity = Offset.zero;
+  double _rocketRotation = math.pi / 2;
+  late Ticker _physicsTicker;
+  bool _initialized = false;
 
   @override
   void initState() {
     super.initState();
-
-    rocketPosition = const Offset(0, 0);
-    rocketVelocity = Offset(
+    _rocketVelocity = Offset(
       0.6 + math.Random().nextDouble() * 1.2,
       0.3 + math.Random().nextDouble() * 1.0,
     );
-    rocketRotation = math.pi / 2;
 
-    rocketTimer = Timer.periodic(const Duration(milliseconds: 20), (timer) {
+    // Use Ticker instead of Timer.periodic — syncs with display refresh rate
+    _physicsTicker = createTicker((_) {
       if (mounted) {
-        setState(_updateRocketPosition);
+        setState(_updateRocketPhysics);
       }
-    });
+    })..start();
   }
 
   @override
   void dispose() {
-    rocketTimer.cancel();
+    _physicsTicker.dispose();
     super.dispose();
   }
 
-  void _updateRocketPosition() {
+  void _updateRocketPhysics() {
     final size = MediaQuery.of(context).size;
+    if (size.isEmpty) return;
+
+    if (!_initialized) {
+      _rocketPosition = Offset(size.width / 2, size.height / 2);
+      _initialized = true;
+    }
 
     final minX = size.width * 0.05;
     final maxX = size.width * 0.95;
     final minY = size.height * 0.05;
     final maxY = size.height * 0.95;
 
-    // --- ORBITAL PHYSICS ALGORITHM ---
-
     const dt = 1.0 / 90.0;
 
-    // Multiple gravity attractors for complex orbital motion
-    final List<Offset> attractors = [
+    final attractors = [
       Offset(size.width * 0.2, size.height * 0.2),
       Offset(size.width * 0.8, size.height * 0.2),
       Offset(size.width * 0.5, size.height * 0.5),
@@ -78,462 +79,283 @@ class _CosmicBackgroundState extends State<CosmicBackground>
       Offset(size.width * 0.8, size.height * 0.8),
     ];
 
-    final List<double> attractorMasses = [0.5, 0.5, 0.8, 0.5, 0.5];
-
-    Offset acceleration = Offset.zero;
-
-    // Time-varying factor so orbits shift over time
+    const attractorMasses = [0.5, 0.5, 0.8, 0.5, 0.5];
     final time = DateTime.now().millisecondsSinceEpoch / 15000;
     final timeFactor = math.sin(time) * 0.15 + 0.85;
 
+    var acceleration = Offset.zero;
+
     for (int i = 0; i < attractors.length; i++) {
-      final attractorPos = attractors[i];
-      final mass = attractorMasses[i] * timeFactor;
+      final dx = attractors[i].dx - _rocketPosition.dx;
+      final dy = attractors[i].dy - _rocketPosition.dy;
+      final distSq = dx * dx + dy * dy;
+      final dist = math.sqrt(distSq);
 
-      final dx = attractorPos.dx - rocketPosition.dx;
-      final dy = attractorPos.dy - rocketPosition.dy;
-      final distanceSquared = dx * dx + dy * dy;
-      final distance = math.sqrt(distanceSquared);
-
-      if (distance > 10.0) {
-        // Simplified Newtonian gravity: F = G*m/r^2
-        final forceMagnitude = mass / distanceSquared * 6.0;
-        final forceX = dx / distance * forceMagnitude;
-        final forceY = dy / distance * forceMagnitude;
-        acceleration += Offset(forceX, forceY);
+      if (dist > 10.0) {
+        final force = attractorMasses[i] * timeFactor / distSq * 6.0;
+        acceleration += Offset(dx / dist * force, dy / dist * force);
       }
     }
 
-    // Slight chaotic perturbation for more organic orbits
-    final chaosX = math.sin(rocketPosition.dx / 70 + time) * 0.02;
-    final chaosY = math.cos(rocketPosition.dy / 70 + time * 1.3) * 0.02;
-    acceleration += Offset(chaosX, chaosY);
-
-    rocketVelocity += acceleration * dt * 1.5;
-
-    final speed = math.sqrt(
-      rocketVelocity.dx * rocketVelocity.dx +
-          rocketVelocity.dy * rocketVelocity.dy,
+    acceleration += Offset(
+      math.sin(_rocketPosition.dx / 70 + time) * 0.02,
+      math.cos(_rocketPosition.dy / 70 + time * 1.3) * 0.02,
     );
 
-    if (speed > 0.0) {
-      if (speed < 0.8) {
-        rocketVelocity = rocketVelocity * (0.8 / speed);
-      } else if (speed > 2.5) {
-        rocketVelocity = rocketVelocity * (2.5 / speed);
-      }
+    _rocketVelocity += acceleration * dt * 1.5;
+
+    final speed = _rocketVelocity.distance;
+    if (speed > 0) {
+      if (speed < 0.8) _rocketVelocity = _rocketVelocity * (0.8 / speed);
+      if (speed > 2.5) _rocketVelocity = _rocketVelocity * (2.5 / speed);
     } else {
-      // Prevent zero velocity by assigning a random direction
       final angle = math.Random().nextDouble() * 2 * math.pi;
-      rocketVelocity = Offset(math.cos(angle), math.sin(angle)) * 0.8;
+      _rocketVelocity = Offset(math.cos(angle), math.sin(angle)) * 0.8;
     }
 
-    Offset newPosition = rocketPosition + rocketVelocity * dt * 60;
+    var newPos = _rocketPosition + _rocketVelocity * dt * 60;
 
-    // Smooth deceleration near edges for natural boundary behavior
-    const edgeProximity = 20.0;
-    const slowdownFactor = 0.95;
-
-    if (newPosition.dx < minX + edgeProximity) {
-      if (rocketVelocity.dx < 0) {
-        rocketVelocity = Offset(
-          rocketVelocity.dx * slowdownFactor,
-          rocketVelocity.dy,
-        );
-      }
-    } else if (newPosition.dx > maxX - edgeProximity) {
-      if (rocketVelocity.dx > 0) {
-        rocketVelocity = Offset(
-          rocketVelocity.dx * slowdownFactor,
-          rocketVelocity.dy,
-        );
-      }
+    // Edge deceleration
+    if (newPos.dx < minX + 20 && _rocketVelocity.dx < 0) {
+      _rocketVelocity = Offset(_rocketVelocity.dx * 0.95, _rocketVelocity.dy);
+    } else if (newPos.dx > maxX - 20 && _rocketVelocity.dx > 0) {
+      _rocketVelocity = Offset(_rocketVelocity.dx * 0.95, _rocketVelocity.dy);
+    }
+    if (newPos.dy < minY + 20 && _rocketVelocity.dy < 0) {
+      _rocketVelocity = Offset(_rocketVelocity.dx, _rocketVelocity.dy * 0.95);
+    } else if (newPos.dy > maxY - 20 && _rocketVelocity.dy > 0) {
+      _rocketVelocity = Offset(_rocketVelocity.dx, _rocketVelocity.dy * 0.95);
     }
 
-    if (newPosition.dy < minY + edgeProximity) {
-      if (rocketVelocity.dy < 0) {
-        rocketVelocity = Offset(
-          rocketVelocity.dx,
-          rocketVelocity.dy * slowdownFactor,
-        );
-      }
-    } else if (newPosition.dy > maxY - edgeProximity) {
-      if (rocketVelocity.dy > 0) {
-        rocketVelocity = Offset(
-          rocketVelocity.dx,
-          rocketVelocity.dy * slowdownFactor,
-        );
-      }
+    // Boundary reflection
+    if (newPos.dx < minX) {
+      newPos = Offset(minX + 2, newPos.dy);
+      _rocketVelocity = Offset(-_rocketVelocity.dx * 0.8, _rocketVelocity.dy * 0.95);
+    } else if (newPos.dx > maxX) {
+      newPos = Offset(maxX - 2, newPos.dy);
+      _rocketVelocity = Offset(-_rocketVelocity.dx * 0.8, _rocketVelocity.dy * 0.95);
+    }
+    if (newPos.dy < minY) {
+      newPos = Offset(newPos.dx, minY + 2);
+      _rocketVelocity = Offset(_rocketVelocity.dx * 0.95, -_rocketVelocity.dy * 0.8);
+    } else if (newPos.dy > maxY) {
+      newPos = Offset(newPos.dx, maxY - 2);
+      _rocketVelocity = Offset(_rocketVelocity.dx * 0.95, -_rocketVelocity.dy * 0.8);
     }
 
-    // Boundary reflection with energy loss for realistic bouncing
-    if (newPosition.dx < minX) {
-      newPosition = Offset(minX + 2.0, newPosition.dy);
-      final vx = -rocketVelocity.dx * 0.8;
-      final vy = rocketVelocity.dy * 0.95;
-      rocketVelocity = Offset(vx, vy);
-    } else if (newPosition.dx > maxX) {
-      newPosition = Offset(maxX - 2.0, newPosition.dy);
-      final vx = -rocketVelocity.dx * 0.8;
-      final vy = rocketVelocity.dy * 0.95;
-      rocketVelocity = Offset(vx, vy);
-    }
+    _rocketPosition = newPos;
 
-    if (newPosition.dy < minY) {
-      newPosition = Offset(newPosition.dx, minY + 2.0);
-      final vx = rocketVelocity.dx * 0.95;
-      final vy = -rocketVelocity.dy * 0.8;
-      rocketVelocity = Offset(vx, vy);
-    } else if (newPosition.dy > maxY) {
-      newPosition = Offset(newPosition.dx, maxY - 2.0);
-      final vx = rocketVelocity.dx * 0.95;
-      final vy = -rocketVelocity.dy * 0.8;
-      rocketVelocity = Offset(vx, vy);
-    }
+    // Rotation
+    var targetRot = _rocketVelocity.distance > 0
+        ? math.atan2(_rocketVelocity.dy, _rocketVelocity.dx) + math.pi / 2
+        : _rocketRotation;
+    if (targetRot.isNaN) targetRot = math.pi / 2;
+    _rocketRotation = _lerpAngle(_rocketRotation, targetRot, 0.05);
 
-    rocketPosition = newPosition;
-
-    double targetRotation;
-    if (rocketVelocity.dx != 0 || rocketVelocity.dy != 0) {
-      // Align rotation to flight direction (+pi/2 so the nose points forward)
-      targetRotation =
-          math.atan2(rocketVelocity.dy, rocketVelocity.dx) + math.pi / 2;
-    } else {
-      targetRotation = rocketRotation;
-    }
-
-    if (targetRotation.isNaN) {
-      targetRotation = math.pi / 2;
-    }
-
-    rocketRotation = _smoothAngle(rocketRotation, targetRotation, 0.05);
-
-    SharedBackgroundController.rocketX = rocketPosition.dx;
-    SharedBackgroundController.rocketY = rocketPosition.dy;
-    SharedBackgroundController.rocketRotation = rocketRotation;
+    SharedBackgroundController.rocketX = _rocketPosition.dx;
+    SharedBackgroundController.rocketY = _rocketPosition.dy;
+    SharedBackgroundController.rocketRotation = _rocketRotation;
   }
 
   @override
   Widget build(BuildContext context) {
-    // Prefer the animation controller passed as a parameter; fall back to the shared one
     final animController =
-        widget.animationController ??
-        SharedBackgroundController.animationController;
+        widget.animationController ?? SharedBackgroundController.animationController;
     final mousePosition = SharedBackgroundController.mousePosition;
 
     if (animController == null) {
-      return Container(color: Colors.black);
+      return const DecoratedBox(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [Color(0xFF000510), Color(0xFF00101F)],
+          ),
+        ),
+      );
     }
 
     return LayoutBuilder(
-      builder: (context, constraints) {
-        // Center the rocket on first layout
-        if (rocketPosition == const Offset(0, 0)) {
-          rocketPosition = Offset(
-            constraints.maxWidth / 2,
-            constraints.maxHeight / 2,
-          );
-        }
-
-        return MouseRegion(
-          onHover: (event) {
-            SharedBackgroundController.updateMousePosition(event.localPosition);
-          },
-          child: Stack(
-            fit: StackFit.expand,
-            children: [
-              // Deep space gradient background
-              Container(
-                decoration: const BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      Color(0xFF000510),
-                      Color(0xFF00101F),
-                      Color(0xFF001429),
-                    ],
+      builder: (context, constraints) => MouseRegion(
+        onHover: (event) => SharedBackgroundController.updateMousePosition(event.localPosition),
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            const DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [Color(0xFF000510), Color(0xFF00101F), Color(0xFF001429)],
+                ),
+              ),
+            ),
+            RepaintBoundary(
+              child: CustomPaint(
+                painter: DeepSpacePainter(time: animController.value),
+                size: Size.infinite,
+              ),
+            ),
+            RepaintBoundary(
+              child: CustomPaint(
+                size: Size.infinite,
+                painter: StarFieldPainter(
+                  animController: animController,
+                  scrollOffset: widget.scrollController?.offset ?? 0,
+                ),
+              ),
+            ),
+            _buildMoon(animController),
+            RepaintBoundary(
+              child: AnimatedBuilder(
+                animation: animController,
+                builder: (_, __) => CustomPaint(
+                  painter: ShootingStarPainter(
+                    time: animController.value,
+                    mousePosition: mousePosition.value,
                   ),
                 ),
               ),
-
-              // Distant galaxies and nebulae
-              RepaintBoundary(
-                child: CustomPaint(
-                  painter: DeepSpacePainter(time: animController.value),
-                  size: Size.infinite,
-                ),
-              ),
-
-              // Star field
-              RepaintBoundary(
-                child: CustomPaint(
-                  size: Size.infinite,
-                  painter: StarFieldPainter(
-                    animController: animController,
-                    scrollOffset: widget.scrollController?.offset ?? 0,
-                  ),
-                ),
-              ),
-
-              // Moon
-              _buildMoon(animController),
-
-              // Shooting stars and comets
-              RepaintBoundary(
-                child: AnimatedBuilder(
-                  animation: animController,
-                  builder: (context, child) => CustomPaint(
-                      painter: ShootingStarPainter(
-                        time: animController.value,
-                        mousePosition: mousePosition.value,
-                      ),
-                    ),
-                ),
-              ),
-
-              // Rocket - scroll-based or free-roaming depending on context
-              if (widget.scrollController != null && widget.pageHeight > 0)
-                _buildScrollBasedRocket(constraints, animController)
-              else
-                _buildFreeRoamingRocket(constraints, animController),
-            ],
-          ),
-        );
-      },
+            ),
+            RepaintBoundary(
+              child: widget.scrollController != null && widget.pageHeight > 0
+                  ? _buildScrollBasedRocket(constraints, animController)
+                  : _buildFreeRoamingRocket(animController),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
   Widget _buildMoon(AnimationController animController) => Positioned(
-      top: 120,
-      right: 120,
+    top: 120,
+    right: 120,
+    child: RepaintBoundary(
       child: AnimatedBuilder(
         animation: animController,
         builder: (_, __) {
-          // Very slow orbital motion simulating a realistic lunar cycle
           final moonTime = animController.value * 24 * 60 * 60;
-
-          final moonPosition = Offset(
+          final moonOffset = Offset(
             math.sin(moonTime * 0.00005) * 10,
             math.cos(moonTime * 0.00005) * 5,
           );
 
-          // Smooth position tracking to prevent teleportation artifacts
-          if (SharedBackgroundController.moonX == null) {
-            SharedBackgroundController.moonX = moonPosition.dx;
-            SharedBackgroundController.moonY = moonPosition.dy;
-          } else {
-            final xDiff =
-                (moonPosition.dx - SharedBackgroundController.moonX!).abs();
-            final yDiff =
-                (moonPosition.dy - SharedBackgroundController.moonY!).abs();
+          SharedBackgroundController.moonX ??= moonOffset.dx;
+          SharedBackgroundController.moonY ??= moonOffset.dy;
 
-            if (xDiff > 5 || yDiff > 5) {
-              final smoothX =
-                  SharedBackgroundController.moonX! +
-                  (moonPosition.dx - SharedBackgroundController.moonX!) * 0.01;
-              final smoothY =
-                  SharedBackgroundController.moonY! +
-                  (moonPosition.dy - SharedBackgroundController.moonY!) * 0.01;
-
-              SharedBackgroundController.moonX = smoothX;
-              SharedBackgroundController.moonY = smoothY;
-            } else {
-              SharedBackgroundController.moonX = moonPosition.dx;
-              SharedBackgroundController.moonY = moonPosition.dy;
-            }
-          }
-
-          final smoothMoonPosition = Offset(
-            SharedBackgroundController.moonX!,
-            SharedBackgroundController.moonY!,
-          );
+          SharedBackgroundController.moonX = SharedBackgroundController.moonX! +
+              (moonOffset.dx - SharedBackgroundController.moonX!) * 0.01;
+          SharedBackgroundController.moonY = SharedBackgroundController.moonY! +
+              (moonOffset.dy - SharedBackgroundController.moonY!) * 0.01;
 
           return Transform.translate(
-            offset: smoothMoonPosition,
-            child: ClipOval(
-              child: Container(
-                width: 70,
-                height: 70,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  gradient: const RadialGradient(
-                    center: Alignment(-0.2, -0.2),
-                    radius: 0.9,
-                    colors: [
-                      Color(0xFFF5F5F5),
-                      Color(0xFFE0E0E0),
-                      Color(0xFFBDBDBD),
-                      Color(0xFFAAAAAA),
-                    ],
-                    stops: [0.0, 0.3, 0.7, 1.0],
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.white.withValues(alpha:0.1),
-                      blurRadius: 15,
-                      spreadRadius: 1,
-                    ),
-                  ],
+            offset: Offset(SharedBackgroundController.moonX!, SharedBackgroundController.moonY!),
+            child: Container(
+              width: 70,
+              height: 70,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: const RadialGradient(
+                  center: Alignment(-0.2, -0.2),
+                  radius: 0.9,
+                  colors: [Color(0xFFF5F5F5), Color(0xFFE0E0E0), Color(0xFFBDBDBD), Color(0xFFAAAAAA)],
+                  stops: [0.0, 0.3, 0.7, 1.0],
                 ),
-                child: CustomPaint(
-                  painter: MoonSurfacePainter(),
-                  size: const Size(70, 70),
-                ),
+                boxShadow: [
+                  BoxShadow(color: Colors.white.withValues(alpha: 0.15), blurRadius: 20, spreadRadius: 3),
+                ],
+              ),
+              child: ClipOval(
+                child: CustomPaint(painter: MoonSurfacePainter(), size: const Size(70, 70)),
               ),
             ),
           );
         },
       ),
-    );
+    ),
+  );
 
-  // Scroll-based rocket movement with physics-based smoothing
-  Widget _buildScrollBasedRocket(
-    BoxConstraints constraints,
-    AnimationController animController,
-  ) => AnimatedBuilder(
-      animation: Listenable.merge([animController, widget.scrollController!]),
-      builder: (context, child) {
-        // Normalized scroll progress (0.0 - 1.0)
-        final scrollProgress =
-            (widget.scrollController!.hasClients)
-                ? (widget.scrollController!.position.pixels /
-                        (widget.pageHeight * 0.8))
-                    .clamp(0.0, 1.0)
-                : 0.0;
+  Widget _buildScrollBasedRocket(BoxConstraints constraints, AnimationController animController) =>
+      AnimatedBuilder(
+        animation: Listenable.merge([animController, widget.scrollController!]),
+        builder: (_, __) {
+          final scrollProgress = widget.scrollController!.hasClients
+              ? (widget.scrollController!.position.pixels / (widget.pageHeight * 0.8)).clamp(0.0, 1.0)
+              : 0.0;
 
-        final rocketY = constraints.maxHeight * scrollProgress;
+          final rocketY = constraints.maxHeight * scrollProgress;
+          const sectionCount = 5;
+          final sectionIndex = (scrollProgress * sectionCount).floor();
+          final sectionProgress = (scrollProgress * sectionCount) - sectionIndex;
 
-        // Divide scroll range into sections for varied flight paths
-        const sectionCount = 5;
-        final sectionIndex = (scrollProgress * sectionCount).floor();
-        final sectionProgress = (scrollProgress * sectionCount) - sectionIndex;
+          final (targetXPos, targetAngle) = switch (sectionIndex) {
+            0 => (
+              constraints.maxWidth * (0.2 + _easeInOut(sectionProgress) * 0.6),
+              math.pi * 1.6 + math.sin(_easeInOut(sectionProgress) * math.pi) * 0.2,
+            ),
+            1 => (
+              constraints.maxWidth * (0.8 - _easeInOut(sectionProgress) * 0.5),
+              math.pi * 1.45 + math.cos(_easeInOut(sectionProgress) * math.pi) * 0.2,
+            ),
+            2 => (
+              constraints.maxWidth * (0.3 + _easeInOut(sectionProgress) * 0.2),
+              math.pi * 1.5 + math.sin(_easeInOut(sectionProgress) * math.pi * 2) * 0.1,
+            ),
+            3 => (
+              constraints.maxWidth * (0.5 + math.sin(_easeInOut(sectionProgress) * math.pi) * 0.3),
+              math.pi * 1.5 + math.cos(_easeInOut(sectionProgress) * math.pi * 2) * 0.2,
+            ),
+            4 => (
+              constraints.maxWidth * (0.7 - _easeInOut(sectionProgress) * 0.4),
+              math.pi * 1.45 + math.sin(_easeInOut(sectionProgress) * math.pi) * 0.15,
+            ),
+            _ => (constraints.maxWidth * 0.5, math.pi * 1.5),
+          };
 
-        double targetXPos = 0;
-        double targetAngle = 0;
+          final realTime = animController.value * 3600;
+          final xWithOscillation = targetXPos + math.sin(realTime * 0.001) * 5;
+          final angleWithOscillation = targetAngle + math.sin(realTime * 0.0005) * 0.015;
 
-        switch (sectionIndex) {
-          case 0:
-            targetXPos =
-                constraints.maxWidth *
-                (0.2 + _easeInOut(sectionProgress) * 0.6);
-            targetAngle =
-                math.pi * 1.6 +
-                math.sin(_easeInOut(sectionProgress) * math.pi) * 0.2;
-            break;
-          case 1:
-            targetXPos =
-                constraints.maxWidth *
-                (0.8 - _easeInOut(sectionProgress) * 0.5);
-            targetAngle =
-                math.pi * 1.45 +
-                math.cos(_easeInOut(sectionProgress) * math.pi) * 0.2;
-            break;
-          case 2:
-            targetXPos =
-                constraints.maxWidth *
-                (0.3 + _easeInOut(sectionProgress) * 0.2);
-            targetAngle =
-                math.pi * 1.5 +
-                math.sin(_easeInOut(sectionProgress) * math.pi * 2) * 0.1;
-            break;
-          case 3:
-            targetXPos =
-                constraints.maxWidth *
-                (0.5 + math.sin(_easeInOut(sectionProgress) * math.pi) * 0.3);
-            targetAngle =
-                math.pi * 1.5 +
-                math.cos(_easeInOut(sectionProgress) * math.pi * 2) * 0.2;
-            break;
-          case 4:
-            targetXPos =
-                constraints.maxWidth *
-                (0.7 - _easeInOut(sectionProgress) * 0.4);
-            targetAngle =
-                math.pi * 1.45 +
-                math.sin(_easeInOut(sectionProgress) * math.pi) * 0.15;
-            break;
-          default:
-            targetXPos = constraints.maxWidth * 0.5;
-            targetAngle = math.pi * 1.5;
-        }
+          final lastX = SharedBackgroundController.rocketX ?? xWithOscillation;
+          final smoothX = lastX + (xWithOscillation - lastX).clamp(-1.5, 1.5);
+          SharedBackgroundController.rocketX = smoothX;
+          SharedBackgroundController.rocketY = 80 + rocketY;
 
-        final realTime = animController.value * 3600;
+          final lastAngle = SharedBackgroundController.rocketRotation ?? angleWithOscillation;
+          var angleDiff = angleWithOscillation - lastAngle;
+          if (angleDiff > math.pi) angleDiff -= 2 * math.pi;
+          if (angleDiff < -math.pi) angleDiff += 2 * math.pi;
+          final smoothAngle = lastAngle + angleDiff.clamp(-0.01, 0.01);
+          SharedBackgroundController.rocketRotation = smoothAngle;
 
-        // Subtle oscillation for liveliness
-        targetXPos += math.sin(realTime * 0.001) * 5;
-        targetAngle += math.sin(realTime * 0.0005) * 0.015;
+          return Positioned(
+            left: smoothX,
+            top: 80 + rocketY,
+            child: Transform.rotate(
+              angle: smoothAngle,
+              child: RocketWidget(animController: animController),
+            ),
+          );
+        },
+      );
 
-        final lastXPos = SharedBackgroundController.rocketX ?? targetXPos;
+  Widget _buildFreeRoamingRocket(AnimationController animController) => Positioned(
+    left: _rocketPosition.dx - 25,
+    top: _rocketPosition.dy - 50,
+    child: Transform.rotate(
+      angle: _rocketRotation,
+      child: RocketWidget(animController: animController, isDragging: false),
+    ),
+  );
 
-        const maxPositionChange = 1.5;
-        final xDiff = targetXPos - lastXPos;
-        final limitedXDiff = xDiff.clamp(-maxPositionChange, maxPositionChange);
-        final smoothXPos = lastXPos + limitedXDiff;
+  double _easeInOut(double t) =>
+      t < 0.5 ? 4 * t * t * t : (t - 1) * (2 * t - 2) * (2 * t - 2) + 1;
 
-        SharedBackgroundController.rocketX = smoothXPos;
-        SharedBackgroundController.rocketY = 80 + rocketY;
-
-        final lastAngle =
-            SharedBackgroundController.rocketRotation ?? targetAngle;
-        const maxAngleChange = 0.01;
-        final angleDiff = (targetAngle - lastAngle);
-        final normalizedDiff =
-            angleDiff > math.pi
-                ? angleDiff - 2 * math.pi
-                : (angleDiff < -math.pi ? angleDiff + 2 * math.pi : angleDiff);
-        final limitedDiff = normalizedDiff.clamp(
-          -maxAngleChange,
-          maxAngleChange,
-        );
-        final smoothAngle = lastAngle + limitedDiff;
-
-        SharedBackgroundController.rocketRotation = smoothAngle;
-
-        return Positioned(
-          left: smoothXPos,
-          top: 80 + rocketY,
-          child: Transform.rotate(
-            angle: smoothAngle,
-            child: RocketWidget(animController: animController),
-          ),
-        );
-      },
-    );
-
-  // Free-roaming rocket driven by the physics simulation in _updateRocketPosition
-  Widget _buildFreeRoamingRocket(
-    BoxConstraints constraints,
-    AnimationController animController,
-  ) {
-    final rocketX = rocketPosition.dx;
-    final rocketY = rocketPosition.dy;
-
-    return Positioned(
-      left: rocketX - 25,
-      top: rocketY - 50,
-      child: Transform.rotate(
-        angle: rocketRotation,
-        child: RocketWidget(animController: animController, isDragging: false),
-      ),
-    );
-  }
-
-  double _easeInOut(double t) => t < 0.5 ? 4 * t * t * t : (t - 1) * (2 * t - 2) * (2 * t - 2) + 1;
-
-  // Interpolates between two angles via the shortest arc
-  double _smoothAngle(
-    double currentAngle,
-    double targetAngle,
-    double smoothFactor,
-  ) {
-    var angleDiff = targetAngle - currentAngle;
-    while (angleDiff > math.pi) {
-      angleDiff -= 2 * math.pi;
-    }
-    while (angleDiff < -math.pi) {
-      angleDiff += 2 * math.pi;
-    }
-    return currentAngle + angleDiff * smoothFactor;
+  double _lerpAngle(double current, double target, double factor) {
+    var diff = target - current;
+    while (diff > math.pi) diff -= 2 * math.pi;
+    while (diff < -math.pi) diff += 2 * math.pi;
+    return current + diff * factor;
   }
 }
