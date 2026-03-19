@@ -53,21 +53,15 @@ class CustomSliverAppBar extends StatelessWidget {
           ),
         ),
       ),
-      title: Obx(() {
-        final name = languageController.getText(
-          'app.short_name',
-          defaultValue: 'YIG',
-        );
-        return Text(
-          name,
-          style: TextStyle(
-            color: AppColors.primary,
-            fontWeight: FontWeight.w700,
-            fontSize: 20,
-            letterSpacing: 2,
-          ),
-        );
-      }),
+      title: Text(
+        languageController.getText('app.short_name', defaultValue: 'YIG'),
+        style: const TextStyle(
+          color: AppColors.primary,
+          fontWeight: FontWeight.w700,
+          fontSize: 20,
+          letterSpacing: 2,
+        ),
+      ),
       leading: isMobile
           ? Builder(
               builder: (context) => IconButton(
