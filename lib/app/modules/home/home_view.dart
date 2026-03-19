@@ -11,6 +11,7 @@ import 'package:flutter_web_portfolio/app/modules/home/sections/contact_section.
 import 'package:flutter_web_portfolio/app/widgets/custom_sliver_app_bar.dart';
 import 'package:flutter_web_portfolio/app/controllers/shared_background_controller.dart';
 import 'package:flutter_web_portfolio/app/widgets/background/cosmic_background.dart';
+import 'package:flutter_web_portfolio/app/widgets/footer.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -64,6 +65,7 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
               _sliverSection(scrollController.experienceKey, const ExperienceSection()),
               _sliverSection(scrollController.projectsKey, const ProjectsSection()),
               _sliverSection(scrollController.contactKey, const ContactSection()),
+              const SliverToBoxAdapter(child: PortfolioFooter()),
             ],
           ),
         ],

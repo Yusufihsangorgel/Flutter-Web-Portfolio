@@ -73,8 +73,6 @@ Future<void> initializeApp(LoadingController loadingController) async {
       await languageController.loadSavedLanguage();
     } catch (_) {}
 
-    await Future.delayed(const Duration(seconds: 1));
-
     if (!kIsWeb) {
       try {
         FlutterNativeSplash.remove();

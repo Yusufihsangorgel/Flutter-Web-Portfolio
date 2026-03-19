@@ -86,22 +86,10 @@ class SharedBackgroundController extends GetxController {
 
   static bool get isInitialized => _animationController != null;
 
+  /// @deprecated Use setAnimationController instead.
+  /// Kept for backward compatibility — safely no-ops if already initialized.
   static void init(TickerProvider vsync) {
-    if (_animationController != null) return;
-
-    _animationController = AnimationController(
-      duration: const Duration(minutes: 10),
-      vsync: vsync,
-    );
-
-    _animationController!.forward();
-    _animationController!.addStatusListener((status) {
-      if (status == AnimationStatus.completed) {
-        _animationController!.reset();
-        _animationController!.value = 0.001;
-        _animationController!.forward();
-      }
-    });
+    // No-op: animation controller is now managed by HomeView
   }
 
   static void updateMousePosition(Offset position) {
