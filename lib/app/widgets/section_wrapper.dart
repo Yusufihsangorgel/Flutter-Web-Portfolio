@@ -1,128 +1,46 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_web_portfolio/app/controllers/theme_controller.dart';
-import 'package:flutter_web_portfolio/app/controllers/shared_background_controller.dart';
 import 'package:flutter_web_portfolio/app/widgets/mouse_effects.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 
-/// Widget that wraps sections with hover animations and cosmic background
-class SectionWrapper extends StatefulWidget {
-
+class SectionWrapper extends StatelessWidget {
   const SectionWrapper({
     super.key,
     required this.child,
     required this.sectionKey,
     required this.sectionId,
     this.backgroundColor,
-    this.useHoverLight = true,
     this.padding = const EdgeInsets.symmetric(vertical: 40, horizontal: 24),
     this.noBackground = false,
     this.minHeight,
   });
+
   final Widget child;
   final GlobalKey sectionKey;
   final String sectionId;
   final Color? backgroundColor;
-  final bool useHoverLight;
   final EdgeInsetsGeometry padding;
   final bool noBackground;
   final double? minHeight;
 
   @override
-  State<SectionWrapper> createState() => _SectionWrapperState();
-}
-
-class _SectionWrapperState extends State<SectionWrapper>
-    with SingleTickerProviderStateMixin {
-  bool _isHovered = false;
-
-  @override
-  void initState() {
-    super.initState();
-    if (widget.sectionId == 'home' &&
-        !SharedBackgroundController.isInitialized) {
-      SharedBackgroundController.init(this);
-    }
-  }
-
-  void _updateMousePosition(PointerEvent event) {
-    if (widget.sectionId == 'home') {
-      SharedBackgroundController.updateMousePosition(event.localPosition);
-    }
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final themeController = Get.find<ThemeController>();
     final screenHeight = MediaQuery.of(context).size.height;
 
-    return MouseRegion(
-      onHover: (event) {
-        _updateMousePosition(event);
-        if (!_isHovered) {
-          setState(() {
-            _isHovered = true;
-          });
-        }
-      },
-      onExit: (_) {
-        if (_isHovered) {
-          setState(() {
-            _isHovered = false;
-          });
-        }
-      },
-      child: Container(
-        key: widget.sectionKey,
-        margin: EdgeInsets.zero,
-        constraints: BoxConstraints(
-          minHeight:
-              widget.minHeight ??
-              (widget.sectionId == 'home'
-                  ? screenHeight - 80
-                  : (widget.sectionId == 'about'
-                      ? screenHeight - 80
-                      : screenHeight * 0.7)),
-        ),
-        color: Colors.transparent,
-        child: Stack(
-          children: [
-            if (!widget.noBackground)
-              AnimatedOpacity(
-                opacity: _isHovered ? 0.5 : 0.0,
-                duration: const Duration(milliseconds: 600),
-                child: Container(
-                  decoration: BoxDecoration(
-                    gradient: RadialGradient(
-                      center: Alignment.center,
-                      radius: 1.0,
-                      colors: [
-                        themeController.primaryColor.withValues(alpha:0.05),
-                        Colors.transparent,
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            Padding(
-              padding:
-                  widget.sectionId == 'home'
-                      ? const EdgeInsets.only(bottom: 0)
-                      : (widget.sectionId == 'about'
-                          ? const EdgeInsets.only(top: 0)
-                          : widget.padding),
-              child: widget.child,
-            ),
-          ],
-        ),
+    return Container(
+      key: sectionKey,
+      constraints: BoxConstraints(
+        minHeight: minHeight ?? screenHeight * 0.7,
       ),
+      color: Colors.transparent,
+      padding: padding,
+      child: child,
     );
   }
 }
 
-/// Adds hover animation to card-style widgets
 class AnimatedCardWrapper extends StatelessWidget {
-
   const AnimatedCardWrapper({
     super.key,
     required this.child,
@@ -134,6 +52,7 @@ class AnimatedCardWrapper extends StatelessWidget {
     this.margin = const EdgeInsets.all(8),
     this.padding = const EdgeInsets.all(16),
   });
+
   final Widget child;
   final double elevation;
   final BorderRadius borderRadius;
@@ -145,16 +64,14 @@ class AnimatedCardWrapper extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final actualBgColor =
-        backgroundColor ?? const Color(0xFF001628).withValues(alpha:0.7);
+    final bgColor = backgroundColor ?? const Color(0xFF001628).withValues(alpha: 0.7);
 
-    // Skip hover effect on non-web platforms
     if (!kIsWeb) {
       return Card(
         margin: margin,
         elevation: elevation,
         shape: RoundedRectangleBorder(borderRadius: borderRadius),
-        color: actualBgColor,
+        color: bgColor,
         child: Padding(padding: padding, child: child),
       );
     }
@@ -166,16 +83,14 @@ class AnimatedCardWrapper extends StatelessWidget {
         margin: margin,
         elevation: elevation,
         shape: RoundedRectangleBorder(borderRadius: borderRadius),
-        color: actualBgColor,
+        color: bgColor,
         child: Padding(padding: padding, child: child),
       ),
     );
   }
 }
 
-/// Adds hover animation to buttons
 class AnimatedButtonWrapper extends StatelessWidget {
-
   const AnimatedButtonWrapper({
     super.key,
     required this.child,
@@ -185,6 +100,7 @@ class AnimatedButtonWrapper extends StatelessWidget {
     this.borderRadius = const BorderRadius.all(Radius.circular(8)),
     this.duration = const Duration(milliseconds: 150),
   });
+
   final Widget child;
   final VoidCallback onTap;
   final double hoverScale;
@@ -196,9 +112,8 @@ class AnimatedButtonWrapper extends StatelessWidget {
   Widget build(BuildContext context) {
     final themeController = Get.find<ThemeController>();
     final effectiveHoverColor =
-        hoverColor ?? themeController.primaryColor.withValues(alpha:0.1);
+        hoverColor ?? themeController.primaryColor.withValues(alpha: 0.1);
 
-    // Skip hover effect on non-web platforms
     if (!kIsWeb) {
       return Material(
         color: Colors.transparent,
