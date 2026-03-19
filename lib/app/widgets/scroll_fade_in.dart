@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 /// Animates child widget when it first scrolls into the viewport.
-/// Uses a fade + slide-up effect triggered once per widget lifecycle.
 class ScrollFadeIn extends StatefulWidget {
   const ScrollFadeIn({
     super.key,
@@ -28,6 +27,7 @@ class _ScrollFadeInState extends State<ScrollFadeIn>
   late Animation<double> _opacity;
   late Animation<Offset> _slide;
   bool _triggered = false;
+  ScrollPosition? _scrollPosition;
 
   @override
   void initState() {
@@ -39,17 +39,39 @@ class _ScrollFadeInState extends State<ScrollFadeIn>
       begin: Offset(0, widget.offset),
       end: Offset.zero,
     ).animate(CurvedAnimation(parent: _controller, curve: widget.curve));
+
+    WidgetsBinding.instance.addPostFrameCallback((_) => _checkVisibility());
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Listen to the nearest scroll controller
+    _scrollPosition?.removeListener(_checkVisibility);
+    _scrollPosition = Scrollable.maybeOf(context)?.position;
+    _scrollPosition?.addListener(_checkVisibility);
   }
 
   @override
   void dispose() {
+    _scrollPosition?.removeListener(_checkVisibility);
     _controller.dispose();
     super.dispose();
   }
 
-  void _onVisibilityChanged(bool visible) {
-    if (visible && !_triggered) {
+  void _checkVisibility() {
+    if (_triggered || !mounted) return;
+
+    final renderBox = context.findRenderObject() as RenderBox?;
+    if (renderBox == null || !renderBox.hasSize) return;
+
+    final position = renderBox.localToGlobal(Offset.zero);
+    final screenHeight = MediaQuery.of(context).size.height;
+
+    if (position.dy < screenHeight * 0.9 && position.dy > -renderBox.size.height) {
       _triggered = true;
+      _scrollPosition?.removeListener(_checkVisibility);
+
       if (widget.delay == Duration.zero) {
         _controller.forward();
       } else {
@@ -61,32 +83,12 @@ class _ScrollFadeInState extends State<ScrollFadeIn>
   }
 
   @override
-  Widget build(BuildContext context) {
-    // Check visibility on every build using layout position
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted || _triggered) return;
-      final renderBox = context.findRenderObject() as RenderBox?;
-      if (renderBox == null || !renderBox.hasSize) return;
-
-      final position = renderBox.localToGlobal(Offset.zero);
-      final screenHeight = MediaQuery.of(context).size.height;
-
-      // Trigger when top of widget is within 85% of screen height
-      if (position.dy < screenHeight * 0.85 && position.dy > -renderBox.size.height) {
-        _onVisibilityChanged(true);
-      }
-    });
-
-    return AnimatedBuilder(
-      animation: _controller,
-      builder: (_, child) => Opacity(
-        opacity: _opacity.value,
-        child: Transform.translate(
-          offset: _slide.value,
-          child: child,
-        ),
-      ),
-      child: widget.child,
-    );
-  }
+  Widget build(BuildContext context) => AnimatedBuilder(
+    animation: _controller,
+    builder: (_, child) => Opacity(
+      opacity: _opacity.value,
+      child: Transform.translate(offset: _slide.value, child: child),
+    ),
+    child: widget.child,
+  );
 }
