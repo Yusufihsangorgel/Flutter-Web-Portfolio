@@ -150,19 +150,19 @@
     "skills": [
       {
         "category": "Mobile",
-        "items": ["Flutter", "Swift"]
+        "items": ["Flutter", "Dart", "Swift", "SwiftUI", "GetX", "BLoC", "Provider"]
       },
       {
         "category": "Backend",
-        "items": ["Node.js", "Express.js", "MongoDB", "SQLite", "MSSQL"]
+        "items": ["Node.js", "Express.js", "Go", "Spring Boot", "MongoDB", "MSSQL", "SQLite"]
       },
       {
         "category": "Frontend",
-        "items": ["HTML", "CSS", "JavaScript", "React"]
+        "items": ["React", "JavaScript", "TypeScript", "HTML", "CSS"]
       },
       {
         "category": "DevOps",
-        "items": ["AWS"]
+        "items": ["AWS", "Docker", "Git", "CI/CD", "Firebase"]
       }
     ],
     "languages": [
@@ -263,7 +263,7 @@
   "home_section": {
     "welcome": "Welcome to my portfolio",
     "title": "I'm Yusuf İhsan Görgel",
-    "subtitle": "Software Developer & UI/UX Designer",
+    "subtitle": "Software Engineer | Flutter & Cross-Platform Developer",
     "download_cv": "Download CV",
     "contact": "Contact"
   },

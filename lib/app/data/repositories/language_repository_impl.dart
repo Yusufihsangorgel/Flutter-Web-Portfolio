@@ -51,53 +51,108 @@ class LanguageRepositoryImpl implements ILanguageRepository {
   Future<Map<String, dynamic>> getTranslations(String languageCode) async => _assetsProvider.loadTranslations(languageCode);
 
   @override
-  Map<String, dynamic> getCVData(String languageCode) {
-    // TODO: Load from assets/data/cv_{languageCode}.json
-    return {
-      'skills': [
-        {'name': 'Flutter', 'level': 90, 'category': 'Mobile'},
-        {'name': 'Dart', 'level': 85, 'category': 'Programming'},
-        {'name': 'React', 'level': 80, 'category': 'Web'},
-        {'name': 'Node.js', 'level': 75, 'category': 'Backend'},
-      ],
-      'experience': [
-        {
-          'company': 'ABC Tech',
-          'position': 'Senior Developer',
-          'period': '2020-2023',
-          'description': 'Mobile application development',
-        },
-        {
-          'company': 'XYZ Software',
-          'position': 'Developer',
-          'period': '2018-2020',
-          'description': 'Web application development',
-        },
-      ],
-      'projects': [
-        {
-          'name': 'E-Commerce App',
-          'description': 'E-commerce application built with Flutter',
-          'technologies': ['Flutter', 'Firebase', 'GetX'],
-        },
-        {
-          'name': 'Portfolio Website',
-          'description': 'Personal portfolio website',
-          'technologies': ['React', 'Next.js', 'Tailwind CSS'],
-        },
-      ],
-      'education': [
-        {
-          'institution': 'ABC University',
-          'degree': 'Computer Engineering',
-          'period': '2014-2018',
-        },
-      ],
-      'languages': [
-        {'name': 'Turkish', 'level': 'Native'},
-        {'name': 'English', 'level': 'Advanced'},
-        {'name': 'German', 'level': 'Intermediate'},
-      ],
-    };
-  }
+  Map<String, dynamic> getCVData(String languageCode) => {
+    'personal_info': {
+      'name': 'Yusuf Ihsan Gorgel',
+      'title': 'Software Engineer',
+      'phone': '+90 544 953 0128',
+      'email': 'developeryusuf@icloud.com',
+      'github': 'https://github.com/Yusufihsangorgel',
+      'linkedin': 'https://linkedin.com/in/yusuf-ihsan-görgel/',
+      'location': 'Antalya, Turkey (Remote)',
+      'bio': 'Software Engineer with 4+ years of experience specializing in Flutter cross-platform development, backend systems with Node.js and Go, and DevOps with AWS. Experienced in ERP, POS, and mobile publishing platforms. Passionate about clean architecture, SOLID principles, and building scalable applications.',
+    },
+    'experiences': [
+      {
+        'company': 'Junius Tech',
+        'position': 'Full Stack Developer',
+        'position_tr': 'Full Stack Gelistirici',
+        'start_date': 'Jun 2023',
+        'end_date': 'Feb 2025',
+        'description': 'Led mobile development team on the Dorse logistics platform. Built Flutter apps deployed across Android, iOS, and web. Handled frontend, backend coordination, deployment pipelines, and QA processes.',
+        'description_tr': 'Dorse lojistik platformunda mobil gelistirme ekibine liderlik ettim. Flutter ile Android, iOS ve web uygulamalari gelistirdim.',
+        'technologies': ['Flutter', 'React', 'Node.js', 'WebSocket', 'REST API', 'Google Maps'],
+      },
+      {
+        'company': 'Uzman Adres',
+        'position': 'Flutter Developer',
+        'position_tr': 'Flutter Gelistirici',
+        'start_date': 'Mar 2022',
+        'end_date': 'Oct 2024',
+        'description': 'Developed FugaSoft POS and sales management system with Flutter. Built complex SQL architectures, real-time socket communication, and barcode scanning. Deployed on Android/iOS tablets and desktop (Linux, macOS, Windows).',
+        'description_tr': 'FugaSoft POS ve satis yonetim sistemini Flutter ile gelistirdim. Karmasik SQL mimarileri ve gercek zamanli soket iletisimi kurdum.',
+        'technologies': ['Flutter', 'SQLite', 'Drift', 'GetX', 'Socket.IO', 'MSSQL'],
+      },
+      {
+        'company': 'Promob TR',
+        'position': 'Flutter Developer (Freelance)',
+        'position_tr': 'Flutter Gelistirici (Serbest)',
+        'start_date': 'Oct 2022',
+        'end_date': 'Jun 2024',
+        'description': 'Built Aydinlik E-Newspaper and Bilim ve Utopya E-Magazine mobile apps. Implemented MVVM architecture with GetX state management and Dio networking. Published on Google Play and App Store.',
+        'description_tr': 'Aydinlik E-Gazete ve Bilim ve Utopya E-Dergi mobil uygulamalarini gelistirdim. Google Play ve App Store\'da yayinladim.',
+        'technologies': ['Flutter', 'GetX', 'Dio', 'MVVM', 'PHP', 'Laravel'],
+      },
+    ],
+    'projects': [
+      {
+        'title': 'FugaSoft',
+        'description': 'Cross-platform POS & Sales Management system. SQLite-Drift local DB, reactive programming with Mediator Pattern, i18n localization. Runs on Android/iOS tablets and desktop.',
+        'technologies': ['Flutter', 'SQLite', 'Drift', 'GetX'],
+        'url': 'https://fugasoft.com/',
+      },
+      {
+        'title': 'Dorse App',
+        'description': 'Logistics platform with mobile app and website. Google/Apple Maps integration, real-time WebSocket tracking, RESTful API architecture.',
+        'technologies': ['Flutter', 'React', 'WebSocket', 'Maps API'],
+        'url': {'website': 'https://dorseapp.com/', 'google_play': 'https://play.google.com/store/apps/details?id=com.juniustech.dorse'},
+      },
+      {
+        'title': 'Aydinlik E-Newspaper',
+        'description': 'Digital newspaper app with MVVM architecture, offline reading, and push notifications. Published on both app stores.',
+        'technologies': ['Flutter', 'GetX', 'Dio', 'MVVM'],
+        'url': {'google_play': 'https://play.google.com/store/apps/details?id=com.aydinlikgazetesi.egazete'},
+      },
+      {
+        'title': 'Bilim ve Utopya E-Magazine',
+        'description': 'Science magazine digital reading app with subscription management and content caching.',
+        'technologies': ['Flutter', 'GetX', 'Dio', 'MVVM'],
+        'url': {'google_play': 'https://play.google.com/store/apps/details?id=com.aydinlikgazetesi.edergi_v1_bvu'},
+      },
+    ],
+    'skills': [
+      {
+        'category': 'Mobile',
+        'items': ['Flutter', 'Dart', 'Swift', 'SwiftUI', 'GetX', 'BLoC', 'Provider'],
+      },
+      {
+        'category': 'Backend',
+        'items': ['Node.js', 'Express.js', 'Go', 'Spring Boot', 'MongoDB', 'MSSQL', 'SQLite'],
+      },
+      {
+        'category': 'Frontend',
+        'items': ['React', 'JavaScript', 'TypeScript', 'HTML', 'CSS'],
+      },
+      {
+        'category': 'DevOps',
+        'items': ['AWS', 'Docker', 'Git', 'CI/CD', 'Firebase'],
+      },
+    ],
+    'education': [
+      {
+        'school': 'Mehmet Akif Ersoy University',
+        'degree': 'Software Engineering',
+        'period': '2021 - 2025',
+      },
+      {
+        'school': 'Dursun Yalim Science High School',
+        'degree': 'Science',
+        'period': '2015 - 2020',
+      },
+    ],
+    'languages': [
+      {'name': 'Turkish', 'level': 'Native'},
+      {'name': 'English', 'level': 'B2'},
+    ],
+  };
 }

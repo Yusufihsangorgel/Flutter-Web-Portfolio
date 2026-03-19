@@ -41,7 +41,7 @@ class PortfolioFooter extends StatelessWidget {
               _SocialButton(
                 icon: Icons.email_outlined,
                 label: 'Email',
-                url: 'mailto:yusufihsan@example.com',
+                url: 'mailto:developeryusuf@icloud.com',
               ),
             ],
           ),

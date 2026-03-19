@@ -158,19 +158,19 @@
     "skills": [
       {
         "category": "Mobile",
-        "items": ["Flutter", "Swift"]
+        "items": ["Flutter", "Dart", "Swift", "SwiftUI", "GetX", "BLoC", "Provider"]
       },
       {
         "category": "Backend",
-        "items": ["Node.js", "Express.js", "MongoDB", "SQLite", "MSSQL"]
+        "items": ["Node.js", "Express.js", "Go", "Spring Boot", "MongoDB", "MSSQL", "SQLite"]
       },
       {
         "category": "Frontend",
-        "items": ["HTML", "CSS", "JavaScript", "React"]
+        "items": ["React", "JavaScript", "TypeScript", "HTML", "CSS"]
       },
       {
         "category": "DevOps",
-        "items": ["AWS"]
+        "items": ["AWS", "Docker", "Git", "CI/CD", "Firebase"]
       }
     ],
     "languages": [
@@ -272,7 +272,7 @@
   "home_section": {
     "welcome": "Portfolyoma hoş geldiniz",
     "title": "Ben Yusuf İhsan Görgel",
-    "subtitle": "Yazılım Geliştirici & UI/UX Tasarımcı",
+    "subtitle": "Yazilim Muhendisi | Flutter & Cross-Platform Gelistirici",
     "download_cv": "CV İndir",
     "contact": "İletişim"
   },
