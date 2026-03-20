@@ -344,7 +344,11 @@
   "about_section": {
     "title": "Sobre Mí",
     "bio": "Soy Ingeniero de Software con más de 4 años de experiencia especializado en aplicaciones móviles de calidad producción. Me enfoco en arquitectura, rendimiento y fiabilidad — apps multiplataforma con Flutter y nativas iOS/Android con Swift y Kotlin.",
-    "bio2": "Aquí hay algunas tecnologías con las que he trabajado recientemente:"
+    "bio2": "Aquí hay algunas tecnologías con las que he trabajado recientemente:",
+    "github_title": "Actividad GitHub",
+    "github_repos": "Repos",
+    "github_followers": "Seguidores",
+    "github_stars": "Estrellas"
   },
   "home_section": {
     "greeting": "Hola, mi nombre es",
@@ -394,5 +398,10 @@
   "skills_section": {
     "title": "Habilidades",
     "description": "Mis habilidades técnicas y áreas de experiencia"
+  },
+  "footer": {
+    "view_source": "Ver código fuente",
+    "command_hint_prefix": "Presione",
+    "command_hint_suffix": "para abrir la paleta de comandos"
   }
 }

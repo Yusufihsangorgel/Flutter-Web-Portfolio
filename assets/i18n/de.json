@@ -373,7 +373,11 @@
   "about_section": {
     "title": "Über Mich",
     "bio": "Ich bin Software-Ingenieur mit über 4 Jahren Erfahrung in der Entwicklung produktionsreifer mobiler Anwendungen. Mein Fokus liegt auf Architektur, Performance und Zuverlässigkeit — Cross-Platform-Apps mit Flutter und native iOS/Android mit Swift und Kotlin.",
-    "bio2": "Hier sind einige Technologien, mit denen ich kürzlich gearbeitet habe:"
+    "bio2": "Hier sind einige Technologien, mit denen ich kürzlich gearbeitet habe:",
+    "github_title": "GitHub Aktivität",
+    "github_repos": "Repos",
+    "github_followers": "Follower",
+    "github_stars": "Sterne"
   },
   "home_section": {
     "greeting": "Hallo, mein Name ist",
@@ -423,5 +427,10 @@
   "skills_section": {
     "title": "Fähigkeiten",
     "description": "Meine technischen Fähigkeiten und Fachgebiete"
+  },
+  "footer": {
+    "view_source": "Quellcode anzeigen",
+    "command_hint_prefix": "Drücken Sie",
+    "command_hint_suffix": "um die Befehlspalette zu öffnen"
   }
 }

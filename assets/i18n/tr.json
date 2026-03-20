@@ -367,7 +367,11 @@
   "about_section": {
     "title": "Hakkımda",
     "bio": "4+ yıllık deneyime sahip, production-grade mobil uygulamalar geliştirmeye odaklanan bir Yazılım Mühendisiyim. Mimari, performans ve güvenilirlik odaklı çalışıyorum — Flutter ile cross-platform, Swift ve Kotlin ile native iOS/Android uygulamalar geliştiriyorum.",
-    "bio2": "Son zamanlarda çalıştığım teknolojilerden bazıları:"
+    "bio2": "Son zamanlarda çalıştığım teknolojilerden bazıları:",
+    "github_title": "GitHub Aktivitesi",
+    "github_repos": "Repo",
+    "github_followers": "Takipçi",
+    "github_stars": "Yıldız"
   },
   "projects_section": {
     "title": "Projelerim",
@@ -420,5 +424,10 @@
   "skills_section": {
     "title": "Beceriler",
     "description": "Teknik yeteneklerim ve uzmanlık alanlarım"
+  },
+  "footer": {
+    "view_source": "Kaynak Kodu",
+    "command_hint_prefix": "Basın",
+    "command_hint_suffix": "komut paletini açmak için"
   }
 }

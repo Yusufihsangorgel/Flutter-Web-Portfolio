@@ -99,7 +99,20 @@ class _ConstellationParticlesState extends State<ConstellationParticles>
       ..repeat();
   }
 
-  // TODO: consider reducing particle count on low-end devices via MediaQuery.highContrast
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Reduce particle count for high-contrast / accessibility mode
+    // and for narrow (mobile) screens to improve performance.
+    final mq = MediaQuery.of(context);
+    var effectiveCount = widget.particleCount;
+    if (mq.highContrast) {
+      effectiveCount = (effectiveCount * 0.5).round();
+    }
+    if (effectiveCount != _particles.length && !_lastSize.isEmpty) {
+      _initParticles(_lastSize, count: effectiveCount);
+    }
+  }
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
@@ -120,10 +133,11 @@ class _ConstellationParticlesState extends State<ConstellationParticles>
 
   // -- Particle helpers -----------------------------------------------------
 
-  void _initParticles(Size size) {
+  void _initParticles(Size size, {int? count}) {
     if (size.isEmpty) return;
     final rng = math.Random(42);
-    _particles = List.generate(widget.particleCount, (_) => _Particle(
+    final effectiveCount = count ?? widget.particleCount;
+    _particles = List.generate(effectiveCount, (_) => _Particle(
         x: rng.nextDouble() * size.width,
         y: rng.nextDouble() * size.height,
         vx: (rng.nextDouble() - 0.5) * 0.4,

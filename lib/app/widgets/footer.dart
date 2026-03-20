@@ -160,7 +160,7 @@ class _ViewSourceLinkState extends State<_ViewSourceLink> {
         ),
         const SizedBox(width: 6),
         Text(
-          'View Source',
+          Get.find<LanguageController>().getText('footer.view_source', defaultValue: 'View Source'),
           style: GoogleFonts.jetBrainsMono(
             fontSize: 12,
             color: _hovered
@@ -183,11 +183,13 @@ class _CommandPaletteHint extends StatelessWidget {
         defaultTargetPlatform == TargetPlatform.macOS;
     final shortcut = isMac ? '\u2318K' : 'Ctrl+K';
 
+    final languageController = Get.find<LanguageController>();
+
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
         Text(
-          'Press ',
+          '${languageController.getText('footer.command_hint_prefix', defaultValue: 'Press')} ',
           style: GoogleFonts.jetBrainsMono(
             fontSize: 11,
             color: AppColors.textSecondary.withValues(alpha: 0.5),
@@ -211,7 +213,7 @@ class _CommandPaletteHint extends StatelessWidget {
           ),
         ),
         Text(
-          ' to open command palette',
+          ' ${languageController.getText('footer.command_hint_suffix', defaultValue: 'to open command palette')}',
           style: GoogleFonts.jetBrainsMono(
             fontSize: 11,
             color: AppColors.textSecondary.withValues(alpha: 0.5),

@@ -366,7 +366,11 @@
   "about_section": {
     "title": "About Me",
     "bio": "I'm a Software Engineer with 4+ years of experience specializing in production-grade mobile applications. I focus on architecture, performance, and reliability — building cross-platform apps with Flutter and native iOS/Android capabilities with Swift and Kotlin.",
-    "bio2": "Here are a few technologies I've been working with recently:"
+    "bio2": "Here are a few technologies I've been working with recently:",
+    "github_title": "GitHub Activity",
+    "github_repos": "Repos",
+    "github_followers": "Followers",
+    "github_stars": "Stars"
   },
   "projects_section": {
     "title": "My Projects",
@@ -419,5 +423,10 @@
   "skills_section": {
     "title": "Skills",
     "description": "My technical skills and areas of expertise"
+  },
+  "footer": {
+    "view_source": "View Source",
+    "command_hint_prefix": "Press",
+    "command_hint_suffix": "to open command palette"
   }
 }

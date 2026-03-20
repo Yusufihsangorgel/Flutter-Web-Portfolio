@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import 'package:flutter_web_portfolio/app/controllers/language_controller.dart';
 import 'package:flutter_web_portfolio/app/controllers/scene_director.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
 import 'package:flutter_web_portfolio/app/core/constants/breakpoints.dart';
@@ -82,12 +83,13 @@ class _GitHubActivityState extends State<GitHubActivity> {
           // Section label
           Obx(() {
             final accent = Get.find<SceneDirector>().currentAccent.value;
+            final languageController = Get.find<LanguageController>();
             return Row(
               children: [
                 Icon(Icons.code_rounded, color: accent, size: 20),
                 const SizedBox(width: 8),
                 Text(
-                  'GitHub Activity',
+                  languageController.getText('about_section.github_title', defaultValue: 'GitHub Activity'),
                   style: AppTypography.h2.copyWith(color: accent),
                 ),
               ],
@@ -133,6 +135,7 @@ class _StatsRow extends StatelessWidget {
 
     return Obx(() {
       final accent = Get.find<SceneDirector>().currentAccent.value;
+      final languageController = Get.find<LanguageController>();
       return Wrap(
         spacing: 16,
         runSpacing: 16,
@@ -171,9 +174,9 @@ class _StatsRow extends StatelessWidget {
                 ),
               ),
             ),
-          _StatChip(label: 'Repos', value: repos, accent: accent),
-          _StatChip(label: 'Followers', value: followers, accent: accent),
-          _StatChip(label: 'Stars', value: totalStars, accent: accent),
+          _StatChip(label: languageController.getText('about_section.github_repos', defaultValue: 'Repos'), value: repos, accent: accent),
+          _StatChip(label: languageController.getText('about_section.github_followers', defaultValue: 'Followers'), value: followers, accent: accent),
+          _StatChip(label: languageController.getText('about_section.github_stars', defaultValue: 'Stars'), value: totalStars, accent: accent),
         ],
       );
     });

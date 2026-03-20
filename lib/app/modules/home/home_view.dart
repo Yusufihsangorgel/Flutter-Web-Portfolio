@@ -157,7 +157,9 @@ class _HomeViewState extends State<HomeView> {
                         child: child,
                       );
                     },
-                    child: const ConstellationParticles(particleCount: 100),
+                    child: ConstellationParticles(
+                      particleCount: MediaQuery.sizeOf(context).width < 600 ? 60 : 100,
+                    ),
                   ),
                 ),
               ] else
