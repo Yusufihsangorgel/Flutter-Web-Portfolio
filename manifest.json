@@ -1,0 +1,35 @@
+{
+    "name": "Yusuf Ihsan Gorgel - Flutter Developer Portfolio",
+    "short_name": "YIG Portfolio",
+    "start_url": ".",
+    "display": "standalone",
+    "background_color": "#00101F",
+    "theme_color": "#00A3FF",
+    "description": "Interactive Flutter Web portfolio with cosmic theme, orbital skill visualization, and clean architecture.",
+    "orientation": "portrait-primary",
+    "prefer_related_applications": false,
+    "icons": [
+        {
+            "src": "icons/Icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "icons/Icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        },
+        {
+            "src": "icons/Icon-maskable-192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "maskable"
+        },
+        {
+            "src": "icons/Icon-maskable-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "maskable"
+        }
+    ]
+}

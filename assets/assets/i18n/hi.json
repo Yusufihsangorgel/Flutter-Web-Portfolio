@@ -1,0 +1,389 @@
+{
+  "app_name": "युसुफ इहसान गोरगेल - पोर्टफोलियो",
+  "theme": {
+    "primary_color": "#3F51B5",
+    "secondary_color": "#FF4081",
+    "background_color": {
+      "light": "#FFFFFF",
+      "dark": "#121212"
+    },
+    "surface_color": {
+      "light": "#F5F5F5",
+      "dark": "#1E1E1E"
+    },
+    "text_color": {
+      "light": "#212121",
+      "dark": "#FFFFFF"
+    }
+  },
+  "navigation": {
+    "items": [
+      { "id": "home", "title": "होम" },
+      { "id": "about", "title": "परिचय" },
+      { "id": "experience", "title": "अनुभव" },
+      { "id": "projects", "title": "प्रोजेक्ट्स" },
+      { "id": "skills", "title": "कौशल" },
+      { "id": "references", "title": "संदर्भ" },
+      { "id": "contact", "title": "संपर्क" }
+    ]
+  },
+  "translations": {
+    "app_name": "युसुफ इहसान गोरगेल - पोर्टफोलियो",
+    "home": "होम",
+    "about": "परिचय",
+    "experience": "अनुभव",
+    "projects": "प्रोजेक्ट्स",
+    "skills": "कौशल",
+    "references": "संदर्भ",
+    "contact": "संपर्क",
+    "explore_more": "और अन्वेषण करें",
+    "dark_mode": "डार्क मोड",
+    "light_mode": "लाइट मोड",
+    "personal_info": "व्यक्तिगत जानकारी",
+    "education": "शिक्षा",
+    "languages": "भाषाएँ",
+    "name": "नाम",
+    "email": "ईमेल",
+    "phone": "फोन",
+    "location": "स्थान",
+    "github": "GitHub",
+    "linkedin": "LinkedIn",
+    "send_message": "संदेश भेजें",
+    "contact_me": "मुझसे संपर्क करें",
+    "your_name": "आपका नाम",
+    "your_email": "आपका ईमेल",
+    "your_message": "आपका संदेश",
+    "send": "भेजें",
+    "subject": "विषय",
+    "portfolio_loading": "पोर्टफोलियो लोड हो रहा है...",
+    "error_name": "कृपया अपना नाम दर्ज करें",
+    "error_email": "कृपया एक वैध ईमेल पता दर्ज करें",
+    "error_subject": "कृपया एक विषय दर्ज करें",
+    "error_message": "कृपया अपना संदेश दर्ज करें"
+  },
+  "animations": {
+    "loading_animation": "assets/animations/loading.json",
+    "scroll_animation_duration": 500,
+    "page_transition_duration": 300
+  },
+  "social_links": {
+    "github": "https://github.com/Yusufihsangorgel",
+    "linkedin": "https://linkedin.com/in/yusuf-ihsan-görgel/"
+  },
+  "cv_data": {
+    "personal_info": {
+      "name": "युसुफ इहसान गोरगेल",
+      "title": "सॉफ्टवेयर इंजीनियर",
+      "phone": "+90 544 953 0128",
+      "email": "developeryusuf@icloud.com",
+      "github": "https://github.com/Yusufihsangorgel",
+      "linkedin": "https://linkedin.com/in/yusuf-ihsan-görgel/",
+      "bio": "नमस्ते, मैं युसुफ इहसान हूँ, 4 साल के अनुभव के साथ एक अंतिम वर्ष के सॉफ्टवेयर इंजीनियरिंग छात्र हूँ। मैंने अपने द्वितीय वर्ष में फ्रीलांसिंग शुरू की और तब से कॉर्पोरेट और स्टार्ट-अप दोनों वातावरणों में अनुभव प्राप्त किया है। मेरे पास Flutter का उपयोग करके मोबाइल, ERP और POS सॉफ्टवेयर विकास पर केंद्रित 3 साल का पेशेवर अनुभव है। मैंने विभिन्न फ्रीलांस प्रोजेक्ट्स में बैकएंड और DevOps भूमिकाओं पर भी काम किया है। मैं समस्या समाधान के प्रति उत्साही हूँ और सहयोगी टीम वातावरण में फलता-फूलता हूँ। मेरे पास परियोजना प्रबंधन के लिए Atlassian-Jira का उपयोग करने का एक ठोस पृष्ठभूमि है, दैनिक बैठकों, स्प्रिंट्स, स्क्रम और कड़ी समय सीमाओं को पूरा करने का अनुभव है।"
+    },
+    "experiences": [
+      {
+        "title": "फुल स्टैक डेवलपर",
+        "company": "Juniustech",
+        "period": "जून 2023 – फरवरी 2025",
+        "description": "मोबाइल टीम लीड (Dorse प्रोजेक्ट), विकास, तैनाती, फ्रंटएंड, बैकएंड और QA समन्वय।"
+      },
+      {
+        "title": "Flutter डेवलपर",
+        "company": "Uzman Adres",
+        "period": "मार्च 2022 – अक्टूबर 2024",
+        "description": "POS, बारकोड बिक्री, लेखा प्रबंधन प्रणाली, ERP; FugaSoft प्रोजेक्ट का फ्रंट-एंड, सॉकेट तकनीक और जटिल SQL आर्किटेक्चर।"
+      },
+      {
+        "title": "Flutter डेवलपर",
+        "company": "Promob TR",
+        "period": "अक्टूबर 2022 – जून 2024",
+        "description": "फ्रीलांस प्रोजेक्ट्स; \"Aydınlık E-Newspaper\" और \"Bilim ve Ütopya E-Magazine\" प्रोजेक्ट्स का फ्रंट-एंड (बैकएंड: PHP-Laravel या Node.js-Express.js-MongoDB)।"
+      }
+    ],
+    "projects": [
+      {
+        "title": "FugaSoft (पॉस - बिक्री प्रबंधन सॉफ्टवेयर)",
+        "description": "Flutter फ्रंट-एंड, SQLite-Drift, GetX, i18n, रिएक्टिव प्रोग्रामिंग; Android/iOS टैबलेट और डेस्कटॉप (Linux, macOS, Windows); मेंटर: Arge टीम लीड Abdüsselam Kösecik",
+        "url": "https://fugasoft.com/",
+        "image": "assets/images/fugasoft.png"
+      },
+      {
+        "title": "Aydınlık E-Newspaper",
+        "description": "Flutter फ्रंट-एंड, GetX, Dio, MVVM; मेंटर: सीनियर Ferhat Balaban",
+        "url": {
+          "google_play": "https://play.google.com/store/apps/details?id=com.aydinlikgazetesi.egazete&hl=tr",
+          "app_store": "https://apps.apple.com/us/app/ayd%C4%B1nl%C4%B1k-e-gazete/id1560103805"
+        },
+        "image": "assets/images/aydinlik.png"
+      },
+      {
+        "title": "Bilim ve Ütopya E-Magazine",
+        "description": "Flutter फ्रंट-एंड, GetX, Dio, MVVM; मेंटर: सीनियर Ferhat Balaban",
+        "url": {
+          "google_play": "https://play.google.com/store/apps/details?id=com.aydinlikgazetesi.edergi_v1_bvu&pcampaignid=web_share",
+          "app_store": "https://apps.apple.com/tr/app/bilim-ve-%C3%BCtopya-e-dergi/id6478221195"
+        },
+        "image": "assets/images/bilim_utopya.png"
+      },
+      {
+        "title": "Dorse App",
+        "description": "मोबाइल एप्लिकेशन और वेबसाइट दोनों; मोबाइल: Flutter; वेब: HTML, CSS, JavaScript, React; उपयोग की गई तकनीकें: RESTful API, SOLID, Google और Apple Maps एकीकरण, WebSocket",
+        "url": {
+          "website": "https://dorseapp.com/",
+          "google_play": "https://play.google.com/store/apps/details?id=com.juniustech.dorse",
+          "app_store": "https://apps.apple.com/tr/app/dorse/id6670605686"
+        },
+        "image": "assets/images/dorse.png"
+      }
+    ],
+    "education": [
+      {
+        "school": "मेहमेत अकिफ एरसॉय विश्वविद्यालय",
+        "degree": "सॉफ्टवेयर इंजीनियरिंग",
+        "period": "2021-2025"
+      },
+      {
+        "school": "दुरसुन यालिम साइंस हाई स्कूल",
+        "period": "2015-2020"
+      }
+    ],
+    "skills": [
+      {
+        "category": "मोबाइल",
+        "items": [
+          "Flutter",
+          "स्टेट मैनेजमेंट (GetX, Provider, Bloc)",
+          "RESTful API",
+          "WebSocket",
+          "लोकलाइजेशन",
+          "Google Maps",
+          "लोकल स्टोरेज",
+          "JWT प्रमाणीकरण",
+          "Swift"
+        ]
+      },
+      {
+        "category": "बैकएंड",
+        "items": ["Node.js", "Express.js", "MongoDB", "SQLite", "MSSQL"]
+      },
+      {
+        "category": "फ्रंटएंड",
+        "items": ["HTML", "CSS", "JavaScript", "React"]
+      },
+      {
+        "category": "DevOps",
+        "items": ["AWS"]
+      }
+    ],
+    "references": [
+      {
+        "name": "Abdüsselam Kösecik",
+        "title": "Arge टीम लीड",
+        "phone": "+90 542 819 80 69",
+        "linkedin": "https://www.linkedin.com/in/abdusselam-k%C3%B6secik-ab209327/"
+      },
+      {
+        "name": "Ferhat Balaban",
+        "title": "सीनियर कंप्यूटर इंजीनियर",
+        "phone": "+90 542 350 50 95",
+        "linkedin": "https://www.linkedin.com/in/balabanferhat/"
+      },
+      {
+        "name": "Emrah Türk",
+        "title": "सीनियर सॉफ्टवेयर डेवलपर",
+        "phone": "+90 551 956 03 91",
+        "linkedin": "https://www.linkedin.com/in/emrah-t%C3%BCrk/"
+      }
+    ],
+    "languages": [
+      {
+        "name": "तुर्की",
+        "level": "मातृभाषा"
+      },
+      {
+        "name": "अंग्रेज़ी",
+        "level": "B2"
+      }
+    ],
+    "testimonials": [
+      {
+        "quote": "यूसुफ लगातार स्वच्छ, अच्छी तरह से संरचित कोड प्रदान करता है। FugaSoft POS सिस्टम पर उनके काम ने रिएक्टिव आर्किटेक्चर और क्रॉस-प्लेटफॉर्म डिप्लॉयमेंट की असाधारण समझ दिखाई। एक विश्वसनीय टीम सदस्य जो जटिल समस्याओं की जिम्मेदारी लेता है।",
+        "name": "अब्दुसलाम कोसेसिक",
+        "position": "आर एंड डी टीम लीड",
+        "company": "उज़मान एड्रेस (फुगासॉफ्ट)"
+      },
+      {
+        "quote": "डोर्स लॉजिस्टिक्स प्लेटफॉर्म पर यूसुफ के साथ काम करना एक शानदार अनुभव था। उन्होंने मोबाइल टीम का प्रभावी नेतृत्व किया और iOS और Android दोनों पर WebSocket एकीकरण के साथ रियल-टाइम वाहन ट्रैकिंग प्रदान की। Flutter में उनकी तकनीकी गहराई उत्कृष्ट है।",
+        "name": "इमराह तुर्क",
+        "position": "वरिष्ठ सॉफ्टवेयर डेवलपर",
+        "company": "जूनियस टेक (डोर्स)"
+      },
+      {
+        "quote": "यूसुफ वास्तविक परियोजनाओं में सॉफ्टवेयर इंजीनियरिंग सिद्धांतों को सीखने और लागू करने की अपनी प्रेरणा के साथ अपने साथियों में अलग खड़ा था। उन्होंने अपनी पढ़ाई में जल्दी पेशेवर काम शुरू किया और शिक्षा और उद्योग अनुभव को उल्लेखनीय रूप से अच्छी तरह संतुलित किया।",
+        "name": "प्रो. डॉ. मेहमत कारा",
+        "position": "कंप्यूटर विज्ञान संकाय",
+        "company": "मेहमत आकिफ एरसॉय विश्वविद्यालय"
+      }
+    ],
+    "blog_posts": [
+      {
+        "title": "Flutter में Clean Architecture — SOLID सिद्धांतों का अनुप्रयोग",
+        "date": "2025-12-15",
+        "summary": "Flutter परियोजनाओं में Clean Architecture के कार्यान्वयन पर गहन नज़र। SOLID सिद्धांतों को लागू करके स्केलेबल और रखरखाव योग्य मोबाइल एप्लिकेशन बनाना।",
+        "readTime": "8 मिनट पढ़ें",
+        "tags": ["Flutter", "Architecture"],
+        "url": "https://medium.com/@developeryusuf"
+      },
+      {
+        "title": "SQLite-Drift के साथ क्रॉस-प्लेटफॉर्म POS सिस्टम बनाना",
+        "date": "2025-09-20",
+        "summary": "Flutter और SQLite-Drift का उपयोग करके प्रोडक्शन-ग्रेड POS सिस्टम कैसे बनाया। जटिल SQL क्वेरीज़, रिएक्टिव डेटा स्ट्रीम्स और ऑफ़लाइन-फर्स्ट आर्किटेक्चर।",
+        "readTime": "12 मिनट पढ़ें",
+        "tags": ["Flutter", "SQLite", "Mobile"],
+        "url": "https://medium.com/@developeryusuf"
+      },
+      {
+        "title": "लॉजिस्टिक्स ऐप्स में WebSocket रियल-टाइम ट्रैकिंग",
+        "date": "2025-06-10",
+        "summary": "Flutter में WebSocket के साथ रियल-टाइम वाहन ट्रैकिंग का कार्यान्वयन। हज़ारों समवर्ती उपयोगकर्ताओं के लिए Google और Apple Maps SDK एकीकरण।",
+        "readTime": "10 मिनट पढ़ें",
+        "tags": ["Flutter", "WebSocket", "Maps"],
+        "url": "https://medium.com/@developeryusuf"
+      }
+    ],
+    "contact": {
+      "form": {
+        "name_label": "नाम",
+        "email_label": "ईमेल",
+        "message_label": "संदेश",
+        "submit_button": "भेजें"
+      },
+      "success_message": "आपका संदेश सफलतापूर्वक भेजा गया है!",
+      "error_message": "एक त्रुटि हुई। कृपया पुनः प्रयास करें।"
+    }
+  },
+  "language_info": {
+    "code": "hi",
+    "name": "हिन्दी",
+    "flag": "🇮🇳",
+    "direction": "ltr"
+  },
+  "terminal": {
+    "title": "टर्मिनल",
+    "welcome_title": "युसुफ इहसान गोरगेल - टर्मिनल",
+    "welcome_text": "स्वागत है! उपलब्ध कमांड देखने के लिए 'help' टाइप करें।",
+    "help_hint": "सुझाव: उपलब्ध कमांड देखने के लिए 'help' टाइप करें",
+    "greeting": "टर्मिनल",
+    "type_help": "उपलब्ध कमांड देखने के लिए 'help' टाइप करें।",
+    "help_title": "उपलब्ध कमांड:",
+    "cleared": "टर्मिनल साफ़ किया गया...",
+    "command_not_found": "'%s' कमांड नहीं मिला। उपलब्ध कमांड देखने के लिए 'help' टाइप करें।",
+    "prefix": "> ",
+    "type_command": "एक कमांड टाइप करें...",
+    "url": {
+      "success": "लिंक ब्राउज़र में खुल रहा है...",
+      "error": "लिंक नहीं खुल सका",
+      "error_with_details": "लिंक खोलने में त्रुटि हुई"
+    },
+    "download_cv_start": "सीवी डाउनलोड शुरू हो रहा है...",
+    "download_cv_success": "सीवी डाउनलोड आपके ब्राउज़र में शुरू हो गया है।",
+    "download_cv_error": "सीवी डाउनलोड करने में त्रुटि हुई। कृपया बाद में पुनः प्रयास करें।",
+    "commands": {
+      "help": "उपलब्ध कमांड दिखाता है",
+      "about": "मेरी व्यक्तिगत जानकारी दिखाता है",
+      "skills": "मेरे तकनीकी कौशल दिखाता है",
+      "experience": "मेरा कार्य अनुभव दिखाता है",
+      "education": "मेरी शैक्षिक पृष्ठभूमि दिखाता है",
+      "projects": "मेरे पूर्ण किए गए प्रोजेक्ट्स दिखाता है",
+      "contact": "मेरी संपर्क जानकारी दिखाता है",
+      "social": "मेरे सोशल मीडिया अकाउंट्स दिखाता है",
+      "download_cv": "मेरा रेज्यूमे डाउनलोड करता है",
+      "clear": "टर्मिनल स्क्रीन साफ़ करता है",
+      "help_cmd": "help",
+      "about_cmd": "about",
+      "skills_cmd": "skills",
+      "experience_cmd": "experience",
+      "education_cmd": "education",
+      "projects_cmd": "projects",
+      "contact_cmd": "contact",
+      "social_cmd": "social",
+      "download_cv_cmd": "download-cv",
+      "clear_cmd": "clear"
+    },
+    "projects": {
+      "title": "मेरी परियोजनाएँ",
+      "untitled": "अनामांकित प्रोजेक्ट",
+      "not_found": "कोई प्रोजेक्ट नहीं मिला।"
+    },
+    "contact": {
+      "email": "ईमेल",
+      "phone": "फोन",
+      "location": "स्थान"
+    },
+    "social": {
+      "github": "GitHub",
+      "linkedin": "LinkedIn",
+      "twitter": "Twitter"
+    }
+  },
+  "nav": {
+    "home": "होम",
+    "about": "परिचय",
+    "skills": "कौशल",
+    "experience": "अनुभव",
+    "projects": "परियोजनाएँ",
+    "contact": "संपर्क",
+    "testimonials": "प्रशंसापत्र",
+    "blog": "ब्लॉग"
+  },
+  "about_section": {
+    "title": "मेरे बारे में",
+    "bio": "मैं 4+ वर्षों के अनुभव वाला सॉफ्टवेयर इंजीनियर हूँ, जो प्रोडक्शन-ग्रेड मोबाइल एप्लिकेशन विकसित करने में विशेषज्ञता रखता हूँ। मेरा ध्यान आर्किटेक्चर, प्रदर्शन और विश्वसनीयता पर है — Flutter के साथ क्रॉस-प्लेटफॉर्म और Swift व Kotlin के साथ नेटिव iOS/Android ऐप्स।",
+    "bio2": "यहाँ कुछ तकनीकें हैं जिनके साथ मैंने हाल ही में काम किया है:"
+  },
+  "home_section": {
+    "greeting": "नमस्ते, मेरा नाम है",
+    "title": "यूसुफ इहसान गोर्गेल।",
+    "subtitle": "मैं मोबाइल के लिए बनाता हूँ।",
+    "bio": "मैं एक सॉफ्टवेयर इंजीनियर हूँ जो प्रोडक्शन-ग्रेड मोबाइल एप्लिकेशन बनाने में विशेषज्ञता रखता हूँ। वर्तमान में Uzman Adres में Flutter के साथ क्रॉस-प्लेटफॉर्म विकास पर काम कर रहा हूँ।",
+    "view_work": "मेरा काम देखें",
+    "download_cv": "CV डाउनलोड करें",
+    "contact": "संपर्क"
+  },
+  "experience_section": {
+    "title": "मैंने कहाँ काम किया"
+  },
+  "projects_section": {
+    "title": "मेरी परियोजनाएँ",
+    "description": "प्रमुख परियोजनाएँ और पूर्ण किए गए कार्य"
+  },
+  "contact_section": {
+    "title": "संपर्क करें",
+    "whats_next": "आगे क्या?",
+    "description": "हालांकि मैं वर्तमान में कोई नई अवसर नहीं खोज रहा, मेरा इनबॉक्स हमेशा खुला है। चाहे आपका कोई सवाल हो या बस नमस्ते कहना हो, मैं जवाब देने की पूरी कोशिश करूँगा!",
+    "form": {
+      "name_label": "नाम",
+      "email_label": "ईमेल",
+      "message_label": "संदेश",
+      "submit_button": "संदेश भेजें",
+      "name_error": "कृपया अपना नाम दर्ज करें",
+      "email_error": "कृपया एक वैध ईमेल पता दर्ज करें",
+      "message_error": "कृपया अपना संदेश दर्ज करें",
+      "success": "आपका संदेश सफलतापूर्वक भेजा गया!",
+      "error": "एक त्रुटि हुई। कृपया पुनः प्रयास करें।",
+      "or_divider": "या सीधे संदेश भेजें"
+    }
+  },
+  "blog_section": {
+    "title": "ब्लॉग",
+    "subtitle": "मोबाइल विकास पर विचार, ट्यूटोरियल और अंतर्दृष्टि"
+  },
+  "testimonials_section": {
+    "title": "प्रशंसापत्र",
+    "subtitle": "उन सहकर्मियों और गुरुओं की प्रतिक्रिया जिनके साथ मैंने काम किया है"
+  },
+  "skills_section": {
+    "title": "कौशल",
+    "description": "मेरे तकनीकी कौशल और विशेषज्ञता के क्षेत्र"
+  }
+}
