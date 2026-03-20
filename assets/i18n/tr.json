@@ -128,7 +128,12 @@
         "title": "FugaSoft (Pos - Sales Management Software)",
         "description": "Flutter front-end, SQLite-Drift, GetX, i18n, reaktif programlama; Android/iOS tablet ve masaüstü (Linux, macOS, Windows); Mentor: Arge Team Lead Abdüsselam Kösecik",
         "url": "https://fugasoft.com/",
-        "image": "assets/images/fugasoft.png"
+        "image": "assets/images/fugasoft.png",
+        "case_study": {
+          "problem": "İşletmelerin Android/iOS tablet ve masaüstü platformlarında (Linux, macOS, Windows) güvenilir şekilde çalışan, karmaşık envanter yönetimi, barkod tarama ve çevrimdışı veri senkronizasyonu sunan birleşik bir POS ve satış yönetim sistemine ihtiyacı vardı.",
+          "solution": "Karmaşık yerel SQL sorguları için SQLite-Drift, Mediator Pattern ile reaktif durum yönetimi için GetX, gerçek zamanlı veri senkronizasyonu için socket teknolojisi ve çok dilli dağıtım için tam i18n desteği kullanılarak cross-platform Flutter uygulaması geliştirildi.",
+          "result": "5 platformda çalışan, reaktif veri akışları ve gerçek zamanlı barkod tarama ile karmaşık SQL mimarilerini yöneten, güvenilir çevrimdışı yeteneğe sahip production-grade POS sistemi teslim edildi."
+        }
       },
       {
         "title": "Aydınlık E-Newspaper",
@@ -137,7 +142,12 @@
           "google_play": "https://play.google.com/store/apps/details?id=com.aydinlikgazetesi.egazete&hl=tr",
           "app_store": "https://apps.apple.com/us/app/ayd%C4%B1nl%C4%B1k-e-gazete/id1560103805"
         },
-        "image": "assets/images/aydinlik.png"
+        "image": "assets/images/aydinlik.png",
+        "case_study": {
+          "problem": "Büyük bir Türk gazetesinin mobil kullanıcılar için sorunsuz sayfa görüntüleme, abonelik yönetimi ve çevrimdışı erişim sunan modern bir dijital okuma deneyimine ihtiyacı vardı.",
+          "solution": "MVVM mimarisi, GetX durum yönetimi ve API entegrasyonu için Dio kullanılarak Flutter mobil uygulaması geliştirildi. Sorunsuz okuma deneyimi için verimli sayfa görüntüleme ve önbellekleme uygulandı.",
+          "result": "Hem Google Play hem App Store'da yayınlanarak, binlerce okuyucuya iOS ve Android'de güvenilir ve performanslı bir dijital gazete deneyimi sunuldu."
+        }
       },
       {
         "title": "Bilim ve Ütopya E-Magazine",
@@ -146,7 +156,12 @@
           "google_play": "https://play.google.com/store/apps/details?id=com.aydinlikgazetesi.edergi_v1_bvu&pcampaignid=web_share",
           "app_store": "https://apps.apple.com/tr/app/bilim-ve-%C3%BCtopya-e-dergi/id6478221195"
         },
-        "image": "assets/images/bilim_utopya.png"
+        "image": "assets/images/bilim_utopya.png",
+        "case_study": {
+          "problem": "Bir bilim dergisi, okuyucuların aylık sayılara erişebileceği, aboneliklerini yönetebileceği ve zengin bilimsel içeriğin keyfini çıkarabileceği özel bir dijital platforma ihtiyaç duyuyordu.",
+          "solution": "Dio API entegrasyonu ile kanıtlanmış MVVM mimarisini paylaşan, dergi formatındaki içerik için yüksek kaliteli görsel işleme ve sayı navigasyonu ile optimize edilmiş Flutter uygulaması geliştirildi.",
+          "result": "Google Play ve App Store'da başarıyla yayınlanarak, bilim meraklılarına Bilim ve Ütopya dergisi için özel ve cilalı bir mobil okuma deneyimi sunuldu."
+        }
       },
       {
         "title": "Dorse App",
@@ -156,7 +171,12 @@
           "google_play": "https://play.google.com/store/apps/details?id=com.juniustech.dorse",
           "app_store": "https://apps.apple.com/tr/app/dorse/id6670605686"
         },
-        "image": "assets/images/dorse.png"
+        "image": "assets/images/dorse.png",
+        "case_study": {
+          "problem": "Lojistik sektörü, mobil platformlarda ve web'de çalışan, canlı konum güncellemeleri ve rota optimizasyonu sunan gerçek zamanlı araç takip ve filo yönetim çözümüne ihtiyaç duyuyordu.",
+          "solution": "WebSocket tabanlı gerçek zamanlı araç takibi, Google ve Apple Maps SDK entegrasyonu, SOLID prensiplerine uygun RESTful API mimarisi ve eşlik eden React web panosu ile Flutter kullanılarak mobil geliştirme yönetildi.",
+          "result": "Android, iOS ve web platformlarında dağıtılarak, lojistik şirketlerinin araçları gerçek zamanlı takip etmesini, rotaları optimize etmesini ve filoları yönetmesini sağlayan — güvenilir WebSocket bağlantılarıyla binlerce eşzamanlı kullanıcıya hizmet veren bir sistem sunuldu."
+        }
       }
     ],
     "education": [
@@ -330,7 +350,11 @@
     "description": "Tamamladığım başlıca projeler ve çalışmalarım",
     "untitled_project": "İsimsiz Proje",
     "technologies": "Teknolojiler",
-    "open_project": "Projeyi Aç"
+    "open_project": "Projeyi Aç",
+    "case_study_problem": "Zorluk",
+    "case_study_solution": "Yaklaşım",
+    "case_study_result": "Sonuç",
+    "links": "Bağlantılar"
   },
   "home_section": {
     "greeting": "Merhaba, ben",

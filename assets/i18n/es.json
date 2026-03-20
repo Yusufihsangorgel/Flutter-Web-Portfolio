@@ -117,7 +117,12 @@
       {
         "title": "FugaSoft (Software de Gestión POS)",
         "description": "Flutter front-end, SQLite-Drift, GetX, i18n, programación reactiva; tablet Android/iOS y escritorio (Linux, macOS, Windows)",
-        "url": "https://fugasoft.com/"
+        "url": "https://fugasoft.com/",
+        "case_study": {
+          "problem": "Las empresas necesitaban un sistema unificado de POS y gestion de ventas que funcionara de manera confiable en tablets Android/iOS y plataformas de escritorio (Linux, macOS, Windows) con gestion de inventario compleja, escaneo de codigos de barras y sincronizacion de datos sin conexion.",
+          "solution": "Se construyo una aplicacion Flutter multiplataforma usando SQLite-Drift para consultas SQL locales complejas, GetX para gestion de estado reactiva con patron Mediator, tecnologia socket para sincronizacion en tiempo real y soporte i18n completo.",
+          "result": "Se entrego un sistema POS de calidad produccion desplegado en 5 plataformas, manejando arquitecturas SQL complejas con flujos de datos reactivos y escaneo de codigos de barras en tiempo real — con capacidad offline-first confiable."
+        }
       },
       {
         "title": "Aydınlık E-Periódico",
@@ -125,6 +130,11 @@
         "url": {
           "google_play": "https://play.google.com/store/apps/details?id=com.aydinlikgazetesi.egazete&hl=tr",
           "app_store": "https://apps.apple.com/us/app/ayd%C4%B1nl%C4%B1k-e-gazete/id1560103805"
+        },
+        "case_study": {
+          "problem": "Un importante periodico turco necesitaba una experiencia de lectura digital moderna para usuarios moviles, con renderizado fluido de paginas, gestion de suscripciones y acceso sin conexion.",
+          "solution": "Se desarrollo una aplicacion Flutter con arquitectura MVVM, gestion de estado GetX y Dio para integracion API. Se implemento renderizado eficiente de paginas y cache para una experiencia de lectura fluida.",
+          "result": "Publicado en Google Play y App Store, proporcionando a miles de lectores una experiencia de periodico digital confiable y de alto rendimiento en iOS y Android."
         }
       },
       {
@@ -133,6 +143,11 @@
         "url": {
           "google_play": "https://play.google.com/store/apps/details?id=com.aydinlikgazetesi.edergi_v1_bvu",
           "app_store": "https://apps.apple.com/tr/app/bilim-ve-%C3%BCtopya-e-dergi/id6478221195"
+        },
+        "case_study": {
+          "problem": "Una revista cientifica necesitaba una plataforma digital dedicada para acceder a numeros mensuales, gestionar suscripciones y disfrutar de contenido cientifico rico en dispositivos moviles.",
+          "solution": "Se construyo una aplicacion Flutter con la arquitectura MVVM probada e integracion Dio API, optimizada para contenido en formato revista con renderizado de imagenes de alta calidad y navegacion entre numeros.",
+          "result": "Lanzado exitosamente en Google Play y App Store, brindando a los entusiastas de la ciencia una experiencia de lectura movil dedicada y pulida para la revista Bilim ve Utopya."
         }
       },
       {
@@ -142,6 +157,11 @@
           "website": "https://dorseapp.com/",
           "google_play": "https://play.google.com/store/apps/details?id=com.juniustech.dorse",
           "app_store": "https://apps.apple.com/tr/app/dorse/id6670605686"
+        },
+        "case_study": {
+          "problem": "La industria logistica necesitaba una solucion de seguimiento vehicular en tiempo real y gestion de flotas que funcione en plataformas moviles y web, con actualizaciones de ubicacion en vivo y optimizacion de rutas.",
+          "solution": "Se lidero el desarrollo movil usando Flutter con seguimiento vehicular en tiempo real basado en WebSocket, integracion de SDKs de Google y Apple Maps, arquitectura RESTful API siguiendo principios SOLID y un panel web React.",
+          "result": "Desplegado en Android, iOS y web, permitiendo a empresas logisticas rastrear vehiculos en tiempo real, optimizar rutas y gestionar flotas — sirviendo a miles de usuarios simultaneos con conexiones WebSocket confiables."
         }
       }
     ],
@@ -316,7 +336,11 @@
   },
   "projects_section": {
     "title": "Mis Proyectos",
-    "description": "Proyectos principales y trabajos completados"
+    "description": "Proyectos principales y trabajos completados",
+    "case_study_problem": "El Desafio",
+    "case_study_solution": "El Enfoque",
+    "case_study_result": "El Resultado",
+    "links": "Enlaces"
   },
   "contact_section": {
     "title": "Ponte en Contacto",

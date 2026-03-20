@@ -10,6 +10,7 @@ import 'package:flutter_web_portfolio/app/core/theme/app_typography.dart';
 import 'package:flutter_web_portfolio/app/utils/responsive_utils.dart';
 import 'package:flutter_web_portfolio/app/widgets/border_light_card.dart';
 import 'package:flutter_web_portfolio/app/widgets/cinematic_focusable.dart';
+import 'package:flutter_web_portfolio/app/widgets/project_detail_overlay.dart';
 import 'package:flutter_web_portfolio/app/widgets/scroll_fade_in.dart';
 
 /// Projects Section — "The Showcase"
@@ -106,11 +107,17 @@ class _ProjectCard extends StatelessWidget {
 
     return Obx(() {
       final accent = Get.find<SceneDirector>().currentAccent.value;
-      return BorderLightCard(
-        glowColor: accent,
-        child: isMobile
-            ? _buildMobileContent(title, description, technologies, url, accent)
-            : _buildDesktopContent(title, description, technologies, url, accent),
+      return GestureDetector(
+        onTap: () => ProjectDetailOverlay.show(context, project),
+        child: MouseRegion(
+          cursor: SystemMouseCursors.click,
+          child: BorderLightCard(
+            glowColor: accent,
+            child: isMobile
+                ? _buildMobileContent(title, description, technologies, url, accent)
+                : _buildDesktopContent(title, description, technologies, url, accent),
+          ),
+        ),
       );
     });
   }
