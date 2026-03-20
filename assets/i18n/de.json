@@ -68,7 +68,8 @@
   },
   "social_links": {
     "github": "https://github.com/Yusufihsangorgel",
-    "linkedin": "https://linkedin.com/in/yusuf-ihsan-görgel/"
+    "linkedin": "https://linkedin.com/in/yusuf-ihsan-görgel/",
+    "medium": "https://medium.com/@developeryusufihsan"
   },
   "cv_data": {
     "personal_info": {
@@ -78,7 +79,8 @@
       "email": "developeryusuf@icloud.com",
       "github": "https://github.com/Yusufihsangorgel",
       "linkedin": "https://linkedin.com/in/yusuf-ihsan-görgel/",
-      "bio": "Hallo, ich bin Yusuf İhsan, ein Software Engineering Student im letzten Jahr mit 4 Jahren Erfahrung. Ich begann in meinem zweiten Studienjahr als Freelancer zu arbeiten und habe seitdem Erfahrungen sowohl in Unternehmen als auch in Start-ups gesammelt. Ich habe 3 Jahre professionelle Erfahrung in der Entwicklung von Mobil-, ERP- und POS-Software mit Flutter. Ich habe auch als Backend- und DevOps-Entwickler in verschiedenen Freelance-Projekten gearbeitet. Ich löse leidenschaftlich gerne Probleme und gedeihe in kollaborativen Teamumgebungen. Ich habe fundierte Kenntnisse in der Verwendung von Atlassian-Jira für Projektmanagement, mit Erfahrung in täglichen Meetings, Sprints, Scrum und der Einhaltung enger Fristen."
+      "bio": "Hallo, ich bin Yusuf İhsan, ein Software Engineering Student im letzten Jahr mit 4 Jahren Erfahrung. Ich begann in meinem zweiten Studienjahr als Freelancer zu arbeiten und habe seitdem Erfahrungen sowohl in Unternehmen als auch in Start-ups gesammelt. Ich habe 3 Jahre professionelle Erfahrung in der Entwicklung von Mobil-, ERP- und POS-Software mit Flutter. Ich habe auch als Backend- und DevOps-Entwickler in verschiedenen Freelance-Projekten gearbeitet. Ich löse leidenschaftlich gerne Probleme und gedeihe in kollaborativen Teamumgebungen. Ich habe fundierte Kenntnisse in der Verwendung von Atlassian-Jira für Projektmanagement, mit Erfahrung in täglichen Meetings, Sprints, Scrum und der Einhaltung enger Fristen.",
+      "medium": "developeryusufihsan"
     },
     "experiences": [
       {
@@ -233,56 +235,6 @@
         "name": "Prof. Dr. Mehmet Kara",
         "position": "Informatik-Fakultaet",
         "company": "Mehmet Akif Ersoy Universitaet"
-      }
-    ],
-    "blog_posts": [
-      {
-        "title": "Aufbau eines cinematischen Portfolios mit Flutter Web",
-        "date": "2026-03-10",
-        "summary": "Ein tiefer Einblick in den Aufbau dieses Portfolios — scroll-gesteuerte Szenenuebergaenge mit Gradient-Mesh-Blending, raumgitterbasierte Partikelsysteme, benutzerdefinierte Cursor-Overlays und eine Befehlspalette. Wie ich eine saubere SOLID-Codebasis mit GetX, abstrakten Interface-Vertraegen und zentralisierten Design-Tokens aufgebaut habe, waehrend ich mit WASM-Unterstuetzung fuer Web ausgeliefert habe.",
-        "readTime": "12 Min. Lesezeit",
-        "tags": ["Flutter Web", "Animation", "Clean Architecture", "WASM"],
-        "url": "https://github.com/Yusufihsangorgel/Flutter-Web-Portfolio"
-      },
-      {
-        "title": "Offline-First POS-Architektur: Null Datenverlust ueber 5 Plattformen",
-        "date": "2025-11-15",
-        "summary": "Wie FugaSofts lokale SQLite-Drift-Datenbank taeglich ueber 100K Transaktionen mit bidirektionaler Synchronisation, Konfliktloesung und automatischen Wiederholungswarteschlangen verarbeitet. Wir haben dieselbe Flutter-Codebasis auf Android-Tablets, iPads, Linux-Terminals, macOS-Workstations und Windows-POS-Hardware deployed — jeweils mit plattformspezifischen Barcode-Scanner-Integrationen.",
-        "readTime": "15 Min. Lesezeit",
-        "tags": ["Flutter", "SQLite-Drift", "Offline-First", "Cross-Platform"],
-        "url": "https://github.com/Yusufihsangorgel"
-      },
-      {
-        "title": "Echtzeit-Flottenverfolgung: WebSocket im grossen Massstab mit Flutter",
-        "date": "2025-08-20",
-        "summary": "Einblick in Dorses Echtzeit-Logistikplattform — Verwaltung von ueber 5.000 gleichzeitigen WebSocket-Verbindungen fuer Live-Fahrzeugverfolgung. Ich behandle die ereignisgesteuerte Architektur, die Google/Apple Maps SDK-Integration fuer Routenrendering und wie wir eine Aktualisierungslatenz von unter 200ms vom GPS-Geraet zum Fahrerbildschirm erreicht haben. Einschliesslich Lehren aus dem Debugging von Verbindungsstuerme zu Spitzenzeiten.",
-        "readTime": "14 Min. Lesezeit",
-        "tags": ["WebSocket", "Maps SDK", "Echtzeit", "Flutter"],
-        "url": "https://github.com/Yusufihsangorgel"
-      },
-      {
-        "title": "Zustandsverwaltung in der Produktion: Skalierbare GetX-Muster",
-        "date": "2025-05-12",
-        "summary": "Nach dem Versand von 4 Produktions-Apps mit GetX — was ich anders machen wuerde. Reaktiver Zustand mit Rx vs. GetBuilder, wann Workers eingesetzt werden (ever/debounce/interval), korrekte Controller-Lebenszyklusverwaltung und die Dependency-Injection-Muster, die unsere 50K+-Zeilen-Codebasis testbar hielten. Mit einem Vergleich von BLoC und Riverpod fuer spezifische Anwendungsfaelle.",
-        "readTime": "11 Min. Lesezeit",
-        "tags": ["GetX", "Zustandsverwaltung", "Architektur", "Testing"],
-        "url": "https://github.com/Yusufihsangorgel"
-      },
-      {
-        "title": "Veroeffentlichung in 4 App Stores: Lehren aus dem Versand von E-Reader-Apps",
-        "date": "2025-02-28",
-        "summary": "Die Reise der gleichzeitigen Veroeffentlichung von Aydınlık E-Newspaper und Bilim ve Uetopya E-Magazine in Google Play und App Store. Von MVVM-Architekturentscheidungen mit GetX und Dio ueber PDF-Rendering im grossen Massstab, Push-Benachrichtigungs-Zustellraten bis hin zu den Fallstricken im Pruefprozess, die unsere erste iOS-Veroeffentlichung um 3 Wochen verzoegerten.",
-        "readTime": "9 Min. Lesezeit",
-        "tags": ["App Store", "Google Play", "MVVM", "Veroeffentlichung"],
-        "url": "https://github.com/Yusufihsangorgel"
-      },
-      {
-        "title": "CustomPaint im Detail: Ein Partikelsystem von Grund auf erstellen",
-        "date": "2026-01-05",
-        "summary": "Wie ich das Konstellations-Partikelsystem in diesem Portfolio gebaut habe — raumgitterbasierte Nachbarsuche fuer O(n)-Verbindungsrendering statt naivem O(n²), gecachte Paint-Objekte zur Eliminierung von GC-Druck bei 60fps, Maus-Abstossungsphysik und lebenszyklus-bewusste Animationscontroller, die pausieren, wenn der Tab in den Hintergrund geht. Performance-Profiling-Ergebnisse inklusive.",
-        "readTime": "13 Min. Lesezeit",
-        "tags": ["CustomPainter", "Performance", "Animation", "Dart"],
-        "url": "https://github.com/Yusufihsangorgel/Flutter-Web-Portfolio"
       }
     ],
     "contact": {

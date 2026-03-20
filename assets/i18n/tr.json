@@ -78,7 +78,8 @@
   },
   "social_links": {
     "github": "https://github.com/Yusufihsangorgel",
-    "linkedin": "https://linkedin.com/in/yusuf-ihsan-görgel/"
+    "linkedin": "https://linkedin.com/in/yusuf-ihsan-görgel/",
+    "medium": "https://medium.com/@developeryusufihsan"
   },
   "cv_data": {
     "personal_info": {
@@ -89,7 +90,8 @@
       "location": "Antalya, Türkiye (Remote)",
       "github": "https://github.com/Yusufihsangorgel",
       "linkedin": "https://linkedin.com/in/yusuf-ihsan-görgel/",
-      "bio": "4+ yıllık deneyime sahip, production-grade mobil uygulamalar geliştirmeye odaklanan bir Yazılım Mühendisiyim. Mimari, performans ve güvenilirlik odaklı çalışıyorum — Flutter ile cross-platform, Swift ve Kotlin ile native iOS/Android uygulamalar geliştiriyorum. Şu anda Uzman Adres'te FugaSoft üzerinde çalışıyorum."
+      "bio": "4+ yıllık deneyime sahip, production-grade mobil uygulamalar geliştirmeye odaklanan bir Yazılım Mühendisiyim. Mimari, performans ve güvenilirlik odaklı çalışıyorum — Flutter ile cross-platform, Swift ve Kotlin ile native iOS/Android uygulamalar geliştiriyorum. Şu anda Uzman Adres'te FugaSoft üzerinde çalışıyorum.",
+      "medium": "developeryusufihsan"
     },
     "experiences": [
       {
@@ -236,56 +238,6 @@
         "name": "Prof. Dr. Mehmet Kara",
         "position": "Bilgisayar Bilimleri Fakültesi",
         "company": "Mehmet Akif Ersoy Üniversitesi"
-      }
-    ],
-    "blog_posts": [
-      {
-        "title": "Flutter Web ile Sinematik Portföy Geliştirme",
-        "date": "2026-03-10",
-        "summary": "Bu portföyü derinlemesine inceliyorum — kaydırma ile tetiklenen sahne geçişleri, gradient mesh karışımları, uzamsal ızgara parçacık sistemleri, özel imleç katmanları ve komut paleti. GetX ile temiz SOLID kod tabanı, soyut arayüz kontratları ve merkezi tasarım tokenleri kullanarak WASM destekli web'e nasıl deploy ettim.",
-        "readTime": "12 dk okuma",
-        "tags": ["Flutter Web", "Animasyon", "Temiz Mimari", "WASM"],
-        "url": "https://github.com/Yusufihsangorgel/Flutter-Web-Portfolio"
-      },
-      {
-        "title": "Offline-First POS Mimarisi: 5 Platformda Sıfır Veri Kaybı",
-        "date": "2025-11-15",
-        "summary": "FugaSoft'un SQLite-Drift yerel veritabanının günlük 100K+ işlemi çift yönlü senkronizasyon, çakışma çözümü ve otomatik yeniden deneme kuyrukları ile nasıl yönettiği. Aynı Flutter kod tabanını Android tabletler, iPad'ler, Linux terminalleri, macOS iş istasyonları ve Windows POS donanımına — her birinde platforma özgü barkod tarayıcı entegrasyonlarıyla deploy ettik.",
-        "readTime": "15 dk okuma",
-        "tags": ["Flutter", "SQLite-Drift", "Offline-First", "Cross-Platform"],
-        "url": "https://github.com/Yusufihsangorgel"
-      },
-      {
-        "title": "Gerçek Zamanlı Filo Takibi: Flutter ile Ölçeklenebilir WebSocket",
-        "date": "2025-08-20",
-        "summary": "Dorse'un gerçek zamanlı lojistik platformunun içinden — canlı araç takibi için 5.000+ eşzamanlı WebSocket bağlantısının yönetimi. Olay güdümlü mimariyi, rota render için Google/Apple Maps SDK entegrasyonunu ve GPS cihazından sürücü ekranına <200ms güncelleme gecikmesini nasıl başardığımızı anlatıyorum. Yoğun saatlerde bağlantı fırtınalarını debug etmekten çıkarılan dersler dahil.",
-        "readTime": "14 dk okuma",
-        "tags": ["WebSocket", "Maps SDK", "Gerçek Zamanlı", "Flutter"],
-        "url": "https://github.com/Yusufihsangorgel"
-      },
-      {
-        "title": "Production'da Durum Yönetimi: Ölçeklenen GetX Kalıpları",
-        "date": "2025-05-12",
-        "summary": "4 production uygulamayı GetX ile gönderdikten sonra neleri farklı yapardım. Rx vs GetBuilder ile reaktif durum yönetimi, Workers ne zaman kullanılır (ever/debounce/interval), doğru controller yaşam döngüsü yönetimi ve 50K+ satırlık kod tabanımızı test edilebilir tutan bağımlılık enjeksiyonu kalıpları. Belirli kullanım durumları için BLoC ve Riverpod karşılaştırması dahil.",
-        "readTime": "11 dk okuma",
-        "tags": ["GetX", "Durum Yönetimi", "Mimari", "Test"],
-        "url": "https://github.com/Yusufihsangorgel"
-      },
-      {
-        "title": "4 Uygulama Mağazasına Yayınlama: E-Okuyucu Uygulamaları Deneyimleri",
-        "date": "2025-02-28",
-        "summary": "Aydınlık E-Gazete ve Bilim ve Ütopya E-Dergi'yi Google Play ve App Store'a eşzamanlı yayınlama yolculuğu. GetX ve Dio ile MVVM mimari kararlarından, ölçekte PDF render işlemeye, push bildirim teslim oranlarına ve ilk iOS sürümümüzü 3 hafta geciktiren inceleme süreci tuzaklarına kadar.",
-        "readTime": "9 dk okuma",
-        "tags": ["App Store", "Google Play", "MVVM", "Yayınlama"],
-        "url": "https://github.com/Yusufihsangorgel"
-      },
-      {
-        "title": "CustomPaint Derinlemesine: Sıfırdan Parçacık Sistemi Geliştirme",
-        "date": "2026-01-05",
-        "summary": "Bu portföydeki takımyıldızı parçacık sistemini nasıl geliştirdim — naif O(n²) yerine O(n) bağlantı render için uzamsal ızgara komşu aramaları, 60fps'de GC baskısını ortadan kaldırmak için önbelleğe alınmış Paint nesneleri, fare itme fiziği ve sekme arka plana alındığında duran yaşam döngüsü farkındalıklı animasyon controller'ları. Performans profilleme sonuçları dahil.",
-        "readTime": "13 dk okuma",
-        "tags": ["CustomPainter", "Performans", "Animasyon", "Dart"],
-        "url": "https://github.com/Yusufihsangorgel/Flutter-Web-Portfolio"
       }
     ],
     "contact": {
