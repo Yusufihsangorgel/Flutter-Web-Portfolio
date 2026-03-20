@@ -1,5 +1,6 @@
-import '../../domain/entities/project.dart';
+import 'package:flutter_web_portfolio/app/domain/entities/project.dart';
 
+/// JSON-backed project data model.
 final class ProjectModel extends Project {
   const ProjectModel({
     required super.id,
@@ -15,7 +16,7 @@ final class ProjectModel extends Project {
     id: json['id'] as String? ?? '',
     title: json['title'] as String? ?? '',
     description: json['description'] as String? ?? '',
-    technologies: List<String>.from(json['technologies'] ?? []),
+    technologies: List<String>.from((json['technologies'] as List?) ?? []),
     imageUrl: json['imageUrl'] as String? ?? '',
     liveUrl: json['liveUrl'] as String? ?? '',
     githubUrl: json['githubUrl'] as String? ?? '',

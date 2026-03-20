@@ -1,14 +1,15 @@
 import 'package:get/get.dart';
-import '../../domain/entities/project.dart';
-import '../../domain/repositories/i_project_repository.dart';
-import '../models/project_model.dart';
-import '../providers/assets_provider.dart';
+import 'package:flutter_web_portfolio/app/data/models/project_model.dart';
+import 'package:flutter_web_portfolio/app/domain/providers/i_assets_provider.dart';
+import 'package:flutter_web_portfolio/app/domain/entities/project.dart';
+import 'package:flutter_web_portfolio/app/domain/repositories/i_project_repository.dart';
 
+/// In-memory cached project repo backed by JSON assets.
 final class ProjectRepositoryImpl implements IProjectRepository {
 
-  ProjectRepositoryImpl({required AssetsProvider assetsProvider})
+  ProjectRepositoryImpl({required IAssetsProvider assetsProvider})
     : _assetsProvider = assetsProvider;
-  final AssetsProvider _assetsProvider;
+  final IAssetsProvider _assetsProvider;
   final RxList<ProjectModel> _cache = <ProjectModel>[].obs;
 
   @override
@@ -29,5 +30,4 @@ final class ProjectRepositoryImpl implements IProjectRepository {
     );
   }
 
-  void clearCache() => _cache.clear();
 }
