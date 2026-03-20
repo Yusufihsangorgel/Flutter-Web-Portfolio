@@ -15,7 +15,8 @@ import 'package:flutter_web_portfolio/app/widgets/scroll_fade_in.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 /// Blog Section — displays blog post cards loaded from i18n JSON.
-/// Responsive grid: 2 columns desktop, 1 column mobile.
+/// Responsive grid: 3 columns desktop (>=900px), 2 columns tablet (600-900px),
+/// 1 column mobile (<600px).
 class BlogSection extends StatelessWidget {
   const BlogSection({super.key});
 
@@ -108,7 +109,19 @@ class _BlogGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.sizeOf(context).width;
-    final crossAxisCount = screenWidth >= Breakpoints.tablet ? 2 : 1;
+    final int crossAxisCount;
+    final double childAspectRatio;
+
+    if (screenWidth >= Breakpoints.tablet) {
+      crossAxisCount = 3;
+      childAspectRatio = 1.0;
+    } else if (screenWidth >= Breakpoints.mobile) {
+      crossAxisCount = 2;
+      childAspectRatio = 1.3;
+    } else {
+      crossAxisCount = 1;
+      childAspectRatio = 1.6;
+    }
 
     return GridView.builder(
       shrinkWrap: true,
@@ -117,7 +130,7 @@ class _BlogGrid extends StatelessWidget {
         crossAxisCount: crossAxisCount,
         mainAxisSpacing: 20,
         crossAxisSpacing: 20,
-        childAspectRatio: crossAxisCount == 1 ? 1.6 : 1.3,
+        childAspectRatio: childAspectRatio,
       ),
       itemCount: blogPosts.length,
       itemBuilder: (context, index) => ScrollFadeIn(

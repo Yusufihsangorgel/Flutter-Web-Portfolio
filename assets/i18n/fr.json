@@ -247,28 +247,52 @@
     ],
     "blog_posts": [
       {
-        "title": "Creer un portfolio cinematique avec Flutter Web",
+        "title": "Construire un portfolio cinematique avec Flutter Web",
         "date": "2026-03-10",
-        "summary": "Comment j'ai concu et construit ce portfolio de zero avec Flutter Web — animations cinematiques, mises en page responsives, support i18n en 7 langues et un emulateur de terminal en surprise.",
-        "readTime": "8 min de lecture",
-        "tags": ["Flutter", "Web", "Animation"],
+        "summary": "Une plongee approfondie dans la construction de ce portfolio — transitions de scenes pilotees par le defilement avec melange de gradient mesh, systemes de particules a grille spatiale, overlays de curseur personnalises et une palette de commandes. Comment j'ai architecture une base de code SOLID propre avec GetX, des contrats d'interface abstraits et des design tokens centralises tout en deployant pour le web avec support WASM.",
+        "readTime": "12 min de lecture",
+        "tags": ["Flutter Web", "Animation", "Clean Architecture", "WASM"],
         "url": "https://github.com/Yusufihsangorgel/Flutter-Web-Portfolio"
       },
       {
-        "title": "Architecture POS multiplateforme avec SQLite-Drift",
-        "date": "2025-09-20",
-        "summary": "Les decisions d'architecture derriere FugaSoft — un systeme POS offline-first avec SQLite-Drift, gestion d'etat reactive et synchronisation sans perte de donnees sur 5 plateformes.",
-        "readTime": "12 min de lecture",
-        "tags": ["Flutter", "SQLite", "Architecture"],
-        "url": "#"
+        "title": "Architecture POS Offline-First : Zero perte de donnees sur 5 plateformes",
+        "date": "2025-11-15",
+        "summary": "Comment la base de donnees locale SQLite-Drift de FugaSoft gere plus de 100K transactions quotidiennes avec synchronisation bidirectionnelle, resolution de conflits et files d'attente de reessai automatiques. Nous avons deploye la meme base de code Flutter sur tablettes Android, iPads, terminaux Linux, stations macOS et materiel POS Windows — chacun avec des integrations de lecteurs de codes-barres specifiques a la plateforme.",
+        "readTime": "15 min de lecture",
+        "tags": ["Flutter", "SQLite-Drift", "Offline-First", "Multiplateforme"],
+        "url": "https://github.com/Yusufihsangorgel"
       },
       {
-        "title": "Suivi vehiculaire en temps reel avec WebSocket dans Flutter",
-        "date": "2025-06-10",
-        "summary": "Comment nous avons implemente le suivi vehiculaire en temps reel pour la plateforme logistique Dorse — architecture WebSocket, integration Google et Apple Maps et gestion de 5 000+ connexions simultanees.",
-        "readTime": "10 min de lecture",
-        "tags": ["Flutter", "WebSocket", "Maps"],
-        "url": "#"
+        "title": "Suivi de flotte en temps reel : WebSocket a grande echelle avec Flutter",
+        "date": "2025-08-20",
+        "summary": "Dans les coulisses de la plateforme logistique temps reel de Dorse — gestion de plus de 5 000 connexions WebSocket simultanees pour le suivi vehiculaire en direct. Je couvre l'architecture evenementielle, l'integration des SDK Google/Apple Maps pour le rendu d'itineraires, et comment nous avons atteint une latence de mise a jour inferieure a 200ms du GPS au ecran du conducteur. Y compris les lecons tirees du debogage des tempetes de connexions aux heures de pointe.",
+        "readTime": "14 min de lecture",
+        "tags": ["WebSocket", "Maps SDK", "Temps Reel", "Flutter"],
+        "url": "https://github.com/Yusufihsangorgel"
+      },
+      {
+        "title": "Gestion d'etat en production : les patterns GetX qui passent a l'echelle",
+        "date": "2025-05-12",
+        "summary": "Apres avoir deploye 4 applications en production avec GetX, voici ce que je ferais differemment. Etat reactif avec Rx vs GetBuilder, quand utiliser les Workers (ever/debounce/interval), gestion correcte du cycle de vie des controllers, et les patterns d'injection de dependances qui ont garde notre base de code de 50K+ lignes testable. Inclut une comparaison avec BLoC et Riverpod pour des cas d'usage specifiques.",
+        "readTime": "11 min de lecture",
+        "tags": ["GetX", "Gestion d'Etat", "Architecture", "Tests"],
+        "url": "https://github.com/Yusufihsangorgel"
+      },
+      {
+        "title": "Publier sur 4 stores : lecons du deploiement d'applications de lecture",
+        "date": "2025-02-28",
+        "summary": "Le parcours de publication simultanee d'Aydınlık E-Newspaper et Bilim ve Utopya E-Magazine sur Google Play et App Store. Des decisions d'architecture MVVM avec GetX et Dio, au rendu PDF a grande echelle, aux taux de livraison des notifications push, et aux pieges du processus de validation qui ont retarde notre premiere sortie iOS de 3 semaines.",
+        "readTime": "9 min de lecture",
+        "tags": ["App Store", "Google Play", "MVVM", "Publication"],
+        "url": "https://github.com/Yusufihsangorgel"
+      },
+      {
+        "title": "CustomPaint en profondeur : construire un systeme de particules de zero",
+        "date": "2026-01-05",
+        "summary": "Comment j'ai construit le systeme de particules constellation dans ce portfolio — recherche de voisins par grille spatiale pour un rendu de connexions en O(n) au lieu d'un naif O(n²), objets Paint caches pour eliminer la pression du GC a 60fps, physique de repulsion de la souris, et controleurs d'animation sensibles au cycle de vie qui se mettent en pause quand l'onglet est en arriere-plan. Resultats de profilage de performance inclus.",
+        "readTime": "13 min de lecture",
+        "tags": ["CustomPainter", "Performance", "Animation", "Dart"],
+        "url": "https://github.com/Yusufihsangorgel/Flutter-Web-Portfolio"
       }
     ],
     "contact": {
@@ -400,7 +424,7 @@
   },
   "blog_section": {
     "title": "Blog",
-    "subtitle": "Reflexions, tutoriels et perspectives sur le developpement mobile"
+    "subtitle": "Analyses techniques approfondies, decisions d'architecture et retours d'experience sur le deploiement d'applications Flutter en production"
   },
   "testimonials_section": {
     "title": "Témoignages",

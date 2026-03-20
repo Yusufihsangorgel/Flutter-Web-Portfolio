@@ -232,26 +232,50 @@
       {
         "title": "Building a Cinematic Portfolio with Flutter Web",
         "date": "2026-03-10",
-        "summary": "How I designed and built this portfolio from scratch using Flutter Web — cinematic animations, responsive layouts, i18n support across 7 languages, and a terminal emulator Easter egg.",
-        "readTime": "8 min read",
-        "tags": ["Flutter", "Web", "Animation"],
+        "summary": "A deep dive into building this portfolio — scroll-driven scene transitions with gradient mesh blending, spatial-grid particle systems, custom cursor overlays, and a command palette. How I architected a clean SOLID codebase with GetX, abstract interface contracts, and centralized design tokens while shipping to web with WASM support.",
+        "readTime": "12 min read",
+        "tags": ["Flutter Web", "Animation", "Clean Architecture", "WASM"],
         "url": "https://github.com/Yusufihsangorgel/Flutter-Web-Portfolio"
       },
       {
-        "title": "Cross-Platform POS Architecture with SQLite-Drift",
-        "date": "2025-09-20",
-        "summary": "Architecture decisions behind FugaSoft — building an offline-first POS system with SQLite-Drift, reactive state management, and zero-data-loss sync across 5 platforms.",
-        "readTime": "12 min read",
-        "tags": ["Flutter", "SQLite", "Architecture"],
-        "url": "#"
+        "title": "Offline-First POS Architecture: Zero Data Loss Across 5 Platforms",
+        "date": "2025-11-15",
+        "summary": "How FugaSoft's SQLite-Drift local database handles 100K+ daily transactions with bidirectional sync, conflict resolution, and automatic retry queues. We deployed the same Flutter codebase to Android tablets, iPads, Linux terminals, macOS workstations, and Windows POS hardware — each with platform-specific barcode scanner integrations.",
+        "readTime": "15 min read",
+        "tags": ["Flutter", "SQLite-Drift", "Offline-First", "Cross-Platform"],
+        "url": "https://github.com/Yusufihsangorgel"
       },
       {
-        "title": "Real-Time Vehicle Tracking with WebSocket in Flutter",
-        "date": "2025-06-10",
-        "summary": "How we implemented real-time vehicle tracking for the Dorse logistics platform — WebSocket architecture, Google and Apple Maps integration, and handling 5,000+ concurrent connections.",
-        "readTime": "10 min read",
-        "tags": ["Flutter", "WebSocket", "Maps"],
-        "url": "#"
+        "title": "Real-Time Fleet Tracking: WebSocket at Scale with Flutter",
+        "date": "2025-08-20",
+        "summary": "Inside Dorse's real-time logistics platform — handling 5,000+ concurrent WebSocket connections for live vehicle tracking. I cover the event-driven architecture, Google/Apple Maps SDK integration for route rendering, and how we achieved <200ms update latency from GPS device to driver's screen. Includes lessons learned from debugging connection storms during peak hours.",
+        "readTime": "14 min read",
+        "tags": ["WebSocket", "Maps SDK", "Real-Time", "Flutter"],
+        "url": "https://github.com/Yusufihsangorgel"
+      },
+      {
+        "title": "State Management in Production: GetX Patterns That Scale",
+        "date": "2025-05-12",
+        "summary": "After shipping 4 production apps with GetX, here's what I'd do differently. Reactive state with Rx vs GetBuilder, when to use Workers (ever/debounce/interval), proper controller lifecycle management, and the dependency injection patterns that kept our 50K+ line codebase testable. Includes a comparison with BLoC and Riverpod for specific use cases.",
+        "readTime": "11 min read",
+        "tags": ["GetX", "State Management", "Architecture", "Testing"],
+        "url": "https://github.com/Yusufihsangorgel"
+      },
+      {
+        "title": "Publishing to 4 App Stores: Lessons from Shipping E-Reader Apps",
+        "date": "2025-02-28",
+        "summary": "The journey of publishing Aydınlık E-Newspaper and Bilim ve Ütopya E-Magazine to Google Play and App Store simultaneously. From MVVM architecture decisions with GetX and Dio, to handling PDF rendering at scale, push notification delivery rates, and the review process gotchas that delayed our first iOS release by 3 weeks.",
+        "readTime": "9 min read",
+        "tags": ["App Store", "Google Play", "MVVM", "Publishing"],
+        "url": "https://github.com/Yusufihsangorgel"
+      },
+      {
+        "title": "Custom Paint Deep Dive: Building a Particle System from Scratch",
+        "date": "2026-01-05",
+        "summary": "How I built the constellation particle system in this portfolio — spatial grid neighbor lookups for O(n) connection rendering instead of naive O(n²), cached Paint objects to eliminate GC pressure at 60fps, mouse-repulsion physics, and lifecycle-aware animation controllers that pause when the tab is backgrounded. Performance profiling results included.",
+        "readTime": "13 min read",
+        "tags": ["CustomPainter", "Performance", "Animation", "Dart"],
+        "url": "https://github.com/Yusufihsangorgel/Flutter-Web-Portfolio"
       }
     ],
     "contact": {
@@ -386,7 +410,7 @@
   },
   "blog_section": {
     "title": "Blog",
-    "subtitle": "Thoughts, tutorials, and insights on mobile development"
+    "subtitle": "Technical deep dives, architecture decisions, and lessons from shipping production Flutter apps"
   },
   "testimonials_section": {
     "title": "What People Say",
