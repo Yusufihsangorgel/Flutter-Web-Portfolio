@@ -21,6 +21,7 @@ dependencies:
   # UI components
   google_fonts: ^6.1.0
   url_launcher: ^6.2.2
+  http: ^1.2.2
 
   # Responsive layout (reserved)
 
@@ -29,6 +30,7 @@ dependencies:
 
   # Storage
   shared_preferences: ^2.2.2
+  web: ^1.1.1
 
 dev_dependencies:
   flutter_test:

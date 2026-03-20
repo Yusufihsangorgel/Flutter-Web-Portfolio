@@ -2,13 +2,21 @@ import 'dart:async';
 import 'dart:developer' as dev;
 import 'dart:math' as math;
 
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import 'package:flutter_web_portfolio/app/core/constants/app_dimensions.dart';
 import 'package:flutter_web_portfolio/app/core/constants/durations.dart';
+import 'package:flutter_web_portfolio/app/routes/app_pages.dart';
+import 'package:flutter_web_portfolio/app/utils/web_url_strategy.dart'
+    as url_strategy;
 
 /// Owns the main ScrollController, tracks section offsets, and drives smooth-scroll.
+///
+/// Deep-linking: keeps the browser URL in sync with the visible section and
+/// scrolls to the correct section when the page is loaded via a direct URL or
+/// browser back/forward navigation.
 class AppScrollController extends GetxController with WidgetsBindingObserver {
   static AppScrollController get to => Get.find();
 
@@ -27,25 +35,88 @@ class AppScrollController extends GetxController with WidgetsBindingObserver {
 
   Timer? _debounceTimer;
 
+  /// Pending section to scroll to on first layout (set from initial URL).
+  String? _pendingSection;
+
+  /// Dispose function for the browser popstate listener.
+  void Function()? _disposePopState;
+
   @override
   void onInit() {
     super.onInit();
+
+    // Determine initial section from URL before any frame renders.
+    _readInitialRoute();
+
     WidgetsBinding.instance
       ..addObserver(this)
       ..addPostFrameCallback((_) {
         _updateSectionInfo();
       });
     scrollController.addListener(_handleScroll);
+
+    // Listen to activeSection changes and push URL updates.
+    ever(activeSection, _onActiveSectionChanged);
+
+    // Listen for browser back/forward.
+    if (kIsWeb) {
+      _disposePopState = url_strategy.onPopState(_onBrowserNavigation);
+    }
   }
 
   @override
   void onClose() {
     WidgetsBinding.instance.removeObserver(this);
     _debounceTimer?.cancel();
+    _disposePopState?.call();
     scrollController
       ..removeListener(_handleScroll)
       ..dispose();
     super.onClose();
+  }
+
+  // ---------------------------------------------------------------------------
+  // Deep-link helpers
+  // ---------------------------------------------------------------------------
+
+  /// Reads the initial URL hash and stores the target section for deferred scroll.
+  void _readInitialRoute() {
+    if (!kIsWeb) return;
+
+    final hash = url_strategy.getUrlHash();
+    if (hash.isNotEmpty && Routes.sectionIds.contains(hash)) {
+      _pendingSection = hash;
+      activeSection.value = hash;
+    }
+  }
+
+  /// Scrolls to the pending section once layout is ready.
+  ///
+  /// Called from [HomeView] after its first frame to guarantee that all
+  /// section GlobalKeys are attached before we attempt to scroll.
+  void handleInitialDeepLink() {
+    final target = _pendingSection;
+    _pendingSection = null;
+    if (target == null || target == 'home') return;
+
+    _updateSectionInfo();
+    // Short delay ensures section render boxes have valid sizes.
+    Future.delayed(const Duration(milliseconds: 100), () {
+      scrollToSection(target);
+    });
+  }
+
+  /// Pushes a new browser URL when the active section changes.
+  void _onActiveSectionChanged(String section) {
+    if (!kIsWeb) return;
+    url_strategy.setUrlHash(section);
+  }
+
+  /// Called when the user presses browser back/forward.
+  void _onBrowserNavigation(String hash) {
+    final section =
+        (hash.isNotEmpty && Routes.sectionIds.contains(hash)) ? hash : 'home';
+    scrollToSection(section);
   }
 
   @override
