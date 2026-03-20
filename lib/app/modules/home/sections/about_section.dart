@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -328,8 +330,26 @@ class _FlashlightPhotoState extends State<_FlashlightPhoto> {
   Offset _mousePos = const Offset(0.5, 0.5);
   bool _hovered = false;
 
+  /// Max tilt angle in radians (3 degrees).
+  static const double _maxTilt = 3.0 * math.pi / 180.0;
+
   @override
-  Widget build(BuildContext context) => MouseRegion(
+  Widget build(BuildContext context) {
+    // Normalized values centered around 0 (-1 to 1 range)
+    final dx = (_mousePos.dx - 0.5) * 2.0;
+    final dy = (_mousePos.dy - 0.5) * 2.0;
+
+    // Tilt transform: rotateY follows horizontal, rotateX follows vertical
+    final tiltTransform = Matrix4.identity()
+      ..setEntry(3, 2, 0.001) // perspective
+      ..rotateY(_hovered ? dx * _maxTilt : 0)
+      ..rotateX(_hovered ? -dy * _maxTilt : 0);
+
+    // Shadow shifts opposite to tilt direction
+    final shadowOffsetX = _hovered ? -dx * 8.0 : 0.0;
+    final shadowOffsetY = _hovered ? -dy * 8.0 : 0.0;
+
+    return MouseRegion(
       onEnter: (_) => setState(() => _hovered = true),
       onHover: (e) {
         final box = context.findRenderObject() as RenderBox?;
@@ -348,14 +368,23 @@ class _FlashlightPhotoState extends State<_FlashlightPhoto> {
       child: AnimatedContainer(
         duration: AppDurations.medium,
         curve: CinematicCurves.hoverLift,
+        transform: tiltTransform,
+        transformAlignment: Alignment.center,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(8),
           boxShadow: _hovered
               ? [
                   BoxShadow(
-                    color: AppColors.heroAccent.withValues(alpha: 0.1),
+                    color: AppColors.heroAccent.withValues(alpha: 0.12),
                     blurRadius: 30,
                     spreadRadius: 0,
+                    offset: Offset(shadowOffsetX, shadowOffsetY),
+                  ),
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.3),
+                    blurRadius: 20,
+                    spreadRadius: -4,
+                    offset: Offset(shadowOffsetX * 0.5, shadowOffsetY * 0.5),
                   ),
                 ]
               : [],
@@ -397,4 +426,5 @@ class _FlashlightPhotoState extends State<_FlashlightPhoto> {
         ),
       ),
     );
+  }
 }
