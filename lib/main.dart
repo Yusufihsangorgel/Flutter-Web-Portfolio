@@ -28,6 +28,8 @@ void main() {
         dev.log('Flutter error', name: 'Main', error: details.exception);
       };
 
+      _printConsoleAsciiArt();
+
       AppBindings().dependencies();
 
       final loadingController = Get.put(LoadingController(), permanent: true);
@@ -48,6 +50,28 @@ void main() {
       dev.log('Uncaught error', name: 'Main', error: error, stackTrace: stack);
     },
   );
+}
+
+void _printConsoleAsciiArt() {
+  if (kIsWeb) {
+    // ignore: avoid_print
+    print('''
+
+ __   __  _______  _______
+|  | |  ||       ||       |
+|  |_|  ||    ___||    ___|
+|       ||   | __ |   | __
+|_     _||   ||  ||   ||  |
+  |   |  |   |_| ||   |_| |
+  |___|  |_______||_______|
+
+  Yusuf Ihsan Gorgel
+  Mobile Software Engineer
+  -------------------------
+  Psst... try Ctrl+K
+
+''');
+  }
 }
 
 Future<void> initializeApp(LoadingController loadingController) async {

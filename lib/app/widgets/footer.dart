@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show defaultTargetPlatform, TargetPlatform;
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -47,6 +48,8 @@ class PortfolioFooter extends StatelessWidget {
                 color: AppColors.textSecondary,
               ),
             ),
+            const SizedBox(height: 12),
+            const _CommandPaletteHint(),
           ],
         ),
       );
@@ -98,4 +101,53 @@ class _SocialLinkState extends State<_SocialLink> {
       ),
     )),
   );
+}
+
+/// Subtle keyboard shortcut hint for the command palette.
+class _CommandPaletteHint extends StatelessWidget {
+  const _CommandPaletteHint();
+
+  @override
+  Widget build(BuildContext context) {
+    final isMac =
+        defaultTargetPlatform == TargetPlatform.macOS;
+    final shortcut = isMac ? '\u2318K' : 'Ctrl+K';
+
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          'Press ',
+          style: GoogleFonts.jetBrainsMono(
+            fontSize: 11,
+            color: AppColors.textSecondary.withValues(alpha: 0.6),
+          ),
+        ),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.05),
+            borderRadius: BorderRadius.circular(3),
+            border: Border.all(
+              color: Colors.white.withValues(alpha: 0.1),
+            ),
+          ),
+          child: Text(
+            shortcut,
+            style: GoogleFonts.jetBrainsMono(
+              fontSize: 11,
+              color: AppColors.textSecondary.withValues(alpha: 0.8),
+            ),
+          ),
+        ),
+        Text(
+          ' to open command palette',
+          style: GoogleFonts.jetBrainsMono(
+            fontSize: 11,
+            color: AppColors.textSecondary.withValues(alpha: 0.6),
+          ),
+        ),
+      ],
+    );
+  }
 }
