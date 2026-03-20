@@ -1,5 +1,6 @@
 name: flutter_web_portfolio
 description: 'Modern and responsive Flutter web portfolio application.'
+repository: https://github.com/Yusufihsangorgel/Flutter-Web-Portfolio
 publish_to: 'none'
 
 version: 1.0.0+1
@@ -14,23 +15,14 @@ dependencies:
     sdk: flutter
   flutter_i18n: ^0.36.2
 
-  cupertino_icons: ^1.0.8
-
   # State management & navigation
   get: ^4.6.6
 
   # UI components
   google_fonts: ^6.1.0
-  flutter_svg: ^2.0.9
   url_launcher: ^6.2.2
-  lottie: ^3.1.0
 
-  # Animations
-  percent_indicator: ^4.2.3
-  timeline_tile: ^2.0.0
-
-  # Responsive layout
-  responsive_framework: ^1.1.1
+  # Responsive layout (reserved)
 
   # Localization
   intl: ^0.20.2
@@ -38,29 +30,10 @@ dependencies:
   # Storage
   shared_preferences: ^2.2.2
 
-  # Native splash screen
-  flutter_native_splash: ^2.4.5
-
-  # Icons & animations
-  font_awesome_flutter: ^10.6.0
-  simple_animations: ^5.0.2
-
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^5.0.0
-
-flutter_native_splash:
-  web: true
-  color: '#FFFFFF'
-  color_dark: '#121212'
-  fullscreen: true
-  web_image_mode: center
-  android_12:
-    color: '#FFFFFF'
-    color_dark: '#121212'
-    icon_background_color: '#FFFFFF'
-    icon_background_color_dark: '#121212'
 
 flutter:
   uses-material-design: true

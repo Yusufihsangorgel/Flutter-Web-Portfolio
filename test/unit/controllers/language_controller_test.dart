@@ -5,11 +5,13 @@ void main() {
   group('LanguageController', () {
     group('getLanguageName', () {
       test('returns correct name for each supported language', () {
-        expect(LanguageController.getLanguageName('tr'), 'Turkce');
+        expect(LanguageController.getLanguageName('tr'), 'Türkçe');
         expect(LanguageController.getLanguageName('en'), 'English');
         expect(LanguageController.getLanguageName('de'), 'Deutsch');
-        expect(LanguageController.getLanguageName('fr'), 'Francais');
-        expect(LanguageController.getLanguageName('es'), 'Espanol');
+        expect(LanguageController.getLanguageName('fr'), 'Français');
+        expect(LanguageController.getLanguageName('es'), 'Español');
+        expect(LanguageController.getLanguageName('ar'), 'العربية');
+        expect(LanguageController.getLanguageName('hi'), 'हिन्दी');
       });
 
       test('returns Unknown for unsupported language code', () {

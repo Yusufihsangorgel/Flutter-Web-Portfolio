@@ -81,31 +81,44 @@
   "cv_data": {
     "personal_info": {
       "name": "Yusuf İhsan Görgel",
-      "title": "Software Engineer",
+      "title": "Mobile Software Engineer",
       "phone": "+90 544 953 0128",
       "email": "developeryusuf@icloud.com",
+      "location": "Antalya, Türkiye (Remote)",
       "github": "https://github.com/Yusufihsangorgel",
       "linkedin": "https://linkedin.com/in/yusuf-ihsan-görgel/",
-      "bio": "Merhaba, ben Yusuf İhsan, son sınıf Yazılım Mühendisliği öğrencisiyim ve 4 yıllık tecrübeye sahibim. İkinci sınıfta freelance çalışmaya başladım ve o zamandan beri hem kurumsal hem de start-up ortamlarında deneyim kazandım. Flutter kullanarak mobil, ERP ve POS yazılım geliştirme konularında yoğunlaşan 3 yıllık profesyonel deneyimim var. Ayrıca, çeşitli freelance projelerde Backend ve DevOps görevlerinde de çalıştım. Problem çözmeye tutkuyla yaklaşıyorum ve işbirlikçi takım ortamlarında başarılı oluyorum. Proje yönetimi için Atlassian-Jira kullanma konusunda sağlam bir geçmişe sahibim, günlük toplantılar, sprintler, scrum ve sıkı teslim tarihlerine uyma konusunda deneyimliyim."
+      "bio": "4+ yıllık deneyime sahip, production-grade mobil uygulamalar geliştirmeye odaklanan bir Yazılım Mühendisiyim. Mimari, performans ve güvenilirlik odaklı çalışıyorum — Flutter ile cross-platform, Swift ve Kotlin ile native iOS/Android uygulamalar geliştiriyorum. Şu anda Uzman Adres'te FugaSoft üzerinde çalışıyorum."
     },
     "experiences": [
       {
-        "title": "Full Stack Developer",
-        "company": "Juniustech",
-        "period": "Haziran 2023 – Şubat 2025",
-        "description": "Mobile Team Lead (Dorse projesi), geliştirme, dağıtım, frontend, backend ve QA koordinasyonu."
-      },
-      {
-        "title": "Flutter Developer",
+        "title": "Flutter Geliştirici",
         "company": "Uzman Adres",
-        "period": "Mart 2022 – Ekim 2024",
-        "description": "POS, Barcode Sales, muhasebe yönetim sistemleri, ERP; FugaSoft projesinin front-end'i, socket teknolojisi ve karmaşık SQL mimarileri."
+        "position": "Flutter Geliştirici",
+        "start_date": "Mar 2022",
+        "end_date": "Devam Ediyor",
+        "period": "Mart 2022 – Devam Ediyor",
+        "description": "FugaSoft — cross-platform POS ve satış yönetim sistemi geliştirme\nSQLite-Drift ile karmaşık SQL mimarileri oluşturma\nMediator Pattern ve GetX ile reaktif programlama implementasyonu\nAndroid/iOS tablet ve masaüstü platformlarına (Linux, macOS, Windows) dağıtım\nGerçek zamanlı veri senkronizasyonu için socket teknolojisi ve barkod tarama sistemleri entegrasyonu",
+        "technologies": ["Flutter", "Dart", "SQLite-Drift", "GetX", "WebSocket", "i18n"]
       },
       {
-        "title": "Flutter Developer",
+        "title": "Full Stack Geliştirici",
+        "company": "Junius Tech",
+        "position": "Full Stack Geliştirici",
+        "start_date": "Haz 2023",
+        "end_date": "Şub 2025",
+        "period": "Haziran 2023 – Şubat 2025",
+        "description": "Dorse — lojistik takip uygulamasında mobil geliştirme ekibini yönettim\nAndroid, iOS ve web platformlarına Flutter uygulamaları geliştirdim\nGoogle/Apple Maps ile WebSocket tabanlı gerçek zamanlı araç takibi implementasyonu\nMobile Team Lead olarak frontend, backend ve QA iş akışlarını koordine ettim",
+        "technologies": ["Flutter", "React", "Node.js", "WebSocket", "REST API", "Maps SDK"]
+      },
+      {
+        "title": "Flutter Geliştirici",
         "company": "Promob TR",
+        "position": "Flutter Geliştirici (Serbest)",
+        "start_date": "Eki 2022",
+        "end_date": "Haz 2024",
         "period": "Ekim 2022 – Haziran 2024",
-        "description": "Freelance projeler; \"Aydınlık E-Newspaper\" ve \"Bilim ve Ütopya E-Magazine\" projelerinin front-end'i (backend: PHP-Laravel veya Node.js-Express.js-MongoDB)."
+        "description": "Aydınlık E-Gazete ve Bilim ve Ütopya E-Dergi mobil uygulamalarını geliştirdim\nGetX ve Dio ile MVVM mimarisi implementasyonu\nHem Google Play hem App Store'da yayınladım",
+        "technologies": ["Flutter", "Dart", "GetX", "Dio", "MVVM"]
       }
     ],
     "projects": [
@@ -260,7 +273,9 @@
     }
   },
   "about_section": {
-    "title": "Hakkımda"
+    "title": "Hakkımda",
+    "bio": "4+ yıllık deneyime sahip, production-grade mobil uygulamalar geliştirmeye odaklanan bir Yazılım Mühendisiyim. Mimari, performans ve güvenilirlik odaklı çalışıyorum — Flutter ile cross-platform, Swift ve Kotlin ile native iOS/Android uygulamalar geliştiriyorum.",
+    "bio2": "Son zamanlarda çalıştığım teknolojilerden bazıları:"
   },
   "projects_section": {
     "title": "Projelerim",
@@ -270,11 +285,21 @@
     "open_project": "Projeyi Aç"
   },
   "home_section": {
-    "welcome": "Portfolyoma hoş geldiniz",
-    "title": "Ben Yusuf İhsan Görgel",
-    "subtitle": "Yazilim Muhendisi | Flutter & Cross-Platform Gelistirici",
+    "greeting": "Merhaba, ben",
+    "title": "Yusuf İhsan Görgel.",
+    "subtitle": "Mobil için geliştiriyorum.",
+    "bio": "Production-grade mobil uygulamalar geliştirmeye odaklanan bir yazılım mühendisiyim. Şu anda Uzman Adres'te Flutter ile cross-platform geliştirme üzerine çalışıyorum — Android, iOS ve masaüstü platformlarında piksel-mükemmel, performanslı deneyimler oluşturuyorum.",
+    "view_work": "Çalışmalarımı Gör",
     "download_cv": "CV İndir",
     "contact": "İletişim"
+  },
+  "experience_section": {
+    "title": "Çalıştığım Yerler"
+  },
+  "contact_section": {
+    "title": "İletişime Geç",
+    "whats_next": "Sırada Ne Var?",
+    "description": "Şu anda yeni fırsatlar aramıyor olsam da, gelen kutum her zaman açık. Bir sorunuz varsa ya da sadece merhaba demek istiyorsanız, size en kısa sürede dönmeye çalışacağım!"
   },
   "skills_section": {
     "title": "Beceriler",

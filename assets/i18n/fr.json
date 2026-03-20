@@ -280,7 +280,42 @@
       "twitter": "Twitter"
     }
   },
+  "nav": {
+    "home": "Accueil",
+    "about": "À Propos",
+    "skills": "Compétences",
+    "experience": "Expérience",
+    "projects": "Projets",
+    "contact": "Contact"
+  },
   "about_section": {
-    "title": "À Propos de Moi"
+    "title": "À Propos de Moi",
+    "bio": "Je suis ingénieur logiciel avec plus de 4 ans d'expérience dans le développement d'applications mobiles de qualité production. Je me concentre sur l'architecture, la performance et la fiabilité — applications cross-platform avec Flutter et iOS/Android natif avec Swift et Kotlin.",
+    "bio2": "Voici quelques technologies avec lesquelles j'ai travaillé récemment :"
+  },
+  "home_section": {
+    "greeting": "Bonjour, je m'appelle",
+    "title": "Yusuf İhsan Görgel.",
+    "subtitle": "Je développe pour le mobile.",
+    "bio": "Je suis un ingénieur logiciel spécialisé dans la création d'applications mobiles de qualité production. Actuellement chez Uzman Adres, je travaille sur le développement cross-platform avec Flutter.",
+    "view_work": "Voir mes travaux",
+    "download_cv": "Télécharger le CV",
+    "contact": "Contact"
+  },
+  "experience_section": {
+    "title": "Où j'ai travaillé"
+  },
+  "projects_section": {
+    "title": "Mes Projets",
+    "description": "Projets majeurs et travaux réalisés"
+  },
+  "contact_section": {
+    "title": "Me Contacter",
+    "whats_next": "Et Ensuite ?",
+    "description": "Bien que je ne cherche pas actuellement de nouvelles opportunités, ma boîte de réception est toujours ouverte. Que vous ayez une question ou que vous vouliez simplement dire bonjour, je ferai de mon mieux pour vous répondre !"
+  },
+  "skills_section": {
+    "title": "Compétences",
+    "description": "Mes compétences techniques et domaines d'expertise"
   }
 }
