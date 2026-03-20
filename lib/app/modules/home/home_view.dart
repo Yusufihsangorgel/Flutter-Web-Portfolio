@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:flutter_web_portfolio/app/controllers/language_controller.dart';
 import 'package:flutter_web_portfolio/app/controllers/scroll_controller.dart';
 import 'package:flutter_web_portfolio/app/controllers/scene_director.dart';
+import 'package:flutter_web_portfolio/app/controllers/theme_controller.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_dimensions.dart';
 import 'package:flutter_web_portfolio/app/core/constants/durations.dart';
@@ -12,6 +13,7 @@ import 'package:flutter_web_portfolio/app/modules/home/sections/about_section.da
 import 'package:flutter_web_portfolio/app/modules/home/sections/experience_section.dart';
 import 'package:flutter_web_portfolio/app/modules/home/sections/projects/projects_section.dart';
 import 'package:flutter_web_portfolio/app/modules/home/sections/contact/contact_section.dart';
+import 'package:flutter_web_portfolio/app/modules/home/sections/testimonials_section.dart';
 import 'package:flutter_web_portfolio/app/widgets/command_palette.dart';
 import 'package:flutter_web_portfolio/app/widgets/custom_sliver_app_bar.dart';
 import 'package:flutter_web_portfolio/app/widgets/footer.dart';
@@ -104,24 +106,45 @@ class _HomeViewState extends State<HomeView> {
       focusNode: _focusNode,
       autofocus: true,
       onKeyEvent: _handleKeyEvent,
-      child: Scaffold(
-        backgroundColor: AppColors.background,
-        body: Stack(
-          children: [
-            // Layer 1: Cinematic gradient mesh (fills viewport)
-            const Positioned.fill(
-              child: CinematicBackground(),
-            ),
-            // Layer 2: Constellation particles (mouse-reactive)
-            const Positioned.fill(
-              child: ConstellationParticles(particleCount: 100),
-            ),
-            // Layer 3: Scrollable content — Obx triggers rebuild on language change
-            Obx(() {
-              // Touch reactive language value so Obx rebuilds on language switch
-              languageController.currentLanguage;
+      child: Obx(() {
+        // Touch reactive values so Obx rebuilds on language/theme switch
+        languageController.currentLanguage;
+        final isDark = Get.isRegistered<ThemeController>()
+            ? Get.find<ThemeController>().isDarkMode.value
+            : true;
 
-              return ValueListenableBuilder<bool>(
+        return Scaffold(
+          backgroundColor: isDark ? AppColors.background : AppColors.lightBackground,
+          body: Stack(
+            children: [
+              if (isDark) ...[
+                // Layer 1: Cinematic gradient mesh (fills viewport)
+                const Positioned.fill(
+                  child: CinematicBackground(),
+                ),
+                // Layer 2: Constellation particles (mouse-reactive)
+                const Positioned.fill(
+                  child: ConstellationParticles(particleCount: 100),
+                ),
+              ] else
+                // Light mode: subtle gradient background
+                Positioned.fill(
+                  child: Container(
+                    decoration: const BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          AppColors.lightBackground,
+                          AppColors.lightBackgroundDark,
+                          AppColors.lightBackground,
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              // Layer 3: Scrollable content
+              ValueListenableBuilder<bool>(
                 valueListenable: HomeSection.entranceComplete,
                 builder: (context, entranceDone, child) => CustomScrollView(
                   controller: scrollController.scrollController,
@@ -151,6 +174,12 @@ class _HomeViewState extends State<HomeView> {
                       delay: AppDurations.staggerShort,
                     ),
                     _buildSection(
+                      scrollController.testimonialsKey,
+                      const TestimonialsSection(),
+                      context,
+                      delay: AppDurations.staggerShort,
+                    ),
+                    _buildSection(
                       scrollController.projectsKey,
                       const ProjectsSection(),
                       context,
@@ -162,21 +191,21 @@ class _HomeViewState extends State<HomeView> {
                       context,
                       delay: AppDurations.staggerShort,
                     ),
-                  const SliverToBoxAdapter(child: PortfolioFooter()),
-                ],
-              ),
-            );
-            }),
-            // Layer 4: Matrix rain easter egg overlay
-            if (_showMatrixRain)
-              Positioned.fill(
-                child: MatrixRain(
-                  onDismiss: () => setState(() => _showMatrixRain = false),
+                    const SliverToBoxAdapter(child: PortfolioFooter()),
+                  ],
                 ),
               ),
-          ],
-        ),
-      ),
+              // Layer 4: Matrix rain easter egg overlay
+              if (_showMatrixRain)
+                Positioned.fill(
+                  child: MatrixRain(
+                    onDismiss: () => setState(() => _showMatrixRain = false),
+                  ),
+                ),
+            ],
+          ),
+        );
+      }),
     );
   }
 

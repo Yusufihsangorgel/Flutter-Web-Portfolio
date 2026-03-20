@@ -10,6 +10,7 @@ import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
 import 'package:flutter_web_portfolio/app/core/constants/breakpoints.dart';
 import 'package:flutter_web_portfolio/app/core/constants/cinematic_curves.dart';
 import 'package:flutter_web_portfolio/app/core/constants/durations.dart';
+import 'package:flutter_web_portfolio/app/controllers/theme_controller.dart';
 import 'package:flutter_web_portfolio/app/widgets/cinematic_focusable.dart';
 import 'package:flutter_web_portfolio/app/widgets/language_switcher.dart';
 
@@ -26,7 +27,7 @@ class CustomSliverAppBar extends StatelessWidget {
   final AppScrollController scrollController;
   final List<Widget>? actions;
 
-  static const _navSections = ['about', 'experience', 'projects', 'contact'];
+  static const _navSections = ['about', 'experience', 'testimonials', 'projects', 'contact'];
 
   @override
   Widget build(BuildContext context) {
@@ -41,46 +42,59 @@ class CustomSliverAppBar extends StatelessWidget {
       backgroundColor: Colors.transparent,
       elevation: 0,
       automaticallyImplyLeading: false,
-      flexibleSpace: Column(
-        children: [
-          Expanded(
-            child: ClipRect(
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: AppColors.background.withValues(alpha: 0.75),
-                    border: Border(
-                      bottom: BorderSide(
-                        color: Colors.white.withValues(alpha: 0.05),
-                        width: 1,
+      flexibleSpace: Obx(() {
+        final isDark = Get.isRegistered<ThemeController>()
+            ? Get.find<ThemeController>().isDarkMode.value
+            : true;
+        return Column(
+          children: [
+            Expanded(
+              child: ClipRect(
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: isDark
+                          ? AppColors.background.withValues(alpha: 0.75)
+                          : AppColors.lightBackground.withValues(alpha: 0.85),
+                      border: Border(
+                        bottom: BorderSide(
+                          color: isDark
+                              ? Colors.white.withValues(alpha: 0.05)
+                              : Colors.black.withValues(alpha: 0.06),
+                          width: 1,
+                        ),
                       ),
                     ),
                   ),
                 ),
               ),
             ),
-          ),
-          _SceneProgressBar(scrollController: scrollController),
-        ],
-      ),
+            _SceneProgressBar(scrollController: scrollController),
+          ],
+        );
+      }),
       title: _LogoText(
         onTap: () => scrollController.scrollToSection('home'),
       ),
       leading: isMobile
           ? Builder(
-              builder: (context) => IconButton(
-                icon: const Icon(
-                  Icons.menu_rounded,
-                  color: AppColors.textPrimary,
-                  size: 24,
-                ),
-                onPressed: () => _showMobileMenu(context),
-              ),
+              builder: (context) {
+                final isDark = Theme.of(context).brightness == Brightness.dark;
+                return IconButton(
+                  icon: Icon(
+                    Icons.menu_rounded,
+                    color: isDark ? AppColors.textPrimary : AppColors.lightTextPrimary,
+                    size: 24,
+                  ),
+                  onPressed: () => _showMobileMenu(context),
+                );
+              },
             )
           : null,
       actions: [
         if (!isMobile) _buildNavItems(),
+        const _ThemeToggleButton(),
         const LanguageSwitcher(),
         ...?actions,
         const SizedBox(width: 16),
@@ -107,11 +121,14 @@ class CustomSliverAppBar extends StatelessWidget {
   });
 
   void _showMobileMenu(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     showGeneralDialog(
       context: context,
       barrierDismissible: true,
       barrierLabel: 'Close menu',
-      barrierColor: AppColors.background.withValues(alpha: 0.95),
+      barrierColor: isDark
+          ? AppColors.background.withValues(alpha: 0.95)
+          : AppColors.lightBackground.withValues(alpha: 0.95),
       transitionDuration: AppDurations.medium,
       transitionBuilder: (context, animation, secondaryAnimation, child) =>
           FadeTransition(
@@ -146,33 +163,81 @@ class _LogoTextState extends State<_LogoText> {
   bool _hovered = false;
 
   @override
-  Widget build(BuildContext context) => Semantics(
-    button: true,
-    label: 'Scroll to top',
-    child: CinematicFocusable(
-      onTap: widget.onTap,
-      onHoverChanged: (h) => setState(() => _hovered = h),
-      child: AnimatedContainer(
-        duration: AppDurations.buttonHover,
-        child: Text(
-          'YG',
-        style: GoogleFonts.spaceGrotesk(
-          fontSize: 20,
-          fontWeight: FontWeight.w700,
-          color: _hovered ? Colors.white : AppColors.textBright,
-          letterSpacing: 1,
-          shadows: _hovered
-              ? [
-                  Shadow(
-                    color: Colors.white.withValues(alpha: 0.3),
-                    blurRadius: 12,
-                  ),
-                ]
-              : [],
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final baseColor = isDark ? AppColors.textBright : AppColors.lightTextBright;
+    final hoverColor = isDark ? Colors.white : AppColors.lightTextBright;
+
+    return Semantics(
+      button: true,
+      label: 'Scroll to top',
+      child: CinematicFocusable(
+        onTap: widget.onTap,
+        onHoverChanged: (h) => setState(() => _hovered = h),
+        child: AnimatedContainer(
+          duration: AppDurations.buttonHover,
+          child: Text(
+            'YG',
+            style: GoogleFonts.spaceGrotesk(
+              fontSize: 20,
+              fontWeight: FontWeight.w700,
+              color: _hovered ? hoverColor : baseColor,
+              letterSpacing: 1,
+              shadows: _hovered
+                  ? [
+                      Shadow(
+                        color: hoverColor.withValues(alpha: 0.3),
+                        blurRadius: 12,
+                      ),
+                    ]
+                  : [],
+            ),
+          ),
         ),
       ),
-    )),
-  );
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Theme toggle: animated sun/moon icon
+// ---------------------------------------------------------------------------
+class _ThemeToggleButton extends StatelessWidget {
+  const _ThemeToggleButton();
+
+  @override
+  Widget build(BuildContext context) {
+    if (!Get.isRegistered<ThemeController>()) {
+      return const SizedBox.shrink();
+    }
+    final themeController = Get.find<ThemeController>();
+
+    return Obx(() {
+      final isDark = themeController.isDarkMode.value;
+      return Semantics(
+        button: true,
+        label: isDark ? 'Switch to light mode' : 'Switch to dark mode',
+        child: IconButton(
+          onPressed: themeController.toggleTheme,
+          icon: AnimatedSwitcher(
+            duration: AppDurations.buttonHover,
+            switchInCurve: CinematicCurves.revealDecel,
+            switchOutCurve: CinematicCurves.revealDecel,
+            transitionBuilder: (child, animation) => RotationTransition(
+              turns: Tween(begin: 0.75, end: 1.0).animate(animation),
+              child: FadeTransition(opacity: animation, child: child),
+            ),
+            child: Icon(
+              isDark ? Icons.light_mode_rounded : Icons.dark_mode_rounded,
+              key: ValueKey(isDark),
+              color: isDark ? AppColors.textPrimary : AppColors.lightTextPrimary,
+              size: 20,
+            ),
+          ),
+        ),
+      );
+    });
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -197,44 +262,51 @@ class _NavItemState extends State<_NavItem> {
   bool _hovered = false;
 
   @override
-  Widget build(BuildContext context) => Semantics(
-    button: true,
-    label: widget.label,
-    child: CinematicFocusable(
-      onTap: widget.onTap,
-      onHoverChanged: (h) => setState(() => _hovered = h),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              widget.label.toUpperCase(),
-            style: GoogleFonts.spaceGrotesk(
-              fontSize: 12,
-              fontWeight: widget.isActive ? FontWeight.w600 : FontWeight.w400,
-              color: widget.isActive
-                  ? AppColors.textBright
-                  : (_hovered ? AppColors.textBright : AppColors.textPrimary),
-              letterSpacing: 2,
-            ),
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final activeColor = isDark ? AppColors.textBright : AppColors.lightTextBright;
+    final inactiveColor = isDark ? AppColors.textPrimary : AppColors.lightTextPrimary;
+    final underlineColor = isDark ? Colors.white : Colors.black;
+
+    return Semantics(
+      button: true,
+      label: widget.label,
+      child: CinematicFocusable(
+        onTap: widget.onTap,
+        onHoverChanged: (h) => setState(() => _hovered = h),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                widget.label.toUpperCase(),
+                style: GoogleFonts.spaceGrotesk(
+                  fontSize: 12,
+                  fontWeight: widget.isActive ? FontWeight.w600 : FontWeight.w400,
+                  color: widget.isActive
+                      ? activeColor
+                      : (_hovered ? activeColor : inactiveColor),
+                  letterSpacing: 2,
+                ),
+              ),
+              const SizedBox(height: 4),
+              // Underline — animates from left
+              AnimatedContainer(
+                duration: AppDurations.buttonHover,
+                curve: CinematicCurves.hoverLift,
+                width: widget.isActive || _hovered ? 20 : 0,
+                height: 1,
+                color: underlineColor.withValues(
+                  alpha: widget.isActive ? 0.6 : 0.3,
+                ),
+              ),
+            ],
           ),
-          const SizedBox(height: 4),
-          // Underline — animates from left
-          AnimatedContainer(
-            duration: AppDurations.buttonHover,
-            curve: CinematicCurves.hoverLift,
-            width: widget.isActive || _hovered ? 20 : 0,
-            height: 1,
-            color: Colors.white.withValues(
-              alpha: widget.isActive ? 0.6 : 0.3,
-            ),
-          ),
-          ],
         ),
       ),
-    ),
-  );
+    );
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -323,45 +395,50 @@ class _MobileMenuOverlay extends StatelessWidget {
   final AppScrollController scrollController;
 
   @override
-  Widget build(BuildContext context) => Material(
-    color: Colors.transparent,
-    child: Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // Close button
-          Align(
-            alignment: Alignment.topRight,
-            child: Padding(
-              padding: const EdgeInsets.only(right: 24, bottom: 40),
-              child: IconButton(
-                icon: const Icon(
-                  Icons.close_rounded,
-                  color: AppColors.textPrimary,
-                  size: 28,
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final iconColor = isDark ? AppColors.textPrimary : AppColors.lightTextPrimary;
+
+    return Material(
+      color: Colors.transparent,
+      child: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Close button
+            Align(
+              alignment: Alignment.topRight,
+              child: Padding(
+                padding: const EdgeInsets.only(right: 24, bottom: 40),
+                child: IconButton(
+                  icon: Icon(
+                    Icons.close_rounded,
+                    color: iconColor,
+                    size: 28,
+                  ),
+                  onPressed: () => Navigator.pop(context),
                 ),
-                onPressed: () => Navigator.pop(context),
               ),
             ),
-          ),
-          // Nav items — clean, centered
-          for (final section in navSections)
-            _MobileNavItem(
-              label: languageController.getText(
-                'nav.$section',
-                defaultValue: section.toUpperCase(),
+            // Nav items — clean, centered
+            for (final section in navSections)
+              _MobileNavItem(
+                label: languageController.getText(
+                  'nav.$section',
+                  defaultValue: section.toUpperCase(),
+                ),
+                onTap: () {
+                  Navigator.pop(context);
+                  scrollController.scrollToSection(section);
+                },
               ),
-              onTap: () {
-                Navigator.pop(context);
-                scrollController.scrollToSection(section);
-              },
-            ),
-          const SizedBox(height: 24),
-          const LanguageSwitcher(),
-        ],
+            const SizedBox(height: 24),
+            const LanguageSwitcher(),
+          ],
+        ),
       ),
-    ),
-  );
+    );
+  }
 }
 
 class _MobileNavItem extends StatefulWidget {
@@ -377,24 +454,30 @@ class _MobileNavItemState extends State<_MobileNavItem> {
   bool _hovered = false;
 
   @override
-  Widget build(BuildContext context) => MouseRegion(
-    onEnter: (_) => setState(() => _hovered = true),
-    onExit: (_) => setState(() => _hovered = false),
-    cursor: SystemMouseCursors.click,
-    child: GestureDetector(
-      onTap: widget.onTap,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 16),
-        child: Text(
-          widget.label.toUpperCase(),
-          style: GoogleFonts.spaceGrotesk(
-            color: _hovered ? AppColors.textBright : AppColors.textPrimary,
-            fontWeight: FontWeight.w500,
-            fontSize: 24,
-            letterSpacing: 4,
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final activeColor = isDark ? AppColors.textBright : AppColors.lightTextBright;
+    final inactiveColor = isDark ? AppColors.textPrimary : AppColors.lightTextPrimary;
+
+    return MouseRegion(
+      onEnter: (_) => setState(() => _hovered = true),
+      onExit: (_) => setState(() => _hovered = false),
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTap: widget.onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          child: Text(
+            widget.label.toUpperCase(),
+            style: GoogleFonts.spaceGrotesk(
+              color: _hovered ? activeColor : inactiveColor,
+              fontWeight: FontWeight.w500,
+              fontSize: 24,
+              letterSpacing: 4,
+            ),
           ),
         ),
       ),
-    ),
-  );
+    );
+  }
 }

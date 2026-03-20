@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
 
-/// Application-wide Material theme configuration (dark only).
+/// Application-wide Material theme configuration.
 final class AppTheme {
   const AppTheme._();
 
@@ -46,6 +46,49 @@ final class AppTheme {
         style: TextButton.styleFrom(foregroundColor: AppColors.accent),
       ),
       textTheme: GoogleFonts.interTextTheme(ThemeData.dark().textTheme),
+    );
+  }
+
+  static ThemeData get light {
+    final colorScheme = ColorScheme.fromSeed(
+      seedColor: AppColors.accent,
+      brightness: Brightness.light,
+      secondary: AppColors.accent,
+      surface: AppColors.lightSurface,
+      onSurface: AppColors.lightTextBright,
+    );
+
+    return ThemeData(
+      useMaterial3: true,
+      colorScheme: colorScheme,
+      brightness: Brightness.light,
+      scaffoldBackgroundColor: AppColors.lightBackground,
+      appBarTheme: const AppBarTheme(
+        elevation: 0,
+        backgroundColor: AppColors.lightBackground,
+        foregroundColor: AppColors.lightTextBright,
+      ),
+      cardTheme: CardThemeData(
+        elevation: 0,
+        color: AppColors.lightSurface,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+      ),
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          elevation: 0,
+          backgroundColor: Colors.transparent,
+          foregroundColor: AppColors.accent,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(4),
+            side: const BorderSide(color: AppColors.accent, width: 1),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+        ),
+      ),
+      textButtonTheme: TextButtonThemeData(
+        style: TextButton.styleFrom(foregroundColor: AppColors.accent),
+      ),
+      textTheme: GoogleFonts.interTextTheme(ThemeData.light().textTheme),
     );
   }
 }
