@@ -95,8 +95,8 @@ class CustomSliverAppBar extends StatelessWidget {
           : null,
       actions: [
         if (!isMobile) _buildNavItems(),
-        const _AudioToggleButton(),
-        const _ThemeToggleButton(),
+        if (!isMobile) const _AudioToggleButton(),
+        if (!isMobile) const _ThemeToggleButton(),
         const LanguageSwitcher(),
         ...?actions,
         const SizedBox(width: 16),
@@ -481,8 +481,18 @@ class _MobileMenuOverlay extends StatelessWidget {
                   scrollController.scrollToSection(section);
                 },
               ),
-            const SizedBox(height: 24),
-            const LanguageSwitcher(),
+            const SizedBox(height: 32),
+            // Mobile-only controls
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const _AudioToggleButton(),
+                const SizedBox(width: 8),
+                const _ThemeToggleButton(),
+                const SizedBox(width: 8),
+                const LanguageSwitcher(key: ValueKey('mobile-lang')),
+              ],
+            ),
           ],
         ),
       ),

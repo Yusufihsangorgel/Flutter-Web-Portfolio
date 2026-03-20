@@ -282,9 +282,14 @@ class _ProjectLinkState extends State<_ProjectLink> {
     child: AnimatedContainer(
       duration: AppDurations.fast,
       padding: const EdgeInsets.all(8),
+      transform: Matrix4.diagonal3Values(_hovered ? 1.1 : 1.0, _hovered ? 1.1 : 1.0, 1.0),
+      transformAlignment: Alignment.center,
       decoration: BoxDecoration(
         color: _hovered ? widget.accent.withValues(alpha: 0.1) : Colors.transparent,
         borderRadius: BorderRadius.circular(6),
+        boxShadow: _hovered
+            ? [BoxShadow(color: widget.accent.withValues(alpha: 0.2), blurRadius: 12)]
+            : [],
       ),
       child: Icon(
         Icons.open_in_new_rounded,

@@ -44,7 +44,7 @@ class AboutSection extends StatelessWidget {
                   desktop: screenWidth * 0.18,
                 ),
                 fontWeight: FontWeight.w800,
-                color: Colors.white.withValues(alpha: 0.03),
+                color: Colors.white.withValues(alpha: 0.02),
                 letterSpacing: -4,
               ),
             )),

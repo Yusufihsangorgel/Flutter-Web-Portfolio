@@ -29,14 +29,14 @@ class PortfolioFooter extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Social links
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+            // Social links — wraps on narrow screens
+            Wrap(
+              alignment: WrapAlignment.center,
+              spacing: 32,
+              runSpacing: 12,
               children: [
                 if (github.isNotEmpty) _SocialLink(label: 'GitHub', url: github),
-                if (github.isNotEmpty && linkedin.isNotEmpty) _dot(),
                 if (linkedin.isNotEmpty) _SocialLink(label: 'LinkedIn', url: linkedin),
-                if (linkedin.isNotEmpty && email.isNotEmpty) _dot(),
                 if (email.isNotEmpty) _SocialLink(label: 'Email', url: 'mailto:$email'),
               ],
             ),
@@ -56,16 +56,6 @@ class PortfolioFooter extends StatelessWidget {
     });
   }
 
-  static Widget _dot() => Padding(
-    padding: const EdgeInsets.symmetric(horizontal: 16),
-    child: Text(
-      '\u00B7',
-      style: GoogleFonts.jetBrainsMono(
-        fontSize: 14,
-        color: AppColors.textSecondary,
-      ),
-    ),
-  );
 }
 
 class _SocialLink extends StatefulWidget {
@@ -120,7 +110,7 @@ class _CommandPaletteHint extends StatelessWidget {
           'Press ',
           style: GoogleFonts.jetBrainsMono(
             fontSize: 11,
-            color: AppColors.textSecondary.withValues(alpha: 0.6),
+            color: AppColors.textSecondary.withValues(alpha: 0.5),
           ),
         ),
         Container(
@@ -136,7 +126,7 @@ class _CommandPaletteHint extends StatelessWidget {
             shortcut,
             style: GoogleFonts.jetBrainsMono(
               fontSize: 11,
-              color: AppColors.textSecondary.withValues(alpha: 0.8),
+              color: AppColors.textSecondary.withValues(alpha: 0.7),
             ),
           ),
         ),
@@ -144,7 +134,7 @@ class _CommandPaletteHint extends StatelessWidget {
           ' to open command palette',
           style: GoogleFonts.jetBrainsMono(
             fontSize: 11,
-            color: AppColors.textSecondary.withValues(alpha: 0.6),
+            color: AppColors.textSecondary.withValues(alpha: 0.5),
           ),
         ),
       ],

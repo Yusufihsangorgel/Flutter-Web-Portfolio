@@ -273,7 +273,7 @@ class _AnimatedCTAButtonsState extends State<_AnimatedCTAButtons>
         child: Wrap(
           alignment: WrapAlignment.center,
           spacing: 20,
-          runSpacing: 12,
+          runSpacing: 16,
           children: [
             CinematicButton(
               label: widget.languageController.getText(
