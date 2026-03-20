@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_web_portfolio/app/core/constants/durations.dart';
 
 /// Animates child widget when it first scrolls into the viewport.
 class ScrollFadeIn extends StatefulWidget {
@@ -6,7 +7,7 @@ class ScrollFadeIn extends StatefulWidget {
     super.key,
     required this.child,
     this.offset = 40.0,
-    this.duration = const Duration(milliseconds: 600),
+    this.duration = AppDurations.entrance,
     this.delay = Duration.zero,
     this.curve = Curves.easeOutCubic,
   });
@@ -66,7 +67,7 @@ class _ScrollFadeInState extends State<ScrollFadeIn>
     if (renderBox == null || !renderBox.hasSize) return;
 
     final position = renderBox.localToGlobal(Offset.zero);
-    final screenHeight = MediaQuery.of(context).size.height;
+    final screenHeight = MediaQuery.sizeOf(context).height;
 
     if (position.dy < screenHeight * 0.9 && position.dy > -renderBox.size.height) {
       _triggered = true;

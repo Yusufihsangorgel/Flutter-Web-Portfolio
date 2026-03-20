@@ -1,3 +1,4 @@
+/// Responsive breakpoint thresholds in logical pixels.
 final class Breakpoints {
   const Breakpoints._();
 

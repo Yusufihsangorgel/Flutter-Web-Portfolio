@@ -1,24 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import '../controllers/theme_controller.dart';
-import 'mouse_effects.dart';
+import 'package:flutter_web_portfolio/app/widgets/custom_cursor.dart';
 
-/// Wrapper widget that manages mouse interactions
+/// Wraps content with the custom cursor overlay (web only).
 class MouseInteractionWrapper extends StatelessWidget {
-
   const MouseInteractionWrapper({super.key, required this.child});
   final Widget child;
 
   @override
-  Widget build(BuildContext context) {
-    final ThemeController themeController = Get.find<ThemeController>();
-    final Color lightColor = themeController.primaryColor;
-
-    return MouseLight(
-      lightColor: lightColor,
-      lightSize: 300,
-      intensity: 0.15,
-      child: child,
-    );
-  }
+  Widget build(BuildContext context) => CustomCursor(child: child);
 }

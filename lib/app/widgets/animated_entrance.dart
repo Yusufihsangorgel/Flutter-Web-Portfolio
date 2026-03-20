@@ -1,28 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_web_portfolio/app/core/constants/durations.dart';
 
-/// Lightweight replacement for animate_do — no debug print spam.
-/// Provides FadeInDown, FadeInUp, FadeInLeft, FadeInRight animations.
+/// Drop-in animate_do replacement without debug print spam.
+/// Named constructors: fadeInDown, fadeInUp, fadeInLeft, fadeInRight.
 class AnimatedEntrance extends StatefulWidget {
   const AnimatedEntrance({
     super.key,
     required this.child,
     this.offset = const Offset(0, -30),
-    this.duration = const Duration(milliseconds: 600),
+    this.duration = AppDurations.entrance,
     this.delay = Duration.zero,
     this.curve = Curves.easeOutCubic,
   });
-
-  final Widget child;
-  final Offset offset;
-  final Duration duration;
-  final Duration delay;
-  final Curve curve;
 
   /// Slide down from above
   const AnimatedEntrance.fadeInDown({
     super.key,
     required this.child,
-    this.duration = const Duration(milliseconds: 600),
+    this.duration = AppDurations.entrance,
     this.delay = Duration.zero,
     this.curve = Curves.easeOutCubic,
   }) : offset = const Offset(0, -30);
@@ -31,7 +26,7 @@ class AnimatedEntrance extends StatefulWidget {
   const AnimatedEntrance.fadeInUp({
     super.key,
     required this.child,
-    this.duration = const Duration(milliseconds: 600),
+    this.duration = AppDurations.entrance,
     this.delay = Duration.zero,
     this.curve = Curves.easeOutCubic,
   }) : offset = const Offset(0, 30);
@@ -40,7 +35,7 @@ class AnimatedEntrance extends StatefulWidget {
   const AnimatedEntrance.fadeInLeft({
     super.key,
     required this.child,
-    this.duration = const Duration(milliseconds: 600),
+    this.duration = AppDurations.entrance,
     this.delay = Duration.zero,
     this.curve = Curves.easeOutCubic,
   }) : offset = const Offset(-30, 0);
@@ -49,10 +44,16 @@ class AnimatedEntrance extends StatefulWidget {
   const AnimatedEntrance.fadeInRight({
     super.key,
     required this.child,
-    this.duration = const Duration(milliseconds: 600),
+    this.duration = AppDurations.entrance,
     this.delay = Duration.zero,
     this.curve = Curves.easeOutCubic,
   }) : offset = const Offset(30, 0);
+
+  final Widget child;
+  final Offset offset;
+  final Duration duration;
+  final Duration delay;
+  final Curve curve;
 
   @override
   State<AnimatedEntrance> createState() => _AnimatedEntranceState();

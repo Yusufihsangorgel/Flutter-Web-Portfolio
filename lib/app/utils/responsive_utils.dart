@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import '../core/constants/breakpoints.dart';
+import 'package:flutter_web_portfolio/app/core/constants/breakpoints.dart';
 
+/// Breakpoint-aware utilities — isMobile, isTablet, getValueForScreenType.
 class ResponsiveUtils {
   static const double mobileWidth = Breakpoints.mobile;
   static const double tabletWidth = Breakpoints.tablet;
@@ -8,20 +9,20 @@ class ResponsiveUtils {
   static const double largeDesktopWidth = Breakpoints.wide;
 
   static bool isMobile(BuildContext context) =>
-      MediaQuery.of(context).size.width < mobileWidth;
+      MediaQuery.sizeOf(context).width < mobileWidth;
 
   static bool isTablet(BuildContext context) {
-    final width = MediaQuery.of(context).size.width;
+    final width = MediaQuery.sizeOf(context).width;
     return width >= mobileWidth && width < tabletWidth;
   }
 
   static bool isDesktop(BuildContext context) {
-    final width = MediaQuery.of(context).size.width;
+    final width = MediaQuery.sizeOf(context).width;
     return width >= tabletWidth && width < desktopWidth;
   }
 
   static bool isLargeDesktop(BuildContext context) =>
-      MediaQuery.of(context).size.width >= desktopWidth;
+      MediaQuery.sizeOf(context).width >= desktopWidth;
 
   static T getValueForScreenType<T>({
     required BuildContext context,
@@ -33,7 +34,7 @@ class ResponsiveUtils {
     final tabletValue = tablet ?? mobile;
     final desktopValue = desktop ?? tabletValue;
     final largeDesktopValue = largeDesktop ?? desktopValue;
-    final width = MediaQuery.of(context).size.width;
+    final width = MediaQuery.sizeOf(context).width;
 
     return switch (width) {
       < Breakpoints.mobile => mobile,
@@ -78,7 +79,7 @@ class ResponsiveBuilder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
+    final screenWidth = MediaQuery.sizeOf(context).width;
 
     return switch (screenWidth) {
       < Breakpoints.mobile => mobile,
