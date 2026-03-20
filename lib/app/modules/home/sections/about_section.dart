@@ -380,7 +380,6 @@ class _FlashlightPhotoState extends State<_FlashlightPhoto> {
             child: Image.asset(
               'assets/images/me.jpeg',
               width: double.infinity,
-              cacheWidth: 600,
               fit: BoxFit.cover,
               errorBuilder: (_, __, ___) => AspectRatio(
                 aspectRatio: 1,
