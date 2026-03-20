@@ -248,6 +248,7 @@
       }
     ],
     "contact": {
+      "formspree_id": "xpznqkao",
       "form": {
         "name_label": "الاسم",
         "email_label": "البريد الإلكتروني",
