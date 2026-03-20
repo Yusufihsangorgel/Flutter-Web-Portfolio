@@ -27,4 +27,34 @@ jobs:
         run: flutter test --coverage
 
       - name: Build web
-        run: flutter build web --release
+        run: flutter build web --release --base-href /Flutter-Web-Portfolio/
+
+      - name: Build web (WASM)
+        run: flutter build web --wasm
+        continue-on-error: true
+
+  deploy:
+    needs: analyze-test-build
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.41.x'
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Build web for GitHub Pages
+        run: flutter build web --release --base-href /Flutter-Web-Portfolio/
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: build/web
