@@ -1,23 +1,84 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:flutter_web_portfolio/app/widgets/animated_entrance.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_web_portfolio/app/controllers/language_controller.dart';
-import 'package:flutter_web_portfolio/app/controllers/theme_controller.dart';
 import 'package:flutter_web_portfolio/app/controllers/scroll_controller.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
+import 'package:flutter_web_portfolio/app/core/constants/cinematic_curves.dart';
+import 'package:flutter_web_portfolio/app/widgets/cinematic_button.dart';
+import 'package:flutter_web_portfolio/app/core/constants/durations.dart';
+import 'package:flutter_web_portfolio/app/widgets/scroll_indicator.dart';
+import 'package:flutter_web_portfolio/app/widgets/shader_text_reveal.dart';
 import 'package:flutter_web_portfolio/app/utils/responsive_utils.dart';
-import 'package:url_launcher/url_launcher.dart';
 
-class HomeSection extends StatelessWidget {
+/// Hero Section — "The Opening Shot"
+/// Cinematic entrance: line draw → name reveal → subtitle → CTA assembly
+class HomeSection extends StatefulWidget {
   const HomeSection({super.key});
+
+  /// Notifies listeners when the entrance animation completes.
+  static final ValueNotifier<bool> entranceComplete = ValueNotifier(false);
+
+  @override
+  State<HomeSection> createState() => _HomeSectionState();
+}
+
+class _HomeSectionState extends State<HomeSection>
+    with TickerProviderStateMixin {
+  late AnimationController _entranceCtrl;
+  late Animation<double> _lineWidth;
+  late Animation<double> _contentOpacity;
+
+  @override
+  void initState() {
+    super.initState();
+    HomeSection.entranceComplete.value = false;
+
+    _entranceCtrl = AnimationController(
+      vsync: this,
+      duration: AppDurations.heroEntrance,
+    );
+
+    _entranceCtrl.addStatusListener((status) {
+      if (status == AnimationStatus.completed) {
+        HomeSection.entranceComplete.value = true;
+      }
+    });
+
+    // 0–25%: horizontal line draws
+    _lineWidth = Tween<double>(begin: 0, end: 1).animate(
+      CurvedAnimation(
+        parent: _entranceCtrl,
+        curve: const Interval(0.0, 0.25, curve: CinematicCurves.revealDecel),
+      ),
+    );
+
+    // 25–100%: content fades in
+    _contentOpacity = Tween<double>(begin: 0, end: 1).animate(
+      CurvedAnimation(
+        parent: _entranceCtrl,
+        curve: const Interval(0.2, 0.35, curve: Curves.easeOut),
+      ),
+    );
+
+    // 400ms initial darkness, then start
+    Future.delayed(AppDurations.heroInitialPause, () {
+      if (mounted) _entranceCtrl.forward();
+    });
+  }
+
+  @override
+  void dispose() {
+    _entranceCtrl.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     final languageController = Get.find<LanguageController>();
-    final themeController = Get.find<ThemeController>();
-    final screenHeight = MediaQuery.of(context).size.height;
-    final screenWidth = MediaQuery.of(context).size.width;
-    final isMobile = ResponsiveUtils.isMobile(context);
+    final screenHeight = MediaQuery.sizeOf(context).height;
+    final screenWidth = MediaQuery.sizeOf(context).width;
 
     final appBarHeight = ResponsiveUtils.getValueForScreenType<double>(
       context: context,
@@ -26,253 +87,220 @@ class HomeSection extends StatelessWidget {
       desktop: 80,
     );
 
-    final horizontalPadding = ResponsiveUtils.getValueForScreenType<double>(
+    // Responsive hero font size — avoids overflow on narrow screens
+    final heroFontSize = ResponsiveUtils.getValueForScreenType<double>(
       context: context,
-      mobile: 24,
-      tablet: 48,
-      desktop: 80,
-      largeDesktop: 120,
+      mobile: 32.0,
+      tablet: 56.0,
+      desktop: (screenWidth * 0.07).clamp(60.0, 120.0),
     );
 
-    final titleFontSize = ResponsiveUtils.getValueForScreenType<double>(
-      context: context,
-      mobile: 28,
-      tablet: 36,
-      desktop: 48,
-      largeDesktop: 56,
-    );
-
-    final subtitleFontSize = ResponsiveUtils.getValueForScreenType<double>(
-      context: context,
-      mobile: 16,
-      tablet: 18,
-      desktop: 20,
-      largeDesktop: 22,
-    );
-
-    return SizedBox(
+    return GestureDetector(
+      onTap: () {
+        if (!_entranceCtrl.isCompleted) {
+          _entranceCtrl.forward(from: 1.0);
+        }
+      },
+      child: SizedBox(
       width: double.infinity,
       height: screenHeight - appBarHeight,
-      child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-        child: isMobile
-            ? _buildMobileLayout(context, languageController, themeController, titleFontSize, subtitleFontSize)
-            : _buildDesktopLayout(context, languageController, themeController, titleFontSize, subtitleFontSize),
-      ),
-    );
-  }
+      child: AnimatedBuilder(
+        animation: _entranceCtrl,
+        builder: (context, _) => Stack(
+          children: [
+            // Opening line
+            Center(
+              child: Container(
+                height: 1,
+                width: screenWidth * 0.6 * _lineWidth.value,
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.6),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.white.withValues(alpha: 0.2),
+                      blurRadius: 8,
+                    ),
+                  ],
+                ),
+              ),
+            ),
 
-  Widget _buildDesktopLayout(
-    BuildContext context,
-    LanguageController languageController,
-    ThemeController themeController,
-    double titleFontSize,
-    double subtitleFontSize,
-  ) => Row(
-    children: [
-      Expanded(
-        flex: 3,
-        child: _buildTextContent(context, languageController, themeController, titleFontSize, subtitleFontSize),
-      ),
-      const SizedBox(width: 40),
-      Expanded(
-        flex: 2,
-        child: AnimatedEntrance.fadeInRight(
-          duration: const Duration(milliseconds: 1000),
-          delay: const Duration(milliseconds: 500),
-          child: _buildProfileImage(themeController),
-        ),
-      ),
-    ],
-  );
+            // Main content
+            Opacity(
+              opacity: _contentOpacity.value,
+              child: Center(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: screenWidth > 1400 ? 160 : (screenWidth > 900 ? 80 : 24),
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      // Name — devasa display text
+                      FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: ShaderTextReveal(
+                          text: languageController.getText(
+                            'home_section.title',
+                            defaultValue: 'YUSUF IHSAN GORGEL',
+                          ).toUpperCase(),
+                          style: GoogleFonts.spaceGrotesk(
+                            fontSize: heroFontSize,
+                            fontWeight: FontWeight.w800,
+                            color: AppColors.textBright,
+                            letterSpacing: -4,
+                            height: 1.0,
+                          ),
+                          delay: AppDurations.heroNameRevealDelay,
+                          duration: AppDurations.heroNameRevealDuration,
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
 
-  Widget _buildMobileLayout(
-    BuildContext context,
-    LanguageController languageController,
-    ThemeController themeController,
-    double titleFontSize,
-    double subtitleFontSize,
-  ) => Column(
-    mainAxisAlignment: MainAxisAlignment.center,
-    children: [
-      AnimatedEntrance.fadeInDown(
-        duration: const Duration(milliseconds: 800),
-        child: _buildProfileImage(themeController, size: 120),
-      ),
-      const SizedBox(height: 32),
-      _buildTextContent(context, languageController, themeController, titleFontSize, subtitleFontSize, centered: true),
-    ],
-  );
+                      // Subtitle
+                      ShaderTextReveal(
+                        text: languageController.getText(
+                          'home_section.subtitle',
+                          defaultValue: 'Mobile Software Engineer',
+                        ),
+                        style: GoogleFonts.spaceGrotesk(
+                          fontSize: (heroFontSize * 0.35).clamp(18.0, 42.0),
+                          fontWeight: FontWeight.w400,
+                          color: AppColors.textPrimary,
+                          letterSpacing: 2,
+                          height: 1.3,
+                        ),
+                        delay: AppDurations.heroSubtitleDelay,
+                        duration: AppDurations.heroSubtitleDuration,
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 8),
 
-  Widget _buildProfileImage(ThemeController themeController, {double size = 200}) => Center(
-    child: Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        border: Border.all(color: AppColors.primary.withValues(alpha: 0.3), width: 3),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.primary.withValues(alpha: 0.2),
-            blurRadius: 30,
-            spreadRadius: 5,
-          ),
-        ],
-      ),
-      child: ClipOval(
-        child: Image.asset(
-          'assets/images/me.jpeg',
-          fit: BoxFit.cover,
-          errorBuilder: (_, __, ___) => Container(
-            color: AppColors.surface,
-            child: Icon(Icons.person, size: size * 0.5, color: AppColors.primary),
-          ),
+                      // Location — monospace
+                      ShaderTextReveal(
+                        text: languageController.getText(
+                          'cv_data.personal_info.location',
+                          defaultValue: 'Antalya, Türkiye',
+                        ),
+                        style: GoogleFonts.jetBrainsMono(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w400,
+                          color: AppColors.textSecondary,
+                          letterSpacing: 3,
+                        ),
+                        delay: AppDurations.heroLocationDelay,
+                        duration: AppDurations.heroLocationDuration,
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 56),
+
+                      // CTA buttons — pixel assembly effect
+                      _AnimatedCTAButtons(
+                        delay: AppDurations.heroCTADelay,
+                        languageController: languageController,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+
+            // Scroll indicator at bottom
+            if (_contentOpacity.value > 0.5)
+              const Positioned(
+                bottom: 32,
+                left: 0,
+                right: 0,
+                child: ScrollIndicator(
+                  delay: AppDurations.heroScrollIndicator,
+                ),
+              ),
+          ],
         ),
       ),
     ),
-  );
-
-  Widget _buildTextContent(
-    BuildContext context,
-    LanguageController languageController,
-    ThemeController themeController,
-    double titleFontSize,
-    double subtitleFontSize, {
-    bool centered = false,
-  }) {
-    final alignment = centered ? CrossAxisAlignment.center : CrossAxisAlignment.start;
-    final textAlign = centered ? TextAlign.center : TextAlign.start;
-
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: alignment,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        AnimatedEntrance.fadeInDown(
-          duration: const Duration(milliseconds: 800),
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.08),
-              borderRadius: BorderRadius.circular(30),
-              border: Border.all(
-                color: AppColors.primary.withValues(alpha: 0.3),
-                width: 1.5,
-              ),
-            ),
-            child: Text(
-              languageController.getText('home_section.welcome', defaultValue: 'Welcome to my portfolio'),
-              style: const TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-                color: Colors.white70,
-                letterSpacing: 0.5,
-              ),
-            ),
-          ),
-        ),
-        const SizedBox(height: 24),
-        AnimatedEntrance.fadeInDown(
-          delay: const Duration(milliseconds: 300),
-          duration: const Duration(milliseconds: 800),
-          child: Text(
-            languageController.getText('home_section.title', defaultValue: 'Yusuf Ihsan Gorgel'),
-            textAlign: textAlign,
-            style: TextStyle(
-              fontSize: titleFontSize,
-              fontWeight: FontWeight.w800,
-              color: Colors.white,
-              letterSpacing: -0.5,
-              height: 1.1,
-              shadows: [
-                Shadow(color: AppColors.primary.withValues(alpha: 0.4), blurRadius: 20),
-              ],
-            ),
-          ),
-        ),
-        const SizedBox(height: 12),
-        AnimatedEntrance.fadeInDown(
-          delay: const Duration(milliseconds: 600),
-          duration: const Duration(milliseconds: 800),
-          child: Text(
-            languageController.getText('home_section.subtitle', defaultValue: 'Flutter Developer & Software Engineer'),
-            textAlign: textAlign,
-            style: TextStyle(
-              fontSize: subtitleFontSize,
-              fontWeight: FontWeight.w300,
-              color: AppColors.primary.withValues(alpha: 0.9),
-              letterSpacing: 1,
-            ),
-          ),
-        ),
-        const SizedBox(height: 40),
-        AnimatedEntrance.fadeInDown(
-          delay: const Duration(milliseconds: 900),
-          duration: const Duration(milliseconds: 800),
-          child: Wrap(
-            spacing: 16,
-            runSpacing: 12,
-            alignment: centered ? WrapAlignment.center : WrapAlignment.start,
-            children: [
-              _ActionButton(
-                icon: Icons.arrow_downward_rounded,
-                label: languageController.getText('home_section.view_work', defaultValue: 'View My Work'),
-                onTap: () => Get.find<AppScrollController>().scrollToSection('projects'),
-                isPrimary: true,
-              ),
-              _ActionButton(
-                icon: Icons.download_outlined,
-                label: languageController.getText('home_section.download_cv', defaultValue: 'Download CV'),
-                onTap: _downloadCV,
-                isPrimary: false,
-              ),
-            ],
-          ),
-        ),
-      ],
     );
-  }
-
-  Future<void> _downloadCV() async {
-    final baseUrl = Uri.base.toString();
-    final cvUrl = '${baseUrl}assets/data/cv.pdf';
-    final uri = Uri.parse(cvUrl);
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
-    }
   }
 }
 
-class _ActionButton extends StatelessWidget {
-  const _ActionButton({
-    required this.icon,
-    required this.label,
-    required this.onTap,
-    required this.isPrimary,
+// ---------------------------------------------------------------------------
+// CTA Buttons with staggered entrance
+// ---------------------------------------------------------------------------
+class _AnimatedCTAButtons extends StatefulWidget {
+  const _AnimatedCTAButtons({
+    required this.delay,
+    required this.languageController,
   });
-
-  final IconData icon;
-  final String label;
-  final VoidCallback onTap;
-  final bool isPrimary;
+  final Duration delay;
+  final LanguageController languageController;
 
   @override
-  Widget build(BuildContext context) => ElevatedButton.icon(
-    onPressed: onTap,
-    icon: Icon(icon, size: 18),
-    label: Text(label),
-    style: ElevatedButton.styleFrom(
-      foregroundColor: isPrimary ? Colors.white : AppColors.primary,
-      backgroundColor: isPrimary ? AppColors.primary : Colors.transparent,
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(30),
-        side: BorderSide(
-          color: AppColors.primary,
-          width: isPrimary ? 0 : 1.5,
+  State<_AnimatedCTAButtons> createState() => _AnimatedCTAButtonsState();
+}
+
+class _AnimatedCTAButtonsState extends State<_AnimatedCTAButtons>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _ctrl;
+  late Animation<double> _opacity;
+
+  @override
+  void initState() {
+    super.initState();
+    _ctrl = AnimationController(
+      vsync: this,
+      duration: AppDurations.entrance,
+    );
+    _opacity = CurvedAnimation(parent: _ctrl, curve: CinematicCurves.revealDecel);
+    Future.delayed(widget.delay, () {
+      if (mounted) _ctrl.forward();
+    });
+  }
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => AnimatedBuilder(
+    animation: _opacity,
+    builder: (_, __) => Opacity(
+      opacity: _opacity.value,
+      child: Transform.translate(
+        offset: Offset(0, 10 * (1 - _opacity.value)),
+        child: Wrap(
+          alignment: WrapAlignment.center,
+          spacing: 20,
+          runSpacing: 12,
+          children: [
+            CinematicButton(
+              label: widget.languageController.getText(
+                'home_section.view_work',
+                defaultValue: 'View My Work',
+              ),
+              onTap: () => Get.find<AppScrollController>()
+                  .scrollToSection('projects'),
+            ),
+            CinematicButton(
+              label: widget.languageController.getText(
+                'home_section.download_cv',
+                defaultValue: 'Download CV',
+              ),
+              onTap: () async {
+                final baseUrl = Uri.base.toString();
+                final cvUrl = '${baseUrl}assets/data/cv.pdf';
+                final uri = Uri.parse(cvUrl);
+                if (await canLaunchUrl(uri)) {
+                  await launchUrl(uri, mode: LaunchMode.externalApplication);
+                }
+              },
+            ),
+          ],
         ),
       ),
-      elevation: 0,
     ),
   );
 }

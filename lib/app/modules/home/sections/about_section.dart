@@ -1,236 +1,273 @@
 import 'package:flutter/material.dart';
-import 'dart:async';
 import 'package:get/get.dart';
-import 'package:flutter_web_portfolio/app/widgets/animated_entrance.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_web_portfolio/app/controllers/language_controller.dart';
-import 'package:flutter_web_portfolio/app/controllers/theme_controller.dart';
-import 'package:flutter_web_portfolio/app/models/terminal_output_model.dart';
-import 'package:flutter_web_portfolio/app/widgets/terminal/terminal_command_handler.dart';
-import 'package:flutter_web_portfolio/app/widgets/terminal/terminal_widget.dart';
-import 'package:flutter_web_portfolio/app/widgets/terminal/typing_animation.dart';
-import 'package:flutter_web_portfolio/app/widgets/section_title.dart';
+import 'package:flutter_web_portfolio/app/controllers/scene_director.dart';
+import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
+import 'package:flutter_web_portfolio/app/core/constants/cinematic_curves.dart';
+import 'package:flutter_web_portfolio/app/core/constants/durations.dart';
+import 'package:flutter_web_portfolio/app/core/theme/app_typography.dart';
+import 'package:flutter_web_portfolio/app/utils/responsive_utils.dart';
+import 'package:flutter_web_portfolio/app/widgets/scroll_fade_in.dart';
 
-/// About section - provides user interaction via a terminal interface
-class AboutSection extends StatefulWidget {
+/// About Section — "The Introduction"
+/// Giant watermark, flashlight photo, floating tech pills.
+class AboutSection extends StatelessWidget {
   const AboutSection({super.key});
 
   @override
-  State<AboutSection> createState() => _AboutSectionState();
-}
+  Widget build(BuildContext context) {
+    final languageController = Get.find<LanguageController>();
+    final isMobile = ResponsiveUtils.isMobile(context);
+    final screenWidth = MediaQuery.sizeOf(context).width;
+    final data = languageController.cvData['personal_info'] as Map<String, dynamic>? ?? <String, dynamic>{};
 
-class _AboutSectionState extends State<AboutSection>
-    with SingleTickerProviderStateMixin {
-  // Controllers
-  final LanguageController _languageController = Get.find<LanguageController>();
-  final ThemeController _themeController = Get.find<ThemeController>();
-
-  // Terminal state
-  final List<TerminalOutputModel> _outputs = [];
-  final ScrollController _scrollController = ScrollController();
-  final TextEditingController _commandController = TextEditingController();
-  final FocusNode _terminalFocus = FocusNode();
-
-  // Helper classes
-  late final TerminalCommandHandler _commandHandler;
-  final TypingAnimation _typingAnimation = TypingAnimation();
-
-  // Animation controller
-  late final AnimationController _animationController;
-
-  // Terminal title and prefix
-  String _terminalTitle = '';
-  String _terminalPrefix = '>';
-
-  @override
-  void initState() {
-    super.initState();
-    _initializeTerminal();
-    _initializeAnimations();
-    _showWelcomeMessage();
-  }
-
-  /// Initializes terminal components
-  void _initializeTerminal() {
-    // Create command handler
-    _commandHandler = TerminalCommandHandler(
-      languageController: _languageController,
-      addOutput: _addOutput,
-      clearTerminal: _clearTerminal,
-      scrollToBottom: _scrollToBottom,
-    );
-
-    // Set terminal title
-    _terminalTitle = _languageController.getText(
-      'terminal.title',
-      defaultValue: 'Terminal',
-    );
-
-    _terminalPrefix = _languageController.getText(
-      'terminal.prefix',
-      defaultValue: '>',
-    );
-  }
-
-  /// Initializes animations
-  void _initializeAnimations() {
-    _animationController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 800),
-    );
-
-    _animationController.forward();
-  }
-
-  /// Displays the welcome message
-  void _showWelcomeMessage() {
-    // Get welcome message
-    final welcomeMessage = _languageController.getText(
-      'terminal.welcome',
-      defaultValue: 'Interactive terminal portföyüme hoş geldiniz!',
-    );
-
-    final helpHint = _languageController.getText(
-      'terminal.help_hint',
-      defaultValue: 'Kullanılabilir komutları görmek için "help" yazın.',
-    );
-
-    // Add welcome message
-    _addOutput(
-      TerminalOutputModel(
-        content: welcomeMessage,
-        type: TerminalOutputType.system,
-        color: Colors.greenAccent,
-        isBold: true,
-        isTyping: true,
-        isCompleted: false,
-        currentIndex: 0,
-      ),
-    );
-
-    // Add help hint
-    _addOutput(
-      TerminalOutputModel(
-        content: helpHint,
-        type: TerminalOutputType.system,
-        color: Colors.cyanAccent,
-        isTyping: true,
-        isCompleted: false,
-        currentIndex: 0,
-      ),
-    );
-  }
-
-  /// Adds terminal output
-  void _addOutput(TerminalOutputModel output) {
-    setState(() {
-      _outputs.add(output);
-
-      // Start typing animation if enabled
-      if (output.isTyping) {
-        _typingAnimation.simulateTyping(
-          output: output,
-          onComplete: _scrollToBottom,
-          setState: setState,
-        );
-      } else {
-        _scrollToBottom();
-      }
-    });
-  }
-
-  /// Clears the terminal screen
-  void _clearTerminal() {
-    setState(_outputs.clear);
-  }
-
-  /// Scrolls to the bottom of the terminal
-  void _scrollToBottom() {
-    if (_scrollController.hasClients) {
-      Future.delayed(const Duration(milliseconds: 50), () {
-        _scrollController.animateTo(
-          _scrollController.position.maxScrollExtent,
-          duration: const Duration(milliseconds: 200),
-          curve: Curves.easeOut,
-        );
-      });
-    }
-  }
-
-  /// Handles command submission
-  void _handleCommandSubmit(String command) {
-    _commandController.clear();
-
-    if (command.trim().isEmpty) return;
-
-    // Add command to output
-    _addOutput(
-      TerminalOutputModel(
-        content: command,
-        type: TerminalOutputType.command,
-        isTyping: false,
-        isCompleted: true,
-        currentIndex: command.length,
-      ),
-    );
-
-    _commandHandler.handleCommand(command);
-    _terminalFocus.requestFocus();
-  }
-
-  @override
-  void dispose() {
-    _scrollController.dispose();
-    _commandController.dispose();
-    _terminalFocus.dispose();
-    _animationController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) => AnimatedEntrance.fadeInUp(
-      duration: const Duration(milliseconds: 800),
-      child: SizedBox(
-        width: double.infinity,
-        // Screen height minus AppBar height
-        height: MediaQuery.of(context).size.height - 80,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
+    return Container(
+      width: double.infinity,
+      constraints: const BoxConstraints(maxWidth: 1100),
+      child: Stack(
+        children: [
+          // Giant watermark — derived from nav i18n
+          Positioned(
+            top: -20,
+            left: -10,
+            child: Obx(() => Text(
+              languageController.getText('nav.about', defaultValue: 'About').toUpperCase(),
+              style: GoogleFonts.spaceGrotesk(
+                fontSize: ResponsiveUtils.getValueForScreenType<double>(
+                  context: context,
+                  mobile: 48.0,
+                  tablet: screenWidth * 0.14,
+                  desktop: screenWidth * 0.18,
+                ),
+                fontWeight: FontWeight.w800,
+                color: Colors.white.withValues(alpha: 0.03),
+                letterSpacing: -4,
+              ),
+            )),
+          ),
+          // Content
+          Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildSectionTitle(),
-
-              const SizedBox(height: 16),
-              Flexible(
-                child: TerminalWidget(
-                  outputs: _outputs,
-                  scrollController: _scrollController,
-                  title: _terminalTitle,
-                  terminalPrefix: _terminalPrefix,
-                  commandController: _commandController,
-                  terminalFocus: _terminalFocus,
-                  onSubmitCommand: _handleCommandSubmit,
-                ),
-              ),
+              const SizedBox(height: 40),
+              if (isMobile)
+                _buildMobileLayout(data, languageController)
+              else
+                _buildDesktopLayout(data, languageController),
             ],
           ),
-        ),
+        ],
       ),
     );
+  }
 
-  /// Builds the section title
-  Widget _buildSectionTitle() => SectionTitle(
-      title: _languageController.getText(
-        'about_section.title',
-        defaultValue: 'Hakkımda',
+  Widget _buildDesktopLayout(Map<String, dynamic> data, LanguageController languageController) => Row(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Expanded(
+        flex: 3,
+        child: ScrollFadeIn(
+          child: _BioContent(data: data, languageController: languageController),
+        ),
       ),
-      useGlow: false,
-      padding: const EdgeInsets.only(left: 8.0, bottom: 0),
-      titleStyle: TextStyle(
-        fontSize: 28,
-        fontWeight: FontWeight.bold,
-        color: _themeController.isDarkMode ? Colors.white : Colors.black,
+      const SizedBox(width: 48),
+      Expanded(
+        flex: 2,
+        child: ScrollFadeIn(
+          delay: AppDurations.staggerMedium,
+          child: _FlashlightPhoto(),
+        ),
+      ),
+    ],
+  );
+
+  Widget _buildMobileLayout(Map<String, dynamic> data, LanguageController languageController) => Column(
+    children: [
+      ScrollFadeIn(child: _FlashlightPhoto()),
+      const SizedBox(height: 32),
+      ScrollFadeIn(
+        delay: AppDurations.staggerMedium,
+        child: _BioContent(data: data, languageController: languageController),
+      ),
+    ],
+  );
+}
+
+// Bio content with staggered word reveal
+class _BioContent extends StatelessWidget {
+  const _BioContent({required this.data, required this.languageController});
+
+  final Map<String, dynamic> data;
+  final LanguageController languageController;
+
+  @override
+  Widget build(BuildContext context) {
+    final sceneDirector = Get.find<SceneDirector>();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Section label
+        Obx(() => Text(
+          languageController.getText('about_section.title', defaultValue: 'About Me'),
+          style: AppTypography.h1.copyWith(
+            color: sceneDirector.currentAccent.value,
+          ),
+        )),
+        const SizedBox(height: 24),
+        Text(
+          (data['bio'] as String?) ?? languageController.getText(
+            'about_section.bio',
+            defaultValue: 'I enjoy creating things that live on the internet, '
+                'whether that be websites, applications, or anything in between. '
+                'My goal is to always build products that provide pixel-perfect, '
+                'performant experiences.',
+          ),
+          style: AppTypography.body,
+        ),
+        const SizedBox(height: 16),
+        Text(
+          languageController.getText(
+            'about_section.bio2',
+            defaultValue: 'Here are a few technologies I\'ve been working with recently:',
+          ),
+          style: AppTypography.body,
+        ),
+        const SizedBox(height: 24),
+        // Floating tech pills — derived from cvData skills
+        _FloatingTechPills(
+          sceneDirector: sceneDirector,
+          languageController: languageController,
+        ),
+      ],
+    );
+  }
+}
+
+// Floating tech pills — data-driven from cvData skills
+class _FloatingTechPills extends StatelessWidget {
+  const _FloatingTechPills({
+    required this.sceneDirector,
+    required this.languageController,
+  });
+  final SceneDirector sceneDirector;
+  final LanguageController languageController;
+
+  List<String> _getTechnologies() {
+    final skills = languageController.cvData['skills'] as List? ?? [];
+    return skills.map<String>((s) {
+      final items = ((s as Map<String, dynamic>)['items'] as List?) ?? [];
+      return items.take(2).join(' & ');
+    }).toList();
+  }
+
+  @override
+  Widget build(BuildContext context) => Obx(() {
+    final accent = sceneDirector.currentAccent.value;
+    final technologies = _getTechnologies();
+    return Wrap(
+      spacing: 10,
+      runSpacing: 10,
+      children: technologies.map((tech) => Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        decoration: BoxDecoration(
+          color: accent.withValues(alpha: 0.08),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: accent.withValues(alpha: 0.15),
+            width: 1,
+          ),
+        ),
+        child: Text(
+          tech,
+          style: GoogleFonts.jetBrainsMono(
+            fontSize: 13,
+            color: accent,
+          ),
+        ),
+      )).toList(),
+    );
+  });
+}
+
+// TODO: extract FlashlightPhoto to its own widget file if reused elsewhere
+class _FlashlightPhoto extends StatefulWidget {
+  @override
+  State<_FlashlightPhoto> createState() => _FlashlightPhotoState();
+}
+
+class _FlashlightPhotoState extends State<_FlashlightPhoto> {
+  Offset _mousePos = const Offset(0.5, 0.5);
+  bool _hovered = false;
+
+  @override
+  Widget build(BuildContext context) => MouseRegion(
+      onEnter: (_) => setState(() => _hovered = true),
+      onHover: (e) {
+        final box = context.findRenderObject() as RenderBox?;
+        if (box == null) return;
+        setState(() {
+          _mousePos = Offset(
+            e.localPosition.dx / box.size.width,
+            e.localPosition.dy / box.size.height,
+          );
+        });
+      },
+      onExit: (_) => setState(() {
+        _hovered = false;
+        _mousePos = const Offset(0.5, 0.5);
+      }),
+      child: AnimatedContainer(
+        duration: AppDurations.medium,
+        curve: CinematicCurves.hoverLift,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(8),
+          boxShadow: _hovered
+              ? [
+                  BoxShadow(
+                    color: AppColors.heroAccent.withValues(alpha: 0.1),
+                    blurRadius: 30,
+                    spreadRadius: 0,
+                  ),
+                ]
+              : [],
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(8),
+          child: ShaderMask(
+            blendMode: BlendMode.dstIn,
+            shaderCallback: (bounds) => RadialGradient(
+              center: Alignment(
+                _mousePos.dx * 2 - 1,
+                _mousePos.dy * 2 - 1,
+              ),
+              radius: _hovered ? 1.2 : 2.0,
+              colors: [
+                Colors.white,
+                Colors.white.withValues(alpha: 0.8),
+                Colors.white.withValues(alpha: _hovered ? 0.2 : 0.5),
+              ],
+              stops: const [0.0, 0.4, 1.0],
+            ).createShader(bounds),
+            child: Image.asset(
+              'assets/images/me.jpeg',
+              width: double.infinity,
+              fit: BoxFit.cover,
+              errorBuilder: (_, __, ___) => AspectRatio(
+                aspectRatio: 1,
+                child: Container(
+                  color: AppColors.backgroundLight,
+                  child: Icon(
+                    Icons.person,
+                    size: 64,
+                    color: AppColors.textSecondary.withValues(alpha: 0.3),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
       ),
     );
 }
