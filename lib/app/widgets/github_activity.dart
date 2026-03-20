@@ -10,6 +10,7 @@ import 'package:flutter_web_portfolio/app/core/theme/app_typography.dart';
 import 'package:flutter_web_portfolio/app/data/providers/github_provider.dart';
 import 'package:flutter_web_portfolio/app/widgets/border_light_card.dart';
 import 'package:flutter_web_portfolio/app/widgets/scroll_fade_in.dart';
+import 'package:flutter_web_portfolio/app/widgets/skeleton_shimmer.dart';
 
 /// Displays live GitHub stats and recent repos fetched from the public API.
 /// Falls back to static data if the API is unreachable.
@@ -353,7 +354,7 @@ class _RepoCard extends StatelessWidget {
 }
 
 // ---------------------------------------------------------------------------
-// Loading skeleton
+// Loading skeleton — animated shimmer placeholders
 // ---------------------------------------------------------------------------
 class _LoadingSkeleton extends StatelessWidget {
   const _LoadingSkeleton();
@@ -364,40 +365,29 @@ class _LoadingSkeleton extends StatelessWidget {
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _shimmer(width: 180, height: 24),
+        // Section title placeholder
+        const SkeletonShimmer(width: 180, height: 24),
         const SizedBox(height: 24),
-        Row(
-          children: [
-            _shimmer(width: 56, height: 56, circular: true),
-            const SizedBox(width: 16),
-            _shimmer(width: 100, height: 40),
-            const SizedBox(width: 16),
-            _shimmer(width: 100, height: 40),
-            const SizedBox(width: 16),
-            _shimmer(width: 100, height: 40),
-          ],
-        ),
-        const SizedBox(height: 24),
+        // 4 stat chip placeholders
         Wrap(
           spacing: 16,
           runSpacing: 16,
-          children: List.generate(3, (_) => _shimmer(width: 200, height: 100)),
+          children: List.generate(
+            4,
+            (_) => const SkeletonShimmer(width: 110, height: 40),
+          ),
+        ),
+        const SizedBox(height: 24),
+        // 5 repo card placeholders
+        Wrap(
+          spacing: 16,
+          runSpacing: 16,
+          children: List.generate(
+            5,
+            (_) => const SkeletonShimmer(width: 220, height: 110),
+          ),
         ),
       ],
-    ),
-  );
-
-  Widget _shimmer({
-    required double width,
-    required double height,
-    bool circular = false,
-  }) => Container(
-    width: width,
-    height: height,
-    decoration: BoxDecoration(
-      color: AppColors.backgroundLight.withValues(alpha: 0.4),
-      borderRadius: circular ? null : BorderRadius.circular(8),
-      shape: circular ? BoxShape.circle : BoxShape.rectangle,
     ),
   );
 }
