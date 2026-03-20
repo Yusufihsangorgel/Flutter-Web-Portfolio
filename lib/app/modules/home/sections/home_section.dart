@@ -280,6 +280,7 @@ class _AnimatedCTAButtonsState extends State<_AnimatedCTAButtons>
                 'home_section.view_work',
                 defaultValue: 'View My Work',
               ),
+              isPrimary: true,
               onTap: () => Get.find<AppScrollController>()
                   .scrollToSection('projects'),
             ),

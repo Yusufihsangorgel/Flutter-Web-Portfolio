@@ -15,6 +15,7 @@ import 'package:flutter_web_portfolio/app/modules/home/sections/projects/project
 import 'package:flutter_web_portfolio/app/modules/home/sections/blog_section.dart';
 import 'package:flutter_web_portfolio/app/modules/home/sections/contact/contact_section.dart';
 import 'package:flutter_web_portfolio/app/modules/home/sections/testimonials_section.dart';
+import 'package:flutter_web_portfolio/app/widgets/back_to_top_button.dart';
 import 'package:flutter_web_portfolio/app/widgets/command_palette.dart';
 import 'package:flutter_web_portfolio/app/widgets/custom_sliver_app_bar.dart';
 import 'package:flutter_web_portfolio/app/widgets/footer.dart';
@@ -24,7 +25,7 @@ import 'package:flutter_web_portfolio/app/widgets/background/cinematic_backgroun
 import 'package:flutter_web_portfolio/app/widgets/constellation_particles.dart';
 
 /// Aurora Cinema home view — cinematic scene-driven portfolio.
-/// Layer stack: dark base → mesh gradient → constellation particles → content.
+/// Layer stack: dark base -> mesh gradient -> constellation particles -> content.
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
 
@@ -50,17 +51,20 @@ class _HomeViewState extends State<HomeView> {
   final List<LogicalKeyboardKey> _konamiBuffer = [];
   bool _showMatrixRain = false;
   final FocusNode _focusNode = FocusNode();
+  final FocusNode _skipLinkFocusNode = FocusNode();
+  bool _skipLinkVisible = false;
 
   @override
   void dispose() {
     _focusNode.dispose();
+    _skipLinkFocusNode.dispose();
     super.dispose();
   }
 
   KeyEventResult _handleKeyEvent(FocusNode _, KeyEvent event) {
     if (event is! KeyDownEvent) return KeyEventResult.ignored;
 
-    // Ctrl+K / Cmd+K → open command palette
+    // Ctrl+K / Cmd+K -> open command palette
     if (event.logicalKey == LogicalKeyboardKey.keyK &&
         (HardwareKeyboard.instance.isControlPressed ||
             HardwareKeyboard.instance.isMetaPressed)) {
@@ -144,6 +148,22 @@ class _HomeViewState extends State<HomeView> {
                     ),
                   ),
                 ),
+              // Skip-to-content link (accessibility)
+              Positioned(
+                top: 0,
+                left: 0,
+                right: 0,
+                child: _SkipToContentLink(
+                  visible: _skipLinkVisible,
+                  focusNode: _skipLinkFocusNode,
+                  onFocusChanged: (focused) {
+                    setState(() => _skipLinkVisible = focused);
+                  },
+                  onActivate: () {
+                    scrollController.scrollToSection('about');
+                  },
+                ),
+              ),
               // Layer 3: Scrollable content
               ValueListenableBuilder<bool>(
                 valueListenable: HomeSection.entranceComplete,
@@ -202,7 +222,9 @@ class _HomeViewState extends State<HomeView> {
                   ],
                 ),
               ),
-              // Layer 4: Matrix rain easter egg overlay
+              // Layer 4: Back-to-top button
+              const BackToTopButton(),
+              // Layer 5: Matrix rain easter egg overlay
               if (_showMatrixRain)
                 Positioned.fill(
                   child: MatrixRain(
@@ -237,6 +259,72 @@ class _HomeViewState extends State<HomeView> {
       child: animated
           ? ScrollFadeIn(delay: delay, child: child)
           : child,
+    ),
+  );
+}
+
+/// Hidden skip-to-content link for keyboard and screen reader users.
+///
+/// Invisible by default; becomes visible when focused via Tab key.
+class _SkipToContentLink extends StatelessWidget {
+  const _SkipToContentLink({
+    required this.visible,
+    required this.focusNode,
+    required this.onFocusChanged,
+    required this.onActivate,
+  });
+
+  final bool visible;
+  final FocusNode focusNode;
+  final ValueChanged<bool> onFocusChanged;
+  final VoidCallback onActivate;
+
+  @override
+  Widget build(BuildContext context) => Semantics(
+    label: 'Skip to content',
+    button: true,
+    child: Focus(
+      focusNode: focusNode,
+      onFocusChange: onFocusChanged,
+      onKeyEvent: (_, event) {
+        if (event is KeyDownEvent &&
+            (event.logicalKey == LogicalKeyboardKey.enter ||
+                event.logicalKey == LogicalKeyboardKey.space)) {
+          onActivate();
+          return KeyEventResult.handled;
+        }
+        return KeyEventResult.ignored;
+      },
+      child: AnimatedOpacity(
+        opacity: visible ? 1.0 : 0.0,
+        duration: AppDurations.fast,
+        child: AnimatedContainer(
+          duration: AppDurations.fast,
+          transform: Matrix4.translationValues(
+            0,
+            visible ? 0 : -48,
+            0,
+          ),
+          child: Center(
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              decoration: BoxDecoration(
+                color: AppColors.accent,
+                borderRadius: BorderRadius.circular(4),
+              ),
+              child: const Text(
+                'Skip to content',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  decoration: TextDecoration.none,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
     ),
   );
 }
