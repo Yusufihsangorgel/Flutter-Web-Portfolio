@@ -9,6 +9,7 @@ import 'package:flutter_web_portfolio/app/controllers/scroll_controller.dart';
 import 'package:flutter_web_portfolio/app/data/providers/assets_provider.dart';
 import 'package:flutter_web_portfolio/app/controllers/theme_controller.dart';
 import 'package:flutter_web_portfolio/app/data/providers/local_storage_provider.dart';
+import 'package:flutter_web_portfolio/app/data/providers/github_provider.dart';
 import 'package:flutter_web_portfolio/app/data/providers/medium_provider.dart';
 import 'package:flutter_web_portfolio/app/data/repositories/language_repository_impl.dart';
 import 'package:flutter_web_portfolio/app/domain/providers/i_assets_provider.dart';
@@ -30,7 +31,8 @@ class AppBindings extends Bindings {
       ..put(SceneDirector(), permanent: true)
       ..put(CursorController(), permanent: true)
       ..put(AudioController(), permanent: true)
-      ..put(MediumProvider(), permanent: true);
+      ..put(MediumProvider(), permanent: true)
+      ..put(GitHubProvider(), permanent: true);
     if (!Get.isRegistered<LanguageController>()) {
       final dummyRepository = LanguageRepositoryImpl(
         assetsProvider: Get.find<IAssetsProvider>(),

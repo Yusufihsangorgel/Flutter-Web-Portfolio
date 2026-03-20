@@ -2,28 +2,10 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_web_portfolio/app/data/providers/github_provider.dart';
 
 void main() {
-  group('GitHubProvider — singleton', () {
-    test('instance returns the same object', () {
-      final a = GitHubProvider.instance;
-      final b = GitHubProvider.instance;
-      expect(a, same(b));
-    });
-
-    test('hasCachedData is false on fresh instance', () {
-      // The singleton may have state from earlier tests, but
-      // fallback data is static and always available.
-      expect(GitHubProvider.instance, isNotNull);
-    });
-  });
-
   group('GitHubProvider — fallback data', () {
-    test('fallbackProfile is non-empty', () {
-      final profile = GitHubProvider.fallbackProfile;
+    test('fallbackProfile is non-empty with expected keys', () {
+      final profile = GitHubProvider.fallbackProfile('testuser');
       expect(profile, isNotEmpty);
-    });
-
-    test('fallbackProfile contains expected keys', () {
-      final profile = GitHubProvider.fallbackProfile;
       expect(profile.containsKey('avatar_url'), isTrue);
       expect(profile.containsKey('public_repos'), isTrue);
       expect(profile.containsKey('followers'), isTrue);
@@ -31,24 +13,21 @@ void main() {
       expect(profile.containsKey('login'), isTrue);
     });
 
-    test('fallbackProfile login matches username', () {
-      final profile = GitHubProvider.fallbackProfile;
-      expect(profile['login'], equals('Yusufihsangorgel'));
+    test('fallbackProfile login matches provided username', () {
+      final profile = GitHubProvider.fallbackProfile('myuser');
+      expect(profile['login'], equals('myuser'));
     });
 
     test('fallbackProfile html_url contains username', () {
-      final profile = GitHubProvider.fallbackProfile;
+      final profile = GitHubProvider.fallbackProfile('somedev');
       final url = profile['html_url'] as String;
-      expect(url, contains('Yusufihsangorgel'));
+      expect(url, contains('somedev'));
     });
 
-    test('fallbackRepos is non-empty', () {
-      final repos = GitHubProvider.fallbackRepos;
+    test('fallbackRepos is non-empty with required fields', () {
+      final repos = GitHubProvider.fallbackRepos('testuser');
       expect(repos, isNotEmpty);
-    });
-
-    test('fallbackRepos first entry has required fields', () {
-      final repo = GitHubProvider.fallbackRepos.first;
+      final repo = repos.first;
       expect(repo.containsKey('name'), isTrue);
       expect(repo.containsKey('description'), isTrue);
       expect(repo.containsKey('language'), isTrue);
@@ -56,21 +35,13 @@ void main() {
       expect(repo.containsKey('html_url'), isTrue);
     });
 
-    test('fallbackRepos returns a new list each call', () {
-      final a = GitHubProvider.fallbackRepos;
-      final b = GitHubProvider.fallbackRepos;
-      expect(a, isNot(same(b)));
+    test('fallbackRepos URL contains username', () {
+      final repos = GitHubProvider.fallbackRepos('forkuser');
+      expect(repos.first['html_url'], contains('forkuser'));
     });
 
     test('fallbackTotalStars is non-negative', () {
       expect(GitHubProvider.fallbackTotalStars, greaterThanOrEqualTo(0));
-    });
-  });
-
-  group('GitHubProvider — username', () {
-    test('fallback profile uses Yusufihsangorgel username', () {
-      final profile = GitHubProvider.fallbackProfile;
-      expect(profile['login'], equals('Yusufihsangorgel'));
     });
   });
 }

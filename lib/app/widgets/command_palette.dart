@@ -161,8 +161,8 @@ class _CommandPaletteState extends State<CommandPalette> {
         category: 'Action',
         icon: Icons.download_rounded,
         onExecute: () => _executeAndClose(() async {
-          const cvUrl =
-              'https://github.com/Yusufihsangorgel/Yusufihsangorgel/raw/main/Yusuf_Ihsan_Gorgel_CV.pdf';
+          final baseUrl = Uri.base.toString();
+          final cvUrl = '${baseUrl}assets/data/cv.pdf';
           final uri = Uri.parse(cvUrl);
           if (await canLaunchUrl(uri)) {
             await launchUrl(uri, mode: LaunchMode.externalApplication);

@@ -24,13 +24,14 @@ class GitHubActivity extends StatefulWidget {
 }
 
 class _GitHubActivityState extends State<GitHubActivity> {
-  final _provider = GitHubProvider.instance;
+  final _provider = Get.find<GitHubProvider>();
   bool _loading = true;
   bool _error = false;
 
   Map<String, dynamic> _profile = {};
   List<Map<String, dynamic>> _repos = [];
   int _totalStars = 0;
+  String _username = '';
 
   @override
   void initState() {
@@ -38,17 +39,29 @@ class _GitHubActivityState extends State<GitHubActivity> {
     _fetchData();
   }
 
+  String _resolveUsername() {
+    final lang = Get.find<LanguageController>();
+    final github = (lang.cvData['personal_info']?['github'] as String?) ?? '';
+    // Extract username from URL like "https://github.com/Yusufihsangorgel"
+    final uri = Uri.tryParse(github);
+    if (uri != null && uri.pathSegments.isNotEmpty) {
+      return uri.pathSegments.first;
+    }
+    return '';
+  }
+
   Future<void> _fetchData() async {
-    // If already cached, skip loading skeleton
-    if (_provider.hasCachedData) {
-      setState(() => _loading = false);
+    _username = _resolveUsername();
+    if (_username.isEmpty) {
+      if (mounted) setState(() => _loading = false);
+      return;
     }
 
     try {
       final results = await Future.wait([
-        _provider.fetchProfile(),
-        _provider.fetchRecentRepos(),
-        _provider.fetchTotalStars(),
+        _provider.fetchProfile(_username),
+        _provider.fetchRecentRepos(_username),
+        _provider.fetchTotalStars(_username),
       ]);
       if (!mounted) return;
       setState(() {
@@ -61,8 +74,8 @@ class _GitHubActivityState extends State<GitHubActivity> {
     } catch (_) {
       if (!mounted) return;
       setState(() {
-        _profile = GitHubProvider.fallbackProfile;
-        _repos = GitHubProvider.fallbackRepos;
+        _profile = GitHubProvider.fallbackProfile(_username);
+        _repos = GitHubProvider.fallbackRepos(_username);
         _totalStars = GitHubProvider.fallbackTotalStars;
         _loading = false;
         _error = true;
