@@ -68,7 +68,8 @@
   },
   "social_links": {
     "github": "https://github.com/Yusufihsangorgel",
-    "linkedin": "https://linkedin.com/in/yusuf-ihsan-görgel/"
+    "linkedin": "https://linkedin.com/in/yusuf-ihsan-görgel/",
+    "medium": "https://medium.com/@developeryusufihsan"
   },
   "cv_data": {
     "personal_info": {
@@ -79,7 +80,8 @@
       "location": "Antalya, Türkiye (Remoto)",
       "github": "https://github.com/Yusufihsangorgel",
       "linkedin": "https://linkedin.com/in/yusuf-ihsan-görgel/",
-      "bio": "Soy Ingeniero de Software con más de 4 años de experiencia especializado en aplicaciones móviles de calidad producción. Me enfoco en arquitectura, rendimiento y fiabilidad — construyendo apps multiplataforma con Flutter y capacidades nativas iOS/Android con Swift y Kotlin. Actualmente trabajo en FugaSoft en Uzman Adres."
+      "bio": "Soy Ingeniero de Software con más de 4 años de experiencia especializado en aplicaciones móviles de calidad producción. Me enfoco en arquitectura, rendimiento y fiabilidad — construyendo apps multiplataforma con Flutter y capacidades nativas iOS/Android con Swift y Kotlin. Actualmente trabajo en FugaSoft en Uzman Adres.",
+      "medium": "developeryusufihsan"
     },
     "experiences": [
       {
@@ -204,56 +206,6 @@
         "name": "Prof. Dr. Mehmet Kara",
         "position": "Facultad de Ciencias de la Computacion",
         "company": "Universidad Mehmet Akif Ersoy"
-      }
-    ],
-    "blog_posts": [
-      {
-        "title": "Construyendo un portafolio cinematico con Flutter Web",
-        "date": "2026-03-10",
-        "summary": "Un analisis profundo de la construccion de este portafolio — transiciones de escenas impulsadas por scroll con mezcla de gradient mesh, sistemas de particulas con cuadricula espacial, overlays de cursor personalizados y una paleta de comandos. Como arquitecte una base de codigo SOLID limpia con GetX, contratos de interfaz abstractos y tokens de diseno centralizados mientras desplegaba en web con soporte WASM.",
-        "readTime": "12 min de lectura",
-        "tags": ["Flutter Web", "Animacion", "Arquitectura Limpia", "WASM"],
-        "url": "https://github.com/Yusufihsangorgel/Flutter-Web-Portfolio"
-      },
-      {
-        "title": "Arquitectura POS Offline-First: Cero perdida de datos en 5 plataformas",
-        "date": "2025-11-15",
-        "summary": "Como la base de datos local SQLite-Drift de FugaSoft maneja mas de 100K transacciones diarias con sincronizacion bidireccional, resolucion de conflictos y colas de reintento automatico. Desplegamos la misma base de codigo Flutter en tablets Android, iPads, terminales Linux, estaciones macOS y hardware POS Windows — cada una con integraciones de escaner de codigos de barras especificas de la plataforma.",
-        "readTime": "15 min de lectura",
-        "tags": ["Flutter", "SQLite-Drift", "Offline-First", "Multiplataforma"],
-        "url": "https://github.com/Yusufihsangorgel"
-      },
-      {
-        "title": "Seguimiento de flotas en tiempo real: WebSocket a escala con Flutter",
-        "date": "2025-08-20",
-        "summary": "Dentro de la plataforma logistica en tiempo real de Dorse — manejando mas de 5,000 conexiones WebSocket simultaneas para seguimiento vehicular en vivo. Cubro la arquitectura basada en eventos, la integracion de SDKs Google/Apple Maps para renderizado de rutas, y como logramos una latencia de actualizacion menor a 200ms desde el dispositivo GPS hasta la pantalla del conductor. Incluye lecciones del debugging de tormentas de conexion en horas pico.",
-        "readTime": "14 min de lectura",
-        "tags": ["WebSocket", "Maps SDK", "Tiempo Real", "Flutter"],
-        "url": "https://github.com/Yusufihsangorgel"
-      },
-      {
-        "title": "Gestion de estado en produccion: patrones GetX que escalan",
-        "date": "2025-05-12",
-        "summary": "Despues de lanzar 4 aplicaciones en produccion con GetX, esto es lo que haria diferente. Estado reactivo con Rx vs GetBuilder, cuando usar Workers (ever/debounce/interval), gestion correcta del ciclo de vida de controllers, y los patrones de inyeccion de dependencias que mantuvieron testable nuestra base de codigo de mas de 50K lineas. Incluye una comparacion con BLoC y Riverpod para casos de uso especificos.",
-        "readTime": "11 min de lectura",
-        "tags": ["GetX", "Gestion de Estado", "Arquitectura", "Testing"],
-        "url": "https://github.com/Yusufihsangorgel"
-      },
-      {
-        "title": "Publicar en 4 tiendas de apps: lecciones del lanzamiento de apps de lectura",
-        "date": "2025-02-28",
-        "summary": "El recorrido de publicar Aydınlık E-Newspaper y Bilim ve Utopya E-Magazine en Google Play y App Store simultaneamente. Desde decisiones de arquitectura MVVM con GetX y Dio, hasta renderizado PDF a escala, tasas de entrega de notificaciones push, y las trampas del proceso de revision que retrasaron nuestro primer lanzamiento en iOS por 3 semanas.",
-        "readTime": "9 min de lectura",
-        "tags": ["App Store", "Google Play", "MVVM", "Publicacion"],
-        "url": "https://github.com/Yusufihsangorgel"
-      },
-      {
-        "title": "CustomPaint a fondo: construyendo un sistema de particulas desde cero",
-        "date": "2026-01-05",
-        "summary": "Como construi el sistema de particulas de constelacion en este portafolio — busquedas de vecinos por cuadricula espacial para renderizado de conexiones O(n) en lugar del ingenuo O(n²), objetos Paint cacheados para eliminar la presion del GC a 60fps, fisica de repulsion del mouse, y controladores de animacion conscientes del ciclo de vida que pausan cuando la pestana esta en segundo plano. Resultados de perfilado de rendimiento incluidos.",
-        "readTime": "13 min de lectura",
-        "tags": ["CustomPainter", "Rendimiento", "Animacion", "Dart"],
-        "url": "https://github.com/Yusufihsangorgel/Flutter-Web-Portfolio"
       }
     ],
     "contact": {
