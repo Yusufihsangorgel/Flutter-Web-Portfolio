@@ -60,7 +60,8 @@ class MediumProvider {
         'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
       ];
       return '${months[dt.month - 1]} ${dt.day}, ${dt.year}';
-    } catch (_) {
+    } catch (e) {
+      dev.log('Date parse failed', name: 'MediumProvider', error: e);
       return raw.length >= 10 ? raw.substring(0, 10) : raw;
     }
   }

@@ -41,6 +41,9 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 
+# Test coverage
+coverage/
+
 # Secrets & signing
 .env
 *.jks

@@ -231,6 +231,7 @@
       }
     ],
     "contact": {
+      "formspree_id": "xpznqkao",
       "form": {
         "name_label": "Name",
         "email_label": "Email",

@@ -12,6 +12,7 @@ linter:
   rules:
     - always_declare_return_types
     - always_use_package_imports
+    - annotate_overrides
     - avoid_print
     - avoid_unnecessary_containers
     - cascade_invocations

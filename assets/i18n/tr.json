@@ -241,6 +241,7 @@
       }
     ],
     "contact": {
+      "formspree_id": "xpznqkao",
       "form": {
         "name_label": "İsim",
         "email_label": "E-posta",

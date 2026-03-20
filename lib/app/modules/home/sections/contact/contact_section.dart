@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer' as dev;
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -251,8 +252,6 @@ class _ContactFormState extends State<_ContactForm> {
   final _messageController = TextEditingController();
   _FormStatus _status = _FormStatus.idle;
 
-  static const _formspreeEndpoint = 'https://formspree.io/f/xpznqkao';
-
   @override
   void dispose() {
     _nameController.dispose();
@@ -267,8 +266,12 @@ class _ContactFormState extends State<_ContactForm> {
     setState(() => _status = _FormStatus.sending);
 
     try {
+      final languageController = Get.find<LanguageController>();
+      final formspreeId = languageController.cvData['contact']?['formspree_id'] as String? ?? '';
+      final formspreeEndpoint = 'https://formspree.io/f/$formspreeId';
+
       final response = await http.post(
-        Uri.parse(_formspreeEndpoint),
+        Uri.parse(formspreeEndpoint),
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
@@ -297,7 +300,8 @@ class _ContactFormState extends State<_ContactForm> {
           if (mounted) setState(() => _status = _FormStatus.idle);
         });
       }
-    } catch (_) {
+    } catch (e) {
+      dev.log('Form submission failed', name: 'ContactForm', error: e);
       if (!mounted) return;
       setState(() => _status = _FormStatus.error);
       Future.delayed(const Duration(seconds: 3), () {

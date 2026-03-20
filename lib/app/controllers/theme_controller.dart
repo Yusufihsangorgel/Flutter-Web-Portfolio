@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_web_portfolio/app/domain/providers/i_local_storage_provider.dart';
 
-/// Manages dark/light theme state with localStorage persistence.
+/// Dark/light mode toggle — persists preference to localStorage.
 class ThemeController extends GetxController {
   static const _storageKey = 'isDarkMode';
 
