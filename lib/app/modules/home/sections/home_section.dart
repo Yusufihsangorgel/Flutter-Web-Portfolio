@@ -108,23 +108,6 @@ class _HomeSectionState extends State<HomeSection>
         animation: _entranceCtrl,
         builder: (context, _) => Stack(
           children: [
-            // Opening line
-            Center(
-              child: Container(
-                height: 1,
-                width: screenWidth * 0.6 * _lineWidth.value,
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.6),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.white.withValues(alpha: 0.2),
-                      blurRadius: 8,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-
             // Main content
             Opacity(
               opacity: _contentOpacity.value,
@@ -137,7 +120,7 @@ class _HomeSectionState extends State<HomeSection>
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      // Name — devasa display text
+                      // Name
                       FittedBox(
                         fit: BoxFit.scaleDown,
                         child: ShaderTextReveal(
@@ -157,7 +140,23 @@ class _HomeSectionState extends State<HomeSection>
                           textAlign: TextAlign.center,
                         ),
                       ),
-                      const SizedBox(height: 16),
+
+                      // Horizontal line between name and subtitle
+                      const SizedBox(height: 20),
+                      Container(
+                        height: 1,
+                        width: screenWidth * 0.5 * _lineWidth.value,
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.4),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.white.withValues(alpha: 0.15),
+                              blurRadius: 6,
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 20),
 
                       // Subtitle
                       ShaderTextReveal(
