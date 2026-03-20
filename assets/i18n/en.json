@@ -298,7 +298,19 @@
   "contact_section": {
     "title": "Get In Touch",
     "whats_next": "What's Next?",
-    "description": "Although I'm not currently looking for any new opportunities, my inbox is always open. Whether you have a question or just want to say hi, I'll try my best to get back to you!"
+    "description": "Although I'm not currently looking for any new opportunities, my inbox is always open. Whether you have a question or just want to say hi, I'll try my best to get back to you!",
+    "form": {
+      "name_label": "Name",
+      "email_label": "Email",
+      "message_label": "Message",
+      "submit_button": "Send Message",
+      "name_error": "Please enter your name",
+      "email_error": "Please enter a valid email",
+      "message_error": "Please enter your message",
+      "success": "Your message has been sent successfully!",
+      "error": "An error occurred. Please try again.",
+      "or_divider": "or send a message directly"
+    }
   },
   "skills_section": {
     "title": "Skills",

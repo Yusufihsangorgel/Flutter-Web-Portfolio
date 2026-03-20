@@ -302,7 +302,19 @@
   "contact_section": {
     "title": "Kontakt aufnehmen",
     "whats_next": "Was kommt als Nächstes?",
-    "description": "Obwohl ich derzeit keine neuen Möglichkeiten suche, ist mein Posteingang immer offen. Ob Sie eine Frage haben oder einfach nur Hallo sagen möchten — ich werde mein Bestes tun, Ihnen zu antworten!"
+    "description": "Obwohl ich derzeit keine neuen Möglichkeiten suche, ist mein Posteingang immer offen. Ob Sie eine Frage haben oder einfach nur Hallo sagen möchten — ich werde mein Bestes tun, Ihnen zu antworten!",
+    "form": {
+      "name_label": "Name",
+      "email_label": "E-Mail",
+      "message_label": "Nachricht",
+      "submit_button": "Nachricht senden",
+      "name_error": "Bitte geben Sie Ihren Namen ein",
+      "email_error": "Bitte geben Sie eine gültige E-Mail-Adresse ein",
+      "message_error": "Bitte geben Sie Ihre Nachricht ein",
+      "success": "Ihre Nachricht wurde erfolgreich gesendet!",
+      "error": "Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.",
+      "or_divider": "oder senden Sie eine Nachricht direkt"
+    }
   },
   "skills_section": {
     "title": "Fähigkeiten",

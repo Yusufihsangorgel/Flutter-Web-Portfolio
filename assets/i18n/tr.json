@@ -299,7 +299,19 @@
   "contact_section": {
     "title": "İletişime Geç",
     "whats_next": "Sırada Ne Var?",
-    "description": "Şu anda yeni fırsatlar aramıyor olsam da, gelen kutum her zaman açık. Bir sorunuz varsa ya da sadece merhaba demek istiyorsanız, size en kısa sürede dönmeye çalışacağım!"
+    "description": "Şu anda yeni fırsatlar aramıyor olsam da, gelen kutum her zaman açık. Bir sorunuz varsa ya da sadece merhaba demek istiyorsanız, size en kısa sürede dönmeye çalışacağım!",
+    "form": {
+      "name_label": "İsim",
+      "email_label": "E-posta",
+      "message_label": "Mesaj",
+      "submit_button": "Mesaj Gönder",
+      "name_error": "Lütfen adınızı girin",
+      "email_error": "Lütfen geçerli bir e-posta adresi girin",
+      "message_error": "Lütfen mesajınızı girin",
+      "success": "Mesajınız başarıyla gönderildi!",
+      "error": "Bir hata oluştu. Lütfen tekrar deneyin.",
+      "or_divider": "veya doğrudan mesaj gönderin"
+    }
   },
   "skills_section": {
     "title": "Beceriler",

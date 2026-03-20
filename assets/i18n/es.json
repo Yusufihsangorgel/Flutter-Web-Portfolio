@@ -273,7 +273,19 @@
   "contact_section": {
     "title": "Ponte en Contacto",
     "whats_next": "¿Qué Sigue?",
-    "description": "Aunque actualmente no busco nuevas oportunidades, mi bandeja de entrada siempre está abierta. Ya sea que tengas una pregunta o solo quieras saludar, ¡haré lo posible por responderte!"
+    "description": "Aunque actualmente no busco nuevas oportunidades, mi bandeja de entrada siempre está abierta. Ya sea que tengas una pregunta o solo quieras saludar, ¡haré lo posible por responderte!",
+    "form": {
+      "name_label": "Nombre",
+      "email_label": "Correo Electrónico",
+      "message_label": "Mensaje",
+      "submit_button": "Enviar Mensaje",
+      "name_error": "Por favor ingresa tu nombre",
+      "email_error": "Por favor ingresa un correo electrónico válido",
+      "message_error": "Por favor ingresa tu mensaje",
+      "success": "¡Tu mensaje ha sido enviado con éxito!",
+      "error": "Ocurrió un error. Por favor intenta de nuevo.",
+      "or_divider": "o envía un mensaje directamente"
+    }
   },
   "skills_section": {
     "title": "Habilidades",

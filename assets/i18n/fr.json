@@ -312,7 +312,19 @@
   "contact_section": {
     "title": "Me Contacter",
     "whats_next": "Et Ensuite ?",
-    "description": "Bien que je ne cherche pas actuellement de nouvelles opportunités, ma boîte de réception est toujours ouverte. Que vous ayez une question ou que vous vouliez simplement dire bonjour, je ferai de mon mieux pour vous répondre !"
+    "description": "Bien que je ne cherche pas actuellement de nouvelles opportunités, ma boîte de réception est toujours ouverte. Que vous ayez une question ou que vous vouliez simplement dire bonjour, je ferai de mon mieux pour vous répondre !",
+    "form": {
+      "name_label": "Nom",
+      "email_label": "E-mail",
+      "message_label": "Message",
+      "submit_button": "Envoyer le message",
+      "name_error": "Veuillez entrer votre nom",
+      "email_error": "Veuillez entrer une adresse e-mail valide",
+      "message_error": "Veuillez entrer votre message",
+      "success": "Votre message a été envoyé avec succès !",
+      "error": "Une erreur s'est produite. Veuillez réessayer.",
+      "or_divider": "ou envoyez un message directement"
+    }
   },
   "skills_section": {
     "title": "Compétences",
