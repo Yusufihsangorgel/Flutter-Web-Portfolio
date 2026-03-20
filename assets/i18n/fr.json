@@ -205,6 +205,26 @@
         "level": "B2"
       }
     ],
+    "testimonials": [
+      {
+        "quote": "Yusuf livre constamment du code propre et bien structure. Son travail sur le systeme POS FugaSoft a montre une comprehension exceptionnelle de l'architecture reactive et du deploiement multiplateforme. Un membre d'equipe fiable qui prend en charge les problemes complexes.",
+        "name": "Abdusselam Kosecik",
+        "position": "Chef d'equipe R&D",
+        "company": "Uzman Adres (FugaSoft)"
+      },
+      {
+        "quote": "Travailler avec Yusuf sur la plateforme logistique Dorse a ete une excellente experience. Il a dirige l'equipe mobile efficacement, livrant le suivi vehiculaire en temps reel avec l'integration WebSocket sur iOS et Android. Sa profondeur technique en Flutter est remarquable.",
+        "name": "Emrah Turk",
+        "position": "Developpeur Logiciel Senior",
+        "company": "Junius Tech (Dorse)"
+      },
+      {
+        "quote": "Yusuf s'est distingue parmi ses pairs par sa motivation a apprendre et appliquer les principes du genie logiciel dans des projets reels. Il a commence a travailler professionnellement tot dans ses etudes et a remarquablement bien equilibre etudes et experience industrielle.",
+        "name": "Prof. Dr. Mehmet Kara",
+        "position": "Faculte d'Informatique",
+        "company": "Universite Mehmet Akif Ersoy"
+      }
+    ],
     "contact": {
       "form": {
         "name_label": "Nom",
@@ -286,7 +306,8 @@
     "skills": "Compétences",
     "experience": "Expérience",
     "projects": "Projets",
-    "contact": "Contact"
+    "contact": "Contact",
+    "testimonials": "Témoignages"
   },
   "about_section": {
     "title": "À Propos de Moi",
@@ -325,6 +346,10 @@
       "error": "Une erreur s'est produite. Veuillez réessayer.",
       "or_divider": "ou envoyez un message directement"
     }
+  },
+  "testimonials_section": {
+    "title": "Témoignages",
+    "subtitle": "Retours de collègues et mentors avec lesquels j'ai travaillé"
   },
   "skills_section": {
     "title": "Compétences",

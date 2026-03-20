@@ -195,6 +195,26 @@
         "level": "B2"
       }
     ],
+    "testimonials": [
+      {
+        "quote": "Yusuf liefert konsequent sauberen, gut strukturierten Code. Seine Arbeit am FugaSoft POS-System zeigte ein aussergewoehnliches Verstaendnis reaktiver Architektur und plattformuebergreifender Bereitstellung. Ein zuverlaessiges Teammitglied, das komplexe Probleme eigenstaendig loest.",
+        "name": "Abdusselam Kosecik",
+        "position": "F&E-Teamleiter",
+        "company": "Uzman Adres (FugaSoft)"
+      },
+      {
+        "quote": "Die Zusammenarbeit mit Yusuf an der Dorse-Logistikplattform war eine grossartige Erfahrung. Er fuehrte das mobile Team effektiv und lieferte Echtzeit-Fahrzeugverfolgung mit WebSocket-Integration auf iOS und Android. Seine technische Tiefe in Flutter ist herausragend.",
+        "name": "Emrah Turk",
+        "position": "Senior Software-Entwickler",
+        "company": "Junius Tech (Dorse)"
+      },
+      {
+        "quote": "Yusuf zeichnete sich durch seinen Antrieb aus, Software-Engineering-Prinzipien in realen Projekten zu lernen und anzuwenden. Er begann frueh in seinem Studium professionell zu arbeiten und vereinte Studium und Berufserfahrung bemerkenswert gut.",
+        "name": "Prof. Dr. Mehmet Kara",
+        "position": "Informatik-Fakultaet",
+        "company": "Mehmet Akif Ersoy Universitaet"
+      }
+    ],
     "contact": {
       "form": {
         "name_label": "Name",
@@ -276,7 +296,8 @@
     "skills": "Fähigkeiten",
     "experience": "Erfahrung",
     "projects": "Projekte",
-    "contact": "Kontakt"
+    "contact": "Kontakt",
+    "testimonials": "Referenzen"
   },
   "about_section": {
     "title": "Über Mich",
@@ -315,6 +336,10 @@
       "error": "Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.",
       "or_divider": "oder senden Sie eine Nachricht direkt"
     }
+  },
+  "testimonials_section": {
+    "title": "Referenzen",
+    "subtitle": "Feedback von Kollegen und Mentoren, mit denen ich zusammengearbeitet habe"
   },
   "skills_section": {
     "title": "Fähigkeiten",

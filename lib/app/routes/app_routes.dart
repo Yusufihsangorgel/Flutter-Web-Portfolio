@@ -8,16 +8,18 @@ abstract class Routes {
   static const home = '/';
   static const about = '/about';
   static const experience = '/experience';
+  static const testimonials = '/testimonials';
   static const projects = '/projects';
   static const contact = '/contact';
 
   /// All valid section IDs in display order.
-  static const sectionIds = ['home', 'about', 'experience', 'projects', 'contact'];
+  static const sectionIds = ['home', 'about', 'experience', 'testimonials', 'projects', 'contact'];
 
   /// Maps a URL path to its section ID.
   static String sectionFromRoute(String route) => switch (route) {
         about => 'about',
         experience => 'experience',
+        testimonials => 'testimonials',
         projects => 'projects',
         contact => 'contact',
         _ => 'home',
@@ -27,6 +29,7 @@ abstract class Routes {
   static String routeFromSection(String section) => switch (section) {
         'about' => about,
         'experience' => experience,
+        'testimonials' => testimonials,
         'projects' => projects,
         'contact' => contact,
         _ => home,

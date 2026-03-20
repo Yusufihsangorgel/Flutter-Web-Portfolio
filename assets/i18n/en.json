@@ -188,6 +188,26 @@
         "level": "B2"
       }
     ],
+    "testimonials": [
+      {
+        "quote": "Yusuf consistently delivers clean, well-structured code. His work on the FugaSoft POS system showed exceptional understanding of reactive architecture and cross-platform deployment. A reliable team member who takes ownership of complex problems.",
+        "name": "Abdusselam Kosecik",
+        "position": "R&D Team Lead",
+        "company": "Uzman Adres (FugaSoft)"
+      },
+      {
+        "quote": "Working with Yusuf on the Dorse logistics platform was a great experience. He led the mobile team effectively, delivering real-time vehicle tracking with WebSocket integration across both iOS and Android. His technical depth in Flutter is outstanding.",
+        "name": "Emrah Turk",
+        "position": "Senior Software Developer",
+        "company": "Junius Tech (Dorse)"
+      },
+      {
+        "quote": "Yusuf stood out among his peers with his drive to learn and apply software engineering principles in real-world projects. He started professional work early in his studies and balanced academics with industry experience remarkably well.",
+        "name": "Prof. Dr. Mehmet Kara",
+        "position": "Computer Science Faculty",
+        "company": "Mehmet Akif Ersoy University"
+      }
+    ],
     "contact": {
       "form": {
         "name_label": "Name",
@@ -269,7 +289,8 @@
     "skills": "Skills",
     "experience": "Experience",
     "projects": "Projects",
-    "contact": "Contact"
+    "contact": "Contact",
+    "testimonials": "Testimonials"
   },
   "about_section": {
     "title": "About Me",
@@ -311,6 +332,10 @@
       "error": "An error occurred. Please try again.",
       "or_divider": "or send a message directly"
     }
+  },
+  "testimonials_section": {
+    "title": "What People Say",
+    "subtitle": "Feedback from colleagues and mentors I have worked with"
   },
   "skills_section": {
     "title": "Skills",
