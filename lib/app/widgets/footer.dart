@@ -5,6 +5,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_web_portfolio/app/controllers/language_controller.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
+import 'package:flutter_web_portfolio/app/core/constants/cinematic_curves.dart';
+import 'package:flutter_web_portfolio/app/core/constants/durations.dart';
 import 'package:flutter_web_portfolio/app/widgets/cinematic_focusable.dart';
 
 /// Footer with social links pulled from cvData.
@@ -87,14 +89,41 @@ class _SocialLinkState extends State<_SocialLink> {
     child: Semantics(
       link: true,
       label: widget.label,
-      child: Text(
-        widget.label,
-      style: GoogleFonts.jetBrainsMono(
-        fontSize: 13,
-        color: _hovered ? AppColors.textBright : AppColors.textSecondary,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            widget.label,
+            style: GoogleFonts.jetBrainsMono(
+              fontSize: 13,
+              color: _hovered ? AppColors.textBright : AppColors.textSecondary,
+            ),
+          ),
+          const SizedBox(height: 2),
+          AnimatedContainer(
+            duration: AppDurations.fast,
+            curve: CinematicCurves.hoverLift,
+            height: 1,
+            width: _hovered ? _labelWidth(widget.label) : 0,
+            color: AppColors.accent.withValues(alpha: 0.6),
+          ),
+        ],
       ),
-    )),
+    ),
   );
+
+  /// Estimate the rendered width of the label text for the underline.
+  double _labelWidth(String text) {
+    final painter = TextPainter(
+      text: TextSpan(
+        text: text,
+        style: GoogleFonts.jetBrainsMono(fontSize: 13),
+      ),
+      textDirection: TextDirection.ltr,
+    )..layout();
+    return painter.width;
+  }
 }
 
 /// Subtle "View Source" link pointing to the GitHub repo.

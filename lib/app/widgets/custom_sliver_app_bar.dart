@@ -16,7 +16,8 @@ import 'package:flutter_web_portfolio/app/widgets/cinematic_focusable.dart';
 import 'package:flutter_web_portfolio/app/widgets/language_switcher.dart';
 
 /// Minimal floating navigation — cinematic, no numbered sections.
-class CustomSliverAppBar extends StatelessWidget {
+/// Shrinks from 80px to 60px as the user scrolls down (200px threshold).
+class CustomSliverAppBar extends StatefulWidget {
   const CustomSliverAppBar({
     super.key,
     required this.languageController,
@@ -30,6 +31,55 @@ class CustomSliverAppBar extends StatelessWidget {
 
   static const _navSections = ['about', 'experience', 'testimonials', 'blog', 'projects', 'contact'];
 
+  /// Maximum (expanded) toolbar height.
+  static const _maxHeight = 80.0;
+
+  /// Minimum (collapsed) toolbar height.
+  static const _minHeight = 60.0;
+
+  /// Scroll distance over which the bar shrinks.
+  static const _shrinkScrollExtent = 200.0;
+
+  @override
+  State<CustomSliverAppBar> createState() => _CustomSliverAppBarState();
+}
+
+class _CustomSliverAppBarState extends State<CustomSliverAppBar> {
+  double _toolbarHeight = CustomSliverAppBar._maxHeight;
+
+  /// Scale factor for logo and nav items: 1.0 at top, smaller when collapsed.
+  double get _scaleFactor =>
+      _toolbarHeight / CustomSliverAppBar._maxHeight;
+
+  @override
+  void initState() {
+    super.initState();
+    widget.scrollController.scrollController.addListener(_onScroll);
+  }
+
+  @override
+  void dispose() {
+    widget.scrollController.scrollController.removeListener(_onScroll);
+    super.dispose();
+  }
+
+  void _onScroll() {
+    final controller = widget.scrollController.scrollController;
+    if (!controller.hasClients) return;
+
+    final offset = controller.offset.clamp(0.0, CustomSliverAppBar._shrinkScrollExtent);
+    final t = offset / CustomSliverAppBar._shrinkScrollExtent;
+    final newHeight = lerpDouble(
+      CustomSliverAppBar._maxHeight,
+      CustomSliverAppBar._minHeight,
+      t,
+    )!;
+
+    if ((newHeight - _toolbarHeight).abs() > 0.5) {
+      setState(() => _toolbarHeight = newHeight);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.sizeOf(context).width;
@@ -39,7 +89,7 @@ class CustomSliverAppBar extends StatelessWidget {
       floating: false,
       snap: false,
       pinned: true,
-      toolbarHeight: 70,
+      toolbarHeight: _toolbarHeight,
       backgroundColor: Colors.transparent,
       elevation: 0,
       automaticallyImplyLeading: false,
@@ -71,12 +121,13 @@ class CustomSliverAppBar extends StatelessWidget {
                 ),
               ),
             ),
-            _SceneProgressBar(scrollController: scrollController),
+            _SceneProgressBar(scrollController: widget.scrollController),
           ],
         );
       }),
       title: _LogoText(
-        onTap: () => scrollController.scrollToSection('home'),
+        onTap: () => widget.scrollController.scrollToSection('home'),
+        scaleFactor: _scaleFactor,
       ),
       leading: isMobile
           ? Builder(
@@ -86,7 +137,7 @@ class CustomSliverAppBar extends StatelessWidget {
                   icon: Icon(
                     Icons.menu_rounded,
                     color: isDark ? AppColors.textPrimary : AppColors.lightTextPrimary,
-                    size: 24,
+                    size: 24 * _scaleFactor,
                   ),
                   onPressed: () => _showMobileMenu(context),
                 );
@@ -98,25 +149,26 @@ class CustomSliverAppBar extends StatelessWidget {
         if (!isMobile) const _AudioToggleButton(),
         if (!isMobile) const _ThemeToggleButton(),
         const LanguageSwitcher(),
-        ...?actions,
+        ...?widget.actions,
         const SizedBox(width: 16),
       ],
     );
   }
 
   Widget _buildNavItems() => Obx(() {
-    final currentSection = scrollController.activeSection.value;
+    final currentSection = widget.scrollController.activeSection.value;
     return Row(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
-        for (int i = 0; i < _navSections.length; i++)
+        for (int i = 0; i < CustomSliverAppBar._navSections.length; i++)
           _NavItem(
-            label: languageController.getText(
-              'nav.${_navSections[i]}',
-              defaultValue: _navSections[i].toUpperCase(),
+            label: widget.languageController.getText(
+              'nav.${CustomSliverAppBar._navSections[i]}',
+              defaultValue: CustomSliverAppBar._navSections[i].toUpperCase(),
             ),
-            isActive: currentSection == _navSections[i],
-            onTap: () => scrollController.scrollToSection(_navSections[i]),
+            isActive: currentSection == CustomSliverAppBar._navSections[i],
+            onTap: () => widget.scrollController.scrollToSection(CustomSliverAppBar._navSections[i]),
+            scaleFactor: _scaleFactor,
           ),
       ],
     );
@@ -142,9 +194,9 @@ class CustomSliverAppBar extends StatelessWidget {
           ),
       pageBuilder: (context, animation, secondaryAnimation) =>
           _MobileMenuOverlay(
-            navSections: _navSections,
-            languageController: languageController,
-            scrollController: scrollController,
+            navSections: CustomSliverAppBar._navSections,
+            languageController: widget.languageController,
+            scrollController: widget.scrollController,
           ),
     );
   }
@@ -154,8 +206,9 @@ class CustomSliverAppBar extends StatelessWidget {
 // Logo: "YG" — Space Grotesk Bold, hover glow
 // ---------------------------------------------------------------------------
 class _LogoText extends StatefulWidget {
-  const _LogoText({required this.onTap});
+  const _LogoText({required this.onTap, this.scaleFactor = 1.0});
   final VoidCallback onTap;
+  final double scaleFactor;
 
   @override
   State<_LogoText> createState() => _LogoTextState();
@@ -181,7 +234,7 @@ class _LogoTextState extends State<_LogoText> {
           child: Text(
             'YG',
             style: GoogleFonts.spaceGrotesk(
-              fontSize: 20,
+              fontSize: 20 * widget.scaleFactor,
               fontWeight: FontWeight.w700,
               color: _hovered ? hoverColor : baseColor,
               letterSpacing: 1,
@@ -297,11 +350,13 @@ class _NavItem extends StatefulWidget {
     required this.label,
     required this.isActive,
     required this.onTap,
+    this.scaleFactor = 1.0,
   });
 
   final String label;
   final bool isActive;
   final VoidCallback onTap;
+  final double scaleFactor;
 
   @override
   State<_NavItem> createState() => _NavItemState();
@@ -331,7 +386,7 @@ class _NavItemState extends State<_NavItem> {
               Text(
                 widget.label.toUpperCase(),
                 style: GoogleFonts.spaceGrotesk(
-                  fontSize: 12,
+                  fontSize: 12 * widget.scaleFactor,
                   fontWeight: widget.isActive ? FontWeight.w600 : FontWeight.w400,
                   color: widget.isActive
                       ? activeColor
@@ -483,14 +538,14 @@ class _MobileMenuOverlay extends StatelessWidget {
               ),
             const SizedBox(height: 32),
             // Mobile-only controls
-            Row(
+            const Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const _AudioToggleButton(),
-                const SizedBox(width: 8),
-                const _ThemeToggleButton(),
-                const SizedBox(width: 8),
-                const LanguageSwitcher(key: ValueKey('mobile-lang')),
+                _AudioToggleButton(),
+                SizedBox(width: 8),
+                _ThemeToggleButton(),
+                SizedBox(width: 8),
+                LanguageSwitcher(key: ValueKey('mobile-lang')),
               ],
             ),
           ],
@@ -526,14 +581,27 @@ class _MobileNavItemState extends State<_MobileNavItem> {
         onTap: widget.onTap,
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 16),
-          child: Text(
-            widget.label.toUpperCase(),
-            style: GoogleFonts.spaceGrotesk(
-              color: _hovered ? activeColor : inactiveColor,
-              fontWeight: FontWeight.w500,
-              fontSize: 24,
-              letterSpacing: 4,
-            ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                widget.label.toUpperCase(),
+                style: GoogleFonts.spaceGrotesk(
+                  color: _hovered ? activeColor : inactiveColor,
+                  fontWeight: FontWeight.w500,
+                  fontSize: 24,
+                  letterSpacing: 4,
+                ),
+              ),
+              const SizedBox(height: 4),
+              AnimatedContainer(
+                duration: AppDurations.fast,
+                curve: CinematicCurves.hoverLift,
+                height: 1,
+                width: _hovered ? 40 : 0,
+                color: (isDark ? Colors.white : Colors.black).withValues(alpha: 0.3),
+              ),
+            ],
           ),
         ),
       ),
