@@ -9,6 +9,7 @@ import 'package:flutter_web_portfolio/app/core/constants/durations.dart';
 import 'package:flutter_web_portfolio/app/core/theme/app_typography.dart';
 import 'package:flutter_web_portfolio/app/utils/responsive_utils.dart';
 import 'package:flutter_web_portfolio/app/widgets/github_activity.dart';
+import 'package:flutter_web_portfolio/app/widgets/numbered_section_heading.dart';
 import 'package:flutter_web_portfolio/app/widgets/scroll_fade_in.dart';
 import 'package:flutter_web_portfolio/app/widgets/skill_bar_chart.dart';
 import 'package:flutter_web_portfolio/app/widgets/skill_orbit.dart';
@@ -158,14 +159,13 @@ class _BioContentState extends State<_BioContent>
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Section label
-        Obx(() => Text(
-          widget.languageController.getText(
+        Obx(() => NumberedSectionHeading(
+          number: '01',
+          title: widget.languageController.getText(
             'about_section.title',
             defaultValue: 'About Me',
           ),
-          style: AppTypography.h1.copyWith(
-            color: sceneDirector.currentAccent.value,
-          ),
+          accent: sceneDirector.currentAccent.value,
         )),
         const SizedBox(height: 24),
         Text(

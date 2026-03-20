@@ -13,6 +13,7 @@ import 'package:flutter_web_portfolio/app/core/constants/durations.dart';
 import 'package:flutter_web_portfolio/app/core/theme/app_typography.dart';
 import 'package:flutter_web_portfolio/app/utils/responsive_utils.dart';
 import 'package:flutter_web_portfolio/app/widgets/magnetic_button.dart';
+import 'package:flutter_web_portfolio/app/widgets/numbered_section_heading.dart';
 import 'package:flutter_web_portfolio/app/widgets/scroll_fade_in.dart';
 
 /// Contact Section — "The Finale"
@@ -70,18 +71,13 @@ class ContactSection extends StatelessWidget {
                     ScrollFadeIn(
                       child: Obx(() {
                         final accent = Get.find<SceneDirector>().currentAccent.value;
-                        return Text(
-                          languageController.getText(
+                        return NumberedSectionHeading(
+                          number: '06',
+                          title: languageController.getText(
                             'contact_section.title',
                             defaultValue: 'Get In Touch',
                           ),
-                          style: GoogleFonts.spaceGrotesk(
-                            fontSize: 48,
-                            fontWeight: FontWeight.w700,
-                            color: accent,
-                            height: 1.1,
-                          ),
-                          textAlign: TextAlign.center,
+                          accent: accent,
                         );
                       }),
                     ),

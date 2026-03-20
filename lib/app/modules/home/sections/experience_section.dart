@@ -10,6 +10,7 @@ import 'package:flutter_web_portfolio/app/core/theme/app_typography.dart';
 import 'package:flutter_web_portfolio/app/utils/responsive_utils.dart';
 import 'package:flutter_web_portfolio/app/widgets/cinematic_focusable.dart';
 import 'package:flutter_web_portfolio/app/core/constants/breakpoints.dart';
+import 'package:flutter_web_portfolio/app/widgets/numbered_section_heading.dart';
 import 'package:flutter_web_portfolio/app/widgets/scroll_fade_in.dart';
 
 /// Experience Section — "The Journey"
@@ -53,12 +54,13 @@ class ExperienceSection extends StatelessWidget {
                 ScrollFadeIn(
                   child: Obx(() {
                     final accent = Get.find<SceneDirector>().currentAccent.value;
-                    return Text(
-                      languageController.getText(
+                    return NumberedSectionHeading(
+                      number: '02',
+                      title: languageController.getText(
                         'experience_section.title',
                         defaultValue: "Where I've Worked",
                       ),
-                      style: AppTypography.h1.copyWith(color: accent),
+                      accent: accent,
                     );
                   }),
                 ),

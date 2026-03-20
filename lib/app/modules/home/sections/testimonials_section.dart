@@ -10,6 +10,7 @@ import 'package:flutter_web_portfolio/app/core/constants/durations.dart';
 import 'package:flutter_web_portfolio/app/core/theme/app_typography.dart';
 import 'package:flutter_web_portfolio/app/utils/responsive_utils.dart';
 import 'package:flutter_web_portfolio/app/widgets/border_light_card.dart';
+import 'package:flutter_web_portfolio/app/widgets/numbered_section_heading.dart';
 import 'package:flutter_web_portfolio/app/widgets/scroll_fade_in.dart';
 
 /// Testimonials Section — colleague and mentor quotes.
@@ -57,12 +58,13 @@ class TestimonialsSection extends StatelessWidget {
                   child: Obx(() {
                     final accent =
                         Get.find<SceneDirector>().currentAccent.value;
-                    return Text(
-                      languageController.getText(
+                    return NumberedSectionHeading(
+                      number: '03',
+                      title: languageController.getText(
                         'testimonials_section.title',
                         defaultValue: 'What People Say',
                       ),
-                      style: AppTypography.h1.copyWith(color: accent),
+                      accent: accent,
                     );
                   }),
                 ),
