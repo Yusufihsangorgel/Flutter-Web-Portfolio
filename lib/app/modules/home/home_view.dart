@@ -23,6 +23,7 @@ import 'package:flutter_web_portfolio/app/widgets/matrix_rain.dart';
 import 'package:flutter_web_portfolio/app/widgets/scroll_fade_in.dart';
 import 'package:flutter_web_portfolio/app/widgets/background/cinematic_background.dart';
 import 'package:flutter_web_portfolio/app/widgets/constellation_particles.dart';
+import 'package:flutter_web_portfolio/app/widgets/social_sidebar.dart';
 
 /// Aurora Cinema home view — cinematic scene-driven portfolio.
 /// Layer stack: dark base -> mesh gradient -> constellation particles -> content.
@@ -123,13 +124,39 @@ class _HomeViewState extends State<HomeView> {
           body: Stack(
             children: [
               if (isDark) ...[
-                // Layer 1: Cinematic gradient mesh (fills viewport)
-                const Positioned.fill(
-                  child: CinematicBackground(),
+                // Layer 1: Cinematic gradient mesh (parallax 0.3x)
+                Positioned.fill(
+                  child: ListenableBuilder(
+                    listenable: scrollController.scrollController,
+                    builder: (_, child) {
+                      final offset = scrollController
+                              .scrollController.hasClients
+                          ? scrollController.scrollController.offset
+                          : 0.0;
+                      return Transform.translate(
+                        offset: Offset(0, -offset * 0.3),
+                        child: child,
+                      );
+                    },
+                    child: const CinematicBackground(),
+                  ),
                 ),
-                // Layer 2: Constellation particles (mouse-reactive)
-                const Positioned.fill(
-                  child: ConstellationParticles(particleCount: 100),
+                // Layer 2: Constellation particles (parallax 0.15x)
+                Positioned.fill(
+                  child: ListenableBuilder(
+                    listenable: scrollController.scrollController,
+                    builder: (_, child) {
+                      final offset = scrollController
+                              .scrollController.hasClients
+                          ? scrollController.scrollController.offset
+                          : 0.0;
+                      return Transform.translate(
+                        offset: Offset(0, -offset * 0.15),
+                        child: child,
+                      );
+                    },
+                    child: const ConstellationParticles(particleCount: 100),
+                  ),
                 ),
               ] else
                 // Light mode: subtle gradient background
@@ -222,7 +249,24 @@ class _HomeViewState extends State<HomeView> {
                   ],
                 ),
               ),
-              // Layer 4: Back-to-top button
+              // Layer 4: Fixed social sidebars (desktop only)
+              ValueListenableBuilder<bool>(
+                valueListenable: HomeSection.entranceComplete,
+                builder: (context, entranceDone, _) => Positioned(
+                  left: 40,
+                  bottom: 0,
+                  child: SocialSidebarLeft(visible: entranceDone),
+                ),
+              ),
+              ValueListenableBuilder<bool>(
+                valueListenable: HomeSection.entranceComplete,
+                builder: (context, entranceDone, _) => Positioned(
+                  right: 40,
+                  bottom: 0,
+                  child: SocialSidebarRight(visible: entranceDone),
+                ),
+              ),
+              // Layer 5: Back-to-top button
               const BackToTopButton(),
               // Layer 5: Matrix rain easter egg overlay
               if (_showMatrixRain)
