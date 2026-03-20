@@ -40,7 +40,11 @@ class PortfolioFooter extends StatelessWidget {
                 if (email.isNotEmpty) _SocialLink(label: 'Email', url: 'mailto:$email'),
               ],
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 20),
+            // View Source link
+            if (github.isNotEmpty)
+              _ViewSourceLink(repoUrl: '$github/Flutter-Web-Portfolio'),
+            const SizedBox(height: 20),
             Text(
               '\u00A9 $year $name',
               style: GoogleFonts.jetBrainsMono(
@@ -90,6 +94,53 @@ class _SocialLinkState extends State<_SocialLink> {
         color: _hovered ? AppColors.textBright : AppColors.textSecondary,
       ),
     )),
+  );
+}
+
+/// Subtle "View Source" link pointing to the GitHub repo.
+class _ViewSourceLink extends StatefulWidget {
+  const _ViewSourceLink({required this.repoUrl});
+
+  final String repoUrl;
+
+  @override
+  State<_ViewSourceLink> createState() => _ViewSourceLinkState();
+}
+
+class _ViewSourceLinkState extends State<_ViewSourceLink> {
+  bool _hovered = false;
+
+  @override
+  Widget build(BuildContext context) => CinematicFocusable(
+    onTap: () async {
+      final uri = Uri.parse(widget.repoUrl);
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
+      }
+    },
+    onHoverChanged: (hovered) => setState(() => _hovered = hovered),
+    child: Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(
+          Icons.code_rounded,
+          size: 14,
+          color: _hovered
+              ? AppColors.textBright
+              : AppColors.textSecondary.withValues(alpha: 0.6),
+        ),
+        const SizedBox(width: 6),
+        Text(
+          'View Source',
+          style: GoogleFonts.jetBrainsMono(
+            fontSize: 12,
+            color: _hovered
+                ? AppColors.textBright
+                : AppColors.textSecondary.withValues(alpha: 0.6),
+          ),
+        ),
+      ],
+    ),
   );
 }
 

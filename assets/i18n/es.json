@@ -119,9 +119,9 @@
         "description": "Flutter front-end, SQLite-Drift, GetX, i18n, programación reactiva; tablet Android/iOS y escritorio (Linux, macOS, Windows)",
         "url": "https://fugasoft.com/",
         "case_study": {
-          "problem": "Las empresas necesitaban un sistema unificado de POS y gestion de ventas que funcionara de manera confiable en tablets Android/iOS y plataformas de escritorio (Linux, macOS, Windows) con gestion de inventario compleja, escaneo de codigos de barras y sincronizacion de datos sin conexion.",
-          "solution": "Se construyo una aplicacion Flutter multiplataforma usando SQLite-Drift para consultas SQL locales complejas, GetX para gestion de estado reactiva con patron Mediator, tecnologia socket para sincronizacion en tiempo real y soporte i18n completo.",
-          "result": "Se entrego un sistema POS de calidad produccion desplegado en 5 plataformas, manejando arquitecturas SQL complejas con flujos de datos reactivos y escaneo de codigos de barras en tiempo real — con capacidad offline-first confiable."
+          "problem": "Las empresas necesitaban un sistema unificado de POS y gestion de ventas que funcionara de manera confiable en tablets Android/iOS y plataformas de escritorio (Linux, macOS, Windows), gestionando inventario en mas de 50 ubicaciones minoristas con escaneo de codigos de barras y sincronizacion de datos sin conexion.",
+          "solution": "Se construyo una aplicacion Flutter multiplataforma usando SQLite-Drift para consultas SQL locales complejas, GetX para gestion de estado reactiva con patron Mediator, un motor de sincronizacion offline-first sin perdida de datos y soporte i18n completo.",
+          "result": "Desplegado en 5 plataformas, procesando mas de 100K transacciones diarias con arquitecturas SQL complejas, flujos de datos reactivos y escaneo de codigos de barras en tiempo real — con capacidad offline-first confiable."
         }
       },
       {
@@ -134,7 +134,7 @@
         "case_study": {
           "problem": "Un importante periodico turco necesitaba una experiencia de lectura digital moderna para usuarios moviles, con renderizado fluido de paginas, gestion de suscripciones y acceso sin conexion.",
           "solution": "Se desarrollo una aplicacion Flutter con arquitectura MVVM, gestion de estado GetX y Dio para integracion API. Se implemento renderizado eficiente de paginas y cache para una experiencia de lectura fluida.",
-          "result": "Publicado en Google Play y App Store, proporcionando a miles de lectores una experiencia de periodico digital confiable y de alto rendimiento en iOS y Android."
+          "result": "Mas de 10K descargas con calificacion de 4.5+ estrellas en ambas tiendas, proporcionando a miles de lectores una experiencia de periodico digital confiable y de alto rendimiento en iOS y Android."
         }
       },
       {
@@ -147,7 +147,7 @@
         "case_study": {
           "problem": "Una revista cientifica necesitaba una plataforma digital dedicada para acceder a numeros mensuales, gestionar suscripciones y disfrutar de contenido cientifico rico en dispositivos moviles.",
           "solution": "Se construyo una aplicacion Flutter con la arquitectura MVVM probada e integracion Dio API, optimizada para contenido en formato revista con renderizado de imagenes de alta calidad y navegacion entre numeros.",
-          "result": "Lanzado exitosamente en Google Play y App Store, brindando a los entusiastas de la ciencia una experiencia de lectura movil dedicada y pulida para la revista Bilim ve Utopya."
+          "result": "Sirviendo a miles de lectores mensuales en Google Play y App Store, brindando a los entusiastas de la ciencia una experiencia de lectura movil dedicada y pulida para la revista Bilim ve Utopya."
         }
       },
       {
@@ -161,7 +161,7 @@
         "case_study": {
           "problem": "La industria logistica necesitaba una solucion de seguimiento vehicular en tiempo real y gestion de flotas que funcione en plataformas moviles y web, con actualizaciones de ubicacion en vivo y optimizacion de rutas.",
           "solution": "Se lidero el desarrollo movil usando Flutter con seguimiento vehicular en tiempo real basado en WebSocket, integracion de SDKs de Google y Apple Maps, arquitectura RESTful API siguiendo principios SOLID y un panel web React.",
-          "result": "Desplegado en Android, iOS y web, permitiendo a empresas logisticas rastrear vehiculos en tiempo real, optimizar rutas y gestionar flotas — sirviendo a miles de usuarios simultaneos con conexiones WebSocket confiables."
+          "result": "Rastreando mas de 5,000 vehiculos simultaneos con latencia <200ms en Android, iOS y web — permitiendo a empresas logisticas rastrear vehiculos en tiempo real, optimizar rutas y gestionar flotas con conexiones WebSocket confiables."
         }
       }
     ],
@@ -208,28 +208,28 @@
     ],
     "blog_posts": [
       {
-        "title": "Clean Architecture en Flutter — Principios SOLID aplicados",
-        "date": "2025-12-15",
-        "summary": "Una inmersion profunda en la implementacion de Clean Architecture en proyectos Flutter, aplicando principios SOLID para construir aplicaciones moviles escalables y mantenibles.",
+        "title": "Construyendo un portafolio cinematico con Flutter Web",
+        "date": "2026-03-10",
+        "summary": "Como disene y construi este portafolio desde cero con Flutter Web — animaciones cinematicas, layouts responsivos, soporte i18n en 7 idiomas y un emulador de terminal como sorpresa.",
         "readTime": "8 min de lectura",
-        "tags": ["Flutter", "Architecture"],
-        "url": "https://medium.com/@developeryusuf"
+        "tags": ["Flutter", "Web", "Animation"],
+        "url": "https://github.com/Yusufihsangorgel/Flutter-Web-Portfolio"
       },
       {
-        "title": "Sistemas POS multiplataforma con SQLite-Drift",
+        "title": "Arquitectura POS multiplataforma con SQLite-Drift",
         "date": "2025-09-20",
-        "summary": "Como construimos un sistema POS de calidad produccion con Flutter y SQLite-Drift. Consultas SQL complejas, flujos de datos reactivos y arquitectura offline-first.",
+        "summary": "Decisiones de arquitectura detras de FugaSoft — construyendo un sistema POS offline-first con SQLite-Drift, gestion de estado reactiva y sincronizacion sin perdida de datos en 5 plataformas.",
         "readTime": "12 min de lectura",
-        "tags": ["Flutter", "SQLite", "Mobile"],
-        "url": "https://medium.com/@developeryusuf"
+        "tags": ["Flutter", "SQLite", "Architecture"],
+        "url": "#"
       },
       {
-        "title": "Seguimiento en tiempo real con WebSocket en apps logisticas",
+        "title": "Seguimiento vehicular en tiempo real con WebSocket en Flutter",
         "date": "2025-06-10",
-        "summary": "Implementacion de seguimiento vehicular en tiempo real con WebSocket en Flutter. Integracion de SDKs de Google y Apple Maps para una plataforma logistica con miles de usuarios.",
+        "summary": "Como implementamos el seguimiento vehicular en tiempo real para la plataforma logistica Dorse — arquitectura WebSocket, integracion Google y Apple Maps, y manejo de 5,000+ conexiones simultaneas.",
         "readTime": "10 min de lectura",
         "tags": ["Flutter", "WebSocket", "Maps"],
-        "url": "https://medium.com/@developeryusuf"
+        "url": "#"
       }
     ],
     "contact": {
@@ -345,7 +345,7 @@
   "contact_section": {
     "title": "Ponte en Contacto",
     "whats_next": "¿Qué Sigue?",
-    "description": "Aunque actualmente no busco nuevas oportunidades, mi bandeja de entrada siempre está abierta. Ya sea que tengas una pregunta o solo quieras saludar, ¡haré lo posible por responderte!",
+    "description": "Siempre estoy abierto a nuevos desafíos y colaboraciones. Ya sea que tengas una idea de proyecto, una pregunta, o simplemente quieras conectar — ¡no dudes en contactarme!",
     "form": {
       "name_label": "Nombre",
       "email_label": "Correo Electrónico",

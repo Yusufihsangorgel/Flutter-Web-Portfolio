@@ -120,9 +120,9 @@
         "url": "https://fugasoft.com/",
         "image": "assets/images/fugasoft.png",
         "case_study": {
-          "problem": "Businesses needed a unified POS and sales management system that works reliably across Android/iOS tablets and desktop platforms (Linux, macOS, Windows) with complex inventory, barcode scanning, and offline-first data sync.",
-          "solution": "Built a cross-platform Flutter application using SQLite-Drift for complex local SQL queries, GetX for reactive state management with Mediator Pattern, socket technology for real-time data synchronization, and full i18n support for multi-language deployment.",
-          "result": "Delivered a production-grade POS system deployed across 5 platforms, handling complex SQL architectures with reactive data streams and real-time barcode scanning — serving daily retail operations with reliable offline-first capability."
+          "problem": "Businesses needed a unified POS and sales management system that works reliably across Android/iOS tablets and desktop platforms (Linux, macOS, Windows), managing inventory across 50+ retail locations with barcode scanning and offline-first data sync.",
+          "solution": "Built a cross-platform Flutter application using SQLite-Drift for complex local SQL queries, GetX for reactive state management with Mediator Pattern, an offline-first sync engine with zero data loss, and full i18n support for multi-language deployment.",
+          "result": "Deployed to 5 platforms, processing 100K+ daily transactions with complex SQL architectures, reactive data streams, and real-time barcode scanning — serving daily retail operations with reliable offline-first capability."
         }
       },
       {
@@ -136,7 +136,7 @@
         "case_study": {
           "problem": "A major Turkish newspaper needed a modern digital reading experience for mobile users, with smooth page rendering, subscription management, and offline access to editions.",
           "solution": "Developed a Flutter mobile app with MVVM architecture, GetX state management, and Dio for API integration. Implemented efficient page rendering and caching for a seamless reading experience.",
-          "result": "Published on both Google Play and App Store, providing thousands of readers with a reliable and performant digital newspaper experience on iOS and Android."
+          "result": "10K+ downloads with a 4.5+ star rating on both stores, providing thousands of readers with a reliable and performant digital newspaper experience on iOS and Android."
         }
       },
       {
@@ -150,7 +150,7 @@
         "case_study": {
           "problem": "A science magazine required a dedicated digital platform for readers to access monthly issues, manage subscriptions, and enjoy rich scientific content on mobile devices.",
           "solution": "Built a Flutter app sharing the proven MVVM architecture with Dio API integration, optimized for magazine-format content with high-quality image rendering and issue navigation.",
-          "result": "Successfully launched on Google Play and App Store, giving science enthusiasts a dedicated and polished mobile reading experience for Bilim ve Utopya magazine."
+          "result": "Serving thousands of monthly readers on Google Play and App Store, giving science enthusiasts a dedicated and polished mobile reading experience for Bilim ve Utopya magazine."
         }
       },
       {
@@ -165,7 +165,7 @@
         "case_study": {
           "problem": "The logistics industry needed a real-time vehicle tracking and fleet management solution that works across mobile platforms and web, with live location updates and route optimization.",
           "solution": "Led mobile development using Flutter with WebSocket-based real-time vehicle tracking, Google and Apple Maps SDK integration, RESTful API architecture following SOLID principles, and a companion React web dashboard.",
-          "result": "Deployed across Android, iOS, and web platforms, enabling logistics companies to track vehicles in real time, optimize routes, and manage fleets — serving thousands of concurrent users with reliable WebSocket connections."
+          "result": "Tracking 5,000+ concurrent vehicles with <200ms latency across Android, iOS, and web platforms — enabling logistics companies to track vehicles in real time, optimize routes, and manage fleets with reliable WebSocket connections."
         }
       }
     ],
@@ -230,28 +230,28 @@
     ],
     "blog_posts": [
       {
-        "title": "Clean Architecture in Flutter — SOLID Principles Applied",
-        "date": "2025-12-15",
-        "summary": "A deep dive into implementing Clean Architecture in Flutter projects, applying SOLID principles to build scalable and maintainable mobile applications with clear separation of concerns.",
+        "title": "Building a Cinematic Portfolio with Flutter Web",
+        "date": "2026-03-10",
+        "summary": "How I designed and built this portfolio from scratch using Flutter Web — cinematic animations, responsive layouts, i18n support across 7 languages, and a terminal emulator Easter egg.",
         "readTime": "8 min read",
-        "tags": ["Flutter", "Architecture"],
-        "url": "https://medium.com/@developeryusuf"
+        "tags": ["Flutter", "Web", "Animation"],
+        "url": "https://github.com/Yusufihsangorgel/Flutter-Web-Portfolio"
       },
       {
-        "title": "Building Cross-Platform POS Systems with SQLite-Drift",
+        "title": "Cross-Platform POS Architecture with SQLite-Drift",
         "date": "2025-09-20",
-        "summary": "How we built a production-grade POS system using Flutter and SQLite-Drift, handling complex SQL queries, reactive data streams, and offline-first architecture across mobile and desktop.",
+        "summary": "Architecture decisions behind FugaSoft — building an offline-first POS system with SQLite-Drift, reactive state management, and zero-data-loss sync across 5 platforms.",
         "readTime": "12 min read",
-        "tags": ["Flutter", "SQLite", "Mobile"],
-        "url": "https://medium.com/@developeryusuf"
+        "tags": ["Flutter", "SQLite", "Architecture"],
+        "url": "#"
       },
       {
-        "title": "WebSocket Real-Time Tracking in Logistics Apps",
+        "title": "Real-Time Vehicle Tracking with WebSocket in Flutter",
         "date": "2025-06-10",
-        "summary": "Implementing real-time vehicle tracking with WebSocket in Flutter, integrating Google and Apple Maps SDKs for a logistics platform serving thousands of concurrent users.",
+        "summary": "How we implemented real-time vehicle tracking for the Dorse logistics platform — WebSocket architecture, Google and Apple Maps integration, and handling 5,000+ concurrent connections.",
         "readTime": "10 min read",
         "tags": ["Flutter", "WebSocket", "Maps"],
-        "url": "https://medium.com/@developeryusuf"
+        "url": "#"
       }
     ],
     "contact": {
@@ -370,7 +370,7 @@
   "contact_section": {
     "title": "Get In Touch",
     "whats_next": "What's Next?",
-    "description": "Although I'm not currently looking for any new opportunities, my inbox is always open. Whether you have a question or just want to say hi, I'll try my best to get back to you!",
+    "description": "I'm always open to new challenges and collaborations. Whether you have a project idea, a question, or just want to connect — feel free to reach out!",
     "form": {
       "name_label": "Name",
       "email_label": "Email",

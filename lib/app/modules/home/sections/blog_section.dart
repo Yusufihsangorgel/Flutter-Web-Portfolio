@@ -145,6 +145,11 @@ class _BlogPostCard extends StatelessWidget {
     }
   }
 
+  bool get _isComingSoon {
+    final url = post['url'] as String? ?? '';
+    return url == '#';
+  }
+
   @override
   Widget build(BuildContext context) {
     final title = post['title'] as String? ?? '';
@@ -153,11 +158,12 @@ class _BlogPostCard extends StatelessWidget {
     final readTime = post['readTime'] as String? ?? '';
     final tags = (post['tags'] as List?)?.cast<String>() ?? [];
     final url = post['url'] as String? ?? '';
+    final isComingSoon = _isComingSoon;
 
     return Obx(() {
       final accent = Get.find<SceneDirector>().currentAccent.value;
       return CinematicFocusable(
-        onTap: url.isNotEmpty ? () => _openUrl(url) : () {},
+        onTap: url.isNotEmpty && !isComingSoon ? () => _openUrl(url) : () {},
         child: BorderLightCard(
           glowColor: accent,
           padding: const EdgeInsets.all(24),
@@ -193,7 +199,30 @@ class _BlogPostCard extends StatelessWidget {
                     ),
                   ),
                   const Spacer(),
-                  if (url.isNotEmpty)
+                  if (isComingSoon)
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 3,
+                      ),
+                      decoration: BoxDecoration(
+                        color: accent.withValues(alpha: 0.15),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: accent.withValues(alpha: 0.3),
+                        ),
+                      ),
+                      child: Text(
+                        'Coming Soon',
+                        style: AppTypography.caption.copyWith(
+                          color: accent,
+                          fontSize: 10,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                    )
+                  else if (url.isNotEmpty)
                     Icon(
                       Icons.open_in_new_rounded,
                       size: 16,

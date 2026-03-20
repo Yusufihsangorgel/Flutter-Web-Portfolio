@@ -130,9 +130,9 @@
         "url": "https://fugasoft.com/",
         "image": "assets/images/fugasoft.png",
         "case_study": {
-          "problem": "İşletmelerin Android/iOS tablet ve masaüstü platformlarında (Linux, macOS, Windows) güvenilir şekilde çalışan, karmaşık envanter yönetimi, barkod tarama ve çevrimdışı veri senkronizasyonu sunan birleşik bir POS ve satış yönetim sistemine ihtiyacı vardı.",
-          "solution": "Karmaşık yerel SQL sorguları için SQLite-Drift, Mediator Pattern ile reaktif durum yönetimi için GetX, gerçek zamanlı veri senkronizasyonu için socket teknolojisi ve çok dilli dağıtım için tam i18n desteği kullanılarak cross-platform Flutter uygulaması geliştirildi.",
-          "result": "5 platformda çalışan, reaktif veri akışları ve gerçek zamanlı barkod tarama ile karmaşık SQL mimarilerini yöneten, güvenilir çevrimdışı yeteneğe sahip production-grade POS sistemi teslim edildi."
+          "problem": "İşletmelerin Android/iOS tablet ve masaüstü platformlarında (Linux, macOS, Windows) güvenilir şekilde çalışan, 50+ perakende lokasyonunda envanter yönetimi, barkod tarama ve çevrimdışı veri senkronizasyonu sunan birleşik bir POS ve satış yönetim sistemine ihtiyacı vardı.",
+          "solution": "Karmaşık yerel SQL sorguları için SQLite-Drift, Mediator Pattern ile reaktif durum yönetimi için GetX, sıfır veri kaybıyla çevrimdışı öncelikli senkronizasyon motoru ve çok dilli dağıtım için tam i18n desteği kullanılarak cross-platform Flutter uygulaması geliştirildi.",
+          "result": "5 platforma dağıtılarak günlük 100K+ işlem işleniyor — reaktif veri akışları ve gerçek zamanlı barkod tarama ile karmaşık SQL mimarilerini yöneten, güvenilir çevrimdışı yeteneğe sahip production-grade POS sistemi."
         }
       },
       {
@@ -146,7 +146,7 @@
         "case_study": {
           "problem": "Büyük bir Türk gazetesinin mobil kullanıcılar için sorunsuz sayfa görüntüleme, abonelik yönetimi ve çevrimdışı erişim sunan modern bir dijital okuma deneyimine ihtiyacı vardı.",
           "solution": "MVVM mimarisi, GetX durum yönetimi ve API entegrasyonu için Dio kullanılarak Flutter mobil uygulaması geliştirildi. Sorunsuz okuma deneyimi için verimli sayfa görüntüleme ve önbellekleme uygulandı.",
-          "result": "Hem Google Play hem App Store'da yayınlanarak, binlerce okuyucuya iOS ve Android'de güvenilir ve performanslı bir dijital gazete deneyimi sunuldu."
+          "result": "Her iki mağazada 10K+ indirme ve 4.5+ yıldız puanıyla, binlerce okuyucuya iOS ve Android'de güvenilir ve performanslı bir dijital gazete deneyimi sunuluyor."
         }
       },
       {
@@ -160,7 +160,7 @@
         "case_study": {
           "problem": "Bir bilim dergisi, okuyucuların aylık sayılara erişebileceği, aboneliklerini yönetebileceği ve zengin bilimsel içeriğin keyfini çıkarabileceği özel bir dijital platforma ihtiyaç duyuyordu.",
           "solution": "Dio API entegrasyonu ile kanıtlanmış MVVM mimarisini paylaşan, dergi formatındaki içerik için yüksek kaliteli görsel işleme ve sayı navigasyonu ile optimize edilmiş Flutter uygulaması geliştirildi.",
-          "result": "Google Play ve App Store'da başarıyla yayınlanarak, bilim meraklılarına Bilim ve Ütopya dergisi için özel ve cilalı bir mobil okuma deneyimi sunuldu."
+          "result": "Google Play ve App Store'da aylık binlerce okuyucuya hizmet vererek, bilim meraklılarına Bilim ve Ütopya dergisi için özel ve cilalı bir mobil okuma deneyimi sunuluyor."
         }
       },
       {
@@ -175,7 +175,7 @@
         "case_study": {
           "problem": "Lojistik sektörü, mobil platformlarda ve web'de çalışan, canlı konum güncellemeleri ve rota optimizasyonu sunan gerçek zamanlı araç takip ve filo yönetim çözümüne ihtiyaç duyuyordu.",
           "solution": "WebSocket tabanlı gerçek zamanlı araç takibi, Google ve Apple Maps SDK entegrasyonu, SOLID prensiplerine uygun RESTful API mimarisi ve eşlik eden React web panosu ile Flutter kullanılarak mobil geliştirme yönetildi.",
-          "result": "Android, iOS ve web platformlarında dağıtılarak, lojistik şirketlerinin araçları gerçek zamanlı takip etmesini, rotaları optimize etmesini ve filoları yönetmesini sağlayan — güvenilir WebSocket bağlantılarıyla binlerce eşzamanlı kullanıcıya hizmet veren bir sistem sunuldu."
+          "result": "Android, iOS ve web platformlarında <200ms gecikmeyle 5.000+ eşzamanlı aracı takip ediyor — lojistik şirketlerinin araçları gerçek zamanlı takip etmesini, rotaları optimize etmesini ve filoları yönetmesini güvenilir WebSocket bağlantılarıyla sağlıyor."
         }
       }
     ],
@@ -240,28 +240,28 @@
     ],
     "blog_posts": [
       {
-        "title": "Flutter'da Clean Architecture — SOLID Prensipleri Uygulaması",
-        "date": "2025-12-15",
-        "summary": "Flutter projelerinde Clean Architecture implementasyonuna derinlemesine bir bakış. SOLID prensiplerini uygulayarak ölçeklenebilir ve sürdürülebilir mobil uygulamalar oluşturma.",
+        "title": "Flutter Web ile Sinematik Portföy Oluşturma",
+        "date": "2026-03-10",
+        "summary": "Bu portföyü Flutter Web ile sıfırdan nasıl tasarlayıp geliştirdim — sinematik animasyonlar, duyarlı düzenler, 7 dilde i18n desteği ve terminal emülatörü sürprizi.",
         "readTime": "8 dk okuma",
-        "tags": ["Flutter", "Architecture"],
-        "url": "https://medium.com/@developeryusuf"
+        "tags": ["Flutter", "Web", "Animation"],
+        "url": "https://github.com/Yusufihsangorgel/Flutter-Web-Portfolio"
       },
       {
-        "title": "SQLite-Drift ile Cross-Platform POS Sistemleri Geliştirme",
+        "title": "SQLite-Drift ile Cross-Platform POS Mimarisi",
         "date": "2025-09-20",
-        "summary": "Flutter ve SQLite-Drift kullanarak production-grade bir POS sistemi nasıl oluşturduk. Karmaşık SQL sorguları, reaktif veri akışları ve offline-first mimari ile mobil ve masaüstü platformlar.",
+        "summary": "FugaSoft'un arkasındaki mimari kararlar — SQLite-Drift ile offline-first POS sistemi, reaktif durum yönetimi ve 5 platformda sıfır veri kaybı senkronizasyonu.",
         "readTime": "12 dk okuma",
-        "tags": ["Flutter", "SQLite", "Mobile"],
-        "url": "https://medium.com/@developeryusuf"
+        "tags": ["Flutter", "SQLite", "Architecture"],
+        "url": "#"
       },
       {
-        "title": "Lojistik Uygulamalarında WebSocket Gerçek Zamanlı Takip",
+        "title": "Flutter'da WebSocket ile Gerçek Zamanlı Araç Takibi",
         "date": "2025-06-10",
-        "summary": "Flutter'da WebSocket ile gerçek zamanlı araç takibi implementasyonu. Binlerce eşzamanlı kullanıcıya hizmet veren bir lojistik platformu için Google ve Apple Maps SDK entegrasyonu.",
+        "summary": "Dorse lojistik platformu için gerçek zamanlı araç takibini nasıl uyguladık — WebSocket mimarisi, Google ve Apple Maps entegrasyonu ve 5.000+ eşzamanlı bağlantı yönetimi.",
         "readTime": "10 dk okuma",
         "tags": ["Flutter", "WebSocket", "Maps"],
-        "url": "https://medium.com/@developeryusuf"
+        "url": "#"
       }
     ],
     "contact": {
@@ -371,7 +371,7 @@
   "contact_section": {
     "title": "İletişime Geç",
     "whats_next": "Sırada Ne Var?",
-    "description": "Şu anda yeni fırsatlar aramıyor olsam da, gelen kutum her zaman açık. Bir sorunuz varsa ya da sadece merhaba demek istiyorsanız, size en kısa sürede dönmeye çalışacağım!",
+    "description": "Yeni zorluklara ve iş birliklerine her zaman açığım. Bir proje fikriniz, sorunuz varsa veya sadece bağlantı kurmak istiyorsanız — çekinmeden ulaşın!",
     "form": {
       "name_label": "İsim",
       "email_label": "E-posta",

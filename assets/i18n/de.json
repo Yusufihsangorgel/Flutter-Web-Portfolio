@@ -107,9 +107,9 @@
         "url": "https://fugasoft.com/",
         "image": "assets/images/fugasoft.png",
         "case_study": {
-          "problem": "Unternehmen benoetigten ein einheitliches POS- und Vertriebsmanagementsystem, das zuverlaessig auf Android/iOS-Tablets und Desktop-Plattformen (Linux, macOS, Windows) mit komplexer Bestandsverwaltung, Barcode-Scanning und Offline-Datensynchronisation funktioniert.",
-          "solution": "Entwicklung einer plattformuebergreifenden Flutter-Anwendung mit SQLite-Drift fuer komplexe lokale SQL-Abfragen, GetX fuer reaktive Zustandsverwaltung mit Mediator Pattern, Socket-Technologie fuer Echtzeit-Datensynchronisation und vollstaendige i18n-Unterstuetzung.",
-          "result": "Bereitstellung eines produktionsreifen POS-Systems auf 5 Plattformen mit komplexen SQL-Architekturen, reaktiven Datenstreams und Echtzeit-Barcode-Scanning — zuverlaessige Offline-First-Faehigkeit fuer den taeglichen Einzelhandel."
+          "problem": "Unternehmen benoetigten ein einheitliches POS- und Vertriebsmanagementsystem, das zuverlaessig auf Android/iOS-Tablets und Desktop-Plattformen (Linux, macOS, Windows) funktioniert und die Bestandsverwaltung ueber 50+ Einzelhandelsstandorte mit Barcode-Scanning und Offline-Datensynchronisation ermoeglicht.",
+          "solution": "Entwicklung einer plattformuebergreifenden Flutter-Anwendung mit SQLite-Drift fuer komplexe lokale SQL-Abfragen, GetX fuer reaktive Zustandsverwaltung mit Mediator Pattern, einer Offline-First-Sync-Engine ohne Datenverlust und vollstaendiger i18n-Unterstuetzung.",
+          "result": "Bereitstellung auf 5 Plattformen mit ueber 100K taeglichen Transaktionen, komplexen SQL-Architekturen, reaktiven Datenstreams und Echtzeit-Barcode-Scanning — zuverlaessige Offline-First-Faehigkeit fuer den taeglichen Einzelhandel."
         }
       },
       {
@@ -123,7 +123,7 @@
         "case_study": {
           "problem": "Eine grosse tuerkische Zeitung benoetigte ein modernes digitales Leseerlebnis fuer mobile Nutzer mit flüssigem Seitenrendering, Abonnementverwaltung und Offline-Zugang.",
           "solution": "Entwicklung einer Flutter-App mit MVVM-Architektur, GetX-Zustandsverwaltung und Dio fuer API-Integration. Effizientes Seitenrendering und Caching fuer ein nahtloses Leseerlebnis.",
-          "result": "Veroeffentlicht im Google Play und App Store — bietet Tausenden von Lesern ein zuverlaessiges und leistungsfaehiges digitales Zeitungserlebnis auf iOS und Android."
+          "result": "Ueber 10K Downloads mit 4,5+ Sternebewertung in beiden Stores — bietet Tausenden von Lesern ein zuverlaessiges und leistungsfaehiges digitales Zeitungserlebnis auf iOS und Android."
         }
       },
       {
@@ -137,7 +137,7 @@
         "case_study": {
           "problem": "Ein Wissenschaftsmagazin benoetigte eine dedizierte digitale Plattform fuer den Zugang zu monatlichen Ausgaben, Abonnementverwaltung und reichhaltigen wissenschaftlichen Inhalten.",
           "solution": "Entwicklung einer Flutter-App mit bewaehrter MVVM-Architektur und Dio-API-Integration, optimiert fuer Magazinformat-Inhalte mit hochqualitativem Bildrendering und Ausgabennavigation.",
-          "result": "Erfolgreich im Google Play und App Store gestartet — bietet Wissenschaftsbegeisterten ein dediziertes und ausgefeiltes mobiles Leseerlebnis fuer das Bilim ve Utopya Magazin."
+          "result": "Bedient Tausende monatliche Leser auf Google Play und App Store — bietet Wissenschaftsbegeisterten ein dediziertes und ausgefeiltes mobiles Leseerlebnis fuer das Bilim ve Utopya Magazin."
         }
       },
       {
@@ -152,7 +152,7 @@
         "case_study": {
           "problem": "Die Logistikbranche benoetigte eine Echtzeit-Fahrzeugverfolgungs- und Flottenmanagement-Loesung, die plattformuebergreifend auf Mobil und Web funktioniert, mit Live-Standortaktualisierungen und Routenoptimierung.",
           "solution": "Leitung der mobilen Entwicklung mit Flutter, WebSocket-basierter Echtzeit-Fahrzeugverfolgung, Google und Apple Maps SDK-Integration, RESTful API-Architektur nach SOLID-Prinzipien und einem begleitenden React Web-Dashboard.",
-          "result": "Bereitstellung auf Android, iOS und Web-Plattformen — ermoeglicht Logistikunternehmen die Echtzeitverfolgung von Fahrzeugen, Routenoptimierung und Flottenmanagement mit zuverlaessigen WebSocket-Verbindungen fuer Tausende gleichzeitiger Nutzer."
+          "result": "Verfolgung von 5.000+ gleichzeitigen Fahrzeugen mit <200ms Latenz auf Android, iOS und Web — ermoeglicht Logistikunternehmen die Echtzeitverfolgung, Routenoptimierung und Flottenmanagement mit zuverlaessigen WebSocket-Verbindungen."
         }
       }
     ],
@@ -237,28 +237,28 @@
     ],
     "blog_posts": [
       {
-        "title": "Clean Architecture in Flutter — SOLID-Prinzipien angewandt",
-        "date": "2025-12-15",
-        "summary": "Ein tiefer Einblick in die Implementierung von Clean Architecture in Flutter-Projekten. SOLID-Prinzipien anwenden, um skalierbare und wartbare mobile Anwendungen zu erstellen.",
+        "title": "Ein cinematisches Portfolio mit Flutter Web erstellen",
+        "date": "2026-03-10",
+        "summary": "Wie ich dieses Portfolio von Grund auf mit Flutter Web entworfen und gebaut habe — cinematische Animationen, responsive Layouts, i18n-Unterstuetzung in 7 Sprachen und ein Terminal-Emulator als Ueberraschung.",
         "readTime": "8 Min. Lesezeit",
-        "tags": ["Flutter", "Architecture"],
-        "url": "https://medium.com/@developeryusuf"
+        "tags": ["Flutter", "Web", "Animation"],
+        "url": "https://github.com/Yusufihsangorgel/Flutter-Web-Portfolio"
       },
       {
-        "title": "Cross-Platform POS-Systeme mit SQLite-Drift entwickeln",
+        "title": "Cross-Platform POS-Architektur mit SQLite-Drift",
         "date": "2025-09-20",
-        "summary": "Wie wir ein produktionsreifes POS-System mit Flutter und SQLite-Drift aufgebaut haben. Komplexe SQL-Abfragen, reaktive Datenstreams und Offline-First-Architektur.",
+        "summary": "Architekturentscheidungen hinter FugaSoft — ein Offline-First POS-System mit SQLite-Drift, reaktiver Zustandsverwaltung und verlustfreier Synchronisation ueber 5 Plattformen.",
         "readTime": "12 Min. Lesezeit",
-        "tags": ["Flutter", "SQLite", "Mobile"],
-        "url": "https://medium.com/@developeryusuf"
+        "tags": ["Flutter", "SQLite", "Architecture"],
+        "url": "#"
       },
       {
-        "title": "WebSocket Echtzeit-Tracking in Logistik-Apps",
+        "title": "Echtzeit-Fahrzeugverfolgung mit WebSocket in Flutter",
         "date": "2025-06-10",
-        "summary": "Implementierung von Echtzeit-Fahrzeugverfolgung mit WebSocket in Flutter. Integration von Google und Apple Maps SDKs fuer eine Logistikplattform mit Tausenden gleichzeitigen Nutzern.",
+        "summary": "Wie wir Echtzeit-Fahrzeugverfolgung fuer die Dorse-Logistikplattform implementiert haben — WebSocket-Architektur, Google und Apple Maps-Integration und Verwaltung von 5.000+ gleichzeitigen Verbindungen.",
         "readTime": "10 Min. Lesezeit",
         "tags": ["Flutter", "WebSocket", "Maps"],
-        "url": "https://medium.com/@developeryusuf"
+        "url": "#"
       }
     ],
     "contact": {
@@ -374,7 +374,7 @@
   "contact_section": {
     "title": "Kontakt aufnehmen",
     "whats_next": "Was kommt als Nächstes?",
-    "description": "Obwohl ich derzeit keine neuen Möglichkeiten suche, ist mein Posteingang immer offen. Ob Sie eine Frage haben oder einfach nur Hallo sagen möchten — ich werde mein Bestes tun, Ihnen zu antworten!",
+    "description": "Ich bin immer offen für neue Herausforderungen und Zusammenarbeit. Ob Sie eine Projektidee, eine Frage haben oder sich einfach vernetzen möchten — schreiben Sie mir gerne!",
     "form": {
       "name_label": "Name",
       "email_label": "E-Mail",
