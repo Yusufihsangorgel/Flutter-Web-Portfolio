@@ -105,7 +105,12 @@
         "title": "FugaSoft (برنامج إدارة المبيعات - POS)",
         "description": "واجهة أمامية Flutter، SQLite-Drift، GetX، i18n، برمجة تفاعلية؛ أجهزة لوحية Android/iOS وسطح المكتب (Linux، macOS، Windows)؛ المرشد: قائد فريق Arge Abdüsselam Kösecik",
         "url": "https://fugasoft.com/",
-        "image": "assets/images/fugasoft.png"
+        "image": "assets/images/fugasoft.png",
+        "case_study": {
+          "problem": "احتاجت الشركات إلى نظام موحد لنقاط البيع وإدارة المبيعات يعمل بشكل موثوق عبر أجهزة Android/iOS اللوحية ومنصات سطح المكتب (Linux، macOS، Windows) مع إدارة مخزون معقدة ومسح باركود ومزامنة بيانات دون اتصال.",
+          "solution": "تم بناء تطبيق Flutter متعدد المنصات باستخدام SQLite-Drift لاستعلامات SQL المحلية المعقدة، وGetX لإدارة الحالة التفاعلية مع نمط Mediator، وتقنية Socket للمزامنة في الوقت الحقيقي، ودعم i18n الكامل.",
+          "result": "تم تسليم نظام POS إنتاجي منشور عبر 5 منصات، يتعامل مع بنيات SQL معقدة وتدفقات بيانات تفاعلية ومسح باركود في الوقت الحقيقي — يخدم عمليات البيع اليومية بقدرة موثوقة للعمل دون اتصال."
+        }
       },
       {
         "title": "Aydınlık E-Newspaper",
@@ -114,7 +119,12 @@
           "google_play": "https://play.google.com/store/apps/details?id=com.aydinlikgazetesi.egazete&hl=tr",
           "app_store": "https://apps.apple.com/us/app/ayd%C4%B1nl%C4%B1k-e-gazete/id1560103805"
         },
-        "image": "assets/images/aydinlik.png"
+        "image": "assets/images/aydinlik.png",
+        "case_study": {
+          "problem": "احتاجت صحيفة تركية كبرى إلى تجربة قراءة رقمية حديثة لمستخدمي الجوال، مع عرض سلس للصفحات وإدارة اشتراكات ووصول دون اتصال.",
+          "solution": "تم تطوير تطبيق Flutter بهندسة MVVM وإدارة حالة GetX وDio لتكامل API. تم تنفيذ عرض فعال للصفحات والتخزين المؤقت لتجربة قراءة سلسة.",
+          "result": "تم نشره على Google Play وApp Store، مما يوفر لآلاف القراء تجربة صحيفة رقمية موثوقة وعالية الأداء على iOS وAndroid."
+        }
       },
       {
         "title": "Bilim ve Ütopya E-Magazine",
@@ -123,7 +133,12 @@
           "google_play": "https://play.google.com/store/apps/details?id=com.aydinlikgazetesi.edergi_v1_bvu&pcampaignid=web_share",
           "app_store": "https://apps.apple.com/tr/app/bilim-ve-%C3%BCtopya-e-dergi/id6478221195"
         },
-        "image": "assets/images/bilim_utopya.png"
+        "image": "assets/images/bilim_utopya.png",
+        "case_study": {
+          "problem": "احتاجت مجلة علمية إلى منصة رقمية مخصصة للوصول إلى الأعداد الشهرية وإدارة الاشتراكات والاستمتاع بمحتوى علمي غني على الأجهزة المحمولة.",
+          "solution": "تم بناء تطبيق Flutter بهندسة MVVM المثبتة وتكامل Dio API، محسّن لمحتوى بتنسيق المجلات مع عرض صور عالي الجودة والتنقل بين الأعداد.",
+          "result": "تم إطلاقه بنجاح على Google Play وApp Store، مما يمنح عشاق العلوم تجربة قراءة متنقلة مخصصة ومصقولة لمجلة Bilim ve Utopya."
+        }
       },
       {
         "title": "Dorse App",
@@ -133,7 +148,12 @@
           "google_play": "https://play.google.com/store/apps/details?id=com.juniustech.dorse",
           "app_store": "https://apps.apple.com/tr/app/dorse/id6670605686"
         },
-        "image": "assets/images/dorse.png"
+        "image": "assets/images/dorse.png",
+        "case_study": {
+          "problem": "احتاجت صناعة الخدمات اللوجستية إلى حل لتتبع المركبات في الوقت الحقيقي وإدارة الأسطول يعمل عبر منصات الجوال والويب، مع تحديثات موقع مباشرة وتحسين المسارات.",
+          "solution": "قيادة التطوير المحمول باستخدام Flutter مع تتبع المركبات في الوقت الحقيقي عبر WebSocket وتكامل Google وApple Maps SDK وبنية RESTful API وفقاً لمبادئ SOLID ولوحة تحكم React.",
+          "result": "تم النشر عبر Android وiOS والويب، مما يمكّن شركات الخدمات اللوجستية من تتبع المركبات في الوقت الحقيقي وتحسين المسارات وإدارة الأساطيل — يخدم آلاف المستخدمين المتزامنين باتصالات WebSocket موثوقة."
+        }
       }
     ],
     "education": [
@@ -355,7 +375,11 @@
   },
   "projects_section": {
     "title": "مشاريعي",
-    "description": "المشاريع الرئيسية والأعمال المنجزة"
+    "description": "المشاريع الرئيسية والأعمال المنجزة",
+    "case_study_problem": "التحدي",
+    "case_study_solution": "النهج",
+    "case_study_result": "النتيجة",
+    "links": "الروابط"
   },
   "contact_section": {
     "title": "تواصل معي",

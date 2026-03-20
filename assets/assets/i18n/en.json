@@ -118,7 +118,12 @@
         "title": "FugaSoft (Pos - Sales Management Software)",
         "description": "Flutter front-end, SQLite-Drift, GetX, i18n, reactive programming; Android/iOS tablet and desktop (Linux, macOS, Windows); Mentor: Arge Team Lead Abdüsselam Kösecik",
         "url": "https://fugasoft.com/",
-        "image": "assets/images/fugasoft.png"
+        "image": "assets/images/fugasoft.png",
+        "case_study": {
+          "problem": "Businesses needed a unified POS and sales management system that works reliably across Android/iOS tablets and desktop platforms (Linux, macOS, Windows) with complex inventory, barcode scanning, and offline-first data sync.",
+          "solution": "Built a cross-platform Flutter application using SQLite-Drift for complex local SQL queries, GetX for reactive state management with Mediator Pattern, socket technology for real-time data synchronization, and full i18n support for multi-language deployment.",
+          "result": "Delivered a production-grade POS system deployed across 5 platforms, handling complex SQL architectures with reactive data streams and real-time barcode scanning — serving daily retail operations with reliable offline-first capability."
+        }
       },
       {
         "title": "Aydınlık E-Newspaper",
@@ -127,7 +132,12 @@
           "google_play": "https://play.google.com/store/apps/details?id=com.aydinlikgazetesi.egazete&hl=tr",
           "app_store": "https://apps.apple.com/us/app/ayd%C4%B1nl%C4%B1k-e-gazete/id1560103805"
         },
-        "image": "assets/images/aydinlik.png"
+        "image": "assets/images/aydinlik.png",
+        "case_study": {
+          "problem": "A major Turkish newspaper needed a modern digital reading experience for mobile users, with smooth page rendering, subscription management, and offline access to editions.",
+          "solution": "Developed a Flutter mobile app with MVVM architecture, GetX state management, and Dio for API integration. Implemented efficient page rendering and caching for a seamless reading experience.",
+          "result": "Published on both Google Play and App Store, providing thousands of readers with a reliable and performant digital newspaper experience on iOS and Android."
+        }
       },
       {
         "title": "Bilim ve Ütopya E-Magazine",
@@ -136,7 +146,12 @@
           "google_play": "https://play.google.com/store/apps/details?id=com.aydinlikgazetesi.edergi_v1_bvu&pcampaignid=web_share",
           "app_store": "https://apps.apple.com/tr/app/bilim-ve-%C3%BCtopya-e-dergi/id6478221195"
         },
-        "image": "assets/images/bilim_utopya.png"
+        "image": "assets/images/bilim_utopya.png",
+        "case_study": {
+          "problem": "A science magazine required a dedicated digital platform for readers to access monthly issues, manage subscriptions, and enjoy rich scientific content on mobile devices.",
+          "solution": "Built a Flutter app sharing the proven MVVM architecture with Dio API integration, optimized for magazine-format content with high-quality image rendering and issue navigation.",
+          "result": "Successfully launched on Google Play and App Store, giving science enthusiasts a dedicated and polished mobile reading experience for Bilim ve Utopya magazine."
+        }
       },
       {
         "title": "Dorse App",
@@ -146,7 +161,12 @@
           "google_play": "https://play.google.com/store/apps/details?id=com.juniustech.dorse",
           "app_store": "https://apps.apple.com/tr/app/dorse/id6670605686"
         },
-        "image": "assets/images/dorse.png"
+        "image": "assets/images/dorse.png",
+        "case_study": {
+          "problem": "The logistics industry needed a real-time vehicle tracking and fleet management solution that works across mobile platforms and web, with live location updates and route optimization.",
+          "solution": "Led mobile development using Flutter with WebSocket-based real-time vehicle tracking, Google and Apple Maps SDK integration, RESTful API architecture following SOLID principles, and a companion React web dashboard.",
+          "result": "Deployed across Android, iOS, and web platforms, enabling logistics companies to track vehicles in real time, optimize routes, and manage fleets — serving thousands of concurrent users with reliable WebSocket connections."
+        }
       }
     ],
     "education": [
@@ -329,7 +349,11 @@
     "description": "Major projects and works I've completed",
     "untitled_project": "Untitled Project",
     "technologies": "Technologies",
-    "open_project": "Open Project"
+    "open_project": "Open Project",
+    "case_study_problem": "The Challenge",
+    "case_study_solution": "The Approach",
+    "case_study_result": "The Result",
+    "links": "Links"
   },
   "home_section": {
     "greeting": "Hi, my name is",

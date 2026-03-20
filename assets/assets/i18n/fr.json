@@ -105,7 +105,12 @@
         "title": "FugaSoft (Logiciel de gestion des ventes POS)",
         "description": "Frontend Flutter, SQLite-Drift, GetX, i18n, programmation réactive; tablette Android/iOS et bureau (Linux, macOS, Windows); Mentor: Chef d'équipe Arge Abdüsselam Kösecik",
         "url": "https://fugasoft.com/",
-        "image": "assets/images/fugasoft.png"
+        "image": "assets/images/fugasoft.png",
+        "case_study": {
+          "problem": "Les entreprises avaient besoin d'un systeme POS et de gestion des ventes unifie fonctionnant de maniere fiable sur tablettes Android/iOS et plateformes de bureau (Linux, macOS, Windows) avec gestion d'inventaire complexe, lecture de codes-barres et synchronisation hors ligne.",
+          "solution": "Developpement d'une application Flutter multiplateforme utilisant SQLite-Drift pour les requetes SQL locales complexes, GetX pour la gestion d'etat reactive avec le pattern Mediator, la technologie socket pour la synchronisation en temps reel et un support i18n complet.",
+          "result": "Livraison d'un systeme POS de qualite production deploye sur 5 plateformes, gerant des architectures SQL complexes avec des flux de donnees reactifs et la lecture de codes-barres en temps reel — avec une capacite hors ligne fiable."
+        }
       },
       {
         "title": "Aydınlık E-Newspaper",
@@ -114,7 +119,12 @@
           "google_play": "https://play.google.com/store/apps/details?id=com.aydinlikgazetesi.egazete&hl=tr",
           "app_store": "https://apps.apple.com/us/app/ayd%C4%B1nl%C4%B1k-e-gazete/id1560103805"
         },
-        "image": "assets/images/aydinlik.png"
+        "image": "assets/images/aydinlik.png",
+        "case_study": {
+          "problem": "Un grand journal turc avait besoin d'une experience de lecture numerique moderne pour les utilisateurs mobiles, avec un rendu fluide des pages, la gestion des abonnements et un acces hors ligne.",
+          "solution": "Developpement d'une application Flutter avec architecture MVVM, gestion d'etat GetX et Dio pour l'integration API. Rendu de pages efficace et mise en cache pour une experience de lecture fluide.",
+          "result": "Publie sur Google Play et App Store, offrant a des milliers de lecteurs une experience de journal numerique fiable et performante sur iOS et Android."
+        }
       },
       {
         "title": "Bilim ve Ütopya E-Magazine",
@@ -123,7 +133,12 @@
           "google_play": "https://play.google.com/store/apps/details?id=com.aydinlikgazetesi.edergi_v1_bvu&pcampaignid=web_share",
           "app_store": "https://apps.apple.com/tr/app/bilim-ve-%C3%BCtopya-e-dergi/id6478221195"
         },
-        "image": "assets/images/bilim_utopya.png"
+        "image": "assets/images/bilim_utopya.png",
+        "case_study": {
+          "problem": "Un magazine scientifique avait besoin d'une plateforme numerique dediee pour acceder aux numeros mensuels, gerer les abonnements et profiter d'un contenu scientifique riche sur mobile.",
+          "solution": "Developpement d'une application Flutter avec l'architecture MVVM eprouvee et l'integration API Dio, optimisee pour le contenu au format magazine avec un rendu d'images haute qualite et la navigation entre numeros.",
+          "result": "Lance avec succes sur Google Play et App Store, offrant aux passionnes de sciences une experience de lecture mobile dediee et soignee pour le magazine Bilim ve Utopya."
+        }
       },
       {
         "title": "Dorse App",
@@ -133,7 +148,12 @@
           "google_play": "https://play.google.com/store/apps/details?id=com.juniustech.dorse",
           "app_store": "https://apps.apple.com/tr/app/dorse/id6670605686"
         },
-        "image": "assets/images/dorse.png"
+        "image": "assets/images/dorse.png",
+        "case_study": {
+          "problem": "L'industrie logistique avait besoin d'une solution de suivi vehiculaire en temps reel et de gestion de flotte fonctionnant sur mobile et web, avec des mises a jour de localisation en direct et l'optimisation des itineraires.",
+          "solution": "Direction du developpement mobile avec Flutter, suivi vehiculaire en temps reel base sur WebSocket, integration des SDK Google et Apple Maps, architecture API RESTful selon les principes SOLID et un tableau de bord web React.",
+          "result": "Deploye sur Android, iOS et web, permettant aux entreprises logistiques de suivre les vehicules en temps reel, d'optimiser les itineraires et de gerer les flottes — servant des milliers d'utilisateurs simultanes avec des connexions WebSocket fiables."
+        }
       }
     ],
     "education": [
@@ -355,7 +375,11 @@
   },
   "projects_section": {
     "title": "Mes Projets",
-    "description": "Projets majeurs et travaux réalisés"
+    "description": "Projets majeurs et travaux réalisés",
+    "case_study_problem": "Le Defi",
+    "case_study_solution": "L'Approche",
+    "case_study_result": "Le Resultat",
+    "links": "Liens"
   },
   "contact_section": {
     "title": "Me Contacter",
