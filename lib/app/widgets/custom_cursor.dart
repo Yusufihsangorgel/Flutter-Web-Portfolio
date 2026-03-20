@@ -6,7 +6,7 @@ import 'package:flutter_web_portfolio/app/controllers/scene_director.dart';
 import 'package:flutter_web_portfolio/app/core/constants/cinematic_curves.dart';
 import 'package:flutter_web_portfolio/app/core/constants/durations.dart';
 
-/// Custom cursor overlay — outer ring + inner dot.
+/// Custom cursor overlay — outer ring + inner dot + spotlight glow.
 /// Expands on interactive element hover.
 class CustomCursor extends StatefulWidget {
   const CustomCursor({super.key, required this.child});
@@ -40,6 +40,7 @@ class _CustomCursorState extends State<CustomCursor> {
       child: Stack(
         children: [
           widget.child,
+          _SpotlightLayer(position: _position, visible: _visible),
           _CursorOverlay(position: _position, visible: _visible),
         ],
       ),
@@ -176,4 +177,75 @@ class _CursorPainter extends CustomPainter {
       ringSize != old.ringSize ||
       dotSize != old.dotSize ||
       accentColor != old.accentColor;
+}
+
+// ---------------------------------------------------------------------------
+// Spotlight layer — subtle radial gradient glow following the cursor
+// ---------------------------------------------------------------------------
+
+class _SpotlightLayer extends StatelessWidget {
+  const _SpotlightLayer({
+    required this.position,
+    required this.visible,
+  });
+
+  final ValueNotifier<Offset> position;
+  final ValueNotifier<bool> visible;
+
+  @override
+  Widget build(BuildContext context) => ValueListenableBuilder<bool>(
+        valueListenable: visible,
+        builder: (_, isVisible, child) {
+          if (!isVisible) return const SizedBox.shrink();
+          return child!;
+        },
+        child: Positioned.fill(
+          child: IgnorePointer(
+            child: ValueListenableBuilder<Offset>(
+              valueListenable: position,
+              builder: (_, pos, __) {
+                final accent =
+                    Get.find<SceneDirector>().currentAccent.value;
+                return CustomPaint(
+                  painter: _SpotlightPainter(
+                    position: pos,
+                    accentColor: accent,
+                  ),
+                );
+              },
+            ),
+          ),
+        ),
+      );
+}
+
+class _SpotlightPainter extends CustomPainter {
+  _SpotlightPainter({
+    required this.position,
+    required this.accentColor,
+  });
+
+  final Offset position;
+  final Color accentColor;
+
+  static const double _radius = 300.0;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..shader = RadialGradient(
+        colors: [
+          accentColor.withValues(alpha: 0.045),
+          accentColor.withValues(alpha: 0.0),
+        ],
+        stops: const [0.0, 1.0],
+      ).createShader(
+        Rect.fromCircle(center: position, radius: _radius),
+      );
+    canvas.drawCircle(position, _radius, paint);
+  }
+
+  @override
+  bool shouldRepaint(_SpotlightPainter old) =>
+      position != old.position || accentColor != old.accentColor;
 }
