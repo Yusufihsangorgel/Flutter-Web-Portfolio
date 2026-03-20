@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:get/get.dart';
+import 'package:flutter_web_portfolio/app/controllers/audio_controller.dart';
 
 /// Focusable interaction wrapper — keyboard nav, hover, tap, focus ring.
 /// Replaces raw MouseRegion + GestureDetector with accessibility baked in.
@@ -36,7 +38,12 @@ class _CinematicFocusableState extends State<CinematicFocusable> {
 
     return FocusableActionDetector(
       mouseCursor: widget.cursor,
-      onShowHoverHighlight: (hovered) => widget.onHoverChanged?.call(hovered),
+      onShowHoverHighlight: (hovered) {
+        if (hovered && Get.isRegistered<AudioController>()) {
+          Get.find<AudioController>().playHover();
+        }
+        widget.onHoverChanged?.call(hovered);
+      },
       onShowFocusHighlight: (focused) => setState(() => _focused = focused),
       actions: {
         ActivateIntent: CallbackAction<ActivateIntent>(
@@ -51,7 +58,12 @@ class _CinematicFocusableState extends State<CinematicFocusable> {
         SingleActivator(LogicalKeyboardKey.space): ActivateIntent(),
       },
       child: GestureDetector(
-        onTap: widget.onTap,
+        onTap: () {
+          if (Get.isRegistered<AudioController>()) {
+            Get.find<AudioController>().playClick();
+          }
+          widget.onTap();
+        },
         child: DecoratedBox(
           decoration: BoxDecoration(
             borderRadius: widget.borderRadius,
