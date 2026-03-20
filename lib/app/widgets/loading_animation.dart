@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_web_portfolio/app/controllers/language_controller.dart';
-import 'package:flutter_web_portfolio/app/controllers/theme_controller.dart';
+import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
+import 'package:flutter_web_portfolio/app/core/constants/durations.dart';
 import 'package:get/get.dart';
 
-/// Animation widget displayed while the app is loading
+/// Pulsing animation widget displayed while the app is loading.
 class LoadingAnimation extends StatefulWidget {
   const LoadingAnimation({super.key});
 
@@ -13,7 +14,6 @@ class LoadingAnimation extends StatefulWidget {
 
 class _LoadingAnimationState extends State<LoadingAnimation>
     with SingleTickerProviderStateMixin {
-  final ThemeController _themeController = Get.find<ThemeController>();
   final LanguageController _languageController = Get.find<LanguageController>();
 
   late AnimationController _animationController;
@@ -25,7 +25,7 @@ class _LoadingAnimationState extends State<LoadingAnimation>
 
     _animationController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 1500),
+      duration: AppDurations.loadingPulse,
     )..repeat(reverse: true);
 
     _opacityAnimation = Tween<double>(begin: 0.5, end: 1.0).animate(
@@ -41,7 +41,7 @@ class _LoadingAnimationState extends State<LoadingAnimation>
 
   @override
   Widget build(BuildContext context) => Scaffold(
-      backgroundColor: _themeController.backgroundColor,
+      backgroundColor: AppColors.background,
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -50,7 +50,6 @@ class _LoadingAnimationState extends State<LoadingAnimation>
             const SizedBox(height: 24),
             _LoadingText(
               text: _languageController.getText('portfolio_loading'),
-              themeController: _themeController,
               animationController: _animationController,
             ),
           ],
@@ -64,15 +63,15 @@ class _LoadingAnimationState extends State<LoadingAnimation>
         width: 120,
         height: 120,
         decoration: BoxDecoration(
-          color: _themeController.primaryColor.withAlpha(51),
+          color: AppColors.accent.withAlpha(51),
           shape: BoxShape.circle,
         ),
         child: Center(
           child: Container(
             width: 80,
             height: 80,
-            decoration: BoxDecoration(
-              color: _themeController.primaryColor,
+            decoration: const BoxDecoration(
+              color: AppColors.accent,
               shape: BoxShape.circle,
             ),
             child: const Icon(Icons.person, color: Colors.white, size: 48),
@@ -82,16 +81,13 @@ class _LoadingAnimationState extends State<LoadingAnimation>
     );
 }
 
-/// Loading text widget
 class _LoadingText extends StatelessWidget {
 
   const _LoadingText({
     required this.text,
-    required this.themeController,
     required this.animationController,
   });
   final String text;
-  final ThemeController themeController;
   final AnimationController animationController;
 
   @override
@@ -101,8 +97,8 @@ class _LoadingText extends StatelessWidget {
           opacity: animationController.value,
           child: Text(
             text,
-            style: TextStyle(
-              color: themeController.primaryTextColor,
+            style: const TextStyle(
+              color: AppColors.textBright,
               fontSize: 18,
               fontWeight: FontWeight.w500,
             ),
