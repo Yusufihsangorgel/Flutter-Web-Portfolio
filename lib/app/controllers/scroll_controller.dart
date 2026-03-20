@@ -1,17 +1,21 @@
 import 'dart:async';
+import 'dart:developer' as dev;
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class AppScrollController extends GetxController {
+import 'package:flutter_web_portfolio/app/core/constants/app_dimensions.dart';
+import 'package:flutter_web_portfolio/app/core/constants/durations.dart';
+
+/// Owns the main ScrollController, tracks section offsets, and drives smooth-scroll.
+class AppScrollController extends GetxController with WidgetsBindingObserver {
   static AppScrollController get to => Get.find();
 
   final homeKey = GlobalKey();
   final aboutKey = GlobalKey();
   final experienceKey = GlobalKey();
   final projectsKey = GlobalKey();
-  final skillsKey = GlobalKey();
   final contactKey = GlobalKey();
 
   final ScrollController scrollController = ScrollController();
@@ -22,29 +26,31 @@ class AppScrollController extends GetxController {
   bool _isManualScrolling = false;
 
   Timer? _debounceTimer;
-  Timer? _periodicTimer;
 
   @override
   void onInit() {
     super.onInit();
+    WidgetsBinding.instance
+      ..addObserver(this)
+      ..addPostFrameCallback((_) {
+        _updateSectionInfo();
+      });
     scrollController.addListener(_handleScroll);
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _updateSectionInfo();
-      _periodicTimer = Timer.periodic(
-        const Duration(milliseconds: 1000),
-        (_) => _updateSectionInfo(),
-      );
-    });
   }
 
   @override
   void onClose() {
+    WidgetsBinding.instance.removeObserver(this);
     _debounceTimer?.cancel();
-    _periodicTimer?.cancel();
-    scrollController.removeListener(_handleScroll);
-    scrollController.dispose();
+    scrollController
+      ..removeListener(_handleScroll)
+      ..dispose();
     super.onClose();
+  }
+
+  @override
+  void didChangeMetrics() {
+    _updateSectionInfo();
   }
 
   void _updateSectionInfo() {
@@ -52,7 +58,6 @@ class AppScrollController extends GetxController {
     _updateKeyInfo('about', aboutKey);
     _updateKeyInfo('experience', experienceKey);
     _updateKeyInfo('projects', projectsKey);
-    _updateKeyInfo('skills', skillsKey);
     _updateKeyInfo('contact', contactKey);
   }
 
@@ -70,14 +75,14 @@ class AppScrollController extends GetxController {
     if (!scrollController.hasClients) return;
 
     _debounceTimer?.cancel();
-    _debounceTimer = Timer(const Duration(milliseconds: 100), _detectActiveSection);
+    _debounceTimer = Timer(AppDurations.scrollDebounce, _detectActiveSection);
   }
 
   void _detectActiveSection() {
     if (!scrollController.hasClients || _sectionOffsets.isEmpty) return;
 
     try {
-      const appBarHeight = 80.0;
+      const appBarHeight = AppDimensions.appBarHeight;
       final screenHeight = Get.height;
 
       if (scrollController.positions.isEmpty) return;
@@ -87,7 +92,7 @@ class AppScrollController extends GetxController {
       final visibleBottom = visibleTop + screenHeight - appBarHeight;
       final visibleMiddle = visibleTop + (screenHeight - appBarHeight) / 2;
 
-      final Map<String, double> sectionScores = {};
+      final sectionScores = <String, double>{};
 
       _sectionOffsets.forEach((sectionId, offsetTop) {
         final height = _sectionHeights[sectionId] ?? 600;
@@ -111,8 +116,8 @@ class AppScrollController extends GetxController {
       });
 
       if (sectionScores.isEmpty) {
-        String closestSection = 'home';
-        double minDistance = double.infinity;
+        var closestSection = 'home';
+        var minDistance = double.infinity;
 
         _sectionOffsets.forEach((sectionId, offsetTop) {
           final height = _sectionHeights[sectionId] ?? 0;
@@ -138,8 +143,8 @@ class AppScrollController extends GetxController {
       if (activeSection.value != bestSection) {
         activeSection.value = bestSection;
       }
-    } catch (_) {
-      // Scroll detection failed silently
+    } catch (e) {
+      dev.log('Section detection failed', name: 'AppScrollController', error: e);
     }
   }
 
@@ -152,7 +157,6 @@ class AppScrollController extends GetxController {
         'about' => aboutKey,
         'experience' => experienceKey,
         'projects' => projectsKey,
-        'skills' => skillsKey,
         'contact' => contactKey,
         _ => null,
       };
@@ -166,7 +170,7 @@ class AppScrollController extends GetxController {
       final renderBox =
           sectionKey.currentContext!.findRenderObject() as RenderBox;
       final screenSize = Get.size;
-      const appBarHeight = 80.0;
+      const appBarHeight = AppDimensions.appBarHeight;
 
       final position = renderBox.localToGlobal(Offset.zero);
       final size = renderBox.size;
@@ -188,17 +192,18 @@ class AppScrollController extends GetxController {
       scrollController
           .animateTo(
             targetScrollOffset,
-            duration: const Duration(milliseconds: 800),
+            duration: AppDurations.sectionScroll,
             curve: Curves.easeInOut,
           )
           .then((_) => _finishScrolling());
-    } catch (_) {
+    } catch (e) {
+      dev.log('Scroll to section failed', name: 'AppScrollController', error: e);
       _isManualScrolling = false;
     }
   }
 
   void _finishScrolling() {
-    Future.delayed(const Duration(milliseconds: 500), () {
+    Future.delayed(AppDurations.heroDebounce, () {
       _isManualScrolling = false;
       _updateSectionInfo();
       _detectActiveSection();

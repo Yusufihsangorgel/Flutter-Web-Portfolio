@@ -1,15 +1,18 @@
 import 'dart:developer' as dev;
 
 import 'package:get/get.dart';
-import '../data/providers/assets_provider.dart';
-import '../data/providers/local_storage_provider.dart';
-import '../data/repositories/language_repository_impl.dart';
-import '../domain/repositories/i_language_repository.dart';
-import '../controllers/language_controller.dart';
-import '../controllers/theme_controller.dart';
-import '../controllers/scroll_controller.dart';
-import '../controllers/shared_background_controller.dart';
+import 'package:flutter_web_portfolio/app/controllers/cursor_controller.dart';
+import 'package:flutter_web_portfolio/app/controllers/language_controller.dart';
+import 'package:flutter_web_portfolio/app/controllers/scene_director.dart';
+import 'package:flutter_web_portfolio/app/controllers/scroll_controller.dart';
+import 'package:flutter_web_portfolio/app/data/providers/assets_provider.dart';
+import 'package:flutter_web_portfolio/app/data/providers/local_storage_provider.dart';
+import 'package:flutter_web_portfolio/app/data/repositories/language_repository_impl.dart';
+import 'package:flutter_web_portfolio/app/domain/providers/i_assets_provider.dart';
+import 'package:flutter_web_portfolio/app/domain/providers/i_local_storage_provider.dart';
+import 'package:flutter_web_portfolio/app/domain/repositories/i_language_repository.dart';
 
+/// Wires up global DI — providers, controllers, repos.
 class AppBindings extends Bindings {
   @override
   void dependencies() {
@@ -18,14 +21,14 @@ class AppBindings extends Bindings {
   }
 
   void _registerSyncDependencies() {
-    Get.put<AssetsProvider>(AssetsProvider(), permanent: true);
-    Get.put(ThemeController(), permanent: true);
-    Get.put(AppScrollController(), permanent: true);
-    Get.put(SharedBackgroundController(), permanent: true);
-
+    Get
+      ..put<IAssetsProvider>(AssetsProvider(), permanent: true)
+      ..put(AppScrollController(), permanent: true)
+      ..put(SceneDirector(), permanent: true)
+      ..put(CursorController(), permanent: true);
     if (!Get.isRegistered<LanguageController>()) {
       final dummyRepository = LanguageRepositoryImpl(
-        assetsProvider: Get.find<AssetsProvider>(),
+        assetsProvider: Get.find<IAssetsProvider>(),
         localStorageProvider: LocalStorageProvider(),
       );
       Get.put(
@@ -37,7 +40,7 @@ class AppBindings extends Bindings {
   }
 
   void _registerAndInitLocalStorage() {
-    Get.putAsync<LocalStorageProvider>(() async {
+    Get.putAsync<ILocalStorageProvider>(() async {
       try {
         final provider = LocalStorageProvider();
         final initialized = await provider.init();
@@ -64,19 +67,19 @@ class AppBindings extends Bindings {
   }
 
   ILanguageRepository _createLanguageRepository(bool useLocalStorage) {
-    final assetsProvider = Get.find<AssetsProvider>();
+    final assetsProvider = Get.find<IAssetsProvider>();
 
     if (useLocalStorage) {
       try {
-        final storageProvider = Get.find<LocalStorageProvider>();
+        final storageProvider = Get.find<ILocalStorageProvider>();
         if (storageProvider.isInitialized) {
           return LanguageRepositoryImpl(
             assetsProvider: assetsProvider,
             localStorageProvider: storageProvider,
           );
         }
-      } catch (_) {
-        // Fall through to fallback
+      } catch (e) {
+        dev.log('Storage provider access failed', name: 'AppBindings', error: e);
       }
     }
 

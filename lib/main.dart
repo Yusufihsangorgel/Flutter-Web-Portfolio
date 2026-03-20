@@ -5,14 +5,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:flutter_i18n/loaders/decoders/json_decode_strategy.dart';
 import 'package:get/get.dart';
 
 import 'package:flutter_web_portfolio/app/bindings/app_bindings.dart';
-import 'package:flutter_web_portfolio/app/controllers/theme_controller.dart';
+import 'package:flutter_web_portfolio/app/controllers/loading_controller.dart';
 import 'package:flutter_web_portfolio/app/controllers/language_controller.dart';
+import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
+import 'package:flutter_web_portfolio/app/core/theme/app_theme.dart';
 import 'package:flutter_web_portfolio/app/routes/app_pages.dart';
 import 'package:flutter_web_portfolio/app/widgets/loading_animation.dart';
 import 'package:flutter_web_portfolio/app/widgets/mouse_interaction_wrapper.dart';
@@ -49,35 +50,10 @@ void main() {
   );
 }
 
-class LoadingController extends GetxController {
-  final RxBool _isLoading = true.obs;
-  bool get isLoading => _isLoading.value;
-
-  void setLoading(bool loading) {
-    _isLoading.value = loading;
-  }
-}
-
 Future<void> initializeApp(LoadingController loadingController) async {
   try {
-    if (!kIsWeb) {
-      try {
-        FlutterNativeSplash.preserve(widgetsBinding: WidgetsBinding.instance);
-      } catch (_) {}
-    }
-
-    Get.find<ThemeController>();
-
-    try {
-      final languageController = Get.find<LanguageController>();
-      await languageController.loadSavedLanguage();
-    } catch (_) {}
-
-    if (!kIsWeb) {
-      try {
-        FlutterNativeSplash.remove();
-      } catch (_) {}
-    }
+    final languageController = Get.find<LanguageController>();
+    await languageController.loadSavedLanguage();
   } catch (e) {
     dev.log('App initialization failed', name: 'Main', error: e);
   } finally {
@@ -85,29 +61,29 @@ Future<void> initializeApp(LoadingController loadingController) async {
   }
 }
 
+/// Root application widget.
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final themeController = Get.find<ThemeController>();
     final loadingController = Get.find<LoadingController>();
 
     return Obx(() {
-      Locale currentLocale = const Locale('tr');
-      String appTitle = 'Portfolio';
+      var currentLocale = const Locale('tr');
+      var appTitle = 'Portfolio';
 
-      try {
+      if (Get.isRegistered<LanguageController>()) {
         final languageController = Get.find<LanguageController>();
         currentLocale = languageController.currentLocale;
         appTitle = languageController.appName;
-      } catch (_) {}
+      }
 
       return GetMaterialApp(
         title: appTitle,
         debugShowCheckedModeBanner: false,
-        theme: themeController.darkTheme,
-        darkTheme: themeController.darkTheme,
+        theme: AppTheme.dark,
+        darkTheme: AppTheme.dark,
         themeMode: ThemeMode.dark,
         locale: currentLocale,
         fallbackLocale: const Locale('tr'),
@@ -130,6 +106,8 @@ class MyApp extends StatelessWidget {
           Locale('de'),
           Locale('fr'),
           Locale('es'),
+          Locale('ar'),
+          Locale('hi'),
         ],
         getPages: AppPages.routes,
         initialRoute: AppPages.initial,
@@ -139,11 +117,11 @@ class MyApp extends StatelessWidget {
 
           final content = Container(
             color: loadingController.isLoading
-                ? themeController.backgroundColor
+                ? AppColors.background
                 : Colors.transparent,
             child: loadingController.isLoading
                 ? const LoadingAnimation()
-                : _buildResponsiveWrapper(context, wrappedApp),
+                : wrappedApp,
           );
 
           if (!kIsWeb) return content;
@@ -152,13 +130,4 @@ class MyApp extends StatelessWidget {
       );
     });
   }
-
-  Widget _buildResponsiveWrapper(BuildContext context, Widget? child) => MediaQuery(
-      data: MediaQuery.of(context).copyWith(
-        textScaler: TextScaler.linear(
-          MediaQuery.of(context).size.width <= 600 ? 0.9 : 1.0,
-        ),
-      ),
-      child: child ?? const SizedBox.shrink(),
-    );
 }

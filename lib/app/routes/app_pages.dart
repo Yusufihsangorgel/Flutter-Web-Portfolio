@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 
 part 'app_routes.dart';
 
+/// GetX route table — single-page portfolio with home route.
 class AppPages {
   static const initial = Routes.home;
 

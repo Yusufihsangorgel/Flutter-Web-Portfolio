@@ -1,9 +1,10 @@
 import 'dart:developer' as dev;
 
 import 'package:get/get.dart';
-import '../../../domain/entities/project.dart';
-import '../../../domain/repositories/i_project_repository.dart';
+import 'package:flutter_web_portfolio/app/domain/entities/project.dart';
+import 'package:flutter_web_portfolio/app/domain/repositories/i_project_repository.dart';
 
+/// Loads and caches project list for the home page.
 class HomeController extends GetxController {
 
   HomeController({required IProjectRepository projectRepository})
