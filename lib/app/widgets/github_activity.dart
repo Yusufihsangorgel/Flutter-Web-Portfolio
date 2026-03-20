@@ -8,6 +8,7 @@ import 'package:flutter_web_portfolio/app/core/constants/breakpoints.dart';
 import 'package:flutter_web_portfolio/app/core/constants/durations.dart';
 import 'package:flutter_web_portfolio/app/core/theme/app_typography.dart';
 import 'package:flutter_web_portfolio/app/data/providers/github_provider.dart';
+import 'package:flutter_web_portfolio/app/widgets/animated_counter.dart';
 import 'package:flutter_web_portfolio/app/widgets/border_light_card.dart';
 import 'package:flutter_web_portfolio/app/widgets/scroll_fade_in.dart';
 import 'package:flutter_web_portfolio/app/widgets/skeleton_shimmer.dart';
@@ -170,9 +171,9 @@ class _StatsRow extends StatelessWidget {
                 ),
               ),
             ),
-          _StatChip(label: 'Repos', value: '$repos', accent: accent),
-          _StatChip(label: 'Followers', value: '$followers', accent: accent),
-          _StatChip(label: 'Stars', value: '$totalStars', accent: accent),
+          _StatChip(label: 'Repos', value: repos, accent: accent),
+          _StatChip(label: 'Followers', value: followers, accent: accent),
+          _StatChip(label: 'Stars', value: totalStars, accent: accent),
         ],
       );
     });
@@ -187,39 +188,43 @@ class _StatChip extends StatelessWidget {
   });
 
   final String label;
-  final String value;
+  final int value;
   final Color accent;
 
   @override
-  Widget build(BuildContext context) => Container(
-    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-    decoration: BoxDecoration(
-      color: accent.withValues(alpha: 0.06),
-      borderRadius: BorderRadius.circular(8),
-      border: Border.all(
-        color: accent.withValues(alpha: 0.12),
-        width: 1,
+  Widget build(BuildContext context) => ScrollFadeIn(
+    delay: AppDurations.staggerShort,
+    child: Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      decoration: BoxDecoration(
+        color: accent.withValues(alpha: 0.06),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+          color: accent.withValues(alpha: 0.12),
+          width: 1,
+        ),
       ),
-    ),
-    child: Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Text(
-          value,
-          style: GoogleFonts.spaceGrotesk(
-            fontSize: 18,
-            fontWeight: FontWeight.w700,
-            color: accent,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          AnimatedCounter(
+            endValue: value,
+            duration: const Duration(milliseconds: 1200),
+            style: GoogleFonts.spaceGrotesk(
+              fontSize: 18,
+              fontWeight: FontWeight.w700,
+              color: accent,
+            ),
           ),
-        ),
-        const SizedBox(width: 6),
-        Text(
-          label,
-          style: AppTypography.caption.copyWith(
-            color: AppColors.textPrimary,
+          const SizedBox(width: 6),
+          Text(
+            label,
+            style: AppTypography.caption.copyWith(
+              color: AppColors.textPrimary,
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     ),
   );
 }
