@@ -10,6 +10,7 @@ class ScrollFadeIn extends StatefulWidget {
     this.duration = AppDurations.entrance,
     this.delay = Duration.zero,
     this.curve = Curves.easeOutCubic,
+    this.enableScale = false,
   });
 
   final Widget child;
@@ -17,6 +18,10 @@ class ScrollFadeIn extends StatefulWidget {
   final Duration duration;
   final Duration delay;
   final Curve curve;
+
+  /// When true, the widget also scales from 0.95 to 1.0 alongside
+  /// the existing opacity + translate animations.
+  final bool enableScale;
 
   @override
   State<ScrollFadeIn> createState() => _ScrollFadeInState();
@@ -27,6 +32,7 @@ class _ScrollFadeInState extends State<ScrollFadeIn>
   late AnimationController _controller;
   late Animation<double> _opacity;
   late Animation<Offset> _slide;
+  late Animation<double> _scale;
   bool _triggered = false;
   ScrollPosition? _scrollPosition;
 
@@ -40,6 +46,10 @@ class _ScrollFadeInState extends State<ScrollFadeIn>
       begin: Offset(0, widget.offset),
       end: Offset.zero,
     ).animate(CurvedAnimation(parent: _controller, curve: widget.curve));
+    _scale = widget.enableScale
+        ? Tween<double>(begin: 0.95, end: 1.0)
+            .animate(CurvedAnimation(parent: _controller, curve: widget.curve))
+        : const AlwaysStoppedAnimation<double>(1.0);
 
     WidgetsBinding.instance.addPostFrameCallback((_) => _checkVisibility());
   }
@@ -86,10 +96,13 @@ class _ScrollFadeInState extends State<ScrollFadeIn>
   @override
   Widget build(BuildContext context) => AnimatedBuilder(
     animation: _controller,
-    builder: (_, child) => Opacity(
-      opacity: _opacity.value,
-      child: Transform.translate(offset: _slide.value, child: child),
-    ),
+    builder: (_, child) {
+      Widget result = Transform.translate(offset: _slide.value, child: child);
+      if (widget.enableScale) {
+        result = Transform.scale(scale: _scale.value, child: result);
+      }
+      return Opacity(opacity: _opacity.value, child: result);
+    },
     child: widget.child,
   );
 }

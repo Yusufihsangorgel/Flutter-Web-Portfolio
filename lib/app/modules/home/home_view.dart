@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -21,6 +22,7 @@ import 'package:flutter_web_portfolio/app/widgets/custom_sliver_app_bar.dart';
 import 'package:flutter_web_portfolio/app/widgets/footer.dart';
 import 'package:flutter_web_portfolio/app/widgets/matrix_rain.dart';
 import 'package:flutter_web_portfolio/app/widgets/scroll_fade_in.dart';
+import 'package:flutter_web_portfolio/app/widgets/scroll_progress_dots.dart';
 import 'package:flutter_web_portfolio/app/widgets/background/cinematic_background.dart';
 import 'package:flutter_web_portfolio/app/widgets/constellation_particles.dart';
 import 'package:flutter_web_portfolio/app/widgets/social_sidebar.dart';
@@ -194,12 +196,23 @@ class _HomeViewState extends State<HomeView> {
               // Layer 3: Scrollable content
               ValueListenableBuilder<bool>(
                 valueListenable: HomeSection.entranceComplete,
-                builder: (context, entranceDone, child) => CustomScrollView(
-                  controller: scrollController.scrollController,
-                  physics: entranceDone
-                      ? const ClampingScrollPhysics()
-                      : const NeverScrollableScrollPhysics(),
-                  slivers: [
+                builder: (context, entranceDone, child) =>
+                    ScrollConfiguration(
+                  behavior: ScrollConfiguration.of(context).copyWith(
+                    dragDevices: {
+                      PointerDeviceKind.touch,
+                      PointerDeviceKind.mouse,
+                      PointerDeviceKind.trackpad,
+                    },
+                  ),
+                  child: CustomScrollView(
+                    controller: scrollController.scrollController,
+                    physics: entranceDone
+                        ? const BouncingScrollPhysics(
+                            decelerationRate: ScrollDecelerationRate.fast,
+                          )
+                        : const NeverScrollableScrollPhysics(),
+                    slivers: [
                     CustomSliverAppBar(
                       scrollController: scrollController,
                       languageController: languageController,
@@ -214,6 +227,7 @@ class _HomeViewState extends State<HomeView> {
                       scrollController.aboutKey,
                       const AboutSection(),
                       context,
+                      enableScale: true,
                     ),
                     _buildSection(
                       scrollController.experienceKey,
@@ -238,6 +252,7 @@ class _HomeViewState extends State<HomeView> {
                       const ProjectsSection(),
                       context,
                       delay: AppDurations.staggerShort,
+                      enableScale: true,
                     ),
                     _buildSection(
                       scrollController.contactKey,
@@ -247,6 +262,7 @@ class _HomeViewState extends State<HomeView> {
                     ),
                     const SliverToBoxAdapter(child: PortfolioFooter()),
                   ],
+                  ),
                 ),
               ),
               // Layer 4: Fixed social sidebars (desktop only)
@@ -266,9 +282,21 @@ class _HomeViewState extends State<HomeView> {
                   child: SocialSidebarRight(visible: entranceDone),
                 ),
               ),
-              // Layer 5: Back-to-top button
+              // Layer 5: Scroll progress dots (desktop only)
+              ValueListenableBuilder<bool>(
+                valueListenable: HomeSection.entranceComplete,
+                builder: (context, entranceDone, _) => Positioned(
+                  right: 20,
+                  top: 0,
+                  bottom: 0,
+                  child: Center(
+                    child: ScrollProgressDots(visible: entranceDone),
+                  ),
+                ),
+              ),
+              // Layer 6: Back-to-top button
               const BackToTopButton(),
-              // Layer 5: Matrix rain easter egg overlay
+              // Layer 7: Matrix rain easter egg overlay
               if (_showMatrixRain)
                 Positioned.fill(
                   child: MatrixRain(
@@ -296,12 +324,17 @@ class _HomeViewState extends State<HomeView> {
     BuildContext context, {
     bool animated = true,
     Duration delay = Duration.zero,
+    bool enableScale = false,
   }) => SliverToBoxAdapter(
     child: Container(
       key: key,
       padding: _sectionPadding(context),
       child: animated
-          ? ScrollFadeIn(delay: delay, child: child)
+          ? ScrollFadeIn(
+              delay: delay,
+              enableScale: enableScale,
+              child: child,
+            )
           : child,
     ),
   );
