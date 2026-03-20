@@ -199,7 +199,7 @@ class _BioContentState extends State<_BioContent>
         ),
         const SizedBox(height: 32),
         // Skill orbit — desktop only (too dense for mobile).
-        if (!isMobile)
+        if (!isMobile) ...[
           ScrollFadeIn(
             delay: AppDurations.staggerMedium,
             child: Obx(() {
@@ -207,10 +207,11 @@ class _BioContentState extends State<_BioContent>
               final skills =
                   widget.languageController.cvData['skills'] as List? ?? [];
               if (skills.isEmpty) return const SizedBox.shrink();
-              return SkillOrbit(skills: skills, accent: accent);
+              return ClipRect(child: SkillOrbit(skills: skills, accent: accent));
             }),
           ),
-        if (!isMobile) const SizedBox(height: 32),
+          const SizedBox(height: 32),
+        ],
         // Skill proficiency chart
         ScrollFadeIn(
           delay: AppDurations.staggerMedium,
