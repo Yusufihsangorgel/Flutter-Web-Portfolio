@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_web_portfolio/app/controllers/language_controller.dart';
+import 'package:flutter_web_portfolio/app/controllers/scene_director.dart';
 import 'package:flutter_web_portfolio/app/controllers/scroll_controller.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
 import 'package:flutter_web_portfolio/app/core/constants/cinematic_curves.dart';
@@ -10,6 +11,7 @@ import 'package:flutter_web_portfolio/app/widgets/cinematic_button.dart';
 import 'package:flutter_web_portfolio/app/core/constants/durations.dart';
 import 'package:flutter_web_portfolio/app/widgets/scroll_indicator.dart';
 import 'package:flutter_web_portfolio/app/widgets/shader_text_reveal.dart';
+import 'package:flutter_web_portfolio/app/widgets/typewriter_text.dart';
 import 'package:flutter_web_portfolio/app/utils/responsive_utils.dart';
 
 /// Hero Section — "The Opening Shot"
@@ -120,25 +122,10 @@ class _HomeSectionState extends State<HomeSection>
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      // Name
-                      FittedBox(
-                        fit: BoxFit.scaleDown,
-                        child: ShaderTextReveal(
-                          text: languageController.getText(
-                            'home_section.title',
-                            defaultValue: 'YUSUF IHSAN GORGEL',
-                          ).toUpperCase(),
-                          style: GoogleFonts.spaceGrotesk(
-                            fontSize: heroFontSize,
-                            fontWeight: FontWeight.w800,
-                            color: AppColors.textBright,
-                            letterSpacing: -4,
-                            height: 1.0,
-                          ),
-                          delay: AppDurations.heroNameRevealDelay,
-                          duration: AppDurations.heroNameRevealDuration,
-                          textAlign: TextAlign.center,
-                        ),
+                      // Name — gradient overlay fades in after reveal
+                      _HeroNameWithGradient(
+                        languageController: languageController,
+                        heroFontSize: heroFontSize,
                       ),
 
                       // Horizontal line between name and subtitle
@@ -158,8 +145,8 @@ class _HomeSectionState extends State<HomeSection>
                       ),
                       const SizedBox(height: 20),
 
-                      // Subtitle
-                      ShaderTextReveal(
+                      // Subtitle — typewriter effect
+                      TypewriterText(
                         text: languageController.getText(
                           'home_section.subtitle',
                           defaultValue: 'Mobile Software Engineer',
@@ -172,7 +159,6 @@ class _HomeSectionState extends State<HomeSection>
                           height: 1.3,
                         ),
                         delay: AppDurations.heroSubtitleDelay,
-                        duration: AppDurations.heroSubtitleDuration,
                         textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 8),
@@ -303,4 +289,84 @@ class _AnimatedCTAButtonsState extends State<_AnimatedCTAButtons>
       ),
     ),
   );
+}
+
+// ---------------------------------------------------------------------------
+// Hero name with gradient that fades in after the entrance reveal completes.
+// Uses a Stack: base layer is the ShaderTextReveal (for the sweep animation),
+// top layer is a gradient-masked copy that cross-fades in once done.
+// ---------------------------------------------------------------------------
+class _HeroNameWithGradient extends StatelessWidget {
+  const _HeroNameWithGradient({
+    required this.languageController,
+    required this.heroFontSize,
+  });
+
+  final LanguageController languageController;
+  final double heroFontSize;
+
+  @override
+  Widget build(BuildContext context) {
+    final nameText = languageController.getText(
+      'home_section.title',
+      defaultValue: 'YUSUF IHSAN GORGEL',
+    ).toUpperCase();
+
+    final nameStyle = GoogleFonts.spaceGrotesk(
+      fontSize: heroFontSize,
+      fontWeight: FontWeight.w800,
+      color: AppColors.textBright,
+      letterSpacing: -4,
+      height: 1.0,
+    );
+
+    return Stack(
+      children: [
+        // Base layer — the original ShaderTextReveal with sweep animation
+        FittedBox(
+          fit: BoxFit.scaleDown,
+          child: ShaderTextReveal(
+            text: nameText,
+            style: nameStyle,
+            delay: AppDurations.heroNameRevealDelay,
+            duration: AppDurations.heroNameRevealDuration,
+            textAlign: TextAlign.center,
+          ),
+        ),
+        // Top layer — gradient text that fades in after entrance completes
+        ValueListenableBuilder<bool>(
+          valueListenable: HomeSection.entranceComplete,
+          builder: (context, complete, _) {
+            final accent = Get.find<SceneDirector>().currentAccent.value;
+            return AnimatedOpacity(
+              opacity: complete ? 1.0 : 0.0,
+              duration: AppDurations.entrance,
+              curve: Curves.easeOut,
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: ShaderMask(
+                  blendMode: BlendMode.srcIn,
+                  shaderCallback: (bounds) => LinearGradient(
+                    colors: [
+                      AppColors.textBright,
+                      Color.lerp(
+                        AppColors.textBright,
+                        accent,
+                        0.20,
+                      )!,
+                    ],
+                  ).createShader(bounds),
+                  child: Text(
+                    nameText,
+                    style: nameStyle,
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ),
+            );
+          },
+        ),
+      ],
+    );
+  }
 }

@@ -13,6 +13,7 @@ import 'package:flutter_web_portfolio/app/widgets/cinematic_focusable.dart';
 import 'package:flutter_web_portfolio/app/widgets/numbered_section_heading.dart';
 import 'package:flutter_web_portfolio/app/widgets/project_detail_overlay.dart';
 import 'package:flutter_web_portfolio/app/widgets/scroll_fade_in.dart';
+import 'package:flutter_web_portfolio/app/widgets/text_scramble.dart';
 
 /// Projects Section — "The Showcase"
 /// Film strip layout with border-light cards.
@@ -87,8 +88,8 @@ class ProjectsSection extends StatelessWidget {
   }
 }
 
-// Project card — film strip style with border light
-class _ProjectCard extends StatelessWidget {
+// Project card — film strip style with border light + scale on hover
+class _ProjectCard extends StatefulWidget {
   const _ProjectCard({
     required this.project,
     this.isReversed = false,
@@ -100,6 +101,17 @@ class _ProjectCard extends StatelessWidget {
   final bool isMobile;
 
   @override
+  State<_ProjectCard> createState() => _ProjectCardState();
+}
+
+class _ProjectCardState extends State<_ProjectCard> {
+  bool _hovered = false;
+
+  Map<String, dynamic> get project => widget.project;
+  bool get isReversed => widget.isReversed;
+  bool get isMobile => widget.isMobile;
+
+  @override
   Widget build(BuildContext context) {
     final p = project;
     final title = (p['title'] as String?) ?? 'Project';
@@ -109,15 +121,28 @@ class _ProjectCard extends StatelessWidget {
 
     return Obx(() {
       final accent = Get.find<SceneDirector>().currentAccent.value;
-      return GestureDetector(
-        onTap: () => ProjectDetailOverlay.show(context, project),
-        child: MouseRegion(
-          cursor: SystemMouseCursors.click,
-          child: BorderLightCard(
-            glowColor: accent,
-            child: isMobile
-                ? _buildMobileContent(title, description, technologies, url, accent)
-                : _buildDesktopContent(title, description, technologies, url, accent),
+      return MouseRegion(
+        cursor: SystemMouseCursors.click,
+        onEnter: (_) => setState(() => _hovered = true),
+        onExit: (_) => setState(() => _hovered = false),
+        child: GestureDetector(
+          onTap: () => ProjectDetailOverlay.show(context, project),
+          child: AnimatedContainer(
+            duration: AppDurations.fast,
+            curve: Curves.easeOut,
+            transform: Matrix4.identity()
+              ..scaleByDouble(_hovered ? 1.02 : 1.0, _hovered ? 1.02 : 1.0, 1.0, 1.0),
+            transformAlignment: Alignment.center,
+            child: AnimatedOpacity(
+              duration: AppDurations.fast,
+              opacity: _hovered ? 1.0 : 0.92,
+              child: BorderLightCard(
+                glowColor: accent,
+                child: isMobile
+                    ? _buildMobileContent(title, description, technologies, url, accent)
+                    : _buildDesktopContent(title, description, technologies, url, accent),
+              ),
+            ),
           ),
         ),
       );
@@ -137,14 +162,13 @@ class _ProjectCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: isReversed ? CrossAxisAlignment.end : CrossAxisAlignment.start,
           children: [
-            Text(
-              title,
+            TextScramble(
+              text: title,
               style: GoogleFonts.spaceGrotesk(
                 fontSize: 28,
                 fontWeight: FontWeight.w700,
                 color: AppColors.textBright,
               ),
-              textAlign: isReversed ? TextAlign.right : TextAlign.left,
             ),
             const SizedBox(height: 16),
             Text(
@@ -204,8 +228,8 @@ class _ProjectCard extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Expanded(
-            child: Text(
-              title,
+            child: TextScramble(
+              text: title,
               style: GoogleFonts.spaceGrotesk(
                 fontSize: 22,
                 fontWeight: FontWeight.w700,
