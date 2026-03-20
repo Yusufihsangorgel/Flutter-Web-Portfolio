@@ -215,6 +215,32 @@
         "company": "Mehmet Akif Ersoy Universitaet"
       }
     ],
+    "blog_posts": [
+      {
+        "title": "Clean Architecture in Flutter — SOLID-Prinzipien angewandt",
+        "date": "2025-12-15",
+        "summary": "Ein tiefer Einblick in die Implementierung von Clean Architecture in Flutter-Projekten. SOLID-Prinzipien anwenden, um skalierbare und wartbare mobile Anwendungen zu erstellen.",
+        "readTime": "8 Min. Lesezeit",
+        "tags": ["Flutter", "Architecture"],
+        "url": "https://medium.com/@developeryusuf"
+      },
+      {
+        "title": "Cross-Platform POS-Systeme mit SQLite-Drift entwickeln",
+        "date": "2025-09-20",
+        "summary": "Wie wir ein produktionsreifes POS-System mit Flutter und SQLite-Drift aufgebaut haben. Komplexe SQL-Abfragen, reaktive Datenstreams und Offline-First-Architektur.",
+        "readTime": "12 Min. Lesezeit",
+        "tags": ["Flutter", "SQLite", "Mobile"],
+        "url": "https://medium.com/@developeryusuf"
+      },
+      {
+        "title": "WebSocket Echtzeit-Tracking in Logistik-Apps",
+        "date": "2025-06-10",
+        "summary": "Implementierung von Echtzeit-Fahrzeugverfolgung mit WebSocket in Flutter. Integration von Google und Apple Maps SDKs fuer eine Logistikplattform mit Tausenden gleichzeitigen Nutzern.",
+        "readTime": "10 Min. Lesezeit",
+        "tags": ["Flutter", "WebSocket", "Maps"],
+        "url": "https://medium.com/@developeryusuf"
+      }
+    ],
     "contact": {
       "form": {
         "name_label": "Name",
@@ -297,7 +323,8 @@
     "experience": "Erfahrung",
     "projects": "Projekte",
     "contact": "Kontakt",
-    "testimonials": "Referenzen"
+    "testimonials": "Referenzen",
+    "blog": "Blog"
   },
   "about_section": {
     "title": "Über Mich",
@@ -336,6 +363,10 @@
       "error": "Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.",
       "or_divider": "oder senden Sie eine Nachricht direkt"
     }
+  },
+  "blog_section": {
+    "title": "Blog",
+    "subtitle": "Gedanken, Tutorials und Einblicke in die mobile Entwicklung"
   },
   "testimonials_section": {
     "title": "Referenzen",

@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_web_portfolio/app/controllers/audio_controller.dart';
 import 'package:flutter_web_portfolio/app/controllers/language_controller.dart';
 import 'package:flutter_web_portfolio/app/controllers/scroll_controller.dart';
 import 'package:flutter_web_portfolio/app/controllers/scene_director.dart';
@@ -27,7 +28,7 @@ class CustomSliverAppBar extends StatelessWidget {
   final AppScrollController scrollController;
   final List<Widget>? actions;
 
-  static const _navSections = ['about', 'experience', 'testimonials', 'projects', 'contact'];
+  static const _navSections = ['about', 'experience', 'testimonials', 'blog', 'projects', 'contact'];
 
   @override
   Widget build(BuildContext context) {
@@ -94,6 +95,7 @@ class CustomSliverAppBar extends StatelessWidget {
           : null,
       actions: [
         if (!isMobile) _buildNavItems(),
+        const _AudioToggleButton(),
         const _ThemeToggleButton(),
         const LanguageSwitcher(),
         ...?actions,
@@ -196,6 +198,53 @@ class _LogoTextState extends State<_LogoText> {
         ),
       ),
     );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Audio toggle: speaker on/off icon
+// ---------------------------------------------------------------------------
+class _AudioToggleButton extends StatelessWidget {
+  const _AudioToggleButton();
+
+  @override
+  Widget build(BuildContext context) {
+    if (!Get.isRegistered<AudioController>()) {
+      return const SizedBox.shrink();
+    }
+    final audioController = Get.find<AudioController>();
+
+    return Obx(() {
+      final muted = audioController.isMuted.value;
+      final isDark = Get.isRegistered<ThemeController>()
+          ? Get.find<ThemeController>().isDarkMode.value
+          : true;
+
+      return Semantics(
+        button: true,
+        label: muted ? 'Enable sound effects' : 'Mute sound effects',
+        child: IconButton(
+          onPressed: audioController.toggleMute,
+          icon: AnimatedSwitcher(
+            duration: AppDurations.buttonHover,
+            switchInCurve: CinematicCurves.revealDecel,
+            switchOutCurve: CinematicCurves.revealDecel,
+            transitionBuilder: (child, animation) => FadeTransition(
+              opacity: animation,
+              child: ScaleTransition(scale: animation, child: child),
+            ),
+            child: Icon(
+              muted ? Icons.volume_off_rounded : Icons.volume_up_rounded,
+              key: ValueKey(muted),
+              color: isDark
+                  ? AppColors.textPrimary
+                  : AppColors.lightTextPrimary,
+              size: 20,
+            ),
+          ),
+        ),
+      );
+    });
   }
 }
 

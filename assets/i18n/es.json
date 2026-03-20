@@ -186,6 +186,32 @@
         "company": "Universidad Mehmet Akif Ersoy"
       }
     ],
+    "blog_posts": [
+      {
+        "title": "Clean Architecture en Flutter — Principios SOLID aplicados",
+        "date": "2025-12-15",
+        "summary": "Una inmersion profunda en la implementacion de Clean Architecture en proyectos Flutter, aplicando principios SOLID para construir aplicaciones moviles escalables y mantenibles.",
+        "readTime": "8 min de lectura",
+        "tags": ["Flutter", "Architecture"],
+        "url": "https://medium.com/@developeryusuf"
+      },
+      {
+        "title": "Sistemas POS multiplataforma con SQLite-Drift",
+        "date": "2025-09-20",
+        "summary": "Como construimos un sistema POS de calidad produccion con Flutter y SQLite-Drift. Consultas SQL complejas, flujos de datos reactivos y arquitectura offline-first.",
+        "readTime": "12 min de lectura",
+        "tags": ["Flutter", "SQLite", "Mobile"],
+        "url": "https://medium.com/@developeryusuf"
+      },
+      {
+        "title": "Seguimiento en tiempo real con WebSocket en apps logisticas",
+        "date": "2025-06-10",
+        "summary": "Implementacion de seguimiento vehicular en tiempo real con WebSocket en Flutter. Integracion de SDKs de Google y Apple Maps para una plataforma logistica con miles de usuarios.",
+        "readTime": "10 min de lectura",
+        "tags": ["Flutter", "WebSocket", "Maps"],
+        "url": "https://medium.com/@developeryusuf"
+      }
+    ],
     "contact": {
       "form": {
         "name_label": "Nombre",
@@ -268,7 +294,8 @@
     "experience": "Experiencia",
     "projects": "Proyectos",
     "contact": "Contacto",
-    "testimonials": "Testimonios"
+    "testimonials": "Testimonios",
+    "blog": "Blog"
   },
   "about_section": {
     "title": "Sobre Mí",
@@ -307,6 +334,10 @@
       "error": "Ocurrió un error. Por favor intenta de nuevo.",
       "or_divider": "o envía un mensaje directamente"
     }
+  },
+  "blog_section": {
+    "title": "Blog",
+    "subtitle": "Pensamientos, tutoriales y perspectivas sobre desarrollo movil"
   },
   "testimonials_section": {
     "title": "Testimonios",

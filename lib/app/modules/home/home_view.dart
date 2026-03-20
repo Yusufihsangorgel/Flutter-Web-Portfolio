@@ -12,6 +12,7 @@ import 'package:flutter_web_portfolio/app/modules/home/sections/home_section.dar
 import 'package:flutter_web_portfolio/app/modules/home/sections/about_section.dart';
 import 'package:flutter_web_portfolio/app/modules/home/sections/experience_section.dart';
 import 'package:flutter_web_portfolio/app/modules/home/sections/projects/projects_section.dart';
+import 'package:flutter_web_portfolio/app/modules/home/sections/blog_section.dart';
 import 'package:flutter_web_portfolio/app/modules/home/sections/contact/contact_section.dart';
 import 'package:flutter_web_portfolio/app/modules/home/sections/testimonials_section.dart';
 import 'package:flutter_web_portfolio/app/widgets/command_palette.dart';
@@ -176,6 +177,12 @@ class _HomeViewState extends State<HomeView> {
                     _buildSection(
                       scrollController.testimonialsKey,
                       const TestimonialsSection(),
+                      context,
+                      delay: AppDurations.staggerShort,
+                    ),
+                    _buildSection(
+                      scrollController.blogKey,
+                      const BlogSection(),
                       context,
                       delay: AppDurations.staggerShort,
                     ),

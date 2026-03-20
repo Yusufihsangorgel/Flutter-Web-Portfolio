@@ -208,6 +208,32 @@
         "company": "Mehmet Akif Ersoy University"
       }
     ],
+    "blog_posts": [
+      {
+        "title": "Clean Architecture in Flutter — SOLID Principles Applied",
+        "date": "2025-12-15",
+        "summary": "A deep dive into implementing Clean Architecture in Flutter projects, applying SOLID principles to build scalable and maintainable mobile applications with clear separation of concerns.",
+        "readTime": "8 min read",
+        "tags": ["Flutter", "Architecture"],
+        "url": "https://medium.com/@developeryusuf"
+      },
+      {
+        "title": "Building Cross-Platform POS Systems with SQLite-Drift",
+        "date": "2025-09-20",
+        "summary": "How we built a production-grade POS system using Flutter and SQLite-Drift, handling complex SQL queries, reactive data streams, and offline-first architecture across mobile and desktop.",
+        "readTime": "12 min read",
+        "tags": ["Flutter", "SQLite", "Mobile"],
+        "url": "https://medium.com/@developeryusuf"
+      },
+      {
+        "title": "WebSocket Real-Time Tracking in Logistics Apps",
+        "date": "2025-06-10",
+        "summary": "Implementing real-time vehicle tracking with WebSocket in Flutter, integrating Google and Apple Maps SDKs for a logistics platform serving thousands of concurrent users.",
+        "readTime": "10 min read",
+        "tags": ["Flutter", "WebSocket", "Maps"],
+        "url": "https://medium.com/@developeryusuf"
+      }
+    ],
     "contact": {
       "form": {
         "name_label": "Name",
@@ -290,7 +316,8 @@
     "experience": "Experience",
     "projects": "Projects",
     "contact": "Contact",
-    "testimonials": "Testimonials"
+    "testimonials": "Testimonials",
+    "blog": "Blog"
   },
   "about_section": {
     "title": "About Me",
@@ -332,6 +359,10 @@
       "error": "An error occurred. Please try again.",
       "or_divider": "or send a message directly"
     }
+  },
+  "blog_section": {
+    "title": "Blog",
+    "subtitle": "Thoughts, tutorials, and insights on mobile development"
   },
   "testimonials_section": {
     "title": "What People Say",

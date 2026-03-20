@@ -24,6 +24,7 @@ class AppScrollController extends GetxController with WidgetsBindingObserver {
   final aboutKey = GlobalKey();
   final experienceKey = GlobalKey();
   final testimonialsKey = GlobalKey();
+  final blogKey = GlobalKey();
   final projectsKey = GlobalKey();
   final contactKey = GlobalKey();
 
@@ -130,6 +131,7 @@ class AppScrollController extends GetxController with WidgetsBindingObserver {
     _updateKeyInfo('about', aboutKey);
     _updateKeyInfo('experience', experienceKey);
     _updateKeyInfo('testimonials', testimonialsKey);
+    _updateKeyInfo('blog', blogKey);
     _updateKeyInfo('projects', projectsKey);
     _updateKeyInfo('contact', contactKey);
   }
@@ -230,6 +232,7 @@ class AppScrollController extends GetxController with WidgetsBindingObserver {
         'about' => aboutKey,
         'experience' => experienceKey,
         'testimonials' => testimonialsKey,
+        'blog' => blogKey,
         'projects' => projectsKey,
         'contact' => contactKey,
         _ => null,

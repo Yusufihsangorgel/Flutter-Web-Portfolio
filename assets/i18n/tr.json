@@ -35,7 +35,8 @@
     "experience": "Deneyim",
     "projects": "Projeler",
     "contact": "İletişim",
-    "testimonials": "Referanslar"
+    "testimonials": "Referanslar",
+    "blog": "Blog"
   },
   "translations": {
     "app_name": "Yusuf İhsan Görgel - Portföy",
@@ -217,6 +218,32 @@
         "company": "Mehmet Akif Ersoy Üniversitesi"
       }
     ],
+    "blog_posts": [
+      {
+        "title": "Flutter'da Clean Architecture — SOLID Prensipleri Uygulaması",
+        "date": "2025-12-15",
+        "summary": "Flutter projelerinde Clean Architecture implementasyonuna derinlemesine bir bakış. SOLID prensiplerini uygulayarak ölçeklenebilir ve sürdürülebilir mobil uygulamalar oluşturma.",
+        "readTime": "8 dk okuma",
+        "tags": ["Flutter", "Architecture"],
+        "url": "https://medium.com/@developeryusuf"
+      },
+      {
+        "title": "SQLite-Drift ile Cross-Platform POS Sistemleri Geliştirme",
+        "date": "2025-09-20",
+        "summary": "Flutter ve SQLite-Drift kullanarak production-grade bir POS sistemi nasıl oluşturduk. Karmaşık SQL sorguları, reaktif veri akışları ve offline-first mimari ile mobil ve masaüstü platformlar.",
+        "readTime": "12 dk okuma",
+        "tags": ["Flutter", "SQLite", "Mobile"],
+        "url": "https://medium.com/@developeryusuf"
+      },
+      {
+        "title": "Lojistik Uygulamalarında WebSocket Gerçek Zamanlı Takip",
+        "date": "2025-06-10",
+        "summary": "Flutter'da WebSocket ile gerçek zamanlı araç takibi implementasyonu. Binlerce eşzamanlı kullanıcıya hizmet veren bir lojistik platformu için Google ve Apple Maps SDK entegrasyonu.",
+        "readTime": "10 dk okuma",
+        "tags": ["Flutter", "WebSocket", "Maps"],
+        "url": "https://medium.com/@developeryusuf"
+      }
+    ],
     "contact": {
       "form": {
         "name_label": "İsim",
@@ -333,6 +360,10 @@
       "error": "Bir hata oluştu. Lütfen tekrar deneyin.",
       "or_divider": "veya doğrudan mesaj gönderin"
     }
+  },
+  "blog_section": {
+    "title": "Blog",
+    "subtitle": "Mobil geliştirme üzerine düşünceler, öğreticiler ve içgörüler"
   },
   "testimonials_section": {
     "title": "Referanslar",

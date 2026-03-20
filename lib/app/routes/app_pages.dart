@@ -43,6 +43,12 @@ class AppPages {
       transition: Transition.fadeIn,
     ),
     GetPage(
+      name: Routes.blog,
+      page: () => const HomeView(),
+      binding: HomeBinding(),
+      transition: Transition.fadeIn,
+    ),
+    GetPage(
       name: Routes.contact,
       page: () => const HomeView(),
       binding: HomeBinding(),

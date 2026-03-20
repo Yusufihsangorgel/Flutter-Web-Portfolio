@@ -225,6 +225,32 @@
         "company": "جامعة محمد عاكف إرسوي"
       }
     ],
+    "blog_posts": [
+      {
+        "title": "الهندسة المعمارية النظيفة في Flutter — تطبيق مبادئ SOLID",
+        "date": "2025-12-15",
+        "summary": "نظرة معمقة في تنفيذ الهندسة المعمارية النظيفة في مشاريع Flutter، مع تطبيق مبادئ SOLID لبناء تطبيقات جوال قابلة للتوسع والصيانة.",
+        "readTime": "8 دقائق قراءة",
+        "tags": ["Flutter", "Architecture"],
+        "url": "https://medium.com/@developeryusuf"
+      },
+      {
+        "title": "بناء أنظمة POS متعددة المنصات باستخدام SQLite-Drift",
+        "date": "2025-09-20",
+        "summary": "كيف بنينا نظام POS إنتاجي باستخدام Flutter و SQLite-Drift. استعلامات SQL معقدة وتدفقات بيانات تفاعلية وبنية offline-first عبر الجوال والمكتبي.",
+        "readTime": "12 دقيقة قراءة",
+        "tags": ["Flutter", "SQLite", "Mobile"],
+        "url": "https://medium.com/@developeryusuf"
+      },
+      {
+        "title": "تتبع الوقت الحقيقي بـ WebSocket في تطبيقات اللوجستيات",
+        "date": "2025-06-10",
+        "summary": "تنفيذ تتبع المركبات في الوقت الحقيقي باستخدام WebSocket في Flutter، مع دمج حزم Google و Apple Maps لمنصة لوجستية تخدم آلاف المستخدمين.",
+        "readTime": "10 دقائق قراءة",
+        "tags": ["Flutter", "WebSocket", "Maps"],
+        "url": "https://medium.com/@developeryusuf"
+      }
+    ],
     "contact": {
       "form": {
         "name_label": "الاسم",
@@ -307,7 +333,8 @@
     "experience": "الخبرة",
     "projects": "المشاريع",
     "contact": "تواصل",
-    "testimonials": "التوصيات"
+    "testimonials": "التوصيات",
+    "blog": "المدونة"
   },
   "about_section": {
     "title": "نبذة عني",
@@ -346,6 +373,10 @@
       "error": "حدث خطأ. يرجى المحاولة مرة أخرى.",
       "or_divider": "أو أرسل رسالة مباشرة"
     }
+  },
+  "blog_section": {
+    "title": "المدونة",
+    "subtitle": "أفكار ودروس تعليمية ورؤى حول تطوير تطبيقات الجوال"
   },
   "testimonials_section": {
     "title": "التوصيات",

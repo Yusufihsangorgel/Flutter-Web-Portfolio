@@ -225,6 +225,32 @@
         "company": "Universite Mehmet Akif Ersoy"
       }
     ],
+    "blog_posts": [
+      {
+        "title": "Clean Architecture dans Flutter — Principes SOLID appliques",
+        "date": "2025-12-15",
+        "summary": "Un approfondissement de l'implementation de Clean Architecture dans les projets Flutter, en appliquant les principes SOLID pour creer des applications mobiles evolutives et maintenables.",
+        "readTime": "8 min de lecture",
+        "tags": ["Flutter", "Architecture"],
+        "url": "https://medium.com/@developeryusuf"
+      },
+      {
+        "title": "Systemes POS multiplateformes avec SQLite-Drift",
+        "date": "2025-09-20",
+        "summary": "Comment nous avons construit un systeme POS de qualite production avec Flutter et SQLite-Drift. Requetes SQL complexes, flux de donnees reactifs et architecture offline-first.",
+        "readTime": "12 min de lecture",
+        "tags": ["Flutter", "SQLite", "Mobile"],
+        "url": "https://medium.com/@developeryusuf"
+      },
+      {
+        "title": "Suivi en temps reel WebSocket dans les apps logistiques",
+        "date": "2025-06-10",
+        "summary": "Implementation du suivi vehiculaire en temps reel avec WebSocket dans Flutter. Integration des SDKs Google et Apple Maps pour une plateforme logistique servant des milliers d'utilisateurs.",
+        "readTime": "10 min de lecture",
+        "tags": ["Flutter", "WebSocket", "Maps"],
+        "url": "https://medium.com/@developeryusuf"
+      }
+    ],
     "contact": {
       "form": {
         "name_label": "Nom",
@@ -307,7 +333,8 @@
     "experience": "Expérience",
     "projects": "Projets",
     "contact": "Contact",
-    "testimonials": "Témoignages"
+    "testimonials": "Témoignages",
+    "blog": "Blog"
   },
   "about_section": {
     "title": "À Propos de Moi",
@@ -346,6 +373,10 @@
       "error": "Une erreur s'est produite. Veuillez réessayer.",
       "or_divider": "ou envoyez un message directement"
     }
+  },
+  "blog_section": {
+    "title": "Blog",
+    "subtitle": "Reflexions, tutoriels et perspectives sur le developpement mobile"
   },
   "testimonials_section": {
     "title": "Témoignages",
