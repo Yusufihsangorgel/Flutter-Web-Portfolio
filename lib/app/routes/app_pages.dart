@@ -1,5 +1,6 @@
 import 'package:flutter_web_portfolio/app/modules/home/bindings/home_binding.dart';
 import 'package:flutter_web_portfolio/app/modules/home/home_view.dart';
+import 'package:flutter_web_portfolio/app/modules/not_found/not_found_view.dart';
 import 'package:get/get.dart';
 
 part 'app_routes.dart';
@@ -55,4 +56,10 @@ class AppPages {
       transition: Transition.fadeIn,
     ),
   ];
+
+  static final unknownRoute = GetPage(
+    name: '/not-found',
+    page: () => const NotFoundView(),
+    transition: Transition.fadeIn,
+  );
 }

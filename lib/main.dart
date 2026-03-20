@@ -142,6 +142,7 @@ class MyApp extends StatelessWidget {
           Locale('hi'),
         ],
         getPages: AppPages.routes,
+        unknownRoute: AppPages.unknownRoute,
         initialRoute: AppPages.initial,
         defaultTransition: Transition.fadeIn,
         builder: (context, child) {
