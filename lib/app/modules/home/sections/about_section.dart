@@ -11,6 +11,7 @@ import 'package:flutter_web_portfolio/app/utils/responsive_utils.dart';
 import 'package:flutter_web_portfolio/app/widgets/github_activity.dart';
 import 'package:flutter_web_portfolio/app/widgets/scroll_fade_in.dart';
 import 'package:flutter_web_portfolio/app/widgets/skill_bar_chart.dart';
+import 'package:flutter_web_portfolio/app/widgets/skill_orbit.dart';
 
 /// About Section — "The Introduction"
 /// Giant watermark, flashlight photo, floating tech pills.
@@ -195,6 +196,19 @@ class _BioContentState extends State<_BioContent>
           languageController: widget.languageController,
         ),
         const SizedBox(height: 32),
+        // Skill orbit — desktop only (too dense for mobile).
+        if (!isMobile)
+          ScrollFadeIn(
+            delay: AppDurations.staggerMedium,
+            child: Obx(() {
+              final accent = sceneDirector.currentAccent.value;
+              final skills =
+                  widget.languageController.cvData['skills'] as List? ?? [];
+              if (skills.isEmpty) return const SizedBox.shrink();
+              return SkillOrbit(skills: skills, accent: accent);
+            }),
+          ),
+        if (!isMobile) const SizedBox(height: 32),
         // Skill proficiency chart
         ScrollFadeIn(
           delay: AppDurations.staggerMedium,
