@@ -107,9 +107,9 @@
         "url": "https://fugasoft.com/",
         "image": "assets/images/fugasoft.png",
         "case_study": {
-          "problem": "Unternehmen benoetigten ein einheitliches POS- und Vertriebsmanagementsystem, das zuverlaessig auf Android/iOS-Tablets und Desktop-Plattformen (Linux, macOS, Windows) mit komplexer Bestandsverwaltung, Barcode-Scanning und Offline-Datensynchronisation funktioniert.",
-          "solution": "Entwicklung einer plattformuebergreifenden Flutter-Anwendung mit SQLite-Drift fuer komplexe lokale SQL-Abfragen, GetX fuer reaktive Zustandsverwaltung mit Mediator Pattern, Socket-Technologie fuer Echtzeit-Datensynchronisation und vollstaendige i18n-Unterstuetzung.",
-          "result": "Bereitstellung eines produktionsreifen POS-Systems auf 5 Plattformen mit komplexen SQL-Architekturen, reaktiven Datenstreams und Echtzeit-Barcode-Scanning — zuverlaessige Offline-First-Faehigkeit fuer den taeglichen Einzelhandel."
+          "problem": "Unternehmen benoetigten ein einheitliches POS- und Vertriebsmanagementsystem, das zuverlaessig auf Android/iOS-Tablets und Desktop-Plattformen (Linux, macOS, Windows) funktioniert und die Bestandsverwaltung ueber 50+ Einzelhandelsstandorte mit Barcode-Scanning und Offline-Datensynchronisation ermoeglicht.",
+          "solution": "Entwicklung einer plattformuebergreifenden Flutter-Anwendung mit SQLite-Drift fuer komplexe lokale SQL-Abfragen, GetX fuer reaktive Zustandsverwaltung mit Mediator Pattern, einer Offline-First-Sync-Engine ohne Datenverlust und vollstaendiger i18n-Unterstuetzung.",
+          "result": "Bereitstellung auf 5 Plattformen mit ueber 100K taeglichen Transaktionen, komplexen SQL-Architekturen, reaktiven Datenstreams und Echtzeit-Barcode-Scanning — zuverlaessige Offline-First-Faehigkeit fuer den taeglichen Einzelhandel."
         }
       },
       {
@@ -123,7 +123,7 @@
         "case_study": {
           "problem": "Eine grosse tuerkische Zeitung benoetigte ein modernes digitales Leseerlebnis fuer mobile Nutzer mit flüssigem Seitenrendering, Abonnementverwaltung und Offline-Zugang.",
           "solution": "Entwicklung einer Flutter-App mit MVVM-Architektur, GetX-Zustandsverwaltung und Dio fuer API-Integration. Effizientes Seitenrendering und Caching fuer ein nahtloses Leseerlebnis.",
-          "result": "Veroeffentlicht im Google Play und App Store — bietet Tausenden von Lesern ein zuverlaessiges und leistungsfaehiges digitales Zeitungserlebnis auf iOS und Android."
+          "result": "Ueber 10K Downloads mit 4,5+ Sternebewertung in beiden Stores — bietet Tausenden von Lesern ein zuverlaessiges und leistungsfaehiges digitales Zeitungserlebnis auf iOS und Android."
         }
       },
       {
@@ -137,7 +137,7 @@
         "case_study": {
           "problem": "Ein Wissenschaftsmagazin benoetigte eine dedizierte digitale Plattform fuer den Zugang zu monatlichen Ausgaben, Abonnementverwaltung und reichhaltigen wissenschaftlichen Inhalten.",
           "solution": "Entwicklung einer Flutter-App mit bewaehrter MVVM-Architektur und Dio-API-Integration, optimiert fuer Magazinformat-Inhalte mit hochqualitativem Bildrendering und Ausgabennavigation.",
-          "result": "Erfolgreich im Google Play und App Store gestartet — bietet Wissenschaftsbegeisterten ein dediziertes und ausgefeiltes mobiles Leseerlebnis fuer das Bilim ve Utopya Magazin."
+          "result": "Bedient Tausende monatliche Leser auf Google Play und App Store — bietet Wissenschaftsbegeisterten ein dediziertes und ausgefeiltes mobiles Leseerlebnis fuer das Bilim ve Utopya Magazin."
         }
       },
       {
@@ -152,7 +152,7 @@
         "case_study": {
           "problem": "Die Logistikbranche benoetigte eine Echtzeit-Fahrzeugverfolgungs- und Flottenmanagement-Loesung, die plattformuebergreifend auf Mobil und Web funktioniert, mit Live-Standortaktualisierungen und Routenoptimierung.",
           "solution": "Leitung der mobilen Entwicklung mit Flutter, WebSocket-basierter Echtzeit-Fahrzeugverfolgung, Google und Apple Maps SDK-Integration, RESTful API-Architektur nach SOLID-Prinzipien und einem begleitenden React Web-Dashboard.",
-          "result": "Bereitstellung auf Android, iOS und Web-Plattformen — ermoeglicht Logistikunternehmen die Echtzeitverfolgung von Fahrzeugen, Routenoptimierung und Flottenmanagement mit zuverlaessigen WebSocket-Verbindungen fuer Tausende gleichzeitiger Nutzer."
+          "result": "Verfolgung von 5.000+ gleichzeitigen Fahrzeugen mit <200ms Latenz auf Android, iOS und Web — ermoeglicht Logistikunternehmen die Echtzeitverfolgung, Routenoptimierung und Flottenmanagement mit zuverlaessigen WebSocket-Verbindungen."
         }
       }
     ],
@@ -237,28 +237,52 @@
     ],
     "blog_posts": [
       {
-        "title": "Clean Architecture in Flutter — SOLID-Prinzipien angewandt",
-        "date": "2025-12-15",
-        "summary": "Ein tiefer Einblick in die Implementierung von Clean Architecture in Flutter-Projekten. SOLID-Prinzipien anwenden, um skalierbare und wartbare mobile Anwendungen zu erstellen.",
-        "readTime": "8 Min. Lesezeit",
-        "tags": ["Flutter", "Architecture"],
-        "url": "https://medium.com/@developeryusuf"
-      },
-      {
-        "title": "Cross-Platform POS-Systeme mit SQLite-Drift entwickeln",
-        "date": "2025-09-20",
-        "summary": "Wie wir ein produktionsreifes POS-System mit Flutter und SQLite-Drift aufgebaut haben. Komplexe SQL-Abfragen, reaktive Datenstreams und Offline-First-Architektur.",
+        "title": "Aufbau eines cinematischen Portfolios mit Flutter Web",
+        "date": "2026-03-10",
+        "summary": "Ein tiefer Einblick in den Aufbau dieses Portfolios — scroll-gesteuerte Szenenuebergaenge mit Gradient-Mesh-Blending, raumgitterbasierte Partikelsysteme, benutzerdefinierte Cursor-Overlays und eine Befehlspalette. Wie ich eine saubere SOLID-Codebasis mit GetX, abstrakten Interface-Vertraegen und zentralisierten Design-Tokens aufgebaut habe, waehrend ich mit WASM-Unterstuetzung fuer Web ausgeliefert habe.",
         "readTime": "12 Min. Lesezeit",
-        "tags": ["Flutter", "SQLite", "Mobile"],
-        "url": "https://medium.com/@developeryusuf"
+        "tags": ["Flutter Web", "Animation", "Clean Architecture", "WASM"],
+        "url": "https://github.com/Yusufihsangorgel/Flutter-Web-Portfolio"
       },
       {
-        "title": "WebSocket Echtzeit-Tracking in Logistik-Apps",
-        "date": "2025-06-10",
-        "summary": "Implementierung von Echtzeit-Fahrzeugverfolgung mit WebSocket in Flutter. Integration von Google und Apple Maps SDKs fuer eine Logistikplattform mit Tausenden gleichzeitigen Nutzern.",
-        "readTime": "10 Min. Lesezeit",
-        "tags": ["Flutter", "WebSocket", "Maps"],
-        "url": "https://medium.com/@developeryusuf"
+        "title": "Offline-First POS-Architektur: Null Datenverlust ueber 5 Plattformen",
+        "date": "2025-11-15",
+        "summary": "Wie FugaSofts lokale SQLite-Drift-Datenbank taeglich ueber 100K Transaktionen mit bidirektionaler Synchronisation, Konfliktloesung und automatischen Wiederholungswarteschlangen verarbeitet. Wir haben dieselbe Flutter-Codebasis auf Android-Tablets, iPads, Linux-Terminals, macOS-Workstations und Windows-POS-Hardware deployed — jeweils mit plattformspezifischen Barcode-Scanner-Integrationen.",
+        "readTime": "15 Min. Lesezeit",
+        "tags": ["Flutter", "SQLite-Drift", "Offline-First", "Cross-Platform"],
+        "url": "https://github.com/Yusufihsangorgel"
+      },
+      {
+        "title": "Echtzeit-Flottenverfolgung: WebSocket im grossen Massstab mit Flutter",
+        "date": "2025-08-20",
+        "summary": "Einblick in Dorses Echtzeit-Logistikplattform — Verwaltung von ueber 5.000 gleichzeitigen WebSocket-Verbindungen fuer Live-Fahrzeugverfolgung. Ich behandle die ereignisgesteuerte Architektur, die Google/Apple Maps SDK-Integration fuer Routenrendering und wie wir eine Aktualisierungslatenz von unter 200ms vom GPS-Geraet zum Fahrerbildschirm erreicht haben. Einschliesslich Lehren aus dem Debugging von Verbindungsstuerme zu Spitzenzeiten.",
+        "readTime": "14 Min. Lesezeit",
+        "tags": ["WebSocket", "Maps SDK", "Echtzeit", "Flutter"],
+        "url": "https://github.com/Yusufihsangorgel"
+      },
+      {
+        "title": "Zustandsverwaltung in der Produktion: Skalierbare GetX-Muster",
+        "date": "2025-05-12",
+        "summary": "Nach dem Versand von 4 Produktions-Apps mit GetX — was ich anders machen wuerde. Reaktiver Zustand mit Rx vs. GetBuilder, wann Workers eingesetzt werden (ever/debounce/interval), korrekte Controller-Lebenszyklusverwaltung und die Dependency-Injection-Muster, die unsere 50K+-Zeilen-Codebasis testbar hielten. Mit einem Vergleich von BLoC und Riverpod fuer spezifische Anwendungsfaelle.",
+        "readTime": "11 Min. Lesezeit",
+        "tags": ["GetX", "Zustandsverwaltung", "Architektur", "Testing"],
+        "url": "https://github.com/Yusufihsangorgel"
+      },
+      {
+        "title": "Veroeffentlichung in 4 App Stores: Lehren aus dem Versand von E-Reader-Apps",
+        "date": "2025-02-28",
+        "summary": "Die Reise der gleichzeitigen Veroeffentlichung von Aydınlık E-Newspaper und Bilim ve Uetopya E-Magazine in Google Play und App Store. Von MVVM-Architekturentscheidungen mit GetX und Dio ueber PDF-Rendering im grossen Massstab, Push-Benachrichtigungs-Zustellraten bis hin zu den Fallstricken im Pruefprozess, die unsere erste iOS-Veroeffentlichung um 3 Wochen verzoegerten.",
+        "readTime": "9 Min. Lesezeit",
+        "tags": ["App Store", "Google Play", "MVVM", "Veroeffentlichung"],
+        "url": "https://github.com/Yusufihsangorgel"
+      },
+      {
+        "title": "CustomPaint im Detail: Ein Partikelsystem von Grund auf erstellen",
+        "date": "2026-01-05",
+        "summary": "Wie ich das Konstellations-Partikelsystem in diesem Portfolio gebaut habe — raumgitterbasierte Nachbarsuche fuer O(n)-Verbindungsrendering statt naivem O(n²), gecachte Paint-Objekte zur Eliminierung von GC-Druck bei 60fps, Maus-Abstossungsphysik und lebenszyklus-bewusste Animationscontroller, die pausieren, wenn der Tab in den Hintergrund geht. Performance-Profiling-Ergebnisse inklusive.",
+        "readTime": "13 Min. Lesezeit",
+        "tags": ["CustomPainter", "Performance", "Animation", "Dart"],
+        "url": "https://github.com/Yusufihsangorgel/Flutter-Web-Portfolio"
       }
     ],
     "contact": {
@@ -349,7 +373,11 @@
   "about_section": {
     "title": "Über Mich",
     "bio": "Ich bin Software-Ingenieur mit über 4 Jahren Erfahrung in der Entwicklung produktionsreifer mobiler Anwendungen. Mein Fokus liegt auf Architektur, Performance und Zuverlässigkeit — Cross-Platform-Apps mit Flutter und native iOS/Android mit Swift und Kotlin.",
-    "bio2": "Hier sind einige Technologien, mit denen ich kürzlich gearbeitet habe:"
+    "bio2": "Hier sind einige Technologien, mit denen ich kürzlich gearbeitet habe:",
+    "github_title": "GitHub Aktivität",
+    "github_repos": "Repos",
+    "github_followers": "Follower",
+    "github_stars": "Sterne"
   },
   "home_section": {
     "greeting": "Hallo, mein Name ist",
@@ -374,7 +402,7 @@
   "contact_section": {
     "title": "Kontakt aufnehmen",
     "whats_next": "Was kommt als Nächstes?",
-    "description": "Obwohl ich derzeit keine neuen Möglichkeiten suche, ist mein Posteingang immer offen. Ob Sie eine Frage haben oder einfach nur Hallo sagen möchten — ich werde mein Bestes tun, Ihnen zu antworten!",
+    "description": "Ich bin immer offen für neue Herausforderungen und Zusammenarbeit. Ob Sie eine Projektidee, eine Frage haben oder sich einfach vernetzen möchten — schreiben Sie mir gerne!",
     "form": {
       "name_label": "Name",
       "email_label": "E-Mail",
@@ -390,7 +418,7 @@
   },
   "blog_section": {
     "title": "Blog",
-    "subtitle": "Gedanken, Tutorials und Einblicke in die mobile Entwicklung"
+    "subtitle": "Technische Tiefenanalysen, Architekturentscheidungen und Erfahrungen aus dem Versand von Flutter-Produktions-Apps"
   },
   "testimonials_section": {
     "title": "Referenzen",
@@ -399,5 +427,10 @@
   "skills_section": {
     "title": "Fähigkeiten",
     "description": "Meine technischen Fähigkeiten und Fachgebiete"
+  },
+  "footer": {
+    "view_source": "Quellcode anzeigen",
+    "command_hint_prefix": "Drücken Sie",
+    "command_hint_suffix": "um die Befehlspalette zu öffnen"
   }
 }

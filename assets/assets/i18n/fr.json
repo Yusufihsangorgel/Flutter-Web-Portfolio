@@ -107,9 +107,9 @@
         "url": "https://fugasoft.com/",
         "image": "assets/images/fugasoft.png",
         "case_study": {
-          "problem": "Les entreprises avaient besoin d'un systeme POS et de gestion des ventes unifie fonctionnant de maniere fiable sur tablettes Android/iOS et plateformes de bureau (Linux, macOS, Windows) avec gestion d'inventaire complexe, lecture de codes-barres et synchronisation hors ligne.",
-          "solution": "Developpement d'une application Flutter multiplateforme utilisant SQLite-Drift pour les requetes SQL locales complexes, GetX pour la gestion d'etat reactive avec le pattern Mediator, la technologie socket pour la synchronisation en temps reel et un support i18n complet.",
-          "result": "Livraison d'un systeme POS de qualite production deploye sur 5 plateformes, gerant des architectures SQL complexes avec des flux de donnees reactifs et la lecture de codes-barres en temps reel — avec une capacite hors ligne fiable."
+          "problem": "Les entreprises avaient besoin d'un systeme POS et de gestion des ventes unifie fonctionnant de maniere fiable sur tablettes Android/iOS et plateformes de bureau (Linux, macOS, Windows), gerant l'inventaire sur plus de 50 points de vente avec lecture de codes-barres et synchronisation hors ligne.",
+          "solution": "Developpement d'une application Flutter multiplateforme utilisant SQLite-Drift pour les requetes SQL locales complexes, GetX pour la gestion d'etat reactive avec le pattern Mediator, un moteur de synchronisation offline-first sans perte de donnees et un support i18n complet.",
+          "result": "Deploye sur 5 plateformes, traitant plus de 100K transactions quotidiennes avec des architectures SQL complexes, des flux de donnees reactifs et la lecture de codes-barres en temps reel — avec une capacite hors ligne fiable."
         }
       },
       {
@@ -123,7 +123,7 @@
         "case_study": {
           "problem": "Un grand journal turc avait besoin d'une experience de lecture numerique moderne pour les utilisateurs mobiles, avec un rendu fluide des pages, la gestion des abonnements et un acces hors ligne.",
           "solution": "Developpement d'une application Flutter avec architecture MVVM, gestion d'etat GetX et Dio pour l'integration API. Rendu de pages efficace et mise en cache pour une experience de lecture fluide.",
-          "result": "Publie sur Google Play et App Store, offrant a des milliers de lecteurs une experience de journal numerique fiable et performante sur iOS et Android."
+          "result": "Plus de 10K telechargements avec une note de 4,5+ etoiles sur les deux stores, offrant a des milliers de lecteurs une experience de journal numerique fiable et performante sur iOS et Android."
         }
       },
       {
@@ -137,7 +137,7 @@
         "case_study": {
           "problem": "Un magazine scientifique avait besoin d'une plateforme numerique dediee pour acceder aux numeros mensuels, gerer les abonnements et profiter d'un contenu scientifique riche sur mobile.",
           "solution": "Developpement d'une application Flutter avec l'architecture MVVM eprouvee et l'integration API Dio, optimisee pour le contenu au format magazine avec un rendu d'images haute qualite et la navigation entre numeros.",
-          "result": "Lance avec succes sur Google Play et App Store, offrant aux passionnes de sciences une experience de lecture mobile dediee et soignee pour le magazine Bilim ve Utopya."
+          "result": "Servant des milliers de lecteurs mensuels sur Google Play et App Store, offrant aux passionnes de sciences une experience de lecture mobile dediee et soignee pour le magazine Bilim ve Utopya."
         }
       },
       {
@@ -152,7 +152,7 @@
         "case_study": {
           "problem": "L'industrie logistique avait besoin d'une solution de suivi vehiculaire en temps reel et de gestion de flotte fonctionnant sur mobile et web, avec des mises a jour de localisation en direct et l'optimisation des itineraires.",
           "solution": "Direction du developpement mobile avec Flutter, suivi vehiculaire en temps reel base sur WebSocket, integration des SDK Google et Apple Maps, architecture API RESTful selon les principes SOLID et un tableau de bord web React.",
-          "result": "Deploye sur Android, iOS et web, permettant aux entreprises logistiques de suivre les vehicules en temps reel, d'optimiser les itineraires et de gerer les flottes — servant des milliers d'utilisateurs simultanes avec des connexions WebSocket fiables."
+          "result": "Suivi de 5 000+ vehicules simultanes avec une latence <200ms sur Android, iOS et web — permettant aux entreprises logistiques de suivre les vehicules en temps reel, d'optimiser les itineraires et de gerer les flottes avec des connexions WebSocket fiables."
         }
       }
     ],
@@ -247,28 +247,52 @@
     ],
     "blog_posts": [
       {
-        "title": "Clean Architecture dans Flutter — Principes SOLID appliques",
-        "date": "2025-12-15",
-        "summary": "Un approfondissement de l'implementation de Clean Architecture dans les projets Flutter, en appliquant les principes SOLID pour creer des applications mobiles evolutives et maintenables.",
-        "readTime": "8 min de lecture",
-        "tags": ["Flutter", "Architecture"],
-        "url": "https://medium.com/@developeryusuf"
-      },
-      {
-        "title": "Systemes POS multiplateformes avec SQLite-Drift",
-        "date": "2025-09-20",
-        "summary": "Comment nous avons construit un systeme POS de qualite production avec Flutter et SQLite-Drift. Requetes SQL complexes, flux de donnees reactifs et architecture offline-first.",
+        "title": "Construire un portfolio cinematique avec Flutter Web",
+        "date": "2026-03-10",
+        "summary": "Une plongee approfondie dans la construction de ce portfolio — transitions de scenes pilotees par le defilement avec melange de gradient mesh, systemes de particules a grille spatiale, overlays de curseur personnalises et une palette de commandes. Comment j'ai architecture une base de code SOLID propre avec GetX, des contrats d'interface abstraits et des design tokens centralises tout en deployant pour le web avec support WASM.",
         "readTime": "12 min de lecture",
-        "tags": ["Flutter", "SQLite", "Mobile"],
-        "url": "https://medium.com/@developeryusuf"
+        "tags": ["Flutter Web", "Animation", "Clean Architecture", "WASM"],
+        "url": "https://github.com/Yusufihsangorgel/Flutter-Web-Portfolio"
       },
       {
-        "title": "Suivi en temps reel WebSocket dans les apps logistiques",
-        "date": "2025-06-10",
-        "summary": "Implementation du suivi vehiculaire en temps reel avec WebSocket dans Flutter. Integration des SDKs Google et Apple Maps pour une plateforme logistique servant des milliers d'utilisateurs.",
-        "readTime": "10 min de lecture",
-        "tags": ["Flutter", "WebSocket", "Maps"],
-        "url": "https://medium.com/@developeryusuf"
+        "title": "Architecture POS Offline-First : Zero perte de donnees sur 5 plateformes",
+        "date": "2025-11-15",
+        "summary": "Comment la base de donnees locale SQLite-Drift de FugaSoft gere plus de 100K transactions quotidiennes avec synchronisation bidirectionnelle, resolution de conflits et files d'attente de reessai automatiques. Nous avons deploye la meme base de code Flutter sur tablettes Android, iPads, terminaux Linux, stations macOS et materiel POS Windows — chacun avec des integrations de lecteurs de codes-barres specifiques a la plateforme.",
+        "readTime": "15 min de lecture",
+        "tags": ["Flutter", "SQLite-Drift", "Offline-First", "Multiplateforme"],
+        "url": "https://github.com/Yusufihsangorgel"
+      },
+      {
+        "title": "Suivi de flotte en temps reel : WebSocket a grande echelle avec Flutter",
+        "date": "2025-08-20",
+        "summary": "Dans les coulisses de la plateforme logistique temps reel de Dorse — gestion de plus de 5 000 connexions WebSocket simultanees pour le suivi vehiculaire en direct. Je couvre l'architecture evenementielle, l'integration des SDK Google/Apple Maps pour le rendu d'itineraires, et comment nous avons atteint une latence de mise a jour inferieure a 200ms du GPS au ecran du conducteur. Y compris les lecons tirees du debogage des tempetes de connexions aux heures de pointe.",
+        "readTime": "14 min de lecture",
+        "tags": ["WebSocket", "Maps SDK", "Temps Reel", "Flutter"],
+        "url": "https://github.com/Yusufihsangorgel"
+      },
+      {
+        "title": "Gestion d'etat en production : les patterns GetX qui passent a l'echelle",
+        "date": "2025-05-12",
+        "summary": "Apres avoir deploye 4 applications en production avec GetX, voici ce que je ferais differemment. Etat reactif avec Rx vs GetBuilder, quand utiliser les Workers (ever/debounce/interval), gestion correcte du cycle de vie des controllers, et les patterns d'injection de dependances qui ont garde notre base de code de 50K+ lignes testable. Inclut une comparaison avec BLoC et Riverpod pour des cas d'usage specifiques.",
+        "readTime": "11 min de lecture",
+        "tags": ["GetX", "Gestion d'Etat", "Architecture", "Tests"],
+        "url": "https://github.com/Yusufihsangorgel"
+      },
+      {
+        "title": "Publier sur 4 stores : lecons du deploiement d'applications de lecture",
+        "date": "2025-02-28",
+        "summary": "Le parcours de publication simultanee d'Aydınlık E-Newspaper et Bilim ve Utopya E-Magazine sur Google Play et App Store. Des decisions d'architecture MVVM avec GetX et Dio, au rendu PDF a grande echelle, aux taux de livraison des notifications push, et aux pieges du processus de validation qui ont retarde notre premiere sortie iOS de 3 semaines.",
+        "readTime": "9 min de lecture",
+        "tags": ["App Store", "Google Play", "MVVM", "Publication"],
+        "url": "https://github.com/Yusufihsangorgel"
+      },
+      {
+        "title": "CustomPaint en profondeur : construire un systeme de particules de zero",
+        "date": "2026-01-05",
+        "summary": "Comment j'ai construit le systeme de particules constellation dans ce portfolio — recherche de voisins par grille spatiale pour un rendu de connexions en O(n) au lieu d'un naif O(n²), objets Paint caches pour eliminer la pression du GC a 60fps, physique de repulsion de la souris, et controleurs d'animation sensibles au cycle de vie qui se mettent en pause quand l'onglet est en arriere-plan. Resultats de profilage de performance inclus.",
+        "readTime": "13 min de lecture",
+        "tags": ["CustomPainter", "Performance", "Animation", "Dart"],
+        "url": "https://github.com/Yusufihsangorgel/Flutter-Web-Portfolio"
       }
     ],
     "contact": {
@@ -359,7 +383,11 @@
   "about_section": {
     "title": "À Propos de Moi",
     "bio": "Je suis ingénieur logiciel avec plus de 4 ans d'expérience dans le développement d'applications mobiles de qualité production. Je me concentre sur l'architecture, la performance et la fiabilité — applications cross-platform avec Flutter et iOS/Android natif avec Swift et Kotlin.",
-    "bio2": "Voici quelques technologies avec lesquelles j'ai travaillé récemment :"
+    "bio2": "Voici quelques technologies avec lesquelles j'ai travaillé récemment :",
+    "github_title": "Activité GitHub",
+    "github_repos": "Dépôts",
+    "github_followers": "Abonnés",
+    "github_stars": "Étoiles"
   },
   "home_section": {
     "greeting": "Bonjour, je m'appelle",
@@ -384,7 +412,7 @@
   "contact_section": {
     "title": "Me Contacter",
     "whats_next": "Et Ensuite ?",
-    "description": "Bien que je ne cherche pas actuellement de nouvelles opportunités, ma boîte de réception est toujours ouverte. Que vous ayez une question ou que vous vouliez simplement dire bonjour, je ferai de mon mieux pour vous répondre !",
+    "description": "Je suis toujours ouvert aux nouveaux défis et collaborations. Que vous ayez une idée de projet, une question, ou que vous souhaitiez simplement échanger — n'hésitez pas à me contacter !",
     "form": {
       "name_label": "Nom",
       "email_label": "E-mail",
@@ -400,7 +428,7 @@
   },
   "blog_section": {
     "title": "Blog",
-    "subtitle": "Reflexions, tutoriels et perspectives sur le developpement mobile"
+    "subtitle": "Analyses techniques approfondies, decisions d'architecture et retours d'experience sur le deploiement d'applications Flutter en production"
   },
   "testimonials_section": {
     "title": "Témoignages",
@@ -409,5 +437,10 @@
   "skills_section": {
     "title": "Compétences",
     "description": "Mes compétences techniques et domaines d'expertise"
+  },
+  "footer": {
+    "view_source": "Voir le code source",
+    "command_hint_prefix": "Appuyez sur",
+    "command_hint_suffix": "pour ouvrir la palette de commandes"
   }
 }

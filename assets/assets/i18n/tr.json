@@ -130,9 +130,9 @@
         "url": "https://fugasoft.com/",
         "image": "assets/images/fugasoft.png",
         "case_study": {
-          "problem": "İşletmelerin Android/iOS tablet ve masaüstü platformlarında (Linux, macOS, Windows) güvenilir şekilde çalışan, karmaşık envanter yönetimi, barkod tarama ve çevrimdışı veri senkronizasyonu sunan birleşik bir POS ve satış yönetim sistemine ihtiyacı vardı.",
-          "solution": "Karmaşık yerel SQL sorguları için SQLite-Drift, Mediator Pattern ile reaktif durum yönetimi için GetX, gerçek zamanlı veri senkronizasyonu için socket teknolojisi ve çok dilli dağıtım için tam i18n desteği kullanılarak cross-platform Flutter uygulaması geliştirildi.",
-          "result": "5 platformda çalışan, reaktif veri akışları ve gerçek zamanlı barkod tarama ile karmaşık SQL mimarilerini yöneten, güvenilir çevrimdışı yeteneğe sahip production-grade POS sistemi teslim edildi."
+          "problem": "İşletmelerin Android/iOS tablet ve masaüstü platformlarında (Linux, macOS, Windows) güvenilir şekilde çalışan, 50+ perakende lokasyonunda envanter yönetimi, barkod tarama ve çevrimdışı veri senkronizasyonu sunan birleşik bir POS ve satış yönetim sistemine ihtiyacı vardı.",
+          "solution": "Karmaşık yerel SQL sorguları için SQLite-Drift, Mediator Pattern ile reaktif durum yönetimi için GetX, sıfır veri kaybıyla çevrimdışı öncelikli senkronizasyon motoru ve çok dilli dağıtım için tam i18n desteği kullanılarak cross-platform Flutter uygulaması geliştirildi.",
+          "result": "5 platforma dağıtılarak günlük 100K+ işlem işleniyor — reaktif veri akışları ve gerçek zamanlı barkod tarama ile karmaşık SQL mimarilerini yöneten, güvenilir çevrimdışı yeteneğe sahip production-grade POS sistemi."
         }
       },
       {
@@ -146,7 +146,7 @@
         "case_study": {
           "problem": "Büyük bir Türk gazetesinin mobil kullanıcılar için sorunsuz sayfa görüntüleme, abonelik yönetimi ve çevrimdışı erişim sunan modern bir dijital okuma deneyimine ihtiyacı vardı.",
           "solution": "MVVM mimarisi, GetX durum yönetimi ve API entegrasyonu için Dio kullanılarak Flutter mobil uygulaması geliştirildi. Sorunsuz okuma deneyimi için verimli sayfa görüntüleme ve önbellekleme uygulandı.",
-          "result": "Hem Google Play hem App Store'da yayınlanarak, binlerce okuyucuya iOS ve Android'de güvenilir ve performanslı bir dijital gazete deneyimi sunuldu."
+          "result": "Her iki mağazada 10K+ indirme ve 4.5+ yıldız puanıyla, binlerce okuyucuya iOS ve Android'de güvenilir ve performanslı bir dijital gazete deneyimi sunuluyor."
         }
       },
       {
@@ -160,7 +160,7 @@
         "case_study": {
           "problem": "Bir bilim dergisi, okuyucuların aylık sayılara erişebileceği, aboneliklerini yönetebileceği ve zengin bilimsel içeriğin keyfini çıkarabileceği özel bir dijital platforma ihtiyaç duyuyordu.",
           "solution": "Dio API entegrasyonu ile kanıtlanmış MVVM mimarisini paylaşan, dergi formatındaki içerik için yüksek kaliteli görsel işleme ve sayı navigasyonu ile optimize edilmiş Flutter uygulaması geliştirildi.",
-          "result": "Google Play ve App Store'da başarıyla yayınlanarak, bilim meraklılarına Bilim ve Ütopya dergisi için özel ve cilalı bir mobil okuma deneyimi sunuldu."
+          "result": "Google Play ve App Store'da aylık binlerce okuyucuya hizmet vererek, bilim meraklılarına Bilim ve Ütopya dergisi için özel ve cilalı bir mobil okuma deneyimi sunuluyor."
         }
       },
       {
@@ -175,7 +175,7 @@
         "case_study": {
           "problem": "Lojistik sektörü, mobil platformlarda ve web'de çalışan, canlı konum güncellemeleri ve rota optimizasyonu sunan gerçek zamanlı araç takip ve filo yönetim çözümüne ihtiyaç duyuyordu.",
           "solution": "WebSocket tabanlı gerçek zamanlı araç takibi, Google ve Apple Maps SDK entegrasyonu, SOLID prensiplerine uygun RESTful API mimarisi ve eşlik eden React web panosu ile Flutter kullanılarak mobil geliştirme yönetildi.",
-          "result": "Android, iOS ve web platformlarında dağıtılarak, lojistik şirketlerinin araçları gerçek zamanlı takip etmesini, rotaları optimize etmesini ve filoları yönetmesini sağlayan — güvenilir WebSocket bağlantılarıyla binlerce eşzamanlı kullanıcıya hizmet veren bir sistem sunuldu."
+          "result": "Android, iOS ve web platformlarında <200ms gecikmeyle 5.000+ eşzamanlı aracı takip ediyor — lojistik şirketlerinin araçları gerçek zamanlı takip etmesini, rotaları optimize etmesini ve filoları yönetmesini güvenilir WebSocket bağlantılarıyla sağlıyor."
         }
       }
     ],
@@ -240,28 +240,52 @@
     ],
     "blog_posts": [
       {
-        "title": "Flutter'da Clean Architecture — SOLID Prensipleri Uygulaması",
-        "date": "2025-12-15",
-        "summary": "Flutter projelerinde Clean Architecture implementasyonuna derinlemesine bir bakış. SOLID prensiplerini uygulayarak ölçeklenebilir ve sürdürülebilir mobil uygulamalar oluşturma.",
-        "readTime": "8 dk okuma",
-        "tags": ["Flutter", "Architecture"],
-        "url": "https://medium.com/@developeryusuf"
-      },
-      {
-        "title": "SQLite-Drift ile Cross-Platform POS Sistemleri Geliştirme",
-        "date": "2025-09-20",
-        "summary": "Flutter ve SQLite-Drift kullanarak production-grade bir POS sistemi nasıl oluşturduk. Karmaşık SQL sorguları, reaktif veri akışları ve offline-first mimari ile mobil ve masaüstü platformlar.",
+        "title": "Flutter Web ile Sinematik Portföy Geliştirme",
+        "date": "2026-03-10",
+        "summary": "Bu portföyü derinlemesine inceliyorum — kaydırma ile tetiklenen sahne geçişleri, gradient mesh karışımları, uzamsal ızgara parçacık sistemleri, özel imleç katmanları ve komut paleti. GetX ile temiz SOLID kod tabanı, soyut arayüz kontratları ve merkezi tasarım tokenleri kullanarak WASM destekli web'e nasıl deploy ettim.",
         "readTime": "12 dk okuma",
-        "tags": ["Flutter", "SQLite", "Mobile"],
-        "url": "https://medium.com/@developeryusuf"
+        "tags": ["Flutter Web", "Animasyon", "Temiz Mimari", "WASM"],
+        "url": "https://github.com/Yusufihsangorgel/Flutter-Web-Portfolio"
       },
       {
-        "title": "Lojistik Uygulamalarında WebSocket Gerçek Zamanlı Takip",
-        "date": "2025-06-10",
-        "summary": "Flutter'da WebSocket ile gerçek zamanlı araç takibi implementasyonu. Binlerce eşzamanlı kullanıcıya hizmet veren bir lojistik platformu için Google ve Apple Maps SDK entegrasyonu.",
-        "readTime": "10 dk okuma",
-        "tags": ["Flutter", "WebSocket", "Maps"],
-        "url": "https://medium.com/@developeryusuf"
+        "title": "Offline-First POS Mimarisi: 5 Platformda Sıfır Veri Kaybı",
+        "date": "2025-11-15",
+        "summary": "FugaSoft'un SQLite-Drift yerel veritabanının günlük 100K+ işlemi çift yönlü senkronizasyon, çakışma çözümü ve otomatik yeniden deneme kuyrukları ile nasıl yönettiği. Aynı Flutter kod tabanını Android tabletler, iPad'ler, Linux terminalleri, macOS iş istasyonları ve Windows POS donanımına — her birinde platforma özgü barkod tarayıcı entegrasyonlarıyla deploy ettik.",
+        "readTime": "15 dk okuma",
+        "tags": ["Flutter", "SQLite-Drift", "Offline-First", "Cross-Platform"],
+        "url": "https://github.com/Yusufihsangorgel"
+      },
+      {
+        "title": "Gerçek Zamanlı Filo Takibi: Flutter ile Ölçeklenebilir WebSocket",
+        "date": "2025-08-20",
+        "summary": "Dorse'un gerçek zamanlı lojistik platformunun içinden — canlı araç takibi için 5.000+ eşzamanlı WebSocket bağlantısının yönetimi. Olay güdümlü mimariyi, rota render için Google/Apple Maps SDK entegrasyonunu ve GPS cihazından sürücü ekranına <200ms güncelleme gecikmesini nasıl başardığımızı anlatıyorum. Yoğun saatlerde bağlantı fırtınalarını debug etmekten çıkarılan dersler dahil.",
+        "readTime": "14 dk okuma",
+        "tags": ["WebSocket", "Maps SDK", "Gerçek Zamanlı", "Flutter"],
+        "url": "https://github.com/Yusufihsangorgel"
+      },
+      {
+        "title": "Production'da Durum Yönetimi: Ölçeklenen GetX Kalıpları",
+        "date": "2025-05-12",
+        "summary": "4 production uygulamayı GetX ile gönderdikten sonra neleri farklı yapardım. Rx vs GetBuilder ile reaktif durum yönetimi, Workers ne zaman kullanılır (ever/debounce/interval), doğru controller yaşam döngüsü yönetimi ve 50K+ satırlık kod tabanımızı test edilebilir tutan bağımlılık enjeksiyonu kalıpları. Belirli kullanım durumları için BLoC ve Riverpod karşılaştırması dahil.",
+        "readTime": "11 dk okuma",
+        "tags": ["GetX", "Durum Yönetimi", "Mimari", "Test"],
+        "url": "https://github.com/Yusufihsangorgel"
+      },
+      {
+        "title": "4 Uygulama Mağazasına Yayınlama: E-Okuyucu Uygulamaları Deneyimleri",
+        "date": "2025-02-28",
+        "summary": "Aydınlık E-Gazete ve Bilim ve Ütopya E-Dergi'yi Google Play ve App Store'a eşzamanlı yayınlama yolculuğu. GetX ve Dio ile MVVM mimari kararlarından, ölçekte PDF render işlemeye, push bildirim teslim oranlarına ve ilk iOS sürümümüzü 3 hafta geciktiren inceleme süreci tuzaklarına kadar.",
+        "readTime": "9 dk okuma",
+        "tags": ["App Store", "Google Play", "MVVM", "Yayınlama"],
+        "url": "https://github.com/Yusufihsangorgel"
+      },
+      {
+        "title": "CustomPaint Derinlemesine: Sıfırdan Parçacık Sistemi Geliştirme",
+        "date": "2026-01-05",
+        "summary": "Bu portföydeki takımyıldızı parçacık sistemini nasıl geliştirdim — naif O(n²) yerine O(n) bağlantı render için uzamsal ızgara komşu aramaları, 60fps'de GC baskısını ortadan kaldırmak için önbelleğe alınmış Paint nesneleri, fare itme fiziği ve sekme arka plana alındığında duran yaşam döngüsü farkındalıklı animasyon controller'ları. Performans profilleme sonuçları dahil.",
+        "readTime": "13 dk okuma",
+        "tags": ["CustomPainter", "Performans", "Animasyon", "Dart"],
+        "url": "https://github.com/Yusufihsangorgel/Flutter-Web-Portfolio"
       }
     ],
     "contact": {
@@ -343,7 +367,11 @@
   "about_section": {
     "title": "Hakkımda",
     "bio": "4+ yıllık deneyime sahip, production-grade mobil uygulamalar geliştirmeye odaklanan bir Yazılım Mühendisiyim. Mimari, performans ve güvenilirlik odaklı çalışıyorum — Flutter ile cross-platform, Swift ve Kotlin ile native iOS/Android uygulamalar geliştiriyorum.",
-    "bio2": "Son zamanlarda çalıştığım teknolojilerden bazıları:"
+    "bio2": "Son zamanlarda çalıştığım teknolojilerden bazıları:",
+    "github_title": "GitHub Aktivitesi",
+    "github_repos": "Repo",
+    "github_followers": "Takipçi",
+    "github_stars": "Yıldız"
   },
   "projects_section": {
     "title": "Projelerim",
@@ -371,7 +399,7 @@
   "contact_section": {
     "title": "İletişime Geç",
     "whats_next": "Sırada Ne Var?",
-    "description": "Şu anda yeni fırsatlar aramıyor olsam da, gelen kutum her zaman açık. Bir sorunuz varsa ya da sadece merhaba demek istiyorsanız, size en kısa sürede dönmeye çalışacağım!",
+    "description": "Yeni zorluklara ve iş birliklerine her zaman açığım. Bir proje fikriniz, sorunuz varsa veya sadece bağlantı kurmak istiyorsanız — çekinmeden ulaşın!",
     "form": {
       "name_label": "İsim",
       "email_label": "E-posta",
@@ -387,7 +415,7 @@
   },
   "blog_section": {
     "title": "Blog",
-    "subtitle": "Mobil geliştirme üzerine düşünceler, öğreticiler ve içgörüler"
+    "subtitle": "Teknik derinlemesine incelemeler, mimari kararlar ve production Flutter uygulamaları gönderme deneyimleri"
   },
   "testimonials_section": {
     "title": "Referanslar",
@@ -396,5 +424,10 @@
   "skills_section": {
     "title": "Beceriler",
     "description": "Teknik yeteneklerim ve uzmanlık alanlarım"
+  },
+  "footer": {
+    "view_source": "Kaynak Kodu",
+    "command_hint_prefix": "Basın",
+    "command_hint_suffix": "komut paletini açmak için"
   }
 }
