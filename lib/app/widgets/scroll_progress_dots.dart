@@ -90,7 +90,7 @@ class _DotState extends State<_Dot> {
               height: 20,
               child: Center(
                 child: AnimatedContainer(
-                  duration: AppDurations.medium,
+                  duration: _hovered ? AppDurations.microFast : AppDurations.medium,
                   curve: Curves.easeOutCubic,
                   width: _hovered && !isActive ? 6.0 : dotSize,
                   height: _hovered && !isActive ? 6.0 : dotSize,

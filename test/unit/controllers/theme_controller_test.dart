@@ -34,8 +34,9 @@ void main() {
     });
 
     test('double toggle returns to dark mode', () {
-      controller.toggleTheme();
-      controller.toggleTheme();
+      controller
+        ..toggleTheme()
+        ..toggleTheme();
       expect(controller.isDarkMode.value, isTrue);
       expect(controller.brightness, equals(Brightness.dark));
     });

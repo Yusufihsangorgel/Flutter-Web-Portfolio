@@ -140,37 +140,43 @@ class _ViewSourceLinkState extends State<_ViewSourceLink> {
   bool _hovered = false;
 
   @override
-  Widget build(BuildContext context) => CinematicFocusable(
-    onTap: () async {
-      final uri = Uri.parse(widget.repoUrl);
-      if (await canLaunchUrl(uri)) {
-        await launchUrl(uri, mode: LaunchMode.externalApplication);
-      }
-    },
-    onHoverChanged: (hovered) => setState(() => _hovered = hovered),
-    child: Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(
-          Icons.code_rounded,
-          size: 14,
-          color: _hovered
-              ? AppColors.textBright
-              : AppColors.textSecondary.withValues(alpha: 0.6),
-        ),
-        const SizedBox(width: 6),
-        Text(
-          Get.find<LanguageController>().getText('footer.view_source', defaultValue: 'View Source'),
-          style: GoogleFonts.jetBrainsMono(
-            fontSize: 12,
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final secondaryColor = isDark ? AppColors.textSecondary : AppColors.lightTextSecondary;
+    final brightColor = isDark ? AppColors.textBright : AppColors.lightTextBright;
+
+    return CinematicFocusable(
+      onTap: () async {
+        final uri = Uri.parse(widget.repoUrl);
+        if (await canLaunchUrl(uri)) {
+          await launchUrl(uri, mode: LaunchMode.externalApplication);
+        }
+      },
+      onHoverChanged: (hovered) => setState(() => _hovered = hovered),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            Icons.code_rounded,
+            size: 14,
             color: _hovered
-                ? AppColors.textBright
-                : AppColors.textSecondary.withValues(alpha: 0.6),
+                ? brightColor
+                : secondaryColor.withValues(alpha: 0.6),
           ),
-        ),
-      ],
-    ),
-  );
+          const SizedBox(width: 6),
+          Text(
+            Get.find<LanguageController>().getText('footer.view_source', defaultValue: 'View Source'),
+            style: GoogleFonts.jetBrainsMono(
+              fontSize: 12,
+              color: _hovered
+                  ? brightColor
+                  : secondaryColor.withValues(alpha: 0.6),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 /// Subtle keyboard shortcut hint for the command palette.
@@ -184,6 +190,8 @@ class _CommandPaletteHint extends StatelessWidget {
     final shortcut = isMac ? '\u2318K' : 'Ctrl+K';
 
     final languageController = Get.find<LanguageController>();
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final secondaryColor = isDark ? AppColors.textSecondary : AppColors.lightTextSecondary;
 
     return Row(
       mainAxisSize: MainAxisSize.min,
@@ -192,7 +200,7 @@ class _CommandPaletteHint extends StatelessWidget {
           '${languageController.getText('footer.command_hint_prefix', defaultValue: 'Press')} ',
           style: GoogleFonts.jetBrainsMono(
             fontSize: 11,
-            color: AppColors.textSecondary.withValues(alpha: 0.5),
+            color: secondaryColor.withValues(alpha: 0.5),
           ),
         ),
         Container(
@@ -208,7 +216,7 @@ class _CommandPaletteHint extends StatelessWidget {
             shortcut,
             style: GoogleFonts.jetBrainsMono(
               fontSize: 11,
-              color: AppColors.textSecondary.withValues(alpha: 0.7),
+              color: secondaryColor.withValues(alpha: 0.7),
             ),
           ),
         ),
@@ -216,7 +224,7 @@ class _CommandPaletteHint extends StatelessWidget {
           ' ${languageController.getText('footer.command_hint_suffix', defaultValue: 'to open command palette')}',
           style: GoogleFonts.jetBrainsMono(
             fontSize: 11,
-            color: AppColors.textSecondary.withValues(alpha: 0.5),
+            color: secondaryColor.withValues(alpha: 0.5),
           ),
         ),
       ],

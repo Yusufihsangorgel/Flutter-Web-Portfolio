@@ -69,9 +69,13 @@ class _CinematicButtonState extends State<CinematicButton> {
                         ? Colors.white.withValues(alpha: 0.05)
                         : Colors.transparent,
                     border: Border.all(
-                      color: _hovered
-                          ? Colors.white.withValues(alpha: 0.4)
-                          : Colors.white.withValues(alpha: 0.15),
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? (_hovered
+                              ? Colors.white.withValues(alpha: 0.4)
+                              : Colors.white.withValues(alpha: 0.08))
+                          : (_hovered
+                              ? Colors.black.withValues(alpha: 0.3)
+                              : Colors.black.withValues(alpha: 0.12)),
                       width: 1,
                     ),
                   ),

@@ -68,7 +68,7 @@ final class AppTypography {
   static final body = GoogleFonts.inter(
     fontSize: 16,
     fontWeight: FontWeight.w400,
-    height: 1.7,
+    height: 1.6,
     letterSpacing: 0.2,
     color: AppColors.textPrimary,
   );

@@ -86,7 +86,7 @@ class _BackToTopButtonState extends State<BackToTopButton> {
                 ),
                 child: Icon(
                   Icons.arrow_upward_rounded,
-                  size: 20,
+                  size: 22,
                   color: _hovered
                       ? AppColors.accent
                       : AppColors.textPrimary,

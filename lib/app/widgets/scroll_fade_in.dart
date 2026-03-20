@@ -6,7 +6,7 @@ class ScrollFadeIn extends StatefulWidget {
   const ScrollFadeIn({
     super.key,
     required this.child,
-    this.offset = 40.0,
+    this.offset = 30.0,
     this.duration = AppDurations.entrance,
     this.delay = Duration.zero,
     this.curve = Curves.easeOutCubic,

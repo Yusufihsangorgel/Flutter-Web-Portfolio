@@ -396,13 +396,16 @@ class _NavItemState extends State<_NavItem> {
               ),
               const SizedBox(height: 4),
               // Underline — animates from left
-              AnimatedContainer(
-                duration: AppDurations.buttonHover,
-                curve: CinematicCurves.hoverLift,
-                width: widget.isActive || _hovered ? 20 : 0,
-                height: 1,
-                color: underlineColor.withValues(
-                  alpha: widget.isActive ? 0.6 : 0.3,
+              Align(
+                alignment: Alignment.centerLeft,
+                child: AnimatedContainer(
+                  duration: AppDurations.buttonHover,
+                  curve: CinematicCurves.hoverLift,
+                  width: widget.isActive || _hovered ? 20 : 0,
+                  height: 1,
+                  color: underlineColor.withValues(
+                    alpha: widget.isActive ? 0.6 : 0.3,
+                  ),
                 ),
               ),
             ],

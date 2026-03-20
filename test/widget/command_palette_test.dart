@@ -31,10 +31,11 @@ void main() {
         assetsProvider: AssetsProvider(),
         localStorageProvider: LocalStorageProvider(),
       );
-      Get.put<LanguageController>(
-        LanguageController(languageRepository: repo),
-      );
-      Get.put<AppScrollController>(AppScrollController());
+      Get
+        ..put<LanguageController>(
+          LanguageController(languageRepository: repo),
+        )
+        ..put<AppScrollController>(AppScrollController());
 
       // Flush post-frame callbacks from AppScrollController.onInit
       await tester.pump();
@@ -65,10 +66,11 @@ void main() {
         assetsProvider: AssetsProvider(),
         localStorageProvider: LocalStorageProvider(),
       );
-      Get.put<LanguageController>(
-        LanguageController(languageRepository: repo),
-      );
-      Get.put<AppScrollController>(AppScrollController());
+      Get
+        ..put<LanguageController>(
+          LanguageController(languageRepository: repo),
+        )
+        ..put<AppScrollController>(AppScrollController());
 
       await tester.pump();
 

@@ -13,7 +13,7 @@ class MagneticButton extends StatefulWidget {
     required this.child,
     required this.onTap,
     this.magneticRadius = 100.0,
-    this.maxDisplacement = 5.0,
+    this.maxDisplacement = 8.0,
   });
 
   final Widget child;

@@ -43,7 +43,7 @@ class _CinematicHoverState extends State<CinematicHover>
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: AppDurations.medium,
+      duration: AppDurations.normal,
     );
     _liftAnim = Tween<double>(begin: 0, end: widget.liftAmount).animate(
       CurvedAnimation(parent: _controller, curve: CinematicCurves.hoverLift),

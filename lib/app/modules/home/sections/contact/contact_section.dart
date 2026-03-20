@@ -288,19 +288,19 @@ class _ContactFormState extends State<_ContactForm> {
         _emailController.clear();
         _messageController.clear();
         // Reset to idle after showing success
-        Future.delayed(const Duration(seconds: 4), () {
+        Future.delayed(const Duration(seconds: 3), () {
           if (mounted) setState(() => _status = _FormStatus.idle);
         });
       } else {
         setState(() => _status = _FormStatus.error);
-        Future.delayed(const Duration(seconds: 4), () {
+        Future.delayed(const Duration(seconds: 3), () {
           if (mounted) setState(() => _status = _FormStatus.idle);
         });
       }
     } catch (_) {
       if (!mounted) return;
       setState(() => _status = _FormStatus.error);
-      Future.delayed(const Duration(seconds: 4), () {
+      Future.delayed(const Duration(seconds: 3), () {
         if (mounted) setState(() => _status = _FormStatus.idle);
       });
     }
@@ -501,7 +501,7 @@ class _CinematicTextFieldState extends State<_CinematicTextField> {
             ? [
                 BoxShadow(
                   color: widget.accent.withValues(alpha: 0.08),
-                  blurRadius: 16,
+                  blurRadius: 20,
                 ),
               ]
             : [],

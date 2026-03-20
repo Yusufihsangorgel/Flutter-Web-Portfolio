@@ -131,8 +131,8 @@ class _HomeSectionState extends State<HomeSection>
                       // Horizontal line between name and subtitle
                       const SizedBox(height: 20),
                       Container(
-                        height: 1,
-                        width: screenWidth * 0.5 * _lineWidth.value,
+                        height: 1.5,
+                        width: (screenWidth * 0.4).clamp(100, 600).toDouble() * _lineWidth.value,
                         decoration: BoxDecoration(
                           color: Colors.white.withValues(alpha: 0.4),
                           boxShadow: [
