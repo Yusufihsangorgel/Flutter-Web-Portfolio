@@ -107,7 +107,7 @@ class ContactSection extends StatelessWidget {
                     const SizedBox(height: 40),
                     // "or" divider
                     ScrollFadeIn(
-                      delay: const Duration(milliseconds: 500),
+                      delay: AppDurations.staggerLong,
                       child: Obx(() => Row(
                         children: [
                           Expanded(
@@ -138,7 +138,7 @@ class ContactSection extends StatelessWidget {
                     const SizedBox(height: 40),
                     // Contact Form
                     const ScrollFadeIn(
-                      delay: Duration(milliseconds: 600),
+                      delay: AppDurations.staggerXLong,
                       child: _ContactForm(),
                     ),
                     const SizedBox(height: 60),
@@ -291,12 +291,12 @@ class _ContactFormState extends State<_ContactForm> {
         _emailController.clear();
         _messageController.clear();
         // Reset to idle after showing success
-        Future.delayed(const Duration(seconds: 3), () {
+        Future.delayed(AppDurations.formResetDelay, () {
           if (mounted) setState(() => _status = _FormStatus.idle);
         });
       } else {
         setState(() => _status = _FormStatus.error);
-        Future.delayed(const Duration(seconds: 3), () {
+        Future.delayed(AppDurations.formResetDelay, () {
           if (mounted) setState(() => _status = _FormStatus.idle);
         });
       }
@@ -304,7 +304,7 @@ class _ContactFormState extends State<_ContactForm> {
       dev.log('Form submission failed', name: 'ContactForm', error: e);
       if (!mounted) return;
       setState(() => _status = _FormStatus.error);
-      Future.delayed(const Duration(seconds: 3), () {
+      Future.delayed(AppDurations.formResetDelay, () {
         if (mounted) setState(() => _status = _FormStatus.idle);
       });
     }

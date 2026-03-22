@@ -66,6 +66,11 @@ class _CursorOverlayState extends State<_CursorOverlay>
   late AnimationController _expandController;
   late Animation<double> _ringSize;
   late Animation<double> _dotSize;
+
+  static const double _ringMin = 20.0;
+  static const double _ringMax = 40.0;
+  static const double _dotMin = 4.0;
+  static const double _dotMax = 6.0;
   late Color _sceneAccent;
   late Worker _accentWorker;
   late Worker _hoverWorker;
@@ -77,11 +82,11 @@ class _CursorOverlayState extends State<_CursorOverlay>
       vsync: this,
       duration: AppDurations.fast,
     );
-    _ringSize = Tween<double>(begin: 20, end: 40).animate(
+    _ringSize = Tween<double>(begin: _ringMin, end: _ringMax).animate(
       CurvedAnimation(
           parent: _expandController, curve: CinematicCurves.hoverLift),
     );
-    _dotSize = Tween<double>(begin: 4, end: 6).animate(
+    _dotSize = Tween<double>(begin: _dotMin, end: _dotMax).animate(
       CurvedAnimation(
           parent: _expandController, curve: CinematicCurves.hoverLift),
     );

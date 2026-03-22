@@ -55,6 +55,7 @@ void main() {
 
 void _printConsoleAsciiArt() {
   if (kIsWeb) {
+    // Intentional console art for visitors inspecting DevTools.
     // ignore: avoid_print
     print('''
 
@@ -95,7 +96,7 @@ class MyApp extends StatelessWidget {
     final loadingController = Get.find<LoadingController>();
 
     return Obx(() {
-      var currentLocale = const Locale('tr');
+      var currentLocale = const Locale('en');
       var appTitle = 'Portfolio';
 
       if (Get.isRegistered<LanguageController>()) {
@@ -118,11 +119,11 @@ class MyApp extends StatelessWidget {
         darkTheme: AppTheme.dark,
         themeMode: activeThemeMode,
         locale: currentLocale,
-        fallbackLocale: const Locale('tr'),
+        fallbackLocale: const Locale('en'),
         localizationsDelegates: [
           FlutterI18nDelegate(
             translationLoader: FileTranslationLoader(
-              fallbackFile: 'tr',
+              fallbackFile: 'en',
               basePath: 'assets/i18n',
               forcedLocale: currentLocale,
               decodeStrategies: [JsonDecodeStrategy()],
@@ -133,8 +134,8 @@ class MyApp extends StatelessWidget {
           GlobalCupertinoLocalizations.delegate,
         ],
         supportedLocales: const [
-          Locale('tr'),
           Locale('en'),
+          Locale('tr'),
           Locale('de'),
           Locale('fr'),
           Locale('es'),

@@ -6,6 +6,8 @@ import 'package:flutter_web_portfolio/app/controllers/language_controller.dart';
 import 'package:flutter_web_portfolio/app/controllers/scene_director.dart';
 import 'package:flutter_web_portfolio/app/controllers/scroll_controller.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
+import 'package:flutter_web_portfolio/app/core/constants/app_dimensions.dart';
+import 'package:flutter_web_portfolio/app/core/constants/breakpoints.dart';
 import 'package:flutter_web_portfolio/app/core/constants/cinematic_curves.dart';
 import 'package:flutter_web_portfolio/app/widgets/cinematic_button.dart';
 import 'package:flutter_web_portfolio/app/core/constants/durations.dart';
@@ -116,7 +118,11 @@ class _HomeSectionState extends State<HomeSection>
               child: Center(
                 child: Padding(
                   padding: EdgeInsets.symmetric(
-                    horizontal: screenWidth > 1400 ? 160 : (screenWidth > 900 ? 80 : 24),
+                    horizontal: screenWidth > AppDimensions.maxContentWidth
+                        ? AppDimensions.sectionPaddingDesktop
+                        : (screenWidth > Breakpoints.tablet
+                            ? AppDimensions.sectionPaddingTablet
+                            : AppDimensions.sectionPaddingMobile),
                   ),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,

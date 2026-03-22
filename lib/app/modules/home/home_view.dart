@@ -8,6 +8,7 @@ import 'package:flutter_web_portfolio/app/controllers/scene_director.dart';
 import 'package:flutter_web_portfolio/app/controllers/theme_controller.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_dimensions.dart';
+import 'package:flutter_web_portfolio/app/core/constants/breakpoints.dart';
 import 'package:flutter_web_portfolio/app/core/constants/durations.dart';
 import 'package:flutter_web_portfolio/app/modules/home/sections/home_section.dart';
 import 'package:flutter_web_portfolio/app/modules/home/sections/about_section.dart';
@@ -158,7 +159,7 @@ class _HomeViewState extends State<HomeView> {
                       );
                     },
                     child: ConstellationParticles(
-                      particleCount: MediaQuery.sizeOf(context).width < 600 ? 60 : 100,
+                      particleCount: MediaQuery.sizeOf(context).width < Breakpoints.mobile ? 60 : 100,
                     ),
                   ),
                 ),
@@ -271,7 +272,7 @@ class _HomeViewState extends State<HomeView> {
               ValueListenableBuilder<bool>(
                 valueListenable: HomeSection.entranceComplete,
                 builder: (context, entranceDone, _) => Positioned(
-                  left: 40,
+                  left: AppDimensions.sidebarInset,
                   bottom: 0,
                   child: SocialSidebarLeft(visible: entranceDone),
                 ),
@@ -279,7 +280,7 @@ class _HomeViewState extends State<HomeView> {
               ValueListenableBuilder<bool>(
                 valueListenable: HomeSection.entranceComplete,
                 builder: (context, entranceDone, _) => Positioned(
-                  right: 40,
+                  right: AppDimensions.sidebarInset,
                   bottom: 0,
                   child: SocialSidebarRight(visible: entranceDone),
                 ),
@@ -288,7 +289,7 @@ class _HomeViewState extends State<HomeView> {
               ValueListenableBuilder<bool>(
                 valueListenable: HomeSection.entranceComplete,
                 builder: (context, entranceDone, _) => Positioned(
-                  right: 20,
+                  right: AppDimensions.scrollDotsInset,
                   top: 0,
                   bottom: 0,
                   child: Center(
@@ -316,7 +317,7 @@ class _HomeViewState extends State<HomeView> {
     final width = MediaQuery.sizeOf(context).width;
     final horizontal = width > AppDimensions.maxContentWidth
         ? AppDimensions.sectionPaddingDesktop
-        : (width > 900 ? AppDimensions.sectionPaddingTablet : AppDimensions.sectionPaddingMobile); // TODO: use Breakpoints.tablet instead of 900
+        : (width > Breakpoints.tablet ? AppDimensions.sectionPaddingTablet : AppDimensions.sectionPaddingMobile);
     return EdgeInsets.symmetric(vertical: 80, horizontal: horizontal);
   }
 

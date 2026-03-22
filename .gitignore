@@ -48,3 +48,6 @@ coverage/
 .env
 *.jks
 *.keystore
+
+# IDE / AI tool config
+.claude/

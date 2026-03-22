@@ -321,7 +321,6 @@ class _FloatingTechPills extends StatelessWidget {
   });
 }
 
-// TODO: extract FlashlightPhoto to its own widget file if reused elsewhere
 class _FlashlightPhoto extends StatefulWidget {
   @override
   State<_FlashlightPhoto> createState() => _FlashlightPhotoState();
@@ -333,6 +332,8 @@ class _FlashlightPhotoState extends State<_FlashlightPhoto> {
 
   /// Max tilt angle in radians (3 degrees).
   static const double _maxTilt = 3.0 * math.pi / 180.0;
+  static const double _perspective = 0.001;
+  static const double _shadowMultiplier = 8.0;
 
   @override
   Widget build(BuildContext context) {
@@ -342,13 +343,13 @@ class _FlashlightPhotoState extends State<_FlashlightPhoto> {
 
     // Tilt transform: rotateY follows horizontal, rotateX follows vertical
     final tiltTransform = Matrix4.identity()
-      ..setEntry(3, 2, 0.001) // perspective
+      ..setEntry(3, 2, _perspective)
       ..rotateY(_hovered ? dx * _maxTilt : 0)
       ..rotateX(_hovered ? -dy * _maxTilt : 0);
 
     // Shadow shifts opposite to tilt direction
-    final shadowOffsetX = _hovered ? -dx * 8.0 : 0.0;
-    final shadowOffsetY = _hovered ? -dy * 8.0 : 0.0;
+    final shadowOffsetX = _hovered ? -dx * _shadowMultiplier : 0.0;
+    final shadowOffsetY = _hovered ? -dy * _shadowMultiplier : 0.0;
 
     return MouseRegion(
       onEnter: (_) => setState(() => _hovered = true),

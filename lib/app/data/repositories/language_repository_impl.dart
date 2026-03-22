@@ -34,10 +34,10 @@ class LanguageRepositoryImpl implements ILanguageRepository {
   Future<String> getSelectedLanguage() async {
     try {
       final savedLanguage = _localStorageProvider.getString(_languageKey);
-      return savedLanguage ?? 'tr';
+      return savedLanguage ?? 'en';
     } catch (e) {
       dev.log('Failed to load language preference', name: 'LanguageRepository', error: e);
-      return 'tr';
+      return 'en';
     }
   }
 

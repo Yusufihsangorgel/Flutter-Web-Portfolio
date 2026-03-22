@@ -37,6 +37,11 @@ final class AppDurations {
   // Stagger delays
   static const staggerShort = Duration(milliseconds: 100);
   static const staggerMedium = Duration(milliseconds: 200);
+  static const staggerLong = Duration(milliseconds: 500);
+  static const staggerXLong = Duration(milliseconds: 600);
+
+  // Form
+  static const formResetDelay = Duration(seconds: 3);
 
   // Debounce
   static const scrollDebounce = Duration(milliseconds: 100);
