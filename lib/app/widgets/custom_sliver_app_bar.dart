@@ -29,7 +29,9 @@ class CustomSliverAppBar extends StatefulWidget {
   final AppScrollController scrollController;
   final List<Widget>? actions;
 
-  static const _navSections = ['about', 'experience', 'testimonials', 'blog', 'projects', 'contact'];
+  /// Nav sections derived at build-time from active sections (excludes 'home').
+  static List<String> navSections(LanguageController lc) =>
+      lc.activeSections.where((s) => s != 'home').toList();
 
   /// Maximum (expanded) toolbar height.
   static const _maxHeight = 80.0;
@@ -157,17 +159,18 @@ class _CustomSliverAppBarState extends State<CustomSliverAppBar> {
 
   Widget _buildNavItems() => Obx(() {
     final currentSection = widget.scrollController.activeSection.value;
+    final sections = CustomSliverAppBar.navSections(widget.languageController);
     return Row(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
-        for (int i = 0; i < CustomSliverAppBar._navSections.length; i++)
+        for (final section in sections)
           _NavItem(
             label: widget.languageController.getText(
-              'nav.${CustomSliverAppBar._navSections[i]}',
-              defaultValue: CustomSliverAppBar._navSections[i].toUpperCase(),
+              'nav.$section',
+              defaultValue: section.toUpperCase(),
             ),
-            isActive: currentSection == CustomSliverAppBar._navSections[i],
-            onTap: () => widget.scrollController.scrollToSection(CustomSliverAppBar._navSections[i]),
+            isActive: currentSection == section,
+            onTap: () => widget.scrollController.scrollToSection(section),
             scaleFactor: _scaleFactor,
           ),
       ],
@@ -194,7 +197,7 @@ class _CustomSliverAppBarState extends State<CustomSliverAppBar> {
           ),
       pageBuilder: (context, animation, secondaryAnimation) =>
           _MobileMenuOverlay(
-            navSections: CustomSliverAppBar._navSections,
+            navSections: CustomSliverAppBar.navSections(widget.languageController),
             languageController: widget.languageController,
             scrollController: widget.scrollController,
           ),

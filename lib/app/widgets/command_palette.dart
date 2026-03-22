@@ -101,48 +101,29 @@ class _CommandPaletteState extends State<CommandPalette> {
     final github = personalInfo['github'] as String? ?? '';
     final linkedin = personalInfo['linkedin'] as String? ?? '';
 
+    final active = languageController.activeSections;
+
+    const sectionIcons = <String, IconData>{
+      'home': Icons.home_rounded,
+      'about': Icons.person_rounded,
+      'experience': Icons.work_rounded,
+      'testimonials': Icons.format_quote_rounded,
+      'blog': Icons.article_rounded,
+      'projects': Icons.code_rounded,
+      'contact': Icons.mail_rounded,
+    };
+
     return [
       // ── Navigation ──────────────────────────────────────────────────────
-      _PaletteCommand(
-        label: 'Go to Home',
-        category: 'Navigate',
-        icon: Icons.home_rounded,
-        onExecute: () => _executeAndClose(
-          () => scrollController.scrollToSection('home'),
+      for (final section in active)
+        _PaletteCommand(
+          label: 'Go to ${section[0].toUpperCase()}${section.substring(1)}',
+          category: 'Navigate',
+          icon: sectionIcons[section] ?? Icons.arrow_forward_rounded,
+          onExecute: () => _executeAndClose(
+            () => scrollController.scrollToSection(section),
+          ),
         ),
-      ),
-      _PaletteCommand(
-        label: 'Go to About',
-        category: 'Navigate',
-        icon: Icons.person_rounded,
-        onExecute: () => _executeAndClose(
-          () => scrollController.scrollToSection('about'),
-        ),
-      ),
-      _PaletteCommand(
-        label: 'Go to Experience',
-        category: 'Navigate',
-        icon: Icons.work_rounded,
-        onExecute: () => _executeAndClose(
-          () => scrollController.scrollToSection('experience'),
-        ),
-      ),
-      _PaletteCommand(
-        label: 'Go to Projects',
-        category: 'Navigate',
-        icon: Icons.code_rounded,
-        onExecute: () => _executeAndClose(
-          () => scrollController.scrollToSection('projects'),
-        ),
-      ),
-      _PaletteCommand(
-        label: 'Go to Contact',
-        category: 'Navigate',
-        icon: Icons.mail_rounded,
-        onExecute: () => _executeAndClose(
-          () => scrollController.scrollToSection('contact'),
-        ),
-      ),
 
       // ── Language ────────────────────────────────────────────────────────
       for (final entry in languageController.supportedLanguages.entries)

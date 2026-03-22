@@ -83,12 +83,12 @@ void main() {
       );
       await tester.pump();
 
-      // Type "about" into the search field
-      await tester.enterText(find.byType(TextField), 'about');
+      // Type "contact" into the search field
+      await tester.enterText(find.byType(TextField), 'contact');
       await tester.pump();
 
-      // Should show the "Go to About" navigation command
-      expect(find.text('Go to About'), findsOneWidget);
+      // Should show the "Go to Contact" navigation command
+      expect(find.text('Go to Contact'), findsOneWidget);
 
       // Non-matching commands should be filtered out
       expect(find.text('Go to Home'), findsNothing);

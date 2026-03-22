@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import 'package:flutter_web_portfolio/app/controllers/language_controller.dart';
 import 'package:flutter_web_portfolio/app/controllers/scroll_controller.dart';
 import 'package:flutter_web_portfolio/app/controllers/theme_controller.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
@@ -17,34 +18,28 @@ class ScrollProgressDots extends StatelessWidget {
   /// Whether the dots should be visible (tied to entrance animation).
   final bool visible;
 
-  static const _sections = <String>[
-    'home',
-    'about',
-    'experience',
-    'testimonials',
-    'projects',
-    'contact',
-  ];
-
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.sizeOf(context).width;
     if (screenWidth < 900) return const SizedBox.shrink();
 
-    return AnimatedOpacity(
-      opacity: visible ? 1.0 : 0.0,
-      duration: AppDurations.entrance,
-      child: IgnorePointer(
-        ignoring: !visible,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            for (final section in _sections)
-              _Dot(sectionId: section),
-          ],
+    return Obx(() {
+      final sections = Get.find<LanguageController>().activeSections;
+      return AnimatedOpacity(
+        opacity: visible ? 1.0 : 0.0,
+        duration: AppDurations.entrance,
+        child: IgnorePointer(
+          ignoring: !visible,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              for (final section in sections)
+                _Dot(sectionId: section),
+            ],
+          ),
         ),
-      ),
-    );
+      );
+    });
   }
 }
 

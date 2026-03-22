@@ -38,6 +38,28 @@ class LanguageController extends GetxController {
   String get appName =>
       _translations.value['app_name']?.toString() ?? 'Portfolio';
 
+  /// Sections that have data in the current language JSON.
+  /// Sections without data are hidden from the UI, nav, and scroll dots.
+  List<String> get activeSections {
+    final data = cvData;
+    return [
+      'home',
+      if (data['personal_info'] is Map) 'about',
+      if (data['experiences'] case final List l when l.isNotEmpty) 'experience',
+      if (data['testimonials'] case final List l when l.isNotEmpty) 'testimonials',
+      if (_hasMediumUsername(data)) 'blog',
+      if (data['projects'] case final List l when l.isNotEmpty) 'projects',
+      'contact',
+    ];
+  }
+
+  static bool _hasMediumUsername(Map<String, dynamic> data) {
+    final info = data['personal_info'];
+    if (info is! Map<String, dynamic>) return false;
+    final medium = info['medium'];
+    return medium is String && medium.isNotEmpty;
+  }
+
   /// Looks up a dot-separated key in the loaded JSON.
   /// Falls back to [defaultValue] if not found.
   String getText(String key, {String defaultValue = ''}) {

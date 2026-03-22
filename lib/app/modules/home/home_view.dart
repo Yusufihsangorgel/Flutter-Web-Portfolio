@@ -117,7 +117,7 @@ class _HomeViewState extends State<HomeView> {
       onKeyEvent: _handleKeyEvent,
       child: Obx(() {
         // Touch reactive values so Obx rebuilds on language/theme switch
-        languageController.currentLanguage;
+        final active = languageController.activeSections;
         final isDark = Get.isRegistered<ThemeController>()
             ? Get.find<ThemeController>().isDarkMode.value
             : true;
@@ -226,43 +226,49 @@ class _HomeViewState extends State<HomeView> {
                       context,
                       animated: false,
                     ),
-                    _buildSection(
-                      scrollController.aboutKey,
-                      const AboutSection(),
-                      context,
-                      enableScale: true,
-                    ),
-                    _buildSection(
-                      scrollController.experienceKey,
-                      const ExperienceSection(),
-                      context,
-                      delay: AppDurations.staggerShort,
-                    ),
-                    _buildSection(
-                      scrollController.testimonialsKey,
-                      const TestimonialsSection(),
-                      context,
-                      delay: AppDurations.staggerShort,
-                    ),
-                    _buildSection(
-                      scrollController.blogKey,
-                      const BlogSection(),
-                      context,
-                      delay: AppDurations.staggerShort,
-                    ),
-                    _buildSection(
-                      scrollController.projectsKey,
-                      const ProjectsSection(),
-                      context,
-                      delay: AppDurations.staggerShort,
-                      enableScale: true,
-                    ),
-                    _buildSection(
-                      scrollController.contactKey,
-                      const ContactSection(),
-                      context,
-                      delay: AppDurations.staggerShort,
-                    ),
+                    if (active.contains('about'))
+                      _buildSection(
+                        scrollController.aboutKey,
+                        const AboutSection(),
+                        context,
+                        enableScale: true,
+                      ),
+                    if (active.contains('experience'))
+                      _buildSection(
+                        scrollController.experienceKey,
+                        const ExperienceSection(),
+                        context,
+                        delay: AppDurations.staggerShort,
+                      ),
+                    if (active.contains('testimonials'))
+                      _buildSection(
+                        scrollController.testimonialsKey,
+                        const TestimonialsSection(),
+                        context,
+                        delay: AppDurations.staggerShort,
+                      ),
+                    if (active.contains('blog'))
+                      _buildSection(
+                        scrollController.blogKey,
+                        const BlogSection(),
+                        context,
+                        delay: AppDurations.staggerShort,
+                      ),
+                    if (active.contains('projects'))
+                      _buildSection(
+                        scrollController.projectsKey,
+                        const ProjectsSection(),
+                        context,
+                        delay: AppDurations.staggerShort,
+                        enableScale: true,
+                      ),
+                    if (active.contains('contact'))
+                      _buildSection(
+                        scrollController.contactKey,
+                        const ContactSection(),
+                        context,
+                        delay: AppDurations.staggerShort,
+                      ),
                     const SliverToBoxAdapter(child: PortfolioFooter()),
                   ],
                   ),
