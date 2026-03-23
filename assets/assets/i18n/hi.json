@@ -383,7 +383,8 @@
     "github_title": "GitHub गतिविधि",
     "github_repos": "रेपो",
     "github_followers": "फॉलोअर्स",
-    "github_stars": "स्टार्स"
+    "github_stars": "स्टार्स",
+    "github_cached": "(कैश्ड)"
   },
   "home_section": {
     "greeting": "नमस्ते, मेरा नाम है",

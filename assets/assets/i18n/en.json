@@ -398,7 +398,8 @@
     "github_title": "GitHub Activity",
     "github_repos": "Repos",
     "github_followers": "Followers",
-    "github_stars": "Stars"
+    "github_stars": "Stars",
+    "github_cached": "(cached)"
   },
   "projects_section": {
     "title": "My Projects",

@@ -399,7 +399,8 @@
     "github_title": "GitHub Aktivitesi",
     "github_repos": "Repo",
     "github_followers": "Takipçi",
-    "github_stars": "Yıldız"
+    "github_stars": "Yıldız",
+    "github_cached": "(önbellek)"
   },
   "projects_section": {
     "title": "Projelerim",
