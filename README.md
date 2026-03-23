@@ -3,13 +3,13 @@
 # Flutter Portfolio — Cinematic Developer Showcase
 
 **A production-grade, cinematic portfolio built entirely with Flutter Web.**\
-Scene-driven backgrounds. Scroll-reactive gradients. 184 automated tests. Zero templates.
+Scene-driven backgrounds. Scroll-reactive gradients. 208 automated tests. Zero templates.
 
 [![CI](https://github.com/Yusufihsangorgel/Flutter-Web-Portfolio/actions/workflows/ci.yml/badge.svg)](https://github.com/Yusufihsangorgel/Flutter-Web-Portfolio/actions)
 ![Flutter](https://img.shields.io/badge/Flutter-3.41-02569B?logo=flutter)
 ![Dart](https://img.shields.io/badge/Dart-3.7-0175C2?logo=dart)
 ![License](https://img.shields.io/badge/License-MIT-green)
-![Tests](https://img.shields.io/badge/Tests-184_passing-success)
+![Tests](https://img.shields.io/badge/Tests-208_passing-success)
 
 [**Live Demo**](https://yusufihsangorgel.github.io/Flutter-Web-Portfolio/) · [Report Bug](https://github.com/Yusufihsangorgel/Flutter-Web-Portfolio/issues) · [Request Feature](https://github.com/Yusufihsangorgel/Flutter-Web-Portfolio/issues)
 
@@ -55,26 +55,31 @@ It is also **fully forkable**. Change three files and you have your own portfoli
 - **Constellation particles** — interactive particle field with spatial-grid neighbor lookups and connecting lines
 - **Vignette overlay** — per-scene intensity control for cinematic framing
 - **Custom cursor** — outer ring + inner dot + spotlight glow, with hover expansion on interactive elements
+- **Cursor trail effect** — 8-point fading particle trail following the custom cursor
 
 ### Content Sections
 - **Cinematic Hero** — typewriter text, staggered entrance animations, and scroll-locked intro sequence
+- **Typewriter cycling** — hero subtitle types, erases, and retypes multiple role descriptions in a loop
 - **About** — terminal emulator with 10+ working commands (help, about, skills, experience, contact, download-cv, etc.)
 - **Experience** — timeline with technology tags and expandable descriptions
 - **Testimonials** — carousel with colleague and mentor quotes
 - **Blog** — Medium RSS integration via rss2json API with live post cards
 - **Projects** — case study cards with problem/solution/result breakdowns and multi-link support (web, App Store, Google Play)
+- **Project category filtering** — filter projects by category (All/Mobile/Web/Backend) with animated transitions
+- **GitHub contribution heatmap** — 90-day activity grid rendered via CustomPainter with 4 intensity levels
 - **Contact** — Formspree-ready form with validation and direct email/social links
 - **Footer** — source link and command palette hint
 
 ### Interactions
 - **Command palette** (Ctrl+K / Cmd+K) — fuzzy search across navigation, language switching, and external links
-- **Konami code easter egg** — enter the classic sequence for a Matrix digital rain overlay
+- **Easter Egg** — try the Konami code (up up down down left right left right B A) for a Matrix digital rain overlay
 - **3D skill orbit** — concentric elliptical orbits with depth-based scaling (z-axis simulation), category tooltips on hover
 - **Scroll-reveal animations** — fade-in with optional scale, configurable delay staggering
 - **Magnetic buttons** — cursor-proximity displacement with spring physics
 - **Text scramble** — character randomization reveal effect for headings
 - **Shader text reveal** — gradient wipe animation for section titles
 - **Scroll progress dots** — fixed right-side indicator showing current section
+- **Section progress arc** — circular arc around active scroll dot showing section visibility progress
 - **Social sidebars** — fixed left/right sidebars with icon links and vertical line (desktop only)
 - **Back-to-top button** — appears on scroll with smooth animated return
 - **Skip-to-content link** — accessible keyboard navigation, visible on Tab focus
@@ -84,7 +89,7 @@ It is also **fully forkable**. Change three files and you have your own portfoli
 - **Modern Dart 3.x** — `abstract interface class`, `final class`, `base class`, switch expressions, pattern matching
 - **GetX state management** — reactive controllers for scroll, scene, theme, language, cursor, and loading states
 - **31 custom widgets** — zero external UI dependencies beyond `google_fonts`
-- **184 automated tests** — unit tests for all controllers, constants, and models + widget tests for interactive components
+- **208 automated tests** — unit tests for all controllers, constants, and models + widget tests for interactive components
 - **GitHub Actions CI/CD** — analyze, test, build, and auto-deploy to GitHub Pages on every push
 
 ### Internationalization
@@ -93,6 +98,7 @@ It is also **fully forkable**. Change three files and you have your own portfoli
 - **Fully data-driven** — all content (CV, sections, terminal commands) lives in JSON files
 
 ### Performance & Progressive Web App
+- **System theme detection** — auto-detects OS dark/light preference and follows system changes
 - **Dark/light theme** — persisted in localStorage via SharedPreferences
 - **PWA manifest** — installable on mobile and desktop
 - **WASM build support** — CI pipeline includes experimental WebAssembly build
@@ -339,14 +345,14 @@ lib/app/
 | URL Handling | [url_launcher](https://pub.dev/packages/url_launcher) |
 | CI/CD | GitHub Actions (analyze + test + build + deploy) |
 | Hosting | GitHub Pages (auto-deploy on push) |
-| Testing | flutter_test (184 tests — unit + widget) |
+| Testing | flutter_test (208 tests — unit + widget) |
 
 ---
 
 ## Testing
 
 ```bash
-# Run all 184 tests
+# Run all 208 tests
 flutter test
 
 # Run with coverage

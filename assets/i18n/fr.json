@@ -383,7 +383,8 @@
     "github_title": "Activité GitHub",
     "github_repos": "Dépôts",
     "github_followers": "Abonnés",
-    "github_stars": "Étoiles"
+    "github_stars": "Étoiles",
+    "github_cached": "(en cache)"
   },
   "home_section": {
     "greeting": "Bonjour, je m'appelle",

@@ -376,7 +376,8 @@
     "github_title": "GitHub Aktivität",
     "github_repos": "Repos",
     "github_followers": "Follower",
-    "github_stars": "Sterne"
+    "github_stars": "Sterne",
+    "github_cached": "(zwischengespeichert)"
   },
   "home_section": {
     "greeting": "Hallo, mein Name ist",

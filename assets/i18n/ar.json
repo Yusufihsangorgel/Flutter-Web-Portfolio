@@ -383,7 +383,8 @@
     "github_title": "نشاط GitHub",
     "github_repos": "المستودعات",
     "github_followers": "المتابعون",
-    "github_stars": "النجوم"
+    "github_stars": "النجوم",
+    "github_cached": "(مخزن مؤقتاً)"
   },
   "home_section": {
     "greeting": "مرحباً، اسمي",

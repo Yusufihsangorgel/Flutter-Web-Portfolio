@@ -190,6 +190,14 @@ class _StatsRow extends StatelessWidget {
           _StatChip(label: languageController.getText('about_section.github_repos', defaultValue: 'Repos'), value: repos, accent: accent),
           _StatChip(label: languageController.getText('about_section.github_followers', defaultValue: 'Followers'), value: followers, accent: accent),
           _StatChip(label: languageController.getText('about_section.github_stars', defaultValue: 'Stars'), value: totalStars, accent: accent),
+          if (isError)
+            Text(
+              languageController.getText('about_section.github_cached', defaultValue: '(cached)'),
+              style: AppTypography.caption.copyWith(
+                color: AppColors.textSecondary,
+                fontSize: 11,
+              ),
+            ),
         ],
       );
     });

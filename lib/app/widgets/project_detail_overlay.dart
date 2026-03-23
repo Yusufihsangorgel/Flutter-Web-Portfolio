@@ -140,6 +140,7 @@ class _Content extends StatelessWidget {
     final technologies = _extractTechnologies(project);
     final urls = _extractAllUrls(project);
     final caseStudy = project['case_study'] as Map<String, dynamic>?;
+    final projectImage = project['image'] as String?;
 
     return Obx(() {
       final accent = Get.find<SceneDirector>().currentAccent.value;
@@ -149,6 +150,32 @@ class _Content extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Header image
+            if (projectImage != null && projectImage.isNotEmpty) ...[
+              ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxHeight: 200),
+                  child: projectImage.startsWith('assets/')
+                      ? Image.asset(
+                          projectImage,
+                          width: double.infinity,
+                          fit: BoxFit.cover,
+                          errorBuilder: (_, __, ___) =>
+                              const SizedBox.shrink(),
+                        )
+                      : Image.network(
+                          projectImage,
+                          width: double.infinity,
+                          fit: BoxFit.cover,
+                          errorBuilder: (_, __, ___) =>
+                              const SizedBox.shrink(),
+                        ),
+                ),
+              ),
+              const SizedBox(height: 24),
+            ],
+
             // Title
             Text(
               title,
@@ -200,6 +227,7 @@ class _Content extends StatelessWidget {
                   ),
                   body: problem,
                   accent: accent,
+                  imageUrl: caseStudy['problem_image'] as String?,
                 ),
                 const SizedBox(height: 24),
               ],
@@ -212,6 +240,7 @@ class _Content extends StatelessWidget {
                   ),
                   body: solution,
                   accent: accent,
+                  imageUrl: caseStudy['solution_image'] as String?,
                 ),
                 const SizedBox(height: 24),
               ],
@@ -224,6 +253,7 @@ class _Content extends StatelessWidget {
                   ),
                   body: result,
                   accent: accent,
+                  imageUrl: caseStudy['result_image'] as String?,
                 ),
                 const SizedBox(height: 24),
               ],
@@ -303,19 +333,39 @@ class _CaseStudyBlock extends StatelessWidget {
     required this.heading,
     required this.body,
     required this.accent,
+    this.imageUrl,
   });
 
   final String heading;
   final String body;
   final Color accent;
+  final String? imageUrl;
 
   @override
   Widget build(BuildContext context) => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(heading, style: AppTypography.h2.copyWith(color: accent)),
+          Semantics(
+            header: true,
+            child: Text(heading, style: AppTypography.h2.copyWith(color: accent)),
+          ),
           const SizedBox(height: 10),
           Text(body, style: AppTypography.body),
+          if (imageUrl != null && imageUrl!.isNotEmpty) ...[
+            const SizedBox(height: 16),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxHeight: 200),
+                child: Image.network(
+                  imageUrl!,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+                ),
+              ),
+            ),
+          ],
         ],
       );
 }
@@ -362,38 +412,42 @@ class _LinkChip extends StatelessWidget {
   final Color accent;
 
   @override
-  Widget build(BuildContext context) => CinematicFocusable(
-        onTap: () async {
-          var urlString = url;
-          if (!urlString.startsWith('http://') &&
-              !urlString.startsWith('https://')) {
-            urlString = 'https://$urlString';
-          }
-          final uri = Uri.parse(urlString);
-          if (await canLaunchUrl(uri)) {
-            await launchUrl(uri, mode: LaunchMode.externalApplication);
-          }
-        },
-        borderRadius: BorderRadius.circular(8),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-          decoration: BoxDecoration(
-            color: accent.withValues(alpha: 0.06),
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(
-              color: accent.withValues(alpha: 0.15),
-            ),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(Icons.open_in_new_rounded, size: 16, color: accent),
-              const SizedBox(width: 8),
-              Text(
-                label,
-                style: AppTypography.bodySmall.copyWith(color: accent),
+  Widget build(BuildContext context) => Semantics(
+        link: true,
+        label: '$label: $url',
+        child: CinematicFocusable(
+          onTap: () async {
+            var urlString = url;
+            if (!urlString.startsWith('http://') &&
+                !urlString.startsWith('https://')) {
+              urlString = 'https://$urlString';
+            }
+            final uri = Uri.parse(urlString);
+            if (await canLaunchUrl(uri)) {
+              await launchUrl(uri, mode: LaunchMode.externalApplication);
+            }
+          },
+          borderRadius: BorderRadius.circular(8),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            decoration: BoxDecoration(
+              color: accent.withValues(alpha: 0.06),
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(
+                color: accent.withValues(alpha: 0.15),
               ),
-            ],
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.open_in_new_rounded, size: 16, color: accent),
+                const SizedBox(width: 8),
+                Text(
+                  label,
+                  style: AppTypography.bodySmall.copyWith(color: accent),
+                ),
+              ],
+            ),
           ),
         ),
       );
