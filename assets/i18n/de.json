@@ -101,7 +101,12 @@
       "github": "https://github.com/Yusufihsangorgel",
       "linkedin": "https://linkedin.com/in/yusuf-ihsan-görgel/",
       "bio": "Hallo, ich bin Yusuf İhsan, ein Software Engineering Student im letzten Jahr mit 4 Jahren Erfahrung. Ich begann in meinem zweiten Studienjahr als Freelancer zu arbeiten und habe seitdem Erfahrungen sowohl in Unternehmen als auch in Start-ups gesammelt. Ich habe 3 Jahre professionelle Erfahrung in der Entwicklung von Mobil-, ERP- und POS-Software mit Flutter. Ich habe auch als Backend- und DevOps-Entwickler in verschiedenen Freelance-Projekten gearbeitet. Ich löse leidenschaftlich gerne Probleme und gedeihe in kollaborativen Teamumgebungen. Ich habe fundierte Kenntnisse in der Verwendung von Atlassian-Jira für Projektmanagement, mit Erfahrung in täglichen Meetings, Sprints, Scrum und der Einhaltung enger Fristen.",
-      "medium": "developeryusufihsan"
+      "medium": "developeryusufihsan",
+      "subtitles": [
+        "Mobile Software-Ingenieur",
+        "Flutter-Entwickler",
+        "Clean Architecture Verfechter"
+      ]
     },
     "experiences": [
       {

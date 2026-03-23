@@ -78,6 +78,16 @@ class _HomeSectionState extends State<HomeSection>
     super.dispose();
   }
 
+  /// Returns subtitle texts for the typewriter cycling effect.
+  /// Falls back to a single subtitle if the JSON key is missing.
+  List<String>? _subtitleTexts(LanguageController lc) {
+    final raw = lc.cvData['personal_info']?['subtitles'];
+    if (raw is List && raw.isNotEmpty) {
+      return raw.whereType<String>().toList();
+    }
+    return null;
+  }
+
   @override
   Widget build(BuildContext context) {
     final languageController = Get.find<LanguageController>();
@@ -151,12 +161,14 @@ class _HomeSectionState extends State<HomeSection>
                       ),
                       const SizedBox(height: 20),
 
-                      // Subtitle — typewriter effect
+                      // Subtitle — typewriter cycling effect
                       TypewriterText(
                         text: languageController.getText(
                           'home_section.subtitle',
                           defaultValue: 'Mobile Software Engineer',
                         ),
+                        texts: _subtitleTexts(languageController),
+                        loop: true,
                         style: GoogleFonts.spaceGrotesk(
                           fontSize: (heroFontSize * 0.35).clamp(18.0, 42.0),
                           fontWeight: FontWeight.w400,

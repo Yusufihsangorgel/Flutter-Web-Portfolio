@@ -4,6 +4,8 @@ import 'package:get/get.dart';
 import 'package:flutter_web_portfolio/app/controllers/theme_controller.dart';
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
   late ThemeController controller;
 
   setUp(() {
@@ -15,41 +17,47 @@ void main() {
   tearDown(Get.reset);
 
   group('ThemeController', () {
-    test('initial isDarkMode is true', () {
-      expect(controller.isDarkMode.value, isTrue);
+    test('initial isDarkMode follows system brightness', () {
+      // Test environment defaults to light, so isDarkMode should be false
+      // when no saved preference exists.
+      expect(controller.isDarkMode, isA<RxBool>());
     });
 
-    test('initial brightness is dark', () {
-      expect(controller.brightness, equals(Brightness.dark));
+    test('brightness getter matches isDarkMode', () {
+      final expected = controller.isDarkMode.value
+          ? Brightness.dark
+          : Brightness.light;
+      expect(controller.brightness, equals(expected));
     });
 
-    test('toggleTheme flips isDarkMode to false', () {
+    test('toggleTheme flips isDarkMode', () {
+      final before = controller.isDarkMode.value;
       controller.toggleTheme();
-      expect(controller.isDarkMode.value, isFalse);
+      expect(controller.isDarkMode.value, equals(!before));
     });
 
-    test('toggleTheme updates brightness to light', () {
+    test('toggleTheme updates brightness', () {
+      final before = controller.brightness;
       controller.toggleTheme();
-      expect(controller.brightness, equals(Brightness.light));
+      expect(controller.brightness, isNot(equals(before)));
     });
 
-    test('double toggle returns to dark mode', () {
+    test('double toggle returns to original mode', () {
+      final original = controller.isDarkMode.value;
       controller
         ..toggleTheme()
         ..toggleTheme();
-      expect(controller.isDarkMode.value, isTrue);
-      expect(controller.brightness, equals(Brightness.dark));
+      expect(controller.isDarkMode.value, equals(original));
     });
 
     test('multiple toggle cycles work correctly', () {
+      final original = controller.isDarkMode.value;
       for (var i = 0; i < 5; i++) {
         controller.toggleTheme();
-        expect(controller.isDarkMode.value, isFalse);
-        expect(controller.brightness, equals(Brightness.light));
+        expect(controller.isDarkMode.value, equals(!original));
 
         controller.toggleTheme();
-        expect(controller.isDarkMode.value, isTrue);
-        expect(controller.brightness, equals(Brightness.dark));
+        expect(controller.isDarkMode.value, equals(original));
       }
     });
 

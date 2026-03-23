@@ -14,13 +14,26 @@ class TypewriterText extends StatefulWidget {
     super.key,
     required this.text,
     required this.style,
+    this.texts,
     this.delay = Duration.zero,
     this.minCharDelay = const Duration(milliseconds: 20),
     this.maxCharDelay = const Duration(milliseconds: 60),
     this.textAlign,
+    this.loop = false,
+    this.pauseBetween = const Duration(seconds: 2),
   });
 
   final String text;
+
+  /// Optional list of texts to cycle through. When provided, [text] is ignored
+  /// and the widget types each string in order, erasing and retyping the next.
+  final List<String>? texts;
+
+  /// Whether to loop back to the first text after the last.
+  final bool loop;
+
+  /// Pause duration between typing the next text.
+  final Duration pauseBetween;
   final TextStyle style;
   final Duration delay;
   final Duration minCharDelay;
@@ -40,6 +53,7 @@ class _TypewriterTextState extends State<TypewriterText> {
   Timer? _typeTimer;
   Timer? _blinkTimer;
   int _blinkCount = 0;
+  int _textIndex = 0;
 
   @override
   void initState() {
@@ -72,7 +86,7 @@ class _TypewriterTextState extends State<TypewriterText> {
   void _typeNextChar() {
     if (!mounted) return;
 
-    if (_charCount >= widget.text.length) {
+    if (_charCount >= _currentText.length) {
       _onTypingComplete();
       return;
     }
@@ -94,6 +108,17 @@ class _TypewriterTextState extends State<TypewriterText> {
   }
 
   void _onTypingComplete() {
+    final hasMultiple = _activeTexts.length > 1;
+
+    if (hasMultiple) {
+      // Pause, then erase and type next
+      _blinkTimer = Timer(widget.pauseBetween, () {
+        if (!mounted) return;
+        _startErasing();
+      });
+      return;
+    }
+
     _typingDone = true;
     _blinkCount = 0;
 
@@ -113,9 +138,35 @@ class _TypewriterTextState extends State<TypewriterText> {
     });
   }
 
+  void _startErasing() {
+    _eraseNextChar();
+  }
+
+  void _eraseNextChar() {
+    if (!mounted) return;
+    if (_charCount <= 0) {
+      _textIndex = (_textIndex + 1) % _activeTexts.length;
+      if (!widget.loop && _textIndex == 0) {
+        // Reached the end without loop — stop.
+        setState(() => _showCursor = false);
+        return;
+      }
+      _typeNextChar();
+      return;
+    }
+    _typeTimer = Timer(const Duration(milliseconds: 25), () {
+      if (!mounted) return;
+      setState(() => _charCount--);
+      _eraseNextChar();
+    });
+  }
+
+  List<String> get _activeTexts => widget.texts ?? [widget.text];
+  String get _currentText => _activeTexts[_textIndex];
+
   @override
   Widget build(BuildContext context) {
-    final visibleText = widget.text.substring(0, _charCount);
+    final visibleText = _currentText.substring(0, _charCount.clamp(0, _currentText.length));
     final cursorChar = _showCursor ? '|' : '';
 
     return Text.rich(

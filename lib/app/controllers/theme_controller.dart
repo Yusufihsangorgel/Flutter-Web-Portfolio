@@ -5,7 +5,8 @@ import 'package:get/get.dart';
 import 'package:flutter_web_portfolio/app/domain/providers/i_local_storage_provider.dart';
 
 /// Dark/light mode toggle — persists preference to localStorage.
-class ThemeController extends GetxController {
+/// Auto-detects system theme on first visit; respects manual override.
+class ThemeController extends GetxController with WidgetsBindingObserver {
   static const _storageKey = 'isDarkMode';
 
   final RxBool isDarkMode = true.obs;
@@ -16,7 +17,38 @@ class ThemeController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    WidgetsBinding.instance.addObserver(this);
     _loadSavedTheme();
+  }
+
+  @override
+  void onClose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.onClose();
+  }
+
+  /// Called when the OS theme changes (e.g. user toggles system dark mode).
+  @override
+  void didChangePlatformBrightness() {
+    // Only follow system if user hasn't manually chosen a theme.
+    if (!_hasManualOverride) {
+      final systemDark =
+          WidgetsBinding.instance.platformDispatcher.platformBrightness ==
+              Brightness.dark;
+      isDarkMode.value = systemDark;
+    }
+  }
+
+  bool get _hasManualOverride {
+    try {
+      if (Get.isRegistered<ILocalStorageProvider>()) {
+        final storage = Get.find<ILocalStorageProvider>();
+        if (storage.isInitialized) {
+          return storage.getBool(_storageKey) != null;
+        }
+      }
+    } catch (_) {}
+    return false;
   }
 
   void _loadSavedTheme() {
@@ -27,9 +59,15 @@ class ThemeController extends GetxController {
           final saved = storage.getBool(_storageKey);
           if (saved != null) {
             isDarkMode.value = saved;
+            return;
           }
         }
       }
+      // No saved preference — use system brightness.
+      final systemDark =
+          WidgetsBinding.instance.platformDispatcher.platformBrightness ==
+              Brightness.dark;
+      isDarkMode.value = systemDark;
     } catch (e) {
       dev.log('Failed to load theme preference', name: 'ThemeController', error: e);
     }

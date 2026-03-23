@@ -74,6 +74,7 @@ class _CursorOverlayState extends State<_CursorOverlay>
   late Color _sceneAccent;
   late Worker _accentWorker;
   late Worker _hoverWorker;
+  final List<Offset> _trail = [];
 
   @override
   void initState() {
@@ -127,7 +128,13 @@ class _CursorOverlayState extends State<_CursorOverlay>
         child: IgnorePointer(
           child: ValueListenableBuilder<Offset>(
             valueListenable: widget.position,
-            builder: (_, position, __) => AnimatedBuilder(
+            builder: (_, position, __) {
+              // Update trail history
+              if (_trail.isEmpty || (_trail.first - position).distance > 4) {
+                _trail.insert(0, position);
+                if (_trail.length > 8) _trail.removeLast();
+              }
+              return AnimatedBuilder(
                 animation: _expandController,
                 builder: (_, __) {
                   final cursorCtrl = Get.find<CursorController>();
@@ -138,10 +145,12 @@ class _CursorOverlayState extends State<_CursorOverlay>
                       dotSize: _dotSize.value,
                       accentColor:
                           cursorCtrl.hoverAccent.value ?? _sceneAccent,
+                      trail: List.of(_trail.skip(1)),
                     ),
                   );
                 },
-              ),
+              );
+            },
           ),
         ),
       ),
@@ -154,21 +163,34 @@ class _CursorPainter extends CustomPainter {
     required this.ringSize,
     required this.dotSize,
     this.accentColor,
+    this.trail = const [],
   });
 
   final Offset position;
   final double ringSize;
   final double dotSize;
   final Color? accentColor;
+  final List<Offset> trail;
 
   static final _ringPaint = Paint()
     ..style = PaintingStyle.stroke
     ..strokeWidth = 1;
 
   static final _dotPaint = Paint();
+  static final _trailPaint = Paint();
+
+  static const _maxTrailDots = 8;
 
   @override
   void paint(Canvas canvas, Size size) {
+    // Trail dots — older positions fade and shrink
+    final trailColor = accentColor ?? Colors.white;
+    for (var i = 0; i < trail.length && i < _maxTrailDots; i++) {
+      final t = 1.0 - (i / _maxTrailDots);
+      _trailPaint.color = trailColor.withValues(alpha: t * 0.15);
+      canvas.drawCircle(trail[i], dotSize * t * 0.4, _trailPaint);
+    }
+
     _ringPaint.color = Colors.white.withValues(alpha: 0.3);
     canvas.drawCircle(position, ringSize / 2, _ringPaint);
 

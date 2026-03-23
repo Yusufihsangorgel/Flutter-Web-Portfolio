@@ -99,7 +99,12 @@
       "github": "https://github.com/Yusufihsangorgel",
       "linkedin": "https://linkedin.com/in/yusuf-ihsan-görgel/",
       "bio": "I'm a Software Engineer with 4+ years of experience specializing in production-grade mobile applications. I focus on architecture, performance, and reliability — building cross-platform apps with Flutter and native iOS/Android capabilities with Swift and Kotlin. Currently working on FugaSoft, a cross-platform POS and sales management system at Uzman Adres.",
-      "medium": "developeryusufihsan"
+      "medium": "developeryusufihsan",
+      "subtitles": [
+        "Mobile Software Engineer",
+        "Flutter Developer",
+        "Clean Architecture Advocate"
+      ]
     },
     "experiences": [
       {

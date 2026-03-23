@@ -99,7 +99,12 @@
       "github": "https://github.com/Yusufihsangorgel",
       "linkedin": "https://linkedin.com/in/yusuf-ihsan-görgel/",
       "bio": "Soy Ingeniero de Software con más de 4 años de experiencia especializado en aplicaciones móviles de calidad producción. Me enfoco en arquitectura, rendimiento y fiabilidad — construyendo apps multiplataforma con Flutter y capacidades nativas iOS/Android con Swift y Kotlin. Actualmente trabajo en FugaSoft en Uzman Adres.",
-      "medium": "developeryusufihsan"
+      "medium": "developeryusufihsan",
+      "subtitles": [
+        "Ingeniero de Software Móvil",
+        "Desarrollador Flutter",
+        "Defensor de Clean Architecture"
+      ]
     },
     "experiences": [
       {

@@ -5,7 +5,6 @@ import 'package:flutter_web_portfolio/app/controllers/language_controller.dart';
 import 'package:flutter_web_portfolio/app/domain/providers/i_assets_provider.dart';
 import 'package:flutter_web_portfolio/app/domain/providers/i_local_storage_provider.dart';
 import 'package:flutter_web_portfolio/app/data/repositories/language_repository_impl.dart';
-import 'package:flutter_web_portfolio/app/domain/repositories/i_language_repository.dart';
 import 'package:flutter_web_portfolio/app/widgets/social_sidebar.dart';
 
 class _MockAssetsProvider implements IAssetsProvider {

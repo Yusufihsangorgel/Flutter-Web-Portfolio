@@ -118,6 +118,7 @@ class MyApp extends StatelessWidget {
         theme: activeTheme,
         darkTheme: AppTheme.dark,
         themeMode: activeThemeMode,
+        transitionDuration: const Duration(milliseconds: 400),
         locale: currentLocale,
         fallbackLocale: const Locale('en'),
         localizationsDelegates: [
