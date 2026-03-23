@@ -1,7 +1,10 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import 'package:flutter_web_portfolio/app/controllers/language_controller.dart';
+import 'package:flutter_web_portfolio/app/controllers/scene_director.dart';
 import 'package:flutter_web_portfolio/app/controllers/scroll_controller.dart';
 import 'package:flutter_web_portfolio/app/controllers/theme_controller.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
@@ -70,6 +73,7 @@ class _DotState extends State<_Dot> {
       final color = isActive
           ? AppColors.accent
           : (isDark ? AppColors.textSecondary : AppColors.lightTextSecondary);
+      final sceneProgress = Get.find<SceneDirector>().sceneProgress.value;
 
       return Padding(
         padding: const EdgeInsets.symmetric(vertical: 6),
@@ -83,24 +87,32 @@ class _DotState extends State<_Dot> {
             child: SizedBox(
               width: 20,
               height: 20,
-              child: Center(
-                child: AnimatedContainer(
-                  duration: _hovered ? AppDurations.microFast : AppDurations.medium,
-                  curve: Curves.easeOutCubic,
-                  width: _hovered && !isActive ? 6.0 : dotSize,
-                  height: _hovered && !isActive ? 6.0 : dotSize,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: color,
-                    boxShadow: isActive
-                        ? [
-                            BoxShadow(
-                              color: AppColors.accent.withValues(alpha: 0.5),
-                              blurRadius: 8,
-                              spreadRadius: 1,
-                            ),
-                          ]
-                        : null,
+              child: CustomPaint(
+                painter: isActive
+                    ? _ProgressArcPainter(
+                        progress: sceneProgress,
+                        color: AppColors.accent.withValues(alpha: 0.6),
+                      )
+                    : null,
+                child: Center(
+                  child: AnimatedContainer(
+                    duration: _hovered ? AppDurations.microFast : AppDurations.medium,
+                    curve: Curves.easeOutCubic,
+                    width: _hovered && !isActive ? 6.0 : dotSize,
+                    height: _hovered && !isActive ? 6.0 : dotSize,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: color,
+                      boxShadow: isActive
+                          ? [
+                              BoxShadow(
+                                color: AppColors.accent.withValues(alpha: 0.5),
+                                blurRadius: 8,
+                                spreadRadius: 1,
+                              ),
+                            ]
+                          : null,
+                    ),
                   ),
                 ),
               ),
@@ -110,4 +122,37 @@ class _DotState extends State<_Dot> {
       );
     });
   }
+}
+
+// ---------------------------------------------------------------------------
+// Arc painter — draws a progress arc around the active dot.
+// ---------------------------------------------------------------------------
+class _ProgressArcPainter extends CustomPainter {
+  _ProgressArcPainter({required this.progress, required this.color});
+
+  final double progress;
+  final Color color;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.5
+      ..strokeCap = StrokeCap.round;
+
+    final center = size.center(Offset.zero);
+    final radius = size.width / 2;
+    canvas.drawArc(
+      Rect.fromCircle(center: center, radius: radius),
+      -pi / 2, // Start from top
+      progress * 2 * pi, // Sweep angle
+      false,
+      paint,
+    );
+  }
+
+  @override
+  bool shouldRepaint(_ProgressArcPainter old) =>
+      progress != old.progress || color != old.color;
 }

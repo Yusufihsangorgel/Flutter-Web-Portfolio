@@ -162,6 +162,7 @@
       {
         "title": "FugaSoft (Software de Gestión POS)",
         "description": "Flutter front-end, SQLite-Drift, GetX, i18n, programación reactiva; tablet Android/iOS y escritorio (Linux, macOS, Windows)",
+        "category": "Mobile",
         "url": "https://fugasoft.com/",
         "case_study": {
           "problem": "Las empresas necesitaban un sistema unificado de POS y gestion de ventas que funcionara de manera confiable en tablets Android/iOS y plataformas de escritorio (Linux, macOS, Windows), gestionando inventario en mas de 50 ubicaciones minoristas con escaneo de codigos de barras y sincronizacion de datos sin conexion.",
@@ -172,6 +173,7 @@
       {
         "title": "Aydınlık E-Periódico",
         "description": "Flutter front-end, GetX, Dio, MVVM",
+        "category": "Mobile",
         "url": {
           "google_play": "https://play.google.com/store/apps/details?id=com.aydinlikgazetesi.egazete&hl=tr",
           "app_store": "https://apps.apple.com/us/app/ayd%C4%B1nl%C4%B1k-e-gazete/id1560103805"
@@ -185,6 +187,7 @@
       {
         "title": "Bilim ve Ütopya E-Revista",
         "description": "Flutter front-end, GetX, Dio, MVVM",
+        "category": "Mobile",
         "url": {
           "google_play": "https://play.google.com/store/apps/details?id=com.aydinlikgazetesi.edergi_v1_bvu",
           "app_store": "https://apps.apple.com/tr/app/bilim-ve-%C3%BCtopya-e-dergi/id6478221195"
@@ -198,6 +201,7 @@
       {
         "title": "Dorse App",
         "description": "Aplicación móvil y sitio web; Móvil: Flutter; Web: React; RESTful API, SOLID, integración Google/Apple Maps, WebSocket",
+        "category": "Web",
         "url": {
           "website": "https://dorseapp.com/",
           "google_play": "https://play.google.com/store/apps/details?id=com.juniustech.dorse",
@@ -408,6 +412,7 @@
   "projects_section": {
     "title": "Mis Proyectos",
     "description": "Proyectos principales y trabajos completados",
+    "filter_all": "Todos",
     "case_study_problem": "El Desafio",
     "case_study_solution": "El Enfoque",
     "case_study_result": "El Resultado",

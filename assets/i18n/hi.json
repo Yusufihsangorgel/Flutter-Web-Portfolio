@@ -132,6 +132,7 @@
       {
         "title": "FugaSoft (पॉस - बिक्री प्रबंधन सॉफ्टवेयर)",
         "description": "Flutter फ्रंट-एंड, SQLite-Drift, GetX, i18n, रिएक्टिव प्रोग्रामिंग; Android/iOS टैबलेट और डेस्कटॉप (Linux, macOS, Windows); मेंटर: Arge टीम लीड Abdüsselam Kösecik",
+        "category": "Mobile",
         "url": "https://fugasoft.com/",
         "image": "assets/images/fugasoft.png",
         "case_study": {
@@ -143,6 +144,7 @@
       {
         "title": "Aydınlık E-Newspaper",
         "description": "Flutter फ्रंट-एंड, GetX, Dio, MVVM; मेंटर: सीनियर Ferhat Balaban",
+        "category": "Mobile",
         "url": {
           "google_play": "https://play.google.com/store/apps/details?id=com.aydinlikgazetesi.egazete&hl=tr",
           "app_store": "https://apps.apple.com/us/app/ayd%C4%B1nl%C4%B1k-e-gazete/id1560103805"
@@ -157,6 +159,7 @@
       {
         "title": "Bilim ve Ütopya E-Magazine",
         "description": "Flutter फ्रंट-एंड, GetX, Dio, MVVM; मेंटर: सीनियर Ferhat Balaban",
+        "category": "Mobile",
         "url": {
           "google_play": "https://play.google.com/store/apps/details?id=com.aydinlikgazetesi.edergi_v1_bvu&pcampaignid=web_share",
           "app_store": "https://apps.apple.com/tr/app/bilim-ve-%C3%BCtopya-e-dergi/id6478221195"
@@ -171,6 +174,7 @@
       {
         "title": "Dorse App",
         "description": "मोबाइल एप्लिकेशन और वेबसाइट दोनों; मोबाइल: Flutter; वेब: HTML, CSS, JavaScript, React; उपयोग की गई तकनीकें: RESTful API, SOLID, Google और Apple Maps एकीकरण, WebSocket",
+        "category": "Web",
         "url": {
           "website": "https://dorseapp.com/",
           "google_play": "https://play.google.com/store/apps/details?id=com.juniustech.dorse",
@@ -397,6 +401,7 @@
   "projects_section": {
     "title": "मेरी परियोजनाएँ",
     "description": "प्रमुख परियोजनाएँ और पूर्ण किए गए कार्य",
+    "filter_all": "सभी",
     "case_study_problem": "चुनौती",
     "case_study_solution": "दृष्टिकोण",
     "case_study_result": "परिणाम",

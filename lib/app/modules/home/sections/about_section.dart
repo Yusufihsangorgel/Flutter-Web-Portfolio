@@ -11,6 +11,7 @@ import 'package:flutter_web_portfolio/app/core/constants/durations.dart';
 import 'package:flutter_web_portfolio/app/core/theme/app_typography.dart';
 import 'package:flutter_web_portfolio/app/utils/responsive_utils.dart';
 import 'package:flutter_web_portfolio/app/widgets/github_activity.dart';
+import 'package:flutter_web_portfolio/app/widgets/github_heatmap.dart';
 import 'package:flutter_web_portfolio/app/widgets/numbered_section_heading.dart';
 import 'package:flutter_web_portfolio/app/widgets/scroll_fade_in.dart';
 import 'package:flutter_web_portfolio/app/widgets/skill_bar_chart.dart';
@@ -63,6 +64,8 @@ class AboutSection extends StatelessWidget {
                 _buildDesktopLayout(data, languageController),
               // GitHub Activity
               const GitHubActivity(),
+              const SizedBox(height: 24),
+              const GitHubHeatmap(),
             ],
           ),
         ],

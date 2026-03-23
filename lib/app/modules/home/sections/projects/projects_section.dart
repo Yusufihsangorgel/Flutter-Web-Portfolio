@@ -16,9 +16,41 @@ import 'package:flutter_web_portfolio/app/widgets/scroll_fade_in.dart';
 import 'package:flutter_web_portfolio/app/widgets/text_scramble.dart';
 
 /// Projects Section — "The Showcase"
-/// Film strip layout with border-light cards.
-class ProjectsSection extends StatelessWidget {
+/// Film strip layout with border-light cards + category filter chips.
+class ProjectsSection extends StatefulWidget {
   const ProjectsSection({super.key});
+
+  @override
+  State<ProjectsSection> createState() => _ProjectsSectionState();
+}
+
+class _ProjectsSectionState extends State<ProjectsSection> {
+  String _selectedCategory = '';
+
+  /// Extract unique category values from the projects list.
+  List<String> _extractCategories(List<dynamic> projects) {
+    final categories = <String>{};
+    for (final project in projects) {
+      if (project case final Map<String, dynamic> p) {
+        final category = p['category'] as String?;
+        if (category != null && category.isNotEmpty) {
+          categories.add(category);
+        }
+      }
+    }
+    return categories.toList()..sort();
+  }
+
+  /// Filter projects by the selected category.
+  List<dynamic> _filterProjects(List<dynamic> projects) {
+    if (_selectedCategory.isEmpty) return projects;
+    return projects.where((project) {
+      if (project case final Map<String, dynamic> p) {
+        return p['category'] == _selectedCategory;
+      }
+      return false;
+    }).toList();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,6 +58,8 @@ class ProjectsSection extends StatelessWidget {
     final isMobile = ResponsiveUtils.isMobile(context);
     final screenWidth = MediaQuery.sizeOf(context).width;
     final projectsData = languageController.cvData['projects'] as List? ?? [];
+    final categories = _extractCategories(projectsData);
+    final filteredProjects = _filterProjects(projectsData);
 
     return SizedBox(
       width: double.infinity,
@@ -67,25 +101,131 @@ class ProjectsSection extends StatelessWidget {
                   );
                 }),
               ),
-              const SizedBox(height: 40),
-              // Featured projects — full width, alternating
-              for (int i = 0; i < projectsData.length; i++) ...[
+              const SizedBox(height: 24),
+              // Category filter chips
+              if (categories.isNotEmpty)
                 ScrollFadeIn(
-                  delay: Duration(milliseconds: i * AppDurations.staggerShort.inMilliseconds),
-                  child: _ProjectCard(
-                    project: projectsData[i] as Map<String, dynamic>,
-                    isReversed: !isMobile && i.isOdd,
-                    isMobile: isMobile,
-                  ),
+                  child: Obx(() {
+                    final accent = Get.find<SceneDirector>().currentAccent.value;
+                    final filterAllLabel = languageController.getText(
+                      'projects_section.filter_all',
+                      defaultValue: 'All',
+                    );
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 16),
+                      child: Wrap(
+                        spacing: 10,
+                        runSpacing: 8,
+                        children: [
+                          _CategoryChip(
+                            label: filterAllLabel,
+                            isSelected: _selectedCategory.isEmpty,
+                            accent: accent,
+                            onTap: () => setState(() => _selectedCategory = ''),
+                          ),
+                          for (final category in categories)
+                            _CategoryChip(
+                              label: category,
+                              isSelected: _selectedCategory == category,
+                              accent: accent,
+                              onTap: () => setState(() => _selectedCategory = category),
+                            ),
+                        ],
+                      ),
+                    );
+                  }),
                 ),
-                if (i < projectsData.length - 1) const SizedBox(height: 32),
-              ],
+              const SizedBox(height: 16),
+              // Featured projects — full width, alternating
+              AnimatedSwitcher(
+                duration: AppDurations.medium,
+                switchInCurve: Curves.easeOut,
+                switchOutCurve: Curves.easeIn,
+                child: Column(
+                  key: ValueKey<String>(_selectedCategory),
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    for (int i = 0; i < filteredProjects.length; i++) ...[
+                      ScrollFadeIn(
+                        delay: Duration(milliseconds: i * AppDurations.staggerShort.inMilliseconds),
+                        child: _ProjectCard(
+                          project: filteredProjects[i] as Map<String, dynamic>,
+                          isReversed: !isMobile && i.isOdd,
+                          isMobile: isMobile,
+                        ),
+                      ),
+                      if (i < filteredProjects.length - 1) const SizedBox(height: 32),
+                    ],
+                  ],
+                ),
+              ),
             ],
           ),
         ],
       ),
     );
   }
+}
+
+/// Category filter chip with accent color highlight.
+class _CategoryChip extends StatefulWidget {
+  const _CategoryChip({
+    required this.label,
+    required this.isSelected,
+    required this.accent,
+    required this.onTap,
+  });
+
+  final String label;
+  final bool isSelected;
+  final Color accent;
+  final VoidCallback onTap;
+
+  @override
+  State<_CategoryChip> createState() => _CategoryChipState();
+}
+
+class _CategoryChipState extends State<_CategoryChip> {
+  bool _hovered = false;
+
+  @override
+  Widget build(BuildContext context) => MouseRegion(
+    cursor: SystemMouseCursors.click,
+    onEnter: (_) => setState(() => _hovered = true),
+    onExit: (_) => setState(() => _hovered = false),
+    child: GestureDetector(
+      onTap: widget.onTap,
+      child: AnimatedContainer(
+        duration: AppDurations.fast,
+        curve: Curves.easeOut,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        decoration: BoxDecoration(
+          color: widget.isSelected
+              ? widget.accent.withValues(alpha: 0.15)
+              : _hovered
+                  ? widget.accent.withValues(alpha: 0.06)
+                  : Colors.transparent,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: widget.isSelected
+                ? widget.accent
+                : _hovered
+                    ? widget.accent.withValues(alpha: 0.4)
+                    : AppColors.textSecondary.withValues(alpha: 0.3),
+            width: widget.isSelected ? 1.5 : 1,
+          ),
+        ),
+        child: Text(
+          widget.label,
+          style: GoogleFonts.jetBrainsMono(
+            fontSize: 13,
+            fontWeight: widget.isSelected ? FontWeight.w600 : FontWeight.w400,
+            color: widget.isSelected ? widget.accent : AppColors.textPrimary,
+          ),
+        ),
+      ),
+    ),
+  );
 }
 
 // Project card — film strip style with border light + scale on hover

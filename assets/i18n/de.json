@@ -132,6 +132,7 @@
       {
         "title": "FugaSoft (Pos - Verkaufsmanagementsoftware)",
         "description": "Flutter Frontend, SQLite-Drift, GetX, i18n, reaktive Programmierung; Android/iOS-Tablet und Desktop (Linux, macOS, Windows); Mentor: Arge Team Lead Abdüsselam Kösecik",
+        "category": "Mobile",
         "url": "https://fugasoft.com/",
         "image": "assets/images/fugasoft.png",
         "case_study": {
@@ -143,6 +144,7 @@
       {
         "title": "Aydınlık E-Newspaper",
         "description": "Flutter Frontend, GetX, Dio, MVVM; Mentor: Senior Ferhat Balaban",
+        "category": "Mobile",
         "url": {
           "google_play": "https://play.google.com/store/apps/details?id=com.aydinlikgazetesi.egazete&hl=tr",
           "app_store": "https://apps.apple.com/us/app/ayd%C4%B1nl%C4%B1k-e-gazete/id1560103805"
@@ -157,6 +159,7 @@
       {
         "title": "Bilim ve Ütopya E-Magazine",
         "description": "Flutter Frontend, GetX, Dio, MVVM; Mentor: Senior Ferhat Balaban",
+        "category": "Mobile",
         "url": {
           "google_play": "https://play.google.com/store/apps/details?id=com.aydinlikgazetesi.edergi_v1_bvu&pcampaignid=web_share",
           "app_store": "https://apps.apple.com/tr/app/bilim-ve-%C3%BCtopya-e-dergi/id6478221195"
@@ -171,6 +174,7 @@
       {
         "title": "Dorse App",
         "description": "Sowohl mobile Anwendung als auch Website; Mobil: Flutter; Web: HTML, CSS, JavaScript, React; Verwendete Technologien: RESTful API, SOLID, Google und Apple Maps Integration, WebSocket",
+        "category": "Web",
         "url": {
           "website": "https://dorseapp.com/",
           "google_play": "https://play.google.com/store/apps/details?id=com.juniustech.dorse",
@@ -390,6 +394,7 @@
   "projects_section": {
     "title": "Meine Projekte",
     "description": "Wichtige Projekte und abgeschlossene Arbeiten",
+    "filter_all": "Alle",
     "case_study_problem": "Die Herausforderung",
     "case_study_solution": "Der Ansatz",
     "case_study_result": "Das Ergebnis",
