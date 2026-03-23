@@ -20,12 +20,30 @@
   },
   "navigation": {
     "items": [
-      { "id": "home", "title": "Home" },
-      { "id": "about", "title": "About" },
-      { "id": "experience", "title": "Experience" },
-      { "id": "projects", "title": "Projects" },
-      { "id": "skills", "title": "Skills" },
-      { "id": "contact", "title": "Contact" }
+      {
+        "id": "home",
+        "title": "Home"
+      },
+      {
+        "id": "about",
+        "title": "About"
+      },
+      {
+        "id": "experience",
+        "title": "Experience"
+      },
+      {
+        "id": "projects",
+        "title": "Projects"
+      },
+      {
+        "id": "skills",
+        "title": "Skills"
+      },
+      {
+        "id": "contact",
+        "title": "Contact"
+      }
     ]
   },
   "translations": {
@@ -92,7 +110,14 @@
         "end_date": "Present",
         "period": "March 2022 – Present",
         "description": "Building FugaSoft — a cross-platform POS and sales management system\nDeveloped complex SQL architectures with SQLite-Drift local database\nImplemented reactive programming with Mediator Pattern and GetX state management\nDeployed across Android/iOS tablets and desktop platforms (Linux, macOS, Windows)\nIntegrated socket technology for real-time data sync and barcode scanning systems",
-        "technologies": ["Flutter", "Dart", "SQLite-Drift", "GetX", "WebSocket", "i18n"]
+        "technologies": [
+          "Flutter",
+          "Dart",
+          "SQLite-Drift",
+          "GetX",
+          "WebSocket",
+          "i18n"
+        ]
       },
       {
         "title": "Full Stack Developer",
@@ -102,7 +127,14 @@
         "end_date": "Feb 2025",
         "period": "June 2023 – February 2025",
         "description": "Led mobile development team on Dorse — a logistics tracking application\nBuilt Flutter apps deployed across Android, iOS, and web platforms\nImplemented WebSocket-based real-time vehicle tracking with Google/Apple Maps\nCoordinated frontend, backend, and QA workflows as Mobile Team Lead",
-        "technologies": ["Flutter", "React", "Node.js", "WebSocket", "REST API", "Maps SDK"]
+        "technologies": [
+          "Flutter",
+          "React",
+          "Node.js",
+          "WebSocket",
+          "REST API",
+          "Maps SDK"
+        ]
       },
       {
         "title": "Flutter Developer",
@@ -112,7 +144,13 @@
         "end_date": "Jun 2024",
         "period": "October 2022 – June 2024",
         "description": "Developed Aydınlık E-Newspaper and Bilim ve Ütopya E-Magazine mobile applications\nImplemented MVVM architecture with GetX and Dio for API integration\nPublished to both Google Play and App Store",
-        "technologies": ["Flutter", "Dart", "GetX", "Dio", "MVVM"]
+        "technologies": [
+          "Flutter",
+          "Dart",
+          "GetX",
+          "Dio",
+          "MVVM"
+        ]
       }
     ],
     "projects": [
@@ -185,19 +223,47 @@
     "skills": [
       {
         "category": "Mobile",
-        "items": ["Flutter", "Dart", "Swift", "SwiftUI", "GetX", "BLoC", "Provider"]
+        "items": [
+          "Flutter",
+          "Dart",
+          "Swift",
+          "SwiftUI",
+          "GetX",
+          "BLoC",
+          "Provider"
+        ]
       },
       {
         "category": "Backend",
-        "items": ["Node.js", "Express.js", "Go", "Spring Boot", "MongoDB", "MSSQL", "SQLite"]
+        "items": [
+          "Node.js",
+          "Express.js",
+          "Go",
+          "Spring Boot",
+          "MongoDB",
+          "MSSQL",
+          "SQLite"
+        ]
       },
       {
         "category": "Frontend",
-        "items": ["React", "JavaScript", "TypeScript", "HTML", "CSS"]
+        "items": [
+          "React",
+          "JavaScript",
+          "TypeScript",
+          "HTML",
+          "CSS"
+        ]
       },
       {
         "category": "DevOps",
-        "items": ["AWS", "Docker", "Git", "CI/CD", "Firebase"]
+        "items": [
+          "AWS",
+          "Docker",
+          "Git",
+          "CI/CD",
+          "Firebase"
+        ]
       }
     ],
     "languages": [
@@ -346,7 +412,8 @@
     "contact": "Contact"
   },
   "experience_section": {
-    "title": "Where I've Worked"
+    "title": "Where I've Worked",
+    "present": "Present"
   },
   "contact_section": {
     "title": "Get In Touch",
@@ -367,7 +434,12 @@
   },
   "blog_section": {
     "title": "Blog",
-    "subtitle": "Technical deep dives, architecture decisions, and lessons from shipping production Flutter apps"
+    "subtitle": "Technical deep dives, architecture decisions, and lessons from shipping production Flutter apps",
+    "empty": "No blog posts yet",
+    "read_on_medium": "Read on Medium",
+    "follow_on_medium": "Follow on Medium",
+    "error": "Could not load blog posts",
+    "retry": "Retry"
   },
   "testimonials_section": {
     "title": "What People Say",
@@ -381,5 +453,10 @@
     "view_source": "View Source",
     "command_hint_prefix": "Press",
     "command_hint_suffix": "to open command palette"
+  },
+  "sidebar": {
+    "github": "GitHub",
+    "linkedin": "LinkedIn",
+    "email": "Email"
   }
 }

@@ -45,19 +45,19 @@ class SocialSidebarLeft extends StatelessWidget {
               if (github.isNotEmpty)
                 _SidebarIcon(
                   icon: Icons.code_rounded,
-                  tooltip: 'GitHub',
+                  tooltip: languageController.getText('sidebar.github', defaultValue: 'GitHub'),
                   url: github,
                 ),
               if (linkedin.isNotEmpty)
                 _SidebarIcon(
                   icon: Icons.business_center_outlined,
-                  tooltip: 'LinkedIn',
+                  tooltip: languageController.getText('sidebar.linkedin', defaultValue: 'LinkedIn'),
                   url: linkedin,
                 ),
               if (email.isNotEmpty)
                 _SidebarIcon(
                   icon: Icons.email_outlined,
-                  tooltip: 'Email',
+                  tooltip: languageController.getText('sidebar.email', defaultValue: 'Email'),
                   url: 'mailto:$email',
                 ),
               const SizedBox(height: 12),

@@ -6,7 +6,8 @@
     "background_color": "#00101F",
     "theme_color": "#00A3FF",
     "description": "Interactive Flutter Web portfolio with cosmic theme, orbital skill visualization, and clean architecture.",
-    "orientation": "portrait-primary",
+    "orientation": "any",
+    "categories": ["portfolio", "productivity"],
     "prefer_related_applications": false,
     "icons": [
         {

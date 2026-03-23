@@ -9,6 +9,9 @@ import 'package:flutter_web_portfolio/app/core/constants/scene_configs.dart';
 // ---------------------------------------------------------------------------
 // Spatial grid for O(n) neighbour lookups
 // ---------------------------------------------------------------------------
+// Spatial grid and particle system are decorative — excluded from semantics
+// at widget level (see ConstellationParticles.build).
+
 class _SpatialGrid {
   _SpatialGrid(this.cellSize);
   final double cellSize;
@@ -198,7 +201,8 @@ class _ConstellationParticlesState extends State<ConstellationParticles>
   }
 
   @override
-  Widget build(BuildContext context) => MouseRegion(
+  Widget build(BuildContext context) => ExcludeSemantics(
+    child: MouseRegion(
       onHover: (e) {
         _mousePos = e.localPosition;
         _mouseInside = true;
@@ -230,6 +234,7 @@ class _ConstellationParticlesState extends State<ConstellationParticles>
           ),
         ),
       ),
+    ),
     );
 }
 

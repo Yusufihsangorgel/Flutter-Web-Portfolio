@@ -21,7 +21,7 @@ class GitHubProvider {
       final response = await http.get(
         Uri.parse('$_baseUrl/users/$username'),
         headers: const {'Accept': 'application/vnd.github.v3+json'},
-      );
+      ).timeout(const Duration(seconds: 10));
 
       if (response.statusCode == 200) {
         _profileCache[username] =
@@ -43,7 +43,7 @@ class GitHubProvider {
       final response = await http.get(
         Uri.parse('$_baseUrl/users/$username/repos?sort=updated&per_page=5'),
         headers: const {'Accept': 'application/vnd.github.v3+json'},
-      );
+      ).timeout(const Duration(seconds: 10));
 
       if (response.statusCode == 200) {
         final list = json.decode(response.body) as List;
@@ -65,7 +65,7 @@ class GitHubProvider {
       final response = await http.get(
         Uri.parse('$_baseUrl/users/$username/repos?per_page=100'),
         headers: const {'Accept': 'application/vnd.github.v3+json'},
-      );
+      ).timeout(const Duration(seconds: 10));
 
       if (response.statusCode == 200) {
         final repos = json.decode(response.body) as List;

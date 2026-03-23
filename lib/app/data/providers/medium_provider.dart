@@ -18,7 +18,8 @@ class MediumProvider {
     final apiUrl = '$_rss2jsonBase${Uri.encodeComponent(feedUrl)}';
 
     try {
-      final response = await http.get(Uri.parse(apiUrl));
+      final response = await http.get(Uri.parse(apiUrl))
+          .timeout(const Duration(seconds: 10));
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body) as Map<String, dynamic>;
         if (data['status'] != 'ok') return [];

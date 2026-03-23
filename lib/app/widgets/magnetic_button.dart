@@ -54,7 +54,9 @@ class _MagneticButtonState extends State<MagneticButton> {
   Widget build(BuildContext context) {
     final cursorCtrl = Get.find<CursorController>();
 
-    return LayoutBuilder(
+    return Semantics(
+      button: true,
+      child: LayoutBuilder(
       builder: (context, constraints) {
         _cachedSize = Size(constraints.maxWidth, constraints.maxHeight);
 
@@ -94,6 +96,7 @@ class _MagneticButtonState extends State<MagneticButton> {
           ),
         );
       },
+    ),
     );
   }
 }

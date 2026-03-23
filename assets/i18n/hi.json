@@ -18,13 +18,34 @@
   },
   "navigation": {
     "items": [
-      { "id": "home", "title": "होम" },
-      { "id": "about", "title": "परिचय" },
-      { "id": "experience", "title": "अनुभव" },
-      { "id": "projects", "title": "प्रोजेक्ट्स" },
-      { "id": "skills", "title": "कौशल" },
-      { "id": "references", "title": "संदर्भ" },
-      { "id": "contact", "title": "संपर्क" }
+      {
+        "id": "home",
+        "title": "होम"
+      },
+      {
+        "id": "about",
+        "title": "परिचय"
+      },
+      {
+        "id": "experience",
+        "title": "अनुभव"
+      },
+      {
+        "id": "projects",
+        "title": "प्रोजेक्ट्स"
+      },
+      {
+        "id": "skills",
+        "title": "कौशल"
+      },
+      {
+        "id": "references",
+        "title": "संदर्भ"
+      },
+      {
+        "id": "contact",
+        "title": "संपर्क"
+      }
     ]
   },
   "translations": {
@@ -186,15 +207,28 @@
       },
       {
         "category": "बैकएंड",
-        "items": ["Node.js", "Express.js", "MongoDB", "SQLite", "MSSQL"]
+        "items": [
+          "Node.js",
+          "Express.js",
+          "MongoDB",
+          "SQLite",
+          "MSSQL"
+        ]
       },
       {
         "category": "फ्रंटएंड",
-        "items": ["HTML", "CSS", "JavaScript", "React"]
+        "items": [
+          "HTML",
+          "CSS",
+          "JavaScript",
+          "React"
+        ]
       },
       {
         "category": "DevOps",
-        "items": ["AWS"]
+        "items": [
+          "AWS"
+        ]
       }
     ],
     "references": [
@@ -352,7 +386,8 @@
     "contact": "संपर्क"
   },
   "experience_section": {
-    "title": "मैंने कहाँ काम किया"
+    "title": "मैंने कहाँ काम किया",
+    "present": "वर्तमान"
   },
   "projects_section": {
     "title": "मेरी परियोजनाएँ",
@@ -360,7 +395,10 @@
     "case_study_problem": "चुनौती",
     "case_study_solution": "दृष्टिकोण",
     "case_study_result": "परिणाम",
-    "links": "लिंक"
+    "links": "लिंक",
+    "untitled_project": "शीर्षकहीन प्रोजेक्ट",
+    "technologies": "प्रौद्योगिकियाँ",
+    "open_project": "प्रोजेक्ट खोलें"
   },
   "contact_section": {
     "title": "संपर्क करें",
@@ -381,7 +419,12 @@
   },
   "blog_section": {
     "title": "ब्लॉग",
-    "subtitle": "गहन तकनीकी विश्लेषण, आर्किटेक्चर निर्णय, और प्रोडक्शन Flutter ऐप्स डिप्लॉय करने से सीखे गए अनुभव"
+    "subtitle": "गहन तकनीकी विश्लेषण, आर्किटेक्चर निर्णय, और प्रोडक्शन Flutter ऐप्स डिप्लॉय करने से सीखे गए अनुभव",
+    "empty": "अभी कोई ब्लॉग पोस्ट नहीं",
+    "read_on_medium": "Medium पर पढ़ें",
+    "follow_on_medium": "Medium पर फ़ॉलो करें",
+    "error": "ब्लॉग पोस्ट लोड नहीं हो सके",
+    "retry": "पुनः प्रयास करें"
   },
   "testimonials_section": {
     "title": "प्रशंसापत्र",
@@ -395,5 +438,10 @@
     "view_source": "स्रोत कोड देखें",
     "command_hint_prefix": "दबाएं",
     "command_hint_suffix": "कमांड पैलेट खोलने के लिए"
+  },
+  "sidebar": {
+    "github": "GitHub",
+    "linkedin": "LinkedIn",
+    "email": "ईमेल"
   }
 }

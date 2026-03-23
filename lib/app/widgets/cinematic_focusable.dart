@@ -34,7 +34,9 @@ class _CinematicFocusableState extends State<CinematicFocusable> {
 
   @override
   Widget build(BuildContext context) {
-    final focusColor = widget.focusColor ?? Colors.white.withValues(alpha: 0.4);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final focusColor = widget.focusColor ??
+        (isDark ? Colors.white : Colors.black).withValues(alpha: 0.4);
 
     return FocusableActionDetector(
       mouseCursor: widget.cursor,

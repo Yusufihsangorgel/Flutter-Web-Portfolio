@@ -18,13 +18,34 @@
   },
   "navigation": {
     "items": [
-      { "id": "home", "title": "Startseite" },
-      { "id": "about", "title": "Über mich" },
-      { "id": "experience", "title": "Erfahrung" },
-      { "id": "projects", "title": "Projekte" },
-      { "id": "skills", "title": "Fähigkeiten" },
-      { "id": "references", "title": "Referenzen" },
-      { "id": "contact", "title": "Kontakt" }
+      {
+        "id": "home",
+        "title": "Startseite"
+      },
+      {
+        "id": "about",
+        "title": "Über mich"
+      },
+      {
+        "id": "experience",
+        "title": "Erfahrung"
+      },
+      {
+        "id": "projects",
+        "title": "Projekte"
+      },
+      {
+        "id": "skills",
+        "title": "Fähigkeiten"
+      },
+      {
+        "id": "references",
+        "title": "Referenzen"
+      },
+      {
+        "id": "contact",
+        "title": "Kontakt"
+      }
     ]
   },
   "translations": {
@@ -172,19 +193,35 @@
     "skills": [
       {
         "category": "Mobile",
-        "items": ["Flutter", "Swift"]
+        "items": [
+          "Flutter",
+          "Swift"
+        ]
       },
       {
         "category": "Backend",
-        "items": ["Node.js", "Express.js", "MongoDB", "SQLite", "MSSQL"]
+        "items": [
+          "Node.js",
+          "Express.js",
+          "MongoDB",
+          "SQLite",
+          "MSSQL"
+        ]
       },
       {
         "category": "Frontend",
-        "items": ["HTML", "CSS", "JavaScript", "React"]
+        "items": [
+          "HTML",
+          "CSS",
+          "JavaScript",
+          "React"
+        ]
       },
       {
         "category": "DevOps",
-        "items": ["AWS"]
+        "items": [
+          "AWS"
+        ]
       }
     ],
     "references": [
@@ -342,7 +379,8 @@
     "contact": "Kontakt"
   },
   "experience_section": {
-    "title": "Wo ich gearbeitet habe"
+    "title": "Wo ich gearbeitet habe",
+    "present": "Aktuell"
   },
   "projects_section": {
     "title": "Meine Projekte",
@@ -350,7 +388,10 @@
     "case_study_problem": "Die Herausforderung",
     "case_study_solution": "Der Ansatz",
     "case_study_result": "Das Ergebnis",
-    "links": "Links"
+    "links": "Links",
+    "untitled_project": "Unbenanntes Projekt",
+    "technologies": "Technologien",
+    "open_project": "Projekt öffnen"
   },
   "contact_section": {
     "title": "Kontakt aufnehmen",
@@ -371,7 +412,12 @@
   },
   "blog_section": {
     "title": "Blog",
-    "subtitle": "Technische Tiefenanalysen, Architekturentscheidungen und Erfahrungen aus dem Versand von Flutter-Produktions-Apps"
+    "subtitle": "Technische Tiefenanalysen, Architekturentscheidungen und Erfahrungen aus dem Versand von Flutter-Produktions-Apps",
+    "empty": "Noch keine Blogbeiträge",
+    "read_on_medium": "Auf Medium lesen",
+    "follow_on_medium": "Auf Medium folgen",
+    "error": "Blogbeiträge konnten nicht geladen werden",
+    "retry": "Erneut versuchen"
   },
   "testimonials_section": {
     "title": "Referenzen",
@@ -385,5 +431,10 @@
     "view_source": "Quellcode anzeigen",
     "command_hint_prefix": "Drücken Sie",
     "command_hint_suffix": "um die Befehlspalette zu öffnen"
+  },
+  "sidebar": {
+    "github": "GitHub",
+    "linkedin": "LinkedIn",
+    "email": "E-Mail"
   }
 }

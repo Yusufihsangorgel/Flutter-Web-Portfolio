@@ -364,7 +364,8 @@ class _ExperienceDetail extends StatelessWidget {
     final position = (exp['position'] as String?) ?? '';
     final company = (exp['company'] as String?) ?? '';
     final startDate = (exp['start_date'] as String?) ?? '';
-    final endDate = (exp['end_date'] as String?) ?? 'Present';
+    final endDate = (exp['end_date'] as String?) ??
+        languageController.getText('experience_section.present', defaultValue: 'Present');
     final description = (exp['description'] as String?) ?? '';
 
     final bullets = description.toString().split('\n')

@@ -97,7 +97,8 @@ class _CinematicBackgroundState extends State<CinematicBackground>
   }
 
   @override
-  Widget build(BuildContext context) => Listener(
+  Widget build(BuildContext context) => ExcludeSemantics(
+    child: Listener(
       onPointerHover: _onMouseMove,
       onPointerMove: _onMouseMove,
       behavior: HitTestBehavior.translucent,
@@ -121,6 +122,7 @@ class _CinematicBackgroundState extends State<CinematicBackground>
           },
         ),
       ),
+    ),
     );
 }
 

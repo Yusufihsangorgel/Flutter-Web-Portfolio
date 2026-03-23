@@ -28,7 +28,10 @@ class _CinematicButtonState extends State<CinematicButton> {
   bool _pressed = false;
 
   @override
-  Widget build(BuildContext context) => GestureDetector(
+  Widget build(BuildContext context) => Semantics(
+    button: true,
+    label: widget.label,
+    child: GestureDetector(
     onTapDown: (_) => setState(() => _pressed = true),
     onTapUp: (_) => setState(() => _pressed = false),
     onTapCancel: () => setState(() => _pressed = false),
@@ -93,5 +96,6 @@ class _CinematicButtonState extends State<CinematicButton> {
         ),
       ),
     ),
+  ),
   );
 }

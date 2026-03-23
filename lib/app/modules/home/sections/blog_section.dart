@@ -28,6 +28,7 @@ class BlogSection extends StatefulWidget {
 class _BlogSectionState extends State<BlogSection> {
   List<MediumPost>? _posts;
   bool _loading = true;
+  bool _error = false;
 
   @override
   void initState() {
@@ -46,13 +47,22 @@ class _BlogSectionState extends State<BlogSection> {
       return;
     }
 
-    final provider = Get.find<MediumProvider>();
-    final posts = await provider.fetchPosts(username);
-    if (mounted) {
-      setState(() {
-        _posts = posts;
-        _loading = false;
-      });
+    try {
+      final provider = Get.find<MediumProvider>();
+      final posts = await provider.fetchPosts(username);
+      if (mounted) {
+        setState(() {
+          _posts = posts;
+          _loading = false;
+        });
+      }
+    } catch (_) {
+      if (mounted) {
+        setState(() {
+          _loading = false;
+          _error = true;
+        });
+      }
     }
   }
 
@@ -119,6 +129,11 @@ class _BlogSectionState extends State<BlogSection> {
                 const SizedBox(height: 40),
                 if (_loading)
                   _BlogShimmerGrid()
+                else if (_error)
+                  _ErrorState(onRetry: () {
+                    setState(() { _loading = true; _error = false; });
+                    _fetchPosts();
+                  })
                 else if (_posts == null || _posts!.isEmpty)
                   _EmptyState()
                 else ...[
@@ -220,6 +235,7 @@ class _EmptyState extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Obx(() {
       final accent = Get.find<SceneDirector>().currentAccent.value;
+      final lang = Get.find<LanguageController>();
       return Center(
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 40),
@@ -229,9 +245,48 @@ class _EmptyState extends StatelessWidget {
                   size: 48, color: accent.withValues(alpha: 0.4)),
               const SizedBox(height: 16),
               Text(
-                'No blog posts yet',
+                lang.getText('blog_section.empty', defaultValue: 'No blog posts yet'),
                 style: AppTypography.body.copyWith(
                   color: AppColors.textSecondary,
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    });
+}
+
+/// Error state with retry button.
+class _ErrorState extends StatelessWidget {
+  const _ErrorState({required this.onRetry});
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) => Obx(() {
+      final accent = Get.find<SceneDirector>().currentAccent.value;
+      final lang = Get.find<LanguageController>();
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 40),
+          child: Column(
+            children: [
+              Icon(Icons.cloud_off_rounded,
+                  size: 48, color: accent.withValues(alpha: 0.4)),
+              const SizedBox(height: 16),
+              Text(
+                lang.getText('blog_section.error', defaultValue: 'Could not load blog posts'),
+                style: AppTypography.body.copyWith(
+                  color: AppColors.textSecondary,
+                ),
+              ),
+              const SizedBox(height: 16),
+              TextButton.icon(
+                onPressed: onRetry,
+                icon: Icon(Icons.refresh_rounded, size: 16, color: accent),
+                label: Text(
+                  lang.getText('blog_section.retry', defaultValue: 'Retry'),
+                  style: AppTypography.bodySmall.copyWith(color: accent),
                 ),
               ),
             ],
@@ -406,7 +461,7 @@ class _MediumBadge extends StatelessWidget {
             size: 14, color: accent.withValues(alpha: 0.7)),
         const SizedBox(width: 4),
         Text(
-          'Read on Medium',
+          Get.find<LanguageController>().getText('blog_section.read_on_medium', defaultValue: 'Read on Medium'),
           style: AppTypography.caption.copyWith(
             color: accent.withValues(alpha: 0.7),
             fontSize: 10,
@@ -458,7 +513,7 @@ class _FollowOnMediumLink extends StatelessWidget {
                     size: 18, color: accent),
                 const SizedBox(width: 8),
                 Text(
-                  'Follow on Medium',
+                  languageController.getText('blog_section.follow_on_medium', defaultValue: 'Follow on Medium'),
                   style: AppTypography.bodySmall.copyWith(
                     color: accent,
                     fontWeight: FontWeight.w600,
