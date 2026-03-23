@@ -416,11 +416,11 @@ class _CloseButtonState extends State<_CloseButton> {
           height: 40,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: _hovered
-                ? Colors.white.withValues(alpha: 0.1)
-                : Colors.white.withValues(alpha: 0.04),
+            color: (Theme.of(context).brightness == Brightness.dark
+                ? Colors.white : Colors.black).withValues(alpha: _hovered ? 0.1 : 0.04),
             border: Border.all(
-              color: Colors.white.withValues(alpha: _hovered ? 0.2 : 0.08),
+              color: (Theme.of(context).brightness == Brightness.dark
+                  ? Colors.white : Colors.black).withValues(alpha: _hovered ? 0.2 : 0.08),
             ),
           ),
           child: Icon(

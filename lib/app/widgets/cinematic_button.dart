@@ -69,7 +69,8 @@ class _CinematicButtonState extends State<CinematicButton> {
                   )
                 : BoxDecoration(
                     color: _hovered
-                        ? Colors.white.withValues(alpha: 0.05)
+                        ? (Theme.of(context).brightness == Brightness.dark
+                            ? Colors.white : Colors.black).withValues(alpha: 0.05)
                         : Colors.transparent,
                     border: Border.all(
                       color: Theme.of(context).brightness == Brightness.dark

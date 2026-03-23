@@ -206,10 +206,12 @@ class _CommandPaletteHint extends StatelessWidget {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
           decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.05),
+            color: (Theme.of(context).brightness == Brightness.dark
+                ? Colors.white : Colors.black).withValues(alpha: 0.05),
             borderRadius: BorderRadius.circular(3),
             border: Border.all(
-              color: Colors.white.withValues(alpha: 0.1),
+              color: (Theme.of(context).brightness == Brightness.dark
+                  ? Colors.white : Colors.black).withValues(alpha: 0.1),
             ),
           ),
           child: Text(

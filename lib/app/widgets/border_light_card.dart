@@ -72,7 +72,8 @@ class _BorderLightCardState extends State<BorderLightCard> {
                   AppColors.backgroundLight.withValues(alpha: 0.5),
               borderRadius: BorderRadius.circular(widget.borderRadius),
               border: Border.all(
-                color: Colors.white.withValues(alpha: 0.05),
+                color: (Theme.of(context).brightness == Brightness.dark
+                    ? Colors.white : Colors.black).withValues(alpha: 0.05),
                 width: 1,
               ),
             ),
