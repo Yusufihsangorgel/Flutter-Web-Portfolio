@@ -109,7 +109,12 @@
       "github": "https://github.com/Yusufihsangorgel",
       "linkedin": "https://linkedin.com/in/yusuf-ihsan-görgel/",
       "bio": "4+ yıllık deneyime sahip, production-grade mobil uygulamalar geliştirmeye odaklanan bir Yazılım Mühendisiyim. Mimari, performans ve güvenilirlik odaklı çalışıyorum — Flutter ile cross-platform, Swift ve Kotlin ile native iOS/Android uygulamalar geliştiriyorum. Şu anda Uzman Adres'te FugaSoft üzerinde çalışıyorum.",
-      "medium": "developeryusufihsan"
+      "medium": "developeryusufihsan",
+      "subtitles": [
+        "Mobil Yazılım Mühendisi",
+        "Flutter Geliştirici",
+        "Temiz Mimari Savunucusu"
+      ]
     },
     "experiences": [
       {
