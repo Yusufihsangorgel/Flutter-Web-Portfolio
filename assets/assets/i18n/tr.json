@@ -172,6 +172,7 @@
       {
         "title": "FugaSoft (Pos - Sales Management Software)",
         "description": "Flutter front-end, SQLite-Drift, GetX, i18n, reaktif programlama; Android/iOS tablet ve masaüstü (Linux, macOS, Windows); Mentor: Arge Team Lead Abdüsselam Kösecik",
+        "category": "Mobile",
         "url": "https://fugasoft.com/",
         "image": "assets/images/fugasoft.png",
         "case_study": {
@@ -183,6 +184,7 @@
       {
         "title": "Aydınlık E-Newspaper",
         "description": "Flutter front-end, GetX, Dio, MVVM; Mentor: Senior Ferhat Balaban",
+        "category": "Mobile",
         "url": {
           "google_play": "https://play.google.com/store/apps/details?id=com.aydinlikgazetesi.egazete&hl=tr",
           "app_store": "https://apps.apple.com/us/app/ayd%C4%B1nl%C4%B1k-e-gazete/id1560103805"
@@ -197,6 +199,7 @@
       {
         "title": "Bilim ve Ütopya E-Magazine",
         "description": "Flutter front-end, GetX, Dio, MVVM; Mentor: Senior Ferhat Balaban",
+        "category": "Mobile",
         "url": {
           "google_play": "https://play.google.com/store/apps/details?id=com.aydinlikgazetesi.edergi_v1_bvu&pcampaignid=web_share",
           "app_store": "https://apps.apple.com/tr/app/bilim-ve-%C3%BCtopya-e-dergi/id6478221195"
@@ -211,6 +214,7 @@
       {
         "title": "Dorse App",
         "description": "Hem mobil uygulama hem de web sitesi; Mobil: Flutter; Web: HTML, CSS, JavaScript, React; Kullanılan teknolojiler: RESTful API, SOLID, Google ve Apple Maps entegrasyonu, WebSocket",
+        "category": "Web",
         "url": {
           "website": "https://dorseapp.com/",
           "google_play": "https://play.google.com/store/apps/details?id=com.juniustech.dorse",
@@ -400,6 +404,7 @@
   "projects_section": {
     "title": "Projelerim",
     "description": "Tamamladığım başlıca projeler ve çalışmalarım",
+    "filter_all": "Tümü",
     "untitled_project": "İsimsiz Proje",
     "technologies": "Teknolojiler",
     "open_project": "Projeyi Aç",
