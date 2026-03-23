@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -14,7 +16,8 @@ import 'package:flutter_web_portfolio/app/widgets/numbered_section_heading.dart'
 import 'package:flutter_web_portfolio/app/widgets/scroll_fade_in.dart';
 
 /// Testimonials Section — colleague and mentor quotes.
-/// Responsive grid: 3 columns desktop, 2 tablet, 1 mobile.
+/// Desktop: responsive grid (3 columns).
+/// Mobile/tablet (< 900px): auto-rotating carousel with dot indicators.
 class TestimonialsSection extends StatelessWidget {
   const TestimonialsSection({super.key});
 
@@ -86,7 +89,14 @@ class TestimonialsSection extends StatelessWidget {
                   final testimonials =
                       languageController.cvData['testimonials'] as List? ?? [];
                   if (testimonials.isEmpty) return const SizedBox.shrink();
-                  return _TestimonialsGrid(testimonials: testimonials);
+
+                  final isDesktop =
+                      screenWidth >= Breakpoints.tablet;
+
+                  if (isDesktop) {
+                    return _TestimonialsGrid(testimonials: testimonials);
+                  }
+                  return _TestimonialsCarousel(testimonials: testimonials);
                 }),
               ],
             ),
@@ -98,7 +108,7 @@ class TestimonialsSection extends StatelessWidget {
 }
 
 // ---------------------------------------------------------------------------
-// Responsive grid of testimonial cards
+// Responsive grid of testimonial cards (desktop only, >= 900px)
 // ---------------------------------------------------------------------------
 class _TestimonialsGrid extends StatelessWidget {
   const _TestimonialsGrid({required this.testimonials});
@@ -127,6 +137,126 @@ class _TestimonialsGrid extends StatelessWidget {
         child: _TestimonialCard(
           testimonial: testimonials[index] as Map<String, dynamic>,
         ),
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Auto-rotating carousel for mobile / tablet (< 900px)
+// ---------------------------------------------------------------------------
+class _TestimonialsCarousel extends StatefulWidget {
+  const _TestimonialsCarousel({required this.testimonials});
+
+  final List<dynamic> testimonials;
+
+  @override
+  State<_TestimonialsCarousel> createState() => _TestimonialsCarouselState();
+}
+
+class _TestimonialsCarouselState extends State<_TestimonialsCarousel> {
+  late final PageController _pageController;
+  Timer? _autoAdvanceTimer;
+  int _currentPage = 0;
+
+  static const _autoAdvanceInterval = Duration(seconds: 5);
+  static const _resumeDelay = Duration(seconds: 3);
+
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController();
+    _startAutoAdvance();
+  }
+
+  @override
+  void dispose() {
+    _autoAdvanceTimer?.cancel();
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  void _startAutoAdvance() {
+    _autoAdvanceTimer?.cancel();
+    _autoAdvanceTimer = Timer.periodic(_autoAdvanceInterval, (_) {
+      if (!mounted) return;
+      final nextPage = (_currentPage + 1) % widget.testimonials.length;
+      _pageController.animateToPage(
+        nextPage,
+        duration: AppDurations.entrance,
+        curve: Curves.easeInOut,
+      );
+    });
+  }
+
+  void _onPageChanged(int page) {
+    setState(() => _currentPage = page);
+  }
+
+  void _onManualSwipe() {
+    // Cancel auto-advance, resume after delay.
+    _autoAdvanceTimer?.cancel();
+    _autoAdvanceTimer = null;
+    Future.delayed(_resumeDelay, () {
+      if (mounted) _startAutoAdvance();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final count = widget.testimonials.length;
+
+    return ScrollFadeIn(
+      child: Column(
+        children: [
+          SizedBox(
+            height: 280,
+            child: NotificationListener<ScrollNotification>(
+              onNotification: (notification) {
+                if (notification is ScrollStartNotification &&
+                    notification.dragDetails != null) {
+                  _onManualSwipe();
+                }
+                return false;
+              },
+              child: PageView.builder(
+                controller: _pageController,
+                onPageChanged: _onPageChanged,
+                itemCount: count,
+                itemBuilder: (context, index) => Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: _TestimonialCard(
+                    testimonial:
+                        widget.testimonials[index] as Map<String, dynamic>,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+          // Dot indicators
+          Obx(() {
+            final accent = Get.find<SceneDirector>().currentAccent.value;
+            return Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: List.generate(
+                count,
+                (i) => AnimatedContainer(
+                  duration: AppDurations.fast,
+                  width: i == _currentPage ? 8 : 4,
+                  height: 4,
+                  margin: const EdgeInsets.symmetric(horizontal: 3),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(2),
+                    color: i == _currentPage
+                        ? accent
+                        : AppColors.textSecondary.withValues(alpha: 0.3),
+                  ),
+                ),
+              ),
+            );
+          }),
+        ],
       ),
     );
   }
