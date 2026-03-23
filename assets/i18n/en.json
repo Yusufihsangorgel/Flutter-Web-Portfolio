@@ -458,5 +458,9 @@
     "github": "GitHub",
     "linkedin": "LinkedIn",
     "email": "Email"
+  },
+  "not_found": {
+    "subtitle": "Page not found",
+    "go_home": "Go Home"
   }
 }

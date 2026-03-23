@@ -443,5 +443,9 @@
     "github": "GitHub",
     "linkedin": "LinkedIn",
     "email": "E-mail"
+  },
+  "not_found": {
+    "subtitle": "Page introuvable",
+    "go_home": "Accueil"
   }
 }

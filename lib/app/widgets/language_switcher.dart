@@ -32,7 +32,8 @@ class LanguageSwitcher extends StatelessWidget {
               ),
               Icon(
                 Icons.arrow_drop_down,
-                color: Colors.white.withValues(alpha: 0.3),
+                color: (Theme.of(context).brightness == Brightness.dark
+                    ? Colors.white : Colors.black).withValues(alpha: 0.3),
                 size: 18,
               ),
             ],
@@ -41,7 +42,8 @@ class LanguageSwitcher extends StatelessWidget {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8),
             side: BorderSide(
-              color: Colors.white.withValues(alpha: 0.05),
+              color: (Theme.of(context).brightness == Brightness.dark
+                  ? Colors.white : Colors.black).withValues(alpha: 0.05),
             ),
           ),
           onSelected: languageController.changeLanguage,

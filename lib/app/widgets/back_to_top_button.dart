@@ -80,7 +80,8 @@ class _BackToTopButtonState extends State<BackToTopButton> {
                   border: Border.all(
                     color: _hovered
                         ? AppColors.accent.withValues(alpha: 0.6)
-                        : Colors.white.withValues(alpha: 0.12),
+                        : (Theme.of(context).brightness == Brightness.dark
+                            ? Colors.white : Colors.black).withValues(alpha: 0.12),
                     width: 1,
                   ),
                 ),

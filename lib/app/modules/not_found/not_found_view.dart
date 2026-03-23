@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
 import 'package:flutter_web_portfolio/app/core/constants/cinematic_curves.dart';
+import 'package:flutter_web_portfolio/app/controllers/language_controller.dart';
 import 'package:flutter_web_portfolio/app/core/constants/durations.dart';
 import 'package:flutter_web_portfolio/app/widgets/cinematic_button.dart';
 import 'package:flutter_web_portfolio/app/widgets/constellation_particles.dart';
@@ -14,6 +15,9 @@ class NotFoundView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.sizeOf(context).height;
+    final lang = Get.isRegistered<LanguageController>()
+        ? Get.find<LanguageController>()
+        : null;
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -49,7 +53,7 @@ class NotFoundView extends StatelessWidget {
                   _FadeSlideIn(
                     delay: AppDurations.staggerMedium,
                     child: Text(
-                      'Page not found',
+                      lang?.getText('not_found.subtitle', defaultValue: 'Page not found') ?? 'Page not found',
                       style: GoogleFonts.spaceGrotesk(
                         fontSize: 24,
                         fontWeight: FontWeight.w400,
@@ -63,7 +67,7 @@ class NotFoundView extends StatelessWidget {
                   _FadeSlideIn(
                     delay: AppDurations.medium,
                     child: CinematicButton(
-                      label: 'Go Home',
+                      label: lang?.getText('not_found.go_home', defaultValue: 'Go Home') ?? 'Go Home',
                       isPrimary: true,
                       onTap: () => Get.offAllNamed('/'),
                     ),

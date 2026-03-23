@@ -408,7 +408,10 @@ class _FlashlightPhotoState extends State<_FlashlightPhoto> {
               ],
               stops: const [0.0, 0.4, 1.0],
             ).createShader(bounds),
-            child: Image.asset(
+            child: Semantics(
+              image: true,
+              label: 'Profile photo',
+              child: Image.asset(
               'assets/images/me.jpeg',
               width: double.infinity,
               fit: BoxFit.cover,
@@ -423,6 +426,7 @@ class _FlashlightPhotoState extends State<_FlashlightPhoto> {
                   ),
                 ),
               ),
+            ),
             ),
           ),
         ),

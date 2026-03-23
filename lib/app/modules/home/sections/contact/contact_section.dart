@@ -281,7 +281,7 @@ class _ContactFormState extends State<_ContactForm> {
           'email': _emailController.text.trim(),
           'message': _messageController.text.trim(),
         }),
-      );
+      ).timeout(const Duration(seconds: 15));
 
       if (!mounted) return;
 

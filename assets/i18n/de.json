@@ -436,5 +436,9 @@
     "github": "GitHub",
     "linkedin": "LinkedIn",
     "email": "E-Mail"
+  },
+  "not_found": {
+    "subtitle": "Seite nicht gefunden",
+    "go_home": "Startseite"
   }
 }

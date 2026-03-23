@@ -443,5 +443,9 @@
     "github": "GitHub",
     "linkedin": "LinkedIn",
     "email": "ईमेल"
+  },
+  "not_found": {
+    "subtitle": "पृष्ठ नहीं मिला",
+    "go_home": "होम पेज"
   }
 }
