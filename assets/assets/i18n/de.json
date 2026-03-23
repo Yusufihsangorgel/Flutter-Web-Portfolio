@@ -391,7 +391,12 @@
     "links": "Links",
     "untitled_project": "Unbenanntes Projekt",
     "technologies": "Technologien",
-    "open_project": "Projekt öffnen"
+    "open_project": "Projekt öffnen",
+    "link_labels": {
+      "google_play": "Google Play",
+      "app_store": "App Store",
+      "website": "Webseite"
+    }
   },
   "contact_section": {
     "title": "Kontakt aufnehmen",

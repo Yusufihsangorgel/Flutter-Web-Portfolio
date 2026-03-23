@@ -398,7 +398,12 @@
     "links": "الروابط",
     "untitled_project": "مشروع بدون عنوان",
     "technologies": "التقنيات",
-    "open_project": "فتح المشروع"
+    "open_project": "فتح المشروع",
+    "link_labels": {
+      "google_play": "Google Play",
+      "app_store": "App Store",
+      "website": "الموقع"
+    }
   },
   "contact_section": {
     "title": "تواصل معي",

@@ -400,7 +400,12 @@
     "case_study_problem": "The Challenge",
     "case_study_solution": "The Approach",
     "case_study_result": "The Result",
-    "links": "Links"
+    "links": "Links",
+    "link_labels": {
+      "google_play": "Google Play",
+      "app_store": "App Store",
+      "website": "Website"
+    }
   },
   "home_section": {
     "greeting": "Hi, my name is",
