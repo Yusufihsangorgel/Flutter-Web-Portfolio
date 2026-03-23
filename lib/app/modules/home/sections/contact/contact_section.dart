@@ -330,6 +330,7 @@ class _ContactFormState extends State<_ContactForm> {
                 defaultValue: 'Name',
               ),
               accent: accent,
+              textInputAction: TextInputAction.next,
               validator: (value) {
                 if (value == null || value.trim().isEmpty) {
                   return lang.getText(
@@ -350,6 +351,7 @@ class _ContactFormState extends State<_ContactForm> {
               ),
               accent: accent,
               keyboardType: TextInputType.emailAddress,
+              textInputAction: TextInputAction.next,
               validator: (value) {
                 if (value == null || value.trim().isEmpty) {
                   return lang.getText(
@@ -379,6 +381,7 @@ class _ContactFormState extends State<_ContactForm> {
               ),
               accent: accent,
               maxLines: 5,
+              textInputAction: TextInputAction.done,
               validator: (value) {
                 if (value == null || value.trim().isEmpty) {
                   return lang.getText(
@@ -469,6 +472,7 @@ class _CinematicTextField extends StatefulWidget {
     this.validator,
     this.maxLines = 1,
     this.keyboardType,
+    this.textInputAction,
   });
 
   final TextEditingController controller;
@@ -477,6 +481,7 @@ class _CinematicTextField extends StatefulWidget {
   final String? Function(String?)? validator;
   final int maxLines;
   final TextInputType? keyboardType;
+  final TextInputAction? textInputAction;
 
   @override
   State<_CinematicTextField> createState() => _CinematicTextFieldState();
@@ -516,6 +521,7 @@ class _CinematicTextFieldState extends State<_CinematicTextField> {
         validator: widget.validator,
         maxLines: widget.maxLines,
         keyboardType: widget.keyboardType,
+        textInputAction: widget.textInputAction,
         style: AppTypography.body.copyWith(color: AppColors.textBright),
         cursorColor: widget.accent,
         decoration: InputDecoration(

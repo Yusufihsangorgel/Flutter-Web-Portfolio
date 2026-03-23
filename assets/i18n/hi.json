@@ -398,7 +398,12 @@
     "links": "लिंक",
     "untitled_project": "शीर्षकहीन प्रोजेक्ट",
     "technologies": "प्रौद्योगिकियाँ",
-    "open_project": "प्रोजेक्ट खोलें"
+    "open_project": "प्रोजेक्ट खोलें",
+    "link_labels": {
+      "google_play": "Google Play",
+      "app_store": "App Store",
+      "website": "वेबसाइट"
+    }
   },
   "contact_section": {
     "title": "संपर्क करें",

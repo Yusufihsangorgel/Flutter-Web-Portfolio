@@ -91,7 +91,9 @@ class _ProjectDetailOverlayState extends State<ProjectDetailOverlay> {
                 child: BackdropFilter(
                   filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
                   child: ColoredBox(
-                    color: AppColors.background.withValues(alpha: 0.85),
+                    color: (Theme.of(context).brightness == Brightness.dark
+                        ? AppColors.background
+                        : AppColors.lightBackground).withValues(alpha: 0.85),
                   ),
                 ),
               ),
@@ -281,12 +283,15 @@ class _Content extends StatelessWidget {
     return result;
   }
 
-  String _urlLabel(String key) => switch (key) {
-        'google_play' => 'Google Play',
-        'app_store' => 'App Store',
-        'website' => 'Website',
-        _ => key,
-      };
+  String _urlLabel(String key) {
+    final lang = Get.find<LanguageController>();
+    return switch (key) {
+      'google_play' => lang.getText('projects_section.link_labels.google_play', defaultValue: 'Google Play'),
+      'app_store' => lang.getText('projects_section.link_labels.app_store', defaultValue: 'App Store'),
+      'website' => lang.getText('projects_section.link_labels.website', defaultValue: 'Website'),
+      _ => key,
+    };
+  }
 }
 
 // ──────────────────────────────────────────────────────────────────────────────

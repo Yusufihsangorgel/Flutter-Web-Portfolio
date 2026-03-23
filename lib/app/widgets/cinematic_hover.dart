@@ -121,7 +121,9 @@ class _CinematicHoverState extends State<CinematicHover>
                           boxShadow: hovered
                               ? [
                                   BoxShadow(
-                                    color: (widget.glowColor ?? Colors.white)
+                                    color: (widget.glowColor ??
+                                            (Theme.of(context).brightness == Brightness.dark
+                                                ? Colors.white : Colors.black))
                                         .withValues(
                                             alpha: widget.glowOpacity),
                                     blurRadius: widget.glowBlur,

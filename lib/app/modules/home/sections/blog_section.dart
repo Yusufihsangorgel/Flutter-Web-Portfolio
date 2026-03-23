@@ -382,7 +382,19 @@ class _BlogPostCard extends StatelessWidget {
                     height: 120,
                     width: double.infinity,
                     fit: BoxFit.cover,
-                    errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+                    errorBuilder: (_, __, ___) => Container(
+                      height: 120,
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: AppColors.backgroundLight.withValues(alpha: 0.5),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Icon(
+                        Icons.image_outlined,
+                        size: 32,
+                        color: AppColors.textSecondary.withValues(alpha: 0.3),
+                      ),
+                    ),
                   ),
                 ),
                 const SizedBox(height: 16),

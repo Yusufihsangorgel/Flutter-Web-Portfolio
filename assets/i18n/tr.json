@@ -401,7 +401,12 @@
     "case_study_problem": "Zorluk",
     "case_study_solution": "Yaklaşım",
     "case_study_result": "Sonuç",
-    "links": "Bağlantılar"
+    "links": "Bağlantılar",
+    "link_labels": {
+      "google_play": "Google Play",
+      "app_store": "App Store",
+      "website": "Web Sitesi"
+    }
   },
   "home_section": {
     "greeting": "Merhaba, ben",

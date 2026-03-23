@@ -409,7 +409,12 @@
     "links": "Enlaces",
     "untitled_project": "Proyecto sin título",
     "technologies": "Tecnologías",
-    "open_project": "Abrir proyecto"
+    "open_project": "Abrir proyecto",
+    "link_labels": {
+      "google_play": "Google Play",
+      "app_store": "App Store",
+      "website": "Sitio Web"
+    }
   },
   "contact_section": {
     "title": "Ponte en Contacto",

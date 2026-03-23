@@ -47,8 +47,10 @@ class _LoadingAnimationState extends State<LoadingAnimation>
   }
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-        backgroundColor: AppColors.background,
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return Scaffold(
+        backgroundColor: isDark ? AppColors.background : AppColors.lightBackground,
         body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -96,7 +98,7 @@ class _LoadingAnimationState extends State<LoadingAnimation>
                     child: Text(
                       _languageController.getText('portfolio_loading'),
                       style: GoogleFonts.spaceGrotesk(
-                        color: AppColors.textBright,
+                        color: isDark ? AppColors.textBright : AppColors.lightTextBright,
                         fontSize: 14,
                         fontWeight: FontWeight.w400,
                         letterSpacing: 2,
@@ -109,6 +111,7 @@ class _LoadingAnimationState extends State<LoadingAnimation>
           ),
         ),
       );
+  }
 }
 
 /// Paints a thin horizontal progress bar.
