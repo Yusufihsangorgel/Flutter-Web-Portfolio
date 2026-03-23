@@ -1,3 +1,5 @@
+import 'dart:math' show pi;
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -5,6 +7,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_web_portfolio/app/controllers/language_controller.dart';
 import 'package:flutter_web_portfolio/app/controllers/scene_director.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
+import 'package:flutter_web_portfolio/app/core/constants/cinematic_curves.dart';
 import 'package:flutter_web_portfolio/app/core/constants/durations.dart';
 import 'package:flutter_web_portfolio/app/core/theme/app_typography.dart';
 import 'package:flutter_web_portfolio/app/utils/responsive_utils.dart';
@@ -251,6 +254,14 @@ class _ProjectCardState extends State<_ProjectCard> {
   bool get isReversed => widget.isReversed;
   bool get isMobile => widget.isMobile;
 
+  bool get _hasCaseStudy {
+    final cs = project['case_study'] as Map<String, dynamic>?;
+    if (cs == null) return false;
+    return (cs['problem'] as String?)?.isNotEmpty == true ||
+        (cs['solution'] as String?)?.isNotEmpty == true ||
+        (cs['result'] as String?)?.isNotEmpty == true;
+  }
+
   @override
   Widget build(BuildContext context) {
     final p = project;
@@ -261,29 +272,57 @@ class _ProjectCardState extends State<_ProjectCard> {
 
     return Obx(() {
       final accent = Get.find<SceneDirector>().currentAccent.value;
-      return MouseRegion(
+
+      final frontCard = MouseRegion(
         cursor: SystemMouseCursors.click,
         onEnter: (_) => setState(() => _hovered = true),
         onExit: (_) => setState(() => _hovered = false),
-        child: GestureDetector(
-          onTap: () => ProjectDetailOverlay.show(context, project),
-          child: AnimatedContainer(
+        child: AnimatedContainer(
+          duration: AppDurations.fast,
+          curve: Curves.easeOut,
+          transform: Matrix4.identity()
+            ..scaleByDouble(_hovered ? 1.02 : 1.0, _hovered ? 1.02 : 1.0, 1.0, 1.0),
+          transformAlignment: Alignment.center,
+          child: AnimatedOpacity(
             duration: AppDurations.fast,
-            curve: Curves.easeOut,
-            transform: Matrix4.identity()
-              ..scaleByDouble(_hovered ? 1.02 : 1.0, _hovered ? 1.02 : 1.0, 1.0, 1.0),
-            transformAlignment: Alignment.center,
-            child: AnimatedOpacity(
-              duration: AppDurations.fast,
-              opacity: _hovered ? 1.0 : 0.92,
-              child: BorderLightCard(
-                glowColor: accent,
-                child: isMobile
-                    ? _buildMobileContent(title, description, technologies, url, accent)
-                    : _buildDesktopContent(title, description, technologies, url, accent),
+            opacity: _hovered ? 1.0 : 0.92,
+            child: BorderLightCard(
+              glowColor: accent,
+              child: Stack(
+                children: [
+                  isMobile
+                      ? _buildMobileContent(title, description, technologies, url, accent)
+                      : _buildDesktopContent(title, description, technologies, url, accent),
+                  if (_hasCaseStudy)
+                    Positioned(
+                      bottom: 0,
+                      right: 0,
+                      child: Icon(
+                        Icons.sync_rounded,
+                        size: 18,
+                        color: accent.withValues(alpha: 0.4),
+                      ),
+                    ),
+                ],
               ),
             ),
           ),
+        ),
+      );
+
+      if (!_hasCaseStudy) {
+        return GestureDetector(
+          onTap: () => ProjectDetailOverlay.show(context, project),
+          child: frontCard,
+        );
+      }
+
+      return _FlipCard(
+        front: frontCard,
+        back: _ProjectCardBack(
+          project: project,
+          isMobile: isMobile,
+          accent: accent,
         ),
       );
     });
@@ -464,4 +503,255 @@ class _ProjectLinkState extends State<_ProjectLink> {
       ),
     ),
   );
+}
+
+// ──────────────────────────────────────────────────────────────────────────────
+// 3D flip card — rotates 180° around Y-axis to reveal back content
+// ──────────────────────────────────────────────────────────────────────────────
+
+class _FlipCard extends StatefulWidget {
+  const _FlipCard({required this.front, required this.back});
+  final Widget front;
+  final Widget back;
+
+  @override
+  State<_FlipCard> createState() => _FlipCardState();
+}
+
+class _FlipCardState extends State<_FlipCard>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+  bool _showFront = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: AppDurations.entrance, // 600ms
+      vsync: this,
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _flip() {
+    if (_showFront) {
+      _controller.forward();
+    } else {
+      _controller.reverse();
+    }
+    _showFront = !_showFront;
+  }
+
+  @override
+  Widget build(BuildContext context) => GestureDetector(
+    onTap: _flip,
+    child: AnimatedBuilder(
+      animation: _controller,
+      builder: (context, _) {
+        final curved = CinematicCurves.dramaticEntrance
+            .transform(_controller.value);
+        final angle = curved * pi;
+        final isFront = angle < pi / 2;
+        return Transform(
+          alignment: Alignment.center,
+          transform: Matrix4.identity()
+            ..setEntry(3, 2, 0.001)
+            ..rotateY(angle),
+          child: isFront
+              ? widget.front
+              : Transform(
+                  alignment: Alignment.center,
+                  transform: Matrix4.identity()..rotateY(pi),
+                  child: widget.back,
+                ),
+        );
+      },
+    ),
+  );
+}
+
+// ──────────────────────────────────────────────────────────────────────────────
+// Project card back face — compact case study view
+// ──────────────────────────────────────────────────────────────────────────────
+
+class _ProjectCardBack extends StatelessWidget {
+  const _ProjectCardBack({
+    required this.project,
+    required this.isMobile,
+    required this.accent,
+  });
+
+  final Map<String, dynamic> project;
+  final bool isMobile;
+  final Color accent;
+
+  @override
+  Widget build(BuildContext context) {
+    final title = (project['title'] as String?) ?? 'Project';
+    final caseStudy = project['case_study'] as Map<String, dynamic>? ?? {};
+    final problem = caseStudy['problem'] as String? ?? '';
+    final solution = caseStudy['solution'] as String? ?? '';
+    final result = caseStudy['result'] as String? ?? '';
+    final technologies = _extractTechnologies(project);
+    final url = _extractUrl(project);
+    final langCtrl = Get.find<LanguageController>();
+
+    return BorderLightCard(
+      glowColor: accent,
+      child: Stack(
+        children: [
+          SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Title
+                Text(
+                  title,
+                  style: AppTypography.h3.copyWith(color: accent),
+                ),
+                const SizedBox(height: 16),
+
+                // Case study sections
+                if (problem.isNotEmpty) ...[
+                  _BackSection(
+                    heading: langCtrl.getText(
+                      'projects_section.case_study_problem',
+                      defaultValue: 'The Challenge',
+                    ),
+                    body: problem,
+                    accent: accent,
+                  ),
+                  const SizedBox(height: 12),
+                ],
+                if (solution.isNotEmpty) ...[
+                  _BackSection(
+                    heading: langCtrl.getText(
+                      'projects_section.case_study_solution',
+                      defaultValue: 'The Approach',
+                    ),
+                    body: solution,
+                    accent: accent,
+                  ),
+                  const SizedBox(height: 12),
+                ],
+                if (result.isNotEmpty) ...[
+                  _BackSection(
+                    heading: langCtrl.getText(
+                      'projects_section.case_study_result',
+                      defaultValue: 'The Result',
+                    ),
+                    body: result,
+                    accent: accent,
+                  ),
+                  const SizedBox(height: 12),
+                ],
+
+                // Technologies
+                if (technologies.isNotEmpty) ...[
+                  const SizedBox(height: 4),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: technologies
+                        .map((tech) => Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 4,
+                              ),
+                              decoration: BoxDecoration(
+                                color: accent.withValues(alpha: 0.08),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Text(
+                                tech,
+                                style: GoogleFonts.jetBrainsMono(
+                                  fontSize: 11,
+                                  color: accent,
+                                ),
+                              ),
+                            ))
+                        .toList(),
+                  ),
+                ],
+
+                // Link button
+                if (url.isNotEmpty) ...[
+                  const SizedBox(height: 12),
+                  _ProjectLink(url: url, accent: accent),
+                ],
+              ],
+            ),
+          ),
+
+          // Flip-back icon
+          Positioned(
+            top: 0,
+            right: 0,
+            child: Icon(
+              Icons.flip_to_front_rounded,
+              size: 18,
+              color: accent.withValues(alpha: 0.4),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  List<String> _extractTechnologies(Map<String, dynamic> project) {
+    if (project['technologies'] case final List<dynamic> techs) {
+      return List<String>.from(techs);
+    }
+    return [];
+  }
+
+  String _extractUrl(Map<String, dynamic> project) => switch (project['url']) {
+        final String url => url,
+        final Map<String, dynamic> urls => [
+            for (final key in ['website', 'google_play', 'app_store'])
+              if (urls[key] case final String url) url,
+          ].firstOrNull ??
+            '',
+        _ => '',
+      };
+}
+
+// Compact case study section for the back face
+class _BackSection extends StatelessWidget {
+  const _BackSection({
+    required this.heading,
+    required this.body,
+    required this.accent,
+  });
+
+  final String heading;
+  final String body;
+  final Color accent;
+
+  @override
+  Widget build(BuildContext context) => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            heading,
+            style: AppTypography.caption.copyWith(
+              color: accent,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            body,
+            style: AppTypography.bodySmall,
+            maxLines: 4,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
+      );
 }

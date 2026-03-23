@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -33,6 +35,10 @@ class _HomeSectionState extends State<HomeSection>
   late AnimationController _entranceCtrl;
   late Animation<double> _lineWidth;
   late Animation<double> _contentOpacity;
+
+  /// Normalised mouse position within the hero section (0–1 on each axis).
+  /// Defaults to centre so the transform starts at identity.
+  Offset _heroMousePos = const Offset(0.5, 0.5);
 
   @override
   void initState() {
@@ -88,6 +94,19 @@ class _HomeSectionState extends State<HomeSection>
     return null;
   }
 
+  /// Builds a subtle 3D perspective matrix that follows the mouse cursor.
+  /// Returns [Matrix4.identity] on mobile/tablet to avoid touch jank.
+  Matrix4 _buildHeroTransform(double screenWidth) {
+    if (screenWidth < 900) return Matrix4.identity();
+    const maxTilt = 2.0 * pi / 180.0; // 2 degrees
+    final dx = (_heroMousePos.dx - 0.5) * 2.0;
+    final dy = (_heroMousePos.dy - 0.5) * 2.0;
+    return Matrix4.identity()
+      ..setEntry(3, 2, 0.001)
+      ..rotateY(dx * maxTilt)
+      ..rotateX(-dy * maxTilt);
+  }
+
   @override
   Widget build(BuildContext context) {
     final languageController = Get.find<LanguageController>();
@@ -125,86 +144,106 @@ class _HomeSectionState extends State<HomeSection>
             // Main content
             Opacity(
               opacity: _contentOpacity.value,
-              child: Center(
-                child: Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: screenWidth > AppDimensions.maxContentWidth
-                        ? AppDimensions.sectionPaddingDesktop
-                        : (screenWidth > Breakpoints.tablet
-                            ? AppDimensions.sectionPaddingTablet
-                            : AppDimensions.sectionPaddingMobile),
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      // Name — gradient overlay fades in after reveal
-                      _HeroNameWithGradient(
-                        languageController: languageController,
-                        heroFontSize: heroFontSize,
+              child: MouseRegion(
+                onHover: (e) {
+                  final box = context.findRenderObject() as RenderBox?;
+                  if (box == null) return;
+                  setState(() {
+                    _heroMousePos = Offset(
+                      e.localPosition.dx / box.size.width,
+                      e.localPosition.dy / box.size.height,
+                    );
+                  });
+                },
+                onExit: (_) => setState(
+                  () => _heroMousePos = const Offset(0.5, 0.5),
+                ),
+                child: AnimatedContainer(
+                  duration: AppDurations.medium,
+                  transform: _buildHeroTransform(screenWidth),
+                  transformAlignment: Alignment.center,
+                  child: Center(
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: screenWidth > AppDimensions.maxContentWidth
+                            ? AppDimensions.sectionPaddingDesktop
+                            : (screenWidth > Breakpoints.tablet
+                                ? AppDimensions.sectionPaddingTablet
+                                : AppDimensions.sectionPaddingMobile),
                       ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          // Name — gradient overlay fades in after reveal
+                          _HeroNameWithGradient(
+                            languageController: languageController,
+                            heroFontSize: heroFontSize,
+                          ),
 
-                      // Horizontal line between name and subtitle
-                      const SizedBox(height: 20),
-                      Container(
-                        height: 1.5,
-                        width: (screenWidth * 0.4).clamp(100, 600).toDouble() * _lineWidth.value,
-                        decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.4),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.white.withValues(alpha: 0.15),
-                              blurRadius: 6,
+                          // Horizontal line between name and subtitle
+                          const SizedBox(height: 20),
+                          Container(
+                            height: 1.5,
+                            width: (screenWidth * 0.4).clamp(100, 600).toDouble() * _lineWidth.value,
+                            decoration: BoxDecoration(
+                              color: Colors.white.withValues(alpha: 0.4),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.white.withValues(alpha: 0.15),
+                                  blurRadius: 6,
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 20),
+                          ),
+                          const SizedBox(height: 20),
 
-                      // Subtitle — typewriter cycling effect
-                      TypewriterText(
-                        text: languageController.getText(
-                          'home_section.subtitle',
-                          defaultValue: 'Mobile Software Engineer',
-                        ),
-                        texts: _subtitleTexts(languageController),
-                        loop: true,
-                        style: GoogleFonts.spaceGrotesk(
-                          fontSize: (heroFontSize * 0.35).clamp(18.0, 42.0),
-                          fontWeight: FontWeight.w400,
-                          color: AppColors.textPrimary,
-                          letterSpacing: 2,
-                          height: 1.3,
-                        ),
-                        delay: AppDurations.heroSubtitleDelay,
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 8),
+                          // Subtitle — typewriter cycling effect
+                          TypewriterText(
+                            text: languageController.getText(
+                              'home_section.subtitle',
+                              defaultValue: 'Mobile Software Engineer',
+                            ),
+                            texts: _subtitleTexts(languageController),
+                            loop: true,
+                            style: GoogleFonts.spaceGrotesk(
+                              fontSize: (heroFontSize * 0.35).clamp(18.0, 42.0),
+                              fontWeight: FontWeight.w400,
+                              color: AppColors.textPrimary,
+                              letterSpacing: 2,
+                              height: 1.3,
+                            ),
+                            delay: AppDurations.heroSubtitleDelay,
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 8),
 
-                      // Location — monospace
-                      ShaderTextReveal(
-                        text: languageController.getText(
-                          'cv_data.personal_info.location',
-                          defaultValue: 'Antalya, Türkiye',
-                        ),
-                        style: GoogleFonts.jetBrainsMono(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w400,
-                          color: AppColors.textSecondary,
-                          letterSpacing: 3,
-                        ),
-                        delay: AppDurations.heroLocationDelay,
-                        duration: AppDurations.heroLocationDuration,
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 56),
+                          // Location — monospace
+                          ShaderTextReveal(
+                            text: languageController.getText(
+                              'cv_data.personal_info.location',
+                              defaultValue: 'Antalya, Türkiye',
+                            ),
+                            style: GoogleFonts.jetBrainsMono(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w400,
+                              color: AppColors.textSecondary,
+                              letterSpacing: 3,
+                            ),
+                            delay: AppDurations.heroLocationDelay,
+                            duration: AppDurations.heroLocationDuration,
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 56),
 
-                      // CTA buttons — pixel assembly effect
-                      _AnimatedCTAButtons(
-                        delay: AppDurations.heroCTADelay,
-                        languageController: languageController,
+                          // CTA buttons — pixel assembly effect
+                          _AnimatedCTAButtons(
+                            delay: AppDurations.heroCTADelay,
+                            languageController: languageController,
+                          ),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
                 ),
               ),
