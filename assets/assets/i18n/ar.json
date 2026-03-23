@@ -18,13 +18,34 @@
   },
   "navigation": {
     "items": [
-      { "id": "home", "title": "الرئيسية" },
-      { "id": "about", "title": "نبذة عني" },
-      { "id": "experience", "title": "الخبرة" },
-      { "id": "projects", "title": "المشاريع" },
-      { "id": "skills", "title": "المهارات" },
-      { "id": "references", "title": "المراجع" },
-      { "id": "contact", "title": "اتصل بي" }
+      {
+        "id": "home",
+        "title": "الرئيسية"
+      },
+      {
+        "id": "about",
+        "title": "نبذة عني"
+      },
+      {
+        "id": "experience",
+        "title": "الخبرة"
+      },
+      {
+        "id": "projects",
+        "title": "المشاريع"
+      },
+      {
+        "id": "skills",
+        "title": "المهارات"
+      },
+      {
+        "id": "references",
+        "title": "المراجع"
+      },
+      {
+        "id": "contact",
+        "title": "اتصل بي"
+      }
     ]
   },
   "translations": {
@@ -186,15 +207,28 @@
       },
       {
         "category": "الواجهة الخلفية",
-        "items": ["Node.js", "Express.js", "MongoDB", "SQLite", "MSSQL"]
+        "items": [
+          "Node.js",
+          "Express.js",
+          "MongoDB",
+          "SQLite",
+          "MSSQL"
+        ]
       },
       {
         "category": "الواجهة الأمامية",
-        "items": ["HTML", "CSS", "JavaScript", "React"]
+        "items": [
+          "HTML",
+          "CSS",
+          "JavaScript",
+          "React"
+        ]
       },
       {
         "category": "DevOps",
-        "items": ["AWS"]
+        "items": [
+          "AWS"
+        ]
       }
     ],
     "references": [
@@ -352,7 +386,8 @@
     "contact": "تواصل"
   },
   "experience_section": {
-    "title": "أين عملت"
+    "title": "أين عملت",
+    "present": "حالياً"
   },
   "projects_section": {
     "title": "مشاريعي",
@@ -360,7 +395,10 @@
     "case_study_problem": "التحدي",
     "case_study_solution": "النهج",
     "case_study_result": "النتيجة",
-    "links": "الروابط"
+    "links": "الروابط",
+    "untitled_project": "مشروع بدون عنوان",
+    "technologies": "التقنيات",
+    "open_project": "فتح المشروع"
   },
   "contact_section": {
     "title": "تواصل معي",
@@ -381,7 +419,12 @@
   },
   "blog_section": {
     "title": "المدونة",
-    "subtitle": "تحليلات تقنية معمّقة، قرارات معمارية، ودروس مستفادة من نشر تطبيقات Flutter في بيئة الإنتاج"
+    "subtitle": "تحليلات تقنية معمّقة، قرارات معمارية، ودروس مستفادة من نشر تطبيقات Flutter في بيئة الإنتاج",
+    "empty": "لا توجد مقالات بعد",
+    "read_on_medium": "اقرأ على Medium",
+    "follow_on_medium": "تابع على Medium",
+    "error": "تعذر تحميل المقالات",
+    "retry": "إعادة المحاولة"
   },
   "testimonials_section": {
     "title": "التوصيات",
@@ -395,5 +438,10 @@
     "view_source": "عرض الكود المصدري",
     "command_hint_prefix": "اضغط",
     "command_hint_suffix": "لفتح لوحة الأوامر"
+  },
+  "sidebar": {
+    "github": "GitHub",
+    "linkedin": "LinkedIn",
+    "email": "البريد الإلكتروني"
   }
 }

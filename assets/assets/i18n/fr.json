@@ -18,13 +18,34 @@
   },
   "navigation": {
     "items": [
-      { "id": "home", "title": "Accueil" },
-      { "id": "about", "title": "À propos" },
-      { "id": "experience", "title": "Expérience" },
-      { "id": "projects", "title": "Projets" },
-      { "id": "skills", "title": "Compétences" },
-      { "id": "references", "title": "Références" },
-      { "id": "contact", "title": "Contact" }
+      {
+        "id": "home",
+        "title": "Accueil"
+      },
+      {
+        "id": "about",
+        "title": "À propos"
+      },
+      {
+        "id": "experience",
+        "title": "Expérience"
+      },
+      {
+        "id": "projects",
+        "title": "Projets"
+      },
+      {
+        "id": "skills",
+        "title": "Compétences"
+      },
+      {
+        "id": "references",
+        "title": "Références"
+      },
+      {
+        "id": "contact",
+        "title": "Contact"
+      }
     ]
   },
   "translations": {
@@ -186,15 +207,28 @@
       },
       {
         "category": "Backend",
-        "items": ["Node.js", "Express.js", "MongoDB", "SQLite", "MSSQL"]
+        "items": [
+          "Node.js",
+          "Express.js",
+          "MongoDB",
+          "SQLite",
+          "MSSQL"
+        ]
       },
       {
         "category": "Frontend",
-        "items": ["HTML", "CSS", "JavaScript", "React"]
+        "items": [
+          "HTML",
+          "CSS",
+          "JavaScript",
+          "React"
+        ]
       },
       {
         "category": "DevOps",
-        "items": ["AWS"]
+        "items": [
+          "AWS"
+        ]
       }
     ],
     "references": [
@@ -352,7 +386,8 @@
     "contact": "Contact"
   },
   "experience_section": {
-    "title": "Où j'ai travaillé"
+    "title": "Où j'ai travaillé",
+    "present": "En cours"
   },
   "projects_section": {
     "title": "Mes Projets",
@@ -360,7 +395,10 @@
     "case_study_problem": "Le Defi",
     "case_study_solution": "L'Approche",
     "case_study_result": "Le Resultat",
-    "links": "Liens"
+    "links": "Liens",
+    "untitled_project": "Projet sans titre",
+    "technologies": "Technologies",
+    "open_project": "Ouvrir le projet"
   },
   "contact_section": {
     "title": "Me Contacter",
@@ -381,7 +419,12 @@
   },
   "blog_section": {
     "title": "Blog",
-    "subtitle": "Analyses techniques approfondies, decisions d'architecture et retours d'experience sur le deploiement d'applications Flutter en production"
+    "subtitle": "Analyses techniques approfondies, decisions d'architecture et retours d'experience sur le deploiement d'applications Flutter en production",
+    "empty": "Aucun article de blog pour le moment",
+    "read_on_medium": "Lire sur Medium",
+    "follow_on_medium": "Suivre sur Medium",
+    "error": "Impossible de charger les articles",
+    "retry": "Réessayer"
   },
   "testimonials_section": {
     "title": "Témoignages",
@@ -395,5 +438,10 @@
     "view_source": "Voir le code source",
     "command_hint_prefix": "Appuyez sur",
     "command_hint_suffix": "pour ouvrir la palette de commandes"
+  },
+  "sidebar": {
+    "github": "GitHub",
+    "linkedin": "LinkedIn",
+    "email": "E-mail"
   }
 }

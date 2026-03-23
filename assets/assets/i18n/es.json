@@ -20,12 +20,30 @@
   },
   "navigation": {
     "items": [
-      { "id": "home", "title": "Inicio" },
-      { "id": "about", "title": "Sobre Mí" },
-      { "id": "experience", "title": "Experiencia" },
-      { "id": "projects", "title": "Proyectos" },
-      { "id": "skills", "title": "Habilidades" },
-      { "id": "contact", "title": "Contacto" }
+      {
+        "id": "home",
+        "title": "Inicio"
+      },
+      {
+        "id": "about",
+        "title": "Sobre Mí"
+      },
+      {
+        "id": "experience",
+        "title": "Experiencia"
+      },
+      {
+        "id": "projects",
+        "title": "Proyectos"
+      },
+      {
+        "id": "skills",
+        "title": "Habilidades"
+      },
+      {
+        "id": "contact",
+        "title": "Contacto"
+      }
     ]
   },
   "translations": {
@@ -92,7 +110,14 @@
         "end_date": "Presente",
         "period": "Marzo 2022 – Presente",
         "description": "Desarrollo de FugaSoft — sistema multiplataforma de POS y gestión de ventas\nArquitecturas SQL complejas con base de datos local SQLite-Drift\nProgramación reactiva con Mediator Pattern y gestión de estado GetX\nDespliegue en tablets Android/iOS y plataformas de escritorio (Linux, macOS, Windows)\nIntegración de tecnología socket para sincronización de datos en tiempo real",
-        "technologies": ["Flutter", "Dart", "SQLite-Drift", "GetX", "WebSocket", "i18n"]
+        "technologies": [
+          "Flutter",
+          "Dart",
+          "SQLite-Drift",
+          "GetX",
+          "WebSocket",
+          "i18n"
+        ]
       },
       {
         "title": "Desarrollador Full Stack",
@@ -102,7 +127,14 @@
         "end_date": "Feb 2025",
         "period": "Junio 2023 – Febrero 2025",
         "description": "Lideré el equipo de desarrollo móvil en Dorse — aplicación de seguimiento logístico\nApps Flutter desplegadas en plataformas Android, iOS y web\nSeguimiento vehicular en tiempo real con WebSocket y Google/Apple Maps\nCoordinación de flujos frontend, backend y QA como Mobile Team Lead",
-        "technologies": ["Flutter", "React", "Node.js", "WebSocket", "REST API", "Maps SDK"]
+        "technologies": [
+          "Flutter",
+          "React",
+          "Node.js",
+          "WebSocket",
+          "REST API",
+          "Maps SDK"
+        ]
       },
       {
         "title": "Desarrollador Flutter",
@@ -112,7 +144,13 @@
         "end_date": "Jun 2024",
         "period": "Octubre 2022 – Junio 2024",
         "description": "Desarrollo de aplicaciones móviles Aydınlık E-Periódico y Bilim ve Ütopya E-Revista\nArquitectura MVVM con GetX y Dio para integración API\nPublicado en Google Play y App Store",
-        "technologies": ["Flutter", "Dart", "GetX", "Dio", "MVVM"]
+        "technologies": [
+          "Flutter",
+          "Dart",
+          "GetX",
+          "Dio",
+          "MVVM"
+        ]
       }
     ],
     "projects": [
@@ -179,14 +217,60 @@
       }
     ],
     "skills": [
-      { "category": "Móvil", "items": ["Flutter", "Dart", "Swift", "SwiftUI", "GetX", "BLoC", "Provider"] },
-      { "category": "Backend", "items": ["Node.js", "Express.js", "Go", "Spring Boot", "MongoDB", "MSSQL", "SQLite"] },
-      { "category": "Frontend", "items": ["React", "JavaScript", "TypeScript", "HTML", "CSS"] },
-      { "category": "DevOps", "items": ["AWS", "Docker", "Git", "CI/CD", "Firebase"] }
+      {
+        "category": "Móvil",
+        "items": [
+          "Flutter",
+          "Dart",
+          "Swift",
+          "SwiftUI",
+          "GetX",
+          "BLoC",
+          "Provider"
+        ]
+      },
+      {
+        "category": "Backend",
+        "items": [
+          "Node.js",
+          "Express.js",
+          "Go",
+          "Spring Boot",
+          "MongoDB",
+          "MSSQL",
+          "SQLite"
+        ]
+      },
+      {
+        "category": "Frontend",
+        "items": [
+          "React",
+          "JavaScript",
+          "TypeScript",
+          "HTML",
+          "CSS"
+        ]
+      },
+      {
+        "category": "DevOps",
+        "items": [
+          "AWS",
+          "Docker",
+          "Git",
+          "CI/CD",
+          "Firebase"
+        ]
+      }
     ],
     "languages": [
-      { "name": "Turco", "level": "Nativo" },
-      { "name": "Inglés", "level": "B2" }
+      {
+        "name": "Turco",
+        "level": "Nativo"
+      },
+      {
+        "name": "Inglés",
+        "level": "B2"
+      }
     ],
     "testimonials": [
       {
@@ -313,7 +397,8 @@
     "contact": "Contacto"
   },
   "experience_section": {
-    "title": "Dónde He Trabajado"
+    "title": "Dónde He Trabajado",
+    "present": "Actual"
   },
   "projects_section": {
     "title": "Mis Proyectos",
@@ -321,7 +406,10 @@
     "case_study_problem": "El Desafio",
     "case_study_solution": "El Enfoque",
     "case_study_result": "El Resultado",
-    "links": "Enlaces"
+    "links": "Enlaces",
+    "untitled_project": "Proyecto sin título",
+    "technologies": "Tecnologías",
+    "open_project": "Abrir proyecto"
   },
   "contact_section": {
     "title": "Ponte en Contacto",
@@ -342,7 +430,12 @@
   },
   "blog_section": {
     "title": "Blog",
-    "subtitle": "Analisis tecnicos profundos, decisiones de arquitectura y lecciones del despliegue de aplicaciones Flutter en produccion"
+    "subtitle": "Analisis tecnicos profundos, decisiones de arquitectura y lecciones del despliegue de aplicaciones Flutter en produccion",
+    "empty": "Aún no hay publicaciones",
+    "read_on_medium": "Leer en Medium",
+    "follow_on_medium": "Seguir en Medium",
+    "error": "No se pudieron cargar las publicaciones",
+    "retry": "Reintentar"
   },
   "testimonials_section": {
     "title": "Testimonios",
@@ -356,5 +449,10 @@
     "view_source": "Ver código fuente",
     "command_hint_prefix": "Presione",
     "command_hint_suffix": "para abrir la paleta de comandos"
+  },
+  "sidebar": {
+    "github": "GitHub",
+    "linkedin": "LinkedIn",
+    "email": "Correo"
   }
 }

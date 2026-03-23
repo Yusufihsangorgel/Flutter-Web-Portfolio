@@ -20,12 +20,30 @@
   },
   "navigation": {
     "items": [
-      { "id": "home", "title": "Ana Sayfa" },
-      { "id": "about", "title": "Hakkımda" },
-      { "id": "experience", "title": "Deneyim" },
-      { "id": "projects", "title": "Projeler" },
-      { "id": "skills", "title": "Yetenekler" },
-      { "id": "contact", "title": "İletişim" }
+      {
+        "id": "home",
+        "title": "Ana Sayfa"
+      },
+      {
+        "id": "about",
+        "title": "Hakkımda"
+      },
+      {
+        "id": "experience",
+        "title": "Deneyim"
+      },
+      {
+        "id": "projects",
+        "title": "Projeler"
+      },
+      {
+        "id": "skills",
+        "title": "Yetenekler"
+      },
+      {
+        "id": "contact",
+        "title": "İletişim"
+      }
     ]
   },
   "nav": {
@@ -102,7 +120,14 @@
         "end_date": "Devam Ediyor",
         "period": "Mart 2022 – Devam Ediyor",
         "description": "FugaSoft — cross-platform POS ve satış yönetim sistemi geliştirme\nSQLite-Drift ile karmaşık SQL mimarileri oluşturma\nMediator Pattern ve GetX ile reaktif programlama implementasyonu\nAndroid/iOS tablet ve masaüstü platformlarına (Linux, macOS, Windows) dağıtım\nGerçek zamanlı veri senkronizasyonu için socket teknolojisi ve barkod tarama sistemleri entegrasyonu",
-        "technologies": ["Flutter", "Dart", "SQLite-Drift", "GetX", "WebSocket", "i18n"]
+        "technologies": [
+          "Flutter",
+          "Dart",
+          "SQLite-Drift",
+          "GetX",
+          "WebSocket",
+          "i18n"
+        ]
       },
       {
         "title": "Full Stack Geliştirici",
@@ -112,7 +137,14 @@
         "end_date": "Şub 2025",
         "period": "Haziran 2023 – Şubat 2025",
         "description": "Dorse — lojistik takip uygulamasında mobil geliştirme ekibini yönettim\nAndroid, iOS ve web platformlarına Flutter uygulamaları geliştirdim\nGoogle/Apple Maps ile WebSocket tabanlı gerçek zamanlı araç takibi implementasyonu\nMobile Team Lead olarak frontend, backend ve QA iş akışlarını koordine ettim",
-        "technologies": ["Flutter", "React", "Node.js", "WebSocket", "REST API", "Maps SDK"]
+        "technologies": [
+          "Flutter",
+          "React",
+          "Node.js",
+          "WebSocket",
+          "REST API",
+          "Maps SDK"
+        ]
       },
       {
         "title": "Flutter Geliştirici",
@@ -122,7 +154,13 @@
         "end_date": "Haz 2024",
         "period": "Ekim 2022 – Haziran 2024",
         "description": "Aydınlık E-Gazete ve Bilim ve Ütopya E-Dergi mobil uygulamalarını geliştirdim\nGetX ve Dio ile MVVM mimarisi implementasyonu\nHem Google Play hem App Store'da yayınladım",
-        "technologies": ["Flutter", "Dart", "GetX", "Dio", "MVVM"]
+        "technologies": [
+          "Flutter",
+          "Dart",
+          "GetX",
+          "Dio",
+          "MVVM"
+        ]
       }
     ],
     "projects": [
@@ -195,19 +233,47 @@
     "skills": [
       {
         "category": "Mobile",
-        "items": ["Flutter", "Dart", "Swift", "SwiftUI", "GetX", "BLoC", "Provider"]
+        "items": [
+          "Flutter",
+          "Dart",
+          "Swift",
+          "SwiftUI",
+          "GetX",
+          "BLoC",
+          "Provider"
+        ]
       },
       {
         "category": "Backend",
-        "items": ["Node.js", "Express.js", "Go", "Spring Boot", "MongoDB", "MSSQL", "SQLite"]
+        "items": [
+          "Node.js",
+          "Express.js",
+          "Go",
+          "Spring Boot",
+          "MongoDB",
+          "MSSQL",
+          "SQLite"
+        ]
       },
       {
         "category": "Frontend",
-        "items": ["React", "JavaScript", "TypeScript", "HTML", "CSS"]
+        "items": [
+          "React",
+          "JavaScript",
+          "TypeScript",
+          "HTML",
+          "CSS"
+        ]
       },
       {
         "category": "DevOps",
-        "items": ["AWS", "Docker", "Git", "CI/CD", "Firebase"]
+        "items": [
+          "AWS",
+          "Docker",
+          "Git",
+          "CI/CD",
+          "Firebase"
+        ]
       }
     ],
     "languages": [
@@ -347,7 +413,8 @@
     "contact": "İletişim"
   },
   "experience_section": {
-    "title": "Çalıştığım Yerler"
+    "title": "Çalıştığım Yerler",
+    "present": "Devam Ediyor"
   },
   "contact_section": {
     "title": "İletişime Geç",
@@ -368,7 +435,12 @@
   },
   "blog_section": {
     "title": "Blog",
-    "subtitle": "Teknik derinlemesine incelemeler, mimari kararlar ve production Flutter uygulamaları gönderme deneyimleri"
+    "subtitle": "Teknik derinlemesine incelemeler, mimari kararlar ve production Flutter uygulamaları gönderme deneyimleri",
+    "empty": "Henüz blog yazısı yok",
+    "read_on_medium": "Medium'da Oku",
+    "follow_on_medium": "Medium'da Takip Et",
+    "error": "Blog yazıları yüklenemedi",
+    "retry": "Tekrar Dene"
   },
   "testimonials_section": {
     "title": "Referanslar",
@@ -382,5 +454,10 @@
     "view_source": "Kaynak Kodu",
     "command_hint_prefix": "Basın",
     "command_hint_suffix": "komut paletini açmak için"
+  },
+  "sidebar": {
+    "github": "GitHub",
+    "linkedin": "LinkedIn",
+    "email": "E-posta"
   }
 }
