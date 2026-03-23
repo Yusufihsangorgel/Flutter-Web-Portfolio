@@ -459,5 +459,9 @@
     "github": "GitHub",
     "linkedin": "LinkedIn",
     "email": "E-posta"
+  },
+  "not_found": {
+    "subtitle": "Sayfa bulunamadı",
+    "go_home": "Ana Sayfa"
   }
 }
