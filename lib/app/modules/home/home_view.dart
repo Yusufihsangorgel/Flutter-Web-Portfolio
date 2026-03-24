@@ -17,10 +17,10 @@ import 'package:flutter_web_portfolio/app/modules/home/sections/projects/project
 import 'package:flutter_web_portfolio/app/modules/home/sections/blog_section.dart';
 import 'package:flutter_web_portfolio/app/modules/home/sections/contact/contact_section.dart';
 import 'package:flutter_web_portfolio/app/modules/home/sections/testimonials_section.dart';
-import 'package:flutter_web_portfolio/app/widgets/back_to_top_button.dart';
 import 'package:flutter_web_portfolio/app/widgets/command_palette.dart';
 import 'package:flutter_web_portfolio/app/widgets/custom_sliver_app_bar.dart';
-import 'package:flutter_web_portfolio/app/widgets/footer.dart';
+import 'package:flutter_web_portfolio/app/widgets/premium_footer.dart';
+import 'package:flutter_web_portfolio/app/widgets/social_links_row.dart';
 import 'package:flutter_web_portfolio/app/widgets/matrix_rain.dart';
 import 'package:flutter_web_portfolio/app/widgets/scroll_fade_in.dart';
 import 'package:flutter_web_portfolio/app/widgets/scroll_progress_dots.dart';
@@ -269,7 +269,7 @@ class _HomeViewState extends State<HomeView> {
                         context,
                         delay: AppDurations.staggerShort,
                       ),
-                    const SliverToBoxAdapter(child: PortfolioFooter()),
+                    const SliverToBoxAdapter(child: PremiumFooter()),
                   ],
                   ),
                 ),
@@ -303,8 +303,8 @@ class _HomeViewState extends State<HomeView> {
                   ),
                 ),
               ),
-              // Layer 6: Back-to-top button
-              const BackToTopButton(),
+              // Layer 6: Back-to-top button with scroll progress
+              const PremiumBackToTopButton(),
               // Layer 7: Matrix rain easter egg overlay
               if (_showMatrixRain)
                 Positioned.fill(
