@@ -23,14 +23,12 @@ import 'package:flutter_web_portfolio/app/widgets/cinematic_preloader.dart';
 import 'package:flutter_web_portfolio/app/widgets/circular_theme_reveal.dart';
 import 'package:flutter_web_portfolio/app/widgets/command_palette.dart';
 import 'package:flutter_web_portfolio/app/widgets/custom_sliver_app_bar.dart';
-import 'package:flutter_web_portfolio/app/widgets/film_grain_overlay.dart';
 import 'package:flutter_web_portfolio/app/widgets/premium_footer.dart';
 import 'package:flutter_web_portfolio/app/widgets/social_links_row.dart';
 import 'package:flutter_web_portfolio/app/widgets/sound_toggle.dart';
 import 'package:flutter_web_portfolio/app/widgets/matrix_rain.dart';
 import 'package:flutter_web_portfolio/app/widgets/scroll_fade_in.dart';
 import 'package:flutter_web_portfolio/app/widgets/scroll_progress_dots.dart';
-import 'package:flutter_web_portfolio/app/widgets/wave_background.dart';
 import 'package:flutter_web_portfolio/app/widgets/background/cinematic_background.dart';
 import 'package:flutter_web_portfolio/app/widgets/constellation_particles.dart';
 import 'package:flutter_web_portfolio/app/widgets/social_sidebar.dart';
@@ -165,46 +163,46 @@ class _HomeViewState extends State<HomeView> {
               if (isDark) ...[
                 // Layer 1: Cinematic gradient mesh (parallax 0.3x)
                 Positioned.fill(
-                  child: ListenableBuilder(
-                    listenable: scrollController.scrollController,
-                    builder: (_, child) {
-                      final offset = scrollController
-                              .scrollController.hasClients
-                          ? scrollController.scrollController.offset
-                          : 0.0;
-                      return Transform.translate(
-                        offset: Offset(0, -offset * 0.3),
-                        child: child,
-                      );
-                    },
-                    child: const CinematicBackground(),
-                  ),
-                ),
-                // Layer 2: Constellation particles (parallax 0.15x)
-                Positioned.fill(
-                  child: ListenableBuilder(
-                    listenable: scrollController.scrollController,
-                    builder: (_, child) {
-                      final offset = scrollController
-                              .scrollController.hasClients
-                          ? scrollController.scrollController.offset
-                          : 0.0;
-                      return Transform.translate(
-                        offset: Offset(0, -offset * 0.15),
-                        child: child,
-                      );
-                    },
-                    child: ConstellationParticles(
-                      particleCount: MediaQuery.sizeOf(context).width < Breakpoints.mobile ? 60 : 100,
+                  child: RepaintBoundary(
+                    child: ListenableBuilder(
+                      listenable: scrollController.scrollController,
+                      builder: (_, child) {
+                        final offset = scrollController
+                                .scrollController.hasClients
+                            ? scrollController.scrollController.offset
+                            : 0.0;
+                        return Transform.translate(
+                          offset: Offset(0, -offset * 0.3),
+                          child: child,
+                        );
+                      },
+                      child: const CinematicBackground(),
                     ),
                   ),
                 ),
-                // Layer 2.5: Subtle film grain overlay (dark mode only)
-                const Positioned.fill(
-                  child: FilmGrainOverlay(intensity: 0.04),
+                // Layer 2: Constellation particles (reduced count, parallax 0.15x)
+                Positioned.fill(
+                  child: RepaintBoundary(
+                    child: ListenableBuilder(
+                      listenable: scrollController.scrollController,
+                      builder: (_, child) {
+                        final offset = scrollController
+                                .scrollController.hasClients
+                            ? scrollController.scrollController.offset
+                            : 0.0;
+                        return Transform.translate(
+                          offset: Offset(0, -offset * 0.15),
+                          child: child,
+                        );
+                      },
+                      child: ConstellationParticles(
+                        particleCount: MediaQuery.sizeOf(context).width < Breakpoints.mobile ? 30 : 50,
+                      ),
+                    ),
+                  ),
                 ),
-              ] else ...[
-                // Light mode: gradient background with wave animation
+              ] else
+                // Light mode: simple gradient background (no wave animation)
                 Positioned.fill(
                   child: Container(
                     decoration: const BoxDecoration(
@@ -220,20 +218,6 @@ class _HomeViewState extends State<HomeView> {
                     ),
                   ),
                 ),
-                // Wave background at the bottom of each viewport
-                const Positioned(
-                  left: 0,
-                  right: 0,
-                  bottom: 0,
-                  height: 200,
-                  child: WaveBackground(
-                    waveCount: 3,
-                    minAmplitude: 15,
-                    maxAmplitude: 30,
-                    baseSpeed: 0.2,
-                  ),
-                ),
-              ],
               // Skip-to-content link (accessibility)
               Positioned(
                 top: 0,

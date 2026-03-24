@@ -48,7 +48,4 @@ flutter:
     - assets/data/
     - assets/i18n/
 
-  shaders:
-    - shaders/film_grain.frag
-
   generate: true

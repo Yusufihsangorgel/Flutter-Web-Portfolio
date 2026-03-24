@@ -215,8 +215,8 @@ class _AdvancedCursorState extends State<AdvancedCursor>
       damping: 20,
     );
 
-    // Ticker for 60 fps updates
-    _ticker = createTicker(_onTick)..start();
+    // Ticker for 60 fps updates — starts only when pointer enters
+    _ticker = createTicker(_onTick);
 
     // React to cursor state changes
     _stateWorker = ever(_advCtrl.state, _onStateChanged);
@@ -335,7 +335,10 @@ class _AdvancedCursorState extends State<AdvancedCursor>
   // ------------------------------------------------------------------
 
   void _onTick(Duration elapsed) {
-    if (!_visible) return;
+    if (!_visible) {
+      _lastTick = Duration.zero;
+      return;
+    }
 
     final dt = _lastTick == Duration.zero
         ? 1 / 60
@@ -399,6 +402,8 @@ class _AdvancedCursorState extends State<AdvancedCursor>
       _springY.value = _rawPosition.dy;
       _smoothPosition = _rawPosition;
       _prevPosition = _rawPosition;
+      // Resume ticker only when pointer enters
+      if (!_ticker.isTicking) _ticker.start();
     }
   }
 
@@ -406,6 +411,8 @@ class _AdvancedCursorState extends State<AdvancedCursor>
     _visible = false;
     _trail.clear();
     _lastTick = Duration.zero;
+    // Stop ticker when pointer leaves — saves 60 rebuilds/sec
+    if (_ticker.isTicking) _ticker.stop();
     if (mounted) setState(() {});
   }
 
