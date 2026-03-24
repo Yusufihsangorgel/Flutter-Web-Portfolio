@@ -3,7 +3,6 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:flutter_web_portfolio/app/controllers/audio_controller.dart';
 import 'package:flutter_web_portfolio/app/controllers/language_controller.dart';
 import 'package:flutter_web_portfolio/app/controllers/scroll_controller.dart';
 import 'package:flutter_web_portfolio/app/controllers/scene_director.dart';
@@ -150,7 +149,6 @@ class _CustomSliverAppBarState extends State<CustomSliverAppBar> {
           : null,
       actions: [
         if (!isMobile) _buildNavItems(),
-        if (!isMobile) const _AudioToggleButton(),
         if (!isMobile) const _ThemeToggleButton(),
         const LanguageSwitcher(),
         ...?widget.actions,
@@ -179,32 +177,6 @@ class _CustomSliverAppBarState extends State<CustomSliverAppBar> {
     );
   });
 
-  void _showMobileMenu(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    showGeneralDialog(
-      context: context,
-      barrierDismissible: true,
-      barrierLabel: 'Close menu',
-      barrierColor: isDark
-          ? AppColors.background.withValues(alpha: 0.95)
-          : AppColors.lightBackground.withValues(alpha: 0.95),
-      transitionDuration: AppDurations.medium,
-      transitionBuilder: (context, animation, secondaryAnimation, child) =>
-          FadeTransition(
-            opacity: CurvedAnimation(
-              parent: animation,
-              curve: CinematicCurves.revealDecel,
-            ),
-            child: child,
-          ),
-      pageBuilder: (context, animation, secondaryAnimation) =>
-          _MobileMenuOverlay(
-            navSections: CustomSliverAppBar.navSections(widget.languageController),
-            languageController: widget.languageController,
-            scrollController: widget.scrollController,
-          ),
-    );
-  }
 }
 
 // ---------------------------------------------------------------------------
@@ -256,53 +228,6 @@ class _LogoTextState extends State<_LogoText> {
         ),
       ),
     );
-  }
-}
-
-// ---------------------------------------------------------------------------
-// Audio toggle: speaker on/off icon
-// ---------------------------------------------------------------------------
-class _AudioToggleButton extends StatelessWidget {
-  const _AudioToggleButton();
-
-  @override
-  Widget build(BuildContext context) {
-    if (!Get.isRegistered<AudioController>()) {
-      return const SizedBox.shrink();
-    }
-    final audioController = Get.find<AudioController>();
-
-    return Obx(() {
-      final muted = audioController.isMuted.value;
-      final isDark = Get.isRegistered<ThemeController>()
-          ? Get.find<ThemeController>().isDarkMode.value
-          : true;
-
-      return Semantics(
-        button: true,
-        label: muted ? 'Enable sound effects' : 'Mute sound effects',
-        child: IconButton(
-          onPressed: audioController.toggleMute,
-          icon: AnimatedSwitcher(
-            duration: AppDurations.buttonHover,
-            switchInCurve: CinematicCurves.revealDecel,
-            switchOutCurve: CinematicCurves.revealDecel,
-            transitionBuilder: (child, animation) => FadeTransition(
-              opacity: animation,
-              child: ScaleTransition(scale: animation, child: child),
-            ),
-            child: Icon(
-              muted ? Icons.volume_off_rounded : Icons.volume_up_rounded,
-              key: ValueKey(muted),
-              color: isDark
-                  ? AppColors.textPrimary
-                  : AppColors.lightTextPrimary,
-              size: 20,
-            ),
-          ),
-        ),
-      );
-    });
   }
 }
 
@@ -492,127 +417,3 @@ class _SceneProgressBarState extends State<_SceneProgressBar> {
   );
 }
 
-// ---------------------------------------------------------------------------
-// Mobile menu overlay — fullscreen, cinematic
-// ---------------------------------------------------------------------------
-class _MobileMenuOverlay extends StatelessWidget {
-  const _MobileMenuOverlay({
-    required this.navSections,
-    required this.languageController,
-    required this.scrollController,
-  });
-
-  final List<String> navSections;
-  final LanguageController languageController;
-  final AppScrollController scrollController;
-
-  @override
-  Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final iconColor = isDark ? AppColors.textPrimary : AppColors.lightTextPrimary;
-
-    return Material(
-      color: Colors.transparent,
-      child: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Close button
-            Align(
-              alignment: Alignment.topRight,
-              child: Padding(
-                padding: const EdgeInsets.only(right: 24, bottom: 40),
-                child: IconButton(
-                  icon: Icon(
-                    Icons.close_rounded,
-                    color: iconColor,
-                    size: 28,
-                  ),
-                  onPressed: () => Navigator.pop(context),
-                ),
-              ),
-            ),
-            // Nav items — clean, centered
-            for (final section in navSections)
-              _MobileNavItem(
-                label: languageController.getText(
-                  'nav.$section',
-                  defaultValue: section.toUpperCase(),
-                ),
-                onTap: () {
-                  Navigator.pop(context);
-                  scrollController.scrollToSection(section);
-                },
-              ),
-            const SizedBox(height: 32),
-            // Mobile-only controls
-            const Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                _AudioToggleButton(),
-                SizedBox(width: 8),
-                _ThemeToggleButton(),
-                SizedBox(width: 8),
-                LanguageSwitcher(key: ValueKey('mobile-lang')),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _MobileNavItem extends StatefulWidget {
-  const _MobileNavItem({required this.label, required this.onTap});
-  final String label;
-  final VoidCallback onTap;
-
-  @override
-  State<_MobileNavItem> createState() => _MobileNavItemState();
-}
-
-class _MobileNavItemState extends State<_MobileNavItem> {
-  bool _hovered = false;
-
-  @override
-  Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final activeColor = isDark ? AppColors.textBright : AppColors.lightTextBright;
-    final inactiveColor = isDark ? AppColors.textPrimary : AppColors.lightTextPrimary;
-
-    return MouseRegion(
-      onEnter: (_) => setState(() => _hovered = true),
-      onExit: (_) => setState(() => _hovered = false),
-      cursor: SystemMouseCursors.click,
-      child: GestureDetector(
-        onTap: widget.onTap,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 16),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                widget.label.toUpperCase(),
-                style: GoogleFonts.spaceGrotesk(
-                  color: _hovered ? activeColor : inactiveColor,
-                  fontWeight: FontWeight.w500,
-                  fontSize: 24,
-                  letterSpacing: 4,
-                ),
-              ),
-              const SizedBox(height: 4),
-              AnimatedContainer(
-                duration: AppDurations.fast,
-                curve: CinematicCurves.hoverLift,
-                height: 1,
-                width: _hovered ? 40 : 0,
-                color: (isDark ? Colors.white : Colors.black).withValues(alpha: 0.3),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}

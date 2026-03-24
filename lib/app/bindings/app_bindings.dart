@@ -1,8 +1,6 @@
 import 'dart:developer' as dev;
 
 import 'package:get/get.dart';
-import 'package:flutter_web_portfolio/app/controllers/achievement_controller.dart';
-import 'package:flutter_web_portfolio/app/controllers/audio_controller.dart';
 import 'package:flutter_web_portfolio/app/controllers/cursor_controller.dart';
 import 'package:flutter_web_portfolio/app/controllers/language_controller.dart';
 import 'package:flutter_web_portfolio/app/controllers/personalization_controller.dart';
@@ -33,11 +31,9 @@ class AppBindings extends Bindings {
       ..put(AppScrollController(), permanent: true)
       ..put(SceneDirector(), permanent: true)
       ..put(CursorController(), permanent: true)
-      ..put(AudioController(), permanent: true)
       ..put(MediumProvider(), permanent: true)
       ..put(GitHubProvider(), permanent: true)
       ..put(SoundController(), permanent: true)
-      ..put(AchievementController(), permanent: true)
       ..put(PersonalizationController(), permanent: true);
     if (!Get.isRegistered<LanguageController>()) {
       final dummyRepository = LanguageRepositoryImpl(

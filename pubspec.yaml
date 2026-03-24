@@ -49,9 +49,6 @@ flutter:
     - assets/i18n/
 
   shaders:
-    - shaders/liquid_distortion.frag
-    - shaders/chromatic_aberration.frag
     - shaders/film_grain.frag
-    - shaders/ripple_effect.frag
 
   generate: true
