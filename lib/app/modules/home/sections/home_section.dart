@@ -13,7 +13,6 @@ import 'package:flutter_web_portfolio/app/core/constants/breakpoints.dart';
 import 'package:flutter_web_portfolio/app/core/constants/cinematic_curves.dart';
 import 'package:flutter_web_portfolio/app/widgets/cinematic_button.dart';
 import 'package:flutter_web_portfolio/app/core/constants/durations.dart';
-import 'package:flutter_web_portfolio/app/widgets/personalized_greeting.dart';
 import 'package:flutter_web_portfolio/app/widgets/scroll_indicator.dart';
 import 'package:flutter_web_portfolio/app/widgets/shader_text_reveal.dart';
 import 'package:flutter_web_portfolio/app/widgets/typewriter_text.dart';
@@ -176,10 +175,6 @@ class _HomeSectionState extends State<HomeSection>
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          // Personalized greeting (time-aware + visit count)
-                          const PersonalizedGreeting(showVisitCount: true),
-                          const SizedBox(height: 16),
-
                           // Name — gradient overlay fades in after reveal
                           _HeroNameWithGradient(
                             languageController: languageController,
