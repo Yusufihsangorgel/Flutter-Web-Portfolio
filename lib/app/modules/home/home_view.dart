@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -17,13 +18,20 @@ import 'package:flutter_web_portfolio/app/modules/home/sections/projects/project
 import 'package:flutter_web_portfolio/app/modules/home/sections/blog_section.dart';
 import 'package:flutter_web_portfolio/app/modules/home/sections/contact/contact_section.dart';
 import 'package:flutter_web_portfolio/app/modules/home/sections/testimonials_section.dart';
+import 'package:flutter_web_portfolio/app/widgets/advanced_cursor.dart';
+import 'package:flutter_web_portfolio/app/widgets/cinematic_preloader.dart';
+import 'package:flutter_web_portfolio/app/widgets/circular_theme_reveal.dart';
 import 'package:flutter_web_portfolio/app/widgets/command_palette.dart';
 import 'package:flutter_web_portfolio/app/widgets/custom_sliver_app_bar.dart';
+import 'package:flutter_web_portfolio/app/widgets/film_grain_overlay.dart';
 import 'package:flutter_web_portfolio/app/widgets/premium_footer.dart';
+import 'package:flutter_web_portfolio/app/widgets/section_divider.dart';
 import 'package:flutter_web_portfolio/app/widgets/social_links_row.dart';
+import 'package:flutter_web_portfolio/app/widgets/sound_toggle.dart';
 import 'package:flutter_web_portfolio/app/widgets/matrix_rain.dart';
 import 'package:flutter_web_portfolio/app/widgets/scroll_fade_in.dart';
 import 'package:flutter_web_portfolio/app/widgets/scroll_progress_dots.dart';
+import 'package:flutter_web_portfolio/app/widgets/wave_background.dart';
 import 'package:flutter_web_portfolio/app/widgets/background/cinematic_background.dart';
 import 'package:flutter_web_portfolio/app/widgets/constellation_particles.dart';
 import 'package:flutter_web_portfolio/app/widgets/social_sidebar.dart';
@@ -122,9 +130,38 @@ class _HomeViewState extends State<HomeView> {
             ? Get.find<ThemeController>().isDarkMode.value
             : true;
 
-        return Scaffold(
+        final isDesktop = MediaQuery.sizeOf(context).width > Breakpoints.tablet;
+
+        Widget scaffold = Scaffold(
           backgroundColor: isDark ? AppColors.background : AppColors.lightBackground,
-          body: Stack(
+          body: _buildBody(context, isDark, isDesktop, scrollController, languageController, active),
+        );
+
+        // Wrap with circular theme reveal transition
+        scaffold = CircularThemeReveal(child: scaffold);
+
+        // Wrap with cinematic preloader (plays once per session)
+        scaffold = CinematicPreloader(child: scaffold);
+
+        // Wrap with advanced cursor on desktop web
+        if (kIsWeb && isDesktop) {
+          scaffold = AdvancedCursor(child: scaffold);
+        }
+
+        return scaffold;
+      }),
+    );
+  }
+
+  Widget _buildBody(
+    BuildContext context,
+    bool isDark,
+    bool isDesktop,
+    AppScrollController scrollController,
+    LanguageController languageController,
+    List<String> active,
+  ) {
+    return Stack(
             children: [
               if (isDark) ...[
                 // Layer 1: Cinematic gradient mesh (parallax 0.3x)
@@ -163,8 +200,12 @@ class _HomeViewState extends State<HomeView> {
                     ),
                   ),
                 ),
-              ] else
-                // Light mode: subtle gradient background
+                // Layer 2.5: Subtle film grain overlay (dark mode only)
+                const Positioned.fill(
+                  child: FilmGrainOverlay(intensity: 0.04),
+                ),
+              ] else ...[
+                // Light mode: gradient background with wave animation
                 Positioned.fill(
                   child: Container(
                     decoration: const BoxDecoration(
@@ -180,6 +221,20 @@ class _HomeViewState extends State<HomeView> {
                     ),
                   ),
                 ),
+                // Wave background at the bottom of each viewport
+                const Positioned(
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  height: 200,
+                  child: WaveBackground(
+                    waveCount: 3,
+                    minAmplitude: 15,
+                    maxAmplitude: 30,
+                    baseSpeed: 0.2,
+                  ),
+                ),
+              ],
               // Skip-to-content link (accessibility)
               Positioned(
                 top: 0,
@@ -226,35 +281,44 @@ class _HomeViewState extends State<HomeView> {
                       context,
                       animated: false,
                     ),
-                    if (active.contains('about'))
+                    if (active.contains('about')) ...[
+                      const SliverToBoxAdapter(child: AnimatedSectionDivider()),
                       _buildSection(
                         scrollController.aboutKey,
                         const AboutSection(),
                         context,
                         enableScale: true,
                       ),
-                    if (active.contains('experience'))
+                    ],
+                    if (active.contains('experience')) ...[
+                      const SliverToBoxAdapter(child: AnimatedSectionDivider(style: DividerStyle.dotted)),
                       _buildSection(
                         scrollController.experienceKey,
                         const ExperienceSection(),
                         context,
                         delay: AppDurations.staggerShort,
                       ),
-                    if (active.contains('testimonials'))
+                    ],
+                    if (active.contains('testimonials')) ...[
+                      const SliverToBoxAdapter(child: AnimatedSectionDivider(centerDot: true)),
                       _buildSection(
                         scrollController.testimonialsKey,
                         const TestimonialsSection(),
                         context,
                         delay: AppDurations.staggerShort,
                       ),
-                    if (active.contains('blog'))
+                    ],
+                    if (active.contains('blog')) ...[
+                      const SliverToBoxAdapter(child: AnimatedSectionDivider(style: DividerStyle.dotted)),
                       _buildSection(
                         scrollController.blogKey,
                         const BlogSection(),
                         context,
                         delay: AppDurations.staggerShort,
                       ),
-                    if (active.contains('projects'))
+                    ],
+                    if (active.contains('projects')) ...[
+                      const SliverToBoxAdapter(child: AnimatedSectionDivider(centerDiamond: true)),
                       _buildSection(
                         scrollController.projectsKey,
                         const ProjectsSection(),
@@ -262,13 +326,16 @@ class _HomeViewState extends State<HomeView> {
                         delay: AppDurations.staggerShort,
                         enableScale: true,
                       ),
-                    if (active.contains('contact'))
+                    ],
+                    if (active.contains('contact')) ...[
+                      const SliverToBoxAdapter(child: AnimatedSectionDivider()),
                       _buildSection(
                         scrollController.contactKey,
                         const ContactSection(),
                         context,
                         delay: AppDurations.staggerShort,
                       ),
+                    ],
                     const SliverToBoxAdapter(child: PremiumFooter()),
                   ],
                   ),
@@ -305,7 +372,21 @@ class _HomeViewState extends State<HomeView> {
               ),
               // Layer 6: Back-to-top button with scroll progress
               const PremiumBackToTopButton(),
-              // Layer 7: Matrix rain easter egg overlay
+              // Layer 7: Sound toggle (bottom-left, desktop only)
+              if (isDesktop)
+                ValueListenableBuilder<bool>(
+                  valueListenable: HomeSection.entranceComplete,
+                  builder: (context, entranceDone, _) => Positioned(
+                    bottom: 24,
+                    left: 24,
+                    child: AnimatedOpacity(
+                      opacity: entranceDone ? 1.0 : 0.0,
+                      duration: AppDurations.medium,
+                      child: const SoundToggle(),
+                    ),
+                  ),
+                ),
+              // Layer 8: Matrix rain easter egg overlay
               if (_showMatrixRain)
                 Positioned.fill(
                   child: MatrixRain(
@@ -313,9 +394,6 @@ class _HomeViewState extends State<HomeView> {
                   ),
                 ),
             ],
-          ),
-        );
-      }),
     );
   }
 

@@ -13,6 +13,8 @@ import 'package:flutter_web_portfolio/app/core/constants/cinematic_curves.dart';
 import 'package:flutter_web_portfolio/app/core/constants/durations.dart';
 import 'package:flutter_web_portfolio/app/controllers/theme_controller.dart';
 import 'package:flutter_web_portfolio/app/widgets/cinematic_focusable.dart';
+import 'package:flutter_web_portfolio/app/widgets/circular_theme_reveal.dart';
+import 'package:flutter_web_portfolio/app/widgets/fullscreen_menu.dart';
 import 'package:flutter_web_portfolio/app/widgets/language_switcher.dart';
 
 /// Minimal floating navigation — cinematic, no numbered sections.
@@ -141,7 +143,7 @@ class _CustomSliverAppBarState extends State<CustomSliverAppBar> {
                     color: isDark ? AppColors.textPrimary : AppColors.lightTextPrimary,
                     size: 24 * _scaleFactor,
                   ),
-                  onPressed: () => _showMobileMenu(context),
+                  onPressed: () => FullscreenMenu.show(context),
                 );
               },
             )
@@ -323,7 +325,7 @@ class _ThemeToggleButton extends StatelessWidget {
         button: true,
         label: isDark ? 'Switch to light mode' : 'Switch to dark mode',
         child: IconButton(
-          onPressed: themeController.toggleTheme,
+          onPressed: () => CircularThemeReveal.toggleWithReveal(context),
           icon: AnimatedSwitcher(
             duration: AppDurations.buttonHover,
             switchInCurve: CinematicCurves.revealDecel,

@@ -1,11 +1,14 @@
 import 'dart:developer' as dev;
 
 import 'package:get/get.dart';
+import 'package:flutter_web_portfolio/app/controllers/achievement_controller.dart';
 import 'package:flutter_web_portfolio/app/controllers/audio_controller.dart';
 import 'package:flutter_web_portfolio/app/controllers/cursor_controller.dart';
 import 'package:flutter_web_portfolio/app/controllers/language_controller.dart';
+import 'package:flutter_web_portfolio/app/controllers/personalization_controller.dart';
 import 'package:flutter_web_portfolio/app/controllers/scene_director.dart';
 import 'package:flutter_web_portfolio/app/controllers/scroll_controller.dart';
+import 'package:flutter_web_portfolio/app/controllers/sound_controller.dart';
 import 'package:flutter_web_portfolio/app/data/providers/assets_provider.dart';
 import 'package:flutter_web_portfolio/app/controllers/theme_controller.dart';
 import 'package:flutter_web_portfolio/app/data/providers/local_storage_provider.dart';
@@ -32,7 +35,10 @@ class AppBindings extends Bindings {
       ..put(CursorController(), permanent: true)
       ..put(AudioController(), permanent: true)
       ..put(MediumProvider(), permanent: true)
-      ..put(GitHubProvider(), permanent: true);
+      ..put(GitHubProvider(), permanent: true)
+      ..put(SoundController(), permanent: true)
+      ..put(AchievementController(), permanent: true)
+      ..put(PersonalizationController(), permanent: true);
     if (!Get.isRegistered<LanguageController>()) {
       final dummyRepository = LanguageRepositoryImpl(
         assetsProvider: Get.find<IAssetsProvider>(),

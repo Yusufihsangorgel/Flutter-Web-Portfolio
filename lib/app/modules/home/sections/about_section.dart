@@ -13,6 +13,7 @@ import 'package:flutter_web_portfolio/app/utils/responsive_utils.dart';
 import 'package:flutter_web_portfolio/app/widgets/github_activity.dart';
 import 'package:flutter_web_portfolio/app/widgets/github_heatmap.dart';
 import 'package:flutter_web_portfolio/app/widgets/numbered_section_heading.dart';
+import 'package:flutter_web_portfolio/app/widgets/animated_stats.dart';
 import 'package:flutter_web_portfolio/app/widgets/scroll_fade_in.dart';
 import 'package:flutter_web_portfolio/app/widgets/skill_bar_chart.dart';
 import 'package:flutter_web_portfolio/app/widgets/skill_orbit.dart';
@@ -62,6 +63,50 @@ class AboutSection extends StatelessWidget {
                 _buildMobileLayout(data, languageController)
               else
                 _buildDesktopLayout(data, languageController),
+              // Animated stats row
+              ScrollFadeIn(
+                delay: AppDurations.staggerShort,
+                child: Obx(() {
+                  final accent = Get.find<SceneDirector>().currentAccent.value;
+                  return Wrap(
+                    spacing: 16,
+                    runSpacing: 16,
+                    alignment: WrapAlignment.center,
+                    children: [
+                      AnimatedStatCard(
+                        value: 5,
+                        suffix: '+',
+                        label: languageController.getText(
+                          'about_section.years_exp',
+                          defaultValue: 'Years Experience',
+                        ),
+                        accentColor: accent,
+                      ),
+                      AnimatedStatCard(
+                        value: 30,
+                        suffix: '+',
+                        label: languageController.getText(
+                          'about_section.projects',
+                          defaultValue: 'Projects Completed',
+                        ),
+                        accentColor: accent,
+                        delay: const Duration(milliseconds: 200),
+                      ),
+                      AnimatedStatCard(
+                        value: 15,
+                        suffix: '+',
+                        label: languageController.getText(
+                          'about_section.technologies',
+                          defaultValue: 'Technologies',
+                        ),
+                        accentColor: accent,
+                        delay: const Duration(milliseconds: 400),
+                      ),
+                    ],
+                  );
+                }),
+              ),
+              const SizedBox(height: 32),
               // GitHub Activity
               const GitHubActivity(),
               const SizedBox(height: 24),
