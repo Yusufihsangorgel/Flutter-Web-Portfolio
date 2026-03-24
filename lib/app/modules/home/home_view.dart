@@ -25,7 +25,6 @@ import 'package:flutter_web_portfolio/app/widgets/command_palette.dart';
 import 'package:flutter_web_portfolio/app/widgets/custom_sliver_app_bar.dart';
 import 'package:flutter_web_portfolio/app/widgets/film_grain_overlay.dart';
 import 'package:flutter_web_portfolio/app/widgets/premium_footer.dart';
-import 'package:flutter_web_portfolio/app/widgets/section_divider.dart';
 import 'package:flutter_web_portfolio/app/widgets/social_links_row.dart';
 import 'package:flutter_web_portfolio/app/widgets/sound_toggle.dart';
 import 'package:flutter_web_portfolio/app/widgets/matrix_rain.dart';
@@ -281,44 +280,35 @@ class _HomeViewState extends State<HomeView> {
                       context,
                       animated: false,
                     ),
-                    if (active.contains('about')) ...[
-                      const SliverToBoxAdapter(child: AnimatedSectionDivider()),
+                    if (active.contains('about'))
                       _buildSection(
                         scrollController.aboutKey,
                         const AboutSection(),
                         context,
                         enableScale: true,
                       ),
-                    ],
-                    if (active.contains('experience')) ...[
-                      const SliverToBoxAdapter(child: AnimatedSectionDivider(style: DividerStyle.dotted)),
+                    if (active.contains('experience'))
                       _buildSection(
                         scrollController.experienceKey,
                         const ExperienceSection(),
                         context,
                         delay: AppDurations.staggerShort,
                       ),
-                    ],
-                    if (active.contains('testimonials')) ...[
-                      const SliverToBoxAdapter(child: AnimatedSectionDivider(centerDot: true)),
+                    if (active.contains('testimonials'))
                       _buildSection(
                         scrollController.testimonialsKey,
                         const TestimonialsSection(),
                         context,
                         delay: AppDurations.staggerShort,
                       ),
-                    ],
-                    if (active.contains('blog')) ...[
-                      const SliverToBoxAdapter(child: AnimatedSectionDivider(style: DividerStyle.dotted)),
+                    if (active.contains('blog'))
                       _buildSection(
                         scrollController.blogKey,
                         const BlogSection(),
                         context,
                         delay: AppDurations.staggerShort,
                       ),
-                    ],
-                    if (active.contains('projects')) ...[
-                      const SliverToBoxAdapter(child: AnimatedSectionDivider(centerDiamond: true)),
+                    if (active.contains('projects'))
                       _buildSection(
                         scrollController.projectsKey,
                         const ProjectsSection(),
@@ -326,16 +316,13 @@ class _HomeViewState extends State<HomeView> {
                         delay: AppDurations.staggerShort,
                         enableScale: true,
                       ),
-                    ],
-                    if (active.contains('contact')) ...[
-                      const SliverToBoxAdapter(child: AnimatedSectionDivider()),
+                    if (active.contains('contact'))
                       _buildSection(
                         scrollController.contactKey,
                         const ContactSection(),
                         context,
                         delay: AppDurations.staggerShort,
                       ),
-                    ],
                     const SliverToBoxAdapter(child: PremiumFooter()),
                   ],
                   ),
