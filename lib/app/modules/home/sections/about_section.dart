@@ -10,7 +10,6 @@ import 'package:flutter_web_portfolio/app/core/constants/cinematic_curves.dart';
 import 'package:flutter_web_portfolio/app/core/constants/durations.dart';
 import 'package:flutter_web_portfolio/app/core/theme/app_typography.dart';
 import 'package:flutter_web_portfolio/app/utils/responsive_utils.dart';
-import 'package:flutter_web_portfolio/app/widgets/github_activity.dart';
 import 'package:flutter_web_portfolio/app/widgets/numbered_section_heading.dart';
 import 'package:flutter_web_portfolio/app/widgets/animated_stats.dart';
 import 'package:flutter_web_portfolio/app/widgets/scroll_fade_in.dart';
@@ -105,9 +104,6 @@ class AboutSection extends StatelessWidget {
                   );
                 }),
               ),
-              const SizedBox(height: 32),
-              // GitHub Activity
-              const GitHubActivity(),
             ],
           ),
         ],
