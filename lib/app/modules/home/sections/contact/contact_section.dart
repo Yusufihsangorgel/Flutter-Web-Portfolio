@@ -27,7 +27,7 @@ class ContactSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final languageController = Get.find<LanguageController>();
     final data = languageController.cvData['personal_info'] as Map<String, dynamic>? ?? <String, dynamic>{};
-    final email = (data['email'] as String?) ?? 'developeryusuf@icloud.com';
+    final email = (data['email'] as String?) ?? 'hello@example.com';
     final screenWidth = MediaQuery.sizeOf(context).width;
 
     return Container(

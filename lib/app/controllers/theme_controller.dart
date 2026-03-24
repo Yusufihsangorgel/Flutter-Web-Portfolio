@@ -47,7 +47,9 @@ class ThemeController extends GetxController with WidgetsBindingObserver {
           return storage.getBool(_storageKey) != null;
         }
       }
-    } catch (_) {}
+    } catch (e) {
+      dev.log('Failed to check manual theme override', name: 'ThemeController', error: e);
+    }
     return false;
   }
 

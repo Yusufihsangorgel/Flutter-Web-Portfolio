@@ -1,3 +1,5 @@
+import 'dart:developer' as dev;
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_web_portfolio/app/controllers/personalization_controller.dart';
@@ -113,7 +115,9 @@ class _PersonalizedGreetingState extends State<PersonalizedGreeting>
       if (Get.isRegistered<PersonalizationController>()) {
         return Get.find<PersonalizationController>();
       }
-    } catch (_) {}
+    } catch (e) {
+      dev.log('Failed to find PersonalizationController', name: 'PersonalizedGreeting', error: e);
+    }
     return null;
   }
 

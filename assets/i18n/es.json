@@ -302,7 +302,7 @@
       }
     ],
     "contact": {
-      "formspree_id": "xpznqkao",
+      "formspree_id": "YOUR_FORMSPREE_ID",
       "form": {
         "name_label": "Nombre",
         "email_label": "Correo Electrónico",

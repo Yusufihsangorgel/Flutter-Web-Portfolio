@@ -49,15 +49,28 @@ class _FullscreenMenuState extends State<FullscreenMenu>
 
   int _hoveredIndex = -1;
 
-  static const _menuItems = [
-    _MenuItem(key: 'home', icon: Icons.home_outlined, number: '01'),
-    _MenuItem(key: 'about', icon: Icons.person_outline, number: '02'),
-    _MenuItem(key: 'experience', icon: Icons.work_outline, number: '03'),
-    _MenuItem(key: 'projects', icon: Icons.code_outlined, number: '04'),
-    _MenuItem(key: 'blog', icon: Icons.article_outlined, number: '05'),
-    _MenuItem(key: 'testimonials', icon: Icons.format_quote_outlined, number: '06'),
-    _MenuItem(key: 'contact', icon: Icons.mail_outline, number: '07'),
-  ];
+  static const _iconMap = <String, IconData>{
+    'home': Icons.home_outlined,
+    'about': Icons.person_outline,
+    'experience': Icons.work_outline,
+    'projects': Icons.code_outlined,
+    'blog': Icons.article_outlined,
+    'testimonials': Icons.format_quote_outlined,
+    'contact': Icons.mail_outline,
+  };
+
+  List<_MenuItem> _buildMenuItems() {
+    final sections = Get.find<LanguageController>().activeSections;
+    return [
+      const _MenuItem(key: 'home', icon: Icons.home_outlined, number: '01'),
+      for (var i = 0; i < sections.length; i++)
+        _MenuItem(
+          key: sections[i],
+          icon: _iconMap[sections[i]] ?? Icons.circle_outlined,
+          number: (i + 2).toString().padLeft(2, '0'),
+        ),
+    ];
+  }
 
   @override
   void initState() {
@@ -166,8 +179,8 @@ class _FullscreenMenuState extends State<FullscreenMenu>
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: List.generate(_menuItems.length, (index) {
-                  final item = _menuItems[index];
+                children: List.generate(_buildMenuItems().length, (index) {
+                  final item = _buildMenuItems()[index];
                   final itemDelay = 0.15 + (index * 0.06);
                   final itemEnd = (itemDelay + 0.25).clamp(0.0, 1.0);
 

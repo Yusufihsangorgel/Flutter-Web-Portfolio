@@ -1,3 +1,4 @@
+import 'dart:developer' as dev;
 import 'dart:js_interop';
 
 import 'package:get/get.dart';
@@ -69,8 +70,8 @@ class SoundController extends GetxController {
           );
         }
       }
-    } catch (_) {
-      // localStorage unavailable — keep defaults.
+    } catch (e) {
+      dev.log('Failed to load sound preferences from localStorage', name: 'SoundController', error: e);
     }
   }
 
@@ -84,8 +85,8 @@ class SoundController extends GetxController {
         SoundConstants.storageKeyVolume,
         masterVolume.value.toString(),
       );
-    } catch (_) {
-      // Ignore write failures.
+    } catch (e) {
+      dev.log('Failed to save sound preferences to localStorage', name: 'SoundController', error: e);
     }
   }
 
@@ -322,7 +323,8 @@ class SoundController extends GetxController {
       return web.window
           .matchMedia('(prefers-reduced-motion: reduce)')
           .matches;
-    } catch (_) {
+    } catch (e) {
+      dev.log('Failed to query prefers-reduced-motion', name: 'SoundController', error: e);
       return false;
     }
   }

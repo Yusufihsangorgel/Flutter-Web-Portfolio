@@ -291,7 +291,7 @@
       }
     ],
     "contact": {
-      "formspree_id": "xpznqkao",
+      "formspree_id": "YOUR_FORMSPREE_ID",
       "form": {
         "name_label": "नाम",
         "email_label": "ईमेल",

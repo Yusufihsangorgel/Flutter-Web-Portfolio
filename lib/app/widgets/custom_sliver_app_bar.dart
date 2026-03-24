@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_web_portfolio/app/controllers/language_controller.dart';
+import 'package:flutter_web_portfolio/app/core/constants/app_config.dart';
 import 'package:flutter_web_portfolio/app/controllers/scroll_controller.dart';
 import 'package:flutter_web_portfolio/app/controllers/scene_director.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
@@ -131,6 +132,7 @@ class _CustomSliverAppBarState extends State<CustomSliverAppBar> {
       title: _LogoText(
         onTap: () => widget.scrollController.scrollToSection('home'),
         scaleFactor: _scaleFactor,
+        languageController: widget.languageController,
       ),
       leading: isMobile
           ? Builder(
@@ -183,9 +185,10 @@ class _CustomSliverAppBarState extends State<CustomSliverAppBar> {
 // Logo: "YG" — Space Grotesk Bold, hover glow
 // ---------------------------------------------------------------------------
 class _LogoText extends StatefulWidget {
-  const _LogoText({required this.onTap, this.scaleFactor = 1.0});
+  const _LogoText({required this.onTap, this.scaleFactor = 1.0, required this.languageController});
   final VoidCallback onTap;
   final double scaleFactor;
+  final LanguageController languageController;
 
   @override
   State<_LogoText> createState() => _LogoTextState();
@@ -209,7 +212,7 @@ class _LogoTextState extends State<_LogoText> {
         child: AnimatedContainer(
           duration: AppDurations.buttonHover,
           child: Text(
-            'YG',
+            AppConfig.initials(widget.languageController),
             style: GoogleFonts.spaceGrotesk(
               fontSize: 20 * widget.scaleFactor,
               fontWeight: FontWeight.w700,

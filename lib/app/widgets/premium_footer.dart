@@ -152,7 +152,7 @@ class _BrandColumn extends StatelessWidget {
       final data = languageController.cvData['personal_info']
               as Map<String, dynamic>? ??
           <String, dynamic>{};
-      final name = (data['name'] as String?) ?? 'Yusuf Ihsan Gorgel';
+      final name = (data['name'] as String?) ?? 'Your Name';
 
       return Column(
         crossAxisAlignment:
@@ -176,9 +176,8 @@ class _BrandColumn extends StatelessWidget {
           // ── Tagline ───────────────────────────────────────────────
           Text(
             languageController.getText(
-              'footer.tagline',
-              defaultValue:
-                  'Crafting digital experiences with code & creativity',
+              'cv_data.personal_info.tagline',
+              defaultValue: 'Building digital experiences',
             ),
             textAlign: centered ? TextAlign.center : TextAlign.start,
             style: GoogleFonts.jetBrainsMono(

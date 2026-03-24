@@ -1,3 +1,5 @@
+import 'dart:developer' as dev;
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -56,7 +58,8 @@ class _BlogSectionState extends State<BlogSection> {
           _loading = false;
         });
       }
-    } catch (_) {
+    } catch (e) {
+      dev.log('Failed to fetch blog posts', name: 'BlogSection', error: e);
       if (mounted) {
         setState(() {
           _loading = false;

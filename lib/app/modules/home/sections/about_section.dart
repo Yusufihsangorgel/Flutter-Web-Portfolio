@@ -11,6 +11,7 @@ import 'package:flutter_web_portfolio/app/core/constants/durations.dart';
 import 'package:flutter_web_portfolio/app/core/theme/app_typography.dart';
 import 'package:flutter_web_portfolio/app/utils/responsive_utils.dart';
 import 'package:flutter_web_portfolio/app/widgets/numbered_section_heading.dart';
+import 'package:flutter_web_portfolio/app/core/constants/app_config.dart';
 import 'package:flutter_web_portfolio/app/widgets/animated_stats.dart';
 import 'package:flutter_web_portfolio/app/widgets/scroll_fade_in.dart';
 import 'package:flutter_web_portfolio/app/widgets/skill_bar_chart.dart';
@@ -62,48 +63,52 @@ class AboutSection extends StatelessWidget {
               else
                 _buildDesktopLayout(data, languageController),
               // Animated stats row
-              ScrollFadeIn(
-                delay: AppDurations.staggerShort,
-                child: Obx(() {
-                  final accent = Get.find<SceneDirector>().currentAccent.value;
-                  return Wrap(
-                    spacing: 16,
-                    runSpacing: 16,
-                    alignment: WrapAlignment.center,
-                    children: [
-                      AnimatedStatCard(
-                        value: 5,
-                        suffix: '+',
-                        label: languageController.getText(
-                          'about_section.years_exp',
-                          defaultValue: 'Years Experience',
-                        ),
-                        accentColor: accent,
-                      ),
-                      AnimatedStatCard(
-                        value: 30,
-                        suffix: '+',
-                        label: languageController.getText(
-                          'about_section.projects',
-                          defaultValue: 'Projects Completed',
-                        ),
-                        accentColor: accent,
-                        delay: const Duration(milliseconds: 200),
-                      ),
-                      AnimatedStatCard(
-                        value: 15,
-                        suffix: '+',
-                        label: languageController.getText(
-                          'about_section.technologies',
-                          defaultValue: 'Technologies',
-                        ),
-                        accentColor: accent,
-                        delay: const Duration(milliseconds: 400),
-                      ),
-                    ],
-                  );
-                }),
-              ),
+              if (AppConfig.hasStats(languageController))
+                ScrollFadeIn(
+                  delay: AppDurations.staggerShort,
+                  child: Obx(() {
+                    final accent = Get.find<SceneDirector>().currentAccent.value;
+                    return Wrap(
+                      spacing: 16,
+                      runSpacing: 16,
+                      alignment: WrapAlignment.center,
+                      children: [
+                        if (AppConfig.yearsExperience(languageController) > 0)
+                          AnimatedStatCard(
+                            value: AppConfig.yearsExperience(languageController),
+                            suffix: '+',
+                            label: languageController.getText(
+                              'about_section.years_exp',
+                              defaultValue: 'Years Experience',
+                            ),
+                            accentColor: accent,
+                          ),
+                        if (AppConfig.projectsCompleted(languageController) > 0)
+                          AnimatedStatCard(
+                            value: AppConfig.projectsCompleted(languageController),
+                            suffix: '+',
+                            label: languageController.getText(
+                              'about_section.projects',
+                              defaultValue: 'Projects Completed',
+                            ),
+                            accentColor: accent,
+                            delay: const Duration(milliseconds: 200),
+                          ),
+                        if (AppConfig.technologies(languageController) > 0)
+                          AnimatedStatCard(
+                            value: AppConfig.technologies(languageController),
+                            suffix: '+',
+                            label: languageController.getText(
+                              'about_section.technologies',
+                              defaultValue: 'Technologies',
+                            ),
+                            accentColor: accent,
+                            delay: const Duration(milliseconds: 400),
+                          ),
+                      ],
+                    );
+                  }),
+                ),
             ],
           ),
         ],

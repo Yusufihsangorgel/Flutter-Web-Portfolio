@@ -1,3 +1,4 @@
+import 'dart:developer' as dev;
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
@@ -171,8 +172,8 @@ class _CinematicPreloaderState extends State<CinematicPreloader>
         try {
           _master.dispose();
           _exit.dispose();
-        } catch (_) {
-          // Controllers may not have been initialised if session flag was set.
+        } catch (e) {
+          dev.log('Failed to dispose animation controllers', name: 'CinematicPreloader', error: e);
         }
       }
     }

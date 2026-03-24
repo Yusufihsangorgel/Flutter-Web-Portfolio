@@ -1,3 +1,5 @@
+import 'dart:developer' as dev;
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -42,7 +44,7 @@ class _GitHubActivityState extends State<GitHubActivity> {
   String _resolveUsername() {
     final lang = Get.find<LanguageController>();
     final github = (lang.cvData['personal_info']?['github'] as String?) ?? '';
-    // Extract username from URL like "https://github.com/Yusufihsangorgel"
+    // Extract username from URL like "https://github.com/username"
     final uri = Uri.tryParse(github);
     if (uri != null && uri.pathSegments.isNotEmpty) {
       return uri.pathSegments.first;
@@ -71,7 +73,8 @@ class _GitHubActivityState extends State<GitHubActivity> {
         _loading = false;
         _error = false;
       });
-    } catch (_) {
+    } catch (e) {
+      dev.log('Failed to fetch GitHub data', name: 'GitHubActivity', error: e);
       if (!mounted) return;
       setState(() {
         _profile = GitHubProvider.fallbackProfile(_username);

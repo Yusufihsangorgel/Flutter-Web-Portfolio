@@ -18,6 +18,7 @@ import 'package:flutter_web_portfolio/app/modules/home/sections/projects/project
 import 'package:flutter_web_portfolio/app/modules/home/sections/blog_section.dart';
 import 'package:flutter_web_portfolio/app/modules/home/sections/contact/contact_section.dart';
 import 'package:flutter_web_portfolio/app/modules/home/sections/testimonials_section.dart';
+import 'package:flutter_web_portfolio/app/core/constants/app_config.dart';
 import 'package:flutter_web_portfolio/app/widgets/advanced_cursor.dart';
 import 'package:flutter_web_portfolio/app/widgets/cinematic_preloader.dart';
 import 'package:flutter_web_portfolio/app/widgets/circular_theme_reveal.dart';
@@ -138,7 +139,11 @@ class _HomeViewState extends State<HomeView> {
         scaffold = CircularThemeReveal(child: scaffold);
 
         // Wrap with cinematic preloader (plays once per session)
-        scaffold = CinematicPreloader(child: scaffold);
+        scaffold = CinematicPreloader(
+          displayName: AppConfig.name(languageController).toUpperCase(),
+          tagline: AppConfig.tagline(languageController),
+          child: scaffold,
+        );
 
         // Wrap with advanced cursor on desktop web
         if (kIsWeb && isDesktop) {

@@ -194,7 +194,9 @@ class VisitorAnalytics {
         final s = Get.find<ILocalStorageProvider>();
         return s.isInitialized ? s : null;
       }
-    } catch (_) {}
+    } catch (e) {
+      dev.log('Failed to access local storage provider', name: 'VisitorAnalytics', error: e);
+    }
     return null;
   }
 
@@ -277,7 +279,9 @@ class VisitorAnalytics {
         if (width < 600) return DeviceType.mobile;
         if (width < 1024) return DeviceType.tablet;
       }
-    } catch (_) {}
+    } catch (e) {
+      dev.log('Failed to detect device type', name: 'VisitorAnalytics', error: e);
+    }
     return DeviceType.desktop;
   }
 
@@ -286,7 +290,9 @@ class VisitorAnalytics {
     try {
       final locales = PlatformDispatcher.instance.locales;
       if (locales.isNotEmpty) return locales.first.languageCode;
-    } catch (_) {}
+    } catch (e) {
+      dev.log('Failed to detect language', name: 'VisitorAnalytics', error: e);
+    }
     return 'en';
   }
 
@@ -299,7 +305,8 @@ class VisitorAnalytics {
       // library level (which would break non-web compilation).
       // ignore: avoid_dynamic_calls
       return Uri.tryParse(_webReferrer())?.host ?? '';
-    } catch (_) {
+    } catch (e) {
+      dev.log('Failed to detect referrer', name: 'VisitorAnalytics', error: e);
       return '';
     }
   }
@@ -312,7 +319,8 @@ class VisitorAnalytics {
       // through the JS interop that Flutter web provides automatically.
       // If this fails we simply return empty.
       return '';
-    } catch (_) {
+    } catch (e) {
+      dev.log('Failed to read web referrer', name: 'VisitorAnalytics', error: e);
       return '';
     }
   }

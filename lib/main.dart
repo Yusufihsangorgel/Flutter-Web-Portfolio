@@ -59,18 +59,12 @@ void _printConsoleAsciiArt() {
     // ignore: avoid_print
     print('''
 
- __   __  _______  _______
-|  | |  ||       ||       |
-|  |_|  ||    ___||    ___|
-|       ||   | __ |   | __
-|_     _||   ||  ||   ||  |
-  |   |  |   |_| ||   |_| |
-  |___|  |_______||_______|
-
-  Yusuf Ihsan Gorgel
-  Mobile Software Engineer
-  -------------------------
-  Psst... try Ctrl+K
+ ╔═══════════════════════════════╗
+ ║   Flutter Developer Portfolio ║
+ ║   Built with Clean Architecture
+ ║   ─────────────────────────── ║
+ ║   Psst... try Ctrl+K         ║
+ ╚═══════════════════════════════╝
 
 ''');
   }
