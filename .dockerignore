@@ -2,8 +2,7 @@
 .github
 .dart_tool
 .idea
-test
-*.md
 .claude
-lib
-assets
+test
+coverage
+*.md
