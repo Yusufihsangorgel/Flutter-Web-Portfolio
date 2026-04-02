@@ -25,85 +25,81 @@ class TestimonialsSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final languageController = Get.find<LanguageController>();
     final screenWidth = MediaQuery.sizeOf(context).width;
+    return Obx(() {
+      final testimonials =
+          languageController.cvData['testimonials'] as List? ?? [];
+      if (testimonials.isEmpty) return const SizedBox.shrink();
 
-    return Center(
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 1100),
-        child: Stack(
-          children: [
-            // Giant watermark
-            Positioned(
-              top: -20,
-              left: -10,
-              child: Obx(() => Text(
-                languageController
-                    .getText('nav.testimonials', defaultValue: 'Testimonials')
-                    .toUpperCase(),
-                style: GoogleFonts.spaceGrotesk(
-                  fontSize: ResponsiveUtils.getValueForScreenType<double>(
-                    context: context,
-                    mobile: 36.0,
-                    tablet: screenWidth * 0.10,
-                    desktop: screenWidth * 0.12,
-                  ),
-                  fontWeight: FontWeight.w800,
-                  color: Colors.white.withValues(alpha: 0.03),
-                  letterSpacing: -3,
-                ),
-              )),
-            ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: 40),
-                // Section title
-                ScrollFadeIn(
-                  child: Obx(() {
-                    final accent =
-                        Get.find<SceneDirector>().currentAccent.value;
-                    return NumberedSectionHeading(
-                      number: '03',
-                      title: languageController.getText(
-                        'testimonials_section.title',
-                        defaultValue: 'What People Say',
-                      ),
-                      accent: accent,
-                    );
-                  }),
-                ),
-                const SizedBox(height: 12),
-                ScrollFadeIn(
-                  delay: AppDurations.staggerShort,
-                  child: Text(
-                    languageController.getText(
-                      'testimonials_section.subtitle',
-                      defaultValue:
-                          'Feedback from colleagues and mentors I have worked with',
+      return Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 1100),
+          child: Stack(
+            children: [
+              Positioned(
+                top: -20,
+                left: -10,
+                child: Obx(() => Text(
+                  languageController
+                      .getText('nav.testimonials', defaultValue: 'Testimonials')
+                      .toUpperCase(),
+                  style: GoogleFonts.spaceGrotesk(
+                    fontSize: ResponsiveUtils.getValueForScreenType<double>(
+                      context: context,
+                      mobile: 36.0,
+                      tablet: screenWidth * 0.10,
+                      desktop: screenWidth * 0.12,
                     ),
-                    style: AppTypography.body,
+                    fontWeight: FontWeight.w800,
+                    color: Colors.white.withValues(alpha: 0.03),
+                    letterSpacing: -3,
                   ),
-                ),
-                const SizedBox(height: 40),
-                // Testimonial cards
-                Obx(() {
-                  final testimonials =
-                      languageController.cvData['testimonials'] as List? ?? [];
-                  if (testimonials.isEmpty) return const SizedBox.shrink();
-
-                  final isDesktop =
-                      screenWidth >= Breakpoints.tablet;
-
-                  if (isDesktop) {
-                    return _TestimonialsGrid(testimonials: testimonials);
-                  }
-                  return _TestimonialsCarousel(testimonials: testimonials);
-                }),
-              ],
-            ),
-          ],
+                )),
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 40),
+                  ScrollFadeIn(
+                    child: Obx(() {
+                      final accent =
+                          Get.find<SceneDirector>().currentAccent.value;
+                      return NumberedSectionHeading(
+                        number: '03',
+                        title: languageController.getText(
+                          'testimonials_section.title',
+                          defaultValue: 'What People Say',
+                        ),
+                        accent: accent,
+                      );
+                    }),
+                  ),
+                  const SizedBox(height: 12),
+                  ScrollFadeIn(
+                    delay: AppDurations.staggerShort,
+                    child: Text(
+                      languageController.getText(
+                        'testimonials_section.subtitle',
+                        defaultValue:
+                            'Feedback from colleagues and mentors I have worked with',
+                      ),
+                      style: AppTypography.body,
+                    ),
+                  ),
+                  const SizedBox(height: 40),
+                  Builder(builder: (context) {
+                    final isDesktop = screenWidth >= Breakpoints.tablet;
+                    if (isDesktop) {
+                      return _TestimonialsGrid(testimonials: testimonials);
+                    }
+                    return _TestimonialsCarousel(testimonials: testimonials);
+                  }),
+                ],
+              ),
+            ],
+          ),
         ),
-      ),
-    );
+      );
+    });
   }
 }
 
@@ -132,11 +128,8 @@ class _TestimonialsGrid extends StatelessWidget {
         childAspectRatio: crossAxisCount == 1 ? 1.8 : 0.85,
       ),
       itemCount: testimonials.length,
-      itemBuilder: (context, index) => ScrollFadeIn(
-        delay: Duration(milliseconds: 100 * index),
-        child: _TestimonialCard(
-          testimonial: testimonials[index] as Map<String, dynamic>,
-        ),
+      itemBuilder: (context, index) => _TestimonialCard(
+        testimonial: testimonials[index] as Map<String, dynamic>,
       ),
     );
   }

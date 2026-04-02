@@ -1,7 +1,5 @@
 import 'dart:async';
 import 'dart:developer' as dev;
-import 'dart:math' as math;
-
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -141,7 +139,8 @@ class AppScrollController extends GetxController with WidgetsBindingObserver {
 
     final renderBox = key.currentContext!.findRenderObject() as RenderBox;
     final position = renderBox.localToGlobal(Offset.zero);
-    _sectionOffsets[sectionId] = position.dy;
+    final currentOffset = scrollController.hasClients ? scrollController.offset : 0.0;
+    _sectionOffsets[sectionId] = position.dy + currentOffset;
     _sectionHeights[sectionId] = renderBox.size.height;
   }
 
@@ -154,66 +153,33 @@ class AppScrollController extends GetxController with WidgetsBindingObserver {
   }
 
   void _detectActiveSection() {
-    if (!scrollController.hasClients || _sectionOffsets.isEmpty) return;
+    if (!scrollController.hasClients) return;
+    if (scrollController.positions.isEmpty) return;
 
     try {
+      // Refresh offsets every detection cycle to avoid stale data
+      _updateSectionInfo();
+
+      if (_sectionOffsets.isEmpty) return;
+
       const appBarHeight = AppDimensions.appBarHeight;
-      final screenHeight = Get.height;
+      final scrollOffset = scrollController.offset;
+      final viewportHeight = Get.height - appBarHeight;
+      final viewportCenter = scrollOffset + appBarHeight + viewportHeight / 2;
 
-      if (scrollController.positions.isEmpty) return;
+      var bestSection = 'home';
+      var bestDistance = double.infinity;
 
-      final scrollPosition = scrollController.offset;
-      final visibleTop = scrollPosition + appBarHeight;
-      final visibleBottom = visibleTop + screenHeight - appBarHeight;
-      final visibleMiddle = visibleTop + (screenHeight - appBarHeight) / 2;
+      _sectionOffsets.forEach((sectionId, top) {
+        final height = _sectionHeights[sectionId] ?? 0;
+        final sectionCenter = top + height / 2;
+        final distance = (sectionCenter - viewportCenter).abs();
 
-      final sectionScores = <String, double>{};
-
-      _sectionOffsets.forEach((sectionId, offsetTop) {
-        final height = _sectionHeights[sectionId] ?? 600;
-        final offsetBottom = offsetTop + height;
-
-        final visibleStart = math.max(offsetTop, visibleTop);
-        final visibleEnd = math.min(offsetBottom, visibleBottom);
-
-        if (visibleEnd > visibleStart) {
-          final visibleAmount = visibleEnd - visibleStart;
-          final visibilityPercentage = visibleAmount / height;
-
-          final sectionMiddle = offsetTop + height / 2;
-          final distanceFromMiddle = (sectionMiddle - visibleMiddle).abs();
-          final normalizedDistance =
-              1.0 - math.min(1.0, distanceFromMiddle / (screenHeight / 2));
-
-          sectionScores[sectionId] =
-              (visibilityPercentage * 0.7) + (normalizedDistance * 0.3);
+        if (distance < bestDistance) {
+          bestDistance = distance;
+          bestSection = sectionId;
         }
       });
-
-      if (sectionScores.isEmpty) {
-        var closestSection = 'home';
-        var minDistance = double.infinity;
-
-        _sectionOffsets.forEach((sectionId, offsetTop) {
-          final height = _sectionHeights[sectionId] ?? 0;
-          final sectionMiddle = offsetTop + height / 2;
-          final distance = (sectionMiddle - visibleMiddle).abs();
-
-          if (distance < minDistance) {
-            minDistance = distance;
-            closestSection = sectionId;
-          }
-        });
-
-        if (activeSection.value != closestSection) {
-          activeSection.value = closestSection;
-        }
-        return;
-      }
-
-      final bestSection = sectionScores.entries
-          .reduce((a, b) => a.value > b.value ? a : b)
-          .key;
 
       if (activeSection.value != bestSection) {
         activeSection.value = bestSection;
@@ -246,25 +212,15 @@ class AppScrollController extends GetxController with WidgetsBindingObserver {
 
       final renderBox =
           sectionKey.currentContext!.findRenderObject() as RenderBox;
-      final screenSize = Get.size;
       const appBarHeight = AppDimensions.appBarHeight;
 
-      final position = renderBox.localToGlobal(Offset.zero);
-      final size = renderBox.size;
-      final currentScrollPosition = scrollController.offset;
-      final viewportHeight = screenSize.height - appBarHeight;
-      final targetGlobalY = appBarHeight + (viewportHeight - size.height) / 2;
-
-      var targetScrollOffset =
-          position.dy - targetGlobalY + currentScrollPosition;
-      targetScrollOffset = math.max(0, targetScrollOffset);
-
-      if (scrollController.position.maxScrollExtent > 0) {
-        targetScrollOffset = math.min(
-          targetScrollOffset,
-          scrollController.position.maxScrollExtent,
-        );
-      }
+      // Convert global screen position to scroll-space offset
+      final globalY = renderBox.localToGlobal(Offset.zero).dy;
+      var targetScrollOffset = globalY + scrollController.offset - appBarHeight;
+      targetScrollOffset = targetScrollOffset.clamp(
+        0.0,
+        scrollController.position.maxScrollExtent,
+      );
 
       scrollController
           .animateTo(

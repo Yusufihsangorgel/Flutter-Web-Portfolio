@@ -183,19 +183,22 @@ class _HomeSectionState extends State<HomeSection>
 
                           // Horizontal line between name and subtitle
                           const SizedBox(height: 20),
-                          Container(
-                            height: 1.5,
-                            width: (screenWidth * 0.4).clamp(100, 600).toDouble() * _lineWidth.value,
-                            decoration: BoxDecoration(
-                              color: Colors.white.withValues(alpha: 0.4),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.white.withValues(alpha: 0.15),
-                                  blurRadius: 6,
-                                ),
-                              ],
-                            ),
-                          ),
+                          Builder(builder: (context) {
+                            const lineColor = Colors.white;
+                            return Container(
+                              height: 1.5,
+                              width: (screenWidth * 0.4).clamp(100, 600).toDouble() * _lineWidth.value,
+                              decoration: BoxDecoration(
+                                color: lineColor.withValues(alpha: 0.4),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: lineColor.withValues(alpha: 0.15),
+                                    blurRadius: 6,
+                                  ),
+                                ],
+                              ),
+                            );
+                          }),
                           const SizedBox(height: 20),
 
                           // Subtitle — typewriter cycling effect
@@ -333,9 +336,11 @@ class _AnimatedCTAButtonsState extends State<_AnimatedCTAButtons>
                 defaultValue: 'Download CV',
               ),
               onTap: () async {
-                final baseUrl = Uri.base.toString();
-                final cvUrl = '${baseUrl}assets/data/cv.pdf';
-                final uri = Uri.parse(cvUrl);
+                final origin = Uri.base.origin;
+                final basePath = Uri.base.path.endsWith('/')
+                    ? Uri.base.path
+                    : '${Uri.base.path}/';
+                final uri = Uri.parse('$origin${basePath}assets/data/cv.pdf');
                 if (await canLaunchUrl(uri)) {
                   await launchUrl(uri, mode: LaunchMode.externalApplication);
                 }

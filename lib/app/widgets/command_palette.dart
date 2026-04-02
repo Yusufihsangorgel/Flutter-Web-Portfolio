@@ -142,9 +142,11 @@ class _CommandPaletteState extends State<CommandPalette> {
         category: 'Action',
         icon: Icons.download_rounded,
         onExecute: () => _executeAndClose(() async {
-          final baseUrl = Uri.base.toString();
-          final cvUrl = '${baseUrl}assets/data/cv.pdf';
-          final uri = Uri.parse(cvUrl);
+          final origin = Uri.base.origin;
+          final basePath = Uri.base.path.endsWith('/')
+              ? Uri.base.path
+              : '${Uri.base.path}/';
+          final uri = Uri.parse('$origin${basePath}assets/data/cv.pdf');
           if (await canLaunchUrl(uri)) {
             await launchUrl(uri, mode: LaunchMode.externalApplication);
           }
@@ -269,12 +271,10 @@ class _CommandPaletteState extends State<CommandPalette> {
               width: paletteWidth,
               constraints: const BoxConstraints(maxHeight: 440),
               decoration: BoxDecoration(
-                color: (Theme.of(context).brightness == Brightness.dark
-                    ? AppColors.background : AppColors.lightBackground).withValues(alpha: 0.85),
+                color: AppColors.background.withValues(alpha: 0.85),
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
-                  color: (Theme.of(context).brightness == Brightness.dark
-                      ? Colors.white : Colors.black).withValues(alpha: 0.08),
+                  color: Colors.white.withValues(alpha: 0.08),
                 ),
                 boxShadow: [
                   BoxShadow(
@@ -292,8 +292,7 @@ class _CommandPaletteState extends State<CommandPalette> {
                     _buildSearchField(),
                     Divider(
                       height: 1,
-                      color: (Theme.of(context).brightness == Brightness.dark
-                          ? Colors.white : Colors.black).withValues(alpha: 0.06),
+                      color: Colors.white.withValues(alpha: 0.06),
                     ),
                     Flexible(child: _buildCommandList()),
                   ],
@@ -338,12 +337,10 @@ class _CommandPaletteState extends State<CommandPalette> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
               decoration: BoxDecoration(
-                color: (Theme.of(context).brightness == Brightness.dark
-                    ? Colors.white : Colors.black).withValues(alpha: 0.06),
+                color: Colors.white.withValues(alpha: 0.06),
                 borderRadius: BorderRadius.circular(4),
                 border: Border.all(
-                  color: (Theme.of(context).brightness == Brightness.dark
-                      ? Colors.white : Colors.black).withValues(alpha: 0.1),
+                  color: Colors.white.withValues(alpha: 0.1),
                 ),
               ),
               child: Text(
@@ -418,8 +415,7 @@ class _CommandPaletteState extends State<CommandPalette> {
                       const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                   decoration: BoxDecoration(
                     color: isSelected
-                        ? (Theme.of(context).brightness == Brightness.dark
-                            ? Colors.white : Colors.black).withValues(alpha: 0.06)
+                        ? Colors.white.withValues(alpha: 0.06)
                         : Colors.transparent,
                     borderRadius: BorderRadius.circular(8),
                   ),

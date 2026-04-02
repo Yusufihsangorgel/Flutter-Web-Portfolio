@@ -17,6 +17,7 @@ class SoundController extends GetxController {
   // ── Reactive state ──────────────────────────────────────────────────
 
   final RxBool isEnabled = false.obs;
+  bool _hasUserInteracted = false;
   final RxDouble masterVolume = SoundConstants.defaultMasterVolume.obs;
   final RxBool isAmbientPlaying = false.obs;
 
@@ -94,6 +95,7 @@ class SoundController extends GetxController {
 
   /// Toggle sound on/off and persist.
   void toggleSound() {
+    _hasUserInteracted = true;
     isEnabled.value = !isEnabled.value;
     _savePreferences();
 
@@ -312,6 +314,7 @@ class SoundController extends GetxController {
   /// Whether we should play a sound right now.
   bool _canPlay() {
     if (!isEnabled.value) return false;
+    if (!_hasUserInteracted) return false;
     if (_prefersReducedMotion()) return false;
     return true;
   }
