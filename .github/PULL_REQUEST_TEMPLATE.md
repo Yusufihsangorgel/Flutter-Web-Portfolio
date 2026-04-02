@@ -18,7 +18,7 @@ Brief description of what this PR does and why.
 ## Checklist
 
 - [ ] `flutter analyze --fatal-infos` passes with no issues
-- [ ] `flutter test` passes (all 184+ tests)
+- [ ] `flutter test` passes (all 185+ tests)
 - [ ] New code includes tests where applicable
 - [ ] Documentation updated if needed
 

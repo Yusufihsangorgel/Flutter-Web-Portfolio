@@ -3,15 +3,15 @@
 # Flutter Portfolio — Cinematic Developer Showcase
 
 **A production-grade, cinematic portfolio built entirely with Flutter Web.**\
-Scene-driven backgrounds. Scroll-reactive gradients. 208 automated tests. Zero templates.
+Scene-driven backgrounds. Scroll-reactive gradients. 185 automated tests. Zero templates.
 
 [![CI](https://github.com/Yusufihsangorgel/Flutter-Web-Portfolio/actions/workflows/ci.yml/badge.svg)](https://github.com/Yusufihsangorgel/Flutter-Web-Portfolio/actions)
 ![Flutter](https://img.shields.io/badge/Flutter-3.41-02569B?logo=flutter)
 ![Dart](https://img.shields.io/badge/Dart-3.7-0175C2?logo=dart)
 ![License](https://img.shields.io/badge/License-MIT-green)
-![Tests](https://img.shields.io/badge/Tests-208_passing-success)
+![Tests](https://img.shields.io/badge/Tests-185_passing-success)
 
-[**Live Demo**](https://yusufihsangorgel.github.io/Flutter-Web-Portfolio/) · [Report Bug](https://github.com/Yusufihsangorgel/Flutter-Web-Portfolio/issues) · [Request Feature](https://github.com/Yusufihsangorgel/Flutter-Web-Portfolio/issues)
+[**Live Demo**](https://developeryusuf.com) · [Report Bug](https://github.com/Yusufihsangorgel/Flutter-Web-Portfolio/issues) · [Request Feature](https://github.com/Yusufihsangorgel/Flutter-Web-Portfolio/issues)
 
 </div>
 
@@ -19,17 +19,20 @@ Scene-driven backgrounds. Scroll-reactive gradients. 208 automated tests. Zero t
 
 ## Screenshots
 
-<!-- Replace with your own screenshots after deploying -->
 <img src="screenshots/hero-dark.png" width="100%" alt="Hero section — dark mode" />
 
 <details>
 <summary>View More Screenshots</summary>
 
-| Dark Mode | Light Mode |
-|-----------|------------|
-| ![About](screenshots/about-dark.png) | ![About Light](screenshots/about-light.png) |
-| ![Projects](screenshots/projects-dark.png) | ![Projects Light](screenshots/projects-light.png) |
-| ![Contact](screenshots/contact-dark.png) | ![Contact Light](screenshots/contact-light.png) |
+| Section | Screenshot |
+|---------|------------|
+| Hero (Light) | ![Hero Light](screenshots/hero-light.png) |
+| About | ![About](screenshots/about-dark.png) |
+| Experience | ![Experience](screenshots/experience-dark.png) |
+| Projects | ![Projects](screenshots/projects-dark.png) |
+| Blog | ![Blog](screenshots/blog-dark.png) |
+| Contact | ![Contact](screenshots/contact-dark.png) |
+| Mobile | ![Mobile](screenshots/mobile-hero.png) |
 
 </details>
 
@@ -89,7 +92,7 @@ It is also **fully forkable**. Change three files and you have your own portfoli
 - **Modern Dart 3.x** — `abstract interface class`, `final class`, `base class`, switch expressions, pattern matching
 - **GetX state management** — reactive controllers for scroll, scene, theme, language, cursor, and loading states
 - **31 custom widgets** — zero external UI dependencies beyond `google_fonts`
-- **208 automated tests** — unit tests for all controllers, constants, and models + widget tests for interactive components
+- **185 automated tests** — unit tests for all controllers, constants, and models + widget tests for interactive components
 - **GitHub Actions CI/CD** — analyze, test, build, and auto-deploy to GitHub Pages on every push
 
 ### Internationalization
@@ -345,14 +348,14 @@ lib/app/
 | URL Handling | [url_launcher](https://pub.dev/packages/url_launcher) |
 | CI/CD | GitHub Actions (analyze + test + build + deploy) |
 | Hosting | GitHub Pages (auto-deploy on push) |
-| Testing | flutter_test (208 tests — unit + widget) |
+| Testing | flutter_test (185 tests — unit + widget) |
 
 ---
 
 ## Testing
 
 ```bash
-# Run all 208 tests
+# Run all 185 tests
 flutter test
 
 # Run with coverage

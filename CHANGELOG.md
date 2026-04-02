@@ -20,7 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Improved
 
-- **Test coverage** expanded from 184 to 208 tests (6 new test files)
+- **Test coverage** expanded from 184 to 185 tests (6 new test files)
 - **i18n completeness** — moved all hardcoded strings to 7-language JSON files (blog, sidebar, experience, 404, project links)
 - **Accessibility** — Semantics on buttons/images/links, ExcludeSemantics on decorative widgets, keyboard navigation
 - **Light mode** — theme-aware colors across 15+ widgets (borders, backgrounds, focus rings)
@@ -60,7 +60,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Skip-to-content link** for keyboard accessibility
 - **Deep linking** with hash-based URL routing and section auto-scroll
 - **Responsive layouts** for mobile (<600px), tablet (600-1200px), and desktop (1200px+)
-- **208 automated tests** (unit + widget) covering controllers, constants, models, and interactive components
+- **185 automated tests** (unit + widget) covering controllers, constants, models, and interactive components
 - **GitHub Actions CI/CD** pipeline: analyze, test, build (JS + WASM), and auto-deploy to GitHub Pages
 - **PWA manifest** for installable web app experience
 - **Clean Architecture** with domain/data/presentation layers and Dependency Inversion
