@@ -26,7 +26,6 @@ Scene-driven backgrounds. Scroll-reactive gradients. 185 automated tests. Zero t
 
 | Section | Screenshot |
 |---------|------------|
-| Hero (Light) | ![Hero Light](screenshots/hero-light.png) |
 | About | ![About](screenshots/about-dark.png) |
 | Experience | ![Experience](screenshots/experience-dark.png) |
 | Projects | ![Projects](screenshots/projects-dark.png) |
@@ -90,7 +89,7 @@ It is also **fully forkable**. Change three files and you have your own portfoli
 ### Architecture & Engineering
 - **Clean Architecture** — domain/data/presentation layers with Dependency Inversion (abstract interfaces)
 - **Modern Dart 3.x** — `abstract interface class`, `final class`, `base class`, switch expressions, pattern matching
-- **GetX state management** — reactive controllers for scroll, scene, theme, language, cursor, and loading states
+- **GetX state management** — reactive controllers for scroll, scene, language, cursor, sound, and loading states
 - **31 custom widgets** — zero external UI dependencies beyond `google_fonts`
 - **185 automated tests** — unit tests for all controllers, constants, and models + widget tests for interactive components
 - **GitHub Actions CI/CD** — analyze, test, build, and auto-deploy to GitHub Pages on every push
@@ -101,8 +100,6 @@ It is also **fully forkable**. Change three files and you have your own portfoli
 - **Fully data-driven** — all content (CV, sections, terminal commands) lives in JSON files
 
 ### Performance & Progressive Web App
-- **System theme detection** — auto-detects OS dark/light preference and follows system changes
-- **Dark/light theme** — persisted in localStorage via SharedPreferences
 - **PWA manifest** — installable on mobile and desktop
 - **WASM build support** — CI pipeline includes experimental WebAssembly build
 - **Deep linking** — hash-based URL routing with section auto-scroll
@@ -236,28 +233,15 @@ Update these lines for SEO and social sharing:
 
 ### GitHub Pages (Recommended — Free)
 
-The CI/CD pipeline auto-deploys on every push to `main`. Just enable it:
+The deploy workflow runs on every push to `main`:
 
 1. Go to **Settings > Pages** in your GitHub repo
-2. Set source to **Deploy from a branch**
-3. Select **gh-pages** branch, **/ (root)** folder
-4. Push to `main` — the site deploys automatically
+2. Set source to **GitHub Actions**
+3. Push to `main` — the site deploys automatically
 
-The workflow is already configured in `.github/workflows/ci.yml`.
+The workflow is in `.github/workflows/deploy.yml`.
 
-### Firebase Hosting
-
-```bash
-# Install Firebase CLI if needed
-npm install -g firebase-tools
-
-# Build and deploy
-flutter build web --release
-firebase init hosting   # Select build/web as public directory
-firebase deploy
-```
-
-### Vercel / Netlify / Cloudflare Pages
+### Docker / Self-Hosted
 
 ```bash
 flutter build web --release
@@ -277,7 +261,7 @@ lib/app/
 │   ├── loading_controller #   App initialization sequence
 │   ├── scene_director     #   Scroll-driven scene state machine
 │   ├── scroll_controller  #   Section navigation + deep linking
-│   └── theme_controller   #   Dark/light mode persistence
+│   └── sound_controller   #   Web Audio API sound design
 ├── core/
 │   ├── constants/         # AppColors, Breakpoints, Durations, SceneConfigs, CinematicCurves
 │   └── theme/             # AppTheme (Material 3), AppTypography (Google Fonts)
@@ -297,22 +281,24 @@ lib/app/
 │       └── sections/      # Hero, About, Experience, Testimonials, Blog, Projects, Contact
 ├── routes/                # GetX routing with deep link support
 ├── utils/                 # ResponsiveUtils, WebUrlStrategy (path-based URLs)
-└── widgets/               # 31 reusable cinematic widgets
+└── widgets/               # 30+ custom cinematic widgets
     ├── background/        #   CinematicBackground (mesh gradient + grain)
-    ├── terminal/          #   Terminal emulator (TerminalWidget, CommandHandler)
+    ├── advanced_cursor    #   Morphing cursor with trail + spotlight
     ├── animated_counter   #   Counting number animation
-    ├── animated_entrance  #   Configurable entrance animations
+    ├── animated_stats     #   Animated statistics row
     ├── border_light_card  #   Card with animated border glow
     ├── cinematic_button   #   Scene-aware button with hover effects
     ├── cinematic_focusable#   Keyboard-accessible focus wrapper
-    ├── cinematic_hover    #   Hover state with accent color integration
+    ├── cinematic_preloader#   Full-screen loading sequence
     ├── command_palette    #   Ctrl+K fuzzy search overlay
     ├── constellation_particles # Spatial-grid particle system
     ├── custom_cursor      #   Ring + dot + spotlight cursor
+    ├── github_heatmap     #   90-day contribution grid
     ├── magnetic_button    #   Proximity-based displacement
     ├── matrix_rain        #   Konami code easter egg overlay
+    ├── neon_effects       #   Neon text, border, card glows
     ├── scroll_fade_in     #   Scroll-triggered reveal animation
-    ├── scroll_indicator   #   Animated scroll-down prompt
+    ├── scroll_progress_dots #  Fixed section indicator dots
     ├── shader_text_reveal #   Gradient wipe text animation
     ├── skill_bar_chart    #   Horizontal skill proficiency bars
     ├── skill_orbit        #   3D elliptical orbit visualization
@@ -344,7 +330,7 @@ lib/app/
 | Internationalization | [flutter_i18n](https://pub.dev/packages/flutter_i18n) (7 languages) |
 | Typography | [Google Fonts](https://pub.dev/packages/google_fonts) (Inter, JetBrains Mono, Space Grotesk) |
 | HTTP | [http](https://pub.dev/packages/http) (GitHub API, Medium RSS) |
-| Storage | [shared_preferences](https://pub.dev/packages/shared_preferences) (theme persistence) |
+| Storage | [shared_preferences](https://pub.dev/packages/shared_preferences) (language + sound preferences) |
 | URL Handling | [url_launcher](https://pub.dev/packages/url_launcher) |
 | CI/CD | GitHub Actions (analyze + test + build + deploy) |
 | Hosting | GitHub Pages (auto-deploy on push) |
@@ -369,7 +355,7 @@ flutter analyze --fatal-infos
 ```
 
 **Test coverage includes:**
-- All 6 controllers (scroll, scene director, theme, language, cursor, loading)
+- All 6 controllers (scroll, scene director, language, cursor, sound, loading)
 - All constant classes (colors, dimensions, breakpoints, durations, curves, scene configs)
 - Data models and providers (ProjectModel, GitHubProvider)
 - Responsive utilities
