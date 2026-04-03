@@ -51,7 +51,7 @@ class SkillOrbit extends StatefulWidget {
   });
 
   /// Skill data: list of {category, items[]}.
-  final List<dynamic> skills;
+  final List<Map<String, dynamic>> skills;
 
   /// Scene-aware accent color for orbit lines and highlights.
   final Color accent;
@@ -104,7 +104,7 @@ class _SkillOrbitState extends State<SkillOrbit>
     final orbitAssignments = <int, List<Map<String, dynamic>>>{};
 
     for (var i = 0; i < skills.length; i++) {
-      final skill = skills[i] as Map<String, dynamic>;
+      final skill = skills[i];
       final orbitIdx = i < 2 ? i : 2; // collapse 3+ into orbit 2
       orbitAssignments.putIfAbsent(orbitIdx, () => []).add(skill);
     }

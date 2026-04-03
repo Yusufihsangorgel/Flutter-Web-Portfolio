@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
 
 /// Color and particle configuration for a single scroll scene.
-class SceneConfig {
+final class SceneConfig {
   const SceneConfig({
     required this.gradient1,
     required this.gradient2,

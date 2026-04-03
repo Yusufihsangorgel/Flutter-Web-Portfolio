@@ -4,7 +4,7 @@ part of 'app_pages.dart';
 ///
 /// The portfolio is a single-page scroll, but each section has its own URL
 /// so that deep-linking and browser back/forward work correctly.
-abstract class Routes {
+abstract final class Routes {
   static const home = '/';
   static const about = '/about';
   static const experience = '/experience';

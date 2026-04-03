@@ -333,7 +333,6 @@ class _SceneProgressBarState extends State<_SceneProgressBar> {
         final accent = Get.find<SceneDirector>().currentAccent.value;
         return Stack(
           children: [
-            Container(color: Colors.transparent),
             AnimatedContainer(
               duration: AppDurations.microFast,
               width: constraints.maxWidth * _progress,

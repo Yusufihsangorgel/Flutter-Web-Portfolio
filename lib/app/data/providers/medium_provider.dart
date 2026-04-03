@@ -84,7 +84,7 @@ class MediumProvider {
 }
 
 /// Single Medium blog post.
-class MediumPost {
+final class MediumPost {
   const MediumPost({
     required this.title,
     required this.link,

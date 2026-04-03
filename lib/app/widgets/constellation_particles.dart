@@ -107,9 +107,9 @@ class _ConstellationParticlesState extends State<ConstellationParticles>
     super.didChangeDependencies();
     // Reduce particle count for high-contrast / accessibility mode
     // and for narrow (mobile) screens to improve performance.
-    final mq = MediaQuery.of(context);
+    final highContrast = MediaQuery.highContrastOf(context);
     var effectiveCount = widget.particleCount;
-    if (mq.highContrast) {
+    if (highContrast) {
       effectiveCount = (effectiveCount * 0.5).round();
     }
     if (effectiveCount != _particles.length && !_lastSize.isEmpty) {

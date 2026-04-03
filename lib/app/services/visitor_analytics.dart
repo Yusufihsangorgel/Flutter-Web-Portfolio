@@ -12,7 +12,7 @@ enum EngagementLevel { low, medium, high }
 enum DeviceType { mobile, tablet, desktop }
 
 /// Aggregated visitor profile built from locally stored analytics.
-class VisitorProfile {
+final class VisitorProfile {
   const VisitorProfile({
     required this.interests,
     required this.engagement,
@@ -296,32 +296,7 @@ class VisitorAnalytics {
     return 'en';
   }
 
-  /// Best-effort referrer detection.
-  /// Uses dart:html on web; returns empty string on other platforms.
-  String _detectReferrer() {
-    if (!kIsWeb) return '';
-    try {
-      // Access document.referrer without importing dart:html at the
-      // library level (which would break non-web compilation).
-      // ignore: avoid_dynamic_calls
-      return Uri.tryParse(_webReferrer())?.host ?? '';
-    } catch (e) {
-      dev.log('Failed to detect referrer', name: 'VisitorAnalytics', error: e);
-      return '';
-    }
-  }
-
-  /// Wrapper that is evaluated only on web — returns document.referrer.
-  static String _webReferrer() {
-    try {
-      // Using universal_html or dart:html would add a dependency; instead
-      // we rely on the browser's window.document.referrer being exposed
-      // through the JS interop that Flutter web provides automatically.
-      // If this fails we simply return empty.
-      return '';
-    } catch (e) {
-      dev.log('Failed to read web referrer', name: 'VisitorAnalytics', error: e);
-      return '';
-    }
-  }
+  /// Referrer detection is not available without dart:html / JS interop.
+  /// Returns empty string.
+  String _detectReferrer() => '';
 }

@@ -79,14 +79,16 @@ class _ProjectDetailOverlayState extends State<ProjectDetailOverlay> {
       desktop: 800,
     );
 
-    return KeyboardListener(
+    return Focus(
       focusNode: _focusNode..requestFocus(),
       autofocus: true,
-      onKeyEvent: (event) {
+      onKeyEvent: (node, event) {
         if (event is KeyDownEvent &&
             event.logicalKey == LogicalKeyboardKey.escape) {
           Navigator.of(context).pop();
+          return KeyEventResult.handled;
         }
+        return KeyEventResult.ignored;
       },
       child: Scaffold(
         backgroundColor: Colors.transparent,

@@ -26,8 +26,9 @@ class TestimonialsSection extends StatelessWidget {
     final languageController = Get.find<LanguageController>();
     final screenWidth = MediaQuery.sizeOf(context).width;
     return Obx(() {
-      final testimonials =
+      final raw =
           languageController.cvData['testimonials'] as List? ?? [];
+      final testimonials = raw.cast<Map<String, dynamic>>();
       if (testimonials.isEmpty) return const SizedBox.shrink();
 
       return Center(
@@ -109,7 +110,7 @@ class TestimonialsSection extends StatelessWidget {
 class _TestimonialsGrid extends StatelessWidget {
   const _TestimonialsGrid({required this.testimonials});
 
-  final List<dynamic> testimonials;
+  final List<Map<String, dynamic>> testimonials;
 
   @override
   Widget build(BuildContext context) {
@@ -129,7 +130,7 @@ class _TestimonialsGrid extends StatelessWidget {
       ),
       itemCount: testimonials.length,
       itemBuilder: (context, index) => _TestimonialCard(
-        testimonial: testimonials[index] as Map<String, dynamic>,
+        testimonial: testimonials[index],
       ),
     );
   }
@@ -141,7 +142,7 @@ class _TestimonialsGrid extends StatelessWidget {
 class _TestimonialsCarousel extends StatefulWidget {
   const _TestimonialsCarousel({required this.testimonials});
 
-  final List<dynamic> testimonials;
+  final List<Map<String, dynamic>> testimonials;
 
   @override
   State<_TestimonialsCarousel> createState() => _TestimonialsCarouselState();
@@ -219,8 +220,7 @@ class _TestimonialsCarouselState extends State<_TestimonialsCarousel> {
                 itemBuilder: (context, index) => Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 8),
                   child: _TestimonialCard(
-                    testimonial:
-                        widget.testimonials[index] as Map<String, dynamic>,
+                    testimonial: widget.testimonials[index],
                   ),
                 ),
               ),

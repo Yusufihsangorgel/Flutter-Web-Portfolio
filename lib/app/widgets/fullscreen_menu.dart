@@ -60,10 +60,10 @@ class _FullscreenMenuState extends State<FullscreenMenu>
   List<_MenuItem> _buildMenuItems() {
     final sections = Get.find<LanguageController>().activeSections;
     return [
-      const _MenuItem(key: 'home', icon: Icons.home_outlined, number: '01'),
+      const _MenuItem(sectionId: 'home', icon: Icons.home_outlined, number: '01'),
       for (var i = 0; i < sections.length; i++)
         _MenuItem(
-          key: sections[i],
+          sectionId: sections[i],
           icon: _iconMap[sections[i]] ?? Icons.circle_outlined,
           number: (i + 2).toString().padLeft(2, '0'),
         ),
@@ -184,8 +184,8 @@ class _FullscreenMenuState extends State<FullscreenMenu>
                   );
 
                   final label = languageController.getText(
-                    'nav.${item.key}',
-                    defaultValue: item.key[0].toUpperCase() + item.key.substring(1),
+                    'nav.${item.sectionId}',
+                    defaultValue: item.sectionId[0].toUpperCase() + item.sectionId.substring(1),
                   );
 
                   return Opacity(
@@ -197,7 +197,7 @@ class _FullscreenMenuState extends State<FullscreenMenu>
                         label: label,
                         isHovered: _hoveredIndex == index,
                         isMobile: isMobile,
-                        onTap: () => _navigateToSection(item.key),
+                        onTap: () => _navigateToSection(item.sectionId),
                         onHover: (hovered) {
                           setState(() => _hoveredIndex = hovered ? index : -1);
                         },
@@ -216,11 +216,11 @@ class _FullscreenMenuState extends State<FullscreenMenu>
 
 class _MenuItem {
   const _MenuItem({
-    required this.key,
+    required this.sectionId,
     required this.icon,
     required this.number,
   });
-  final String key;
+  final String sectionId;
   final IconData icon;
   final String number;
 }

@@ -249,9 +249,10 @@ class _BioContentState extends State<_BioContent>
             delay: AppDurations.staggerMedium,
             child: Obx(() {
               final accent = sceneDirector.currentAccent.value;
-              final skills =
+              final rawSkills =
                   widget.languageController.cvData['skills'] as List? ?? [];
-              if (skills.isEmpty) return const SizedBox.shrink();
+              if (rawSkills.isEmpty) return const SizedBox.shrink();
+              final skills = rawSkills.cast<Map<String, dynamic>>();
               return ClipRect(child: SkillOrbit(skills: skills, accent: accent));
             }),
           ),
@@ -372,8 +373,8 @@ class _FlashlightPhoto extends StatefulWidget {
 }
 
 class _FlashlightPhotoState extends State<_FlashlightPhoto> {
-  Offset _mousePos = const Offset(0.5, 0.5);
-  bool _hovered = false;
+  final _mousePos = ValueNotifier<Offset>(const Offset(0.5, 0.5));
+  final _hovered = ValueNotifier<bool>(false);
 
   /// Max tilt angle in radians (3 degrees).
   static const double _maxTilt = 3.0 * math.pi / 180.0;
@@ -381,101 +382,122 @@ class _FlashlightPhotoState extends State<_FlashlightPhoto> {
   static const double _shadowMultiplier = 8.0;
 
   @override
-  Widget build(BuildContext context) {
-    // Normalized values centered around 0 (-1 to 1 range)
-    final dx = (_mousePos.dx - 0.5) * 2.0;
-    final dy = (_mousePos.dy - 0.5) * 2.0;
+  void dispose() {
+    _mousePos.dispose();
+    _hovered.dispose();
+    super.dispose();
+  }
 
-    // Tilt transform: rotateY follows horizontal, rotateX follows vertical
-    final tiltTransform = Matrix4.identity()
-      ..setEntry(3, 2, _perspective)
-      ..rotateY(_hovered ? dx * _maxTilt : 0)
-      ..rotateX(_hovered ? -dy * _maxTilt : 0);
-
-    // Shadow shifts opposite to tilt direction
-    final shadowOffsetX = _hovered ? -dx * _shadowMultiplier : 0.0;
-    final shadowOffsetY = _hovered ? -dy * _shadowMultiplier : 0.0;
-
-    return MouseRegion(
-      onEnter: (_) => setState(() => _hovered = true),
+  @override
+  Widget build(BuildContext context) => MouseRegion(
+      onEnter: (_) => _hovered.value = true,
       onHover: (e) {
         final box = context.findRenderObject() as RenderBox?;
         if (box == null) return;
-        setState(() {
-          _mousePos = Offset(
-            e.localPosition.dx / box.size.width,
-            e.localPosition.dy / box.size.height,
-          );
-        });
+        _mousePos.value = Offset(
+          e.localPosition.dx / box.size.width,
+          e.localPosition.dy / box.size.height,
+        );
       },
-      onExit: (_) => setState(() {
-        _hovered = false;
-        _mousePos = const Offset(0.5, 0.5);
-      }),
-      child: AnimatedContainer(
-        duration: AppDurations.medium,
-        curve: CinematicCurves.hoverLift,
-        transform: tiltTransform,
-        transformAlignment: Alignment.center,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(8),
-          boxShadow: _hovered
-              ? [
-                  BoxShadow(
-                    color: AppColors.heroAccent.withValues(alpha: 0.12),
-                    blurRadius: 30,
-                    spreadRadius: 0,
-                    offset: Offset(shadowOffsetX, shadowOffsetY),
-                  ),
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.3),
-                    blurRadius: 20,
-                    spreadRadius: -4,
-                    offset: Offset(shadowOffsetX * 0.5, shadowOffsetY * 0.5),
-                  ),
-                ]
-              : [],
+      onExit: (_) {
+        _hovered.value = false;
+        _mousePos.value = const Offset(0.5, 0.5);
+      },
+      child: ValueListenableBuilder<Offset>(
+        valueListenable: _mousePos,
+        builder: (context, mousePos, child) =>
+            ValueListenableBuilder<bool>(
+          valueListenable: _hovered,
+          builder: (context, hovered, _) {
+            // Normalized values centered around 0 (-1 to 1 range)
+            final dx = (mousePos.dx - 0.5) * 2.0;
+            final dy = (mousePos.dy - 0.5) * 2.0;
+
+            // Tilt transform: rotateY follows horizontal, rotateX follows vertical
+            final tiltTransform = Matrix4.identity()
+              ..setEntry(3, 2, _perspective)
+              ..rotateY(hovered ? dx * _maxTilt : 0)
+              ..rotateX(hovered ? -dy * _maxTilt : 0);
+
+            // Shadow shifts opposite to tilt direction
+            final shadowOffsetX = hovered ? -dx * _shadowMultiplier : 0.0;
+            final shadowOffsetY = hovered ? -dy * _shadowMultiplier : 0.0;
+
+            return AnimatedContainer(
+              duration: AppDurations.medium,
+              curve: CinematicCurves.hoverLift,
+              transform: tiltTransform,
+              transformAlignment: Alignment.center,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8),
+                boxShadow: hovered
+                    ? [
+                        BoxShadow(
+                          color: AppColors.heroAccent.withValues(alpha: 0.12),
+                          blurRadius: 30,
+                          spreadRadius: 0,
+                          offset: Offset(shadowOffsetX, shadowOffsetY),
+                        ),
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.3),
+                          blurRadius: 20,
+                          spreadRadius: -4,
+                          offset: Offset(shadowOffsetX * 0.5, shadowOffsetY * 0.5),
+                        ),
+                      ]
+                    : [],
+              ),
+              child: child,
+            );
+          },
         ),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(8),
-          child: ShaderMask(
-            blendMode: BlendMode.dstIn,
-            shaderCallback: (bounds) => RadialGradient(
-              center: Alignment(
-                _mousePos.dx * 2 - 1,
-                _mousePos.dy * 2 - 1,
+          child: ValueListenableBuilder<Offset>(
+            valueListenable: _mousePos,
+            builder: (context, mousePos, child) =>
+                ValueListenableBuilder<bool>(
+              valueListenable: _hovered,
+              builder: (context, hovered, _) => ShaderMask(
+                blendMode: BlendMode.dstIn,
+                shaderCallback: (bounds) => RadialGradient(
+                  center: Alignment(
+                    mousePos.dx * 2 - 1,
+                    mousePos.dy * 2 - 1,
+                  ),
+                  radius: hovered ? 1.2 : 2.0,
+                  colors: [
+                    Colors.white,
+                    Colors.white.withValues(alpha: 0.8),
+                    Colors.white.withValues(alpha: hovered ? 0.2 : 0.5),
+                  ],
+                  stops: const [0.0, 0.4, 1.0],
+                ).createShader(bounds),
+                child: child,
               ),
-              radius: _hovered ? 1.2 : 2.0,
-              colors: [
-                Colors.white,
-                Colors.white.withValues(alpha: 0.8),
-                Colors.white.withValues(alpha: _hovered ? 0.2 : 0.5),
-              ],
-              stops: const [0.0, 0.4, 1.0],
-            ).createShader(bounds),
+            ),
             child: Semantics(
               image: true,
               label: 'Profile photo',
               child: Image.asset(
-              'assets/images/me.jpeg',
-              width: double.infinity,
-              fit: BoxFit.cover,
-              errorBuilder: (_, __, ___) => AspectRatio(
-                aspectRatio: 1,
-                child: Container(
-                  color: AppColors.backgroundLight,
-                  child: Icon(
-                    Icons.person,
-                    size: 64,
-                    color: AppColors.textSecondary.withValues(alpha: 0.3),
+                'assets/images/me.jpeg',
+                width: double.infinity,
+                fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) => AspectRatio(
+                  aspectRatio: 1,
+                  child: Container(
+                    color: AppColors.backgroundLight,
+                    child: Icon(
+                      Icons.person,
+                      size: 64,
+                      color: AppColors.textSecondary.withValues(alpha: 0.3),
+                    ),
                   ),
                 ),
               ),
-            ),
             ),
           ),
         ),
       ),
     );
-  }
 }

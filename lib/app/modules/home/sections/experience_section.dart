@@ -64,7 +64,8 @@ class ExperienceSection extends StatelessWidget {
                 ),
                 const SizedBox(height: 32),
                 Obx(() {
-                  final experiences = languageController.cvData['experiences'] as List? ?? [];
+                  final raw = languageController.cvData['experiences'] as List? ?? [];
+                  final experiences = raw.cast<Map<String, dynamic>>();
                   if (experiences.isEmpty) return const SizedBox.shrink();
                   return _ExperienceTabs(
                     experiences: experiences,
@@ -87,7 +88,7 @@ class _ExperienceTabs extends StatefulWidget {
     required this.languageController,
   });
 
-  final List<dynamic> experiences;
+  final List<Map<String, dynamic>> experiences;
   final LanguageController languageController;
 
   @override
@@ -113,7 +114,7 @@ class _ExperienceTabsState extends State<_ExperienceTabs> {
               scrollDirection: Axis.horizontal,
               itemCount: widget.experiences.length,
               itemBuilder: (context, i) {
-                final exp = widget.experiences[i] as Map<String, dynamic>;
+                final exp = widget.experiences[i];
                 final isActive = i == _selectedIndex;
                 return Obx(() => _TabButton(
                   label: (exp['company'] as String?) ?? '',
@@ -132,7 +133,7 @@ class _ExperienceTabsState extends State<_ExperienceTabs> {
             switchOutCurve: Curves.easeIn,
             child: _ExperienceDetail(
               key: ValueKey(_selectedIndex),
-              experience: widget.experiences[_selectedIndex] as Map<String, dynamic>,
+              experience: widget.experiences[_selectedIndex],
               languageController: widget.languageController,
             ),
           ),
@@ -162,7 +163,7 @@ class _ExperienceTabsState extends State<_ExperienceTabs> {
             switchOutCurve: Curves.easeIn,
             child: _ExperienceDetail(
               key: ValueKey(_selectedIndex),
-              experience: widget.experiences[_selectedIndex] as Map<String, dynamic>,
+              experience: widget.experiences[_selectedIndex],
               languageController: widget.languageController,
             ),
           ),
@@ -181,7 +182,7 @@ class _VerticalTimeline extends StatelessWidget {
     required this.onSelect,
   });
 
-  final List<dynamic> experiences;
+  final List<Map<String, dynamic>> experiences;
   final int selectedIndex;
   final Color accent;
   final ValueChanged<int> onSelect;
@@ -192,7 +193,7 @@ class _VerticalTimeline extends StatelessWidget {
     children: [
       for (int i = 0; i < experiences.length; i++)
         _TimelineEntry(
-          label: ((experiences[i] as Map<String, dynamic>)['company'] as String?) ?? '',
+          label: (experiences[i]['company'] as String?) ?? '',
           isActive: i == selectedIndex,
           accent: accent,
           isLast: i == experiences.length - 1,
