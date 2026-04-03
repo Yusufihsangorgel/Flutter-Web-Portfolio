@@ -5,7 +5,7 @@ import 'package:flutter_web_portfolio/app/domain/providers/i_local_storage_provi
 import 'package:flutter_web_portfolio/app/domain/repositories/i_language_repository.dart';
 
 /// JSON-backed language repo — reads translations from assets, persists preference.
-class LanguageRepositoryImpl implements ILanguageRepository {
+final class LanguageRepositoryImpl implements ILanguageRepository {
 
   LanguageRepositoryImpl({
     required IAssetsProvider assetsProvider,

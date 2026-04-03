@@ -9,7 +9,7 @@ part 'app_routes.dart';
 ///
 /// Every route renders the same [HomeView]; the [AppScrollController] reads
 /// the initial route and scrolls to the matching section on first frame.
-class AppPages {
+final class AppPages {
   static const initial = Routes.home;
 
   static final routes = [

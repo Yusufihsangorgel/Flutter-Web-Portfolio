@@ -7,7 +7,7 @@ import 'package:http/http.dart' as http;
 ///
 /// Username is passed at runtime from cvData — not hardcoded.
 /// Results are cached per-username so repeat calls skip the network.
-class GitHubProvider {
+final class GitHubProvider {
   static const _baseUrl = 'https://api.github.com';
 
   final Map<String, Map<String, dynamic>> _profileCache = {};

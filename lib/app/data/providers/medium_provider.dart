@@ -5,7 +5,7 @@ import 'package:http/http.dart' as http;
 
 /// Fetches blog posts from any Medium profile via rss2json public API.
 /// Username is passed at runtime — not hardcoded.
-class MediumProvider {
+final class MediumProvider {
   static const _rss2jsonBase = 'https://api.rss2json.com/v1/api.json?rss_url=';
 
   final Map<String, List<MediumPost>> _cache = {};

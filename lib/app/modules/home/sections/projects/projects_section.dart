@@ -31,7 +31,7 @@ class _ProjectsSectionState extends State<ProjectsSection> {
   String _selectedCategory = '';
 
   /// Extract unique category values from the projects list.
-  List<String> _extractCategories(List<dynamic> projects) {
+  List<String> _extractCategories(List<Object?> projects) {
     final categories = <String>{};
     for (final project in projects) {
       if (project case final Map<String, dynamic> p) {
@@ -45,7 +45,7 @@ class _ProjectsSectionState extends State<ProjectsSection> {
   }
 
   /// Filter projects by the selected category.
-  List<dynamic> _filterProjects(List<dynamic> projects) {
+  List<Object?> _filterProjects(List<Object?> projects) {
     if (_selectedCategory.isEmpty) return projects;
     return projects.where((project) {
       if (project case final Map<String, dynamic> p) {

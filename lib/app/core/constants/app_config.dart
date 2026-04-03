@@ -9,7 +9,7 @@ import 'package:flutter_web_portfolio/app/controllers/language_controller.dart';
 /// stats, social links — is pulled from there at startup.
 ///
 /// This class provides typed helpers so widgets never hard-code personal data.
-class AppConfig {
+final class AppConfig {
   AppConfig._();
 
   // ─── Identity ──────────────────────────────────────────────────────

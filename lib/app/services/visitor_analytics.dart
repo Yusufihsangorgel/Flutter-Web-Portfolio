@@ -67,7 +67,7 @@ final class VisitorProfile {
 /// sent to any server. The service tracks lightweight behavioural signals
 /// (scroll depth, section dwell time, project views) and exposes a
 /// [VisitorProfile] for downstream personalisation.
-class VisitorAnalytics {
+final class VisitorAnalytics {
   // ─── Storage keys ──────────────────────────────────────────────────
   static const _keyVisitCount = 'va_visit_count';
   static const _keyFirstVisitTs = 'va_first_visit';

@@ -5,7 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_web_portfolio/app/domain/providers/i_assets_provider.dart';
 
 /// Loads and decodes bundled JSON from assets/.
-class AssetsProvider implements IAssetsProvider {
+final class AssetsProvider implements IAssetsProvider {
   @override
   Future<List<Map<String, dynamic>>> loadProjectsData() async {
     try {

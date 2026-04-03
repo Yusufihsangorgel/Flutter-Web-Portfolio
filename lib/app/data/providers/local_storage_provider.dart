@@ -4,7 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_web_portfolio/app/domain/providers/i_local_storage_provider.dart';
 
 /// Thin SharedPreferences wrapper — async init, typed get/set.
-class LocalStorageProvider implements ILocalStorageProvider {
+final class LocalStorageProvider implements ILocalStorageProvider {
   SharedPreferences? _prefs;
 
   @override
