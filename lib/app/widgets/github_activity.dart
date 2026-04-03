@@ -15,6 +15,7 @@ import 'package:flutter_web_portfolio/app/widgets/animated_counter.dart';
 import 'package:flutter_web_portfolio/app/widgets/border_light_card.dart';
 import 'package:flutter_web_portfolio/app/widgets/scroll_fade_in.dart';
 import 'package:flutter_web_portfolio/app/widgets/skeleton_shimmer.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 /// Displays live GitHub stats and recent repos fetched from the public API.
 /// Falls back to static data if the API is unreachable.
@@ -302,8 +303,15 @@ class _RepoCard extends StatelessWidget {
     final description = repo['description'] as String? ?? '';
     final language = repo['language'] as String? ?? '';
     final stars = repo['stargazers_count'] as int? ?? 0;
+    final htmlUrl = repo['html_url'] as String? ?? '';
 
-    return BorderLightCard(
+    return GestureDetector(
+      onTap: htmlUrl.isNotEmpty
+          ? () => launchUrl(Uri.parse(htmlUrl), mode: LaunchMode.externalApplication)
+          : null,
+      child: MouseRegion(
+        cursor: htmlUrl.isNotEmpty ? SystemMouseCursors.click : SystemMouseCursors.basic,
+        child: BorderLightCard(
       glowColor: accent,
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -368,6 +376,8 @@ class _RepoCard extends StatelessWidget {
           ),
         ],
       ),
+    ),
+    ),
     );
   }
 
