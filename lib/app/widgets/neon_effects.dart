@@ -53,6 +53,7 @@ class _NeonTextState extends State<NeonText>
     with SingleTickerProviderStateMixin {
   late final AnimationController _ctrl;
   final math.Random _rng = math.Random();
+  bool _flickerListenerAdded = false;
 
   /// Current flicker opacity multiplier (1.0 = fully on).
   double _flickerValue = 1.0;
@@ -70,6 +71,7 @@ class _NeonTextState extends State<NeonText>
     }
     if (widget.flickering) {
       _ctrl.addListener(_updateFlicker);
+      _flickerListenerAdded = true;
     }
   }
 
@@ -84,9 +86,10 @@ class _NeonTextState extends State<NeonText>
 
   @override
   void dispose() {
-    _ctrl
-      ..removeListener(_updateFlicker)
-      ..dispose();
+    if (_flickerListenerAdded) {
+      _ctrl.removeListener(_updateFlicker);
+    }
+    _ctrl.dispose();
     super.dispose();
   }
 

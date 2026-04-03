@@ -65,8 +65,7 @@ class _ScrollIndicatorState extends State<ScrollIndicator>
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
                     colors: [
-                      (Theme.of(context).brightness == Brightness.dark
-                          ? Colors.white : Colors.black).withValues(alpha: 0.3),
+                      Colors.white.withValues(alpha: 0.3),
                       Colors.transparent,
                     ],
                   ),
@@ -81,8 +80,7 @@ class _ScrollIndicatorState extends State<ScrollIndicator>
                     width: 3,
                     height: 3,
                     decoration: BoxDecoration(
-                      color: (Theme.of(context).brightness == Brightness.dark
-                          ? Colors.white : Colors.black).withValues(alpha: 0.8),
+                      color: Colors.white.withValues(alpha: 0.8),
                       shape: BoxShape.circle,
                       boxShadow: [
                         BoxShadow(

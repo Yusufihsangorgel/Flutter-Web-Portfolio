@@ -6,7 +6,6 @@ import 'package:get/get.dart';
 import 'package:flutter_web_portfolio/app/controllers/language_controller.dart';
 import 'package:flutter_web_portfolio/app/controllers/scroll_controller.dart';
 import 'package:flutter_web_portfolio/app/controllers/scene_director.dart';
-import 'package:flutter_web_portfolio/app/controllers/theme_controller.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_dimensions.dart';
 import 'package:flutter_web_portfolio/app/core/constants/breakpoints.dart';
@@ -21,7 +20,6 @@ import 'package:flutter_web_portfolio/app/modules/home/sections/testimonials_sec
 import 'package:flutter_web_portfolio/app/core/constants/app_config.dart';
 import 'package:flutter_web_portfolio/app/widgets/advanced_cursor.dart';
 import 'package:flutter_web_portfolio/app/widgets/cinematic_preloader.dart';
-import 'package:flutter_web_portfolio/app/widgets/circular_theme_reveal.dart';
 import 'package:flutter_web_portfolio/app/widgets/command_palette.dart';
 import 'package:flutter_web_portfolio/app/widgets/custom_sliver_app_bar.dart';
 import 'package:flutter_web_portfolio/app/widgets/premium_footer.dart';
@@ -122,21 +120,14 @@ class _HomeViewState extends State<HomeView> {
       autofocus: true,
       onKeyEvent: _handleKeyEvent,
       child: Obx(() {
-        // Touch reactive values so Obx rebuilds on language/theme switch
         final active = languageController.activeSections;
-        final isDark = Get.isRegistered<ThemeController>()
-            ? Get.find<ThemeController>().isDarkMode.value
-            : true;
 
         final isDesktop = MediaQuery.sizeOf(context).width > Breakpoints.tablet;
 
         Widget scaffold = Scaffold(
-          backgroundColor: isDark ? AppColors.background : AppColors.lightBackground,
-          body: _buildBody(context, isDark, isDesktop, scrollController, languageController, active),
+          backgroundColor: AppColors.background,
+          body: _buildBody(context, isDesktop, scrollController, languageController, active),
         );
-
-        // Wrap with circular theme reveal transition
-        scaffold = CircularThemeReveal(child: scaffold);
 
         // Wrap with cinematic preloader (plays once per session)
         scaffold = CinematicPreloader(
@@ -157,72 +148,51 @@ class _HomeViewState extends State<HomeView> {
 
   Widget _buildBody(
     BuildContext context,
-    bool isDark,
     bool isDesktop,
     AppScrollController scrollController,
     LanguageController languageController,
     List<String> active,
-  ) {
-    return Stack(
+  ) =>
+      Stack(
             children: [
-              if (isDark) ...[
-                // Layer 1: Cinematic gradient mesh (parallax 0.3x)
-                Positioned.fill(
-                  child: RepaintBoundary(
-                    child: ListenableBuilder(
-                      listenable: scrollController.scrollController,
-                      builder: (_, child) {
-                        final offset = scrollController
-                                .scrollController.hasClients
-                            ? scrollController.scrollController.offset
-                            : 0.0;
-                        return Transform.translate(
-                          offset: Offset(0, -offset * 0.3),
-                          child: child,
-                        );
-                      },
-                      child: const CinematicBackground(),
+              Positioned.fill(
+                child: RepaintBoundary(
+                  child: ListenableBuilder(
+                    listenable: scrollController.scrollController,
+                    builder: (_, child) {
+                      final offset = scrollController
+                              .scrollController.hasClients
+                          ? scrollController.scrollController.offset
+                          : 0.0;
+                      return Transform.translate(
+                        offset: Offset(0, -offset * 0.3),
+                        child: child,
+                      );
+                    },
+                    child: const CinematicBackground(),
+                  ),
+                ),
+              ),
+              Positioned.fill(
+                child: RepaintBoundary(
+                  child: ListenableBuilder(
+                    listenable: scrollController.scrollController,
+                    builder: (_, child) {
+                      final offset = scrollController
+                              .scrollController.hasClients
+                          ? scrollController.scrollController.offset
+                          : 0.0;
+                      return Transform.translate(
+                        offset: Offset(0, -offset * 0.15),
+                        child: child,
+                      );
+                    },
+                    child: ConstellationParticles(
+                      particleCount: MediaQuery.sizeOf(context).width < Breakpoints.mobile ? 30 : 50,
                     ),
                   ),
                 ),
-                // Layer 2: Constellation particles (reduced count, parallax 0.15x)
-                Positioned.fill(
-                  child: RepaintBoundary(
-                    child: ListenableBuilder(
-                      listenable: scrollController.scrollController,
-                      builder: (_, child) {
-                        final offset = scrollController
-                                .scrollController.hasClients
-                            ? scrollController.scrollController.offset
-                            : 0.0;
-                        return Transform.translate(
-                          offset: Offset(0, -offset * 0.15),
-                          child: child,
-                        );
-                      },
-                      child: ConstellationParticles(
-                        particleCount: MediaQuery.sizeOf(context).width < Breakpoints.mobile ? 30 : 50,
-                      ),
-                    ),
-                  ),
-                ),
-              ] else
-                // Light mode: simple gradient background (no wave animation)
-                Positioned.fill(
-                  child: Container(
-                    decoration: const BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [
-                          AppColors.lightBackground,
-                          AppColors.lightBackgroundDark,
-                          AppColors.lightBackground,
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
+              ),
               // Skip-to-content link (accessibility)
               Positioned(
                 top: 0,
@@ -371,7 +341,6 @@ class _HomeViewState extends State<HomeView> {
                 ),
             ],
     );
-  }
 
   EdgeInsets _sectionPadding(BuildContext context) {
     final width = MediaQuery.sizeOf(context).width;

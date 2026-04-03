@@ -1,4 +1,4 @@
-import 'dart:math';
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -6,7 +6,6 @@ import 'package:get/get.dart';
 import 'package:flutter_web_portfolio/app/controllers/language_controller.dart';
 import 'package:flutter_web_portfolio/app/controllers/scene_director.dart';
 import 'package:flutter_web_portfolio/app/controllers/scroll_controller.dart';
-import 'package:flutter_web_portfolio/app/controllers/theme_controller.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
 import 'package:flutter_web_portfolio/app/core/constants/durations.dart';
 
@@ -63,16 +62,11 @@ class _DotState extends State<_Dot> {
   @override
   Widget build(BuildContext context) {
     final scrollController = Get.find<AppScrollController>();
-    final isDark = Get.isRegistered<ThemeController>()
-        ? Get.find<ThemeController>().isDarkMode.value
-        : true;
 
     return Obx(() {
       final isActive = scrollController.activeSection.value == widget.sectionId;
       final dotSize = isActive ? 8.0 : 4.0;
-      final color = isActive
-          ? AppColors.accent
-          : (isDark ? AppColors.textSecondary : AppColors.lightTextSecondary);
+      final color = isActive ? AppColors.accent : AppColors.textSecondary;
       final sceneProgress = Get.find<SceneDirector>().sceneProgress.value;
 
       return Padding(
@@ -145,8 +139,8 @@ class _ProgressArcPainter extends CustomPainter {
     final radius = size.width / 2;
     canvas.drawArc(
       Rect.fromCircle(center: center, radius: radius),
-      -pi / 2, // Start from top
-      progress * 2 * pi, // Sweep angle
+      -math.pi / 2, // Start from top
+      progress * 2 * math.pi, // Sweep angle
       false,
       paint,
     );

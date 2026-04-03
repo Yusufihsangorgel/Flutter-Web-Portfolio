@@ -53,7 +53,10 @@ class ContactSection extends StatelessWidget {
                     desktop: screenWidth * 0.18,
                   ),
                   fontWeight: FontWeight.w800,
-                  color: Colors.white.withValues(alpha: 0.02),
+                  color: (Theme.of(context).brightness == Brightness.dark
+                          ? Colors.white
+                          : Colors.black)
+                      .withValues(alpha: 0.03),
                   letterSpacing: -2,
                 ),
               )),
@@ -503,8 +506,7 @@ class _CinematicTextFieldState extends State<_CinematicTextField> {
         border: Border.all(
           color: _focused
               ? widget.accent.withValues(alpha: 0.6)
-              : (Theme.of(context).brightness == Brightness.dark
-                  ? Colors.white : Colors.black).withValues(alpha: 0.08),
+              : Colors.white.withValues(alpha: 0.08),
           width: 1,
         ),
         boxShadow: _focused

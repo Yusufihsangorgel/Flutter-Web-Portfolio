@@ -34,7 +34,6 @@ class AboutSection extends StatelessWidget {
       constraints: const BoxConstraints(maxWidth: 1100),
       child: Stack(
         children: [
-          // Giant watermark — derived from nav i18n
           Positioned(
             top: -20,
             left: -10,
@@ -48,7 +47,7 @@ class AboutSection extends StatelessWidget {
                   desktop: screenWidth * 0.18,
                 ),
                 fontWeight: FontWeight.w800,
-                color: Colors.white.withValues(alpha: 0.02),
+                color: Colors.white.withValues(alpha: 0.03),
                 letterSpacing: -4,
               ),
             )),

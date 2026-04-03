@@ -8,7 +8,6 @@ import 'package:flutter_web_portfolio/app/controllers/scene_director.dart';
 import 'package:flutter_web_portfolio/app/controllers/scroll_controller.dart';
 import 'package:flutter_web_portfolio/app/controllers/sound_controller.dart';
 import 'package:flutter_web_portfolio/app/data/providers/assets_provider.dart';
-import 'package:flutter_web_portfolio/app/controllers/theme_controller.dart';
 import 'package:flutter_web_portfolio/app/data/providers/local_storage_provider.dart';
 import 'package:flutter_web_portfolio/app/data/providers/github_provider.dart';
 import 'package:flutter_web_portfolio/app/data/providers/medium_provider.dart';
@@ -71,9 +70,6 @@ class AppBindings extends Bindings {
       Get.lazyPut<ILanguageRepository>(() => repository, fenix: true);
       _createAndRegisterLanguageController(repository);
 
-      if (!Get.isRegistered<ThemeController>()) {
-        Get.put(ThemeController(), permanent: true);
-      }
     } catch (e) {
       dev.log('Language dependency registration failed', name: 'AppBindings', error: e);
     }

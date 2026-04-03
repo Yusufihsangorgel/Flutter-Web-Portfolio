@@ -12,7 +12,6 @@ import 'package:get/get.dart';
 import 'package:flutter_web_portfolio/app/bindings/app_bindings.dart';
 import 'package:flutter_web_portfolio/app/controllers/loading_controller.dart';
 import 'package:flutter_web_portfolio/app/controllers/language_controller.dart';
-import 'package:flutter_web_portfolio/app/controllers/theme_controller.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
 import 'package:flutter_web_portfolio/app/core/theme/app_theme.dart';
 import 'package:flutter_web_portfolio/app/routes/app_pages.dart';
@@ -38,8 +37,8 @@ void main() {
       SystemChrome.setSystemUIOverlayStyle(
         const SystemUiOverlayStyle(
           statusBarColor: Colors.transparent,
-          statusBarIconBrightness: Brightness.dark,
-          statusBarBrightness: Brightness.light,
+          statusBarIconBrightness: Brightness.light,
+          statusBarBrightness: Brightness.dark,
         ),
       );
 
@@ -99,19 +98,12 @@ class MyApp extends StatelessWidget {
         appTitle = languageController.appName;
       }
 
-      // Determine active theme from ThemeController
-      final isDark = Get.isRegistered<ThemeController>()
-          ? Get.find<ThemeController>().isDarkMode.value
-          : true;
-      final activeTheme = isDark ? AppTheme.dark : AppTheme.light;
-      final activeThemeMode = isDark ? ThemeMode.dark : ThemeMode.light;
-
       return GetMaterialApp(
         title: appTitle,
         debugShowCheckedModeBanner: false,
-        theme: activeTheme,
+        theme: AppTheme.dark,
         darkTheme: AppTheme.dark,
-        themeMode: activeThemeMode,
+        themeMode: ThemeMode.dark,
         transitionDuration: const Duration(milliseconds: 400),
         locale: currentLocale,
         fallbackLocale: const Locale('en'),

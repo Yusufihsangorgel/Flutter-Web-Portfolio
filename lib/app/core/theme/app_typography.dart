@@ -1,8 +1,10 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/painting.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
 
 /// Centralized text styles — display, heading, body, and monospace tiers.
+///
+/// Dark-only theme. Call site can override with `.copyWith(color: ...)` when needed.
 final class AppTypography {
   const AppTypography._();
 
@@ -113,4 +115,5 @@ final class AppTypography {
     height: 1.5,
     color: AppColors.textSecondary,
   );
+
 }

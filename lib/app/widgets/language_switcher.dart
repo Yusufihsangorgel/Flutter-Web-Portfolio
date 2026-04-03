@@ -32,8 +32,7 @@ class LanguageSwitcher extends StatelessWidget {
               ),
               Icon(
                 Icons.arrow_drop_down,
-                color: (Theme.of(context).brightness == Brightness.dark
-                    ? Colors.white : Colors.black).withValues(alpha: 0.3),
+                color: Colors.white.withValues(alpha: 0.3),
                 size: 18,
               ),
             ],

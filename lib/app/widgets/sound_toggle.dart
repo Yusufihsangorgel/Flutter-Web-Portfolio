@@ -59,8 +59,7 @@ class _SoundToggleState extends State<SoundToggle>
     }
 
     final controller = Get.find<SoundController>();
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final iconColor = isDark ? AppColors.textPrimary : AppColors.lightTextPrimary;
+    const iconColor = AppColors.textPrimary;
 
     return Obx(() {
       final enabled = controller.isEnabled.value;

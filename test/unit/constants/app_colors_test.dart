@@ -51,34 +51,6 @@ void main() {
     });
   });
 
-  group('AppColors — light mode', () {
-    test('light mode colors exist and are Color instances', () {
-      expect(AppColors.lightBackground, isA<Color>());
-      expect(AppColors.lightBackgroundDark, isA<Color>());
-      expect(AppColors.lightSurface, isA<Color>());
-      expect(AppColors.lightSurfaceVariant, isA<Color>());
-      expect(AppColors.lightBackgroundHover, isA<Color>());
-      expect(AppColors.lightTextBright, isA<Color>());
-      expect(AppColors.lightTextPrimary, isA<Color>());
-      expect(AppColors.lightTextSecondary, isA<Color>());
-    });
-
-    test('light mode background differs from dark mode background', () {
-      expect(AppColors.lightBackground, isNot(equals(AppColors.background)));
-    });
-
-    test('light mode text differs from dark mode text', () {
-      expect(AppColors.lightTextBright, isNot(equals(AppColors.textBright)));
-      expect(AppColors.lightTextPrimary, isNot(equals(AppColors.textPrimary)));
-    });
-
-    test('light background is lighter than dark background', () {
-      final lightLum = AppColors.lightBackground.computeLuminance();
-      final darkLum = AppColors.background.computeLuminance();
-      expect(lightLum, greaterThan(darkLum));
-    });
-  });
-
   group('AppColors — semantic aliases', () {
     test('accent matches heroAccent', () {
       expect(AppColors.accent, equals(AppColors.heroAccent));

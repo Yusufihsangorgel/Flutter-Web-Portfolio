@@ -55,6 +55,14 @@ class ProjectDetailOverlay extends StatefulWidget {
 }
 
 class _ProjectDetailOverlayState extends State<ProjectDetailOverlay> {
+  final FocusNode _focusNode = FocusNode();
+
+  @override
+  void dispose() {
+    _focusNode.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     final isMobile = ResponsiveUtils.isMobile(context);
@@ -72,7 +80,7 @@ class _ProjectDetailOverlayState extends State<ProjectDetailOverlay> {
     );
 
     return KeyboardListener(
-      focusNode: FocusNode()..requestFocus(),
+      focusNode: _focusNode..requestFocus(),
       autofocus: true,
       onKeyEvent: (event) {
         if (event is KeyDownEvent &&
@@ -91,9 +99,7 @@ class _ProjectDetailOverlayState extends State<ProjectDetailOverlay> {
                 child: BackdropFilter(
                   filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
                   child: ColoredBox(
-                    color: (Theme.of(context).brightness == Brightness.dark
-                        ? AppColors.background
-                        : AppColors.lightBackground).withValues(alpha: 0.85),
+                    color: AppColors.background.withValues(alpha: 0.85),
                   ),
                 ),
               ),
@@ -475,11 +481,9 @@ class _CloseButtonState extends State<_CloseButton> {
           height: 40,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: (Theme.of(context).brightness == Brightness.dark
-                ? Colors.white : Colors.black).withValues(alpha: _hovered ? 0.1 : 0.04),
+            color: Colors.white.withValues(alpha: _hovered ? 0.1 : 0.04),
             border: Border.all(
-              color: (Theme.of(context).brightness == Brightness.dark
-                  ? Colors.white : Colors.black).withValues(alpha: _hovered ? 0.2 : 0.08),
+              color: Colors.white.withValues(alpha: _hovered ? 0.2 : 0.08),
             ),
           ),
           child: Icon(

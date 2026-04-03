@@ -11,9 +11,7 @@ import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
 import 'package:flutter_web_portfolio/app/core/constants/breakpoints.dart';
 import 'package:flutter_web_portfolio/app/core/constants/cinematic_curves.dart';
 import 'package:flutter_web_portfolio/app/core/constants/durations.dart';
-import 'package:flutter_web_portfolio/app/controllers/theme_controller.dart';
 import 'package:flutter_web_portfolio/app/widgets/cinematic_focusable.dart';
-import 'package:flutter_web_portfolio/app/widgets/circular_theme_reveal.dart';
 import 'package:flutter_web_portfolio/app/widgets/fullscreen_menu.dart';
 import 'package:flutter_web_portfolio/app/widgets/language_switcher.dart';
 
@@ -97,61 +95,46 @@ class _CustomSliverAppBarState extends State<CustomSliverAppBar> {
       backgroundColor: Colors.transparent,
       elevation: 0,
       automaticallyImplyLeading: false,
-      flexibleSpace: Obx(() {
-        final isDark = Get.isRegistered<ThemeController>()
-            ? Get.find<ThemeController>().isDarkMode.value
-            : true;
-        return Column(
-          children: [
-            Expanded(
-              child: ClipRect(
-                child: BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: isDark
-                          ? AppColors.background.withValues(alpha: 0.75)
-                          : AppColors.lightBackground.withValues(alpha: 0.85),
-                      border: Border(
-                        bottom: BorderSide(
-                          color: isDark
-                              ? Colors.white.withValues(alpha: 0.05)
-                              : Colors.black.withValues(alpha: 0.06),
-                          width: 1,
-                        ),
+      flexibleSpace: Column(
+        children: [
+          Expanded(
+            child: ClipRect(
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: AppColors.background.withValues(alpha: 0.75),
+                    border: const Border(
+                      bottom: BorderSide(
+                        color: Color(0x0DFFFFFF),
+                        width: 1,
                       ),
                     ),
                   ),
                 ),
               ),
             ),
-            _SceneProgressBar(scrollController: widget.scrollController),
-          ],
-        );
-      }),
+          ),
+          _SceneProgressBar(scrollController: widget.scrollController),
+        ],
+      ),
       title: _LogoText(
         onTap: () => widget.scrollController.scrollToSection('home'),
         scaleFactor: _scaleFactor,
         languageController: widget.languageController,
       ),
       leading: isMobile
-          ? Builder(
-              builder: (context) {
-                final isDark = Theme.of(context).brightness == Brightness.dark;
-                return IconButton(
-                  icon: Icon(
-                    Icons.menu_rounded,
-                    color: isDark ? AppColors.textPrimary : AppColors.lightTextPrimary,
-                    size: 24 * _scaleFactor,
-                  ),
-                  onPressed: () => FullscreenMenu.show(context),
-                );
-              },
+          ? IconButton(
+              icon: Icon(
+                Icons.menu_rounded,
+                color: AppColors.textPrimary,
+                size: 24 * _scaleFactor,
+              ),
+              onPressed: () => FullscreenMenu.show(context),
             )
           : null,
       actions: [
         if (!isMobile) _buildNavItems(),
-        if (!isMobile) const _ThemeToggleButton(),
         const LanguageSwitcher(),
         ...?widget.actions,
         const SizedBox(width: 16),
@@ -199,9 +182,8 @@ class _LogoTextState extends State<_LogoText> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final baseColor = isDark ? AppColors.textBright : AppColors.lightTextBright;
-    final hoverColor = isDark ? Colors.white : AppColors.lightTextBright;
+    const baseColor = AppColors.textBright;
+    const hoverColor = Colors.white;
 
     return Semantics(
       button: true,
@@ -235,47 +217,6 @@ class _LogoTextState extends State<_LogoText> {
 }
 
 // ---------------------------------------------------------------------------
-// Theme toggle: animated sun/moon icon
-// ---------------------------------------------------------------------------
-class _ThemeToggleButton extends StatelessWidget {
-  const _ThemeToggleButton();
-
-  @override
-  Widget build(BuildContext context) {
-    if (!Get.isRegistered<ThemeController>()) {
-      return const SizedBox.shrink();
-    }
-    final themeController = Get.find<ThemeController>();
-
-    return Obx(() {
-      final isDark = themeController.isDarkMode.value;
-      return Semantics(
-        button: true,
-        label: isDark ? 'Switch to light mode' : 'Switch to dark mode',
-        child: IconButton(
-          onPressed: () => CircularThemeReveal.toggleWithReveal(context),
-          icon: AnimatedSwitcher(
-            duration: AppDurations.buttonHover,
-            switchInCurve: CinematicCurves.revealDecel,
-            switchOutCurve: CinematicCurves.revealDecel,
-            transitionBuilder: (child, animation) => RotationTransition(
-              turns: Tween(begin: 0.75, end: 1.0).animate(animation),
-              child: FadeTransition(opacity: animation, child: child),
-            ),
-            child: Icon(
-              isDark ? Icons.light_mode_rounded : Icons.dark_mode_rounded,
-              key: ValueKey(isDark),
-              color: isDark ? AppColors.textPrimary : AppColors.lightTextPrimary,
-              size: 20,
-            ),
-          ),
-        ),
-      );
-    });
-  }
-}
-
-// ---------------------------------------------------------------------------
 // Nav item: uppercase, hover underline animation
 // ---------------------------------------------------------------------------
 class _NavItem extends StatefulWidget {
@@ -300,10 +241,9 @@ class _NavItemState extends State<_NavItem> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final activeColor = isDark ? AppColors.textBright : AppColors.lightTextBright;
-    final inactiveColor = isDark ? AppColors.textPrimary : AppColors.lightTextPrimary;
-    final underlineColor = isDark ? Colors.white : Colors.black;
+    const activeColor = AppColors.textBright;
+    const inactiveColor = AppColors.textPrimary;
+    const underlineColor = Colors.white;
 
     return Semantics(
       button: true,

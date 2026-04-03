@@ -82,7 +82,7 @@ class _ProjectsSectionState extends State<ProjectsSection> {
                   desktop: screenWidth * 0.18,
                 ),
                 fontWeight: FontWeight.w800,
-                color: Colors.white.withValues(alpha: 0.02),
+                color: Colors.white.withValues(alpha: 0.03),
                 letterSpacing: -4,
               ),
             )),

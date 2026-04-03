@@ -6,7 +6,6 @@ import 'package:google_fonts/google_fonts.dart';
 
 import 'package:flutter_web_portfolio/app/controllers/scroll_controller.dart';
 import 'package:flutter_web_portfolio/app/controllers/language_controller.dart';
-import 'package:flutter_web_portfolio/app/controllers/theme_controller.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
 import 'package:flutter_web_portfolio/app/core/constants/cinematic_curves.dart';
 
@@ -43,7 +42,6 @@ class FullscreenMenu extends StatefulWidget {
 class _FullscreenMenuState extends State<FullscreenMenu>
     with TickerProviderStateMixin {
   late AnimationController _masterController;
-  late AnimationController _hoverController;
   late Animation<double> _backdropBlur;
   late Animation<double> _overlayOpacity;
 
@@ -81,11 +79,6 @@ class _FullscreenMenuState extends State<FullscreenMenu>
       duration: const Duration(milliseconds: 600),
     );
 
-    _hoverController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 200),
-    );
-
     _backdropBlur = Tween<double>(begin: 0, end: 20).animate(
       CurvedAnimation(
         parent: _masterController,
@@ -106,7 +99,6 @@ class _FullscreenMenuState extends State<FullscreenMenu>
   @override
   void dispose() {
     _masterController.dispose();
-    _hoverController.dispose();
     super.dispose();
   }
 
@@ -125,18 +117,15 @@ class _FullscreenMenuState extends State<FullscreenMenu>
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Get.isRegistered<ThemeController>()
-        ? Get.find<ThemeController>().isDarkMode.value
-        : true;
     final languageController = Get.find<LanguageController>();
     final screenWidth = MediaQuery.sizeOf(context).width;
     final isMobile = screenWidth < 768;
+    final menuItems = _buildMenuItems();
 
     return AnimatedBuilder(
       animation: _masterController,
       builder: (context, _) => Stack(
         children: [
-          // Backdrop blur
           Positioned.fill(
             child: GestureDetector(
               onTap: _close,
@@ -146,14 +135,13 @@ class _FullscreenMenuState extends State<FullscreenMenu>
                   sigmaY: _backdropBlur.value,
                 ),
                 child: Container(
-                  color: (isDark ? Colors.black : Colors.white)
+                  color: Colors.black
                       .withValues(alpha: 0.7 * _overlayOpacity.value),
                 ),
               ),
             ),
           ),
 
-          // Close button
           Positioned(
             top: 24,
             right: 24,
@@ -161,9 +149,9 @@ class _FullscreenMenuState extends State<FullscreenMenu>
               opacity: _overlayOpacity.value,
               child: IconButton(
                 onPressed: _close,
-                icon: Icon(
+                icon: const Icon(
                   Icons.close,
-                  color: isDark ? Colors.white : Colors.black87,
+                  color: Colors.white,
                   size: 32,
                 ),
               ),
@@ -179,8 +167,8 @@ class _FullscreenMenuState extends State<FullscreenMenu>
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: List.generate(_buildMenuItems().length, (index) {
-                  final item = _buildMenuItems()[index];
+                children: List.generate(menuItems.length, (index) {
+                  final item = menuItems[index];
                   final itemDelay = 0.15 + (index * 0.06);
                   final itemEnd = (itemDelay + 0.25).clamp(0.0, 1.0);
 
@@ -208,7 +196,6 @@ class _FullscreenMenuState extends State<FullscreenMenu>
                         item: item,
                         label: label,
                         isHovered: _hoveredIndex == index,
-                        isDark: isDark,
                         isMobile: isMobile,
                         onTap: () => _navigateToSection(item.key),
                         onHover: (hovered) {
@@ -243,7 +230,6 @@ class _MenuItemWidget extends StatelessWidget {
     required this.item,
     required this.label,
     required this.isHovered,
-    required this.isDark,
     required this.isMobile,
     required this.onTap,
     required this.onHover,
@@ -252,15 +238,14 @@ class _MenuItemWidget extends StatelessWidget {
   final _MenuItem item;
   final String label;
   final bool isHovered;
-  final bool isDark;
   final bool isMobile;
   final VoidCallback onTap;
   final ValueChanged<bool> onHover;
 
   @override
   Widget build(BuildContext context) {
-    final textColor = isDark ? Colors.white : Colors.black87;
-    final accentColor = AppColors.accent;
+    const textColor = Colors.white;
+    const accentColor = AppColors.accent;
     final fontSize = isMobile ? 28.0 : 48.0;
 
     return MouseRegion(
@@ -279,7 +264,7 @@ class _MenuItemWidget extends StatelessWidget {
           decoration: BoxDecoration(
             border: Border(
               bottom: BorderSide(
-                color: (isDark ? Colors.white : Colors.black).withValues(alpha: 0.08),
+                color: Colors.white.withValues(alpha: 0.08),
                 width: 1,
               ),
             ),

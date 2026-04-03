@@ -14,9 +14,6 @@ class LoadingAnimation extends StatefulWidget {
 
 class _LoadingAnimationState extends State<LoadingAnimation>
     with SingleTickerProviderStateMixin {
-  final LanguageController _languageController =
-      Get.find<LanguageController>();
-
   late AnimationController _controller;
   int _counter = 0;
 
@@ -47,10 +44,8 @@ class _LoadingAnimationState extends State<LoadingAnimation>
   }
 
   @override
-  Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    return Scaffold(
-        backgroundColor: isDark ? AppColors.background : AppColors.lightBackground,
+  Widget build(BuildContext context) => Scaffold(
+        backgroundColor: AppColors.background,
         body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -96,9 +91,9 @@ class _LoadingAnimationState extends State<LoadingAnimation>
                   return Opacity(
                     opacity: pulse,
                     child: Text(
-                      _languageController.getText('portfolio_loading'),
+                      Get.find<LanguageController>().getText('portfolio_loading'),
                       style: GoogleFonts.spaceGrotesk(
-                        color: isDark ? AppColors.textBright : AppColors.lightTextBright,
+                        color: AppColors.textBright,
                         fontSize: 14,
                         fontWeight: FontWeight.w400,
                         letterSpacing: 2,
@@ -111,7 +106,6 @@ class _LoadingAnimationState extends State<LoadingAnimation>
           ),
         ),
       );
-  }
 }
 
 /// Paints a thin horizontal progress bar.

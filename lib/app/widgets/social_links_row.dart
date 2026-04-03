@@ -142,8 +142,7 @@ class _SocialLinksRowState extends State<SocialLinksRow>
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Wrap(
+  Widget build(BuildContext context) => Wrap(
       alignment: _wrapAlignment,
       spacing: widget.spacing,
       runSpacing: widget.spacing * 0.75,
@@ -170,7 +169,6 @@ class _SocialLinksRowState extends State<SocialLinksRow>
         );
       }),
     );
-  }
 
   WrapAlignment get _wrapAlignment => switch (widget.alignment) {
         MainAxisAlignment.start => WrapAlignment.start,
@@ -215,9 +213,7 @@ class _SocialIconButtonState extends State<_SocialIconButton> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final baseColor =
-        isDark ? AppColors.textSecondary : AppColors.lightTextSecondary;
+    const baseColor = AppColors.textSecondary;
     final hoverColor = widget.data.brandColor ?? AppColors.accent;
 
     return Tooltip(
@@ -251,11 +247,18 @@ class _SocialIconButtonState extends State<_SocialIconButton> {
               duration: AppDurations.fast,
               curve: CinematicCurves.magneticPull,
               transform: Matrix4.identity()
-                ..translate(
+                ..translateByDouble(
                   _hovered ? _magneticOffset.dx : 0.0,
                   _hovered ? _magneticOffset.dy : 0.0,
+                  0.0,
+                  1.0,
                 )
-                ..scale(_hovered ? 1.2 : 1.0),
+                ..scaleByDouble(
+                  _hovered ? 1.2 : 1.0,
+                  _hovered ? 1.2 : 1.0,
+                  _hovered ? 1.2 : 1.0,
+                  1.0,
+                ),
               transformAlignment: Alignment.center,
               padding: EdgeInsets.all(widget.iconSize * 0.45),
               decoration: BoxDecoration(
@@ -419,14 +422,17 @@ class _PremiumBackToTopButtonState extends State<PremiumBackToTopButton>
                             painter: _ScrollProgressPainter(
                               progress: _scrollProgress,
                               hovered: _hovered,
-                              isDark: Theme.of(context).brightness ==
-                                  Brightness.dark,
                             ),
                             child: Center(
                               child: AnimatedContainer(
                                 duration: AppDurations.fast,
                                 transform: Matrix4.identity()
-                                  ..scale(_hovered ? 1.15 : 1.0),
+                                  ..scaleByDouble(
+                                    _hovered ? 1.15 : 1.0,
+                                    _hovered ? 1.15 : 1.0,
+                                    _hovered ? 1.15 : 1.0,
+                                    1.0,
+                                  ),
                                 transformAlignment: Alignment.center,
                                 child: Icon(
                                   Icons.arrow_upward_rounded,
@@ -462,12 +468,10 @@ class _ScrollProgressPainter extends CustomPainter {
   _ScrollProgressPainter({
     required this.progress,
     required this.hovered,
-    required this.isDark,
   });
 
   final double progress;
   final bool hovered;
-  final bool isDark;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -475,18 +479,13 @@ class _ScrollProgressPainter extends CustomPainter {
     final radius = size.width / 2 - 3;
     final strokeWidth = hovered ? 2.5 : 2.0;
 
-    // Background fill circle
     final bgPaint = Paint()
-      ..color = isDark
-          ? AppColors.backgroundLight.withValues(alpha: hovered ? 0.8 : 0.6)
-          : AppColors.lightSurface.withValues(alpha: hovered ? 0.95 : 0.85)
+      ..color = AppColors.backgroundLight.withValues(alpha: hovered ? 0.8 : 0.6)
       ..style = PaintingStyle.fill;
     canvas.drawCircle(center, radius + 1, bgPaint);
 
-    // Track circle (subtle ring)
     final trackPaint = Paint()
-      ..color = (isDark ? Colors.white : Colors.black)
-          .withValues(alpha: hovered ? 0.15 : 0.08)
+      ..color = Colors.white.withValues(alpha: hovered ? 0.15 : 0.08)
       ..style = PaintingStyle.stroke
       ..strokeWidth = strokeWidth;
     canvas.drawCircle(center, radius, trackPaint);
@@ -530,6 +529,5 @@ class _ScrollProgressPainter extends CustomPainter {
   @override
   bool shouldRepaint(_ScrollProgressPainter old) =>
       progress != old.progress ||
-      hovered != old.hovered ||
-      isDark != old.isDark;
+      hovered != old.hovered;
 }

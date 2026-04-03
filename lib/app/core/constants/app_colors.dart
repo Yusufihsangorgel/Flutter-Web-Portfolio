@@ -16,16 +16,6 @@ final class AppColors {
   static const textSecondary = Color(0xFF475569);
   static const white = Color(0xFFF8FAFC);
 
-  // ─── Light mode ─────────────────────────────────────────────────────
-  static const lightBackground = Color(0xFFF8FAFC);
-  static const lightBackgroundDark = Color(0xFFF1F5F9);
-  static const lightSurface = Color(0xFFFFFFFF);
-  static const lightSurfaceVariant = Color(0xFFE2E8F0);
-  static const lightBackgroundHover = Color(0xFFE2E8F0);
-  static const lightTextBright = Color(0xFF0F172A);
-  static const lightTextPrimary = Color(0xFF334155);
-  static const lightTextSecondary = Color(0xFF64748B);
-
   // ─── Scene: Hero — Blade Runner 2049 ──────────────────────────────
   static const heroGradient1 = Color(0xFF1E0B3E);
   static const heroGradient2 = Color(0xFF2D1055);

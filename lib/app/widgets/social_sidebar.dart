@@ -3,7 +3,6 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_web_portfolio/app/controllers/language_controller.dart';
-import 'package:flutter_web_portfolio/app/controllers/theme_controller.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
 import 'package:flutter_web_portfolio/app/core/constants/cinematic_curves.dart';
 import 'package:flutter_web_portfolio/app/core/constants/durations.dart';
@@ -61,7 +60,7 @@ class SocialSidebarLeft extends StatelessWidget {
                   url: 'mailto:$email',
                 ),
               const SizedBox(height: 12),
-              _VerticalLine(),
+              const _VerticalLine(),
             ],
           ),
         ),
@@ -106,7 +105,7 @@ class SocialSidebarRight extends StatelessWidget {
             children: [
               _RotatedEmailLink(email: email),
               const SizedBox(height: 12),
-              _VerticalLine(),
+              const _VerticalLine(),
             ],
           ),
         ),
@@ -138,11 +137,8 @@ class _SidebarIconState extends State<_SidebarIcon> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Get.isRegistered<ThemeController>()
-        ? Get.find<ThemeController>().isDarkMode.value
-        : true;
-    final baseColor = isDark ? AppColors.textSecondary : AppColors.lightTextSecondary;
-    final hoverColor = isDark ? AppColors.textBright : AppColors.lightTextBright;
+    const baseColor = AppColors.textSecondary;
+    const hoverColor = AppColors.textBright;
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
@@ -196,11 +192,8 @@ class _RotatedEmailLinkState extends State<_RotatedEmailLink> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Get.isRegistered<ThemeController>()
-        ? Get.find<ThemeController>().isDarkMode.value
-        : true;
-    final baseColor = isDark ? AppColors.textSecondary : AppColors.lightTextSecondary;
-    final hoverColor = isDark ? AppColors.textBright : AppColors.lightTextBright;
+    const baseColor = AppColors.textSecondary;
+    const hoverColor = AppColors.textBright;
 
     return MouseRegion(
       onEnter: (_) => setState(() => _hovered = true),
@@ -241,8 +234,7 @@ class _RotatedEmailLinkState extends State<_RotatedEmailLink> {
                   curve: CinematicCurves.hoverLift,
                   height: 1,
                   width: _hovered ? 160 : 0,
-                  color: (isDark ? AppColors.accent : AppColors.lightTextBright)
-                      .withValues(alpha: 0.5),
+                  color: AppColors.accent.withValues(alpha: 0.5),
                 ),
               ],
             ),
@@ -257,17 +249,12 @@ class _RotatedEmailLinkState extends State<_RotatedEmailLink> {
 // Vertical line — 1px wide, ~100px tall, accent at 0.2 opacity
 // ---------------------------------------------------------------------------
 class _VerticalLine extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    final isDark = Get.isRegistered<ThemeController>()
-        ? Get.find<ThemeController>().isDarkMode.value
-        : true;
+  const _VerticalLine();
 
-    return Container(
+  @override
+  Widget build(BuildContext context) => Container(
       width: 1,
       height: 100,
-      color: (isDark ? AppColors.accent : AppColors.lightTextSecondary)
-          .withValues(alpha: 0.2),
+      color: AppColors.accent.withValues(alpha: 0.2),
     );
-  }
 }

@@ -22,13 +22,11 @@ class ExperienceSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final languageController = Get.find<LanguageController>();
     final screenWidth = MediaQuery.sizeOf(context).width;
-
     return Center(
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 900),
         child: Stack(
           children: [
-            // Giant watermark — derived from nav i18n
             Positioned(
               top: -20,
               right: -10,
@@ -42,7 +40,7 @@ class ExperienceSection extends StatelessWidget {
                     desktop: screenWidth * 0.18,
                   ),
                   fontWeight: FontWeight.w800,
-                  color: Colors.white.withValues(alpha: 0.02),
+                  color: Colors.white.withValues(alpha: 0.03),
                   letterSpacing: -3,
                 ),
               )),

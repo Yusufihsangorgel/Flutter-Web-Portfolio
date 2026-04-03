@@ -32,7 +32,6 @@ class PremiumFooter extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     final width = MediaQuery.sizeOf(context).width;
     final isDesktop = width >= Breakpoints.tablet;
 
@@ -40,13 +39,10 @@ class PremiumFooter extends StatelessWidget {
       child: Container(
         width: double.infinity,
         decoration: BoxDecoration(
-          color: isDark
-              ? AppColors.backgroundDark.withValues(alpha: 0.85)
-              : AppColors.lightBackgroundDark.withValues(alpha: 0.7),
+          color: AppColors.backgroundDark.withValues(alpha: 0.85),
           border: Border(
             top: BorderSide(
-              color: (isDark ? Colors.white : Colors.black)
-                  .withValues(alpha: 0.04),
+              color: Colors.white.withValues(alpha: 0.04),
             ),
           ),
         ),
@@ -91,8 +87,7 @@ class _DesktopLayout extends StatelessWidget {
   const _DesktopLayout();
 
   @override
-  Widget build(BuildContext context) {
-    return const Row(
+  Widget build(BuildContext context) => const Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Left — brand identity
@@ -105,7 +100,6 @@ class _DesktopLayout extends StatelessWidget {
         Expanded(flex: 3, child: _ConnectColumn()),
       ],
     );
-  }
 }
 
 // =============================================================================
@@ -116,8 +110,7 @@ class _MobileLayout extends StatelessWidget {
   const _MobileLayout();
 
   @override
-  Widget build(BuildContext context) {
-    return const Column(
+  Widget build(BuildContext context) => const Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         _BrandColumn(centered: true),
@@ -127,7 +120,6 @@ class _MobileLayout extends StatelessWidget {
         _ConnectColumn(centered: true),
       ],
     );
-  }
 }
 
 // =============================================================================
@@ -142,11 +134,8 @@ class _BrandColumn extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final languageController = Get.find<LanguageController>();
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final secondaryColor =
-        isDark ? AppColors.textSecondary : AppColors.lightTextSecondary;
-    final brightColor =
-        isDark ? AppColors.textBright : AppColors.lightTextBright;
+    const secondaryColor = AppColors.textSecondary;
+    const brightColor = AppColors.textBright;
 
     return Obx(() {
       final data = languageController.cvData['personal_info']
@@ -207,9 +196,7 @@ class _QuickLinksColumn extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final brightColor =
-        isDark ? AppColors.textBright : AppColors.lightTextBright;
+    const brightColor = AppColors.textBright;
 
     const sections = <_QuickLinkItem>[
       _QuickLinkItem('home', 'Home'),
@@ -272,9 +259,7 @@ class _QuickLinkButtonState extends State<_QuickLinkButton> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final baseColor =
-        isDark ? AppColors.textSecondary : AppColors.lightTextSecondary;
+    const baseColor = AppColors.textSecondary;
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
@@ -333,9 +318,7 @@ class _ConnectColumn extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final languageController = Get.find<LanguageController>();
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final brightColor =
-        isDark ? AppColors.textBright : AppColors.lightTextBright;
+    const brightColor = AppColors.textBright;
 
     return Obx(() {
       final data = languageController.cvData['personal_info']
@@ -414,9 +397,7 @@ class _EmailLinkState extends State<_EmailLink> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final baseColor =
-        isDark ? AppColors.textSecondary : AppColors.lightTextSecondary;
+    const baseColor = AppColors.textSecondary;
 
     return MouseRegion(
       onEnter: (_) => setState(() => _hovered = true),
@@ -504,9 +485,7 @@ class _NewsletterSubscribeState extends State<_NewsletterSubscribe>
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final secondaryColor =
-        isDark ? AppColors.textSecondary : AppColors.lightTextSecondary;
+    const secondaryColor = AppColors.textSecondary;
 
     return Column(
       crossAxisAlignment: widget.centered
@@ -575,8 +554,7 @@ class _NewsletterSubscribeState extends State<_NewsletterSubscribe>
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(8),
                 border: Border.all(
-                  color: (isDark ? Colors.white : Colors.black)
-                      .withValues(alpha: 0.1),
+                  color: Colors.white.withValues(alpha: 0.1),
                 ),
               ),
               child: Row(
@@ -587,9 +565,7 @@ class _NewsletterSubscribeState extends State<_NewsletterSubscribe>
                       onSubmitted: (_) => _subscribe(),
                       style: GoogleFonts.jetBrainsMono(
                         fontSize: 12,
-                        color: isDark
-                            ? AppColors.textBright
-                            : AppColors.lightTextBright,
+                        color: AppColors.textBright,
                       ),
                       decoration: InputDecoration(
                         hintText: 'your@email.com',
@@ -629,8 +605,7 @@ class _SubscribeButtonState extends State<_SubscribeButton> {
   bool _hovered = false;
 
   @override
-  Widget build(BuildContext context) {
-    return MouseRegion(
+  Widget build(BuildContext context) => MouseRegion(
       onEnter: (_) => setState(() => _hovered = true),
       onExit: (_) => setState(() => _hovered = false),
       cursor: SystemMouseCursors.click,
@@ -657,7 +632,6 @@ class _SubscribeButtonState extends State<_SubscribeButton> {
         ),
       ),
     );
-  }
 }
 
 // =============================================================================
@@ -731,9 +705,7 @@ class _CopyrightEasterEggState extends State<_CopyrightEasterEgg>
   @override
   Widget build(BuildContext context) {
     final year = DateTime.now().year;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final secondaryColor =
-        isDark ? AppColors.textSecondary : AppColors.lightTextSecondary;
+    const secondaryColor = AppColors.textSecondary;
 
     return Column(
       crossAxisAlignment: widget.centered
@@ -802,9 +774,7 @@ class _BottomBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final secondaryColor =
-        isDark ? AppColors.textSecondary : AppColors.lightTextSecondary;
+    const secondaryColor = AppColors.textSecondary;
 
     return Container(
       width: double.infinity,
@@ -812,8 +782,7 @@ class _BottomBar extends StatelessWidget {
       decoration: BoxDecoration(
         border: Border(
           top: BorderSide(
-            color: (isDark ? Colors.white : Colors.black)
-                .withValues(alpha: 0.05),
+            color: Colors.white.withValues(alpha: 0.05),
           ),
         ),
       ),
@@ -874,9 +843,7 @@ class _BuiltWithFlutterState extends State<_BuiltWithFlutter>
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final secondaryColor =
-        isDark ? AppColors.textSecondary : AppColors.lightTextSecondary;
+    const secondaryColor = AppColors.textSecondary;
 
     return Row(
       mainAxisSize: MainAxisSize.min,
@@ -947,9 +914,7 @@ class _PoweredByFlutterState extends State<_PoweredByFlutter>
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final secondaryColor =
-        isDark ? AppColors.textSecondary : AppColors.lightTextSecondary;
+    const secondaryColor = AppColors.textSecondary;
 
     return MouseRegion(
       onEnter: (_) => _onHoverChanged(true),
@@ -966,14 +931,12 @@ class _PoweredByFlutterState extends State<_PoweredByFlutter>
           ),
           AnimatedBuilder(
             animation: _spinCtrl,
-            builder: (_, child) {
-              return Transform(
+            builder: (_, child) => Transform(
                 alignment: Alignment.center,
                 transform:
                     Matrix4.rotationY(_spinCtrl.value * 2 * math.pi),
                 child: child,
-              );
-            },
+              ),
             child: FlutterLogo(
               size: 14,
               style: FlutterLogoStyle.markOnly,
@@ -1009,9 +972,7 @@ class _CommandPaletteHint extends StatelessWidget {
   Widget build(BuildContext context) {
     final isMac = defaultTargetPlatform == TargetPlatform.macOS;
     final shortcut = isMac ? '\u2318K' : 'Ctrl+K';
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final secondaryColor =
-        isDark ? AppColors.textSecondary : AppColors.lightTextSecondary;
+    const secondaryColor = AppColors.textSecondary;
     final languageController = Get.find<LanguageController>();
 
     return Row(
@@ -1028,11 +989,10 @@ class _CommandPaletteHint extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
           decoration: BoxDecoration(
             color:
-                (isDark ? Colors.white : Colors.black).withValues(alpha: 0.05),
+                Colors.white.withValues(alpha: 0.05),
             borderRadius: BorderRadius.circular(3),
             border: Border.all(
-              color: (isDark ? Colors.white : Colors.black)
-                  .withValues(alpha: 0.1),
+              color: Colors.white.withValues(alpha: 0.1),
             ),
           ),
           child: Text(

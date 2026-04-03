@@ -94,7 +94,7 @@ class _BlogSectionState extends State<BlogSection> {
                     desktop: screenWidth * 0.12,
                   ),
                   fontWeight: FontWeight.w800,
-                  color: Colors.white.withValues(alpha: 0.02),
+                  color: Colors.white.withValues(alpha: 0.03),
                   letterSpacing: -3,
                 ),
               )),
