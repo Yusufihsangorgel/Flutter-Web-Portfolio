@@ -1,23 +1,5 @@
 {
   "app_name": "Yusuf İhsan Görgel - Portföy",
-  "theme": {
-    "primary_color": "#3F51B5",
-    "secondary_color": "#FF4081",
-    "background_color": {
-      "light": "#FFFFFF",
-      "dark": "#121212"
-    },
-    "surface_color": {
-      "light": "#F5F5F5",
-      "dark": "#1E1E1E"
-    },
-    "text_color": {
-      "light": "#212121",
-      "dark": "#FFFFFF"
-    },
-    "light_mode": "Aydınlık Mod",
-    "dark_mode": "Karanlık Mod"
-  },
   "navigation": {
     "items": [
       {
@@ -65,8 +47,6 @@
     "skills": "Yetenekler",
     "contact": "İletişim",
     "explore_more": "Daha Fazla Keşfet",
-    "dark_mode": "Karanlık Mod",
-    "light_mode": "Aydınlık Mod",
     "personal_info": "Kişisel Bilgiler",
     "education": "Eğitim",
     "languages": "Diller",
@@ -102,24 +82,24 @@
   "cv_data": {
     "personal_info": {
       "name": "Yusuf İhsan Görgel",
-      "title": "Mobile Software Engineer",
+      "title": "Software Engineer",
       "phone": "+90 544 953 0128",
       "email": "developeryusuf@icloud.com",
       "location": "Antalya, Türkiye (Remote)",
       "github": "https://github.com/Yusufihsangorgel",
       "linkedin": "https://linkedin.com/in/yusuf-ihsan-görgel/",
-      "bio": "4+ yıllık deneyime sahip, production-grade mobil uygulamalar geliştirmeye odaklanan bir Yazılım Mühendisiyim. Mimari, performans ve güvenilirlik odaklı çalışıyorum — Flutter ile cross-platform, Swift ve Kotlin ile native iOS/Android uygulamalar geliştiriyorum. Şu anda Uzman Adres'te FugaSoft üzerinde çalışıyorum.",
+      "bio": "Türkiye'den, Flutter ve Go odaklı bir yazılım mühendisiyim. Mobil uygulamalar, web arayüzleri ve bunları destekleyen backend sistemleri geliştiriyorum — veritabanı şemalarından Docker dağıtımlarına kadar. Şu anda SaaS ürünleri ve açık kaynak geliştirici araçları üzerinde çalışıyorum.",
       "tagline": "Kod ve yaratıcılıkla dijital deneyimler oluşturuyorum",
       "medium": "developeryusufihsan",
       "stats": {
         "years_experience": 5,
-        "projects_completed": 30,
-        "technologies": 15
+        "projects_completed": 12,
+        "technologies": 20
       },
       "subtitles": [
-        "Mobil Yazılım Mühendisi",
-        "Flutter Geliştirici",
-        "Temiz Mimari Savunucusu"
+        "Yazılım Mühendisi",
+        "Flutter & Go Geliştirici",
+        "SaaS Geliştirici"
       ]
     },
     "experiences": [
@@ -177,7 +157,7 @@
     "projects": [
       {
         "title": "FugaSoft (Pos - Sales Management Software)",
-        "description": "Flutter front-end, SQLite-Drift, GetX, i18n, reaktif programlama; Android/iOS tablet ve masaüstü (Linux, macOS, Windows); Mentor: Arge Team Lead Abdüsselam Kösecik",
+        "description": "Flutter front-end, SQLite-Drift, GetX, i18n, reaktif programlama; Android/iOS tablet ve masaüstü (Linux, macOS, Windows)",
         "category": "Mobile",
         "url": "https://fugasoft.com/",
         "image": "assets/images/fugasoft.png",
@@ -189,7 +169,7 @@
       },
       {
         "title": "Aydınlık E-Newspaper",
-        "description": "Flutter front-end, GetX, Dio, MVVM; Mentor: Senior Ferhat Balaban",
+        "description": "Flutter front-end, GetX, Dio, MVVM",
         "category": "Mobile",
         "url": {
           "google_play": "https://play.google.com/store/apps/details?id=com.aydinlikgazetesi.egazete&hl=tr",
@@ -204,7 +184,7 @@
       },
       {
         "title": "Bilim ve Ütopya E-Magazine",
-        "description": "Flutter front-end, GetX, Dio, MVVM; Mentor: Senior Ferhat Balaban",
+        "description": "Flutter front-end, GetX, Dio, MVVM",
         "category": "Mobile",
         "url": {
           "google_play": "https://play.google.com/store/apps/details?id=com.aydinlikgazetesi.edergi_v1_bvu&pcampaignid=web_share",
@@ -232,6 +212,72 @@
           "solution": "WebSocket tabanlı gerçek zamanlı araç takibi, Google ve Apple Maps SDK entegrasyonu, SOLID prensiplerine uygun RESTful API mimarisi ve eşlik eden React web panosu ile Flutter kullanılarak mobil geliştirme yönetildi.",
           "result": "Android, iOS ve web platformlarında <200ms gecikmeyle 5.000+ eşzamanlı aracı takip ediyor — lojistik şirketlerinin araçları gerçek zamanlı takip etmesini, rotaları optimize etmesini ve filoları yönetmesini güvenilir WebSocket bağlantılarıyla sağlıyor."
         }
+      },
+      {
+        "title": "FakeCallApp",
+        "description": "80+ karakterli şaka görüntülü arama uygulaması — Flutter mobil + Next.js web",
+        "category": "Web",
+        "url": "https://fakecallapp.com"
+      },
+      {
+        "title": "CleanMyGallery",
+        "description": "Akıllı telefon galeri temizleyici — sıkıştırma, filigran, EXIF temizleme",
+        "category": "Web",
+        "url": "https://cleanmygallery.com"
+      },
+      {
+        "title": "FocusGroves",
+        "description": "Pomodoro odaklanma zamanlayıcısı — çalışma odaları ve verimlilik takibi",
+        "category": "Web",
+        "url": "https://focusgroves.com"
+      },
+      {
+        "title": "MoodGrade",
+        "description": "Duygu durum takibi — ilaç kayıtları, AI içgörüler ve veri dışa aktarma",
+        "category": "Web",
+        "url": "https://moodgrade.com"
+      },
+      {
+        "title": "GetQrivo",
+        "description": "QR kod oluşturucu — kısa linkler ve tarama analizleri",
+        "category": "Web",
+        "url": "https://getqrivo.com"
+      },
+      {
+        "title": "OverlayPhoto",
+        "description": "Fotoğraf düzenleyici — filtreler, çerçeveler ve zaman kapsülleri",
+        "category": "Web",
+        "url": "https://overlayphoto.com"
+      },
+      {
+        "title": "DistractionKiller",
+        "description": "Uygulama engelleyici ve dijital sağlık aracı",
+        "category": "Web",
+        "url": "https://distractionkiller.com"
+      },
+      {
+        "title": "KPSSHazirlan",
+        "description": "KPSS hazırlık platformu — çalışma planları ve deneme sınavları",
+        "category": "Web",
+        "url": "https://kpsshazirlan.com"
+      },
+      {
+        "title": "EhliyetCoz",
+        "description": "Ehliyet sınavı hazırlık — günlük quizler ve ilerleme takibi",
+        "category": "Web",
+        "url": "https://ehliyetcoz.com"
+      },
+      {
+        "title": "Kazanamazi",
+        "description": "Kaza namazı ve oruç takipçisi — ısı haritaları ve hatırlatıcılar",
+        "category": "Web",
+        "url": "https://kazanamazi.net"
+      },
+      {
+        "title": "PDFScanPro",
+        "description": "PDF araç seti — dönüştürme, sıkıştırma, birleştirme, bölme",
+        "category": "Web",
+        "url": "https://pdfscanpro.com"
       }
     ],
     "education": [

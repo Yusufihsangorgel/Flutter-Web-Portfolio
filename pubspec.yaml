@@ -42,8 +42,6 @@ flutter:
 
   assets:
     - assets/images/
-    - assets/icons/
-    - assets/icons/skills/
     - assets/animations/
     - assets/data/
     - assets/i18n/

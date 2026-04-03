@@ -131,64 +131,13 @@ flutter build web --release
 
 ## Make It Yours
 
-You need to change **three files** to make this your own portfolio. That's it.
+Customize these files to make this your own portfolio:
 
 ### 1. Your CV Data — `assets/i18n/en.json`
 
-This single file drives every section of the portfolio. Edit it and the site updates automatically.
+This single file drives every section. Edit it and the site updates automatically.
 
-```jsonc
-{
-  "cv_data": {
-    "personal_info": {
-      "name": "Your Name",                    // Hero section heading
-      "title": "Your Job Title",              // Hero subtitle
-      "email": "you@example.com",             // Contact section + terminal
-      "location": "City, Country",            // Contact section
-      "github": "https://github.com/you",     // Sidebar + command palette
-      "linkedin": "https://linkedin.com/in/you",
-      "bio": "Your bio paragraph...",         // About section
-      "medium": "yourMediumUsername"           // Blog section (RSS feed)
-    },
-    "experiences": [
-      {
-        "company": "Company Name",
-        "position": "Your Role",
-        "period": "Jan 2024 – Present",
-        "description": "What you did...",
-        "technologies": ["Flutter", "Dart"]   // Technology tags
-      }
-    ],
-    "projects": [
-      {
-        "title": "Project Name",
-        "description": "Tech stack summary",
-        "url": "https://project.com",         // Single URL or object with multiple links
-        "image": "assets/images/project.png",
-        "case_study": {
-          "problem": "The challenge...",
-          "solution": "Your approach...",
-          "result": "The outcome..."
-        }
-      }
-    ],
-    "skills": [
-      { "category": "Mobile", "items": ["Flutter", "Dart", "Swift"] },
-      { "category": "Backend", "items": ["Node.js", "Go", "PostgreSQL"] }
-    ],
-    "testimonials": [
-      {
-        "quote": "What they said about you...",
-        "name": "Colleague Name",
-        "position": "Their Title",
-        "company": "Their Company"
-      }
-    ]
-  }
-}
-```
-
-> Repeat for each language file (`tr.json`, `de.json`, `fr.json`, `es.json`, `ar.json`, `hi.json`).
+All personal info, experiences, projects, skills, and testimonials are read from the `cv_data` object. Update each language file (`en.json`, `tr.json`, `de.json`, etc.) with your own content.
 
 ### 2. Your Photo — `assets/images/me.jpeg`
 
@@ -196,36 +145,19 @@ Replace with your own photo. Recommended: 600x600px, JPEG or PNG.
 
 ### 3. Your Meta Tags — `web/index.html`
 
-Update these lines for SEO and social sharing:
+Update title, description, author, Open Graph, Twitter Card, and JSON-LD structured data with your own info.
 
-```html
-<!-- Line 14 -->
-<title>Your Name - Developer Portfolio</title>
+### 4. Your CV — `assets/data/cv.pdf`
 
-<!-- Line 15 -->
-<meta name="description" content="Your description here.">
+Replace with your own PDF resume. The "Download CV" button serves this file.
 
-<!-- Line 17 -->
-<meta name="author" content="Your Name">
+### 5. Web Config
 
-<!-- Line 18 -->
-<link rel="canonical" href="https://yourdomain.com/">
-
-<!-- Lines 22-26: Open Graph -->
-<meta property="og:title" content="Your Name - Developer">
-<meta property="og:description" content="Your portfolio description.">
-<meta property="og:url" content="https://yourdomain.com/">
-<meta property="og:image" content="https://yourdomain.com/preview.png">
-```
-
-### 4. Your Integrations
-
-| Integration | Where to Change | What to Change |
-|------------|----------------|----------------|
-| **Medium blog** | `assets/i18n/en.json` → `cv_data.personal_info.medium` | Your Medium username (without @) |
-| **GitHub stats** | `lib/app/data/providers/github_provider.dart` → `_username` | Your GitHub username |
-| **Contact form** | `lib/app/modules/home/sections/contact/contact_section.dart` | Your Formspree endpoint |
-| **CV download** | `lib/app/widgets/command_palette.dart` → `cvUrl` | URL to your hosted PDF |
+| File | What to Change |
+|------|----------------|
+| `web/index.html` | Analytics script (line 78) — replace or remove |
+| `web/sitemap.xml` | Replace `developeryusuf.com` with your domain |
+| `web/manifest.json` | App name and description |
 
 ---
 
