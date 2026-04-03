@@ -23,16 +23,16 @@ final class AppDurations {
   static const loadingPulse = Duration(milliseconds: 1500);
 
   // Hero sequence
-  static const heroEntrance = Duration(milliseconds: 3200);
-  static const heroInitialPause = Duration(milliseconds: 400);
-  static const heroNameRevealDelay = Duration(milliseconds: 800);
-  static const heroNameRevealDuration = Duration(milliseconds: 800);
-  static const heroSubtitleDelay = Duration(milliseconds: 1600);
-  static const heroSubtitleDuration = Duration(milliseconds: 1000);
-  static const heroLocationDelay = Duration(milliseconds: 1800);
-  static const heroLocationDuration = Duration(milliseconds: 600);
-  static const heroCTADelay = Duration(milliseconds: 2400);
-  static const heroScrollIndicator = Duration(milliseconds: 3000);
+  static const heroEntrance = Duration(milliseconds: 1800);
+  static const heroInitialPause = Duration(milliseconds: 200);
+  static const heroNameRevealDelay = Duration(milliseconds: 300);
+  static const heroNameRevealDuration = Duration(milliseconds: 600);
+  static const heroSubtitleDelay = Duration(milliseconds: 800);
+  static const heroSubtitleDuration = Duration(milliseconds: 600);
+  static const heroLocationDelay = Duration(milliseconds: 1000);
+  static const heroLocationDuration = Duration(milliseconds: 400);
+  static const heroCTADelay = Duration(milliseconds: 1200);
+  static const heroScrollIndicator = Duration(milliseconds: 1600);
 
   // Stagger delays
   static const staggerShort = Duration(milliseconds: 100);

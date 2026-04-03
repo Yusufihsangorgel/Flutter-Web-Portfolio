@@ -30,8 +30,8 @@ class CinematicPreloader extends StatefulWidget {
     this.onLoadingComplete,
     this.displayName = 'YUSUF IHSAN GORGEL',
     this.tagline = 'Crafting digital experiences',
-    this.minimumDuration = const Duration(milliseconds: 3500),
-    this.exitDuration = const Duration(milliseconds: 900),
+    this.minimumDuration = const Duration(milliseconds: 1800),
+    this.exitDuration = const Duration(milliseconds: 500),
   });
 
   /// The main content revealed after the preloader finishes.

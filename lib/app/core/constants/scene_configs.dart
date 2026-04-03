@@ -45,9 +45,9 @@ final class SceneConfigs {
     gradient2: AppColors.heroGradient2,
     gradient3: AppColors.heroGradient3,
     accent: AppColors.heroAccent,
-    particleDensity: 1.0,
-    particleSpeed: 0.8,
-    vignetteIntensity: 0.35,
+    particleDensity: 0.6,
+    particleSpeed: 0.5,
+    vignetteIntensity: 0.3,
   );
 
   // Scene 1: About — Dune
@@ -56,9 +56,9 @@ final class SceneConfigs {
     gradient2: AppColors.aboutGradient2,
     gradient3: AppColors.aboutGradient3,
     accent: AppColors.aboutAccent,
-    particleDensity: 0.7,
-    particleSpeed: 0.5,
-    vignetteIntensity: 0.4,
+    particleDensity: 0.4,
+    particleSpeed: 0.3,
+    vignetteIntensity: 0.3,
   );
 
   // Scene 2: Experience — Matrix
@@ -67,9 +67,9 @@ final class SceneConfigs {
     gradient2: AppColors.expGradient2,
     gradient3: AppColors.expGradient3,
     accent: AppColors.expAccent,
-    particleDensity: 0.8,
-    particleSpeed: 0.6,
-    vignetteIntensity: 0.35,
+    particleDensity: 0.5,
+    particleSpeed: 0.4,
+    vignetteIntensity: 0.3,
   );
 
   // Scene 3: Projects — Spider-Verse
@@ -78,9 +78,9 @@ final class SceneConfigs {
     gradient2: AppColors.projGradient2,
     gradient3: AppColors.projGradient3,
     accent: AppColors.projAccent,
-    particleDensity: 1.2,
-    particleSpeed: 1.0,
-    vignetteIntensity: 0.3,
+    particleDensity: 0.6,
+    particleSpeed: 0.5,
+    vignetteIntensity: 0.25,
   );
 
   // Scene 4: Contact — Interstellar
@@ -89,8 +89,8 @@ final class SceneConfigs {
     gradient2: AppColors.contactGradient2,
     gradient3: AppColors.contactGradient3,
     accent: AppColors.contactAccent,
-    particleDensity: 1.5,
-    particleSpeed: 0.3,
-    vignetteIntensity: 0.5,
+    particleDensity: 0.8,
+    particleSpeed: 0.2,
+    vignetteIntensity: 0.4,
   );
 }

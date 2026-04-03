@@ -84,7 +84,7 @@ class _CinematicBackgroundState extends State<CinematicBackground>
     final random = math.Random(seed);
     final paint = Paint()..color = Colors.white.withValues(alpha: 0.015);
 
-    for (var i = 0; i < 80; i++) {
+    for (var i = 0; i < 40; i++) {
       final x = random.nextDouble() * grainSize;
       final y = random.nextDouble() * grainSize;
       final r = 0.5 + random.nextDouble() * 0.5; // 0.5 - 1px
