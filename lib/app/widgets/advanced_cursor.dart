@@ -226,9 +226,6 @@ class _AdvancedCursorState extends State<AdvancedCursor>
     _accentWorker = ever(Get.find<SceneDirector>().currentAccent, (Color c) {
       _accentColor = c;
     });
-
-    // Hide native cursor via CSS on web
-    _hideNativeCursor();
   }
 
   @override
@@ -236,47 +233,7 @@ class _AdvancedCursorState extends State<AdvancedCursor>
     _ticker.dispose();
     _stateWorker.dispose();
     _accentWorker.dispose();
-    _restoreNativeCursor();
     super.dispose();
-  }
-
-  // ------------------------------------------------------------------
-  // Native cursor hide/restore (web only, safe no-op on other platforms)
-  // ------------------------------------------------------------------
-
-  void _hideNativeCursor() {
-    if (!kIsWeb) return;
-    try {
-      // ignore: avoid_dynamic_calls
-      _evalJs("document.body.style.cursor = 'none'");
-    } catch (_) {}
-  }
-
-  void _restoreNativeCursor() {
-    if (!kIsWeb) return;
-    try {
-      // ignore: avoid_dynamic_calls
-      _evalJs("document.body.style.cursor = 'auto'");
-    } catch (_) {}
-  }
-
-  /// Evaluate JS in web context. No-op on non-web.
-  void _evalJs(String js) {
-    // Uses dart:js_interop when compiled for web; safe try/catch otherwise.
-    try {
-      // The web engine exposes `dart:js_util` – but for maximum compatibility
-      // we use a conditional import guard. In production Flutter web builds
-      // `dart:html` is available.
-      // ignore: undefined_function
-      _runJs(js);
-    } catch (_) {}
-  }
-
-  static void _runJs(String js) {
-    // Stubbed – Flutter web engine will inline this via dart:html or
-    // dart:js_interop depending on the renderer. The body.style.cursor
-    // assignment is also handled by the MouseRegion cursor: none below,
-    // so this is a belt-and-suspenders approach.
   }
 
   // ------------------------------------------------------------------

@@ -240,26 +240,7 @@
         ]
       }
     ],
-    "references": [
-      {
-        "name": "Abdüsselam Kösecik",
-        "title": "قائد فريق Arge",
-        "phone": "+90 542 819 80 69",
-        "linkedin": "https://www.linkedin.com/in/abdusselam-k%C3%B6secik-ab209327/"
-      },
-      {
-        "name": "Ferhat Balaban",
-        "title": "كبير مهندسي الكمبيوتر",
-        "phone": "+90 542 350 50 95",
-        "linkedin": "https://www.linkedin.com/in/balabanferhat/"
-      },
-      {
-        "name": "Emrah Türk",
-        "title": "كبير مطوري البرمجيات",
-        "phone": "+90 551 956 03 91",
-        "linkedin": "https://www.linkedin.com/in/emrah-t%C3%BCrk/"
-      }
-    ],
+    "references": [],
     "languages": [
       {
         "name": "التركية",

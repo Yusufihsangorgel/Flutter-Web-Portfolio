@@ -154,6 +154,24 @@ class _MatrixPainter extends CustomPainter {
   final int rowCount;
   final TextStyle textStyle;
 
+  static final Map<int, TextPainter> _painterCache = {};
+
+  TextPainter _getPainter(String char, Color color) {
+    final key = char.hashCode ^ color.toARGB32();
+    var painter = _painterCache[key];
+    if (painter == null) {
+      painter = TextPainter(
+        text: TextSpan(
+          text: char,
+          style: textStyle.copyWith(color: color),
+        ),
+        textDirection: TextDirection.ltr,
+      )..layout();
+      _painterCache[key] = painter;
+    }
+    return painter;
+  }
+
   @override
   void paint(Canvas canvas, Size size) {
     for (var col = 0; col < columns.length; col++) {
@@ -188,13 +206,7 @@ class _MatrixPainter extends CustomPainter {
           color = Color.fromRGBO(0, 180, 40, alpha);
         }
 
-        (TextPainter(
-          text: TextSpan(
-            text: column.chars[row],
-            style: textStyle.copyWith(color: color),
-          ),
-          textDirection: TextDirection.ltr,
-        )..layout())
+        _getPainter(column.chars[row], color)
             .paint(canvas, Offset(x + 1, y));
       }
     }

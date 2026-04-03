@@ -178,12 +178,13 @@ class _GlowBarPainter extends CustomPainter {
       final dotPaint = Paint()
         ..color = Colors.white.withValues(alpha: 0.9)
         ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 3);
-      canvas.drawCircle(Offset(fillWidth, cy), barHeight * 1.5, dotPaint);
-      canvas.drawCircle(
-        Offset(fillWidth, cy),
-        barHeight * 0.8,
-        Paint()..color = Colors.white,
-      );
+      canvas
+        ..drawCircle(Offset(fillWidth, cy), barHeight * 1.5, dotPaint)
+        ..drawCircle(
+          Offset(fillWidth, cy),
+          barHeight * 0.8,
+          Paint()..color = Colors.white,
+        );
     }
   }
 
@@ -361,8 +362,9 @@ class _PreloaderParticlesState extends State<PreloaderParticles>
             builder: (_, __) {
               // Update positions
               for (final p in _particles) {
-                p.x += p.vx;
-                p.y += p.vy;
+                p
+                  ..x += p.vx
+                  ..y += p.vy;
                 if (p.x < 0) p.x = size.width;
                 if (p.x > size.width) p.x = 0;
                 if (p.y < 0) p.y = size.height;

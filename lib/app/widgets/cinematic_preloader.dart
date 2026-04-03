@@ -1,4 +1,3 @@
-import 'dart:developer' as dev;
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
@@ -68,18 +67,18 @@ class _CinematicPreloaderState extends State<CinematicPreloader>
   // ── Controllers ──────────────────────────────────────────────────────────
 
   /// Master timeline for the entire preloader sequence.
-  late AnimationController _master;
+  AnimationController? _master;
 
   /// Exit animation: circle-expand reveal.
-  late AnimationController _exit;
+  AnimationController? _exit;
 
   // ── Sequenced intervals off the master controller ────────────────────────
 
-  late Animation<double> _bgFade;
-  late Animation<double> _nameReveal;
-  late Animation<double> _taglineFade;
-  late Animation<double> _progressAnim;
-  late Animation<double> _exitReveal;
+  Animation<double>? _bgFade;
+  Animation<double>? _nameReveal;
+  Animation<double>? _taglineFade;
+  Animation<double>? _progressAnim;
+  Animation<double>? _exitReveal;
 
   bool _showContent = false;
   bool _preloaderDone = false;
@@ -98,55 +97,57 @@ class _CinematicPreloaderState extends State<CinematicPreloader>
     CinematicPreloader._hasPlayedThisSession = true;
 
     // ── Master timeline ───────────────────────────────────────────────────
-    _master = AnimationController(
+    final master = AnimationController(
       vsync: this,
       duration: widget.minimumDuration,
     );
+    _master = master;
 
     // ── Exit controller ───────────────────────────────────────────────────
-    _exit = AnimationController(
+    final exit = AnimationController(
       vsync: this,
       duration: widget.exitDuration,
     );
+    _exit = exit;
 
     // ── Interval animations ───────────────────────────────────────────────
 
     _bgFade = Tween<double>(begin: 0, end: 1).animate(
       CurvedAnimation(
-        parent: _master,
+        parent: master,
         curve: const Interval(0.0, 0.08, curve: Curves.easeOut),
       ),
     );
 
     _nameReveal = Tween<double>(begin: 0, end: 1).animate(
       CurvedAnimation(
-        parent: _master,
+        parent: master,
         curve: const Interval(0.05, 0.42, curve: CinematicCurves.revealDecel),
       ),
     );
 
     _taglineFade = Tween<double>(begin: 0, end: 1).animate(
       CurvedAnimation(
-        parent: _master,
+        parent: master,
         curve: const Interval(0.32, 0.55, curve: CinematicCurves.easeInOutCinematic),
       ),
     );
 
     _progressAnim = Tween<double>(begin: 0, end: 1).animate(
       CurvedAnimation(
-        parent: _master,
+        parent: master,
         curve: const Interval(0.10, 0.78, curve: CinematicCurves.easeInOutCinematic),
       ),
     );
 
     _exitReveal = Tween<double>(begin: 0, end: 1).animate(
       CurvedAnimation(
-        parent: _exit,
+        parent: exit,
         curve: CinematicCurves.dramaticEntrance,
       ),
     );
 
-    _exit.addStatusListener((status) {
+    exit.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
         setState(() => _preloaderDone = true);
         widget.onLoadingComplete?.call();
@@ -154,29 +155,19 @@ class _CinematicPreloaderState extends State<CinematicPreloader>
     });
 
     // Start the sequence
-    _master.forward().then((_) {
+    master.forward().then((_) {
       setState(() => _showContent = true);
       // Allow one frame for the child to layout before the reveal
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        _exit.forward();
+        exit.forward();
       });
     });
   }
 
   @override
   void dispose() {
-    if (!CinematicPreloader._hasPlayedThisSession ||
-        _master.duration != null) {
-      // Only dispose if they were initialised
-      if (!_preloaderDone || _master.duration != null) {
-        try {
-          _master.dispose();
-          _exit.dispose();
-        } catch (e) {
-          dev.log('Failed to dispose animation controllers', name: 'CinematicPreloader', error: e);
-        }
-      }
-    }
+    _master?.dispose();
+    _exit?.dispose();
     super.dispose();
   }
 
@@ -201,13 +192,13 @@ class _CinematicPreloaderState extends State<CinematicPreloader>
 
         // Exit reveal clips the preloader away
         AnimatedBuilder(
-          animation: _exit,
+          animation: _exit!,
           builder: (_, __) {
-            if (_exitReveal.value >= 1.0) return const SizedBox.shrink();
+            if (_exitReveal!.value >= 1.0) return const SizedBox.shrink();
 
             // Inverse clip: we clip the *preloader* with an inverted circle
             return _InverseCircleClip(
-              progress: _exitReveal.value,
+              progress: _exitReveal!.value,
               child: _buildPreloaderSurface(context),
             );
           },
@@ -218,7 +209,7 @@ class _CinematicPreloaderState extends State<CinematicPreloader>
 
   Widget _buildPreloaderSurface(BuildContext context) =>
     AnimatedBuilder(
-      animation: _master,
+      animation: _master!,
       builder: (_, __) => Scaffold(
         backgroundColor: Colors.transparent,
         body: Container(
@@ -230,11 +221,11 @@ class _CinematicPreloaderState extends State<CinematicPreloader>
               end: Alignment.bottomRight,
               colors: [
                 AppColors.backgroundDark
-                    .withValues(alpha: _bgFade.value),
+                    .withValues(alpha: _bgFade!.value),
                 AppColors.background
-                    .withValues(alpha: _bgFade.value),
+                    .withValues(alpha: _bgFade!.value),
                 const Color(0xFF0A0520)
-                    .withValues(alpha: _bgFade.value),
+                    .withValues(alpha: _bgFade!.value),
               ],
             ),
           ),
@@ -243,7 +234,7 @@ class _CinematicPreloaderState extends State<CinematicPreloader>
               // Layer 1: Ambient particles
               Positioned.fill(
                 child: Opacity(
-                  opacity: _bgFade.value,
+                  opacity: _bgFade!.value,
                   child: const PreloaderParticles(
                     particleCount: 40,
                     color: AppColors.heroAccent,
@@ -254,7 +245,7 @@ class _CinematicPreloaderState extends State<CinematicPreloader>
               // Layer 2: Film grain
               Positioned.fill(
                 child: Opacity(
-                  opacity: _bgFade.value * 0.6,
+                  opacity: _bgFade!.value * 0.6,
                   child: const PreloaderFilmGrain(opacity: 0.025),
                 ),
               ),
@@ -262,7 +253,7 @@ class _CinematicPreloaderState extends State<CinematicPreloader>
               // Layer 3: Vignette
               Positioned.fill(
                 child: Opacity(
-                  opacity: _bgFade.value,
+                  opacity: _bgFade!.value,
                   child: const _Vignette(),
                 ),
               ),
@@ -275,7 +266,7 @@ class _CinematicPreloaderState extends State<CinematicPreloader>
                     // Name reveal
                     LetterStaggerAnimation(
                       text: widget.displayName,
-                      animation: _nameReveal,
+                      animation: _nameReveal!,
                       style: GoogleFonts.spaceGrotesk(
                         fontSize: _responsiveFontSize(context),
                         fontWeight: FontWeight.w800,
@@ -288,15 +279,15 @@ class _CinematicPreloaderState extends State<CinematicPreloader>
                     const SizedBox(height: 8),
 
                     // Accent line
-                    _AnimatedLine(animation: _nameReveal),
+                    _AnimatedLine(animation: _nameReveal!),
 
                     const SizedBox(height: 20),
 
                     // Tagline
                     Opacity(
-                      opacity: _taglineFade.value,
+                      opacity: _taglineFade!.value,
                       child: Transform.translate(
-                        offset: Offset(0, 8 * (1 - _taglineFade.value)),
+                        offset: Offset(0, 8 * (1 - _taglineFade!.value)),
                         child: Text(
                           widget.tagline,
                           style: GoogleFonts.inter(
@@ -315,9 +306,9 @@ class _CinematicPreloaderState extends State<CinematicPreloader>
 
                     // Progress bar
                     Opacity(
-                      opacity: _progressAnim.value > 0 ? 1.0 : 0.0,
+                      opacity: _progressAnim!.value > 0 ? 1.0 : 0.0,
                       child: GlowProgressBar(
-                        progress: _progressAnim.value,
+                        progress: _progressAnim!.value,
                         width: _responsiveBarWidth(context),
                         height: 1.5,
                         color: AppColors.heroAccent,
@@ -328,9 +319,9 @@ class _CinematicPreloaderState extends State<CinematicPreloader>
 
                     // Percentage counter
                     Opacity(
-                      opacity: _progressAnim.value > 0 ? 1.0 : 0.0,
+                      opacity: _progressAnim!.value > 0 ? 1.0 : 0.0,
                       child: PercentageCounter(
-                        animation: _progressAnim,
+                        animation: _progressAnim!,
                         style: GoogleFonts.jetBrainsMono(
                           fontSize: 12,
                           fontWeight: FontWeight.w400,
