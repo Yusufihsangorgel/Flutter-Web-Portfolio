@@ -28,8 +28,9 @@ Scene-driven backgrounds. Scroll-reactive gradients. 185 automated tests. Zero t
 |---------|------------|
 | About | ![About](screenshots/about-dark.png) |
 | Experience | ![Experience](screenshots/experience-dark.png) |
-| Projects | ![Projects](screenshots/projects-dark.png) |
+| Testimonials | ![Testimonials](screenshots/testimonials-dark.png) |
 | Blog | ![Blog](screenshots/blog-dark.png) |
+| Projects | ![Projects](screenshots/projects-dark.png) |
 | Contact | ![Contact](screenshots/contact-dark.png) |
 | Mobile | ![Mobile](screenshots/mobile-hero.png) |
 
