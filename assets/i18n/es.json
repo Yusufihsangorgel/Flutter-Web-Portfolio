@@ -283,22 +283,16 @@
     ],
     "testimonials": [
       {
-        "quote": "Yusuf entrega consistentemente codigo limpio y bien estructurado. Su trabajo en el sistema POS FugaSoft mostro una comprension excepcional de la arquitectura reactiva y el despliegue multiplataforma. Un miembro de equipo confiable que asume la responsabilidad de problemas complejos.",
-        "name": "Abdusselam Kosecik",
-        "position": "Lider del Equipo de I+D",
-        "company": "Uzman Adres (FugaSoft)"
-      },
-      {
         "quote": "Trabajar con Yusuf en la plataforma logistica Dorse fue una gran experiencia. Lidero el equipo movil de manera efectiva, entregando seguimiento vehicular en tiempo real con integracion WebSocket en iOS y Android. Su profundidad tecnica en Flutter es sobresaliente.",
         "name": "Emrah Turk",
         "position": "Desarrollador de Software Senior",
         "company": "Junius Tech (Dorse)"
       },
       {
-        "quote": "Yusuf se destaco entre sus companeros por su impulso para aprender y aplicar principios de ingenieria de software en proyectos reales. Comenzo a trabajar profesionalmente temprano en sus estudios y equilibro notablemente bien los estudios con la experiencia en la industria.",
-        "name": "Prof. Dr. Mehmet Kara",
-        "position": "Facultad de Ciencias de la Computacion",
-        "company": "Universidad Mehmet Akif Ersoy"
+        "quote": "Yusuf tiene un solido dominio tanto de los sistemas moviles como de backend. En el proyecto Promob construyo funcionalidades criticas de principio a fin — desde el frontend en Flutter hasta la capa de API — con codigo limpio y mantenible. Un ingeniero confiable que cumple con los plazos.",
+        "name": "Ferhat Balaban",
+        "position": "Ingeniero Informatico Senior",
+        "company": "Promob.tr"
       }
     ],
     "contact": {

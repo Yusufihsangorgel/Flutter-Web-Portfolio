@@ -303,22 +303,16 @@
     ],
     "testimonials": [
       {
-        "quote": "Yusuf her zaman temiz ve iyi yapılandırılmış kod sunar. FugaSoft POS sistemi üzerindeki çalışmaları, reaktif mimari ve cross-platform dağıtım konusundaki olağanüstü anlayışını gösterdi. Karmaşık sorunların sahipliğini üstlenen güvenilir bir takım üyesidir.",
-        "name": "Abdüsselam Kösecik",
-        "position": "Ar-Ge Takım Lideri",
-        "company": "Uzman Adres (FugaSoft)"
-      },
-      {
         "quote": "Yusuf ile Dorse lojistik platformunda çalışmak harika bir deneyimdi. Mobil ekibi etkili bir şekilde yönetti ve WebSocket entegrasyonu ile hem iOS hem Android üzerinde gerçek zamanlı araç takibi sundu. Flutter konusundaki teknik derinliği olağanüstü.",
         "name": "Emrah Türk",
         "position": "Kıdemli Yazılım Geliştirici",
         "company": "Junius Tech (Dorse)"
       },
       {
-        "quote": "Yusuf, yazılım mühendisliği ilkelerini gerçek dünya projelerinde öğrenme ve uygulama konusundaki azmiyle akranları arasında öne çıktı. Çalışma hayatına erken başladı ve akademik çalışmalarını sektör deneyimiyle son derece iyi dengeledi.",
-        "name": "Prof. Dr. Mehmet Kara",
-        "position": "Bilgisayar Bilimleri Fakültesi",
-        "company": "Mehmet Akif Ersoy Üniversitesi"
+        "quote": "Yusuf hem mobil hem backend sistemlere hâkim. Promob e-dergi ve e-gazete platformunda Flutter arayüzden API katmanına kadar kritik özellikleri uçtan uca geliştirdi — temiz, bakımı kolay kodlarla. Zamanında teslim eden güvenilir bir mühendis.",
+        "name": "Ferhat Balaban",
+        "position": "Kıdemli Bilgisayar Mühendisi",
+        "company": "Promob.tr"
       }
     ],
     "contact": {
