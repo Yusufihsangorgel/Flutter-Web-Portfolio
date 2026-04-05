@@ -13,12 +13,6 @@ A developer portfolio built entirely with Flutter Web — cinematic backgrounds,
 
 </div>
 
----
-
-https://github.com/Yusufihsangorgel/Flutter-Web-Portfolio/raw/main/screenshots/demo.mp4
-
----
-
 ## Features
 
 🎬 **Cinematic Backgrounds** — 5 movie-inspired palettes that crossfade as you scroll
