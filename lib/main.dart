@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:developer' as dev;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/semantics.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -22,6 +23,9 @@ void main() {
   runZonedGuarded(
     () {
       WidgetsFlutterBinding.ensureInitialized();
+      // Force the semantics tree to stay populated — screen readers and
+      // Playwright semantics snapshots both rely on this on Flutter Web.
+      SemanticsBinding.instance.ensureSemantics();
 
       FlutterError.onError = (FlutterErrorDetails details) {
         FlutterError.presentError(details);
@@ -91,11 +95,16 @@ class MyApp extends StatelessWidget {
     return Obx(() {
       var currentLocale = const Locale('en');
       var appTitle = 'Portfolio';
+      var textDirection = TextDirection.ltr;
 
       if (Get.isRegistered<LanguageController>()) {
         final languageController = Get.find<LanguageController>();
         currentLocale = languageController.currentLocale;
         appTitle = languageController.appName;
+        // Arabic is RTL
+        if (languageController.currentLanguage == 'ar') {
+          textDirection = TextDirection.rtl;
+        }
       }
 
       return GetMaterialApp(
@@ -136,13 +145,19 @@ class MyApp extends StatelessWidget {
         builder: (context, child) {
           final wrappedApp = FlutterI18n.rootAppBuilder()(context, child);
 
-          final content = Container(
+          Widget content = Container(
             color: loadingController.isLoading
                 ? AppColors.background
                 : Colors.transparent,
             child: loadingController.isLoading
                 ? const LoadingAnimation()
                 : wrappedApp,
+          );
+
+          // Wrap with Directionality for RTL languages (Arabic)
+          content = Directionality(
+            textDirection: textDirection,
+            child: content,
           );
 
           if (!kIsWeb) return content;
