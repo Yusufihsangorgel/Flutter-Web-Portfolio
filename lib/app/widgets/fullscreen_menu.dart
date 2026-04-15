@@ -6,7 +6,9 @@ import 'package:google_fonts/google_fonts.dart';
 
 import 'package:flutter_web_portfolio/app/controllers/scroll_controller.dart';
 import 'package:flutter_web_portfolio/app/controllers/language_controller.dart';
+import 'package:flutter_web_portfolio/app/controllers/sound_controller.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
+import 'package:flutter_web_portfolio/app/core/constants/breakpoints.dart';
 import 'package:flutter_web_portfolio/app/core/constants/cinematic_curves.dart';
 
 /// Full-screen overlay menu with staggered panel animations.
@@ -58,14 +60,18 @@ class _FullscreenMenuState extends State<FullscreenMenu>
   };
 
   List<_MenuItem> _buildMenuItems() {
-    final sections = Get.find<LanguageController>().activeSections;
+    // Drop 'home' — the logo already scrolls to top, so listing it here
+    // produces a confusing duplicate row at the top of the drawer.
+    final sections = Get.find<LanguageController>()
+        .activeSections
+        .where((s) => s != 'home')
+        .toList();
     return [
-      const _MenuItem(sectionId: 'home', icon: Icons.home_outlined, number: '01'),
       for (var i = 0; i < sections.length; i++)
         _MenuItem(
           sectionId: sections[i],
           icon: _iconMap[sections[i]] ?? Icons.circle_outlined,
-          number: (i + 2).toString().padLeft(2, '0'),
+          number: (i + 1).toString().padLeft(2, '0'),
         ),
     ];
   }
@@ -94,6 +100,9 @@ class _FullscreenMenuState extends State<FullscreenMenu>
     );
 
     _masterController.forward();
+    if (Get.isRegistered<SoundController>()) {
+      Get.find<SoundController>().playTransition();
+    }
   }
 
   @override
@@ -119,7 +128,7 @@ class _FullscreenMenuState extends State<FullscreenMenu>
   Widget build(BuildContext context) {
     final languageController = Get.find<LanguageController>();
     final screenWidth = MediaQuery.sizeOf(context).width;
-    final isMobile = screenWidth < 768;
+    final isMobile = screenWidth < Breakpoints.tablet;
     final menuItems = _buildMenuItems();
 
     return AnimatedBuilder(
