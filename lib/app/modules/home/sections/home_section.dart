@@ -316,25 +316,30 @@ class _AnimatedCTAButtonsState extends State<_AnimatedCTAButtons>
       opacity: _opacity.value,
       child: Transform.translate(
         offset: Offset(0, 10 * (1 - _opacity.value)),
-        child: Wrap(
+        child: Obx(() {
+          // Touch reactive translations so the button labels rebuild on
+          // language change. Without this, Wrap caches the original labels.
+          final viewWorkLabel = widget.languageController.getText(
+            'home_section.view_work',
+            defaultValue: 'View My Work',
+          );
+          final downloadCvLabel = widget.languageController.getText(
+            'home_section.download_cv',
+            defaultValue: 'Download CV',
+          );
+          return Wrap(
           alignment: WrapAlignment.center,
           spacing: 20,
           runSpacing: 16,
           children: [
             CinematicButton(
-              label: widget.languageController.getText(
-                'home_section.view_work',
-                defaultValue: 'View My Work',
-              ),
+              label: viewWorkLabel,
               isPrimary: true,
               onTap: () => Get.find<AppScrollController>()
                   .scrollToSection('projects'),
             ),
             CinematicButton(
-              label: widget.languageController.getText(
-                'home_section.download_cv',
-                defaultValue: 'Download CV',
-              ),
+              label: downloadCvLabel,
               onTap: () async {
                 final origin = Uri.base.origin;
                 final basePath = Uri.base.path.endsWith('/')
@@ -347,7 +352,8 @@ class _AnimatedCTAButtonsState extends State<_AnimatedCTAButtons>
               },
             ),
           ],
-        ),
+          );
+        }),
       ),
     ),
   );
