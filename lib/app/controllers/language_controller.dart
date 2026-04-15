@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:flutter_web_portfolio/app/domain/repositories/i_language_repository.dart';
+import 'package:flutter_web_portfolio/app/utils/web_url_strategy.dart'
+    as url_strategy;
 
 /// Reactive language state — loads i18n JSON, exposes getText() and cvData.
 class LanguageController extends GetxController {
@@ -96,6 +98,7 @@ class LanguageController extends GetxController {
 
     _currentLanguage.value = languageCode;
     unawaited(Get.updateLocale(Locale(languageCode)));
+    url_strategy.setHtmlLang(languageCode);
     await _languageRepository.saveSelectedLanguage(languageCode);
     await _updateTranslations(languageCode);
   }

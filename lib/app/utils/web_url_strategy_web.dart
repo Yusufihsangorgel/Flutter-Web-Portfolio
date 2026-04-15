@@ -27,6 +27,13 @@ void setUrlHash(String hash) {
   web.window.history.pushState(null, '', url);
 }
 
+/// Updates the `<html lang="...">` attribute so the document language tracks
+/// the app locale. Keeps screen readers and SEO happy.
+void setHtmlLang(String languageCode) {
+  if (languageCode.isEmpty) return;
+  web.document.documentElement?.setAttribute('lang', languageCode);
+}
+
 /// Registers a listener for browser back/forward navigation.
 ///
 /// Returns a dispose function that removes the listener.
