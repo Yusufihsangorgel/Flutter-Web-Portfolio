@@ -157,7 +157,7 @@
     "projects": [
       {
         "title": "FugaSoft (Pos - Sales Management Software)",
-        "description": "Flutter front-end, SQLite-Drift, GetX, i18n, reaktif programlama; Android/iOS tablet ve masaüstü (Linux, macOS, Windows)",
+        "description": "Çapraz platform POS ve satış yönetim sistemi — Flutter arayüz, SQLite-Drift yerel veritabanı, GetX reaktif durum yönetimi; Android/iOS tablet ve masaüstü (Linux, macOS, Windows)",
         "category": "Mobile",
         "url": "https://fugasoft.com/",
         "image": "assets/images/fugasoft.png",
@@ -169,7 +169,7 @@
       },
       {
         "title": "Aydınlık E-Newspaper",
-        "description": "Flutter front-end, GetX, Dio, MVVM",
+        "description": "Aydınlık Gazetesi için Flutter mobil uygulaması — MVVM mimarisi, GetX durum yönetimi, Dio API entegrasyonu",
         "category": "Mobile",
         "url": {
           "google_play": "https://play.google.com/store/apps/details?id=com.aydinlikgazetesi.egazete&hl=tr",
@@ -184,7 +184,7 @@
       },
       {
         "title": "Bilim ve Ütopya E-Magazine",
-        "description": "Flutter front-end, GetX, Dio, MVVM",
+        "description": "Bilim ve Ütopya dergisi için Flutter mobil uygulaması — MVVM, GetX ve Dio ile dergi okuma deneyimi",
         "category": "Mobile",
         "url": {
           "google_play": "https://play.google.com/store/apps/details?id=com.aydinlikgazetesi.edergi_v1_bvu&pcampaignid=web_share",
@@ -199,7 +199,7 @@
       },
       {
         "title": "Dorse App",
-        "description": "Hem mobil uygulama hem de web sitesi; Mobil: Flutter; Web: HTML, CSS, JavaScript, React; Kullanılan teknolojiler: RESTful API, SOLID, Google ve Apple Maps entegrasyonu, WebSocket",
+        "description": "Lojistik araç takip platformu — Flutter mobil, React web, WebSocket ile gerçek zamanlı takip, Google ve Apple Maps entegrasyonu",
         "category": "Web",
         "url": {
           "website": "https://dorseapp.com/",
@@ -293,7 +293,7 @@
     ],
     "skills": [
       {
-        "category": "Mobile",
+        "category": "Mobil",
         "items": [
           "Flutter",
           "Dart",
@@ -305,7 +305,7 @@
         ]
       },
       {
-        "category": "Backend",
+        "category": "Arka Uç",
         "items": [
           "Node.js",
           "Express.js",
@@ -317,7 +317,7 @@
         ]
       },
       {
-        "category": "Frontend",
+        "category": "Ön Yüz",
         "items": [
           "React",
           "JavaScript",
@@ -463,7 +463,9 @@
       "google_play": "Google Play",
       "app_store": "App Store",
       "website": "Web Sitesi"
-    }
+    },
+    "case_study_label": "Vaka Çalışması",
+    "flip_hint": "Vaka çalışmasını görmek için tıklayın"
   },
   "home_section": {
     "greeting": "Merhaba, ben",
@@ -515,7 +517,11 @@
   "footer": {
     "view_source": "Kaynak Kodu",
     "command_hint_prefix": "Basın",
-    "command_hint_suffix": "komut paletini açmak için"
+    "command_hint_suffix": "komut paletini açmak için",
+    "quick_links": "Hızlı Bağlantılar",
+    "connect": "Bağlan",
+    "stay_updated": "Güncel Kal",
+    "subscribed": "Abone olundu!"
   },
   "sidebar": {
     "github": "GitHub",
