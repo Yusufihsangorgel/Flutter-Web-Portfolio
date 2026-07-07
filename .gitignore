@@ -50,5 +50,5 @@ coverage/
 *.keystore
 
 # IDE / AI tool config
-.claude/
 .metadata
+deploy.sh

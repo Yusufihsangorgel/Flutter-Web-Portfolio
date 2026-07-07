@@ -2,7 +2,6 @@
 .github
 .dart_tool
 .idea
-.claude
 test
 coverage
 *.md
