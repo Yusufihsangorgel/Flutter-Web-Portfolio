@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:kartal/kartal.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_web_portfolio/app/controllers/language_controller.dart';
 import 'package:flutter_web_portfolio/app/controllers/scene_director.dart';
@@ -110,8 +111,8 @@ class _HomeSectionState extends State<HomeSection>
   @override
   Widget build(BuildContext context) {
     final languageController = Get.find<LanguageController>();
-    final screenHeight = MediaQuery.sizeOf(context).height;
-    final screenWidth = MediaQuery.sizeOf(context).width;
+    final screenHeight = context.sized.height;
+    final screenWidth = context.sized.width;
 
     final appBarHeight = ResponsiveUtils.getValueForScreenType<double>(
       context: context,

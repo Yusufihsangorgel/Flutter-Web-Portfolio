@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
+import 'package:kartal/kartal.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_web_portfolio/app/controllers/language_controller.dart';
 import 'package:flutter_web_portfolio/app/controllers/scene_director.dart';
@@ -28,12 +29,12 @@ class ContactSection extends StatelessWidget {
     final languageController = Get.find<LanguageController>();
     final data = languageController.cvData['personal_info'] as Map<String, dynamic>? ?? <String, dynamic>{};
     final email = (data['email'] as String?) ?? 'hello@example.com';
-    final screenWidth = MediaQuery.sizeOf(context).width;
+    final screenWidth = context.sized.width;
 
     return Container(
       width: double.infinity,
       constraints: BoxConstraints(
-        minHeight: MediaQuery.sizeOf(context).height * 0.6,
+        minHeight: context.sized.dynamicHeight(0.6),
       ),
       child: Stack(
         children: [

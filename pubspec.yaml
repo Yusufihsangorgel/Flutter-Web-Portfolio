@@ -23,6 +23,9 @@ dependencies:
   url_launcher: ^6.2.2
   http: ^1.2.2
 
+  # Context extensions (responsive sizing helpers)
+  kartal: ^4.2.0
+
   # Responsive layout (reserved)
 
   # Localization
