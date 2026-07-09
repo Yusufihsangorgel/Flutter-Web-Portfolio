@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://developeryusuf.com/sitemap.xml

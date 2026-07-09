@@ -1,0 +1,442 @@
+{
+  "app_name": "Yusuf İhsan Görgel - Portfolio",
+  "theme": {
+    "primary_color": "#3F51B5",
+    "secondary_color": "#FF4081",
+    "background_color": {
+      "light": "#FFFFFF",
+      "dark": "#121212"
+    },
+    "surface_color": {
+      "light": "#F5F5F5",
+      "dark": "#1E1E1E"
+    },
+    "text_color": {
+      "light": "#212121",
+      "dark": "#FFFFFF"
+    }
+  },
+  "navigation": {
+    "items": [
+      {
+        "id": "home",
+        "title": "Accueil"
+      },
+      {
+        "id": "about",
+        "title": "À propos"
+      },
+      {
+        "id": "experience",
+        "title": "Expérience"
+      },
+      {
+        "id": "projects",
+        "title": "Projets"
+      },
+      {
+        "id": "skills",
+        "title": "Compétences"
+      },
+      {
+        "id": "references",
+        "title": "Références"
+      },
+      {
+        "id": "contact",
+        "title": "Contact"
+      }
+    ]
+  },
+  "translations": {
+    "app_name": "Yusuf İhsan Görgel - Portfolio",
+    "home": "Accueil",
+    "about": "À propos",
+    "experience": "Expérience",
+    "projects": "Projets",
+    "skills": "Compétences",
+    "references": "Références",
+    "contact": "Contact",
+    "explore_more": "Explorer plus",
+    "dark_mode": "Mode sombre",
+    "light_mode": "Mode clair",
+    "personal_info": "Informations personnelles",
+    "education": "Éducation",
+    "languages": "Langues",
+    "name": "Nom",
+    "email": "E-mail",
+    "phone": "Téléphone",
+    "location": "Emplacement",
+    "github": "GitHub",
+    "linkedin": "LinkedIn",
+    "send_message": "Envoyer un message",
+    "contact_me": "Contactez-moi",
+    "your_name": "Votre nom",
+    "your_email": "Votre e-mail",
+    "your_message": "Votre message",
+    "send": "Envoyer",
+    "subject": "Sujet",
+    "portfolio_loading": "Chargement du portfolio...",
+    "error_name": "Veuillez entrer votre nom",
+    "error_email": "Veuillez entrer une adresse e-mail valide",
+    "error_subject": "Veuillez entrer un sujet",
+    "error_message": "Veuillez entrer votre message"
+  },
+  "animations": {
+    "loading_animation": "assets/animations/loading.json",
+    "scroll_animation_duration": 500,
+    "page_transition_duration": 300
+  },
+  "social_links": {
+    "github": "https://github.com/Yusufihsangorgel",
+    "linkedin": "https://linkedin.com/in/yusuf-ihsan-görgel/",
+    "medium": "https://medium.com/@developeryusufihsan"
+  },
+  "cv_data": {
+    "personal_info": {
+      "name": "Yusuf İhsan Görgel",
+      "title": "Ingénieur Logiciel",
+      "phone": "+90 544 953 0128",
+      "email": "developeryusuf@icloud.com",
+      "github": "https://github.com/Yusufihsangorgel",
+      "linkedin": "https://linkedin.com/in/yusuf-ihsan-görgel/",
+      "bio": "Bonjour, je suis Yusuf İhsan, étudiant en dernière année d'ingénierie logicielle avec 4 ans d'expérience. J'ai commencé à travailler en freelance pendant ma deuxième année et j'ai depuis acquis de l'expérience dans des environnements d'entreprise et de start-up. J'ai 3 ans d'expérience professionnelle axée sur le développement de logiciels mobiles, ERP et POS utilisant Flutter. J'ai également travaillé sur des rôles Backend et DevOps dans divers projets freelance. Je suis passionné par la résolution de problèmes et je m'épanouis dans des environnements d'équipe collaboratifs. J'ai une solide expérience dans l'utilisation d'Atlassian-Jira pour la gestion de projet, avec de l'expérience dans les réunions quotidiennes, les sprints, le scrum et le respect des délais serrés.",
+      "medium": "developeryusufihsan",
+      "subtitles": [
+        "Ingénieur Logiciel Mobile",
+        "Développeur Flutter",
+        "Adepte de Clean Architecture"
+      ]
+    },
+    "experiences": [
+      {
+        "title": "Développeur Full Stack",
+        "company": "Juniustech",
+        "period": "Juin 2023 – Février 2025",
+        "description": "Chef d'équipe mobile (projet Dorse), développement, déploiement, frontend, backend et coordination QA."
+      },
+      {
+        "title": "Développeur Flutter",
+        "company": "Uzman Adres",
+        "period": "Mars 2022 – Octobre 2024",
+        "description": "POS, vente par code-barres, systèmes de gestion comptable, ERP; frontend du projet Promob, technologie socket et architectures SQL complexes."
+      },
+      {
+        "title": "Développeur Flutter",
+        "company": "Promob TR",
+        "period": "Octobre 2022 – Juin 2024",
+        "description": "Projets freelance; frontend des projets \"Aydınlık E-Newspaper\" et \"Bilim ve Ütopya E-Magazine\" (backend: PHP-Laravel ou Node.js-Express.js-MongoDB)."
+      }
+    ],
+    "projects": [
+      {
+        "title": "FugaSoft (Logiciel de gestion des ventes POS)",
+        "description": "Frontend Flutter, SQLite-Drift, GetX, i18n, programmation réactive; tablette Android/iOS et bureau (Linux, macOS, Windows); Mentor: Chef d'équipe Arge Abdüsselam Kösecik",
+        "category": "Mobile",
+        "url": "https://fugasoft.com/",
+        "image": "assets/images/fugasoft.png",
+        "case_study": {
+          "problem": "Les entreprises avaient besoin d'un systeme POS et de gestion des ventes unifie fonctionnant de maniere fiable sur tablettes Android/iOS et plateformes de bureau (Linux, macOS, Windows), gerant l'inventaire sur plus de 50 points de vente avec lecture de codes-barres et synchronisation hors ligne.",
+          "solution": "Developpement d'une application Flutter multiplateforme utilisant SQLite-Drift pour les requetes SQL locales complexes, GetX pour la gestion d'etat reactive avec le pattern Mediator, un moteur de synchronisation offline-first sans perte de donnees et un support i18n complet.",
+          "result": "Deploye sur 5 plateformes, traitant plus de 100K transactions quotidiennes avec des architectures SQL complexes, des flux de donnees reactifs et la lecture de codes-barres en temps reel — avec une capacite hors ligne fiable."
+        }
+      },
+      {
+        "title": "Aydınlık E-Newspaper",
+        "description": "Frontend Flutter, GetX, Dio, MVVM; Mentor: Senior Ferhat Balaban",
+        "category": "Mobile",
+        "url": {
+          "google_play": "https://play.google.com/store/apps/details?id=com.aydinlikgazetesi.egazete&hl=tr",
+          "app_store": "https://apps.apple.com/us/app/ayd%C4%B1nl%C4%B1k-e-gazete/id1560103805"
+        },
+        "image": "assets/images/aydinlik.png",
+        "case_study": {
+          "problem": "Un grand journal turc avait besoin d'une experience de lecture numerique moderne pour les utilisateurs mobiles, avec un rendu fluide des pages, la gestion des abonnements et un acces hors ligne.",
+          "solution": "Developpement d'une application Flutter avec architecture MVVM, gestion d'etat GetX et Dio pour l'integration API. Rendu de pages efficace et mise en cache pour une experience de lecture fluide.",
+          "result": "Plus de 10K telechargements avec une note de 4,5+ etoiles sur les deux stores, offrant a des milliers de lecteurs une experience de journal numerique fiable et performante sur iOS et Android."
+        }
+      },
+      {
+        "title": "Bilim ve Ütopya E-Magazine",
+        "description": "Frontend Flutter, GetX, Dio, MVVM; Mentor: Senior Ferhat Balaban",
+        "category": "Mobile",
+        "url": {
+          "google_play": "https://play.google.com/store/apps/details?id=com.aydinlikgazetesi.edergi_v1_bvu&pcampaignid=web_share",
+          "app_store": "https://apps.apple.com/tr/app/bilim-ve-%C3%BCtopya-e-dergi/id6478221195"
+        },
+        "image": "assets/images/bilim_utopya.png",
+        "case_study": {
+          "problem": "Un magazine scientifique avait besoin d'une plateforme numerique dediee pour acceder aux numeros mensuels, gerer les abonnements et profiter d'un contenu scientifique riche sur mobile.",
+          "solution": "Developpement d'une application Flutter avec l'architecture MVVM eprouvee et l'integration API Dio, optimisee pour le contenu au format magazine avec un rendu d'images haute qualite et la navigation entre numeros.",
+          "result": "Servant des milliers de lecteurs mensuels sur Google Play et App Store, offrant aux passionnes de sciences une experience de lecture mobile dediee et soignee pour le magazine Bilim ve Utopya."
+        }
+      },
+      {
+        "title": "Dorse App",
+        "description": "Application mobile et site web; Mobile: Flutter; Web: HTML, CSS, JavaScript, React; Technologies utilisées: API RESTful, SOLID, intégration Google et Apple Maps, WebSocket",
+        "category": "Web",
+        "url": {
+          "website": "https://dorseapp.com/",
+          "google_play": "https://play.google.com/store/apps/details?id=com.juniustech.dorse",
+          "app_store": "https://apps.apple.com/tr/app/dorse/id6670605686"
+        },
+        "image": "assets/images/dorse.png",
+        "case_study": {
+          "problem": "L'industrie logistique avait besoin d'une solution de suivi vehiculaire en temps reel et de gestion de flotte fonctionnant sur mobile et web, avec des mises a jour de localisation en direct et l'optimisation des itineraires.",
+          "solution": "Direction du developpement mobile avec Flutter, suivi vehiculaire en temps reel base sur WebSocket, integration des SDK Google et Apple Maps, architecture API RESTful selon les principes SOLID et un tableau de bord web React.",
+          "result": "Suivi de 5 000+ vehicules simultanes avec une latence <200ms sur Android, iOS et web — permettant aux entreprises logistiques de suivre les vehicules en temps reel, d'optimiser les itineraires et de gerer les flottes avec des connexions WebSocket fiables."
+        }
+      }
+    ],
+    "education": [
+      {
+        "school": "Université Mehmet Akif Ersoy",
+        "degree": "Ingénierie Logicielle",
+        "period": "2021-2025"
+      },
+      {
+        "school": "Lycée Scientifique Dursun Yalım",
+        "period": "2015-2020"
+      }
+    ],
+    "skills": [
+      {
+        "category": "Mobile",
+        "items": [
+          "Flutter",
+          "Gestion d'état (GetX, Provider, Bloc)",
+          "API RESTful",
+          "WebSocket",
+          "Localisation",
+          "Google Maps",
+          "Stockage local",
+          "Authentification JWT",
+          "Swift"
+        ]
+      },
+      {
+        "category": "Backend",
+        "items": [
+          "Node.js",
+          "Express.js",
+          "MongoDB",
+          "SQLite",
+          "MSSQL"
+        ]
+      },
+      {
+        "category": "Frontend",
+        "items": [
+          "HTML",
+          "CSS",
+          "JavaScript",
+          "React"
+        ]
+      },
+      {
+        "category": "DevOps",
+        "items": [
+          "AWS"
+        ]
+      }
+    ],
+    "references": [],
+    "languages": [
+      {
+        "name": "Turc",
+        "level": "Langue maternelle"
+      },
+      {
+        "name": "Anglais",
+        "level": "B2"
+      }
+    ],
+    "testimonials": [
+      {
+        "quote": "Travailler avec Yusuf sur la plateforme logistique Dorse a ete une excellente experience. Il a dirige l'equipe mobile efficacement, livrant le suivi vehiculaire en temps reel avec l'integration WebSocket sur iOS et Android. Sa profondeur technique en Flutter est remarquable.",
+        "name": "Emrah Turk",
+        "position": "Developpeur Logiciel Senior",
+        "company": "Junius Tech (Dorse)"
+      },
+      {
+        "quote": "Yusuf possede une solide maitrise des systemes mobiles et backend. Sur le projet Promob, il a developpe des fonctionnalites critiques de bout en bout — du frontend Flutter a la couche API — avec un code propre et maintenable. Un ingenieur fiable qui respecte les delais.",
+        "name": "Ferhat Balaban",
+        "position": "Ingenieur Informaticien Senior",
+        "company": "Promob.tr"
+      }
+    ],
+    "contact": {
+      "formspree_id": "YOUR_FORMSPREE_ID",
+      "form": {
+        "name_label": "Nom",
+        "email_label": "E-mail",
+        "message_label": "Message",
+        "submit_button": "Envoyer"
+      },
+      "success_message": "Votre message a été envoyé avec succès!",
+      "error_message": "Une erreur s'est produite. Veuillez réessayer."
+    }
+  },
+  "language_info": {
+    "code": "fr",
+    "name": "Français",
+    "flag": "🇫🇷",
+    "direction": "ltr"
+  },
+  "terminal": {
+    "title": "Terminal",
+    "welcome_title": "Yusuf İhsan Görgel - Terminal",
+    "welcome_text": "Bienvenue ! Tapez 'help' pour voir les commandes disponibles.",
+    "help_hint": "Astuce : Tapez 'help' pour voir les commandes disponibles",
+    "greeting": "Terminal",
+    "type_help": "Tapez \"help\" pour voir les commandes disponibles",
+    "help_title": "Commandes disponibles :",
+    "cleared": "Terminal effacé...",
+    "command_not_found": "Commande '%s' introuvable. Tapez 'help' pour voir les commandes disponibles.",
+    "prefix": "> ",
+    "type_command": "Tapez une commande...",
+    "url": {
+      "success": "Ouverture du lien dans le navigateur...",
+      "error": "Impossible d'ouvrir le lien",
+      "error_with_details": "Erreur lors de l'ouverture de l'URL"
+    },
+    "download_cv_start": "Démarrage du téléchargement du CV...",
+    "download_cv_success": "Le téléchargement du CV a démarré dans votre navigateur.",
+    "download_cv_error": "Erreur lors du téléchargement du CV. Veuillez réessayer plus tard.",
+    "commands": {
+      "help": "Aide - affiche les commandes disponibles",
+      "about": "À propos - affiche les informations personnelles",
+      "skills": "Compétences - affiche les compétences techniques",
+      "experience": "Expérience - affiche l'expérience professionnelle",
+      "education": "Éducation - affiche le parcours éducatif",
+      "projects": "Projets - affiche les projets terminés",
+      "contact": "Contact - affiche les informations de contact",
+      "social": "Social - affiche les comptes de médias sociaux",
+      "download_cv": "Télécharger CV - télécharge mon CV",
+      "clear": "Effacer - efface l'écran du terminal",
+      "help_cmd": "aide",
+      "about_cmd": "apropos",
+      "skills_cmd": "competences",
+      "experience_cmd": "experience",
+      "education_cmd": "education",
+      "projects_cmd": "projets",
+      "contact_cmd": "contact",
+      "social_cmd": "social",
+      "download_cv_cmd": "telecharger-cv",
+      "clear_cmd": "effacer"
+    },
+    "projects": {
+      "title": "MES PROJETS",
+      "untitled": "Projet sans titre",
+      "not_found": "Aucun projet trouvé."
+    },
+    "contact": {
+      "email": "Email",
+      "phone": "Téléphone",
+      "location": "Emplacement"
+    },
+    "social": {
+      "github": "GitHub",
+      "linkedin": "LinkedIn",
+      "twitter": "Twitter"
+    }
+  },
+  "nav": {
+    "home": "Accueil",
+    "about": "À Propos",
+    "skills": "Compétences",
+    "experience": "Expérience",
+    "projects": "Projets",
+    "contact": "Contact",
+    "testimonials": "Témoignages",
+    "blog": "Blog"
+  },
+  "about_section": {
+    "title": "À Propos de Moi",
+    "bio": "Je suis ingénieur logiciel avec plus de 4 ans d'expérience dans le développement d'applications mobiles de qualité production. Je me concentre sur l'architecture, la performance et la fiabilité — applications cross-platform avec Flutter et iOS/Android natif avec Swift et Kotlin.",
+    "bio2": "Voici quelques technologies avec lesquelles j'ai travaillé récemment :",
+    "github_title": "Activité GitHub",
+    "github_repos": "Dépôts",
+    "github_followers": "Abonnés",
+    "github_stars": "Étoiles",
+    "github_cached": "(en cache)"
+  },
+  "home_section": {
+    "greeting": "Bonjour, je m'appelle",
+    "title": "Yusuf İhsan Görgel.",
+    "subtitle": "Je développe pour le mobile.",
+    "bio": "Je suis un ingénieur logiciel spécialisé dans la création d'applications mobiles de qualité production. Actuellement chez Uzman Adres, je travaille sur le développement cross-platform avec Flutter.",
+    "view_work": "Voir mes travaux",
+    "download_cv": "Télécharger le CV",
+    "contact": "Contact"
+  },
+  "experience_section": {
+    "title": "Où j'ai travaillé",
+    "present": "En cours"
+  },
+  "projects_section": {
+    "title": "Mes Projets",
+    "description": "Projets majeurs et travaux réalisés",
+    "filter_all": "Tous",
+    "case_study_problem": "Le Defi",
+    "case_study_solution": "L'Approche",
+    "case_study_result": "Le Resultat",
+    "links": "Liens",
+    "untitled_project": "Projet sans titre",
+    "technologies": "Technologies",
+    "open_project": "Ouvrir le projet",
+    "link_labels": {
+      "google_play": "Google Play",
+      "app_store": "App Store",
+      "website": "Site Web"
+    }
+  },
+  "contact_section": {
+    "title": "Me Contacter",
+    "whats_next": "Et Ensuite ?",
+    "description": "Je suis toujours ouvert aux nouveaux défis et collaborations. Que vous ayez une idée de projet, une question, ou que vous souhaitiez simplement échanger — n'hésitez pas à me contacter !",
+    "form": {
+      "name_label": "Nom",
+      "email_label": "E-mail",
+      "message_label": "Message",
+      "submit_button": "Envoyer le message",
+      "name_error": "Veuillez entrer votre nom",
+      "email_error": "Veuillez entrer une adresse e-mail valide",
+      "message_error": "Veuillez entrer votre message",
+      "success": "Votre message a été envoyé avec succès !",
+      "error": "Une erreur s'est produite. Veuillez réessayer.",
+      "or_divider": "ou envoyez un message directement"
+    }
+  },
+  "blog_section": {
+    "title": "Blog",
+    "subtitle": "Analyses techniques approfondies, decisions d'architecture et retours d'experience sur le deploiement d'applications Flutter en production",
+    "empty": "Aucun article de blog pour le moment",
+    "read_on_medium": "Lire sur Medium",
+    "follow_on_medium": "Suivre sur Medium",
+    "error": "Impossible de charger les articles",
+    "retry": "Réessayer"
+  },
+  "testimonials_section": {
+    "title": "Témoignages",
+    "subtitle": "Retours de collègues et mentors avec lesquels j'ai travaillé"
+  },
+  "skills_section": {
+    "title": "Compétences",
+    "description": "Mes compétences techniques et domaines d'expertise"
+  },
+  "footer": {
+    "view_source": "Voir le code source",
+    "command_hint_prefix": "Appuyez sur",
+    "command_hint_suffix": "pour ouvrir la palette de commandes"
+  },
+  "sidebar": {
+    "github": "GitHub",
+    "linkedin": "LinkedIn",
+    "email": "E-mail"
+  },
+  "not_found": {
+    "subtitle": "Page introuvable",
+    "go_home": "Accueil"
+  }
+}
