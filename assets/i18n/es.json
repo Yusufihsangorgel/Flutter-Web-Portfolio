@@ -99,7 +99,13 @@
       "github": "https://github.com/Yusufihsangorgel",
       "linkedin": "https://linkedin.com/in/yusuf-ihsan-görgel/",
       "bio": "Soy Ingeniero de Software con más de 4 años de experiencia especializado en aplicaciones móviles de calidad producción. Me enfoco en arquitectura, rendimiento y fiabilidad — construyendo apps multiplataforma con Flutter y capacidades nativas iOS/Android con Swift y Kotlin. Actualmente trabajo en FugaSoft en Uzman Adres.",
+      "tagline": "Creando experiencias digitales con codigo y creatividad",
       "medium": "developeryusufihsan",
+      "stats": {
+        "years_experience": 5,
+        "projects_completed": 12,
+        "technologies": 20
+      },
       "subtitles": [
         "Ingeniero de Software Móvil",
         "Desarrollador Flutter",
@@ -212,6 +218,72 @@
           "solution": "Se lidero el desarrollo movil usando Flutter con seguimiento vehicular en tiempo real basado en WebSocket, integracion de SDKs de Google y Apple Maps, arquitectura RESTful API siguiendo principios SOLID y un panel web React.",
           "result": "Rastreando mas de 5,000 vehiculos simultaneos con latencia <200ms en Android, iOS y web — permitiendo a empresas logisticas rastrear vehiculos en tiempo real, optimizar rutas y gestionar flotas con conexiones WebSocket confiables."
         }
+      },
+      {
+        "title": "FakeCallApp",
+        "description": "App de videollamadas de broma con mas de 80 personajes — Flutter mobile + sitio web Next.js",
+        "category": "Web",
+        "url": "https://fakecallapp.com"
+      },
+      {
+        "title": "CleanMyGallery",
+        "description": "Limpiador inteligente de galeria — comprimir, marca de agua, eliminar EXIF",
+        "category": "Web",
+        "url": "https://cleanmygallery.com"
+      },
+      {
+        "title": "FocusGroves",
+        "description": "Temporizador Pomodoro con salas de estudio, tareas y seguimiento de productividad",
+        "category": "Web",
+        "url": "https://focusgroves.com"
+      },
+      {
+        "title": "MoodGrade",
+        "description": "Seguimiento del estado de animo con registro de medicamentos, analisis con IA y exportacion de datos",
+        "category": "Web",
+        "url": "https://moodgrade.com"
+      },
+      {
+        "title": "GetQrivo",
+        "description": "Generador de codigos QR con enlaces cortos y analiticas de escaneo",
+        "category": "Web",
+        "url": "https://getqrivo.com"
+      },
+      {
+        "title": "OverlayPhoto",
+        "description": "Editor de superposicion de fotos con filtros, marcos y capsulas de tiempo",
+        "category": "Web",
+        "url": "https://overlayphoto.com"
+      },
+      {
+        "title": "DistractionKiller",
+        "description": "Bloqueador de apps y herramienta de bienestar digital con horarios de concentracion",
+        "category": "Web",
+        "url": "https://distractionkiller.com"
+      },
+      {
+        "title": "KPSSHazirlan",
+        "description": "Plataforma de preparacion para examenes de funcion publica con planes de estudio y tests de practica",
+        "category": "Web",
+        "url": "https://kpsshazirlan.com"
+      },
+      {
+        "title": "EhliyetCoz",
+        "description": "Preparacion para el examen de conducir con cuestionarios diarios y seguimiento del progreso",
+        "category": "Web",
+        "url": "https://ehliyetcoz.com"
+      },
+      {
+        "title": "Kazanamazi",
+        "description": "Registro de oraciones y ayunos perdidos con mapas de calor y recordatorios",
+        "category": "Web",
+        "url": "https://kazanamazi.net"
+      },
+      {
+        "title": "PDFScanPro",
+        "description": "Kit de herramientas PDF — convertir, comprimir, fusionar, dividir y escanear documentos",
+        "category": "Web",
+        "url": "https://pdfscanpro.com"
       }
     ],
     "education": [
@@ -419,7 +491,9 @@
       "google_play": "Google Play",
       "app_store": "App Store",
       "website": "Sitio Web"
-    }
+    },
+    "case_study_label": "Caso de Estudio",
+    "flip_hint": "Haz clic para ver el caso de estudio"
   },
   "contact_section": {
     "title": "Ponte en Contacto",
@@ -458,7 +532,11 @@
   "footer": {
     "view_source": "Ver código fuente",
     "command_hint_prefix": "Presione",
-    "command_hint_suffix": "para abrir la paleta de comandos"
+    "command_hint_suffix": "para abrir la paleta de comandos",
+    "quick_links": "Enlaces Rápidos",
+    "connect": "Conectar",
+    "stay_updated": "Mantente Informado",
+    "subscribed": "¡Suscrito!"
   },
   "sidebar": {
     "github": "GitHub",

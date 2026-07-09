@@ -462,7 +462,9 @@
       "google_play": "Google Play",
       "app_store": "App Store",
       "website": "Website"
-    }
+    },
+    "case_study_label": "Case Study",
+    "flip_hint": "Click to view case study"
   },
   "home_section": {
     "greeting": "Hi, my name is",
@@ -513,6 +515,10 @@
   },
   "footer": {
     "view_source": "View Source",
+    "quick_links": "Quick Links",
+    "connect": "Connect",
+    "stay_updated": "Stay Updated",
+    "subscribed": "Subscribed!",
     "command_hint_prefix": "Press",
     "command_hint_suffix": "to open command palette"
   },
