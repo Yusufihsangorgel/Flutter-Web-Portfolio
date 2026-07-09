@@ -188,7 +188,7 @@ class _HomeViewState extends State<HomeView> {
                       );
                     },
                     child: ConstellationParticles(
-                      particleCount: MediaQuery.sizeOf(context).width < Breakpoints.mobile ? 15 : 30,
+                      particleCount: MediaQuery.sizeOf(context).width < Breakpoints.mobile ? 10 : 20,
                     ),
                   ),
                 ),

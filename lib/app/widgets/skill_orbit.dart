@@ -358,5 +358,8 @@ class _SkillOrbitPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(_SkillOrbitPainter old) => true;
+  bool shouldRepaint(_SkillOrbitPainter old) =>
+      old.animationValue != animationValue ||
+      old.mousePosition != mousePosition ||
+      old.accent != accent;
 }
