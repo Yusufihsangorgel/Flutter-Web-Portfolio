@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import 'package:flutter_web_portfolio/app/controllers/language_controller.dart';
 import 'package:flutter_web_portfolio/app/controllers/scene_director.dart';
+import 'package:flutter_web_portfolio/app/controllers/sound_controller.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
 import 'package:flutter_web_portfolio/app/core/constants/breakpoints.dart';
 import 'package:flutter_web_portfolio/app/core/constants/durations.dart';
@@ -126,7 +127,7 @@ class _TestimonialsGrid extends StatelessWidget {
         crossAxisCount: crossAxisCount,
         mainAxisSpacing: 20,
         crossAxisSpacing: 20,
-        childAspectRatio: crossAxisCount == 1 ? 1.8 : 0.85,
+        childAspectRatio: crossAxisCount == 1 ? 1.8 : 1.0,
       ),
       itemCount: testimonials.length,
       itemBuilder: (context, index) => _TestimonialCard(
@@ -227,23 +228,42 @@ class _TestimonialsCarouselState extends State<_TestimonialsCarousel> {
             ),
           ),
           const SizedBox(height: 16),
-          // Dot indicators
+          // Dot indicators — tappable for direct navigation
           Obx(() {
             final accent = Get.find<SceneDirector>().currentAccent.value;
             return Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: List.generate(
                 count,
-                (i) => AnimatedContainer(
-                  duration: AppDurations.fast,
-                  width: i == _currentPage ? 8 : 4,
-                  height: 4,
-                  margin: const EdgeInsets.symmetric(horizontal: 3),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(2),
-                    color: i == _currentPage
-                        ? accent
-                        : AppColors.textSecondary.withValues(alpha: 0.3),
+                (i) => GestureDetector(
+                  onTap: () {
+                    if (Get.isRegistered<SoundController>()) {
+                      Get.find<SoundController>().playClick();
+                    }
+                    _onManualSwipe();
+                    _pageController.animateToPage(
+                      i,
+                      duration: AppDurations.entrance,
+                      curve: Curves.easeInOut,
+                    );
+                  },
+                  child: Semantics(
+                    button: true,
+                    label: 'Testimonial ${i + 1}',
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 8),
+                      child: AnimatedContainer(
+                        duration: AppDurations.fast,
+                        width: i == _currentPage ? 8 : 4,
+                        height: 4,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(2),
+                          color: i == _currentPage
+                              ? accent
+                              : AppColors.textSecondary.withValues(alpha: 0.3),
+                        ),
+                      ),
+                    ),
                   ),
                 ),
               ),

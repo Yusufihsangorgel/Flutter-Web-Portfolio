@@ -9,6 +9,7 @@ import 'package:kartal/kartal.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_web_portfolio/app/controllers/language_controller.dart';
 import 'package:flutter_web_portfolio/app/controllers/scene_director.dart';
+import 'package:flutter_web_portfolio/app/controllers/sound_controller.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
 import 'package:flutter_web_portfolio/app/core/constants/cinematic_curves.dart';
 import 'package:flutter_web_portfolio/app/core/constants/durations.dart';
@@ -272,6 +273,17 @@ class _ContactFormState extends State<_ContactForm> {
     try {
       final languageController = Get.find<LanguageController>();
       final formspreeId = languageController.cvData['contact']?['formspree_id'] as String? ?? '';
+
+      if (formspreeId.isEmpty || formspreeId == 'YOUR_FORMSPREE_ID') {
+        dev.log('Formspree ID not configured', name: 'ContactForm');
+        if (!mounted) return;
+        setState(() => _status = _FormStatus.error);
+        Future.delayed(AppDurations.formResetDelay, () {
+          if (mounted) setState(() => _status = _FormStatus.idle);
+        });
+        return;
+      }
+
       final formspreeEndpoint = 'https://formspree.io/f/$formspreeId';
 
       final response = await http.post(
@@ -290,6 +302,9 @@ class _ContactFormState extends State<_ContactForm> {
       if (!mounted) return;
 
       if (response.statusCode == 200) {
+        if (Get.isRegistered<SoundController>()) {
+          Get.find<SoundController>().playSuccess();
+        }
         setState(() => _status = _FormStatus.success);
         _nameController.clear();
         _emailController.clear();
@@ -323,6 +338,7 @@ class _ContactFormState extends State<_ContactForm> {
 
       return Form(
         key: _formKey,
+        autovalidateMode: AutovalidateMode.onUserInteraction,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -611,10 +627,10 @@ class _SubmitButtonState extends State<_SubmitButton> {
         alignment: Alignment.center,
         child: widget.isSending
             ? SizedBox(
-                height: 20,
-                width: 20,
+                height: 24,
+                width: 24,
                 child: CircularProgressIndicator(
-                  strokeWidth: 2,
+                  strokeWidth: 2.5,
                   valueColor: AlwaysStoppedAnimation(widget.accent),
                 ),
               )
