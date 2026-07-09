@@ -1,0 +1,29 @@
+{
+  "name": "flutter-web-portfolio",
+  "version": "1.0.0",
+  "description": "<div align=\"center\">",
+  "main": "index.js",
+  "directories": {
+    "doc": "doc",
+    "lib": "lib",
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Yusufihsangorgel/Flutter-Web-Portfolio.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Yusufihsangorgel/Flutter-Web-Portfolio/issues"
+  },
+  "homepage": "https://github.com/Yusufihsangorgel/Flutter-Web-Portfolio#readme",
+  "devDependencies": {
+    "@playwright/test": "^1.59.1"
+  }
+}

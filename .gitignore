@@ -52,3 +52,6 @@ coverage/
 # IDE / AI tool config
 .metadata
 deploy.sh
+
+# Playwright output
+test-results/
