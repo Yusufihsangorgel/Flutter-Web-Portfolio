@@ -13,7 +13,7 @@ final class AppColors {
   // ─── Text hierarchy (dark) ──────────────────────────────────────────
   static const textBright = Color(0xFFE8ECF4);
   static const textPrimary = Color(0xFF94A3B8);
-  static const textSecondary = Color(0xFF475569);
+  static const textSecondary = Color(0xFF64748B);
   static const white = Color(0xFFF8FAFC);
 
   // ─── Scene: Hero — Blade Runner 2049 ──────────────────────────────

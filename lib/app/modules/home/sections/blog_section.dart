@@ -385,6 +385,29 @@ class _BlogPostCard extends StatelessWidget {
                     height: 120,
                     width: double.infinity,
                     fit: BoxFit.cover,
+                    frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
+                      if (wasSynchronouslyLoaded) return child;
+                      return AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 300),
+                        child: frame != null
+                            ? child
+                            : Container(
+                                height: 120,
+                                width: double.infinity,
+                                color: AppColors.backgroundLight.withValues(alpha: 0.5),
+                                child: Center(
+                                  child: SizedBox(
+                                    width: 20,
+                                    height: 20,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      color: accent.withValues(alpha: 0.3),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                      );
+                    },
                     errorBuilder: (_, __, ___) => Container(
                       height: 120,
                       width: double.infinity,

@@ -367,11 +367,14 @@ class _ExperienceDetail extends StatelessWidget {
         languageController.getText('experience_section.present', defaultValue: 'Present');
     final description = (exp['description'] as String?) ?? '';
 
-    final bullets = description.toString().split('\n')
-        .where((s) => s.trim().isNotEmpty)
+    final bullets = description
+        .toString()
+        .split(RegExp(r'[\n•·]+'))
+        .map((s) => s.replaceFirst(RegExp(r'^[\s\-–—▸►]\s*'), '').trim())
+        .where((s) => s.isNotEmpty)
         .toList();
-    if (bullets.isEmpty && description.toString().isNotEmpty) {
-      bullets.add(description.toString());
+    if (bullets.isEmpty && description.toString().trim().isNotEmpty) {
+      bullets.add(description.toString().trim());
     }
 
     return Obx(() {

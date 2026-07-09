@@ -47,7 +47,7 @@ class AboutSection extends StatelessWidget {
                   desktop: screenWidth * 0.18,
                 ),
                 fontWeight: FontWeight.w800,
-                color: Colors.white.withValues(alpha: 0.03),
+                color: Colors.white.withValues(alpha: 0.05),
                 letterSpacing: -4,
               ),
             )),
@@ -334,7 +334,7 @@ class _FloatingTechPills extends StatelessWidget {
     final skills = languageController.cvData['skills'] as List? ?? [];
     return skills.map<String>((s) {
       final items = ((s as Map<String, dynamic>)['items'] as List?) ?? [];
-      return items.take(2).join(' & ');
+      return items.take(3).join(' · ');
     }).toList();
   }
 
@@ -487,10 +487,24 @@ class _FlashlightPhotoState extends State<_FlashlightPhoto> {
                   aspectRatio: 1,
                   child: Container(
                     color: AppColors.backgroundLight,
-                    child: Icon(
-                      Icons.person,
-                      size: 64,
-                      color: AppColors.textSecondary.withValues(alpha: 0.3),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.person_outline_rounded,
+                          size: 64,
+                          color: AppColors.textSecondary.withValues(alpha: 0.3),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'YG',
+                          style: GoogleFonts.spaceGrotesk(
+                            fontSize: 24,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.textSecondary.withValues(alpha: 0.4),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
