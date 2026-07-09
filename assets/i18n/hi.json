@@ -39,10 +39,6 @@
         "title": "कौशल"
       },
       {
-        "id": "references",
-        "title": "संदर्भ"
-      },
-      {
         "id": "contact",
         "title": "संपर्क"
       }
@@ -55,7 +51,6 @@
     "experience": "अनुभव",
     "projects": "प्रोजेक्ट्स",
     "skills": "कौशल",
-    "references": "संदर्भ",
     "contact": "संपर्क",
     "explore_more": "और अन्वेषण करें",
     "dark_mode": "डार्क मोड",
@@ -100,8 +95,15 @@
       "email": "developeryusuf@icloud.com",
       "github": "https://github.com/Yusufihsangorgel",
       "linkedin": "https://linkedin.com/in/yusuf-ihsan-görgel/",
+      "location": "Antalya, Türkiye (Remote)",
       "bio": "नमस्ते, मैं युसुफ इहसान हूँ, 4 साल के अनुभव के साथ एक अंतिम वर्ष के सॉफ्टवेयर इंजीनियरिंग छात्र हूँ। मैंने अपने द्वितीय वर्ष में फ्रीलांसिंग शुरू की और तब से कॉर्पोरेट और स्टार्ट-अप दोनों वातावरणों में अनुभव प्राप्त किया है। मेरे पास Flutter का उपयोग करके मोबाइल, ERP और POS सॉफ्टवेयर विकास पर केंद्रित 3 साल का पेशेवर अनुभव है। मैंने विभिन्न फ्रीलांस प्रोजेक्ट्स में बैकएंड और DevOps भूमिकाओं पर भी काम किया है। मैं समस्या समाधान के प्रति उत्साही हूँ और सहयोगी टीम वातावरण में फलता-फूलता हूँ। मेरे पास परियोजना प्रबंधन के लिए Atlassian-Jira का उपयोग करने का एक ठोस पृष्ठभूमि है, दैनिक बैठकों, स्प्रिंट्स, स्क्रम और कड़ी समय सीमाओं को पूरा करने का अनुभव है।",
+      "tagline": "कोड और रचनात्मकता से डिजिटल अनुभव गढ़ना",
       "medium": "developeryusufihsan",
+      "stats": {
+        "years_experience": 5,
+        "projects_completed": 12,
+        "technologies": 20
+      },
       "subtitles": [
         "मोबाइल सॉफ्टवेयर इंजीनियर",
         "Flutter डेवलपर",
@@ -110,22 +112,54 @@
     },
     "experiences": [
       {
-        "title": "फुल स्टैक डेवलपर",
-        "company": "Juniustech",
-        "period": "जून 2023 – फरवरी 2025",
-        "description": "मोबाइल टीम लीड (Dorse प्रोजेक्ट), विकास, तैनाती, फ्रंटएंड, बैकएंड और QA समन्वय।"
-      },
-      {
         "title": "Flutter डेवलपर",
         "company": "Uzman Adres",
-        "period": "मार्च 2022 – अक्टूबर 2024",
-        "description": "POS, बारकोड बिक्री, लेखा प्रबंधन प्रणाली, ERP; Promob प्रोजेक्ट का फ्रंट-एंड, सॉकेट तकनीक और जटिल SQL आर्किटेक्चर।"
+        "position": "Flutter Developer",
+        "start_date": "Mar 2022",
+        "end_date": "Present",
+        "period": "मार्च 2022 – वर्तमान",
+        "description": "FugaSoft का विकास — क्रॉस-प्लेटफॉर्म POS और बिक्री प्रबंधन प्रणाली\nSQLite-Drift स्थानीय डेटाबेस के साथ जटिल SQL आर्किटेक्चर\nMediator Pattern और GetX स्टेट मैनेजमेंट के साथ रिएक्टिव प्रोग्रामिंग\nAndroid/iOS टैबलेट और डेस्कटॉप प्लेटफॉर्म पर तैनाती\nरियल-टाइम डेटा सिंक के लिए सॉकेट तकनीक",
+        "technologies": [
+          "Flutter",
+          "Dart",
+          "SQLite-Drift",
+          "GetX",
+          "WebSocket",
+          "i18n"
+        ]
+      },
+      {
+        "title": "फुल स्टैक डेवलपर",
+        "company": "Junius Tech",
+        "position": "Full Stack Developer",
+        "start_date": "Jun 2023",
+        "end_date": "Feb 2025",
+        "period": "जून 2023 – फरवरी 2025",
+        "description": "मोबाइल टीम लीड (Dorse प्रोजेक्ट), विकास, तैनाती, फ्रंटएंड, बैकएंड और QA समन्वय।",
+        "technologies": [
+          "Flutter",
+          "React",
+          "Node.js",
+          "WebSocket",
+          "REST API",
+          "Maps SDK"
+        ]
       },
       {
         "title": "Flutter डेवलपर",
         "company": "Promob TR",
+        "position": "Flutter Developer",
+        "start_date": "Oct 2022",
+        "end_date": "Jun 2024",
         "period": "अक्टूबर 2022 – जून 2024",
-        "description": "फ्रीलांस प्रोजेक्ट्स; \"Aydınlık E-Newspaper\" और \"Bilim ve Ütopya E-Magazine\" प्रोजेक्ट्स का फ्रंट-एंड (बैकएंड: PHP-Laravel या Node.js-Express.js-MongoDB)।"
+        "description": "फ्रीलांस प्रोजेक्ट्स; \"Aydınlık E-Newspaper\" और \"Bilim ve Ütopya E-Magazine\" प्रोजेक्ट्स का फ्रंट-एंड (बैकएंड: PHP-Laravel या Node.js-Express.js-MongoDB)।",
+        "technologies": [
+          "Flutter",
+          "Dart",
+          "GetX",
+          "Dio",
+          "MVVM"
+        ]
       }
     ],
     "projects": [
@@ -186,6 +220,72 @@
           "solution": "WebSocket-आधारित रियल-टाइम वाहन ट्रैकिंग, Google और Apple Maps SDK इंटीग्रेशन, SOLID सिद्धांतों के अनुसार RESTful API आर्किटेक्चर और एक React वेब डैशबोर्ड के साथ Flutter का उपयोग करके मोबाइल विकास का नेतृत्व किया।",
           "result": "Android, iOS और वेब पर <200ms लेटेंसी के साथ 5,000+ समवर्ती वाहनों को ट्रैक करता है — लॉजिस्टिक्स कंपनियों को रियल-टाइम में वाहनों को ट्रैक करने, रूट ऑप्टिमाइज़ करने और फ्लीट प्रबंधित करने में विश्वसनीय WebSocket कनेक्शन के साथ सक्षम बनाता है।"
         }
+      },
+      {
+        "title": "FakeCallApp",
+        "description": "80 से अधिक किरदारों वाला मज़ाकिया वीडियो कॉल ऐप — Flutter मोबाइल + Next.js वेबसाइट",
+        "category": "Web",
+        "url": "https://fakecallapp.com"
+      },
+      {
+        "title": "CleanMyGallery",
+        "description": "स्मार्ट फोन गैलरी क्लीनर — कम्प्रेस, वॉटरमार्क, EXIF डेटा हटाना",
+        "category": "Web",
+        "url": "https://cleanmygallery.com"
+      },
+      {
+        "title": "FocusGroves",
+        "description": "पोमोडोरो फोकस टाइमर — स्टडी रूम, कार्य और उत्पादकता ट्रैकिंग के साथ",
+        "category": "Web",
+        "url": "https://focusgroves.com"
+      },
+      {
+        "title": "MoodGrade",
+        "description": "मूड ट्रैकिंग — दवा लॉग, AI विश्लेषण और डेटा निर्यात के साथ",
+        "category": "Web",
+        "url": "https://moodgrade.com"
+      },
+      {
+        "title": "GetQrivo",
+        "description": "QR कोड जनरेटर — शॉर्ट लिंक और स्कैन एनालिटिक्स के साथ",
+        "category": "Web",
+        "url": "https://getqrivo.com"
+      },
+      {
+        "title": "OverlayPhoto",
+        "description": "फोटो ओवरले एडिटर — फिल्टर, फ्रेम और टाइम कैप्सूल के साथ",
+        "category": "Web",
+        "url": "https://overlayphoto.com"
+      },
+      {
+        "title": "DistractionKiller",
+        "description": "ऐप ब्लॉकर और डिजिटल वेलनेस टूल — फोकस शेड्यूल के साथ",
+        "category": "Web",
+        "url": "https://distractionkiller.com"
+      },
+      {
+        "title": "KPSSHazirlan",
+        "description": "सिविल सेवा परीक्षा तैयारी मंच — अध्ययन योजनाओं और अभ्यास परीक्षाओं के साथ",
+        "category": "Web",
+        "url": "https://kpsshazirlan.com"
+      },
+      {
+        "title": "EhliyetCoz",
+        "description": "ड्राइविंग लाइसेंस परीक्षा की तैयारी — दैनिक क्विज़ और प्रगति ट्रैकिंग के साथ",
+        "category": "Web",
+        "url": "https://ehliyetcoz.com"
+      },
+      {
+        "title": "Kazanamazi",
+        "description": "छूटी नमाज़ और रोज़ों का ट्रैकर — हीटमैप और रिमाइंडर के साथ",
+        "category": "Web",
+        "url": "https://kazanamazi.net"
+      },
+      {
+        "title": "PDFScanPro",
+        "description": "PDF टूलकिट — कन्वर्ट, कम्प्रेस, मर्ज, स्प्लिट और दस्तावेज़ स्कैन",
+        "category": "Web",
+        "url": "https://pdfscanpro.com"
       }
     ],
     "education": [
@@ -204,14 +304,12 @@
         "category": "मोबाइल",
         "items": [
           "Flutter",
-          "स्टेट मैनेजमेंट (GetX, Provider, Bloc)",
-          "RESTful API",
-          "WebSocket",
-          "लोकलाइजेशन",
-          "Google Maps",
-          "लोकल स्टोरेज",
-          "JWT प्रमाणीकरण",
-          "Swift"
+          "Dart",
+          "Swift",
+          "SwiftUI",
+          "GetX",
+          "BLoC",
+          "Provider"
         ]
       },
       {
@@ -219,28 +317,34 @@
         "items": [
           "Node.js",
           "Express.js",
+          "Go",
+          "Spring Boot",
           "MongoDB",
-          "SQLite",
-          "MSSQL"
+          "MSSQL",
+          "SQLite"
         ]
       },
       {
         "category": "फ्रंटएंड",
         "items": [
-          "HTML",
-          "CSS",
+          "React",
           "JavaScript",
-          "React"
+          "TypeScript",
+          "HTML",
+          "CSS"
         ]
       },
       {
         "category": "DevOps",
         "items": [
-          "AWS"
+          "AWS",
+          "Docker",
+          "Git",
+          "CI/CD",
+          "Firebase"
         ]
       }
     ],
-    "references": [],
     "languages": [
       {
         "name": "तुर्की",
@@ -389,7 +493,9 @@
       "google_play": "Google Play",
       "app_store": "App Store",
       "website": "वेबसाइट"
-    }
+    },
+    "case_study_label": "केस स्टडी",
+    "flip_hint": "केस स्टडी देखने के लिए क्लिक करें"
   },
   "contact_section": {
     "title": "संपर्क करें",
@@ -428,7 +534,11 @@
   "footer": {
     "view_source": "स्रोत कोड देखें",
     "command_hint_prefix": "दबाएं",
-    "command_hint_suffix": "कमांड पैलेट खोलने के लिए"
+    "command_hint_suffix": "कमांड पैलेट खोलने के लिए",
+    "quick_links": "त्वरित लिंक",
+    "connect": "जुड़ें",
+    "stay_updated": "अपडेट रहें",
+    "subscribed": "सदस्यता ली!"
   },
   "sidebar": {
     "github": "GitHub",

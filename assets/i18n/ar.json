@@ -39,10 +39,6 @@
         "title": "المهارات"
       },
       {
-        "id": "references",
-        "title": "المراجع"
-      },
-      {
         "id": "contact",
         "title": "اتصل بي"
       }
@@ -55,7 +51,6 @@
     "experience": "الخبرة",
     "projects": "المشاريع",
     "skills": "المهارات",
-    "references": "المراجع",
     "contact": "اتصل بي",
     "explore_more": "استكشف المزيد",
     "dark_mode": "الوضع الداكن",
@@ -100,8 +95,15 @@
       "email": "developeryusuf@icloud.com",
       "github": "https://github.com/Yusufihsangorgel",
       "linkedin": "https://linkedin.com/in/yusuf-ihsan-görgel/",
+      "location": "Antalya, Türkiye (Remote)",
       "bio": "مرحبًا، أنا يوسف إحسان، طالب في السنة النهائية في هندسة البرمجيات مع 4 سنوات من الخبرة. بدأت العمل الحر في سنتي الثانية واكتسبت منذ ذلك الحين خبرة في بيئات الشركات والشركات الناشئة. لدي 3 سنوات من الخبرة المهنية في تطوير برامج الجوال وERP وPOS باستخدام Flutter. كما عملت في أدوار الواجهة الخلفية وDevOps في مشاريع مستقلة مختلفة. أنا شغوف بحل المشكلات وأزدهر في بيئات الفريق التعاونية. لدي خلفية قوية في استخدام Atlassian-Jira لإدارة المشاريع، مع خبرة في الاجتماعات اليومية والسباقات والسكرم والالتزام بالمواعيد النهائية الضيقة.",
+      "tagline": "صناعة تجارب رقمية بالبرمجة والإبداع",
       "medium": "developeryusufihsan",
+      "stats": {
+        "years_experience": 5,
+        "projects_completed": 12,
+        "technologies": 20
+      },
       "subtitles": [
         "مهندس برمجيات الهاتف المحمول",
         "مطور Flutter",
@@ -110,22 +112,54 @@
     },
     "experiences": [
       {
-        "title": "مطور الويب الشامل",
-        "company": "Juniustech",
-        "period": "يونيو 2023 - فبراير 2025",
-        "description": "قائد فريق الجوال (مشروع Dorse)، التطوير، النشر، الواجهة الأمامية، الواجهة الخلفية وتنسيق ضمان الجودة."
-      },
-      {
         "title": "مطور Flutter",
         "company": "Uzman Adres",
-        "period": "مارس 2022 - أكتوبر 2024",
-        "description": "POS، مبيعات الباركود، أنظمة إدارة المحاسبة، ERP؛ الواجهة الأمامية لمشروع Promob، تقنية Socket وهندسة SQL المعقدة."
+        "position": "Flutter Developer",
+        "start_date": "Mar 2022",
+        "end_date": "Present",
+        "period": "مارس 2022 - الحاضر",
+        "description": "تطوير FugaSoft — نظام POS وإدارة مبيعات متعدد المنصات\nهندسة SQL معقدة مع قاعدة بيانات محلية SQLite-Drift\nبرمجة تفاعلية مع نمط Mediator وإدارة حالة GetX\nنشر على أجهزة Android/iOS اللوحية ومنصات سطح المكتب\nتقنية Socket لمزامنة البيانات في الوقت الحقيقي",
+        "technologies": [
+          "Flutter",
+          "Dart",
+          "SQLite-Drift",
+          "GetX",
+          "WebSocket",
+          "i18n"
+        ]
+      },
+      {
+        "title": "مطور الويب الشامل",
+        "company": "Junius Tech",
+        "position": "Full Stack Developer",
+        "start_date": "Jun 2023",
+        "end_date": "Feb 2025",
+        "period": "يونيو 2023 - فبراير 2025",
+        "description": "قائد فريق الجوال (مشروع Dorse)، التطوير، النشر، الواجهة الأمامية، الواجهة الخلفية وتنسيق ضمان الجودة.",
+        "technologies": [
+          "Flutter",
+          "React",
+          "Node.js",
+          "WebSocket",
+          "REST API",
+          "Maps SDK"
+        ]
       },
       {
         "title": "مطور Flutter",
         "company": "Promob TR",
+        "position": "Flutter Developer",
+        "start_date": "Oct 2022",
+        "end_date": "Jun 2024",
         "period": "أكتوبر 2022 - يونيو 2024",
-        "description": "مشاريع مستقلة؛ الواجهة الأمامية لمشاريع \"Aydınlık E-Newspaper\" و \"Bilim ve Ütopya E-Magazine\" (الواجهة الخلفية: PHP-Laravel أو Node.js-Express.js-MongoDB)."
+        "description": "مشاريع مستقلة؛ الواجهة الأمامية لمشاريع \"Aydınlık E-Newspaper\" و \"Bilim ve Ütopya E-Magazine\" (الواجهة الخلفية: PHP-Laravel أو Node.js-Express.js-MongoDB).",
+        "technologies": [
+          "Flutter",
+          "Dart",
+          "GetX",
+          "Dio",
+          "MVVM"
+        ]
       }
     ],
     "projects": [
@@ -186,6 +220,72 @@
           "solution": "قيادة التطوير المحمول باستخدام Flutter مع تتبع المركبات في الوقت الحقيقي عبر WebSocket وتكامل Google وApple Maps SDK وبنية RESTful API وفقاً لمبادئ SOLID ولوحة تحكم React.",
           "result": "تتبع أكثر من 5,000 مركبة متزامنة بزمن استجابة أقل من 200 مللي ثانية عبر Android وiOS والويب — مما يمكّن شركات الخدمات اللوجستية من تتبع المركبات في الوقت الحقيقي وتحسين المسارات وإدارة الأساطيل باتصالات WebSocket موثوقة."
         }
+      },
+      {
+        "title": "FakeCallApp",
+        "description": "تطبيق مكالمات فيديو وهمية مع اكثر من 80 شخصية — Flutter للجوال + موقع Next.js",
+        "category": "Web",
+        "url": "https://fakecallapp.com"
+      },
+      {
+        "title": "CleanMyGallery",
+        "description": "منظف ذكي لمعرض الصور — ضغط وعلامة مائية وازالة بيانات EXIF",
+        "category": "Web",
+        "url": "https://cleanmygallery.com"
+      },
+      {
+        "title": "FocusGroves",
+        "description": "مؤقت بومودورو مع غرف دراسة ومهام وتتبع الانتاجية",
+        "category": "Web",
+        "url": "https://focusgroves.com"
+      },
+      {
+        "title": "MoodGrade",
+        "description": "تتبع المزاج مع سجل الادوية وتحليلات الذكاء الاصطناعي وتصدير البيانات",
+        "category": "Web",
+        "url": "https://moodgrade.com"
+      },
+      {
+        "title": "GetQrivo",
+        "description": "مولد رموز QR مع روابط مختصرة وتحليلات المسح",
+        "category": "Web",
+        "url": "https://getqrivo.com"
+      },
+      {
+        "title": "OverlayPhoto",
+        "description": "محرر تراكب صور مع فلاتر واطارات وكبسولات زمنية",
+        "category": "Web",
+        "url": "https://overlayphoto.com"
+      },
+      {
+        "title": "DistractionKiller",
+        "description": "حاجب تطبيقات واداة رفاهية رقمية مع جداول تركيز",
+        "category": "Web",
+        "url": "https://distractionkiller.com"
+      },
+      {
+        "title": "KPSSHazirlan",
+        "description": "منصة تحضير لامتحانات الخدمة المدنية مع خطط دراسة واختبارات تدريبية",
+        "category": "Web",
+        "url": "https://kpsshazirlan.com"
+      },
+      {
+        "title": "EhliyetCoz",
+        "description": "تحضير لامتحان رخصة القيادة مع اختبارات يومية وتتبع التقدم",
+        "category": "Web",
+        "url": "https://ehliyetcoz.com"
+      },
+      {
+        "title": "Kazanamazi",
+        "description": "متتبع الصلوات والصيام الفائتة مع خرائط حرارية وتذكيرات",
+        "category": "Web",
+        "url": "https://kazanamazi.net"
+      },
+      {
+        "title": "PDFScanPro",
+        "description": "مجموعة ادوات PDF — تحويل وضغط ودمج وتقسيم ومسح المستندات",
+        "category": "Web",
+        "url": "https://pdfscanpro.com"
       }
     ],
     "education": [
@@ -204,14 +304,12 @@
         "category": "الجوال",
         "items": [
           "Flutter",
-          "إدارة الحالة (GetX، Provider، Bloc)",
-          "RESTful API",
-          "WebSocket",
-          "التوطين",
-          "خرائط Google",
-          "التخزين المحلي",
-          "مصادقة JWT",
-          "Swift"
+          "Dart",
+          "Swift",
+          "SwiftUI",
+          "GetX",
+          "BLoC",
+          "Provider"
         ]
       },
       {
@@ -219,28 +317,34 @@
         "items": [
           "Node.js",
           "Express.js",
+          "Go",
+          "Spring Boot",
           "MongoDB",
-          "SQLite",
-          "MSSQL"
+          "MSSQL",
+          "SQLite"
         ]
       },
       {
         "category": "الواجهة الأمامية",
         "items": [
-          "HTML",
-          "CSS",
+          "React",
           "JavaScript",
-          "React"
+          "TypeScript",
+          "HTML",
+          "CSS"
         ]
       },
       {
         "category": "DevOps",
         "items": [
-          "AWS"
+          "AWS",
+          "Docker",
+          "Git",
+          "CI/CD",
+          "Firebase"
         ]
       }
     ],
-    "references": [],
     "languages": [
       {
         "name": "التركية",
@@ -389,7 +493,9 @@
       "google_play": "Google Play",
       "app_store": "App Store",
       "website": "الموقع"
-    }
+    },
+    "case_study_label": "دراسة حالة",
+    "flip_hint": "انقر لعرض دراسة الحالة"
   },
   "contact_section": {
     "title": "تواصل معي",
@@ -428,7 +534,11 @@
   "footer": {
     "view_source": "عرض الكود المصدري",
     "command_hint_prefix": "اضغط",
-    "command_hint_suffix": "لفتح لوحة الأوامر"
+    "command_hint_suffix": "لفتح لوحة الأوامر",
+    "quick_links": "روابط سريعة",
+    "connect": "تواصل",
+    "stay_updated": "ابقَ على اطلاع",
+    "subscribed": "تم الاشتراك!"
   },
   "sidebar": {
     "github": "GitHub",
