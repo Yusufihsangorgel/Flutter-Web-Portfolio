@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_web_portfolio/app/controllers/language_controller.dart';
 import 'package:flutter_web_portfolio/app/controllers/scene_director.dart';
+import 'package:flutter_web_portfolio/app/controllers/sound_controller.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
 import 'package:flutter_web_portfolio/app/core/constants/cinematic_curves.dart';
 import 'package:flutter_web_portfolio/app/core/constants/durations.dart';
@@ -64,8 +65,8 @@ class _ProjectsSectionState extends State<ProjectsSection> {
     final categories = _extractCategories(projectsData);
     final filteredProjects = _filterProjects(projectsData);
 
-    return SizedBox(
-      width: double.infinity,
+    return ConstrainedBox(
+      constraints: const BoxConstraints(maxWidth: 1100),
       child: Stack(
         children: [
           // Giant watermark — derived from nav i18n
@@ -192,12 +193,26 @@ class _CategoryChipState extends State<_CategoryChip> {
   bool _hovered = false;
 
   @override
-  Widget build(BuildContext context) => MouseRegion(
+  Widget build(BuildContext context) => Semantics(
+    button: true,
+    selected: widget.isSelected,
+    label: widget.label,
+    child: MouseRegion(
     cursor: SystemMouseCursors.click,
-    onEnter: (_) => setState(() => _hovered = true),
+    onEnter: (_) {
+      setState(() => _hovered = true);
+      if (Get.isRegistered<SoundController>()) {
+        Get.find<SoundController>().playHover();
+      }
+    },
     onExit: (_) => setState(() => _hovered = false),
     child: GestureDetector(
-      onTap: widget.onTap,
+      onTap: () {
+        if (Get.isRegistered<SoundController>()) {
+          Get.find<SoundController>().playClick();
+        }
+        widget.onTap();
+      },
       child: AnimatedContainer(
         duration: AppDurations.fast,
         curve: Curves.easeOut,
@@ -227,6 +242,7 @@ class _CategoryChipState extends State<_CategoryChip> {
           ),
         ),
       ),
+    ),
     ),
   );
 }
@@ -293,14 +309,20 @@ class _ProjectCardState extends State<_ProjectCard> {
                   isMobile
                       ? _buildMobileContent(title, description, technologies, url, accent)
                       : _buildDesktopContent(title, description, technologies, url, accent),
-                  if (_hasCaseStudy)
+                  if (_hasCaseStudy && !isMobile)
                     Positioned(
-                      bottom: 0,
-                      right: 0,
-                      child: Icon(
-                        Icons.sync_rounded,
-                        size: 18,
-                        color: accent.withValues(alpha: 0.4),
+                      bottom: 4,
+                      right: 4,
+                      child: Tooltip(
+                        message: Get.find<LanguageController>().getText(
+                          'projects_section.flip_hint',
+                          defaultValue: 'Click to view case study',
+                        ),
+                        child: Icon(
+                          Icons.flip_rounded,
+                          size: 16,
+                          color: accent.withValues(alpha: 0.4),
+                        ),
                       ),
                     ),
                 ],
@@ -314,6 +336,44 @@ class _ProjectCardState extends State<_ProjectCard> {
         return GestureDetector(
           onTap: () => ProjectDetailOverlay.show(context, project),
           child: frontCard,
+        );
+      }
+
+      // On mobile, show case study in a bottom sheet instead of 3D flip
+      if (isMobile) {
+        return GestureDetector(
+          onTap: () => _showCaseStudySheet(context, project, accent),
+          child: Stack(
+            children: [
+              frontCard,
+              Positioned(
+                bottom: 8,
+                right: 8,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: accent.withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: accent.withValues(alpha: 0.2)),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.auto_stories_rounded, size: 12, color: accent),
+                      const SizedBox(width: 4),
+                      Text(
+                        Get.find<LanguageController>().getText(
+                          'projects_section.case_study_label',
+                          defaultValue: 'Case Study',
+                        ),
+                        style: GoogleFonts.jetBrainsMono(fontSize: 10, color: accent),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
         );
       }
 
@@ -335,63 +395,116 @@ class _ProjectCardState extends State<_ProjectCard> {
     String url,
     Color accent,
   ) {
-    final content = [
-      Expanded(
-        flex: 3,
-        child: Column(
-          crossAxisAlignment: isReversed ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+    final category = (project['category'] as String?) ?? '';
+    final urls = _extractAllUrls(project);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Header row: category badge + title
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            TextScramble(
-              text: title,
-              style: GoogleFonts.spaceGrotesk(
-                fontSize: 28,
-                fontWeight: FontWeight.w700,
-                color: AppColors.textBright,
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (category.isNotEmpty)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 8),
+                      child: Text(
+                        category.toUpperCase(),
+                        style: GoogleFonts.jetBrainsMono(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                          color: accent,
+                          letterSpacing: 2,
+                        ),
+                      ),
+                    ),
+                  TextScramble(
+                    text: title,
+                    style: GoogleFonts.spaceGrotesk(
+                      fontSize: 26,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.textBright,
+                    ),
+                  ),
+                ],
               ),
             ),
-            const SizedBox(height: 16),
-            Text(
-              description,
-              style: AppTypography.body,
-              textAlign: isReversed ? TextAlign.right : TextAlign.left,
-            ),
-            const SizedBox(height: 20),
-            // Tech pills
-            Wrap(
-              alignment: isReversed ? WrapAlignment.end : WrapAlignment.start,
-              spacing: 8,
-              runSpacing: 8,
-              children: technologies.map((tech) => Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
-                decoration: BoxDecoration(
-                  color: accent.withValues(alpha: 0.08),
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Text(
-                  tech,
-                  style: GoogleFonts.jetBrainsMono(
-                    fontSize: 12,
-                    color: accent,
+            // Platform icons
+            if (urls.isNotEmpty)
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  for (final entry in urls.entries)
+                    Padding(
+                      padding: const EdgeInsets.only(left: 8),
+                      child: _PlatformIcon(
+                        platform: entry.key,
+                        url: entry.value,
+                        accent: accent,
+                      ),
+                    ),
+                ],
+              ),
+          ],
+        ),
+        const SizedBox(height: 14),
+        // Description
+        Text(
+          description,
+          style: AppTypography.body.copyWith(height: 1.7),
+          maxLines: 3,
+          overflow: TextOverflow.ellipsis,
+        ),
+        const SizedBox(height: 18),
+        // Tech pills + Visit CTA row
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            Expanded(
+              child: Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: technologies.take(6).map((tech) => Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+                  decoration: BoxDecoration(
+                    color: accent.withValues(alpha: 0.08),
+                    borderRadius: BorderRadius.circular(16),
                   ),
-                ),
-              )).toList(),
+                  child: Text(
+                    tech,
+                    style: GoogleFonts.jetBrainsMono(
+                      fontSize: 12,
+                      color: accent,
+                    ),
+                  ),
+                )).toList(),
+              ),
             ),
             if (url.isNotEmpty) ...[
-              const SizedBox(height: 16),
-              Align(
-                alignment: isReversed ? Alignment.centerRight : Alignment.centerLeft,
-                child: _ProjectLink(url: url, accent: accent),
-              ),
+              const SizedBox(width: 16),
+              _VisitButton(url: url, accent: accent),
             ],
           ],
         ),
-      ),
-    ];
-
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: isReversed ? content.reversed.toList() : content,
+      ],
     );
+  }
+
+  /// Extract all URL types (website, google_play, app_store).
+  Map<String, String> _extractAllUrls(Map<String, dynamic> project) {
+    final result = <String, String>{};
+    if (project['url'] case final String url) {
+      result['website'] = url;
+    } else if (project['url'] case final Map<String, dynamic> urls) {
+      for (final key in ['website', 'google_play', 'app_store']) {
+        if (urls[key] case final String url) result[key] = url;
+      }
+    }
+    return result;
   }
 
   Widget _buildMobileContent(
@@ -407,8 +520,8 @@ class _ProjectCardState extends State<_ProjectCard> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Expanded(
-            child: TextScramble(
-              text: title,
+            child: Text(
+              title,
               style: GoogleFonts.spaceGrotesk(
                 fontSize: 22,
                 fontWeight: FontWeight.w700,
@@ -505,8 +618,208 @@ class _ProjectLinkState extends State<_ProjectLink> {
   );
 }
 
+/// Small platform icon (web, Play Store, App Store) with tooltip + launch.
+class _PlatformIcon extends StatefulWidget {
+  const _PlatformIcon({
+    required this.platform,
+    required this.url,
+    required this.accent,
+  });
+
+  final String platform;
+  final String url;
+  final Color accent;
+
+  @override
+  State<_PlatformIcon> createState() => _PlatformIconState();
+}
+
+class _PlatformIconState extends State<_PlatformIcon> {
+  bool _hovered = false;
+
+  IconData get _icon => switch (widget.platform) {
+    'google_play' => Icons.android_rounded,
+    'app_store' => Icons.apple_rounded,
+    _ => Icons.language_rounded,
+  };
+
+  String get _label => switch (widget.platform) {
+    'google_play' => 'Google Play',
+    'app_store' => 'App Store',
+    _ => 'Website',
+  };
+
+  @override
+  Widget build(BuildContext context) => Tooltip(
+    message: _label,
+    child: MouseRegion(
+      cursor: SystemMouseCursors.click,
+      onEnter: (_) => setState(() => _hovered = true),
+      onExit: (_) => setState(() => _hovered = false),
+      child: GestureDetector(
+        onTap: () async {
+          var urlString = widget.url;
+          if (!urlString.startsWith('http')) urlString = 'https://$urlString';
+          final uri = Uri.tryParse(urlString);
+          if (uri != null && await canLaunchUrl(uri)) {
+            await launchUrl(uri, mode: LaunchMode.externalApplication);
+          }
+        },
+        child: AnimatedContainer(
+          duration: AppDurations.fast,
+          padding: const EdgeInsets.all(6),
+          decoration: BoxDecoration(
+            color: _hovered ? widget.accent.withValues(alpha: 0.12) : Colors.transparent,
+            borderRadius: BorderRadius.circular(6),
+          ),
+          child: Icon(
+            _icon,
+            size: 18,
+            color: _hovered ? widget.accent : AppColors.textSecondary,
+          ),
+        ),
+      ),
+    ),
+  );
+}
+
+/// Prominent "Visit" CTA button for project cards.
+class _VisitButton extends StatefulWidget {
+  const _VisitButton({required this.url, required this.accent});
+  final String url;
+  final Color accent;
+
+  @override
+  State<_VisitButton> createState() => _VisitButtonState();
+}
+
+class _VisitButtonState extends State<_VisitButton> {
+  bool _hovered = false;
+
+  @override
+  Widget build(BuildContext context) => CinematicFocusable(
+    onTap: () async {
+      var urlString = widget.url;
+      if (!urlString.startsWith('http')) urlString = 'https://$urlString';
+      final uri = Uri.tryParse(urlString);
+      if (uri != null && await canLaunchUrl(uri)) {
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
+      }
+    },
+    onHoverChanged: (hovered) => setState(() => _hovered = hovered),
+    borderRadius: BorderRadius.circular(8),
+    child: AnimatedContainer(
+      duration: AppDurations.fast,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      decoration: BoxDecoration(
+        color: _hovered ? widget.accent.withValues(alpha: 0.15) : widget.accent.withValues(alpha: 0.06),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+          color: _hovered ? widget.accent : widget.accent.withValues(alpha: 0.3),
+        ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            Get.find<LanguageController>().getText(
+              'projects_section.open_project',
+              defaultValue: 'Visit',
+            ),
+            style: GoogleFonts.jetBrainsMono(
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              color: widget.accent,
+            ),
+          ),
+          const SizedBox(width: 6),
+          Icon(
+            Icons.arrow_outward_rounded,
+            size: 14,
+            color: widget.accent,
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
+/// Shows a bottom sheet with the case study on mobile.
+void _showCaseStudySheet(
+  BuildContext context,
+  Map<String, dynamic> project,
+  Color accent,
+) {
+  final langCtrl = Get.find<LanguageController>();
+  final caseStudy = project['case_study'] as Map<String, dynamic>? ?? {};
+  final title = (project['title'] as String?) ?? 'Project';
+  final problem = caseStudy['problem'] as String? ?? '';
+  final solution = caseStudy['solution'] as String? ?? '';
+  final result = caseStudy['result'] as String? ?? '';
+
+  showModalBottomSheet<void>(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: AppColors.backgroundDark,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+    ),
+    builder: (_) => DraggableScrollableSheet(
+      initialChildSize: 0.65,
+      maxChildSize: 0.9,
+      minChildSize: 0.4,
+      expand: false,
+      builder: (_, scrollController) => SingleChildScrollView(
+        controller: scrollController,
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Center(
+              child: Container(
+                width: 40,
+                height: 4,
+                margin: const EdgeInsets.only(bottom: 20),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ),
+            Text(title, style: AppTypography.h3.copyWith(color: accent)),
+            const SizedBox(height: 20),
+            if (problem.isNotEmpty) ...[
+              _BackSection(
+                heading: langCtrl.getText('projects_section.case_study_problem', defaultValue: 'The Challenge'),
+                body: problem,
+                accent: accent,
+              ),
+              const SizedBox(height: 16),
+            ],
+            if (solution.isNotEmpty) ...[
+              _BackSection(
+                heading: langCtrl.getText('projects_section.case_study_solution', defaultValue: 'The Approach'),
+                body: solution,
+                accent: accent,
+              ),
+              const SizedBox(height: 16),
+            ],
+            if (result.isNotEmpty)
+              _BackSection(
+                heading: langCtrl.getText('projects_section.case_study_result', defaultValue: 'The Result'),
+                body: result,
+                accent: accent,
+              ),
+            const SizedBox(height: 24),
+          ],
+        ),
+      ),
+    ),
+  );
+}
+
 // ──────────────────────────────────────────────────────────────────────────────
-// 3D flip card — rotates 180° around Y-axis to reveal back content
+// 3D flip card — rotates 180° around Y-axis to reveal back content (desktop)
 // ──────────────────────────────────────────────────────────────────────────────
 
 class _FlipCard extends StatefulWidget {
