@@ -46,6 +46,10 @@ class _SoundToggleState extends State<SoundToggle>
 
   void _onToggle(SoundController controller) {
     controller.toggleSound();
+    // Play confirmation tone after toggling on.
+    if (controller.isEnabled.value) {
+      controller.playToggle(on: true);
+    }
     // Play the brief volume indicator animation.
     _indicatorController
       ..reset()
