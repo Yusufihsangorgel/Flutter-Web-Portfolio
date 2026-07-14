@@ -31,7 +31,13 @@ const engineConfig = {
   // Keep Flutter's implicit Roboto/emoji fallback fonts on the same origin.
   // The application typography is bundled through pubspec fonts; this path
   // covers glyphs outside those families without a fonts.gstatic.com fetch.
-  fontFallbackBaseUrl: 'assets/fallback_fonts/',
+  // An absolute URL avoids both document-relative `/fallback_fonts` requests
+  // and renderer-side duplication of the `assets/` prefix. `document.baseURI`
+  // also preserves repository subpaths in GitHub Pages builds.
+  fontFallbackBaseUrl: new URL(
+    'assets/fallback_fonts/',
+    document.baseURI,
+  ).toString(),
 };
 
 _flutter.loader.load({

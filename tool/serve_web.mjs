@@ -38,13 +38,6 @@ const server = createServer((request, response) => {
     return;
   }
 
-  if (existsSync(filePath) && statSync(filePath).isDirectory()) {
-    filePath = join(filePath, 'index.html');
-  }
-  if (!existsSync(filePath) || !statSync(filePath).isFile()) {
-    filePath = join(root, 'index.html');
-  }
-
   response.setHeader('Cache-Control', 'no-store');
   response.setHeader('Cross-Origin-Embedder-Policy', 'credentialless');
   response.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
@@ -52,6 +45,19 @@ const server = createServer((request, response) => {
     'Content-Security-Policy',
     "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://analytics.developeryusuf.com; worker-src 'self' blob:; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: https: blob:; connect-src 'self' https://api.rss2json.com https://api.github.com https://analytics.developeryusuf.com; frame-ancestors 'self';",
   );
+
+  if (existsSync(filePath) && statSync(filePath).isDirectory()) {
+    filePath = join(filePath, 'index.html');
+  }
+  if (!existsSync(filePath) || !statSync(filePath).isFile()) {
+    if (extname(relativePath)) {
+      response.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
+      response.end('Not Found');
+      return;
+    }
+    filePath = join(root, 'index.html');
+  }
+
   response.setHeader(
     'Content-Type',
     contentTypes.get(extname(filePath)) ?? 'application/octet-stream',

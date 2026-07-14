@@ -15,6 +15,11 @@ test('boots the Flutter experience without browser errors', async ({ page }) => 
   page.on('console', (message) => {
     if (message.type() === 'error') errors.push(message.text());
   });
+  page.on('response', (response) => {
+    if (response.status() >= 400) {
+      errors.push(`HTTP ${response.status()} ${response.url()}`);
+    }
+  });
 
   const response = await page.goto('/', { waitUntil: 'domcontentloaded' });
   expect(response?.status()).toBe(200);
@@ -95,6 +100,19 @@ test('retires the legacy service worker without keeping a registration', async (
       { timeout: 10000 },
     )
     .toBe(0);
+});
+
+test('serves same-origin fallback fonts without masking missing assets', async ({
+  request,
+}) => {
+  const font = await request.get(
+    '/assets/fallback_fonts/roboto/v32/KFOmCnqEu92Fr1Me4GZLCzYlKw.woff2',
+  );
+  expect(font.status()).toBe(200);
+  expect(font.headers()['content-type']).toContain('font/woff2');
+
+  const missing = await request.get('/assets/fallback_fonts/missing.woff2');
+  expect(missing.status()).toBe(404);
 });
 
 test('exposes the live Engineering Lab through the keyboard', async ({ page }) => {

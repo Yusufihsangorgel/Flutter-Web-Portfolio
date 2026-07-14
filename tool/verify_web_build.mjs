@@ -103,7 +103,11 @@ try {
   if (!bootstrap.includes("window.addEventListener('flutter-first-frame'")) {
     failures.push('custom first-frame bootstrap cleanup is missing');
   }
-  if (!bootstrap.includes("fontFallbackBaseUrl: 'assets/fallback_fonts/'")) {
+  if (
+    !bootstrap.includes('fontFallbackBaseUrl: new URL(') ||
+    !bootstrap.includes("'assets/fallback_fonts/'") ||
+    !bootstrap.includes('document.baseURI')
+  ) {
     failures.push(
       'Flutter fallback fonts are not configured for same-origin loading',
     );
