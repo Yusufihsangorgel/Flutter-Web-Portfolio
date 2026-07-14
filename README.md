@@ -151,7 +151,7 @@ npm test
 
 Tests cover pure state transitions, out-of-order locale requests, repositories, scene configuration, responsive widgets, the command palette, and narrow-screen Engineering Lab layout.
 
-The bundle gate currently caps `main.dart.wasm` at 3 MiB and the JavaScript fallback at 4 MiB. It also verifies the Wasm header, dual-runtime build configuration, custom first-frame bootstrap, and that the application has not silently re-enabled Flutter's generated service worker.
+The bundle gate currently caps `main.dart.wasm` at 3 MiB and the JavaScript fallback at 4 MiB. It also verifies the Wasm header, dual-runtime build configuration, custom first-frame bootstrap, same-origin fallback fonts, and the fetch-free retirement worker used to remove legacy service-worker registrations.
 
 ---
 

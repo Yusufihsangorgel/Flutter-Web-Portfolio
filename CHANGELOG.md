@@ -24,8 +24,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Contact drafts open the visitor's mail client; the UI no longer claims delivery before the visitor sends
 - Browser history is synchronized directly by the scroll controller instead of a page router
 - Reduced-motion preferences stop continuous scene animation and bypass the cinematic preloader
-- Generated `build/web` output is no longer kept as source
+- The verified `build/web` release artifact is committed for the lightweight Nginx packaging path; private CV and portrait assets were removed from both source and output
 - Unverifiable named endorsements were replaced by repository-backed engineering evidence
+- GitHub Actions run on Node 24 releases pinned to immutable commit SHAs
 
 ### Fixed
 
@@ -34,6 +35,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Stable Wasm filenames are revalidated instead of receiving a one-year immutable cache policy
 - Nginx serves Dart's `.mjs` support runtime with a JavaScript MIME type under `nosniff`
 - Unsupported public project metrics were removed from all seven locale documents
+- Legacy Flutter service workers now unregister themselves and return controlled clients to the network
+- Same-origin fallback fonts resolve correctly for both root and repository-subpath deployments
 
 ## [1.1.0] - 2026-03-23
 
