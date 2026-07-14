@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Desktop and mobile Playwright smoke tests** for Wasm, first frame, runtime inspection, and browser history
 - **Bundle integrity gate** with explicit Wasm and JavaScript budgets
 - **Accessible bootstrap recovery** when the Flutter engine cannot start
+- **Deterministic social preview pipeline** with a 1200×630, repository-rendered Open Graph card
 
 ### Changed
 
@@ -27,6 +28,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The verified `build/web` release artifact is committed for the lightweight Nginx packaging path; private CV and portrait assets were removed from both source and output
 - Unverifiable named endorsements were replaced by repository-backed engineering evidence
 - GitHub Actions run on Node 24 releases pinned to immutable commit SHAs
+- Open Graph and Twitter previews now use the engineering showcase card instead of the generic application icon
 
 ### Fixed
 

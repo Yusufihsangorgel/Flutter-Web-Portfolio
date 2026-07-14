@@ -7,6 +7,7 @@
     "test": "playwright test",
     "test:e2e": "playwright test",
     "test:e2e:prod": "playwright test --config playwright.prod.config.ts",
+    "render:social-card": "node tool/render_social_card.mjs",
     "verify:bundle": "node tool/verify_web_build.mjs"
   },
   "keywords": [

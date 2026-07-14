@@ -115,6 +115,19 @@ test('serves same-origin fallback fonts without masking missing assets', async (
   expect(missing.status()).toBe(404);
 });
 
+test('ships the social preview at the declared large-card dimensions', async ({
+  request,
+}) => {
+  const response = await request.get('/assets/og/engineering-showcase.png');
+  expect(response.status()).toBe(200);
+  expect(response.headers()['content-type']).toContain('image/png');
+
+  const png = await response.body();
+  expect(png.subarray(1, 4).toString()).toBe('PNG');
+  expect(png.readUInt32BE(16)).toBe(1200);
+  expect(png.readUInt32BE(20)).toBe(630);
+});
+
 test('exposes the live Engineering Lab through the keyboard', async ({ page }) => {
   await openPortfolio(page);
   await page.keyboard.press('Control+Shift+KeyL');

@@ -85,6 +85,7 @@ These headers make the page cross-origin isolated where the browser supports it.
 |------|------|---------|
 | Public content | `assets/i18n/*.json` | Project evidence, skills, and localized interface copy |
 | Your meta tags | `web/index.html` | Title, OG tags, analytics, structured data |
+| Social preview | `tool/social_card.html` | Deterministic 1200×630 source; run `npm run render:social-card` after editing |
 | Scene palette | `lib/app/core/constants/scene_configs.dart` | Gradients, accents, particle speed, vignette |
 
 ---
@@ -148,6 +149,9 @@ flutter build web --release --wasm --no-web-resources-cdn
 npm run verify:bundle
 npm test
 ```
+
+The browser suite also verifies that the Open Graph image is a real PNG at the
+declared 1200×630 large-card dimensions.
 
 Tests cover pure state transitions, out-of-order locale requests, repositories, scene configuration, responsive widgets, the command palette, and narrow-screen Engineering Lab layout.
 
