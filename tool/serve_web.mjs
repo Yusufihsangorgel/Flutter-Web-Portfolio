@@ -4,6 +4,11 @@ import { extname, join, normalize, resolve } from 'node:path';
 
 const root = resolve(process.env.WEB_ROOT ?? 'build/web');
 const port = Number(process.env.PORT ?? 4173);
+const wasmDelayMs = Number(process.env.WASM_DELAY_MS ?? 0);
+
+if (!Number.isFinite(wasmDelayMs) || wasmDelayMs < 0) {
+  throw new Error('WASM_DELAY_MS must be a non-negative number.');
+}
 
 const contentTypes = new Map([
   ['.css', 'text/css; charset=utf-8'],
@@ -62,11 +67,17 @@ const server = createServer((request, response) => {
     'Content-Type',
     contentTypes.get(extname(filePath)) ?? 'application/octet-stream',
   );
-  createReadStream(filePath).pipe(response);
+  const sendFile = () => createReadStream(filePath).pipe(response);
+  if (wasmDelayMs > 0 && extname(filePath) === '.wasm') {
+    setTimeout(sendFile, wasmDelayMs);
+    return;
+  }
+  sendFile();
 });
 
 server.listen(port, '127.0.0.1', () => {
-  console.log(`Flutter web test server listening on http://127.0.0.1:${port}`);
+  const delay = wasmDelayMs > 0 ? ` (Wasm delay: ${wasmDelayMs} ms)` : '';
+  console.log(`Flutter web test server listening on http://127.0.0.1:${port}${delay}`);
 });
 
 for (const signal of ['SIGINT', 'SIGTERM']) {

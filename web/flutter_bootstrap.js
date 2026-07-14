@@ -4,6 +4,7 @@
 const removeBootstrapSurface = () => {
   const splash = document.getElementById('bootstrap-surface');
   if (!splash) return;
+  splash.setAttribute('aria-busy', 'false');
   splash.classList.add('bootstrap-surface--done');
   window.setTimeout(() => splash.remove(), 220);
 };
@@ -13,9 +14,15 @@ const showBootstrapFailure = (error) => {
   const splash = document.getElementById('bootstrap-surface');
   if (!splash) return;
 
+  splash.classList.add('bootstrap-surface--failed');
+  splash.setAttribute('aria-busy', 'false');
   splash.setAttribute('aria-label', 'The Flutter experience could not start');
   const label = splash.querySelector('.bootstrap-label');
   if (label) label.textContent = 'FLUTTER WEB / BOOT FAILED';
+  const status = splash.querySelector('.bootstrap-status-copy');
+  if (status) {
+    status.textContent = 'The live canvas could not start. Retry the isolated runtime.';
+  }
   const track = splash.querySelector('.bootstrap-track');
   if (track) {
     const retry = document.createElement('button');

@@ -32,6 +32,31 @@ test('boots the Flutter experience without browser errors', async ({ page }) => 
   expect(errors).toEqual([]);
 });
 
+test('paints an accessible engineering shell before the Wasm canvas', async ({
+  page,
+}) => {
+  let releaseWasm: (() => void) | undefined;
+  const wasmGate = new Promise<void>((resolve) => {
+    releaseWasm = resolve;
+  });
+  await page.route('**/main.dart.wasm', async (route) => {
+    await wasmGate;
+    await route.continue();
+  });
+
+  await page.goto('/', { waitUntil: 'domcontentloaded' });
+  const shell = page.locator('#bootstrap-surface');
+  await expect(shell).toBeVisible();
+  await expect(shell).toHaveAttribute('aria-busy', 'true');
+  await expect(shell.getByRole('heading', { name: /FLUTTER WEB/ })).toBeVisible();
+  await expect(shell.getByText('Release contract')).toBeVisible();
+  await expect(shell.getByText('main.dart.wasm')).toBeVisible();
+  await expect(shell.getByText('Preparing the live canvas')).toBeVisible();
+
+  releaseWasm?.();
+  await expect(shell).toHaveCount(0, { timeout: 20000 });
+});
+
 test('offers an accessible retry when the Wasm artifact cannot load', async ({
   page,
 }) => {
@@ -46,6 +71,13 @@ test('offers an accessible retry when the Wasm artifact cannot load', async ({
     'aria-label',
     'The Flutter experience could not start',
   );
+  await expect(page.locator('#bootstrap-surface')).toHaveAttribute(
+    'aria-busy',
+    'false',
+  );
+  await expect(
+    page.getByText('The live canvas could not start. Retry the isolated runtime.'),
+  ).toBeVisible();
 });
 
 test('runs the Wasm/SkWasm path with cross-origin isolation', async ({ page }) => {

@@ -16,6 +16,11 @@ A graphics-heavy, responsive portfolio built entirely with Flutter widgets and c
 
 The page is not a video, a DOM mockup, or a wrapper around a JavaScript animation library. Scroll position drives a scene state machine; that state feeds gradients, particles, accents, vignette intensity, and section transitions on Flutter's canvas.
 
+Before that canvas is ready, the server-rendered instant shell paints the same
+engineering thesis directly from `index.html`. It remains useful on a cold or
+constrained connection, exposes an accessible busy state, and hands off only
+after Flutter emits its first-frame event.
+
 Open the live site and press:
 
 - `Ctrl/Cmd + Shift + L` — inspect the active runtime, renderer, browser isolation, and live frame timings.
@@ -156,6 +161,13 @@ artifact. The production suite intentionally uses one worker against the live
 Wasm deployment, so limited client bandwidth cannot turn parallel downloads
 into false boot-time failures. Both suites verify that the Open Graph image is
 a real PNG at the declared 1200×630 large-card dimensions.
+
+For visual QA of the instant shell on a constrained connection, the local
+server can delay only Wasm responses without changing application code:
+
+```bash
+WASM_DELAY_MS=5000 PORT=4174 node tool/serve_web.mjs
+```
 
 Tests cover pure state transitions, out-of-order locale requests, repositories, scene configuration, responsive widgets, the command palette, and narrow-screen Engineering Lab layout.
 

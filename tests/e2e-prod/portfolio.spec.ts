@@ -86,6 +86,9 @@ test('serves the declared production sharing and font assets', async ({
   const document = await request.get('/');
   expect(document.status()).toBe(200);
   const html = await document.text();
+  expect(html).toContain('class="bootstrap-title"');
+  expect(html).toContain('aria-busy="true"');
+  expect(html).toContain('Preparing the live canvas');
   expect(html).toContain(
     'content="https://developeryusuf.com/assets/og/engineering-showcase.png"',
   );

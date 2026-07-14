@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Accessible bootstrap recovery** when the Flutter engine cannot start
 - **Deterministic social preview pipeline** with a 1200×630, repository-rendered Open Graph card
 - **Semantic production smoke suite** with serialized live Wasm verification
+- **Instant engineering shell** that renders accessible, indexable content before Flutter's first frame
 
 ### Changed
 

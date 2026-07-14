@@ -90,6 +90,21 @@ try {
 }
 
 try {
+  const index = await readFile(path.join(webRoot, 'index.html'), 'utf8');
+  if (!index.includes('class="bootstrap-title"')) {
+    failures.push('the instant engineering shell headline is missing');
+  }
+  if (!index.includes('aria-busy="true"')) {
+    failures.push('the instant engineering shell does not expose loading state');
+  }
+  if (!index.includes('Preparing the live canvas')) {
+    failures.push('the instant engineering shell status is missing');
+  }
+} catch {
+  failures.push('index.html is missing');
+}
+
+try {
   const bootstrap = await readFile(
     path.join(webRoot, 'flutter_bootstrap.js'),
     'utf8',
@@ -114,6 +129,9 @@ try {
   }
   if (!bootstrap.includes('}).catch(showBootstrapFailure);')) {
     failures.push('the bootstrap failure recovery surface is missing');
+  }
+  if (!bootstrap.includes("splash.setAttribute('aria-busy', 'false')")) {
+    failures.push('the bootstrap does not resolve its accessible busy state');
   }
   if (/\_flutter\.loader\.load\(\{\s*serviceWorkerSettings/.test(bootstrap)) {
     failures.push('the application bootstrap re-enabled the service worker');
