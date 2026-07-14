@@ -45,6 +45,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Legacy Flutter service workers now unregister themselves and return controlled clients to the network
 - Same-origin fallback fonts resolve correctly for both root and repository-subpath deployments
 - Renderer debug symbol maps are no longer published by Docker or GitHub Pages releases
+- Stable Flutter entrypoint names now carry a content hash and renderer URLs include the exact engine revision, enabling cache-safe one-year binary responses
 
 ## [1.1.0] - 2026-03-23
 

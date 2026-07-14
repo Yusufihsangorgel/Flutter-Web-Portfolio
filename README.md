@@ -173,7 +173,7 @@ WASM_DELAY_MS=5000 PORT=4174 node tool/serve_web.mjs
 
 Tests cover pure state transitions, out-of-order locale requests, repositories, scene configuration, responsive widgets, the command palette, and narrow-screen Engineering Lab layout.
 
-The release preparation step removes renderer debug symbol maps before packaging. The bundle gate rejects their return, caps the complete public release at 36 MiB, `main.dart.wasm` at 3 MiB, and the JavaScript fallback at 4 MiB. It also verifies the Wasm header, dual-runtime build configuration, custom first-frame bootstrap, same-origin fallback fonts, and the fetch-free retirement worker used to remove legacy service-worker registrations.
+The release preparation step removes renderer debug symbol maps, versions app entrypoints with a content hash, and moves renderer binaries below Flutter's exact engine revision. Nginx can therefore cache those large immutable responses for a year without pairing a new bootstrap with stale runtime bytes. The bundle gate rejects unversioned artifacts, caps the complete public release at 36 MiB, `main.dart.wasm` at 3 MiB, and the JavaScript fallback at 4 MiB. It also verifies the Wasm header, dual-runtime build configuration, custom first-frame bootstrap, same-origin fallback fonts, and the fetch-free retirement worker used to remove legacy service-worker registrations.
 
 ---
 

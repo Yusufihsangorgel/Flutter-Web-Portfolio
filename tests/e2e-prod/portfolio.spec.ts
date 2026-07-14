@@ -29,22 +29,33 @@ test('boots the production Wasm release with its security contract', async ({
   });
 
   const wasmResponse = page.waitForResponse((response) =>
-    response.url().endsWith('/main.dart.wasm'),
+    response.url().includes('/main.dart.wasm?v='),
   );
   const runtimeResponse = page.waitForResponse((response) =>
-    response.url().endsWith('/main.dart.mjs'),
+    response.url().includes('/main.dart.mjs?v='),
+  );
+  const rendererResponse = page.waitForResponse((response) =>
+    /\/canvaskit\/[0-9a-f]{40}\/skwasm\.wasm$/.test(response.url()),
   );
 
   const documentResponse = await page.goto('/', {
     waitUntil: 'domcontentloaded',
   });
-  const [wasm, runtime] = await Promise.all([wasmResponse, runtimeResponse]);
+  const [wasm, runtime, renderer] = await Promise.all([
+    wasmResponse,
+    runtimeResponse,
+    rendererResponse,
+  ]);
 
   expect(documentResponse?.status()).toBe(200);
   expect(wasm.status()).toBe(200);
+  expect(wasm.url()).toMatch(/main\.dart\.wasm\?v=[0-9a-f]{16}$/);
   expect(wasm.headers()['content-type']).toContain('application/wasm');
+  expect(wasm.headers()['cache-control']).toContain('max-age=31536000');
   expect(runtime.status()).toBe(200);
   expect(runtime.headers()['content-type']).toContain('javascript');
+  expect(renderer.status()).toBe(200);
+  expect(renderer.headers()['cache-control']).toContain('max-age=31536000');
   expect(documentResponse?.headers()['cross-origin-opener-policy']).toBe(
     'same-origin',
   );

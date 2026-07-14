@@ -35,6 +35,13 @@ const showBootstrapFailure = (error) => {
 };
 
 const engineConfig = {
+  // Flutter's engine revision becomes part of the renderer URL. This lets the
+  // server cache large SkWasm/CanvasKit binaries for a year without a future
+  // Flutter upgrade reusing stale bytes at the same path.
+  canvasKitBaseUrl: new URL(
+    `canvaskit/${_flutter.buildConfig.engineRevision}/`,
+    document.baseURI,
+  ).toString(),
   // Keep Flutter's implicit Roboto/emoji fallback fonts on the same origin.
   // The application typography is bundled through pubspec fonts; this path
   // covers glyphs outside those families without a fonts.gstatic.com fetch.

@@ -442,6 +442,10 @@ class _ArchitectureCard extends StatelessWidget {
           value: '0',
           label: 'renderer debug symbol files in the public release',
         ),
+        const _ArchitectureRow(
+          value: '1Y',
+          label: 'cache window for release-versioned runtime binaries',
+        ),
         _ArchitectureRow(
           value: '#/$activeSection',
           label: 'section synchronized with browser history',

@@ -40,7 +40,7 @@ test('paints an accessible engineering shell before the Wasm canvas', async ({
   const wasmGate = new Promise<void>((resolve) => {
     releaseWasm = resolve;
   });
-  await page.route('**/main.dart.wasm', async (route) => {
+  await page.route('**/main.dart.wasm*', async (route) => {
     await wasmGate;
     await route.continue();
   });
@@ -61,7 +61,7 @@ test('paints an accessible engineering shell before the Wasm canvas', async ({
 test('offers an accessible retry when the Wasm artifact cannot load', async ({
   page,
 }) => {
-  await page.route('**/main.dart.wasm', (route) => route.abort('failed'));
+  await page.route('**/main.dart.wasm*', (route) => route.abort('failed'));
   await page.goto('/', { waitUntil: 'domcontentloaded' });
 
   await expect(page.getByText('FLUTTER WEB / BOOT FAILED')).toBeVisible({
@@ -83,10 +83,14 @@ test('offers an accessible retry when the Wasm artifact cannot load', async ({
 
 test('runs the Wasm/SkWasm path with cross-origin isolation', async ({ page }) => {
   const wasmResponse = page.waitForResponse(
-    (response) => response.url().endsWith('/main.dart.wasm'),
+    (response) => response.url().includes('/main.dart.wasm?v='),
   );
   const runtimeResponse = page.waitForResponse(
-    (response) => response.url().endsWith('/main.dart.mjs'),
+    (response) => response.url().includes('/main.dart.mjs?v='),
+  );
+  const rendererResponse = page.waitForResponse(
+    (response) =>
+      /\/canvaskit\/[0-9a-f]{40}\/skwasm\.wasm$/.test(response.url()),
   );
 
   const documentResponse = await page.goto('/', {
@@ -94,11 +98,15 @@ test('runs the Wasm/SkWasm path with cross-origin isolation', async ({ page }) =
   });
   const wasm = await wasmResponse;
   const runtime = await runtimeResponse;
+  const renderer = await rendererResponse;
 
   expect(wasm.status()).toBe(200);
+  expect(wasm.url()).toMatch(/main\.dart\.wasm\?v=[0-9a-f]{16}$/);
   expect(wasm.headers()['content-type']).toContain('application/wasm');
   expect(runtime.status()).toBe(200);
+  expect(runtime.url()).toMatch(/main\.dart\.mjs\?v=[0-9a-f]{16}$/);
   expect(runtime.headers()['content-type']).toContain('javascript');
+  expect(renderer.status()).toBe(200);
   expect(documentResponse?.headers()['cross-origin-opener-policy']).toBe(
     'same-origin',
   );

@@ -135,6 +135,34 @@ try {
   if (!bootstrap.includes('"useLocalCanvasKit":true')) {
     failures.push('renderer binaries are not configured for self-hosting');
   }
+  for (const artifact of ['main.dart.wasm', 'main.dart.mjs', 'main.dart.js']) {
+    if (!bootstrap.includes(`${artifact}?v=`)) {
+      failures.push(`${artifact} does not have a release-versioned URL`);
+    }
+  }
+  const engineRevision = bootstrap.match(
+    /"engineRevision":"([0-9a-f]{40})"/,
+  )?.[1];
+  if (!engineRevision) {
+    failures.push('flutter_bootstrap.js does not expose an engine revision');
+  } else {
+    try {
+      const renderer = await stat(
+        path.join(webRoot, 'canvaskit', engineRevision, 'skwasm.wasm'),
+      );
+      if (!renderer.isFile() || renderer.size === 0) {
+        failures.push('the versioned SkWasm renderer is empty');
+      }
+    } catch {
+      failures.push('the versioned SkWasm renderer is missing');
+    }
+  }
+  try {
+    await stat(path.join(webRoot, 'canvaskit', 'skwasm.wasm'));
+    failures.push('an unversioned SkWasm renderer is still publicly shippable');
+  } catch {
+    // Expected: renderer binaries live below the engine revision.
+  }
   if (!bootstrap.includes("window.addEventListener('flutter-first-frame'")) {
     failures.push('custom first-frame bootstrap cleanup is missing');
   }

@@ -33,7 +33,7 @@ addEventListener("message", eventListener);
 if (!window._flutter) {
   window._flutter = {};
 }
-_flutter.buildConfig = {"engineRevision":"6c0baaebf70e0148f485f27d5616b3d3382da7bf","builds":[{"compileTarget":"dart2wasm","renderer":"skwasm","mainWasmPath":"main.dart.wasm","jsSupportRuntimePath":"main.dart.mjs"},{"compileTarget":"dart2js","renderer":"canvaskit","mainJsPath":"main.dart.js"}],"useLocalCanvasKit":true};
+_flutter.buildConfig = {"engineRevision":"6c0baaebf70e0148f485f27d5616b3d3382da7bf","builds":[{"compileTarget":"dart2wasm","renderer":"skwasm","mainWasmPath":"main.dart.wasm?v=9749aa6ad4ca2df3","jsSupportRuntimePath":"main.dart.mjs?v=9749aa6ad4ca2df3"},{"compileTarget":"dart2js","renderer":"canvaskit","mainJsPath":"main.dart.js?v=9749aa6ad4ca2df3"}],"useLocalCanvasKit":true};
 
 
 const removeBootstrapSurface = () => {
@@ -70,6 +70,13 @@ const showBootstrapFailure = (error) => {
 };
 
 const engineConfig = {
+  // Flutter's engine revision becomes part of the renderer URL. This lets the
+  // server cache large SkWasm/CanvasKit binaries for a year without a future
+  // Flutter upgrade reusing stale bytes at the same path.
+  canvasKitBaseUrl: new URL(
+    `canvaskit/${_flutter.buildConfig.engineRevision}/`,
+    document.baseURI,
+  ).toString(),
   // Keep Flutter's implicit Roboto/emoji fallback fonts on the same origin.
   // The application typography is bundled through pubspec fonts; this path
   // covers glyphs outside those families without a fonts.gstatic.com fetch.
