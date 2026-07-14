@@ -148,10 +148,14 @@ flutter test
 flutter build web --release --wasm --no-web-resources-cdn
 npm run verify:bundle
 npm test
+npm run test:e2e:prod
 ```
 
-The browser suite also verifies that the Open Graph image is a real PNG at the
-declared 1200×630 large-card dimensions.
+The local browser suite runs desktop and mobile in parallel against the release
+artifact. The production suite intentionally uses one worker against the live
+Wasm deployment, so limited client bandwidth cannot turn parallel downloads
+into false boot-time failures. Both suites verify that the Open Graph image is
+a real PNG at the declared 1200×630 large-card dimensions.
 
 Tests cover pure state transitions, out-of-order locale requests, repositories, scene configuration, responsive widgets, the command palette, and narrow-screen Engineering Lab layout.
 

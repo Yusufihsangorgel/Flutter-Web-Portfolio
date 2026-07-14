@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Bundle integrity gate** with explicit Wasm and JavaScript budgets
 - **Accessible bootstrap recovery** when the Flutter engine cannot start
 - **Deterministic social preview pipeline** with a 1200×630, repository-rendered Open Graph card
+- **Semantic production smoke suite** with serialized live Wasm verification
 
 ### Changed
 
@@ -29,6 +30,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Unverifiable named endorsements were replaced by repository-backed engineering evidence
 - GitHub Actions run on Node 24 releases pinned to immutable commit SHAs
 - Open Graph and Twitter previews now use the engineering showcase card instead of the generic application icon
+- Production verification no longer executes one-off coordinate-driven audit scripts in parallel
 
 ### Fixed
 

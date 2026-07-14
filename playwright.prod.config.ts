@@ -2,9 +2,11 @@ import { defineConfig, devices } from '@playwright/test';
 
 export default defineConfig({
   testDir: './tests/e2e-prod',
-  timeout: 60000,
+  testMatch: 'portfolio.spec.ts',
+  timeout: 90000,
   expect: { timeout: 15000 },
-  fullyParallel: true,
+  fullyParallel: false,
+  workers: 1,
   reporter: [['list'], ['json', { outputFile: 'test-results/results.json' }]],
   use: {
     baseURL: 'https://developeryusuf.com',

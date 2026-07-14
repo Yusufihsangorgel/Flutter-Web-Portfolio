@@ -1,135 +1,111 @@
-import { test, expect, Page, ConsoleMessage, Request, Response } from '@playwright/test';
+import { expect, Page, test } from '@playwright/test';
 
-const waitForFlutter = async (page: Page) => {
-  // Flutter web mounts to a <flt-glass-pane> or canvaskit canvas
-  await page.waitForLoadState('domcontentloaded');
-  await page.waitForFunction(
-    () => {
-      const glass = document.querySelector('flt-glass-pane, flutter-view, flt-scene-host');
-      const canvas = document.querySelector('canvas');
-      return !!(glass || canvas);
-    },
-    { timeout: 45000 }
+async function openPortfolio(page: Page) {
+  const response = await page.goto('/', { waitUntil: 'domcontentloaded' });
+  expect(response?.status()).toBe(200);
+  await page.waitForSelector('flt-semantics-host', {
+    state: 'attached',
+    timeout: 75000,
+  });
+  await expect(page.getByRole('heading').first()).toBeAttached();
+  await expect(page.locator('#bootstrap-surface')).toHaveCount(0);
+}
+
+test('boots the production Wasm release with its security contract', async ({
+  page,
+}) => {
+  const errors: string[] = [];
+  const badResponses: string[] = [];
+  const origin = new URL(test.info().project.use.baseURL as string).origin;
+
+  page.on('pageerror', (error) => errors.push(error.message));
+  page.on('console', (message) => {
+    if (message.type() === 'error') errors.push(message.text());
+  });
+  page.on('response', (response) => {
+    if (response.url().startsWith(origin) && response.status() >= 400) {
+      badResponses.push(`${response.status()} ${response.url()}`);
+    }
+  });
+
+  const wasmResponse = page.waitForResponse((response) =>
+    response.url().endsWith('/main.dart.wasm'),
   );
-  // Give the Flutter engine a moment to render a frame
-  await page.waitForTimeout(2500);
-};
+  const runtimeResponse = page.waitForResponse((response) =>
+    response.url().endsWith('/main.dart.mjs'),
+  );
 
-test.describe('developeryusuf.com portfolio', () => {
-  test('home page loads (200, title, Flutter renders)', async ({ page }) => {
-    const response = await page.goto('/', { waitUntil: 'domcontentloaded' });
-    expect(response, 'navigation response should exist').not.toBeNull();
-    expect(response!.status(), 'home status').toBeLessThan(400);
-    await waitForFlutter(page);
-
-    const title = await page.title();
-    expect(title.length, `page title should be non-empty (got "${title}")`).toBeGreaterThan(0);
-
-    // Flutter canvaskit/html renders at least one canvas
-    const canvasCount = await page.locator('canvas').count();
-    expect(canvasCount, 'Flutter should render >=1 <canvas>').toBeGreaterThan(0);
+  const documentResponse = await page.goto('/', {
+    waitUntil: 'domcontentloaded',
   });
+  const [wasm, runtime] = await Promise.all([wasmResponse, runtimeResponse]);
 
-  test('main visual sections visible (non-blank viewport)', async ({ page }) => {
-    await page.goto('/', { waitUntil: 'domcontentloaded' });
-    await waitForFlutter(page);
+  expect(documentResponse?.status()).toBe(200);
+  expect(wasm.status()).toBe(200);
+  expect(wasm.headers()['content-type']).toContain('application/wasm');
+  expect(runtime.status()).toBe(200);
+  expect(runtime.headers()['content-type']).toContain('javascript');
+  expect(documentResponse?.headers()['cross-origin-opener-policy']).toBe(
+    'same-origin',
+  );
+  expect(documentResponse?.headers()['cross-origin-embedder-policy']).toBe(
+    'credentialless',
+  );
+  expect(documentResponse?.headers()['content-security-policy']).toContain(
+    "default-src 'self'",
+  );
 
-    // Because Flutter paints to canvas, we assert the glass-pane box is non-zero
-    const pane = page.locator('flt-glass-pane, flutter-view, flt-scene-host').first();
-    const box = await pane.boundingBox();
-    expect(box, 'flutter root has a bounding box').not.toBeNull();
-    expect((box?.width ?? 0) * (box?.height ?? 0), 'flutter root area > 0').toBeGreaterThan(10000);
-
-    // Scroll through the page to trigger section renders (Flutter uses scroll events)
-    for (const y of [0, 600, 1200, 1800, 2400, 3000]) {
-      await page.mouse.wheel(0, 600);
-      await page.waitForTimeout(400);
-    }
-    await expect(page).toHaveScreenshot; // screenshot utility available (not called, just sanity)
+  await page.waitForSelector('flt-semantics-host', {
+    state: 'attached',
+    timeout: 75000,
   });
+  await expect(page.getByRole('heading').first()).toBeAttached();
+  await expect(page.locator('#bootstrap-surface')).toHaveCount(0);
+  expect(await page.evaluate(() => window.crossOriginIsolated)).toBe(true);
+  expect(badResponses).toEqual([]);
+  expect(errors).toEqual([]);
+});
 
-  test('no console errors on load', async ({ page }) => {
-    const errors: string[] = [];
-    page.on('console', (msg: ConsoleMessage) => {
-      if (msg.type() === 'error') errors.push(msg.text());
-    });
-    page.on('pageerror', (err) => errors.push(`pageerror: ${err.message}`));
+test('exposes interactive engineering evidence in production', async ({ page }) => {
+  await openPortfolio(page);
+  await page.keyboard.press('Control+Shift+KeyL');
 
-    await page.goto('/', { waitUntil: 'domcontentloaded' });
-    await waitForFlutter(page);
-    await page.waitForTimeout(2000);
+  await expect(page.getByText('ENGINEERING LAB / LIVE')).toBeAttached();
+  await expect(page.getByText('Dart WebAssembly')).toBeAttached();
+  await expect(page.getByText('SkWasm', { exact: true })).toBeAttached();
+  await expect(page.getByText('main.dart.wasm')).toBeAttached();
+  await expect(page.getByText('Flutter scheduler telemetry')).toBeAttached();
+});
 
-    // Filter out known benign noise (favicon/preload warnings)
-    const meaningful = errors.filter((e) => !/favicon|manifest\.json|preload|service-?worker/i.test(e));
-    expect(meaningful, `console errors found:\n${meaningful.join('\n')}`).toEqual([]);
-  });
+test('serves the declared production sharing and font assets', async ({
+  request,
+  isMobile,
+}) => {
+  test.skip(isMobile, 'static release contract only needs one browser project');
 
-  test('no broken images / no 4xx-5xx network responses', async ({ page }) => {
-    const bad: { url: string; status: number; type: string }[] = [];
+  const document = await request.get('/');
+  expect(document.status()).toBe(200);
+  const html = await document.text();
+  expect(html).toContain(
+    'content="https://developeryusuf.com/assets/og/engineering-showcase.png"',
+  );
+  expect(html).toContain('<meta property="og:image:width" content="1200">');
+  expect(html).toContain('<meta property="og:image:height" content="630">');
 
-    page.on('response', (resp: Response) => {
-      const status = resp.status();
-      const url = resp.url();
-      const type = resp.request().resourceType();
-      if (status >= 400 && !/favicon|\.map$/i.test(url)) {
-        bad.push({ url, status, type });
-      }
-    });
+  const image = await request.get('/assets/og/engineering-showcase.png');
+  expect(image.status()).toBe(200);
+  expect(image.headers()['content-type']).toContain('image/png');
+  const png = await image.body();
+  expect(png.subarray(1, 4).toString()).toBe('PNG');
+  expect(png.readUInt32BE(16)).toBe(1200);
+  expect(png.readUInt32BE(20)).toBe(630);
 
-    await page.goto('/', { waitUntil: 'domcontentloaded' });
-    await waitForFlutter(page);
-    await page.waitForTimeout(3000);
+  const font = await request.get(
+    '/assets/fallback_fonts/roboto/v32/KFOmCnqEu92Fr1Me4GZLCzYlKw.woff2',
+  );
+  expect(font.status()).toBe(200);
+  expect(font.headers()['content-type']).toContain('font/woff2');
 
-    // Any raw <img> tags should have naturalWidth > 0
-    const brokenImages = await page.$$eval('img', (imgs) =>
-      imgs
-        .filter((i) => !(i as HTMLImageElement).complete || (i as HTMLImageElement).naturalWidth === 0)
-        .map((i) => (i as HTMLImageElement).src)
-    );
-
-    expect(bad, `4xx/5xx responses:\n${bad.map((b) => `${b.status} ${b.type} ${b.url}`).join('\n')}`).toEqual([]);
-    expect(brokenImages, `broken <img> sources:\n${brokenImages.join('\n')}`).toEqual([]);
-  });
-
-  test('contact / project link assets reachable', async ({ page, request }) => {
-    await page.goto('/', { waitUntil: 'domcontentloaded' });
-    await waitForFlutter(page);
-
-    // Flutter app typically opens social/project URLs via window.open
-    // Capture popup targets by hooking window.open
-    const openedUrls: string[] = [];
-    await page.exposeFunction('__capture', (u: string) => openedUrls.push(u));
-    await page.evaluate(() => {
-      const orig = window.open;
-      window.open = function (u?: string | URL) {
-        // @ts-ignore
-        window.__capture(String(u));
-        return null as any;
-      } as any;
-    });
-
-    // Try clicking around the page in likely link regions (canvas driven)
-    for (const y of [200, 400, 800, 1200, 1600, 2000, 2400]) {
-      await page.mouse.click(720, y);
-      await page.waitForTimeout(200);
-    }
-
-    // At minimum the Flutter shell should not have crashed
-    const canvas = await page.locator('canvas').count();
-    expect(canvas, 'canvas still present after interaction').toBeGreaterThan(0);
-
-    // Sanity check the domain itself via HEAD
-    const head = await request.get('/');
-    expect(head.status()).toBeLessThan(400);
-  });
-
-  test('mobile viewport renders Flutter', async ({ page, browserName, isMobile }) => {
-    test.skip(!isMobile, 'mobile-only assertion');
-    await page.goto('/', { waitUntil: 'domcontentloaded' });
-    await waitForFlutter(page);
-    const canvas = await page.locator('canvas').count();
-    expect(canvas).toBeGreaterThan(0);
-    const vp = page.viewportSize();
-    expect(vp!.width).toBeLessThan(600);
-  });
+  const missing = await request.get('/assets/fallback_fonts/missing.woff2');
+  expect(missing.status()).toBe(404);
 });
