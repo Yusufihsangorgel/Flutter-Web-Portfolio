@@ -438,6 +438,10 @@ class _ArchitectureCard extends StatelessWidget {
           value: '1',
           label: 'HTML boot/recovery surface · product UI in Flutter',
         ),
+        const _ArchitectureRow(
+          value: '0',
+          label: 'renderer debug symbol files in the public release',
+        ),
         _ArchitectureRow(
           value: '#/$activeSection',
           label: 'section synchronized with browser history',

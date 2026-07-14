@@ -48,6 +48,7 @@ jobs:
       - run: flutter pub get
       - run: flutter build web --release --wasm --no-web-resources-cdn
       - run: npm ci
+      - run: npm run prepare:bundle
       - run: npm run verify:bundle
       - run: npx playwright install --with-deps chromium
       - run: npm test

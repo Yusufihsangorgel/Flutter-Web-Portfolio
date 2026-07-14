@@ -67,6 +67,7 @@ Build the same dual-runtime release used by CI:
 
 ```bash
 flutter build web --release --wasm --no-web-resources-cdn
+npm run prepare:bundle
 ```
 
 The output contains both `main.dart.wasm` and `main.dart.js`. Compatible browsers run the Wasm/SkWasm path; Flutter selects the JavaScript/CanvasKit path when needed.
@@ -151,6 +152,7 @@ Run the same quality gates as CI:
 flutter analyze --fatal-infos
 flutter test
 flutter build web --release --wasm --no-web-resources-cdn
+npm run prepare:bundle
 npm run verify:bundle
 npm test
 npm run test:e2e:prod
@@ -171,7 +173,7 @@ WASM_DELAY_MS=5000 PORT=4174 node tool/serve_web.mjs
 
 Tests cover pure state transitions, out-of-order locale requests, repositories, scene configuration, responsive widgets, the command palette, and narrow-screen Engineering Lab layout.
 
-The bundle gate currently caps `main.dart.wasm` at 3 MiB and the JavaScript fallback at 4 MiB. It also verifies the Wasm header, dual-runtime build configuration, custom first-frame bootstrap, same-origin fallback fonts, and the fetch-free retirement worker used to remove legacy service-worker registrations.
+The release preparation step removes renderer debug symbol maps before packaging. The bundle gate rejects their return, caps the complete public release at 36 MiB, `main.dart.wasm` at 3 MiB, and the JavaScript fallback at 4 MiB. It also verifies the Wasm header, dual-runtime build configuration, custom first-frame bootstrap, same-origin fallback fonts, and the fetch-free retirement worker used to remove legacy service-worker registrations.
 
 ---
 
@@ -183,6 +185,7 @@ The bundle gate currently caps `main.dart.wasm` at 3 MiB and the JavaScript fall
 
 ```bash
 flutter build web --release --wasm --no-web-resources-cdn
+npm run prepare:bundle
 docker build -t flutter-web-portfolio .
 ```
 

@@ -161,6 +161,15 @@ test('ships the social preview at the declared large-card dimensions', async ({
   expect(png.readUInt32BE(20)).toBe(630);
 });
 
+test('does not publish renderer debug symbols', async ({ request }) => {
+  const response = await request.get('/canvaskit/skwasm.js.symbols');
+  expect(response.status()).toBe(404);
+
+  const version = await request.get('/version.json');
+  expect(version.status()).toBe(200);
+  expect(await version.json()).toMatchObject({ version: '1.1.0' });
+});
+
 test('exposes the live Engineering Lab through the keyboard', async ({ page }) => {
   await openPortfolio(page);
   await page.keyboard.press('Control+Shift+KeyL');

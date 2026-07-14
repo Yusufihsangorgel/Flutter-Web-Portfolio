@@ -111,4 +111,13 @@ test('serves the declared production sharing and font assets', async ({
 
   const missing = await request.get('/assets/fallback_fonts/missing.woff2');
   expect(missing.status()).toBe(404);
+
+  const rendererSymbols = await request.get(
+    '/canvaskit/skwasm.js.symbols',
+  );
+  expect(rendererSymbols.status()).toBe(404);
+
+  const version = await request.get('/version.json');
+  expect(version.status()).toBe(200);
+  expect(await version.json()).toMatchObject({ version: '1.1.0' });
 });

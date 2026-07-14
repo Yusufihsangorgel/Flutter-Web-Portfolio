@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Deterministic social preview pipeline** with a 1200×630, repository-rendered Open Graph card
 - **Semantic production smoke suite** with serialized live Wasm verification
 - **Instant engineering shell** that renders accessible, indexable content before Flutter's first frame
+- **Release preparation gate** that strips renderer symbol maps and budgets the complete public artifact
 
 ### Changed
 
@@ -32,6 +33,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - GitHub Actions run on Node 24 releases pinned to immutable commit SHAs
 - Open Graph and Twitter previews now use the engineering showcase card instead of the generic application icon
 - Production verification no longer executes one-off coordinate-driven audit scripts in parallel
+- Package metadata and the footer now agree on version 1.1.0
 
 ### Fixed
 
@@ -42,6 +44,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Unsupported public project metrics were removed from all seven locale documents
 - Legacy Flutter service workers now unregister themselves and return controlled clients to the network
 - Same-origin fallback fonts resolve correctly for both root and repository-subpath deployments
+- Renderer debug symbol maps are no longer published by Docker or GitHub Pages releases
 
 ## [1.1.0] - 2026-03-23
 

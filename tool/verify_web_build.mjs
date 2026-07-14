@@ -1,4 +1,4 @@
-import { readFile, stat } from 'node:fs/promises';
+import { readFile, readdir, stat } from 'node:fs/promises';
 import path from 'node:path';
 import process from 'node:process';
 
@@ -10,6 +10,7 @@ const budgets = {
 };
 
 const failures = [];
+const releaseBudget = 36 * 1024 * 1024;
 
 async function inspectArtifact(fileName, budget) {
   const filePath = path.join(webRoot, fileName);
@@ -38,6 +39,25 @@ const entries = await Promise.all(
     size: await inspectArtifact(fileName, budget),
   })),
 );
+
+const releaseFiles = await collectFiles(webRoot);
+const symbolFiles = releaseFiles.filter((file) => file.endsWith('.symbols'));
+if (symbolFiles.length > 0) {
+  failures.push(
+    `${symbolFiles.length} renderer symbol files are still publicly shippable; run npm run prepare:bundle`,
+  );
+}
+
+const releaseBytes = (
+  await Promise.all(
+    releaseFiles.map(async (file) => (await stat(file)).size),
+  )
+).reduce((total, size) => total + size, 0);
+if (releaseBytes > releaseBudget) {
+  failures.push(
+    `the public release is ${formatBytes(releaseBytes)}; budget is ${formatBytes(releaseBudget)}`,
+  );
+}
 
 const fallbackAssets = [
   'assets/fallback_fonts/roboto/v32/KFOmCnqEu92Fr1Me4GZLCzYlKw.woff2',
@@ -148,6 +168,10 @@ for (const { fileName, size, budget } of entries) {
   );
 }
 
+console.log(
+  `${'public release'.padEnd(21)} ${formatBytes(releaseBytes).padStart(9)} / ${formatBytes(releaseBudget)}`,
+);
+
 if (failures.length > 0) {
   console.error('\nWeb build verification failed:');
   for (const failure of failures) console.error(`- ${failure}`);
@@ -158,4 +182,15 @@ if (failures.length > 0) {
 
 function formatBytes(bytes) {
   return `${(bytes / 1024 / 1024).toFixed(2)} MiB`;
+}
+
+async function collectFiles(directory) {
+  const directoryEntries = await readdir(directory, { withFileTypes: true });
+  const nested = await Promise.all(
+    directoryEntries.map(async (entry) => {
+      const entryPath = path.join(directory, entry.name);
+      return entry.isDirectory() ? collectFiles(entryPath) : [entryPath];
+    }),
+  );
+  return nested.flat();
 }
