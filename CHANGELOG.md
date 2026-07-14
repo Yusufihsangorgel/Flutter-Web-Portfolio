@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Semantic production smoke suite** with serialized live Wasm verification
 - **Instant engineering shell** that renders accessible, indexable content before Flutter's first frame
 - **Release preparation gate** that strips renderer symbol maps and budgets the complete public artifact
+- **Container packaging gate** that validates Nginx syntax during both image creation and CI
 
 ### Changed
 
