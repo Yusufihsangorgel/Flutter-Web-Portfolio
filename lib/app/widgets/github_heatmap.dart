@@ -2,11 +2,11 @@ import 'dart:convert';
 import 'dart:developer' as dev;
 
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:http/http.dart' as http;
 
-import 'package:flutter_web_portfolio/app/controllers/language_controller.dart';
-import 'package:flutter_web_portfolio/app/controllers/scene_director.dart';
+import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
+import 'package:flutter_web_portfolio/app/widgets/scene_accent_builder.dart';
 
 /// A GitHub contribution heatmap that fetches event data from the public API
 /// and renders a 13-week (90-day) grid coloured by contribution intensity.
@@ -34,9 +34,8 @@ class _GitHubHeatmapState extends State<GitHubHeatmap> {
   }
 
   String _resolveUsername() {
-    final lang = Get.find<LanguageController>();
-    final github =
-        (lang.cvData['personal_info']?['github'] as String?) ?? '';
+    final lang = context.read<LanguageCubit>();
+    final github = (lang.cvData['personal_info']?['github'] as String?) ?? '';
     final uri = Uri.tryParse(github);
     if (uri != null && uri.pathSegments.isNotEmpty) {
       return uri.pathSegments.first;
@@ -114,9 +113,8 @@ class _GitHubHeatmapState extends State<GitHubHeatmap> {
     if (_loading) return const SizedBox.shrink();
 
     return ExcludeSemantics(
-      child: Obx(() {
-        final accent = Get.find<SceneDirector>().currentAccent.value;
-        return Padding(
+      child: SceneAccentBuilder(
+        builder: (context, accent) => Padding(
           padding: const EdgeInsets.only(top: 16),
           child: CustomPaint(
             painter: _HeatmapPainter(
@@ -125,8 +123,8 @@ class _GitHubHeatmapState extends State<GitHubHeatmap> {
             ),
             size: const Size(13 * 12, 7 * 12),
           ),
-        );
-      }),
+        ),
+      ),
     );
   }
 }
@@ -136,10 +134,7 @@ class _GitHubHeatmapState extends State<GitHubHeatmap> {
 // ---------------------------------------------------------------------------
 
 class _HeatmapPainter extends CustomPainter {
-  _HeatmapPainter({
-    required this.contributions,
-    required this.accent,
-  });
+  _HeatmapPainter({required this.contributions, required this.accent});
 
   final Map<String, int> contributions;
   final Color accent;
@@ -158,8 +153,7 @@ class _HeatmapPainter extends CustomPainter {
     final now = DateTime.now();
     // Start from 90 days ago, aligned to the beginning of that week (Monday).
     final origin = now.subtract(const Duration(days: 90));
-    final startOfWeek =
-        origin.subtract(Duration(days: origin.weekday - 1));
+    final startOfWeek = origin.subtract(Duration(days: origin.weekday - 1));
 
     final emptyPaint = Paint()..color = accent.withValues(alpha: 0.1);
 
@@ -175,12 +169,7 @@ class _HeatmapPainter extends CustomPainter {
 
         final paint = Paint()..color = _colorForCount(count);
         final rect = RRect.fromRectAndRadius(
-          Rect.fromLTWH(
-            week * _step,
-            day * _step,
-            _cellSize,
-            _cellSize,
-          ),
+          Rect.fromLTWH(week * _step, day * _step, _cellSize, _cellSize),
           const Radius.circular(_radius),
         );
 

@@ -1,16 +1,17 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/services.dart';
-import 'package:get/get.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_web_portfolio/app/core/theme/app_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import 'package:flutter_web_portfolio/app/controllers/language_controller.dart';
+import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
 import 'package:flutter_web_portfolio/app/controllers/scroll_controller.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
 import 'package:flutter_web_portfolio/app/core/constants/cinematic_curves.dart';
 import 'package:flutter_web_portfolio/app/core/constants/durations.dart';
+import 'package:flutter_web_portfolio/app/features/engineering_lab/presentation/engineering_lab.dart';
 
 /// A command entry that the palette can display and execute.
 class _PaletteCommand {
@@ -58,7 +59,7 @@ class CommandPalette extends StatefulWidget {
           ),
         );
       },
-      pageBuilder: (_, __, ___) => const CommandPalette(),
+      pageBuilder: (_, _, _) => const CommandPalette(),
     );
   }
 
@@ -92,11 +93,10 @@ class _CommandPaletteState extends State<CommandPalette> {
   }
 
   List<_PaletteCommand> _buildCommands() {
-    final scrollController = Get.find<AppScrollController>();
-    final languageController = Get.find<LanguageController>();
+    final scrollController = context.read<AppScrollController>();
+    final languageController = context.read<LanguageCubit>();
     final cvData = languageController.cvData;
-    final personalInfo =
-        cvData['personal_info'] as Map<String, dynamic>? ?? {};
+    final personalInfo = cvData['personal_info'] as Map<String, dynamic>? ?? {};
 
     final github = personalInfo['github'] as String? ?? '';
     final linkedin = personalInfo['linkedin'] as String? ?? '';
@@ -107,7 +107,7 @@ class _CommandPaletteState extends State<CommandPalette> {
       'home': Icons.home_rounded,
       'about': Icons.person_rounded,
       'experience': Icons.work_rounded,
-      'testimonials': Icons.format_quote_rounded,
+      'proof': Icons.verified_rounded,
       'blog': Icons.article_rounded,
       'projects': Icons.code_rounded,
       'contact': Icons.mail_rounded,
@@ -120,9 +120,8 @@ class _CommandPaletteState extends State<CommandPalette> {
           label: 'Go to ${section[0].toUpperCase()}${section.substring(1)}',
           category: 'Navigate',
           icon: sectionIcons[section] ?? Icons.arrow_forward_rounded,
-          onExecute: () => _executeAndClose(
-            () => scrollController.scrollToSection(section),
-          ),
+          onExecute: () =>
+              _executeAndClose(() => scrollController.scrollToSection(section)),
         ),
 
       // ── Language ────────────────────────────────────────────────────────
@@ -138,19 +137,18 @@ class _CommandPaletteState extends State<CommandPalette> {
 
       // ── Actions ─────────────────────────────────────────────────────────
       _PaletteCommand(
-        label: 'Download CV',
+        label: 'Open Engineering Lab',
         category: 'Action',
-        icon: Icons.download_rounded,
-        onExecute: () => _executeAndClose(() async {
-          final origin = Uri.base.origin;
-          final basePath = Uri.base.path.endsWith('/')
-              ? Uri.base.path
-              : '${Uri.base.path}/';
-          final uri = Uri.parse('$origin${basePath}assets/data/cv.pdf');
-          if (await canLaunchUrl(uri)) {
-            await launchUrl(uri, mode: LaunchMode.externalApplication);
-          }
-        }),
+        icon: Icons.science_rounded,
+        onExecute: () {
+          final navigator = Navigator.of(context, rootNavigator: true)..pop();
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            EngineeringLab.show(
+              navigator.context,
+              activeSection: scrollController.activeSection,
+            );
+          });
+        },
       ),
       if (github.isNotEmpty)
         _PaletteCommand(
@@ -191,9 +189,11 @@ class _CommandPaletteState extends State<CommandPalette> {
         _filteredCommands = List.of(_allCommands);
       } else {
         _filteredCommands = _allCommands
-            .where((cmd) =>
-                _fuzzyMatch(cmd.label.toLowerCase(), query) ||
-                _fuzzyMatch(cmd.category.toLowerCase(), query))
+            .where(
+              (cmd) =>
+                  _fuzzyMatch(cmd.label.toLowerCase(), query) ||
+                  _fuzzyMatch(cmd.category.toLowerCase(), query),
+            )
             .toList();
       }
       _selectedIndex = _filteredCommands.isEmpty
@@ -230,7 +230,8 @@ class _CommandPaletteState extends State<CommandPalette> {
     if (key == LogicalKeyboardKey.arrowUp) {
       setState(() {
         if (_filteredCommands.isNotEmpty) {
-          _selectedIndex = (_selectedIndex - 1 + _filteredCommands.length) %
+          _selectedIndex =
+              (_selectedIndex - 1 + _filteredCommands.length) %
               _filteredCommands.length;
         }
       });
@@ -273,9 +274,7 @@ class _CommandPaletteState extends State<CommandPalette> {
               decoration: BoxDecoration(
                 color: AppColors.background.withValues(alpha: 0.85),
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(
-                  color: Colors.white.withValues(alpha: 0.08),
-                ),
+                border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withValues(alpha: 0.5),
@@ -306,54 +305,49 @@ class _CommandPaletteState extends State<CommandPalette> {
   }
 
   Widget _buildSearchField() => Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-        child: Row(
-          children: [
-            const Icon(
-              Icons.search_rounded,
-              color: AppColors.textSecondary,
-              size: 20,
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: TextField(
-                controller: _searchController,
-                focusNode: _focusNode,
-                style: GoogleFonts.inter(
-                  fontSize: 15,
-                  color: AppColors.textBright,
-                ),
-                decoration: InputDecoration(
-                  hintText: 'Type a command...',
-                  hintStyle: GoogleFonts.inter(
-                    fontSize: 15,
-                    color: AppColors.textSecondary,
-                  ),
-                  border: InputBorder.none,
-                  contentPadding: const EdgeInsets.symmetric(vertical: 14),
-                ),
-              ),
-            ),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.06),
-                borderRadius: BorderRadius.circular(4),
-                border: Border.all(
-                  color: Colors.white.withValues(alpha: 0.1),
-                ),
-              ),
-              child: Text(
-                'ESC',
-                style: GoogleFonts.jetBrainsMono(
-                  fontSize: 10,
-                  color: AppColors.textSecondary,
-                ),
-              ),
-            ),
-          ],
+    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+    child: Row(
+      children: [
+        const Icon(
+          Icons.search_rounded,
+          color: AppColors.textSecondary,
+          size: 20,
         ),
-      );
+        const SizedBox(width: 12),
+        Expanded(
+          child: TextField(
+            controller: _searchController,
+            focusNode: _focusNode,
+            style: AppFonts.inter(fontSize: 15, color: AppColors.textBright),
+            decoration: InputDecoration(
+              hintText: 'Type a command...',
+              hintStyle: AppFonts.inter(
+                fontSize: 15,
+                color: AppColors.textSecondary,
+              ),
+              border: InputBorder.none,
+              contentPadding: const EdgeInsets.symmetric(vertical: 14),
+            ),
+          ),
+        ),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.06),
+            borderRadius: BorderRadius.circular(4),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+          ),
+          child: Text(
+            'ESC',
+            style: AppFonts.jetBrainsMono(
+              fontSize: 10,
+              color: AppColors.textSecondary,
+            ),
+          ),
+        ),
+      ],
+    ),
+  );
 
   Widget _buildCommandList() {
     if (_filteredCommands.isEmpty) {
@@ -361,10 +355,7 @@ class _CommandPaletteState extends State<CommandPalette> {
         padding: const EdgeInsets.all(24),
         child: Text(
           'No matching commands',
-          style: GoogleFonts.inter(
-            fontSize: 14,
-            color: AppColors.textSecondary,
-          ),
+          style: AppFonts.inter(fontSize: 14, color: AppColors.textSecondary),
         ),
       );
     }
@@ -388,7 +379,7 @@ class _CommandPaletteState extends State<CommandPalette> {
             padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
             child: Text(
               command.category.toUpperCase(),
-              style: GoogleFonts.jetBrainsMono(
+              style: AppFonts.jetBrainsMono(
                 fontSize: 10,
                 fontWeight: FontWeight.w600,
                 color: AppColors.textSecondary,
@@ -401,7 +392,7 @@ class _CommandPaletteState extends State<CommandPalette> {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if (categoryHeader != null) categoryHeader,
+            ?categoryHeader,
             MouseRegion(
               cursor: SystemMouseCursors.click,
               onEnter: (_) => setState(() => _selectedIndex = index),
@@ -409,10 +400,14 @@ class _CommandPaletteState extends State<CommandPalette> {
                 onTap: command.onExecute,
                 child: AnimatedContainer(
                   duration: AppDurations.microFast,
-                  margin:
-                      const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                  margin: const EdgeInsets.symmetric(
+                    horizontal: 6,
+                    vertical: 1,
+                  ),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 10,
+                  ),
                   decoration: BoxDecoration(
                     color: isSelected
                         ? Colors.white.withValues(alpha: 0.06)
@@ -432,7 +427,7 @@ class _CommandPaletteState extends State<CommandPalette> {
                       Expanded(
                         child: Text(
                           command.label,
-                          style: GoogleFonts.inter(
+                          style: AppFonts.inter(
                             fontSize: 14,
                             color: isSelected
                                 ? AppColors.textBright

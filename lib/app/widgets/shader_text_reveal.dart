@@ -31,10 +31,7 @@ class _ShaderTextRevealState extends State<ShaderTextReveal>
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: widget.duration,
-    );
+    _controller = AnimationController(vsync: this, duration: widget.duration);
     _reveal = CurvedAnimation(
       parent: _controller,
       curve: CinematicCurves.textReveal,
@@ -58,7 +55,7 @@ class _ShaderTextRevealState extends State<ShaderTextReveal>
   @override
   Widget build(BuildContext context) => AnimatedBuilder(
     animation: _reveal,
-    builder: (_, __) => ShaderMask(
+    builder: (_, _) => ShaderMask(
       blendMode: BlendMode.dstIn,
       shaderCallback: (bounds) => LinearGradient(
         colors: const [Colors.white, Colors.white, Colors.transparent],

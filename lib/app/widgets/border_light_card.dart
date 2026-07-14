@@ -51,8 +51,7 @@ class _BorderLightCardState extends State<BorderLightCard> {
         },
         child: ValueListenableBuilder<Offset>(
           valueListenable: _mousePos,
-          builder: (context, mousePos, child) =>
-              ValueListenableBuilder<bool>(
+          builder: (context, mousePos, child) => ValueListenableBuilder<bool>(
             valueListenable: _hovered,
             builder: (context, hovered, _) => CustomPaint(
               foregroundPainter: hovered
@@ -68,7 +67,8 @@ class _BorderLightCardState extends State<BorderLightCard> {
           child: Container(
             padding: widget.padding,
             decoration: BoxDecoration(
-              color: widget.backgroundColor ??
+              color:
+                  widget.backgroundColor ??
                   AppColors.backgroundLight.withValues(alpha: 0.5),
               borderRadius: BorderRadius.circular(widget.borderRadius),
               border: Border.all(

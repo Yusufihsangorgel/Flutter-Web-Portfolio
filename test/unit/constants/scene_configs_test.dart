@@ -12,16 +12,16 @@ void main() {
       expect(SceneConfigs.hero, isA<SceneConfig>());
       expect(SceneConfigs.about, isA<SceneConfig>());
       expect(SceneConfigs.experience, isA<SceneConfig>());
+      expect(SceneConfigs.proof, isA<SceneConfig>());
       expect(SceneConfigs.projects, isA<SceneConfig>());
-      expect(SceneConfigs.contact, isA<SceneConfig>());
     });
 
     test('scenes list contains all named configs in order', () {
       expect(SceneConfigs.scenes[0], same(SceneConfigs.hero));
       expect(SceneConfigs.scenes[1], same(SceneConfigs.about));
       expect(SceneConfigs.scenes[2], same(SceneConfigs.experience));
-      expect(SceneConfigs.scenes[3], same(SceneConfigs.projects));
-      expect(SceneConfigs.scenes[4], same(SceneConfigs.contact));
+      expect(SceneConfigs.scenes[3], same(SceneConfigs.proof));
+      expect(SceneConfigs.scenes[4], same(SceneConfigs.projects));
     });
 
     test('each scene has non-null accent color', () {
@@ -90,9 +90,18 @@ void main() {
     test('t=0.5 interpolates colors to midpoint', () {
       final result = SceneConfig.lerp(a, b, 0.5);
 
-      expect(result.gradient1, equals(Color.lerp(a.gradient1, b.gradient1, 0.5)));
-      expect(result.gradient2, equals(Color.lerp(a.gradient2, b.gradient2, 0.5)));
-      expect(result.gradient3, equals(Color.lerp(a.gradient3, b.gradient3, 0.5)));
+      expect(
+        result.gradient1,
+        equals(Color.lerp(a.gradient1, b.gradient1, 0.5)),
+      );
+      expect(
+        result.gradient2,
+        equals(Color.lerp(a.gradient2, b.gradient2, 0.5)),
+      );
+      expect(
+        result.gradient3,
+        equals(Color.lerp(a.gradient3, b.gradient3, 0.5)),
+      );
       expect(result.accent, equals(Color.lerp(a.accent, b.accent, 0.5)));
     });
 
@@ -103,7 +112,8 @@ void main() {
       final expectedSpeed =
           a.particleSpeed + (b.particleSpeed - a.particleSpeed) * 0.5;
       final expectedVignette =
-          a.vignetteIntensity + (b.vignetteIntensity - a.vignetteIntensity) * 0.5;
+          a.vignetteIntensity +
+          (b.vignetteIntensity - a.vignetteIntensity) * 0.5;
 
       expect(result.particleDensity, closeTo(expectedDensity, 0.001));
       expect(result.particleSpeed, closeTo(expectedSpeed, 0.001));

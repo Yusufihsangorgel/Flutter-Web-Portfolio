@@ -23,10 +23,7 @@ void main() {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
-            body: TextScramble(
-              text: 'Test',
-              style: TextStyle(fontSize: 14),
-            ),
+            body: TextScramble(text: 'Test', style: TextStyle(fontSize: 14)),
           ),
         ),
       );

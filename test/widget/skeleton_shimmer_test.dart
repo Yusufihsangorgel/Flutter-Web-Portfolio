@@ -7,9 +7,7 @@ void main() {
     testWidgets('renders with given dimensions', (tester) async {
       await tester.pumpWidget(
         const MaterialApp(
-          home: Scaffold(
-            body: SkeletonShimmer(width: 200, height: 40),
-          ),
+          home: Scaffold(body: SkeletonShimmer(width: 200, height: 40)),
         ),
       );
       expect(find.byType(SkeletonShimmer), findsOneWidget);
@@ -29,9 +27,7 @@ void main() {
     testWidgets('animation runs continuously', (tester) async {
       await tester.pumpWidget(
         const MaterialApp(
-          home: Scaffold(
-            body: SkeletonShimmer(width: 100, height: 20),
-          ),
+          home: Scaffold(body: SkeletonShimmer(width: 100, height: 20)),
         ),
       );
       // Pump a few frames to verify animation does not crash
@@ -43,9 +39,7 @@ void main() {
     testWidgets('default borderRadius is 8.0', (tester) async {
       await tester.pumpWidget(
         const MaterialApp(
-          home: Scaffold(
-            body: SkeletonShimmer(width: 150, height: 30),
-          ),
+          home: Scaffold(body: SkeletonShimmer(width: 150, height: 30)),
         ),
       );
 
@@ -58,9 +52,7 @@ void main() {
     testWidgets('stores width and height correctly', (tester) async {
       await tester.pumpWidget(
         const MaterialApp(
-          home: Scaffold(
-            body: SkeletonShimmer(width: 250, height: 50),
-          ),
+          home: Scaffold(body: SkeletonShimmer(width: 250, height: 50)),
         ),
       );
 

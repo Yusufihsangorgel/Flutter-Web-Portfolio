@@ -7,11 +7,7 @@ void main() {
     testWidgets('renders child widget', (tester) async {
       await tester.pumpWidget(
         const MaterialApp(
-          home: Scaffold(
-            body: ScrollFadeIn(
-              child: Text('Hello'),
-            ),
-          ),
+          home: Scaffold(body: ScrollFadeIn(child: Text('Hello'))),
         ),
       );
 
@@ -21,11 +17,7 @@ void main() {
     testWidgets('starts with zero opacity', (tester) async {
       await tester.pumpWidget(
         const MaterialApp(
-          home: Scaffold(
-            body: ScrollFadeIn(
-              child: Text('Fade me'),
-            ),
-          ),
+          home: Scaffold(body: ScrollFadeIn(child: Text('Fade me'))),
         ),
       );
 

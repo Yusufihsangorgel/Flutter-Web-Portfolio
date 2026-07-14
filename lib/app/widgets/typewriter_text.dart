@@ -92,7 +92,8 @@ class _TypewriterTextState extends State<TypewriterText> {
     }
 
     final delay = Duration(
-      milliseconds: widget.minCharDelay.inMilliseconds +
+      milliseconds:
+          widget.minCharDelay.inMilliseconds +
           _random.nextInt(
             widget.maxCharDelay.inMilliseconds -
                 widget.minCharDelay.inMilliseconds +
@@ -166,7 +167,10 @@ class _TypewriterTextState extends State<TypewriterText> {
 
   @override
   Widget build(BuildContext context) {
-    final visibleText = _currentText.substring(0, _charCount.clamp(0, _currentText.length));
+    final visibleText = _currentText.substring(
+      0,
+      _charCount.clamp(0, _currentText.length),
+    );
     final cursorChar = _showCursor ? '|' : '';
 
     return Text.rich(
@@ -176,9 +180,7 @@ class _TypewriterTextState extends State<TypewriterText> {
           if (_showCursor || (!_typingDone && _charCount == 0))
             TextSpan(
               text: cursorChar,
-              style: widget.style.copyWith(
-                fontWeight: FontWeight.w300,
-              ),
+              style: widget.style.copyWith(fontWeight: FontWeight.w300),
             ),
         ],
       ),

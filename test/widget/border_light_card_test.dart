@@ -1,25 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:get/get.dart';
 import 'package:flutter_web_portfolio/app/controllers/cursor_controller.dart';
 import 'package:flutter_web_portfolio/app/widgets/border_light_card.dart';
 
 void main() {
   group('BorderLightCard', () {
-    setUp(() {
-      Get.testMode = true;
-      Get.put<CursorController>(CursorController());
-    });
-
-    tearDown(Get.reset);
-
     testWidgets('renders child widget', (tester) async {
+      final cursor = CursorController();
+      addTearDown(cursor.close);
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: BorderLightCard(
-              child: Text('Card Content'),
-            ),
+        BlocProvider.value(
+          value: cursor,
+          child: const MaterialApp(
+            home: Scaffold(body: BorderLightCard(child: Text('Card Content'))),
           ),
         ),
       );
@@ -28,12 +22,13 @@ void main() {
     });
 
     testWidgets('has CustomPaint for glow effect', (tester) async {
+      final cursor = CursorController();
+      addTearDown(cursor.close);
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: BorderLightCard(
-              child: Text('Glow'),
-            ),
+        BlocProvider.value(
+          value: cursor,
+          child: const MaterialApp(
+            home: Scaffold(body: BorderLightCard(child: Text('Glow'))),
           ),
         ),
       );

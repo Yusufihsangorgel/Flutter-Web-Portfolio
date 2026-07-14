@@ -1,5 +1,5 @@
 {
-  "app_name": "يوسف إحسان جورجل - معرض الأعمال",
+  "app_name": "ملف الأنظمة",
   "theme": {
     "primary_color": "#3F51B5",
     "secondary_color": "#FF4081",
@@ -45,7 +45,7 @@
     ]
   },
   "translations": {
-    "app_name": "يوسف إحسان جورجل - معرض الأعمال",
+    "app_name": "ملف الأنظمة",
     "home": "الرئيسية",
     "about": "نبذة عني",
     "experience": "الخبرة",
@@ -83,222 +83,147 @@
     "page_transition_duration": 300
   },
   "social_links": {
-    "github": "https://github.com/Yusufihsangorgel",
-    "linkedin": "https://linkedin.com/in/yusuf-ihsan-görgel/",
-    "medium": "https://medium.com/@developeryusufihsan"
+    "github": "",
+    "linkedin": "",
+    "medium": ""
   },
   "cv_data": {
     "personal_info": {
-      "name": "يوسف إحسان جورجل",
-      "title": "مهندس برمجيات",
-      "phone": "+90 544 953 0128",
-      "email": "developeryusuf@icloud.com",
-      "github": "https://github.com/Yusufihsangorgel",
-      "linkedin": "https://linkedin.com/in/yusuf-ihsan-görgel/",
-      "location": "Antalya, Türkiye (Remote)",
-      "bio": "مرحبًا، أنا يوسف إحسان، طالب في السنة النهائية في هندسة البرمجيات مع 4 سنوات من الخبرة. بدأت العمل الحر في سنتي الثانية واكتسبت منذ ذلك الحين خبرة في بيئات الشركات والشركات الناشئة. لدي 3 سنوات من الخبرة المهنية في تطوير برامج الجوال وERP وPOS باستخدام Flutter. كما عملت في أدوار الواجهة الخلفية وDevOps في مشاريع مستقلة مختلفة. أنا شغوف بحل المشكلات وأزدهر في بيئات الفريق التعاونية. لدي خلفية قوية في استخدام Atlassian-Jira لإدارة المشاريع، مع خبرة في الاجتماعات اليومية والسباقات والسكرم والالتزام بالمواعيد النهائية الضيقة.",
-      "tagline": "صناعة تجارب رقمية بالبرمجة والإبداع",
-      "medium": "developeryusufihsan",
-      "stats": {
-        "years_experience": 5,
-        "projects_completed": 12,
-        "technologies": 20
-      },
+      "name": "ملف الأنظمة",
+      "title": "هندسة برمجيات مستقلة",
+      "phone": "",
+      "email": "",
+      "location": "Remote",
+      "github": "",
+      "linkedin": "",
+      "bio": "ملف هندسي مجهول الهوية يركز على Flutter وGo وأنظمة البيانات والموثوقية القابلة للقياس في الإنتاج.",
+      "tagline": "أنظمة برمجية قابلة للفحص ومقاسة في الإنتاج",
+      "medium": "",
       "subtitles": [
-        "مهندس برمجيات الهاتف المحمول",
-        "مطور Flutter",
-        "مناصر العمارة النظيفة"
+        "Flutter systems",
+        "Go services",
+        "Production reliability"
       ]
     },
     "experiences": [
       {
-        "title": "مطور Flutter",
-        "company": "Uzman Adres",
-        "position": "Flutter Developer",
-        "start_date": "Mar 2022",
-        "end_date": "Present",
-        "period": "مارس 2022 - الحاضر",
-        "description": "تطوير FugaSoft — نظام POS وإدارة مبيعات متعدد المنصات\nهندسة SQL معقدة مع قاعدة بيانات محلية SQLite-Drift\nبرمجة تفاعلية مع نمط Mediator وإدارة حالة GetX\nنشر على أجهزة Android/iOS اللوحية ومنصات سطح المكتب\nتقنية Socket لمزامنة البيانات في الوقت الحقيقي",
+        "title": "Client engineering",
+        "company": "Cross-platform applications",
+        "position": "Flutter systems",
+        "start_date": "",
+        "end_date": "",
+        "period": "Selected production work",
+        "description": "Flutter · offline-first data · native integrations · realtime synchronization",
         "technologies": [
           "Flutter",
           "Dart",
-          "SQLite-Drift",
-          "GetX",
+          "SQLite",
           "WebSocket",
           "i18n"
         ]
       },
       {
-        "title": "مطور الويب الشامل",
-        "company": "Junius Tech",
-        "position": "Full Stack Developer",
-        "start_date": "Jun 2023",
-        "end_date": "Feb 2025",
-        "period": "يونيو 2023 - فبراير 2025",
-        "description": "قائد فريق الجوال (مشروع Dorse)، التطوير، النشر، الواجهة الأمامية، الواجهة الخلفية وتنسيق ضمان الجودة.",
+        "title": "Backend engineering",
+        "company": "API and data systems",
+        "position": "Go services",
+        "start_date": "",
+        "end_date": "",
+        "period": "Selected production work",
+        "description": "Go Fiber · PostgreSQL · Redis · object storage · background jobs",
         "technologies": [
-          "Flutter",
-          "React",
-          "Node.js",
-          "WebSocket",
-          "REST API",
-          "Maps SDK"
+          "Go",
+          "PostgreSQL",
+          "Redis",
+          "MinIO",
+          "Asynq"
         ]
       },
       {
-        "title": "مطور Flutter",
-        "company": "Promob TR",
-        "position": "Flutter Developer",
-        "start_date": "Oct 2022",
-        "end_date": "Jun 2024",
-        "period": "أكتوبر 2022 - يونيو 2024",
-        "description": "مشاريع مستقلة؛ الواجهة الأمامية لمشاريع \"Aydınlık E-Newspaper\" و \"Bilim ve Ütopya E-Magazine\" (الواجهة الخلفية: PHP-Laravel أو Node.js-Express.js-MongoDB).",
+        "title": "Reliability engineering",
+        "company": "Self-hosted runtime",
+        "position": "Production operations",
+        "start_date": "",
+        "end_date": "",
+        "period": "Selected production work",
+        "description": "Docker Swarm · immutable images · backup drills · observability · incident recovery",
         "technologies": [
-          "Flutter",
-          "Dart",
-          "GetX",
-          "Dio",
-          "MVVM"
+          "Docker",
+          "Nginx",
+          "Prometheus",
+          "Grafana",
+          "PostgreSQL"
         ]
       }
     ],
     "projects": [
       {
-        "title": "FugaSoft (برنامج إدارة المبيعات - POS)",
-        "description": "واجهة أمامية Flutter، SQLite-Drift، GetX، i18n، برمجة تفاعلية؛ أجهزة لوحية Android/iOS وسطح المكتب (Linux، macOS، Windows)؛ المرشد: قائد فريق Arge Abdüsselam Kösecik",
-        "category": "Mobile",
-        "url": "https://fugasoft.com/",
-        "image": "assets/images/fugasoft.png",
-        "case_study": {
-          "problem": "احتاجت الشركات إلى نظام موحد لنقاط البيع وإدارة المبيعات يعمل بشكل موثوق عبر أجهزة Android/iOS اللوحية ومنصات سطح المكتب (Linux، macOS، Windows)، مع إدارة المخزون عبر أكثر من 50 موقع بيع بالتجزئة ومسح باركود ومزامنة بيانات دون اتصال.",
-          "solution": "تم بناء تطبيق Flutter متعدد المنصات باستخدام SQLite-Drift لاستعلامات SQL المحلية المعقدة، وGetX لإدارة الحالة التفاعلية مع نمط Mediator، ومحرك مزامنة يعمل بدون اتصال أولاً بدون فقدان بيانات، ودعم i18n الكامل.",
-          "result": "تم النشر عبر 5 منصات، يعالج أكثر من 100 ألف معاملة يومية مع بنيات SQL معقدة وتدفقات بيانات تفاعلية ومسح باركود في الوقت الحقيقي — يخدم عمليات البيع اليومية بقدرة موثوقة للعمل دون اتصال."
-        }
-      },
-      {
-        "title": "Aydınlık E-Newspaper",
-        "description": "واجهة أمامية Flutter، GetX، Dio، MVVM؛ المرشد: كبير المهندسين Ferhat Balaban",
-        "category": "Mobile",
-        "url": {
-          "google_play": "https://play.google.com/store/apps/details?id=com.aydinlikgazetesi.egazete&hl=tr",
-          "app_store": "https://apps.apple.com/us/app/ayd%C4%B1nl%C4%B1k-e-gazete/id1560103805"
-        },
-        "image": "assets/images/aydinlik.png",
-        "case_study": {
-          "problem": "احتاجت صحيفة تركية كبرى إلى تجربة قراءة رقمية حديثة لمستخدمي الجوال، مع عرض سلس للصفحات وإدارة اشتراكات ووصول دون اتصال.",
-          "solution": "تم تطوير تطبيق Flutter بهندسة MVVM وإدارة حالة GetX وDio لتكامل API. تم تنفيذ عرض فعال للصفحات والتخزين المؤقت لتجربة قراءة سلسة.",
-          "result": "أكثر من 10 آلاف تنزيل مع تقييم 4.5+ نجوم على كلا المتجرين، مما يوفر لآلاف القراء تجربة صحيفة رقمية موثوقة وعالية الأداء على iOS وAndroid."
-        }
-      },
-      {
-        "title": "Bilim ve Ütopya E-Magazine",
-        "description": "واجهة أمامية Flutter، GetX، Dio، MVVM؛ المرشد: كبير المهندسين Ferhat Balaban",
-        "category": "Mobile",
-        "url": {
-          "google_play": "https://play.google.com/store/apps/details?id=com.aydinlikgazetesi.edergi_v1_bvu&pcampaignid=web_share",
-          "app_store": "https://apps.apple.com/tr/app/bilim-ve-%C3%BCtopya-e-dergi/id6478221195"
-        },
-        "image": "assets/images/bilim_utopya.png",
-        "case_study": {
-          "problem": "احتاجت مجلة علمية إلى منصة رقمية مخصصة للوصول إلى الأعداد الشهرية وإدارة الاشتراكات والاستمتاع بمحتوى علمي غني على الأجهزة المحمولة.",
-          "solution": "تم بناء تطبيق Flutter بهندسة MVVM المثبتة وتكامل Dio API، محسّن لمحتوى بتنسيق المجلات مع عرض صور عالي الجودة والتنقل بين الأعداد.",
-          "result": "يخدم آلاف القراء شهرياً على Google Play وApp Store، مما يمنح عشاق العلوم تجربة قراءة متنقلة مخصصة ومصقولة لمجلة Bilim ve Utopya."
-        }
-      },
-      {
-        "title": "Dorse App",
-        "description": "تطبيق جوال وموقع ويب؛ الجوال: Flutter؛ الويب: HTML، CSS، JavaScript، React؛ التقنيات المستخدمة: RESTful API، SOLID، تكامل خرائط Google وApple، WebSocket",
-        "category": "Web",
-        "url": {
-          "website": "https://dorseapp.com/",
-          "google_play": "https://play.google.com/store/apps/details?id=com.juniustech.dorse",
-          "app_store": "https://apps.apple.com/tr/app/dorse/id6670605686"
-        },
-        "image": "assets/images/dorse.png",
-        "case_study": {
-          "problem": "احتاجت صناعة الخدمات اللوجستية إلى حل لتتبع المركبات في الوقت الحقيقي وإدارة الأسطول يعمل عبر منصات الجوال والويب، مع تحديثات موقع مباشرة وتحسين المسارات.",
-          "solution": "قيادة التطوير المحمول باستخدام Flutter مع تتبع المركبات في الوقت الحقيقي عبر WebSocket وتكامل Google وApple Maps SDK وبنية RESTful API وفقاً لمبادئ SOLID ولوحة تحكم React.",
-          "result": "تتبع أكثر من 5,000 مركبة متزامنة بزمن استجابة أقل من 200 مللي ثانية عبر Android وiOS والويب — مما يمكّن شركات الخدمات اللوجستية من تتبع المركبات في الوقت الحقيقي وتحسين المسارات وإدارة الأساطيل باتصالات WebSocket موثوقة."
-        }
-      },
-      {
         "title": "FakeCallApp",
-        "description": "تطبيق مكالمات فيديو وهمية مع اكثر من 80 شخصية — Flutter للجوال + موقع Next.js",
+        "description": "Flutter · Next.js · Go",
         "category": "Web",
         "url": "https://fakecallapp.com"
       },
       {
         "title": "CleanMyGallery",
-        "description": "منظف ذكي لمعرض الصور — ضغط وعلامة مائية وازالة بيانات EXIF",
+        "description": "Flutter · image pipeline · EXIF",
         "category": "Web",
         "url": "https://cleanmygallery.com"
       },
       {
         "title": "FocusGroves",
-        "description": "مؤقت بومودورو مع غرف دراسة ومهام وتتبع الانتاجية",
+        "description": "Flutter · focus systems · realtime rooms",
         "category": "Web",
         "url": "https://focusgroves.com"
       },
       {
         "title": "MoodGrade",
-        "description": "تتبع المزاج مع سجل الادوية وتحليلات الذكاء الاصطناعي وتصدير البيانات",
+        "description": "Flutter · health journal · export",
         "category": "Web",
         "url": "https://moodgrade.com"
       },
       {
         "title": "GetQrivo",
-        "description": "مولد رموز QR مع روابط مختصرة وتحليلات المسح",
+        "description": "QR · short links · analytics",
         "category": "Web",
         "url": "https://getqrivo.com"
       },
       {
         "title": "OverlayPhoto",
-        "description": "محرر تراكب صور مع فلاتر واطارات وكبسولات زمنية",
+        "description": "Flutter · compositing · time capsules",
         "category": "Web",
         "url": "https://overlayphoto.com"
       },
       {
         "title": "DistractionKiller",
-        "description": "حاجب تطبيقات واداة رفاهية رقمية مع جداول تركيز",
+        "description": "Flutter · digital wellbeing · schedules",
         "category": "Web",
         "url": "https://distractionkiller.com"
       },
       {
         "title": "KPSSHazirlan",
-        "description": "منصة تحضير لامتحانات الخدمة المدنية مع خطط دراسة واختبارات تدريبية",
+        "description": "Learning plans · practice engine · analytics",
         "category": "Web",
         "url": "https://kpsshazirlan.com"
       },
       {
         "title": "EhliyetCoz",
-        "description": "تحضير لامتحان رخصة القيادة مع اختبارات يومية وتتبع التقدم",
+        "description": "Daily quizzes · progress model · content QA",
         "category": "Web",
         "url": "https://ehliyetcoz.com"
       },
       {
         "title": "Kazanamazi",
-        "description": "متتبع الصلوات والصيام الفائتة مع خرائط حرارية وتذكيرات",
+        "description": "Habit ledger · heatmaps · reminders",
         "category": "Web",
         "url": "https://kazanamazi.net"
       },
       {
         "title": "PDFScanPro",
-        "description": "مجموعة ادوات PDF — تحويل وضغط ودمج وتقسيم ومسح المستندات",
+        "description": "PDF pipeline · conversion · compression",
         "category": "Web",
         "url": "https://pdfscanpro.com"
       }
     ],
-    "education": [
-      {
-        "school": "جامعة محمد عاكف إرسوي",
-        "degree": "هندسة البرمجيات",
-        "period": "2021-2025"
-      },
-      {
-        "school": "مدرسة دورسون ياليم الثانوية العلمية",
-        "period": "2015-2020"
-      }
-    ],
+    "education": [],
     "skills": [
       {
         "category": "الجوال",
@@ -355,95 +280,29 @@
         "level": "B2"
       }
     ],
-    "testimonials": [
+    "proof": [
       {
-        "quote": "كان العمل مع يوسف على منصة دورسي اللوجستية تجربة رائعة. قاد فريق الجوال بفعالية وقدم تتبع المركبات في الوقت الحقيقي مع تكامل WebSocket على كل من iOS و Android. عمقه التقني في Flutter متميز.",
-        "name": "إمراه تورك",
-        "position": "مطور برمجيات أول",
-        "company": "جونيوس تك (دورسي)"
+        "title": "تسليم ببيئتي تشغيل",
+        "detail": "يعد WebAssembly مع SkWasm المخرج الأساسي، مع بديل JavaScript وCanvasKit للمتصفحات غير المتوافقة.",
+        "verification": "افحص بيان البناء"
       },
       {
-        "quote": "يتمتع يوسف بفهم قوي لأنظمة الجوال والواجهة الخلفية على حد سواء. في مشروع Promob قام ببناء ميزات حيوية من البداية إلى النهاية — من واجهة Flutter الأمامية إلى طبقة API — بكود نظيف وقابل للصيانة. مهندس يعتمد عليه ويلتزم بالمواعيد.",
-        "name": "Ferhat Balaban",
-        "position": "مهندس حاسوب أول",
-        "company": "Promob.tr"
+        "title": "قياس داخل المتصفح",
+        "detail": "يعرض مختبر الهندسة بيئة التشغيل ومحرك الرسم وحالة العزل ونسب توقيت الإطارات المتحركة من التطبيق الحي.",
+        "verification": "افتح مختبر الهندسة"
+      },
+      {
+        "title": "محصن للإنتاج",
+        "detail": "تغطي الاختبارات الآلية الحالة وإمكانية الوصول والروابط العميقة والتعافي من الأخطاء وتخطيطات الجوال؛ ويفرض الخادم CSP وCOOP وCOEP وأنواع Wasm MIME الصحيحة.",
+        "verification": "افحص الاختبارات وإعداد Nginx"
       }
-    ],
-    "contact": {
-      "formspree_id": "YOUR_FORMSPREE_ID",
-      "form": {
-        "name_label": "الاسم",
-        "email_label": "البريد الإلكتروني",
-        "message_label": "الرسالة",
-        "submit_button": "إرسال"
-      },
-      "success_message": "تم إرسال رسالتك بنجاح!",
-      "error_message": "حدث خطأ. يرجى المحاولة مرة أخرى."
-    }
+    ]
   },
   "language_info": {
     "code": "ar",
     "name": "العربية",
     "flag": "🇦🇪",
     "direction": "rtl"
-  },
-  "terminal": {
-    "title": "محطة الطرفية",
-    "welcome_title": "يوسف إحسان غورغل - محطة الطرفية",
-    "welcome_text": "مرحبًا! اكتب 'help' لرؤية الأوامر المتاحة.",
-    "help_hint": "نصيحة: اكتب 'help' لرؤية الأوامر المتاحة",
-    "greeting": "محطة الطرفية",
-    "type_help": "اكتب \"help\" لرؤية الأوامر المتاحة",
-    "help_title": "الأوامر المتاحة:",
-    "cleared": "تم مسح المحطة الطرفية...",
-    "command_not_found": "الأمر '%s' غير موجود. اكتب 'help' لرؤية الأوامر المتاحة.",
-    "prefix": "> ",
-    "type_command": "اكتب أمرًا...",
-    "url": {
-      "success": "جاري فتح الرابط في المتصفح...",
-      "error": "تعذر فتح الرابط",
-      "error_with_details": "خطأ أثناء فتح الرابط"
-    },
-    "download_cv_start": "جاري بدء تنزيل السيرة الذاتية...",
-    "download_cv_success": "بدأ تنزيل السيرة الذاتية في متصفحك.",
-    "download_cv_error": "خطأ أثناء تنزيل السيرة الذاتية. يرجى المحاولة مرة أخرى لاحقًا.",
-    "commands": {
-      "help": "مساعدة - يعرض الأوامر المتاحة",
-      "about": "حول - يعرض المعلومات الشخصية",
-      "skills": "المهارات - يعرض المهارات التقنية",
-      "experience": "الخبرة - يعرض الخبرة العملية",
-      "education": "التعليم - يعرض الخلفية التعليمية",
-      "projects": "المشاريع - يعرض المشاريع المكتملة",
-      "contact": "الاتصال - يعرض معلومات الاتصال",
-      "social": "التواصل الاجتماعي - يعرض حسابات التواصل الاجتماعي",
-      "download_cv": "تنزيل السيرة الذاتية - ينزل سيرتي الذاتية",
-      "clear": "مسح - يمسح شاشة المحطة الطرفية",
-      "help_cmd": "مساعدة",
-      "about_cmd": "حول",
-      "skills_cmd": "مهارات",
-      "experience_cmd": "خبرة",
-      "education_cmd": "تعليم",
-      "projects_cmd": "مشاريع",
-      "contact_cmd": "اتصال",
-      "social_cmd": "اجتماعي",
-      "download_cv_cmd": "تنزيل-السيرة",
-      "clear_cmd": "مسح"
-    },
-    "projects": {
-      "title": "مشاريعي",
-      "untitled": "مشروع بدون عنوان",
-      "not_found": "لم يتم العثور على مشاريع."
-    },
-    "contact": {
-      "email": "البريد الإلكتروني",
-      "phone": "الهاتف",
-      "location": "الموقع"
-    },
-    "social": {
-      "github": "جيتهاب",
-      "linkedin": "لينكد إن",
-      "twitter": "تويتر"
-    }
   },
   "nav": {
     "home": "الرئيسية",
@@ -452,12 +311,12 @@
     "experience": "الخبرة",
     "projects": "المشاريع",
     "contact": "تواصل",
-    "testimonials": "التوصيات",
+    "proof": "الأدلة",
     "blog": "المدونة"
   },
   "about_section": {
     "title": "نبذة عني",
-    "bio": "أنا مهندس برمجيات لدي أكثر من 4 سنوات من الخبرة في تطوير تطبيقات الجوال عالية الجودة. أركز على البنية والأداء والموثوقية — تطبيقات متعددة المنصات بـ Flutter وتطبيقات iOS/Android أصلية بـ Swift و Kotlin.",
+    "bio": "يوثق هذا الملف تصميم البرمجيات وقياسها واختبارها وتشغيلها دون كشف الهوية الشخصية.",
     "bio2": "إليك بعض التقنيات التي عملت بها مؤخراً:",
     "github_title": "نشاط GitHub",
     "github_repos": "المستودعات",
@@ -466,12 +325,12 @@
     "github_cached": "(مخزن مؤقتاً)"
   },
   "home_section": {
-    "greeting": "مرحباً، اسمي",
-    "title": "يوسف إحسان غورغل.",
-    "subtitle": "أطوّر للجوال.",
-    "bio": "أنا مهندس برمجيات متخصص في بناء تطبيقات جوال إنتاجية. أعمل حالياً في أوزمان أدرس على التطوير متعدد المنصات باستخدام Flutter.",
+    "greeting": "BUILD / MEASURE / OPERATE",
+    "title": "ملف الأنظمة.",
+    "subtitle": "هندسة برمجيات مستقلة",
+    "bio": "ملف برمجي يركز على الإنتاج للعملاء متعددي المنصات وواجهات الخدمات والبنية التحتية ذاتية الاستضافة.",
     "view_work": "عرض أعمالي",
-    "download_cv": "تحميل السيرة الذاتية",
+    "inspect_runtime": "Inspect runtime",
     "contact": "تواصل"
   },
   "experience_section": {
@@ -509,7 +368,7 @@
       "name_error": "الرجاء إدخال اسمك",
       "email_error": "الرجاء إدخال عنوان بريد إلكتروني صالح",
       "message_error": "الرجاء إدخال رسالتك",
-      "success": "تم إرسال رسالتك بنجاح!",
+      "success": "تم فتح تطبيق البريد الإلكتروني. راجع رسالتك ثم أرسلها.",
       "error": "حدث خطأ. يرجى المحاولة مرة أخرى.",
       "or_divider": "أو أرسل رسالة مباشرة"
     }
@@ -523,9 +382,9 @@
     "error": "تعذر تحميل المقالات",
     "retry": "إعادة المحاولة"
   },
-  "testimonials_section": {
-    "title": "التوصيات",
-    "subtitle": "آراء الزملاء والموجهين الذين عملت معهم"
+  "proof_section": {
+    "title": "أدلة هندسية",
+    "subtitle": "ادعاءات يمكنك التحقق منها في المستودع وبيئة التشغيل الحية"
   },
   "skills_section": {
     "title": "المهارات",

@@ -6,7 +6,6 @@ import 'package:flutter_web_portfolio/app/domain/repositories/i_language_reposit
 
 /// JSON-backed language repo — reads translations from assets, persists preference.
 final class LanguageRepositoryImpl implements ILanguageRepository {
-
   LanguageRepositoryImpl({
     required IAssetsProvider assetsProvider,
     required ILocalStorageProvider localStorageProvider,
@@ -36,7 +35,11 @@ final class LanguageRepositoryImpl implements ILanguageRepository {
       final savedLanguage = _localStorageProvider.getString(_languageKey);
       return savedLanguage ?? 'en';
     } catch (e) {
-      dev.log('Failed to load language preference', name: 'LanguageRepository', error: e);
+      dev.log(
+        'Failed to load language preference',
+        name: 'LanguageRepository',
+        error: e,
+      );
       return 'en';
     }
   }
@@ -46,10 +49,15 @@ final class LanguageRepositoryImpl implements ILanguageRepository {
     try {
       await _localStorageProvider.setString(_languageKey, languageCode);
     } catch (e) {
-      dev.log('Failed to save language preference', name: 'LanguageRepository', error: e);
+      dev.log(
+        'Failed to save language preference',
+        name: 'LanguageRepository',
+        error: e,
+      );
     }
   }
 
   @override
-  Future<Map<String, dynamic>> getTranslations(String languageCode) async => _assetsProvider.loadTranslations(languageCode);
+  Future<Map<String, dynamic>> getTranslations(String languageCode) async =>
+      _assetsProvider.loadTranslations(languageCode);
 }

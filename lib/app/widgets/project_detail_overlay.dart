@@ -1,25 +1,22 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/services.dart';
-import 'package:get/get.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_web_portfolio/app/core/theme/app_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:flutter_web_portfolio/app/controllers/language_controller.dart';
-import 'package:flutter_web_portfolio/app/controllers/scene_director.dart';
+import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
 import 'package:flutter_web_portfolio/app/core/constants/durations.dart';
 import 'package:flutter_web_portfolio/app/core/theme/app_typography.dart';
 import 'package:flutter_web_portfolio/app/utils/responsive_utils.dart';
 import 'package:flutter_web_portfolio/app/widgets/cinematic_focusable.dart';
+import 'package:flutter_web_portfolio/app/widgets/scene_accent_builder.dart';
 
 /// Full-screen overlay that shows a project case study.
 /// Frosted glass backdrop with fade+scale entrance animation.
 class ProjectDetailOverlay extends StatefulWidget {
-  const ProjectDetailOverlay({
-    super.key,
-    required this.project,
-  });
+  const ProjectDetailOverlay({super.key, required this.project});
 
   final Map<String, dynamic> project;
 
@@ -27,28 +24,27 @@ class ProjectDetailOverlay extends StatefulWidget {
   static Future<void> show(
     BuildContext context,
     Map<String, dynamic> project,
-  ) =>
-      showGeneralDialog(
-        context: context,
-        barrierDismissible: true,
-        barrierLabel: 'Close project detail',
-        barrierColor: Colors.transparent,
-        transitionDuration: AppDurations.medium,
-        pageBuilder: (_, __, ___) => ProjectDetailOverlay(project: project),
-        transitionBuilder: (context, animation, _, child) {
-          final curved = CurvedAnimation(
-            parent: animation,
-            curve: Curves.easeOutCubic,
-          );
-          return FadeTransition(
-            opacity: curved,
-            child: ScaleTransition(
-              scale: Tween<double>(begin: 0.95, end: 1.0).animate(curved),
-              child: child,
-            ),
-          );
-        },
+  ) => showGeneralDialog(
+    context: context,
+    barrierDismissible: true,
+    barrierLabel: 'Close project detail',
+    barrierColor: Colors.transparent,
+    transitionDuration: AppDurations.medium,
+    pageBuilder: (_, _, _) => ProjectDetailOverlay(project: project),
+    transitionBuilder: (context, animation, _, child) {
+      final curved = CurvedAnimation(
+        parent: animation,
+        curve: Curves.easeOutCubic,
       );
+      return FadeTransition(
+        opacity: curved,
+        child: ScaleTransition(
+          scale: Tween<double>(begin: 0.95, end: 1.0).animate(curved),
+          child: child,
+        ),
+      );
+    },
+  );
 
   @override
   State<ProjectDetailOverlay> createState() => _ProjectDetailOverlayState();
@@ -142,7 +138,7 @@ class _Content extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final langCtrl = Get.find<LanguageController>();
+    final langCtrl = context.read<LanguageCubit>();
     final title = (project['title'] as String?) ?? 'Project';
     final description = (project['description'] as String?) ?? '';
     final technologies = _extractTechnologies(project);
@@ -150,153 +146,156 @@ class _Content extends StatelessWidget {
     final caseStudy = project['case_study'] as Map<String, dynamic>?;
     final projectImage = project['image'] as String?;
 
-    return Obx(() {
-      final accent = Get.find<SceneDirector>().currentAccent.value;
+    return BlocBuilder<LanguageCubit, LanguageState>(
+      buildWhen: (previous, current) =>
+          previous.languageCode != current.languageCode ||
+          !identical(previous.translations, current.translations),
+      builder: (context, languageState) => SceneAccentBuilder(
+        builder: (context, accent) => SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Header image
+              if (projectImage != null && projectImage.isNotEmpty) ...[
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxHeight: 200),
+                    child: projectImage.startsWith('assets/')
+                        ? Image.asset(
+                            projectImage,
+                            width: double.infinity,
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, _, _) => const SizedBox.shrink(),
+                          )
+                        : Image.network(
+                            projectImage,
+                            width: double.infinity,
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, _, _) => const SizedBox.shrink(),
+                          ),
+                  ),
+                ),
+                const SizedBox(height: 24),
+              ],
 
-      return SingleChildScrollView(
-        physics: const BouncingScrollPhysics(),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Header image
-            if (projectImage != null && projectImage.isNotEmpty) ...[
-              ClipRRect(
-                borderRadius: BorderRadius.circular(8),
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxHeight: 200),
-                  child: projectImage.startsWith('assets/')
-                      ? Image.asset(
-                          projectImage,
-                          width: double.infinity,
-                          fit: BoxFit.cover,
-                          errorBuilder: (_, __, ___) =>
-                              const SizedBox.shrink(),
-                        )
-                      : Image.network(
-                          projectImage,
-                          width: double.infinity,
-                          fit: BoxFit.cover,
-                          errorBuilder: (_, __, ___) =>
-                              const SizedBox.shrink(),
-                        ),
+              // Title
+              Text(
+                title,
+                style: AppTypography.h1.copyWith(
+                  color: accent,
+                  fontSize: ResponsiveUtils.getValueForScreenType<double>(
+                    context: context,
+                    mobile: 28,
+                    desktop: 36,
+                  ),
                 ),
               ),
               const SizedBox(height: 24),
-            ],
 
-            // Title
-            Text(
-              title,
-              style: AppTypography.h1.copyWith(
-                color: accent,
-                fontSize: ResponsiveUtils.getValueForScreenType<double>(
-                  context: context,
-                  mobile: 28,
-                  desktop: 36,
-                ),
-              ),
-            ),
-            const SizedBox(height: 24),
-
-            // Description
-            Text(description, style: AppTypography.body),
-            const SizedBox(height: 28),
-
-            // Technologies
-            if (technologies.isNotEmpty) ...[
-              Text(
-                langCtrl.getText(
-                  'projects_section.technologies',
-                  defaultValue: 'Technologies',
-                ),
-                style: AppTypography.label.copyWith(color: accent),
-              ),
-              const SizedBox(height: 12),
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: technologies
-                    .map((tech) => _TechPill(label: tech, accent: accent))
-                    .toList(),
-              ),
-              const SizedBox(height: 32),
-            ],
-
-            // Case study sections
-            if (caseStudy != null) ...[
-              _Divider(accent: accent),
+              // Description
+              Text(description, style: AppTypography.body),
               const SizedBox(height: 28),
-              if (caseStudy['problem'] case final String problem
-                  when problem.isNotEmpty) ...[
-                _CaseStudyBlock(
-                  heading: langCtrl.getText(
-                    'projects_section.case_study_problem',
-                    defaultValue: 'The Challenge',
-                  ),
-                  body: problem,
-                  accent: accent,
-                  imageUrl: caseStudy['problem_image'] as String?,
-                ),
-                const SizedBox(height: 24),
-              ],
-              if (caseStudy['solution'] case final String solution
-                  when solution.isNotEmpty) ...[
-                _CaseStudyBlock(
-                  heading: langCtrl.getText(
-                    'projects_section.case_study_solution',
-                    defaultValue: 'The Approach',
-                  ),
-                  body: solution,
-                  accent: accent,
-                  imageUrl: caseStudy['solution_image'] as String?,
-                ),
-                const SizedBox(height: 24),
-              ],
-              if (caseStudy['result'] case final String result
-                  when result.isNotEmpty) ...[
-                _CaseStudyBlock(
-                  heading: langCtrl.getText(
-                    'projects_section.case_study_result',
-                    defaultValue: 'The Result',
-                  ),
-                  body: result,
-                  accent: accent,
-                  imageUrl: caseStudy['result_image'] as String?,
-                ),
-                const SizedBox(height: 24),
-              ],
-              const SizedBox(height: 8),
-            ],
 
-            // Links
-            if (urls.isNotEmpty) ...[
-              _Divider(accent: accent),
-              const SizedBox(height: 24),
-              Text(
-                langCtrl.getText(
-                  'projects_section.links',
-                  defaultValue: 'Links',
+              // Technologies
+              if (technologies.isNotEmpty) ...[
+                Text(
+                  langCtrl.getText(
+                    'projects_section.technologies',
+                    defaultValue: 'Technologies',
+                  ),
+                  style: AppTypography.label.copyWith(color: accent),
                 ),
-                style: AppTypography.label.copyWith(color: accent),
-              ),
-              const SizedBox(height: 12),
-              Wrap(
-                spacing: 12,
-                runSpacing: 12,
-                children: urls.entries
-                    .map((e) => _LinkChip(
-                          label: _urlLabel(e.key),
+                const SizedBox(height: 12),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: technologies
+                      .map((tech) => _TechPill(label: tech, accent: accent))
+                      .toList(),
+                ),
+                const SizedBox(height: 32),
+              ],
+
+              // Case study sections
+              if (caseStudy != null) ...[
+                _Divider(accent: accent),
+                const SizedBox(height: 28),
+                if (caseStudy['problem'] case final String problem
+                    when problem.isNotEmpty) ...[
+                  _CaseStudyBlock(
+                    heading: langCtrl.getText(
+                      'projects_section.case_study_problem',
+                      defaultValue: 'The Challenge',
+                    ),
+                    body: problem,
+                    accent: accent,
+                    imageUrl: caseStudy['problem_image'] as String?,
+                  ),
+                  const SizedBox(height: 24),
+                ],
+                if (caseStudy['solution'] case final String solution
+                    when solution.isNotEmpty) ...[
+                  _CaseStudyBlock(
+                    heading: langCtrl.getText(
+                      'projects_section.case_study_solution',
+                      defaultValue: 'The Approach',
+                    ),
+                    body: solution,
+                    accent: accent,
+                    imageUrl: caseStudy['solution_image'] as String?,
+                  ),
+                  const SizedBox(height: 24),
+                ],
+                if (caseStudy['result'] case final String result
+                    when result.isNotEmpty) ...[
+                  _CaseStudyBlock(
+                    heading: langCtrl.getText(
+                      'projects_section.case_study_result',
+                      defaultValue: 'The Result',
+                    ),
+                    body: result,
+                    accent: accent,
+                    imageUrl: caseStudy['result_image'] as String?,
+                  ),
+                  const SizedBox(height: 24),
+                ],
+                const SizedBox(height: 8),
+              ],
+
+              // Links
+              if (urls.isNotEmpty) ...[
+                _Divider(accent: accent),
+                const SizedBox(height: 24),
+                Text(
+                  langCtrl.getText(
+                    'projects_section.links',
+                    defaultValue: 'Links',
+                  ),
+                  style: AppTypography.label.copyWith(color: accent),
+                ),
+                const SizedBox(height: 12),
+                Wrap(
+                  spacing: 12,
+                  runSpacing: 12,
+                  children: urls.entries
+                      .map(
+                        (e) => _LinkChip(
+                          label: _urlLabel(e.key, langCtrl),
                           url: e.value,
                           accent: accent,
-                        ))
-                    .toList(),
-              ),
-              const SizedBox(height: 24),
+                        ),
+                      )
+                      .toList(),
+                ),
+                const SizedBox(height: 24),
+              ],
             ],
-          ],
+          ),
         ),
-      );
-    });
+      ),
+    );
   }
 
   List<String> _extractTechnologies(Map<String, dynamic> project) {
@@ -321,15 +320,21 @@ class _Content extends StatelessWidget {
     return result;
   }
 
-  String _urlLabel(String key) {
-    final lang = Get.find<LanguageController>();
-    return switch (key) {
-      'google_play' => lang.getText('projects_section.link_labels.google_play', defaultValue: 'Google Play'),
-      'app_store' => lang.getText('projects_section.link_labels.app_store', defaultValue: 'App Store'),
-      'website' => lang.getText('projects_section.link_labels.website', defaultValue: 'Website'),
-      _ => key,
-    };
-  }
+  String _urlLabel(String key, LanguageCubit lang) => switch (key) {
+    'google_play' => lang.getText(
+      'projects_section.link_labels.google_play',
+      defaultValue: 'Google Play',
+    ),
+    'app_store' => lang.getText(
+      'projects_section.link_labels.app_store',
+      defaultValue: 'App Store',
+    ),
+    'website' => lang.getText(
+      'projects_section.link_labels.website',
+      defaultValue: 'Website',
+    ),
+    _ => key,
+  };
 }
 
 // ──────────────────────────────────────────────────────────────────────────────
@@ -351,31 +356,31 @@ class _CaseStudyBlock extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Semantics(
-            header: true,
-            child: Text(heading, style: AppTypography.h2.copyWith(color: accent)),
-          ),
-          const SizedBox(height: 10),
-          Text(body, style: AppTypography.body),
-          if (imageUrl != null && imageUrl!.isNotEmpty) ...[
-            const SizedBox(height: 16),
-            ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxHeight: 200),
-                child: Image.network(
-                  imageUrl!,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) => const SizedBox.shrink(),
-                ),
-              ),
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Semantics(
+        header: true,
+        child: Text(heading, style: AppTypography.h2.copyWith(color: accent)),
+      ),
+      const SizedBox(height: 10),
+      Text(body, style: AppTypography.body),
+      if (imageUrl != null && imageUrl!.isNotEmpty) ...[
+        const SizedBox(height: 16),
+        ClipRRect(
+          borderRadius: BorderRadius.circular(8),
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxHeight: 200),
+            child: Image.network(
+              imageUrl!,
+              width: double.infinity,
+              fit: BoxFit.cover,
+              errorBuilder: (_, _, _) => const SizedBox.shrink(),
             ),
-          ],
-        ],
-      );
+          ),
+        ),
+      ],
+    ],
+  );
 }
 
 class _TechPill extends StatelessWidget {
@@ -385,16 +390,16 @@ class _TechPill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
-        decoration: BoxDecoration(
-          color: accent.withValues(alpha: 0.08),
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: Text(
-          label,
-          style: GoogleFonts.jetBrainsMono(fontSize: 12, color: accent),
-        ),
-      );
+    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+    decoration: BoxDecoration(
+      color: accent.withValues(alpha: 0.08),
+      borderRadius: BorderRadius.circular(16),
+    ),
+    child: Text(
+      label,
+      style: AppFonts.jetBrainsMono(fontSize: 12, color: accent),
+    ),
+  );
 }
 
 class _Divider extends StatelessWidget {
@@ -402,10 +407,8 @@ class _Divider extends StatelessWidget {
   final Color accent;
 
   @override
-  Widget build(BuildContext context) => Container(
-        height: 1,
-        color: accent.withValues(alpha: 0.12),
-      );
+  Widget build(BuildContext context) =>
+      Container(height: 1, color: accent.withValues(alpha: 0.12));
 }
 
 class _LinkChip extends StatelessWidget {
@@ -421,44 +424,39 @@ class _LinkChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Semantics(
-        link: true,
-        label: '$label: $url',
-        child: CinematicFocusable(
-          onTap: () async {
-            var urlString = url;
-            if (!urlString.startsWith('http://') &&
-                !urlString.startsWith('https://')) {
-              urlString = 'https://$urlString';
-            }
-            final uri = Uri.parse(urlString);
-            if (await canLaunchUrl(uri)) {
-              await launchUrl(uri, mode: LaunchMode.externalApplication);
-            }
-          },
+    link: true,
+    label: '$label: $url',
+    child: CinematicFocusable(
+      onTap: () async {
+        var urlString = url;
+        if (!urlString.startsWith('http://') &&
+            !urlString.startsWith('https://')) {
+          urlString = 'https://$urlString';
+        }
+        final uri = Uri.parse(urlString);
+        if (await canLaunchUrl(uri)) {
+          await launchUrl(uri, mode: LaunchMode.externalApplication);
+        }
+      },
+      borderRadius: BorderRadius.circular(8),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        decoration: BoxDecoration(
+          color: accent.withValues(alpha: 0.06),
           borderRadius: BorderRadius.circular(8),
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-            decoration: BoxDecoration(
-              color: accent.withValues(alpha: 0.06),
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(
-                color: accent.withValues(alpha: 0.15),
-              ),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(Icons.open_in_new_rounded, size: 16, color: accent),
-                const SizedBox(width: 8),
-                Text(
-                  label,
-                  style: AppTypography.bodySmall.copyWith(color: accent),
-                ),
-              ],
-            ),
-          ),
+          border: Border.all(color: accent.withValues(alpha: 0.15)),
         ),
-      );
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.open_in_new_rounded, size: 16, color: accent),
+            const SizedBox(width: 8),
+            Text(label, style: AppTypography.bodySmall.copyWith(color: accent)),
+          ],
+        ),
+      ),
+    ),
+  );
 }
 
 class _CloseButton extends StatefulWidget {
@@ -474,25 +472,25 @@ class _CloseButtonState extends State<_CloseButton> {
 
   @override
   Widget build(BuildContext context) => CinematicFocusable(
-        onTap: widget.onTap,
-        onHoverChanged: (hovered) => setState(() => _hovered = hovered),
-        borderRadius: BorderRadius.circular(20),
-        child: AnimatedContainer(
-          duration: AppDurations.fast,
-          width: 40,
-          height: 40,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: Colors.white.withValues(alpha: _hovered ? 0.1 : 0.04),
-            border: Border.all(
-              color: Colors.white.withValues(alpha: _hovered ? 0.2 : 0.08),
-            ),
-          ),
-          child: Icon(
-            Icons.close_rounded,
-            size: 20,
-            color: _hovered ? AppColors.textBright : AppColors.textPrimary,
-          ),
+    onTap: widget.onTap,
+    onHoverChanged: (hovered) => setState(() => _hovered = hovered),
+    borderRadius: BorderRadius.circular(20),
+    child: AnimatedContainer(
+      duration: AppDurations.fast,
+      width: 40,
+      height: 40,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: Colors.white.withValues(alpha: _hovered ? 0.1 : 0.04),
+        border: Border.all(
+          color: Colors.white.withValues(alpha: _hovered ? 0.2 : 0.08),
         ),
-      );
+      ),
+      child: Icon(
+        Icons.close_rounded,
+        size: 20,
+        color: _hovered ? AppColors.textBright : AppColors.textPrimary,
+      ),
+    ),
+  );
 }

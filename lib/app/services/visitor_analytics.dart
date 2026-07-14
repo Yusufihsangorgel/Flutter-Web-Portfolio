@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:developer' as dev;
 
 import 'package:flutter/foundation.dart';
-import 'package:get/get.dart';
 import 'package:flutter_web_portfolio/app/domain/providers/i_local_storage_provider.dart';
 
 /// Engagement level inferred from visitor behaviour.
@@ -68,6 +67,11 @@ final class VisitorProfile {
 /// (scroll depth, section dwell time, project views) and exposes a
 /// [VisitorProfile] for downstream personalisation.
 final class VisitorAnalytics {
+  VisitorAnalytics({required ILocalStorageProvider storageProvider})
+    : _storageProvider = storageProvider;
+
+  final ILocalStorageProvider _storageProvider;
+
   // ─── Storage keys ──────────────────────────────────────────────────
   static const _keyVisitCount = 'va_visit_count';
   static const _keyFirstVisitTs = 'va_first_visit';
@@ -138,15 +142,17 @@ final class VisitorAnalytics {
       // Viewed projects.
       final savedProjects = storage.getString(_keyViewedProjects);
       if (savedProjects != null) {
-        _viewedProjectIds =
-            (jsonDecode(savedProjects) as List).cast<String>().toList();
+        _viewedProjectIds = (jsonDecode(savedProjects) as List)
+            .cast<String>()
+            .toList();
       }
 
       // Section durations.
       final savedDurations = storage.getString(_keySectionDurations);
       if (savedDurations != null) {
-        _sectionDurations = (jsonDecode(savedDurations) as Map)
-            .map((k, v) => MapEntry(k as String, (v as num).toInt()));
+        _sectionDurations = (jsonDecode(savedDurations) as Map).map(
+          (k, v) => MapEntry(k as String, (v as num).toInt()),
+        );
       }
     } catch (e) {
       dev.log('Failed to load analytics', name: 'VisitorAnalytics', error: e);
@@ -190,12 +196,13 @@ final class VisitorAnalytics {
 
   ILocalStorageProvider? get _storage {
     try {
-      if (Get.isRegistered<ILocalStorageProvider>()) {
-        final s = Get.find<ILocalStorageProvider>();
-        return s.isInitialized ? s : null;
-      }
+      return _storageProvider.isInitialized ? _storageProvider : null;
     } catch (e) {
-      dev.log('Failed to access local storage provider', name: 'VisitorAnalytics', error: e);
+      dev.log(
+        'Failed to access local storage provider',
+        name: 'VisitorAnalytics',
+        error: e,
+      );
     }
     return null;
   }
@@ -211,8 +218,7 @@ final class VisitorAnalytics {
   /// Close timing for the current section and accumulate its duration.
   void _flushCurrentSection() {
     if (_currentSection != null && _sectionEnteredAt != null) {
-      final elapsed =
-          DateTime.now().difference(_sectionEnteredAt!).inSeconds;
+      final elapsed = DateTime.now().difference(_sectionEnteredAt!).inSeconds;
       if (elapsed > 0) {
         _sectionDurations[_currentSection!] =
             (_sectionDurations[_currentSection!] ?? 0) + elapsed;
@@ -274,13 +280,16 @@ final class VisitorAnalytics {
     try {
       final view = PlatformDispatcher.instance.implicitView;
       if (view != null) {
-        final width =
-            view.physicalSize.width / view.devicePixelRatio;
+        final width = view.physicalSize.width / view.devicePixelRatio;
         if (width < 600) return DeviceType.mobile;
         if (width < 1024) return DeviceType.tablet;
       }
     } catch (e) {
-      dev.log('Failed to detect device type', name: 'VisitorAnalytics', error: e);
+      dev.log(
+        'Failed to detect device type',
+        name: 'VisitorAnalytics',
+        error: e,
+      );
     }
     return DeviceType.desktop;
   }

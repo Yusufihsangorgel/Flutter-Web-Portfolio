@@ -1,7 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_web_portfolio/app/core/theme/app_fonts.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
 
 /// Data for a single skill placed on an orbit ring.
@@ -44,11 +44,7 @@ class _PositionedNode {
 /// Skills closer to the viewer appear larger (simulated z-axis via sin/cos).
 /// Mouse hover highlights a skill and shows its category in a tooltip.
 class SkillOrbit extends StatefulWidget {
-  const SkillOrbit({
-    super.key,
-    required this.skills,
-    required this.accent,
-  });
+  const SkillOrbit({super.key, required this.skills, required this.accent});
 
   /// Skill data: list of {category, items[]}.
   final List<Map<String, dynamic>> skills;
@@ -125,12 +121,14 @@ class _SkillOrbitState extends State<SkillOrbit>
       // Evenly distribute items around the orbit.
       final count = names.length;
       for (var j = 0; j < count; j++) {
-        _nodes.add(_SkillNode(
-          name: names[j],
-          category: categories[j],
-          orbitIndex: orbitIdx,
-          angleOffset: (2 * pi * j) / count,
-        ));
+        _nodes.add(
+          _SkillNode(
+            name: names[j],
+            category: categories[j],
+            orbitIndex: orbitIdx,
+            angleOffset: (2 * pi * j) / count,
+          ),
+        );
       }
     }
   }
@@ -203,13 +201,11 @@ class _SkillOrbitState extends State<SkillOrbit>
               decoration: BoxDecoration(
                 color: AppColors.backgroundLight.withValues(alpha: 0.92),
                 borderRadius: BorderRadius.circular(6),
-                border: Border.all(
-                  color: widget.accent.withValues(alpha: 0.3),
-                ),
+                border: Border.all(color: widget.accent.withValues(alpha: 0.3)),
               ),
               child: Text(
                 node.category,
-                style: GoogleFonts.jetBrainsMono(
+                style: AppFonts.jetBrainsMono(
                   fontSize: 11,
                   color: widget.accent,
                   fontWeight: FontWeight.w500,
@@ -276,13 +272,13 @@ class _SkillOrbitPainter extends CustomPainter {
 
     for (var i = 0; i < nodes.length; i++) {
       final node = nodes[i];
-      final config = orbitConfigs[node.orbitIndex.clamp(0, orbitConfigs.length - 1)];
+      final config =
+          orbitConfigs[node.orbitIndex.clamp(0, orbitConfigs.length - 1)];
       final rx = baseSize * config.rxFrac;
       final ry = baseSize * config.ryFrac;
 
       // Current angle = base rotation * speed + offset.
-      final angle =
-          animationValue * 2 * pi * config.speed + node.angleOffset;
+      final angle = animationValue * 2 * pi * config.speed + node.angleOffset;
 
       final x = centerX + rx * cos(angle);
       final y = centerY + ry * sin(angle);
@@ -306,7 +302,8 @@ class _SkillOrbitPainter extends CustomPainter {
       final depthAlpha = 0.3 + (item.z + 1.0) / 2.0 * 0.7;
 
       final fontSize = 13.0 * depthScale;
-      final isHovered = mousePosition != null &&
+      final isHovered =
+          mousePosition != null &&
           (Offset(item.x, item.y) - mousePosition!).distance < _hitRadius;
 
       if (isHovered) hoveredIdx = item.index;
@@ -317,8 +314,14 @@ class _SkillOrbitPainter extends CustomPainter {
 
       // Draw a subtle dot at the node position.
       final dotPaint = Paint()
-        ..color = (isHovered ? accent : accent.withValues(alpha: depthAlpha * 0.5));
-      canvas.drawCircle(Offset(item.x, item.y), isHovered ? 3.5 : 2.0, dotPaint);
+        ..color = (isHovered
+            ? accent
+            : accent.withValues(alpha: depthAlpha * 0.5));
+      canvas.drawCircle(
+        Offset(item.x, item.y),
+        isHovered ? 3.5 : 2.0,
+        dotPaint,
+      );
 
       // Draw glow ring on hover.
       if (isHovered) {
@@ -335,7 +338,7 @@ class _SkillOrbitPainter extends CustomPainter {
           text: node.name,
           style: TextStyle(
             fontSize: fontSize,
-            fontFamily: GoogleFonts.spaceGrotesk().fontFamily,
+            fontFamily: AppFonts.spaceGrotesk().fontFamily,
             fontWeight: isHovered ? FontWeight.w700 : FontWeight.w500,
             color: labelColor,
             letterSpacing: isHovered ? 0.5 : 0.0,

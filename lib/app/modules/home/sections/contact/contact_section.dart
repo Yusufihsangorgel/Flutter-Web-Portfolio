@@ -1,42 +1,46 @@
-import 'dart:convert';
 import 'dart:developer' as dev;
 
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:http/http.dart' as http;
-import 'package:kartal/kartal.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_web_portfolio/app/core/theme/app_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:flutter_web_portfolio/app/controllers/language_controller.dart';
-import 'package:flutter_web_portfolio/app/controllers/scene_director.dart';
+import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
 import 'package:flutter_web_portfolio/app/controllers/sound_controller.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
 import 'package:flutter_web_portfolio/app/core/constants/cinematic_curves.dart';
 import 'package:flutter_web_portfolio/app/core/constants/durations.dart';
 import 'package:flutter_web_portfolio/app/core/theme/app_typography.dart';
+import 'package:flutter_web_portfolio/app/features/contact/domain/contact_mailto.dart';
 import 'package:flutter_web_portfolio/app/utils/responsive_utils.dart';
 import 'package:flutter_web_portfolio/app/widgets/magnetic_button.dart';
 import 'package:flutter_web_portfolio/app/widgets/numbered_section_heading.dart';
 import 'package:flutter_web_portfolio/app/widgets/scroll_fade_in.dart';
+import 'package:flutter_web_portfolio/app/widgets/scene_accent_builder.dart';
 
 /// Contact Section — "The Finale"
 /// White particles on deep black, shader reveal title, magnetic CTA button,
-/// and a Formspree-powered contact form.
+/// and a mail-client handoff that keeps visitor messages on their device.
 class ContactSection extends StatelessWidget {
   const ContactSection({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final languageController = Get.find<LanguageController>();
-    final data = languageController.cvData['personal_info'] as Map<String, dynamic>? ?? <String, dynamic>{};
+  Widget build(BuildContext context) =>
+      BlocBuilder<LanguageCubit, LanguageState>(
+        builder: (context, _) => _buildContent(context),
+      );
+
+  Widget _buildContent(BuildContext context) {
+    final languageController = context.read<LanguageCubit>();
+    final data =
+        languageController.cvData['personal_info'] as Map<String, dynamic>? ??
+        <String, dynamic>{};
     final email = (data['email'] as String?) ?? 'hello@example.com';
-    final screenWidth = context.sized.width;
+    final screenSize = MediaQuery.sizeOf(context);
+    final screenWidth = screenSize.width;
 
     return Container(
       width: double.infinity,
-      constraints: BoxConstraints(
-        minHeight: context.sized.dynamicHeight(0.6),
-      ),
+      constraints: BoxConstraints(minHeight: screenSize.height * 0.6),
       child: Stack(
         children: [
           // Giant watermark — derived from nav i18n
@@ -45,9 +49,11 @@ class ContactSection extends StatelessWidget {
             left: 0,
             right: 0,
             child: Center(
-              child: Obx(() => Text(
-                languageController.getText('nav.contact', defaultValue: 'Contact').toUpperCase(),
-                style: GoogleFonts.spaceGrotesk(
+              child: Text(
+                languageController
+                    .getText('nav.contact', defaultValue: 'Contact')
+                    .toUpperCase(),
+                style: AppFonts.spaceGrotesk(
                   fontSize: ResponsiveUtils.getValueForScreenType<double>(
                     context: context,
                     mobile: 48.0,
@@ -55,13 +61,14 @@ class ContactSection extends StatelessWidget {
                     desktop: screenWidth * 0.18,
                   ),
                   fontWeight: FontWeight.w800,
-                  color: (Theme.of(context).brightness == Brightness.dark
-                          ? Colors.white
-                          : Colors.black)
-                      .withValues(alpha: 0.03),
+                  color:
+                      (Theme.of(context).brightness == Brightness.dark
+                              ? Colors.white
+                              : Colors.black)
+                          .withValues(alpha: 0.03),
                   letterSpacing: -2,
                 ),
-              )),
+              ),
             ),
           ),
           Center(
@@ -75,17 +82,16 @@ class ContactSection extends StatelessWidget {
                     const SizedBox(height: 60),
                     // Title
                     ScrollFadeIn(
-                      child: Obx(() {
-                        final accent = Get.find<SceneDirector>().currentAccent.value;
-                        return NumberedSectionHeading(
+                      child: SceneAccentBuilder(
+                        builder: (context, accent) => NumberedSectionHeading(
                           number: '06',
                           title: languageController.getText(
                             'contact_section.title',
                             defaultValue: 'Get In Touch',
                           ),
                           accent: accent,
-                        );
-                      }),
+                        ),
+                      ),
                     ),
                     const SizedBox(height: 24),
                     // Description
@@ -94,7 +100,8 @@ class ContactSection extends StatelessWidget {
                       child: Text(
                         languageController.getText(
                           'contact_section.description',
-                          defaultValue: 'I\'m always open to new challenges and '
+                          defaultValue:
+                              'I\'m always open to new challenges and '
                               'collaborations. Whether you have a project idea, '
                               'a question, or just want to connect — feel free '
                               'to reach out!',
@@ -113,7 +120,7 @@ class ContactSection extends StatelessWidget {
                     // "or" divider
                     ScrollFadeIn(
                       delay: AppDurations.staggerLong,
-                      child: Obx(() => Row(
+                      child: Row(
                         children: [
                           Expanded(
                             child: Container(
@@ -138,7 +145,7 @@ class ContactSection extends StatelessWidget {
                             ),
                           ),
                         ],
-                      )),
+                      ),
                     ),
                     const SizedBox(height: 40),
                     // Contact Form
@@ -164,29 +171,27 @@ class _MagneticCTA extends StatelessWidget {
   final String email;
 
   @override
-  Widget build(BuildContext context) => Obx(() {
-    final accent = Get.find<SceneDirector>().currentAccent.value;
-    final label = Get.find<LanguageController>().getText(
-      'translations.send_message',
-      defaultValue: 'Say Hello',
-    );
-    return Semantics(
-      button: true,
-      label: label,
-      child: MagneticButton(
-        onTap: () async {
-          final uri = Uri.parse('mailto:$email');
-          if (await canLaunchUrl(uri)) {
-            await launchUrl(uri);
-          }
-        },
-          child: _HoverContainer(
-          accent: accent,
-          label: label,
+  Widget build(BuildContext context) => SceneAccentBuilder(
+    builder: (context, accent) {
+      final label = context.read<LanguageCubit>().getText(
+        'translations.send_message',
+        defaultValue: 'Say Hello',
+      );
+      return Semantics(
+        button: true,
+        label: label,
+        child: MagneticButton(
+          onTap: () async {
+            final uri = Uri.parse('mailto:$email');
+            if (await canLaunchUrl(uri)) {
+              await launchUrl(uri);
+            }
+          },
+          child: _HoverContainer(accent: accent, label: label),
         ),
-      ),
-    );
-  });
+      );
+    },
+  );
 }
 
 class _HoverContainer extends StatefulWidget {
@@ -229,7 +234,7 @@ class _HoverContainerState extends State<_HoverContainer> {
       ),
       child: Text(
         widget.label,
-        style: GoogleFonts.spaceGrotesk(
+        style: AppFonts.spaceGrotesk(
           fontSize: 16,
           fontWeight: FontWeight.w500,
           color: widget.accent,
@@ -240,7 +245,7 @@ class _HoverContainerState extends State<_HoverContainer> {
   );
 }
 
-/// Formspree-powered contact form with cinematic styling.
+/// Contact draft form with a local mail-client handoff.
 class _ContactForm extends StatefulWidget {
   const _ContactForm();
 
@@ -271,216 +276,212 @@ class _ContactFormState extends State<_ContactForm> {
     setState(() => _status = _FormStatus.sending);
 
     try {
-      final languageController = Get.find<LanguageController>();
-      final formspreeId = languageController.cvData['contact']?['formspree_id'] as String? ?? '';
+      final languageController = context.read<LanguageCubit>();
+      final personalInfo =
+          languageController.cvData['personal_info'] as Map<String, dynamic>?;
+      final recipient = personalInfo?['email'] as String? ?? '';
+      if (recipient.isEmpty) throw StateError('Contact email is unavailable');
 
-      if (formspreeId.isEmpty || formspreeId == 'YOUR_FORMSPREE_ID') {
-        dev.log('Formspree ID not configured', name: 'ContactForm');
-        if (!mounted) return;
-        setState(() => _status = _FormStatus.error);
-        Future.delayed(AppDurations.formResetDelay, () {
-          if (mounted) setState(() => _status = _FormStatus.idle);
-        });
-        return;
-      }
-
-      final formspreeEndpoint = 'https://formspree.io/f/$formspreeId';
-
-      final response = await http.post(
-        Uri.parse(formspreeEndpoint),
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
-        body: jsonEncode({
-          'name': _nameController.text.trim(),
-          'email': _emailController.text.trim(),
-          'message': _messageController.text.trim(),
-        }),
-      ).timeout(const Duration(seconds: 15));
+      final mailto = buildContactMailtoUri(
+        recipient: recipient,
+        senderName: _nameController.text.trim(),
+        senderEmail: _emailController.text.trim(),
+        message: _messageController.text.trim(),
+      );
+      final opened = await launchUrl(mailto);
 
       if (!mounted) return;
-
-      if (response.statusCode == 200) {
-        if (Get.isRegistered<SoundController>()) {
-          Get.find<SoundController>().playSuccess();
-        }
+      if (opened) {
+        context.read<SoundController>().playSuccess();
         setState(() => _status = _FormStatus.success);
-        _nameController.clear();
-        _emailController.clear();
-        _messageController.clear();
-        // Reset to idle after showing success
-        Future.delayed(AppDurations.formResetDelay, () {
-          if (mounted) setState(() => _status = _FormStatus.idle);
-        });
+        _resetStatusAfterDelay();
       } else {
         setState(() => _status = _FormStatus.error);
-        Future.delayed(AppDurations.formResetDelay, () {
-          if (mounted) setState(() => _status = _FormStatus.idle);
-        });
+        _resetStatusAfterDelay();
       }
-    } catch (e) {
-      dev.log('Form submission failed', name: 'ContactForm', error: e);
+    } catch (error, stackTrace) {
+      dev.log(
+        'Mail client handoff failed',
+        name: 'ContactForm',
+        error: error,
+        stackTrace: stackTrace,
+      );
       if (!mounted) return;
       setState(() => _status = _FormStatus.error);
-      Future.delayed(AppDurations.formResetDelay, () {
-        if (mounted) setState(() => _status = _FormStatus.idle);
-      });
+      _resetStatusAfterDelay();
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final lang = Get.find<LanguageController>();
-
-    return Obx(() {
-      final accent = Get.find<SceneDirector>().currentAccent.value;
-
-      return Form(
-        key: _formKey,
-        autovalidateMode: AutovalidateMode.onUserInteraction,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            // Name field
-            _CinematicTextField(
-              controller: _nameController,
-              label: lang.getText(
-                'contact_section.form.name_label',
-                defaultValue: 'Name',
-              ),
-              accent: accent,
-              textInputAction: TextInputAction.next,
-              validator: (value) {
-                if (value == null || value.trim().isEmpty) {
-                  return lang.getText(
-                    'contact_section.form.name_error',
-                    defaultValue: 'Please enter your name',
-                  );
-                }
-                return null;
-              },
-            ),
-            const SizedBox(height: 20),
-            // Email field
-            _CinematicTextField(
-              controller: _emailController,
-              label: lang.getText(
-                'contact_section.form.email_label',
-                defaultValue: 'Email',
-              ),
-              accent: accent,
-              keyboardType: TextInputType.emailAddress,
-              textInputAction: TextInputAction.next,
-              validator: (value) {
-                if (value == null || value.trim().isEmpty) {
-                  return lang.getText(
-                    'contact_section.form.email_error',
-                    defaultValue: 'Please enter a valid email',
-                  );
-                }
-                final emailRegex = RegExp(
-                  r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
-                );
-                if (!emailRegex.hasMatch(value.trim())) {
-                  return lang.getText(
-                    'contact_section.form.email_error',
-                    defaultValue: 'Please enter a valid email',
-                  );
-                }
-                return null;
-              },
-            ),
-            const SizedBox(height: 20),
-            // Message field
-            _CinematicTextField(
-              controller: _messageController,
-              label: lang.getText(
-                'contact_section.form.message_label',
-                defaultValue: 'Message',
-              ),
-              accent: accent,
-              maxLines: 5,
-              textInputAction: TextInputAction.done,
-              validator: (value) {
-                if (value == null || value.trim().isEmpty) {
-                  return lang.getText(
-                    'contact_section.form.message_error',
-                    defaultValue: 'Please enter your message',
-                  );
-                }
-                return null;
-              },
-            ),
-            const SizedBox(height: 28),
-            // Status message
-            AnimatedSwitcher(
-              duration: AppDurations.medium,
-              child: switch (_status) {
-                _FormStatus.success => Padding(
-                  key: const ValueKey('success'),
-                  padding: const EdgeInsets.only(bottom: 16),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(Icons.check_circle_outline,
-                          color: AppColors.expAccent, size: 18),
-                      const SizedBox(width: 8),
-                      Flexible(
-                        child: Text(
-                          lang.getText(
-                            'contact_section.form.success',
-                            defaultValue:
-                                'Your message has been sent successfully!',
-                          ),
-                          style: AppTypography.bodySmall
-                              .copyWith(color: AppColors.expAccent),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                _FormStatus.error => Padding(
-                  key: const ValueKey('error'),
-                  padding: const EdgeInsets.only(bottom: 16),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(Icons.error_outline,
-                          color: AppColors.projAccent, size: 18),
-                      const SizedBox(width: 8),
-                      Flexible(
-                        child: Text(
-                          lang.getText(
-                            'contact_section.form.error',
-                            defaultValue:
-                                'An error occurred. Please try again.',
-                          ),
-                          style: AppTypography.bodySmall
-                              .copyWith(color: AppColors.projAccent),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                _ => const SizedBox.shrink(key: ValueKey('idle')),
-              },
-            ),
-            // Submit button
-            _SubmitButton(
-              accent: accent,
-              label: lang.getText(
-                'contact_section.form.submit_button',
-                defaultValue: 'Send Message',
-              ),
-              isSending: _status == _FormStatus.sending,
-              onTap: _status == _FormStatus.sending ? null : _submit,
-            ),
-          ],
-        ),
-      );
+  void _resetStatusAfterDelay() {
+    Future<void>.delayed(AppDurations.formResetDelay, () {
+      if (mounted) setState(() => _status = _FormStatus.idle);
     });
   }
+
+  @override
+  Widget build(
+    BuildContext context,
+  ) => BlocBuilder<LanguageCubit, LanguageState>(
+    buildWhen: (previous, current) =>
+        previous.languageCode != current.languageCode ||
+        !identical(previous.translations, current.translations),
+    builder: (context, languageState) {
+      final lang = context.read<LanguageCubit>();
+      return SceneAccentBuilder(
+        builder: (context, accent) => Form(
+          key: _formKey,
+          autovalidateMode: AutovalidateMode.onUserInteraction,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // Name field
+              _CinematicTextField(
+                controller: _nameController,
+                label: lang.getText(
+                  'contact_section.form.name_label',
+                  defaultValue: 'Name',
+                ),
+                accent: accent,
+                textInputAction: TextInputAction.next,
+                validator: (value) {
+                  if (value == null || value.trim().isEmpty) {
+                    return lang.getText(
+                      'contact_section.form.name_error',
+                      defaultValue: 'Please enter your name',
+                    );
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 20),
+              // Email field
+              _CinematicTextField(
+                controller: _emailController,
+                label: lang.getText(
+                  'contact_section.form.email_label',
+                  defaultValue: 'Email',
+                ),
+                accent: accent,
+                keyboardType: TextInputType.emailAddress,
+                textInputAction: TextInputAction.next,
+                validator: (value) {
+                  if (value == null || value.trim().isEmpty) {
+                    return lang.getText(
+                      'contact_section.form.email_error',
+                      defaultValue: 'Please enter a valid email',
+                    );
+                  }
+                  final emailRegex = RegExp(
+                    r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
+                  );
+                  if (!emailRegex.hasMatch(value.trim())) {
+                    return lang.getText(
+                      'contact_section.form.email_error',
+                      defaultValue: 'Please enter a valid email',
+                    );
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 20),
+              // Message field
+              _CinematicTextField(
+                controller: _messageController,
+                label: lang.getText(
+                  'contact_section.form.message_label',
+                  defaultValue: 'Message',
+                ),
+                accent: accent,
+                maxLines: 5,
+                textInputAction: TextInputAction.done,
+                validator: (value) {
+                  if (value == null || value.trim().isEmpty) {
+                    return lang.getText(
+                      'contact_section.form.message_error',
+                      defaultValue: 'Please enter your message',
+                    );
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 28),
+              // Status message
+              AnimatedSwitcher(
+                duration: AppDurations.medium,
+                child: switch (_status) {
+                  _FormStatus.success => Padding(
+                    key: const ValueKey('success'),
+                    padding: const EdgeInsets.only(bottom: 16),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(
+                          Icons.check_circle_outline,
+                          color: AppColors.expAccent,
+                          size: 18,
+                        ),
+                        const SizedBox(width: 8),
+                        Flexible(
+                          child: Text(
+                            lang.getText(
+                              'contact_section.form.success',
+                              defaultValue:
+                                  'Your email app is open. Review and send your message.',
+                            ),
+                            style: AppTypography.bodySmall.copyWith(
+                              color: AppColors.expAccent,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  _FormStatus.error => Padding(
+                    key: const ValueKey('error'),
+                    padding: const EdgeInsets.only(bottom: 16),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(
+                          Icons.error_outline,
+                          color: AppColors.projAccent,
+                          size: 18,
+                        ),
+                        const SizedBox(width: 8),
+                        Flexible(
+                          child: Text(
+                            lang.getText(
+                              'contact_section.form.error',
+                              defaultValue:
+                                  'An error occurred. Please try again.',
+                            ),
+                            style: AppTypography.bodySmall.copyWith(
+                              color: AppColors.projAccent,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  _ => const SizedBox.shrink(key: ValueKey('idle')),
+                },
+              ),
+              // Submit button
+              _SubmitButton(
+                accent: accent,
+                label: lang.getText(
+                  'contact_section.form.submit_button',
+                  defaultValue: 'Send Message',
+                ),
+                isSending: _status == _FormStatus.sending,
+                onTap: _status == _FormStatus.sending ? null : _submit,
+              ),
+            ],
+          ),
+        ),
+      );
+    },
+  );
 }
 
 /// Transparent text field with accent-colored focus border.
@@ -546,9 +547,7 @@ class _CinematicTextFieldState extends State<_CinematicTextField> {
         decoration: InputDecoration(
           labelText: widget.label,
           labelStyle: AppTypography.bodySmall.copyWith(
-            color: _focused
-                ? widget.accent
-                : AppColors.textSecondary,
+            color: _focused ? widget.accent : AppColors.textSecondary,
           ),
           floatingLabelStyle: AppTypography.caption.copyWith(
             color: widget.accent,
@@ -607,8 +606,8 @@ class _SubmitButtonState extends State<_SubmitButton> {
           color: widget.isSending
               ? widget.accent.withValues(alpha: 0.05)
               : _hovered
-                  ? widget.accent.withValues(alpha: 0.12)
-                  : widget.accent.withValues(alpha: 0.06),
+              ? widget.accent.withValues(alpha: 0.12)
+              : widget.accent.withValues(alpha: 0.06),
           border: Border.all(
             color: _hovered && !widget.isSending
                 ? widget.accent.withValues(alpha: 0.8)
@@ -636,7 +635,7 @@ class _SubmitButtonState extends State<_SubmitButton> {
               )
             : Text(
                 widget.label,
-                style: GoogleFonts.spaceGrotesk(
+                style: AppFonts.spaceGrotesk(
                   fontSize: 15,
                   fontWeight: FontWeight.w600,
                   color: widget.accent,

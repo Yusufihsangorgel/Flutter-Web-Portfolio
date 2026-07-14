@@ -1,8 +1,9 @@
+import 'dart:async';
 import 'dart:math' as math;
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_web_portfolio/app/controllers/scene_director.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
 import 'package:flutter_web_portfolio/app/core/constants/scene_configs.dart';
@@ -22,10 +23,12 @@ class _CinematicBackgroundState extends State<CinematicBackground>
   Offset _mouseOffset = Offset.zero;
 
   late SceneConfig _config;
-  late Worker _configWorker;
+  StreamSubscription<SceneState>? _configSubscription;
+  SceneDirector? _sceneDirector;
 
   ui.Image? _grainTexture;
   int _lastGrainSeed = -1;
+  bool _reduceMotion = false;
 
   @override
   void initState() {
@@ -36,32 +39,54 @@ class _CinematicBackgroundState extends State<CinematicBackground>
       duration: const Duration(seconds: 30),
     )..repeat();
 
-    final sceneDirector = Get.find<SceneDirector>();
-    _config = sceneDirector.blendedConfig.value;
-    _configWorker = ever(sceneDirector.blendedConfig, (cfg) {
-      _config = cfg;
-    });
+    _config = SceneConfigs.hero;
   }
 
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
-    _configWorker.dispose();
+    _configSubscription?.cancel();
     _animController.dispose();
     _grainTexture?.dispose();
     super.dispose();
   }
 
   @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.hidden || state == AppLifecycleState.paused) {
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final director = context.read<SceneDirector>();
+    if (!identical(director, _sceneDirector)) {
+      _configSubscription?.cancel();
+      _sceneDirector = director;
+      _config = director.state.blendedConfig;
+      _configSubscription = director.stream.listen((state) {
+        _config = state.blendedConfig;
+      });
+    }
+
+    final reduceMotion = MediaQuery.disableAnimationsOf(context);
+    if (_reduceMotion == reduceMotion) return;
+    _reduceMotion = reduceMotion;
+    if (reduceMotion) {
       _animController.stop();
-    } else if (state == AppLifecycleState.resumed) {
+      _mouseOffset = Offset.zero;
+    } else if (!_animController.isAnimating) {
       _animController.repeat();
     }
   }
 
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.hidden ||
+        state == AppLifecycleState.paused) {
+      _animController.stop();
+    } else if (state == AppLifecycleState.resumed) {
+      if (!_reduceMotion) _animController.repeat();
+    }
+  }
+
   void _onMouseMove(PointerEvent event) {
+    if (_reduceMotion) return;
     final size = context.size;
     if (size == null) return;
     // Normalized -1 to 1
@@ -123,7 +148,7 @@ class _CinematicBackgroundState extends State<CinematicBackground>
         ),
       ),
     ),
-    );
+  );
 }
 
 class _MeshGradientPainter extends CustomPainter {
@@ -164,24 +189,30 @@ class _MeshGradientPainter extends CustomPainter {
     final blobs = [
       _BlobConfig(
         center: Offset(
-          size.width * (0.25 + 0.15 * math.sin(t * 0.7) + mouseOffset.dx * 0.02),
-          size.height * (0.3 + 0.15 * math.cos(t * 0.5) + mouseOffset.dy * 0.02),
+          size.width *
+              (0.25 + 0.15 * math.sin(t * 0.7) + mouseOffset.dx * 0.02),
+          size.height *
+              (0.3 + 0.15 * math.cos(t * 0.5) + mouseOffset.dy * 0.02),
         ),
         radius: size.width * 0.45,
         color: gradient1.withValues(alpha: 0.25),
       ),
       _BlobConfig(
         center: Offset(
-          size.width * (0.75 + 0.12 * math.cos(t * 0.6) + mouseOffset.dx * 0.015),
-          size.height * (0.25 + 0.18 * math.sin(t * 0.8) + mouseOffset.dy * 0.015),
+          size.width *
+              (0.75 + 0.12 * math.cos(t * 0.6) + mouseOffset.dx * 0.015),
+          size.height *
+              (0.25 + 0.18 * math.sin(t * 0.8) + mouseOffset.dy * 0.015),
         ),
         radius: size.width * 0.4,
         color: gradient2.withValues(alpha: 0.2),
       ),
       _BlobConfig(
         center: Offset(
-          size.width * (0.5 + 0.2 * math.sin(t * 0.4 + 1.5) + mouseOffset.dx * 0.025),
-          size.height * (0.7 + 0.12 * math.cos(t * 0.9 + 0.8) + mouseOffset.dy * 0.025),
+          size.width *
+              (0.5 + 0.2 * math.sin(t * 0.4 + 1.5) + mouseOffset.dx * 0.025),
+          size.height *
+              (0.7 + 0.12 * math.cos(t * 0.9 + 0.8) + mouseOffset.dy * 0.025),
         ),
         radius: size.width * 0.5,
         color: gradient3.withValues(alpha: 0.15),

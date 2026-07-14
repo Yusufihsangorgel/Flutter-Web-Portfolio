@@ -1,11 +1,10 @@
 import 'dart:developer' as dev;
 
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_web_portfolio/app/core/theme/app_fonts.dart';
 
-import 'package:flutter_web_portfolio/app/controllers/language_controller.dart';
-import 'package:flutter_web_portfolio/app/controllers/scene_director.dart';
+import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
 import 'package:flutter_web_portfolio/app/core/constants/breakpoints.dart';
 import 'package:flutter_web_portfolio/app/core/constants/durations.dart';
@@ -14,6 +13,7 @@ import 'package:flutter_web_portfolio/app/data/providers/github_provider.dart';
 import 'package:flutter_web_portfolio/app/widgets/animated_counter.dart';
 import 'package:flutter_web_portfolio/app/widgets/border_light_card.dart';
 import 'package:flutter_web_portfolio/app/widgets/scroll_fade_in.dart';
+import 'package:flutter_web_portfolio/app/widgets/scene_accent_builder.dart';
 import 'package:flutter_web_portfolio/app/widgets/skeleton_shimmer.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -27,7 +27,7 @@ class GitHubActivity extends StatefulWidget {
 }
 
 class _GitHubActivityState extends State<GitHubActivity> {
-  final _provider = Get.find<GitHubProvider>();
+  late final GitHubProvider _provider;
   bool _loading = true;
   bool _error = false;
 
@@ -39,11 +39,12 @@ class _GitHubActivityState extends State<GitHubActivity> {
   @override
   void initState() {
     super.initState();
+    _provider = context.read<GitHubProvider>();
     _fetchData();
   }
 
   String _resolveUsername() {
-    final lang = Get.find<LanguageController>();
+    final lang = context.read<LanguageCubit>();
     final github = (lang.cvData['personal_info']?['github'] as String?) ?? '';
     // Extract username from URL like "https://github.com/username"
     final uri = Uri.tryParse(github);
@@ -98,20 +99,29 @@ class _GitHubActivityState extends State<GitHubActivity> {
         children: [
           const SizedBox(height: 48),
           // Section label
-          Obx(() {
-            final accent = Get.find<SceneDirector>().currentAccent.value;
-            final languageController = Get.find<LanguageController>();
-            return Row(
-              children: [
-                Icon(Icons.code_rounded, color: accent, size: 20),
-                const SizedBox(width: 8),
-                Text(
-                  languageController.getText('about_section.github_title', defaultValue: 'GitHub Activity'),
-                  style: AppTypography.h2.copyWith(color: accent),
-                ),
-              ],
-            );
-          }),
+          BlocBuilder<LanguageCubit, LanguageState>(
+            buildWhen: (previous, current) =>
+                previous.languageCode != current.languageCode ||
+                !identical(previous.translations, current.translations),
+            builder: (context, languageState) => SceneAccentBuilder(
+              builder: (context, accent) {
+                final languageController = context.read<LanguageCubit>();
+                return Row(
+                  children: [
+                    Icon(Icons.code_rounded, color: accent, size: 20),
+                    const SizedBox(width: 8),
+                    Text(
+                      languageController.getText(
+                        'about_section.github_title',
+                        defaultValue: 'GitHub Activity',
+                      ),
+                      style: AppTypography.h2.copyWith(color: accent),
+                    ),
+                  ],
+                );
+              },
+            ),
+          ),
           const SizedBox(height: 24),
           // Stats row
           _StatsRow(
@@ -150,61 +160,91 @@ class _StatsRow extends StatelessWidget {
     final repos = profile['public_repos'] as int? ?? 0;
     final followers = profile['followers'] as int? ?? 0;
 
-    return Obx(() {
-      final accent = Get.find<SceneDirector>().currentAccent.value;
-      final languageController = Get.find<LanguageController>();
-      return Wrap(
-        spacing: 16,
-        runSpacing: 16,
-        crossAxisAlignment: WrapCrossAlignment.center,
-        children: [
-          // Avatar
-          if (avatarUrl.isNotEmpty)
-            Container(
-              width: isMobile ? 48 : 56,
-              height: isMobile ? 48 : 56,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: accent.withValues(alpha: 0.3),
-                  width: 2,
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: accent.withValues(alpha: 0.15),
-                    blurRadius: 16,
+    return BlocBuilder<LanguageCubit, LanguageState>(
+      buildWhen: (previous, current) =>
+          previous.languageCode != current.languageCode ||
+          !identical(previous.translations, current.translations),
+      builder: (context, languageState) => SceneAccentBuilder(
+        builder: (context, accent) {
+          final languageController = context.read<LanguageCubit>();
+          return Wrap(
+            spacing: 16,
+            runSpacing: 16,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              // Avatar
+              if (avatarUrl.isNotEmpty)
+                Container(
+                  width: isMobile ? 48 : 56,
+                  height: isMobile ? 48 : 56,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: accent.withValues(alpha: 0.3),
+                      width: 2,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: accent.withValues(alpha: 0.15),
+                        blurRadius: 16,
+                      ),
+                    ],
                   ),
-                ],
-              ),
-              child: ClipOval(
-                child: Image.network(
-                  avatarUrl,
-                  fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) => Container(
-                    color: AppColors.backgroundLight,
-                    child: Icon(
-                      Icons.person,
-                      color: AppColors.textSecondary,
-                      size: isMobile ? 24 : 28,
+                  child: ClipOval(
+                    child: Image.network(
+                      avatarUrl,
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, _, _) => Container(
+                        color: AppColors.backgroundLight,
+                        child: Icon(
+                          Icons.person,
+                          color: AppColors.textSecondary,
+                          size: isMobile ? 24 : 28,
+                        ),
+                      ),
                     ),
                   ),
                 ),
+              _StatChip(
+                label: languageController.getText(
+                  'about_section.github_repos',
+                  defaultValue: 'Repos',
+                ),
+                value: repos,
+                accent: accent,
               ),
-            ),
-          _StatChip(label: languageController.getText('about_section.github_repos', defaultValue: 'Repos'), value: repos, accent: accent),
-          _StatChip(label: languageController.getText('about_section.github_followers', defaultValue: 'Followers'), value: followers, accent: accent),
-          _StatChip(label: languageController.getText('about_section.github_stars', defaultValue: 'Stars'), value: totalStars, accent: accent),
-          if (isError)
-            Text(
-              languageController.getText('about_section.github_cached', defaultValue: '(cached)'),
-              style: AppTypography.caption.copyWith(
-                color: AppColors.textSecondary,
-                fontSize: 11,
+              _StatChip(
+                label: languageController.getText(
+                  'about_section.github_followers',
+                  defaultValue: 'Followers',
+                ),
+                value: followers,
+                accent: accent,
               ),
-            ),
-        ],
-      );
-    });
+              _StatChip(
+                label: languageController.getText(
+                  'about_section.github_stars',
+                  defaultValue: 'Stars',
+                ),
+                value: totalStars,
+                accent: accent,
+              ),
+              if (isError)
+                Text(
+                  languageController.getText(
+                    'about_section.github_cached',
+                    defaultValue: '(cached)',
+                  ),
+                  style: AppTypography.caption.copyWith(
+                    color: AppColors.textSecondary,
+                    fontSize: 11,
+                  ),
+                ),
+            ],
+          );
+        },
+      ),
+    );
   }
 }
 
@@ -227,10 +267,7 @@ class _StatChip extends StatelessWidget {
       decoration: BoxDecoration(
         color: accent.withValues(alpha: 0.06),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-          color: accent.withValues(alpha: 0.12),
-          width: 1,
-        ),
+        border: Border.all(color: accent.withValues(alpha: 0.12), width: 1),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -238,7 +275,7 @@ class _StatChip extends StatelessWidget {
           AnimatedCounter(
             endValue: value,
             duration: const Duration(milliseconds: 1200),
-            style: GoogleFonts.spaceGrotesk(
+            style: AppFonts.spaceGrotesk(
               fontSize: 18,
               fontWeight: FontWeight.w700,
               color: accent,
@@ -247,9 +284,7 @@ class _StatChip extends StatelessWidget {
           const SizedBox(width: 6),
           Text(
             label,
-            style: AppTypography.caption.copyWith(
-              color: AppColors.textPrimary,
-            ),
+            style: AppTypography.caption.copyWith(color: AppColors.textPrimary),
           ),
         ],
       ),
@@ -268,11 +303,12 @@ class _RecentRepos extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.sizeOf(context).width;
-    final crossAxisCount = screenWidth >= Breakpoints.tablet ? 3 : (screenWidth >= Breakpoints.mobile ? 2 : 1);
+    final crossAxisCount = screenWidth >= Breakpoints.tablet
+        ? 3
+        : (screenWidth >= Breakpoints.mobile ? 2 : 1);
 
-    return Obx(() {
-      final accent = Get.find<SceneDirector>().currentAccent.value;
-      return GridView.builder(
+    return SceneAccentBuilder(
+      builder: (context, accent) => GridView.builder(
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -282,12 +318,10 @@ class _RecentRepos extends StatelessWidget {
           childAspectRatio: 1.6,
         ),
         itemCount: repos.length,
-        itemBuilder: (context, index) => _RepoCard(
-          repo: repos[index],
-          accent: accent,
-        ),
-      );
-    });
+        itemBuilder: (context, index) =>
+            _RepoCard(repo: repos[index], accent: accent),
+      ),
+    );
   }
 }
 
@@ -307,77 +341,86 @@ class _RepoCard extends StatelessWidget {
 
     return GestureDetector(
       onTap: htmlUrl.isNotEmpty
-          ? () => launchUrl(Uri.parse(htmlUrl), mode: LaunchMode.externalApplication)
+          ? () => launchUrl(
+              Uri.parse(htmlUrl),
+              mode: LaunchMode.externalApplication,
+            )
           : null,
       child: MouseRegion(
-        cursor: htmlUrl.isNotEmpty ? SystemMouseCursors.click : SystemMouseCursors.basic,
+        cursor: htmlUrl.isNotEmpty
+            ? SystemMouseCursors.click
+            : SystemMouseCursors.basic,
         child: BorderLightCard(
-      glowColor: accent,
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
+          glowColor: accent,
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Icon(Icons.folder_open_rounded, size: 16, color: accent),
-              const SizedBox(width: 8),
+              Row(
+                children: [
+                  Icon(Icons.folder_open_rounded, size: 16, color: accent),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      name,
+                      style: AppFonts.jetBrainsMono(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.textBright,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
               Expanded(
                 child: Text(
-                  name,
-                  style: GoogleFonts.jetBrainsMono(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.textBright,
+                  description,
+                  style: AppTypography.caption.copyWith(
+                    color: AppColors.textPrimary,
+                    height: 1.4,
                   ),
-                  maxLines: 1,
+                  maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Expanded(
-            child: Text(
-              description,
-              style: AppTypography.caption.copyWith(
-                color: AppColors.textPrimary,
-                height: 1.4,
-              ),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Row(
-            children: [
-              if (language.isNotEmpty) ...[
-                Container(
-                  width: 8,
-                  height: 8,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: _languageColor(language),
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  if (language.isNotEmpty) ...[
+                    Container(
+                      width: 8,
+                      height: 8,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: _languageColor(language),
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      language,
+                      style: AppTypography.caption.copyWith(fontSize: 11),
+                    ),
+                    const Spacer(),
+                  ],
+                  const Icon(
+                    Icons.star_border_rounded,
+                    size: 14,
+                    color: AppColors.textSecondary,
                   ),
-                ),
-                const SizedBox(width: 4),
-                Text(
-                  language,
-                  style: AppTypography.caption.copyWith(fontSize: 11),
-                ),
-                const Spacer(),
-              ],
-              const Icon(Icons.star_border_rounded, size: 14, color: AppColors.textSecondary),
-              const SizedBox(width: 2),
-              Text(
-                '$stars',
-                style: AppTypography.caption.copyWith(fontSize: 11),
+                  const SizedBox(width: 2),
+                  Text(
+                    '$stars',
+                    style: AppTypography.caption.copyWith(fontSize: 11),
+                  ),
+                ],
               ),
             ],
           ),
-        ],
+        ),
       ),
-    ),
-    ),
     );
   }
 

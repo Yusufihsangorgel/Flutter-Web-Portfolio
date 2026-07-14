@@ -54,4 +54,6 @@ coverage/
 deploy.sh
 
 # Playwright output
+node_modules/
 test-results/
+playwright-report/

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/services.dart';
-import 'package:get/get.dart';
 import 'package:flutter_web_portfolio/app/controllers/sound_controller.dart';
 
 /// Focusable interaction wrapper — keyboard nav, hover, tap, focus ring.
@@ -34,14 +34,13 @@ class _CinematicFocusableState extends State<CinematicFocusable> {
 
   @override
   Widget build(BuildContext context) {
-    final focusColor = widget.focusColor ??
-        Colors.white.withValues(alpha: 0.4);
+    final focusColor = widget.focusColor ?? Colors.white.withValues(alpha: 0.4);
 
     return FocusableActionDetector(
       mouseCursor: widget.cursor,
       onShowHoverHighlight: (hovered) {
-        if (hovered && Get.isRegistered<SoundController>()) {
-          Get.find<SoundController>().playHover();
+        if (hovered) {
+          context.read<SoundController>().playHover();
         }
         widget.onHoverChanged?.call(hovered);
       },
@@ -60,9 +59,7 @@ class _CinematicFocusableState extends State<CinematicFocusable> {
       },
       child: GestureDetector(
         onTap: () {
-          if (Get.isRegistered<SoundController>()) {
-            Get.find<SoundController>().playClick();
-          }
+          context.read<SoundController>().playClick();
           widget.onTap();
         },
         child: DecoratedBox(

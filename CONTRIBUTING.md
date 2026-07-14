@@ -7,7 +7,7 @@ Thanks for your interest in contributing to this project. Here's how to get star
 1. **Fork** the repository
 2. **Clone** your fork:
    ```bash
-   git clone https://github.com/YOUR_USERNAME/Flutter-Web-Portfolio.git
+   git clone <your-fork-url>
    cd Flutter-Web-Portfolio
    ```
 3. **Install dependencies:**
@@ -23,7 +23,7 @@ Thanks for your interest in contributing to this project. Here's how to get star
 
 ### Before You Code
 
-- Check [existing issues](https://github.com/Yusufihsangorgel/Flutter-Web-Portfolio/issues) to avoid duplicate work
+- Check the repository issue tracker to avoid duplicate work
 - For large changes, open an issue first to discuss the approach
 
 ### While You Code
@@ -35,14 +35,25 @@ Thanks for your interest in contributing to this project. Here's how to get star
 
 ### Before You Submit
 
-Both checks must pass:
+All quality gates must pass:
 
 ```bash
+# Canonical Dart 3.11 formatting
+dart format --output=none --set-exit-if-changed lib test
+
 # Static analysis — zero warnings, zero infos
 flutter analyze --fatal-infos
 
 # All tests pass
 flutter test
+
+# Dual-runtime release build
+flutter build web --release --wasm --no-web-resources-cdn
+
+# Bundle integrity and browser smoke tests
+npm ci
+npm run verify:bundle
+npm test
 ```
 
 ## Pull Request Process
@@ -72,23 +83,27 @@ flutter test
 
 ```
 lib/app/
-├── controllers/    # GetX reactive controllers
-├── core/           # Constants, theme definitions
+├── controllers/    # Frame-adjacent scroll, scene, cursor, and sound state
+├── core/           # Constants and theme definitions
 ├── data/           # Models, providers, repository implementations
-├── domain/         # Entities, abstract interfaces (DIP)
-├── modules/        # Page modules with sections
-├── utils/          # Utility functions
-└── widgets/        # Reusable UI components
+├── domain/         # Entities and abstract interfaces
+├── features/       # Vertically sliced application features
+├── modules/        # Page modules and sections
+├── utils/          # Platform-aware utilities
+└── widgets/        # Reusable UI and custom painters
 ```
 
 When adding a new widget:
 1. Create it in `lib/app/widgets/`
 2. Add a corresponding test in `test/widget/`
-3. Export it if other modules need it
+
+Application features with state, infrastructure, and presentation code belong
+under `lib/app/features/<feature>/`. Keep frame-frequency state out of Cubits;
+use a synchronous `Listenable` when a value can change every rendered frame.
 
 ## Reporting Bugs
 
-Use the [bug report template](https://github.com/Yusufihsangorgel/Flutter-Web-Portfolio/issues/new?template=bug_report.md) and include:
+Use the repository bug report template and include:
 - Flutter version (`flutter --version`)
 - Browser and OS
 - Steps to reproduce

@@ -9,6 +9,9 @@ void setUrlHash(String hash) {}
 /// No-op on non-web platforms.
 void setHtmlLang(String languageCode) {}
 
+/// No-op outside a browser.
+void reloadPage() {}
+
 /// Registers a listener that fires when the browser navigates back/forward.
 /// Returns a dispose callback.
 void Function() onPopState(void Function(String hash) callback) => () {};

@@ -1,15 +1,27 @@
-// Stub implementation for non-web platforms — all sound operations are no-ops.
+import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'package:get/get.dart';
+import 'package:flutter_web_portfolio/app/controllers/sound_state.dart';
+import 'package:flutter_web_portfolio/app/core/constants/sound_constants.dart';
 
 /// No-op sound controller for non-web platforms.
-class SoundController extends GetxController {
-  final RxBool isEnabled = false.obs;
-  final RxDouble masterVolume = 0.5.obs;
-  final RxBool isAmbientPlaying = false.obs;
+final class SoundController extends Cubit<SoundState> {
+  SoundController()
+    : super(
+        const SoundState.initial(
+          masterVolume: SoundConstants.defaultMasterVolume,
+        ),
+      );
 
-  void toggleSound() => isEnabled.value = !isEnabled.value;
-  void setMasterVolume(double volume) => masterVolume.value = volume;
+  void toggleSound() => emit(state.copyWith(isEnabled: !state.isEnabled));
+
+  void setMasterVolume(double volume) => emit(
+    state.copyWith(
+      masterVolume: volume.clamp(
+        SoundConstants.minVolume,
+        SoundConstants.maxVolume,
+      ),
+    ),
+  );
 
   void playHover() {}
   void playClick() {}

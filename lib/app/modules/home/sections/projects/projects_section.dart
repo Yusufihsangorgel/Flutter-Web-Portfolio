@@ -1,11 +1,10 @@
 import 'dart:math' show pi;
 
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_web_portfolio/app/core/theme/app_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:flutter_web_portfolio/app/controllers/language_controller.dart';
-import 'package:flutter_web_portfolio/app/controllers/scene_director.dart';
+import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
 import 'package:flutter_web_portfolio/app/controllers/sound_controller.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
 import 'package:flutter_web_portfolio/app/core/constants/cinematic_curves.dart';
@@ -17,6 +16,7 @@ import 'package:flutter_web_portfolio/app/widgets/cinematic_focusable.dart';
 import 'package:flutter_web_portfolio/app/widgets/numbered_section_heading.dart';
 import 'package:flutter_web_portfolio/app/widgets/project_detail_overlay.dart';
 import 'package:flutter_web_portfolio/app/widgets/scroll_fade_in.dart';
+import 'package:flutter_web_portfolio/app/widgets/scene_accent_builder.dart';
 import 'package:flutter_web_portfolio/app/widgets/text_scramble.dart';
 
 /// Projects Section — "The Showcase"
@@ -57,8 +57,13 @@ class _ProjectsSectionState extends State<ProjectsSection> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    final languageController = Get.find<LanguageController>();
+  Widget build(BuildContext context) =>
+      BlocBuilder<LanguageCubit, LanguageState>(
+        builder: (context, _) => _buildContent(context),
+      );
+
+  Widget _buildContent(BuildContext context) {
+    final languageController = context.read<LanguageCubit>();
     final isMobile = ResponsiveUtils.isMobile(context);
     final screenWidth = MediaQuery.sizeOf(context).width;
     final projectsData = languageController.cvData['projects'] as List? ?? [];
@@ -73,9 +78,11 @@ class _ProjectsSectionState extends State<ProjectsSection> {
           Positioned(
             top: -20,
             left: -10,
-            child: Obx(() => Text(
-              languageController.getText('nav.projects', defaultValue: 'Projects').toUpperCase(),
-              style: GoogleFonts.spaceGrotesk(
+            child: Text(
+              languageController
+                  .getText('nav.projects', defaultValue: 'Projects')
+                  .toUpperCase(),
+              style: AppFonts.spaceGrotesk(
                 fontSize: ResponsiveUtils.getValueForScreenType<double>(
                   context: context,
                   mobile: 48.0,
@@ -86,58 +93,61 @@ class _ProjectsSectionState extends State<ProjectsSection> {
                 color: Colors.white.withValues(alpha: 0.03),
                 letterSpacing: -4,
               ),
-            )),
+            ),
           ),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 40),
               ScrollFadeIn(
-                child: Obx(() {
-                  final accent = Get.find<SceneDirector>().currentAccent.value;
-                  return NumberedSectionHeading(
+                child: SceneAccentBuilder(
+                  builder: (context, accent) => NumberedSectionHeading(
                     number: '05',
                     title: languageController.getText(
                       'projects_section.title',
                       defaultValue: "Things I've Built",
                     ),
                     accent: accent,
-                  );
-                }),
+                  ),
+                ),
               ),
               const SizedBox(height: 24),
               // Category filter chips
               if (categories.isNotEmpty)
                 ScrollFadeIn(
-                  child: Obx(() {
-                    final accent = Get.find<SceneDirector>().currentAccent.value;
-                    final filterAllLabel = languageController.getText(
-                      'projects_section.filter_all',
-                      defaultValue: 'All',
-                    );
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: 16),
-                      child: Wrap(
-                        spacing: 10,
-                        runSpacing: 8,
-                        children: [
-                          _CategoryChip(
-                            label: filterAllLabel,
-                            isSelected: _selectedCategory.isEmpty,
-                            accent: accent,
-                            onTap: () => setState(() => _selectedCategory = ''),
-                          ),
-                          for (final category in categories)
+                  child: SceneAccentBuilder(
+                    builder: (context, accent) {
+                      final filterAllLabel = languageController.getText(
+                        'projects_section.filter_all',
+                        defaultValue: 'All',
+                      );
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 16),
+                        child: Wrap(
+                          spacing: 10,
+                          runSpacing: 8,
+                          children: [
                             _CategoryChip(
-                              label: category,
-                              isSelected: _selectedCategory == category,
+                              label: filterAllLabel,
+                              isSelected: _selectedCategory.isEmpty,
                               accent: accent,
-                              onTap: () => setState(() => _selectedCategory = category),
+                              onTap: () =>
+                                  setState(() => _selectedCategory = ''),
                             ),
-                        ],
-                      ),
-                    );
-                  }),
+                            for (final category in categories)
+                              _CategoryChip(
+                                label: category,
+                                isSelected: _selectedCategory == category,
+                                accent: accent,
+                                onTap: () => setState(
+                                  () => _selectedCategory = category,
+                                ),
+                              ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
                 ),
               const SizedBox(height: 16),
               // Featured projects — full width, alternating
@@ -151,14 +161,18 @@ class _ProjectsSectionState extends State<ProjectsSection> {
                   children: [
                     for (int i = 0; i < filteredProjects.length; i++) ...[
                       ScrollFadeIn(
-                        delay: Duration(milliseconds: i * AppDurations.staggerShort.inMilliseconds),
+                        delay: Duration(
+                          milliseconds:
+                              i * AppDurations.staggerShort.inMilliseconds,
+                        ),
                         child: _ProjectCard(
                           project: filteredProjects[i] as Map<String, dynamic>,
                           isReversed: !isMobile && i.isOdd,
                           isMobile: isMobile,
                         ),
                       ),
-                      if (i < filteredProjects.length - 1) const SizedBox(height: 32),
+                      if (i < filteredProjects.length - 1)
+                        const SizedBox(height: 32),
                     ],
                   ],
                 ),
@@ -198,51 +212,47 @@ class _CategoryChipState extends State<_CategoryChip> {
     selected: widget.isSelected,
     label: widget.label,
     child: MouseRegion(
-    cursor: SystemMouseCursors.click,
-    onEnter: (_) {
-      setState(() => _hovered = true);
-      if (Get.isRegistered<SoundController>()) {
-        Get.find<SoundController>().playHover();
-      }
-    },
-    onExit: (_) => setState(() => _hovered = false),
-    child: GestureDetector(
-      onTap: () {
-        if (Get.isRegistered<SoundController>()) {
-          Get.find<SoundController>().playClick();
-        }
-        widget.onTap();
+      cursor: SystemMouseCursors.click,
+      onEnter: (_) {
+        setState(() => _hovered = true);
+        context.read<SoundController>().playHover();
       },
-      child: AnimatedContainer(
-        duration: AppDurations.fast,
-        curve: Curves.easeOut,
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        decoration: BoxDecoration(
-          color: widget.isSelected
-              ? widget.accent.withValues(alpha: 0.15)
-              : _hovered
-                  ? widget.accent.withValues(alpha: 0.06)
-                  : Colors.transparent,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(
+      onExit: (_) => setState(() => _hovered = false),
+      child: GestureDetector(
+        onTap: () {
+          context.read<SoundController>().playClick();
+          widget.onTap();
+        },
+        child: AnimatedContainer(
+          duration: AppDurations.fast,
+          curve: Curves.easeOut,
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          decoration: BoxDecoration(
             color: widget.isSelected
-                ? widget.accent
+                ? widget.accent.withValues(alpha: 0.15)
                 : _hovered
-                    ? widget.accent.withValues(alpha: 0.4)
-                    : AppColors.textSecondary.withValues(alpha: 0.3),
-            width: widget.isSelected ? 1.5 : 1,
+                ? widget.accent.withValues(alpha: 0.06)
+                : Colors.transparent,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: widget.isSelected
+                  ? widget.accent
+                  : _hovered
+                  ? widget.accent.withValues(alpha: 0.4)
+                  : AppColors.textSecondary.withValues(alpha: 0.3),
+              width: widget.isSelected ? 1.5 : 1,
+            ),
           ),
-        ),
-        child: Text(
-          widget.label,
-          style: GoogleFonts.jetBrainsMono(
-            fontSize: 13,
-            fontWeight: widget.isSelected ? FontWeight.w600 : FontWeight.w400,
-            color: widget.isSelected ? widget.accent : AppColors.textPrimary,
+          child: Text(
+            widget.label,
+            style: AppFonts.jetBrainsMono(
+              fontSize: 13,
+              fontWeight: widget.isSelected ? FontWeight.w600 : FontWeight.w400,
+              color: widget.isSelected ? widget.accent : AppColors.textPrimary,
+            ),
           ),
         ),
       ),
-    ),
     ),
   );
 }
@@ -286,106 +296,133 @@ class _ProjectCardState extends State<_ProjectCard> {
     final technologies = _extractTechnologies(p);
     final url = _extractUrl(p);
 
-    return Obx(() {
-      final accent = Get.find<SceneDirector>().currentAccent.value;
-
-      final frontCard = MouseRegion(
-        cursor: SystemMouseCursors.click,
-        onEnter: (_) => setState(() => _hovered = true),
-        onExit: (_) => setState(() => _hovered = false),
-        child: AnimatedContainer(
-          duration: AppDurations.fast,
-          curve: Curves.easeOut,
-          transform: Matrix4.identity()
-            ..scaleByDouble(_hovered ? 1.02 : 1.0, _hovered ? 1.02 : 1.0, 1.0, 1.0),
-          transformAlignment: Alignment.center,
-          child: AnimatedOpacity(
+    return SceneAccentBuilder(
+      builder: (context, accent) {
+        final frontCard = MouseRegion(
+          cursor: SystemMouseCursors.click,
+          onEnter: (_) => setState(() => _hovered = true),
+          onExit: (_) => setState(() => _hovered = false),
+          child: AnimatedContainer(
             duration: AppDurations.fast,
-            opacity: _hovered ? 1.0 : 0.92,
-            child: BorderLightCard(
-              glowColor: accent,
-              child: Stack(
-                children: [
-                  isMobile
-                      ? _buildMobileContent(title, description, technologies, url, accent)
-                      : _buildDesktopContent(title, description, technologies, url, accent),
-                  if (_hasCaseStudy && !isMobile)
-                    Positioned(
-                      bottom: 4,
-                      right: 4,
-                      child: Tooltip(
-                        message: Get.find<LanguageController>().getText(
-                          'projects_section.flip_hint',
-                          defaultValue: 'Click to view case study',
-                        ),
-                        child: Icon(
-                          Icons.flip_rounded,
-                          size: 16,
-                          color: accent.withValues(alpha: 0.4),
+            curve: Curves.easeOut,
+            transform: Matrix4.identity()
+              ..scaleByDouble(
+                _hovered ? 1.02 : 1.0,
+                _hovered ? 1.02 : 1.0,
+                1.0,
+                1.0,
+              ),
+            transformAlignment: Alignment.center,
+            child: AnimatedOpacity(
+              duration: AppDurations.fast,
+              opacity: _hovered ? 1.0 : 0.92,
+              child: BorderLightCard(
+                glowColor: accent,
+                child: Stack(
+                  children: [
+                    isMobile
+                        ? _buildMobileContent(
+                            title,
+                            description,
+                            technologies,
+                            url,
+                            accent,
+                          )
+                        : _buildDesktopContent(
+                            title,
+                            description,
+                            technologies,
+                            url,
+                            accent,
+                          ),
+                    if (_hasCaseStudy && !isMobile)
+                      Positioned(
+                        bottom: 4,
+                        right: 4,
+                        child: Tooltip(
+                          message: context.read<LanguageCubit>().getText(
+                            'projects_section.flip_hint',
+                            defaultValue: 'Click to view case study',
+                          ),
+                          child: Icon(
+                            Icons.flip_rounded,
+                            size: 16,
+                            color: accent.withValues(alpha: 0.4),
+                          ),
                         ),
                       ),
-                    ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
-        ),
-      );
-
-      if (!_hasCaseStudy) {
-        return GestureDetector(
-          onTap: () => ProjectDetailOverlay.show(context, project),
-          child: frontCard,
         );
-      }
 
-      // On mobile, show case study in a bottom sheet instead of 3D flip
-      if (isMobile) {
-        return GestureDetector(
-          onTap: () => _showCaseStudySheet(context, project, accent),
-          child: Stack(
-            children: [
-              frontCard,
-              Positioned(
-                bottom: 8,
-                right: 8,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: accent.withValues(alpha: 0.12),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: accent.withValues(alpha: 0.2)),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(Icons.auto_stories_rounded, size: 12, color: accent),
-                      const SizedBox(width: 4),
-                      Text(
-                        Get.find<LanguageController>().getText(
-                          'projects_section.case_study_label',
-                          defaultValue: 'Case Study',
+        if (!_hasCaseStudy) {
+          return GestureDetector(
+            onTap: () => ProjectDetailOverlay.show(context, project),
+            child: frontCard,
+          );
+        }
+
+        // On mobile, show case study in a bottom sheet instead of 3D flip
+        if (isMobile) {
+          return GestureDetector(
+            onTap: () => _showCaseStudySheet(context, project, accent),
+            child: Stack(
+              children: [
+                frontCard,
+                Positioned(
+                  bottom: 8,
+                  right: 8,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: accent.withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: accent.withValues(alpha: 0.2)),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.auto_stories_rounded,
+                          size: 12,
+                          color: accent,
                         ),
-                        style: GoogleFonts.jetBrainsMono(fontSize: 10, color: accent),
-                      ),
-                    ],
+                        const SizedBox(width: 4),
+                        Text(
+                          context.read<LanguageCubit>().getText(
+                            'projects_section.case_study_label',
+                            defaultValue: 'Case Study',
+                          ),
+                          style: AppFonts.jetBrainsMono(
+                            fontSize: 10,
+                            color: accent,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
+          );
+        }
+
+        return _FlipCard(
+          front: frontCard,
+          back: _ProjectCardBack(
+            project: project,
+            isMobile: isMobile,
+            accent: accent,
           ),
         );
-      }
-
-      return _FlipCard(
-        front: frontCard,
-        back: _ProjectCardBack(
-          project: project,
-          isMobile: isMobile,
-          accent: accent,
-        ),
-      );
-    });
+      },
+    );
   }
 
   Widget _buildDesktopContent(
@@ -414,7 +451,7 @@ class _ProjectCardState extends State<_ProjectCard> {
                       padding: const EdgeInsets.only(bottom: 8),
                       child: Text(
                         category.toUpperCase(),
-                        style: GoogleFonts.jetBrainsMono(
+                        style: AppFonts.jetBrainsMono(
                           fontSize: 11,
                           fontWeight: FontWeight.w600,
                           color: accent,
@@ -424,7 +461,7 @@ class _ProjectCardState extends State<_ProjectCard> {
                     ),
                   TextScramble(
                     text: title,
-                    style: GoogleFonts.spaceGrotesk(
+                    style: AppFonts.spaceGrotesk(
                       fontSize: 26,
                       fontWeight: FontWeight.w700,
                       color: AppColors.textBright,
@@ -468,20 +505,28 @@ class _ProjectCardState extends State<_ProjectCard> {
               child: Wrap(
                 spacing: 8,
                 runSpacing: 8,
-                children: technologies.take(6).map((tech) => Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
-                  decoration: BoxDecoration(
-                    color: accent.withValues(alpha: 0.08),
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Text(
-                    tech,
-                    style: GoogleFonts.jetBrainsMono(
-                      fontSize: 12,
-                      color: accent,
-                    ),
-                  ),
-                )).toList(),
+                children: technologies
+                    .take(6)
+                    .map(
+                      (tech) => Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 5,
+                        ),
+                        decoration: BoxDecoration(
+                          color: accent.withValues(alpha: 0.08),
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: Text(
+                          tech,
+                          style: AppFonts.jetBrainsMono(
+                            fontSize: 12,
+                            color: accent,
+                          ),
+                        ),
+                      ),
+                    )
+                    .toList(),
               ),
             ),
             if (url.isNotEmpty) ...[
@@ -522,7 +567,7 @@ class _ProjectCardState extends State<_ProjectCard> {
           Expanded(
             child: Text(
               title,
-              style: GoogleFonts.spaceGrotesk(
+              style: AppFonts.spaceGrotesk(
                 fontSize: 22,
                 fontWeight: FontWeight.w700,
                 color: AppColors.textBright,
@@ -538,17 +583,24 @@ class _ProjectCardState extends State<_ProjectCard> {
       Wrap(
         spacing: 8,
         runSpacing: 8,
-        children: technologies.map((tech) => Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-          decoration: BoxDecoration(
-            color: accent.withValues(alpha: 0.08),
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Text(
-            tech,
-            style: GoogleFonts.jetBrainsMono(fontSize: 11, color: accent),
-          ),
-        )).toList(),
+        children: technologies
+            .map(
+              (tech) => Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 4,
+                ),
+                decoration: BoxDecoration(
+                  color: accent.withValues(alpha: 0.08),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  tech,
+                  style: AppFonts.jetBrainsMono(fontSize: 11, color: accent),
+                ),
+              ),
+            )
+            .toList(),
       ),
     ],
   );
@@ -562,10 +614,12 @@ class _ProjectCardState extends State<_ProjectCard> {
 
   String _extractUrl(Map<String, dynamic> project) => switch (project['url']) {
     final String url => url,
-    final Map<String, dynamic> urls => [
-      for (final key in ['website', 'google_play', 'app_store'])
-        if (urls[key] case final String url) url,
-    ].firstOrNull ?? '',
+    final Map<String, dynamic> urls =>
+      [
+            for (final key in ['website', 'google_play', 'app_store'])
+              if (urls[key] case final String url) url,
+          ].firstOrNull ??
+          '',
     _ => '',
   };
 }
@@ -587,7 +641,8 @@ class _ProjectLinkState extends State<_ProjectLink> {
   Widget build(BuildContext context) => CinematicFocusable(
     onTap: () async {
       var urlString = widget.url;
-      if (!urlString.startsWith('http://') && !urlString.startsWith('https://')) {
+      if (!urlString.startsWith('http://') &&
+          !urlString.startsWith('https://')) {
         urlString = 'https://$urlString';
       }
       final uri = Uri.parse(urlString);
@@ -600,13 +655,24 @@ class _ProjectLinkState extends State<_ProjectLink> {
     child: AnimatedContainer(
       duration: AppDurations.fast,
       padding: const EdgeInsets.all(8),
-      transform: Matrix4.diagonal3Values(_hovered ? 1.1 : 1.0, _hovered ? 1.1 : 1.0, 1.0),
+      transform: Matrix4.diagonal3Values(
+        _hovered ? 1.1 : 1.0,
+        _hovered ? 1.1 : 1.0,
+        1.0,
+      ),
       transformAlignment: Alignment.center,
       decoration: BoxDecoration(
-        color: _hovered ? widget.accent.withValues(alpha: 0.1) : Colors.transparent,
+        color: _hovered
+            ? widget.accent.withValues(alpha: 0.1)
+            : Colors.transparent,
         borderRadius: BorderRadius.circular(6),
         boxShadow: _hovered
-            ? [BoxShadow(color: widget.accent.withValues(alpha: 0.2), blurRadius: 12)]
+            ? [
+                BoxShadow(
+                  color: widget.accent.withValues(alpha: 0.2),
+                  blurRadius: 12,
+                ),
+              ]
             : [],
       ),
       child: Icon(
@@ -669,7 +735,9 @@ class _PlatformIconState extends State<_PlatformIcon> {
           duration: AppDurations.fast,
           padding: const EdgeInsets.all(6),
           decoration: BoxDecoration(
-            color: _hovered ? widget.accent.withValues(alpha: 0.12) : Colors.transparent,
+            color: _hovered
+                ? widget.accent.withValues(alpha: 0.12)
+                : Colors.transparent,
             borderRadius: BorderRadius.circular(6),
           ),
           child: Icon(
@@ -712,32 +780,32 @@ class _VisitButtonState extends State<_VisitButton> {
       duration: AppDurations.fast,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
-        color: _hovered ? widget.accent.withValues(alpha: 0.15) : widget.accent.withValues(alpha: 0.06),
+        color: _hovered
+            ? widget.accent.withValues(alpha: 0.15)
+            : widget.accent.withValues(alpha: 0.06),
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
-          color: _hovered ? widget.accent : widget.accent.withValues(alpha: 0.3),
+          color: _hovered
+              ? widget.accent
+              : widget.accent.withValues(alpha: 0.3),
         ),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            Get.find<LanguageController>().getText(
+            context.read<LanguageCubit>().getText(
               'projects_section.open_project',
               defaultValue: 'Visit',
             ),
-            style: GoogleFonts.jetBrainsMono(
+            style: AppFonts.jetBrainsMono(
               fontSize: 12,
               fontWeight: FontWeight.w600,
               color: widget.accent,
             ),
           ),
           const SizedBox(width: 6),
-          Icon(
-            Icons.arrow_outward_rounded,
-            size: 14,
-            color: widget.accent,
-          ),
+          Icon(Icons.arrow_outward_rounded, size: 14, color: widget.accent),
         ],
       ),
     ),
@@ -750,7 +818,7 @@ void _showCaseStudySheet(
   Map<String, dynamic> project,
   Color accent,
 ) {
-  final langCtrl = Get.find<LanguageController>();
+  final langCtrl = context.read<LanguageCubit>();
   final caseStudy = project['case_study'] as Map<String, dynamic>? ?? {};
   final title = (project['title'] as String?) ?? 'Project';
   final problem = caseStudy['problem'] as String? ?? '';
@@ -790,7 +858,10 @@ void _showCaseStudySheet(
             const SizedBox(height: 20),
             if (problem.isNotEmpty) ...[
               _BackSection(
-                heading: langCtrl.getText('projects_section.case_study_problem', defaultValue: 'The Challenge'),
+                heading: langCtrl.getText(
+                  'projects_section.case_study_problem',
+                  defaultValue: 'The Challenge',
+                ),
                 body: problem,
                 accent: accent,
               ),
@@ -798,7 +869,10 @@ void _showCaseStudySheet(
             ],
             if (solution.isNotEmpty) ...[
               _BackSection(
-                heading: langCtrl.getText('projects_section.case_study_solution', defaultValue: 'The Approach'),
+                heading: langCtrl.getText(
+                  'projects_section.case_study_solution',
+                  defaultValue: 'The Approach',
+                ),
                 body: solution,
                 accent: accent,
               ),
@@ -806,7 +880,10 @@ void _showCaseStudySheet(
             ],
             if (result.isNotEmpty)
               _BackSection(
-                heading: langCtrl.getText('projects_section.case_study_result', defaultValue: 'The Result'),
+                heading: langCtrl.getText(
+                  'projects_section.case_study_result',
+                  defaultValue: 'The Result',
+                ),
                 body: result,
                 accent: accent,
               ),
@@ -866,8 +943,9 @@ class _FlipCardState extends State<_FlipCard>
     child: AnimatedBuilder(
       animation: _controller,
       builder: (context, _) {
-        final curved = CinematicCurves.dramaticEntrance
-            .transform(_controller.value);
+        final curved = CinematicCurves.dramaticEntrance.transform(
+          _controller.value,
+        );
         final angle = curved * pi;
         final isFront = angle < pi / 2;
         return Transform(
@@ -912,7 +990,7 @@ class _ProjectCardBack extends StatelessWidget {
     final result = caseStudy['result'] as String? ?? '';
     final technologies = _extractTechnologies(project);
     final url = _extractUrl(project);
-    final langCtrl = Get.find<LanguageController>();
+    final langCtrl = context.read<LanguageCubit>();
 
     return BorderLightCard(
       glowColor: accent,
@@ -924,10 +1002,7 @@ class _ProjectCardBack extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Title
-                Text(
-                  title,
-                  style: AppTypography.h3.copyWith(color: accent),
-                ),
+                Text(title, style: AppTypography.h3.copyWith(color: accent)),
                 const SizedBox(height: 16),
 
                 // Case study sections
@@ -972,23 +1047,25 @@ class _ProjectCardBack extends StatelessWidget {
                     spacing: 8,
                     runSpacing: 8,
                     children: technologies
-                        .map((tech) => Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 10,
-                                vertical: 4,
+                        .map(
+                          (tech) => Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: accent.withValues(alpha: 0.08),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Text(
+                              tech,
+                              style: AppFonts.jetBrainsMono(
+                                fontSize: 11,
+                                color: accent,
                               ),
-                              decoration: BoxDecoration(
-                                color: accent.withValues(alpha: 0.08),
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: Text(
-                                tech,
-                                style: GoogleFonts.jetBrainsMono(
-                                  fontSize: 11,
-                                  color: accent,
-                                ),
-                              ),
-                            ))
+                            ),
+                          ),
+                        )
                         .toList(),
                   ),
                 ],
@@ -1025,14 +1102,15 @@ class _ProjectCardBack extends StatelessWidget {
   }
 
   String _extractUrl(Map<String, dynamic> project) => switch (project['url']) {
-        final String url => url,
-        final Map<String, dynamic> urls => [
+    final String url => url,
+    final Map<String, dynamic> urls =>
+      [
             for (final key in ['website', 'google_play', 'app_store'])
               if (urls[key] case final String url) url,
           ].firstOrNull ??
-            '',
-        _ => '',
-      };
+          '',
+    _ => '',
+  };
 }
 
 // Compact case study section for the back face
@@ -1049,22 +1127,22 @@ class _BackSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            heading,
-            style: AppTypography.caption.copyWith(
-              color: accent,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            body,
-            style: AppTypography.bodySmall,
-            maxLines: 4,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ],
-      );
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text(
+        heading,
+        style: AppTypography.caption.copyWith(
+          color: accent,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+      const SizedBox(height: 4),
+      Text(
+        body,
+        style: AppTypography.bodySmall,
+        maxLines: 4,
+        overflow: TextOverflow.ellipsis,
+      ),
+    ],
+  );
 }

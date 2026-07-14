@@ -1,5 +1,5 @@
 {
-  "app_name": "Yusuf İhsan Görgel - Portfolio",
+  "app_name": "Systems Portfolio",
   "navigation": {
     "items": [
       {
@@ -29,7 +29,7 @@
     ]
   },
   "translations": {
-    "app_name": "Yusuf İhsan Görgel - Portfolio",
+    "app_name": "Systems Portfolio",
     "home": "Home",
     "about": "About",
     "experience": "Experience",
@@ -65,222 +65,147 @@
     "page_transition_duration": 300
   },
   "social_links": {
-    "github": "https://github.com/Yusufihsangorgel",
-    "linkedin": "https://linkedin.com/in/yusuf-ihsan-görgel/",
-    "medium": "https://medium.com/@developeryusufihsan"
+    "github": "",
+    "linkedin": "",
+    "medium": ""
   },
   "cv_data": {
     "personal_info": {
-      "name": "Yusuf İhsan Görgel",
-      "title": "Software Engineer",
-      "phone": "+90 544 953 0128",
-      "email": "developeryusuf@icloud.com",
-      "location": "Antalya, Türkiye (Remote)",
-      "github": "https://github.com/Yusufihsangorgel",
-      "linkedin": "https://linkedin.com/in/yusuf-ihsan-görgel/",
-      "bio": "I'm a software engineer from Turkey focused on Flutter and Go. I build mobile apps, web frontends, and the backend systems that power them — from database schemas to Docker deployments. Currently building SaaS products and open-source developer tools.",
-      "tagline": "Crafting digital experiences with code & creativity",
-      "medium": "developeryusufihsan",
-      "stats": {
-        "years_experience": 5,
-        "projects_completed": 12,
-        "technologies": 20
-      },
+      "name": "Systems Portfolio",
+      "title": "Independent Software Engineering",
+      "phone": "",
+      "email": "",
+      "location": "Remote",
+      "github": "",
+      "linkedin": "",
+      "bio": "An anonymous engineering portfolio focused on Flutter, Go, data systems, and measurable production reliability.",
+      "tagline": "Inspectable software systems, measured in production",
+      "medium": "",
       "subtitles": [
-        "Software Engineer",
-        "Flutter & Go Developer",
-        "SaaS Builder"
+        "Flutter systems",
+        "Go services",
+        "Production reliability"
       ]
     },
     "experiences": [
       {
-        "title": "Flutter Developer",
-        "company": "Uzman Adres",
-        "position": "Flutter Developer",
-        "start_date": "Mar 2022",
-        "end_date": "Present",
-        "period": "March 2022 – Present",
-        "description": "Building FugaSoft — a cross-platform POS and sales management system\nDeveloped complex SQL architectures with SQLite-Drift local database\nImplemented reactive programming with Mediator Pattern and GetX state management\nDeployed across Android/iOS tablets and desktop platforms (Linux, macOS, Windows)\nIntegrated socket technology for real-time data sync and barcode scanning systems",
+        "title": "Client engineering",
+        "company": "Cross-platform applications",
+        "position": "Flutter systems",
+        "start_date": "",
+        "end_date": "",
+        "period": "Selected production work",
+        "description": "Flutter · offline-first data · native integrations · realtime synchronization",
         "technologies": [
           "Flutter",
           "Dart",
-          "SQLite-Drift",
-          "GetX",
+          "SQLite",
           "WebSocket",
           "i18n"
         ]
       },
       {
-        "title": "Full Stack Developer",
-        "company": "Junius Tech",
-        "position": "Full Stack Developer",
-        "start_date": "Jun 2023",
-        "end_date": "Feb 2025",
-        "period": "June 2023 – February 2025",
-        "description": "Led mobile development team on Dorse — a logistics tracking application\nBuilt Flutter apps deployed across Android, iOS, and web platforms\nImplemented WebSocket-based real-time vehicle tracking with Google/Apple Maps\nCoordinated frontend, backend, and QA workflows as Mobile Team Lead",
+        "title": "Backend engineering",
+        "company": "API and data systems",
+        "position": "Go services",
+        "start_date": "",
+        "end_date": "",
+        "period": "Selected production work",
+        "description": "Go Fiber · PostgreSQL · Redis · object storage · background jobs",
         "technologies": [
-          "Flutter",
-          "React",
-          "Node.js",
-          "WebSocket",
-          "REST API",
-          "Maps SDK"
+          "Go",
+          "PostgreSQL",
+          "Redis",
+          "MinIO",
+          "Asynq"
         ]
       },
       {
-        "title": "Flutter Developer",
-        "company": "Promob TR",
-        "position": "Flutter Developer",
-        "start_date": "Oct 2022",
-        "end_date": "Jun 2024",
-        "period": "October 2022 – June 2024",
-        "description": "Developed Aydınlık E-Newspaper and Bilim ve Ütopya E-Magazine mobile applications\nImplemented MVVM architecture with GetX and Dio for API integration\nPublished to both Google Play and App Store",
+        "title": "Reliability engineering",
+        "company": "Self-hosted runtime",
+        "position": "Production operations",
+        "start_date": "",
+        "end_date": "",
+        "period": "Selected production work",
+        "description": "Docker Swarm · immutable images · backup drills · observability · incident recovery",
         "technologies": [
-          "Flutter",
-          "Dart",
-          "GetX",
-          "Dio",
-          "MVVM"
+          "Docker",
+          "Nginx",
+          "Prometheus",
+          "Grafana",
+          "PostgreSQL"
         ]
       }
     ],
     "projects": [
       {
-        "title": "FugaSoft (Pos - Sales Management Software)",
-        "description": "Flutter front-end, SQLite-Drift, GetX, i18n, reactive programming; Android/iOS tablet and desktop (Linux, macOS, Windows)",
-        "category": "Mobile",
-        "url": "https://fugasoft.com/",
-        "image": "assets/images/fugasoft.png",
-        "case_study": {
-          "problem": "Businesses needed a unified POS and sales management system that works reliably across Android/iOS tablets and desktop platforms (Linux, macOS, Windows), managing inventory across 50+ retail locations with barcode scanning and offline-first data sync.",
-          "solution": "Built a cross-platform Flutter application using SQLite-Drift for complex local SQL queries, GetX for reactive state management with Mediator Pattern, an offline-first sync engine with zero data loss, and full i18n support for multi-language deployment.",
-          "result": "Deployed to 5 platforms, processing 100K+ daily transactions with complex SQL architectures, reactive data streams, and real-time barcode scanning — serving daily retail operations with reliable offline-first capability."
-        }
-      },
-      {
-        "title": "Aydınlık E-Newspaper",
-        "description": "Flutter front-end, GetX, Dio, MVVM",
-        "category": "Mobile",
-        "url": {
-          "google_play": "https://play.google.com/store/apps/details?id=com.aydinlikgazetesi.egazete&hl=tr",
-          "app_store": "https://apps.apple.com/us/app/ayd%C4%B1nl%C4%B1k-e-gazete/id1560103805"
-        },
-        "image": "assets/images/aydinlik.png",
-        "case_study": {
-          "problem": "A major Turkish newspaper needed a modern digital reading experience for mobile users, with smooth page rendering, subscription management, and offline access to editions.",
-          "solution": "Developed a Flutter mobile app with MVVM architecture, GetX state management, and Dio for API integration. Implemented efficient page rendering and caching for a seamless reading experience.",
-          "result": "10K+ downloads with a 4.5+ star rating on both stores, providing thousands of readers with a reliable and performant digital newspaper experience on iOS and Android."
-        }
-      },
-      {
-        "title": "Bilim ve Ütopya E-Magazine",
-        "description": "Flutter front-end, GetX, Dio, MVVM",
-        "category": "Mobile",
-        "url": {
-          "google_play": "https://play.google.com/store/apps/details?id=com.aydinlikgazetesi.edergi_v1_bvu&pcampaignid=web_share",
-          "app_store": "https://apps.apple.com/tr/app/bilim-ve-%C3%BCtopya-e-dergi/id6478221195"
-        },
-        "image": "assets/images/bilim_utopya.png",
-        "case_study": {
-          "problem": "A science magazine required a dedicated digital platform for readers to access monthly issues, manage subscriptions, and enjoy rich scientific content on mobile devices.",
-          "solution": "Built a Flutter app sharing the proven MVVM architecture with Dio API integration, optimized for magazine-format content with high-quality image rendering and issue navigation.",
-          "result": "Serving thousands of monthly readers on Google Play and App Store, giving science enthusiasts a dedicated and polished mobile reading experience for Bilim ve Utopya magazine."
-        }
-      },
-      {
-        "title": "Dorse App",
-        "description": "Both mobile application and website; Mobile: Flutter; Web: HTML, CSS, JavaScript, React; Technologies used: RESTful API, SOLID, Google and Apple Maps integration, WebSocket",
-        "category": "Web",
-        "url": {
-          "website": "https://dorseapp.com/",
-          "google_play": "https://play.google.com/store/apps/details?id=com.juniustech.dorse",
-          "app_store": "https://apps.apple.com/tr/app/dorse/id6670605686"
-        },
-        "image": "assets/images/dorse.png",
-        "case_study": {
-          "problem": "The logistics industry needed a real-time vehicle tracking and fleet management solution that works across mobile platforms and web, with live location updates and route optimization.",
-          "solution": "Led mobile development using Flutter with WebSocket-based real-time vehicle tracking, Google and Apple Maps SDK integration, RESTful API architecture following SOLID principles, and a companion React web dashboard.",
-          "result": "Tracking 5,000+ concurrent vehicles with <200ms latency across Android, iOS, and web platforms — enabling logistics companies to track vehicles in real time, optimize routes, and manage fleets with reliable WebSocket connections."
-        }
-      },
-      {
         "title": "FakeCallApp",
-        "description": "Prank video call app with 80+ characters — Flutter mobile + Next.js website",
+        "description": "Flutter · Next.js · Go",
         "category": "Web",
         "url": "https://fakecallapp.com"
       },
       {
         "title": "CleanMyGallery",
-        "description": "Smart phone gallery cleaner — compress, watermark, EXIF strip",
+        "description": "Flutter · image pipeline · EXIF",
         "category": "Web",
         "url": "https://cleanmygallery.com"
       },
       {
         "title": "FocusGroves",
-        "description": "Pomodoro focus timer with study rooms, tasks, and productivity tracking",
+        "description": "Flutter · focus systems · realtime rooms",
         "category": "Web",
         "url": "https://focusgroves.com"
       },
       {
         "title": "MoodGrade",
-        "description": "Mood tracking with medication logs, AI insights, and data export",
+        "description": "Flutter · health journal · export",
         "category": "Web",
         "url": "https://moodgrade.com"
       },
       {
         "title": "GetQrivo",
-        "description": "QR code generator with short links and scan analytics",
+        "description": "QR · short links · analytics",
         "category": "Web",
         "url": "https://getqrivo.com"
       },
       {
         "title": "OverlayPhoto",
-        "description": "Photo overlay editor with filters, frames, and time capsules",
+        "description": "Flutter · compositing · time capsules",
         "category": "Web",
         "url": "https://overlayphoto.com"
       },
       {
         "title": "DistractionKiller",
-        "description": "App blocker and digital wellness tool with focus schedules",
+        "description": "Flutter · digital wellbeing · schedules",
         "category": "Web",
         "url": "https://distractionkiller.com"
       },
       {
         "title": "KPSSHazirlan",
-        "description": "Civil service exam preparation platform with study plans and practice tests",
+        "description": "Learning plans · practice engine · analytics",
         "category": "Web",
         "url": "https://kpsshazirlan.com"
       },
       {
         "title": "EhliyetCoz",
-        "description": "Driving license exam prep with daily quizzes and progress tracking",
+        "description": "Daily quizzes · progress model · content QA",
         "category": "Web",
         "url": "https://ehliyetcoz.com"
       },
       {
         "title": "Kazanamazi",
-        "description": "Missed prayer and fasting tracker with heatmaps and reminders",
+        "description": "Habit ledger · heatmaps · reminders",
         "category": "Web",
         "url": "https://kazanamazi.net"
       },
       {
         "title": "PDFScanPro",
-        "description": "PDF toolkit — convert, compress, merge, split, and scan documents",
+        "description": "PDF pipeline · conversion · compression",
         "category": "Web",
         "url": "https://pdfscanpro.com"
       }
     ],
-    "education": [
-      {
-        "school": "Mehmet Akif Ersoy University",
-        "degree": "Software Engineering",
-        "period": "2021-2025"
-      },
-      {
-        "school": "Dursun Yalım Science High School",
-        "period": "2015-2020"
-      }
-    ],
+    "education": [],
     "skills": [
       {
         "category": "Mobile",
@@ -337,95 +262,29 @@
         "level": "B2"
       }
     ],
-    "testimonials": [
+    "proof": [
       {
-        "quote": "Working with Yusuf on the Dorse logistics platform was a great experience. He led the mobile team effectively, delivering real-time vehicle tracking with WebSocket integration across both iOS and Android. His technical depth in Flutter is outstanding.",
-        "name": "Emrah Turk",
-        "position": "Senior Software Developer",
-        "company": "Junius Tech (Dorse)"
+        "title": "Dual-runtime delivery",
+        "detail": "WebAssembly with SkWasm is the primary artifact, with a JavaScript and CanvasKit fallback for browsers that cannot run it.",
+        "verification": "Inspect the build manifest"
       },
       {
-        "quote": "Yusuf has a strong grasp of both mobile and backend systems. On the Promob e-magazine and e-newspaper platform he built critical features end-to-end — from the Flutter frontend to the API layer — with clean, maintainable code. A dependable engineer who delivers on time.",
-        "name": "Ferhat Balaban",
-        "position": "Senior Computer Engineer",
-        "company": "Promob.tr"
+        "title": "Measured in the browser",
+        "detail": "The Engineering Lab exposes the active runtime, renderer, isolation status, and rolling frame-timing percentiles from the live app.",
+        "verification": "Open Engineering Lab"
+      },
+      {
+        "title": "Production hardened",
+        "detail": "Automated tests cover state, accessibility, deep links, failure recovery, and mobile layouts; the server enforces CSP, COOP, COEP, and correct Wasm MIME types.",
+        "verification": "Inspect tests and Nginx config"
       }
-    ],
-    "contact": {
-      "formspree_id": "YOUR_FORMSPREE_ID",
-      "form": {
-        "name_label": "Name",
-        "email_label": "Email",
-        "message_label": "Message",
-        "submit_button": "Send"
-      },
-      "success_message": "Your message has been sent successfully!",
-      "error_message": "An error occurred. Please try again."
-    }
+    ]
   },
   "language_info": {
     "code": "en",
     "name": "English",
     "flag": "🇬🇧",
     "direction": "ltr"
-  },
-  "terminal": {
-    "title": "Terminal",
-    "welcome_title": "Yusuf İhsan Görgel - Terminal",
-    "welcome_text": "Welcome! Type 'help' to see available commands.",
-    "help_hint": "Tip: Type 'help' to see available commands",
-    "greeting": "Terminal",
-    "type_help": "Type 'help' to see available commands",
-    "help_title": "Available Commands:",
-    "cleared": "Terminal cleared...",
-    "command_not_found": "Command '%s' not found. Type 'help' to see available commands.",
-    "prefix": "> ",
-    "type_command": "Type a command...",
-    "url": {
-      "success": "Opening link in browser...",
-      "error": "Could not launch link",
-      "error_with_details": "Error launching URL"
-    },
-    "download_cv_start": "Initiating CV download...",
-    "download_cv_success": "CV download started in your browser.",
-    "download_cv_error": "Error downloading CV. Please try again later.",
-    "commands": {
-      "help": "displays available commands",
-      "about": "shows personal information",
-      "skills": "displays technical skills",
-      "experience": "shows work experience",
-      "education": "shows educational background",
-      "projects": "shows completed projects",
-      "contact": "shows contact information",
-      "social": "displays social media accounts",
-      "download_cv": "downloads my resume",
-      "clear": "clears the terminal screen",
-      "help_cmd": "help",
-      "about_cmd": "about",
-      "skills_cmd": "skills",
-      "experience_cmd": "experience",
-      "education_cmd": "education",
-      "projects_cmd": "projects",
-      "contact_cmd": "contact",
-      "social_cmd": "social",
-      "download_cv_cmd": "download-cv",
-      "clear_cmd": "clear"
-    },
-    "projects": {
-      "title": "MY PROJECTS",
-      "untitled": "Untitled Project",
-      "not_found": "No projects found."
-    },
-    "contact": {
-      "email": "Email",
-      "phone": "Phone",
-      "location": "Location"
-    },
-    "social": {
-      "github": "GitHub",
-      "linkedin": "LinkedIn",
-      "twitter": "Twitter"
-    }
   },
   "nav": {
     "home": "Home",
@@ -434,12 +293,12 @@
     "experience": "Experience",
     "projects": "Projects",
     "contact": "Contact",
-    "testimonials": "Testimonials",
+    "proof": "Proof",
     "blog": "Blog"
   },
   "about_section": {
     "title": "About Me",
-    "bio": "I'm a Software Engineer with 4+ years of experience specializing in production-grade mobile applications. I focus on architecture, performance, and reliability — building cross-platform apps with Flutter and native iOS/Android capabilities with Swift and Kotlin.",
+    "bio": "This portfolio documents how software is designed, measured, tested, and operated without exposing personal identity.",
     "bio2": "Here are a few technologies I've been working with recently:",
     "github_title": "GitHub Activity",
     "github_repos": "Repos",
@@ -467,12 +326,12 @@
     "flip_hint": "Click to view case study"
   },
   "home_section": {
-    "greeting": "Hi, my name is",
-    "title": "Yusuf İhsan Görgel.",
-    "subtitle": "I build things for mobile.",
-    "bio": "I'm a software engineer specializing in building production-grade mobile applications. Currently focused on cross-platform development with Flutter at Uzman Adres, crafting pixel-perfect, performant experiences across Android, iOS, and desktop.",
+    "greeting": "BUILD / MEASURE / OPERATE",
+    "title": "SYSTEMS PORTFOLIO.",
+    "subtitle": "Independent Software Engineering",
+    "bio": "A production-minded software portfolio for cross-platform clients, service APIs, and self-hosted infrastructure.",
     "view_work": "View My Work",
-    "download_cv": "Download CV",
+    "inspect_runtime": "Inspect runtime",
     "contact": "Contact"
   },
   "experience_section": {
@@ -491,7 +350,7 @@
       "name_error": "Please enter your name",
       "email_error": "Please enter a valid email",
       "message_error": "Please enter your message",
-      "success": "Your message has been sent successfully!",
+      "success": "Your email app is open. Review and send your message.",
       "error": "An error occurred. Please try again.",
       "or_divider": "or send a message directly"
     }
@@ -505,9 +364,9 @@
     "error": "Could not load blog posts",
     "retry": "Retry"
   },
-  "testimonials_section": {
-    "title": "What People Say",
-    "subtitle": "Feedback from colleagues and mentors I have worked with"
+  "proof_section": {
+    "title": "Engineering Proof",
+    "subtitle": "Claims you can inspect in the repository and the live runtime"
   },
   "skills_section": {
     "title": "Skills",

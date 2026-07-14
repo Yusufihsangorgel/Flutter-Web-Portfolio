@@ -12,7 +12,11 @@ void main() {
         AppColors.projAccent,
         AppColors.contactAccent,
       };
-      expect(accents.length, 5, reason: 'All 5 scene accent colors must be unique');
+      expect(
+        accents.length,
+        5,
+        reason: 'All 5 scene accent colors must be unique',
+      );
     });
 
     test('all scene accents are non-null Color instances', () {
@@ -72,10 +76,26 @@ void main() {
   group('AppColors — scene gradients', () {
     test('each scene has three distinct gradient colors', () {
       final sceneGradients = [
-        [AppColors.heroGradient1, AppColors.heroGradient2, AppColors.heroGradient3],
-        [AppColors.aboutGradient1, AppColors.aboutGradient2, AppColors.aboutGradient3],
-        [AppColors.expGradient1, AppColors.expGradient2, AppColors.expGradient3],
-        [AppColors.projGradient1, AppColors.projGradient2, AppColors.projGradient3],
+        [
+          AppColors.heroGradient1,
+          AppColors.heroGradient2,
+          AppColors.heroGradient3,
+        ],
+        [
+          AppColors.aboutGradient1,
+          AppColors.aboutGradient2,
+          AppColors.aboutGradient3,
+        ],
+        [
+          AppColors.expGradient1,
+          AppColors.expGradient2,
+          AppColors.expGradient3,
+        ],
+        [
+          AppColors.projGradient1,
+          AppColors.projGradient2,
+          AppColors.projGradient3,
+        ],
         [
           AppColors.contactGradient1,
           AppColors.contactGradient2,
@@ -85,7 +105,11 @@ void main() {
 
       for (final gradients in sceneGradients) {
         final unique = gradients.toSet();
-        expect(unique.length, 3, reason: 'Each scene should have 3 distinct gradients');
+        expect(
+          unique.length,
+          3,
+          reason: 'Each scene should have 3 distinct gradients',
+        );
       }
     });
   });

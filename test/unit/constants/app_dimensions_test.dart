@@ -34,16 +34,19 @@ void main() {
       );
     });
 
-    test('sectionPaddingDesktop > sectionPaddingTablet > sectionPaddingMobile', () {
-      expect(
-        AppDimensions.sectionPaddingDesktop,
-        greaterThan(AppDimensions.sectionPaddingTablet),
-      );
-      expect(
-        AppDimensions.sectionPaddingTablet,
-        greaterThan(AppDimensions.sectionPaddingMobile),
-      );
-    });
+    test(
+      'sectionPaddingDesktop > sectionPaddingTablet > sectionPaddingMobile',
+      () {
+        expect(
+          AppDimensions.sectionPaddingDesktop,
+          greaterThan(AppDimensions.sectionPaddingTablet),
+        );
+        expect(
+          AppDimensions.sectionPaddingTablet,
+          greaterThan(AppDimensions.sectionPaddingMobile),
+        );
+      },
+    );
 
     test('maxContentWidth is a reasonable desktop value', () {
       expect(AppDimensions.maxContentWidth, greaterThanOrEqualTo(1200));

@@ -1,16 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:get/get.dart';
-import 'package:flutter_web_portfolio/app/controllers/language_controller.dart';
+import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
 import 'package:flutter_web_portfolio/app/domain/providers/i_assets_provider.dart';
 import 'package:flutter_web_portfolio/app/domain/providers/i_local_storage_provider.dart';
 import 'package:flutter_web_portfolio/app/data/repositories/language_repository_impl.dart';
 import 'package:flutter_web_portfolio/app/widgets/scroll_progress_dots.dart';
 
 class _MockAssetsProvider implements IAssetsProvider {
-  @override
-  Future<List<Map<String, dynamic>>> loadProjectsData() async => [];
-
   @override
   Future<Map<String, dynamic>> loadTranslations(String langCode) async =>
       <String, dynamic>{};
@@ -47,12 +44,6 @@ class _MockLocalStorage implements ILocalStorageProvider {
 
 void main() {
   group('ScrollProgressDots', () {
-    setUp(() {
-      Get.testMode = true;
-    });
-
-    tearDown(Get.reset);
-
     testWidgets('hidden on narrow screens (< 900px)', (tester) async {
       tester.view.physicalSize = const Size(500, 800);
       tester.view.devicePixelRatio = 1.0;
@@ -61,14 +52,14 @@ void main() {
         assetsProvider: _MockAssetsProvider(),
         localStorageProvider: _MockLocalStorage(),
       );
-      Get.put<LanguageController>(
-        LanguageController(languageRepository: repo),
-      );
+      final language = LanguageCubit(languageRepository: repo);
+      addTearDown(language.close);
 
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: ScrollProgressDots(visible: true),
+        BlocProvider.value(
+          value: language,
+          child: const MaterialApp(
+            home: Scaffold(body: ScrollProgressDots(visible: true)),
           ),
         ),
       );
@@ -89,14 +80,14 @@ void main() {
         assetsProvider: _MockAssetsProvider(),
         localStorageProvider: _MockLocalStorage(),
       );
-      Get.put<LanguageController>(
-        LanguageController(languageRepository: repo),
-      );
+      final language = LanguageCubit(languageRepository: repo);
+      addTearDown(language.close);
 
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: ScrollProgressDots(visible: true),
+        BlocProvider.value(
+          value: language,
+          child: const MaterialApp(
+            home: Scaffold(body: ScrollProgressDots(visible: true)),
           ),
         ),
       );

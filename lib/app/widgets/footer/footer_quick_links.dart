@@ -13,38 +13,66 @@ class _QuickLinksColumn extends StatelessWidget {
   Widget build(BuildContext context) {
     const brightColor = AppColors.textBright;
 
-    final lang = Get.find<LanguageController>();
-    final sections = <_QuickLinkItem>[
-      _QuickLinkItem('home', lang.getText('nav.home', defaultValue: 'Home')),
-      _QuickLinkItem('about', lang.getText('nav.about', defaultValue: 'About')),
-      _QuickLinkItem('experience', lang.getText('nav.experience', defaultValue: 'Experience')),
-      _QuickLinkItem('projects', lang.getText('nav.projects', defaultValue: 'Projects')),
-      _QuickLinkItem('blog', lang.getText('nav.blog', defaultValue: 'Blog')),
-      _QuickLinkItem('contact', lang.getText('nav.contact', defaultValue: 'Contact')),
-    ];
-
-    return Obx(() => Column(
-      crossAxisAlignment:
-          centered ? CrossAxisAlignment.center : CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Text(
-          lang.getText('footer.quick_links', defaultValue: 'Quick Links'),
-          style: GoogleFonts.jetBrainsMono(
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-            color: brightColor,
-            letterSpacing: 1.2,
+    return BlocBuilder<LanguageCubit, LanguageState>(
+      buildWhen: (previous, current) =>
+          previous.languageCode != current.languageCode ||
+          !identical(previous.translations, current.translations),
+      builder: (context, state) {
+        final lang = context.read<LanguageCubit>();
+        final sections = <_QuickLinkItem>[
+          _QuickLinkItem(
+            'home',
+            lang.getText('nav.home', defaultValue: 'Home'),
           ),
-        ),
-        const SizedBox(height: 16),
-        ...sections.map((item) => _QuickLinkButton(
-              sectionId: item.id,
-              label: item.label,
-              centered: centered,
-            )),
-      ],
-    ));
+          _QuickLinkItem(
+            'about',
+            lang.getText('nav.about', defaultValue: 'About'),
+          ),
+          _QuickLinkItem(
+            'experience',
+            lang.getText('nav.experience', defaultValue: 'Experience'),
+          ),
+          _QuickLinkItem(
+            'projects',
+            lang.getText('nav.projects', defaultValue: 'Projects'),
+          ),
+          _QuickLinkItem(
+            'blog',
+            lang.getText('nav.blog', defaultValue: 'Blog'),
+          ),
+          _QuickLinkItem(
+            'contact',
+            lang.getText('nav.contact', defaultValue: 'Contact'),
+          ),
+        ];
+
+        return Column(
+          crossAxisAlignment: centered
+              ? CrossAxisAlignment.center
+              : CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              lang.getText('footer.quick_links', defaultValue: 'Quick Links'),
+              style: AppFonts.jetBrainsMono(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: brightColor,
+                letterSpacing: 1.2,
+              ),
+            ),
+            const SizedBox(height: 16),
+            ...sections.map(
+              (item) => _QuickLinkButton(
+                sectionId: item.id,
+                label: item.label,
+                centered: centered,
+              ),
+            ),
+          ],
+        );
+      },
+    );
   }
 }
 
@@ -85,10 +113,10 @@ class _QuickLinkButtonState extends State<_QuickLinkButton> {
         cursor: SystemMouseCursors.click,
         child: GestureDetector(
           onTap: () {
-            if (Get.isRegistered<SoundController>()) {
-              Get.find<SoundController>().playClick();
-            }
-            Get.find<AppScrollController>().scrollToSection(widget.sectionId);
+            context.read<SoundController>().playClick();
+            context.read<AppScrollController>().scrollToSection(
+              widget.sectionId,
+            );
           },
           child: AnimatedContainer(
             duration: AppDurations.fast,
@@ -111,7 +139,7 @@ class _QuickLinkButtonState extends State<_QuickLinkButton> {
                 if (_hovered) const SizedBox(width: 8),
                 Text(
                   widget.label,
-                  style: GoogleFonts.jetBrainsMono(
+                  style: AppFonts.jetBrainsMono(
                     fontSize: 13,
                     color: _hovered ? AppColors.accent : baseColor,
                   ),

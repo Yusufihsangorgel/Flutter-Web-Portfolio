@@ -59,7 +59,11 @@ final class SoundConstants {
   static const double typeGain = 0.03;
 
   // ── Success: ascending three-note arpeggio ──────────────────────────
-  static const List<double> successFrequencies = [523.25, 659.25, 783.99]; // C5, E5, G5
+  static const List<double> successFrequencies = [
+    523.25,
+    659.25,
+    783.99,
+  ]; // C5, E5, G5
   static const String successWaveform = 'sine';
   static const double successNoteDuration = 0.12; // 120 ms per note
   static const double successNoteGap = 0.08; // 80 ms gap

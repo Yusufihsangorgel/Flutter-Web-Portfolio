@@ -7,9 +7,7 @@ void main() {
     testWidgets('renders widget', (tester) async {
       await tester.pumpWidget(
         const MaterialApp(
-          home: Scaffold(
-            body: ScrollIndicator(delay: Duration.zero),
-          ),
+          home: Scaffold(body: ScrollIndicator(delay: Duration.zero)),
         ),
       );
 
@@ -24,9 +22,7 @@ void main() {
     testWidgets('has Container elements', (tester) async {
       await tester.pumpWidget(
         const MaterialApp(
-          home: Scaffold(
-            body: ScrollIndicator(delay: Duration.zero),
-          ),
+          home: Scaffold(body: ScrollIndicator(delay: Duration.zero)),
         ),
       );
 

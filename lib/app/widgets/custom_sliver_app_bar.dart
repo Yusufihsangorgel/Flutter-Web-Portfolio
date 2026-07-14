@@ -1,12 +1,11 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:flutter_web_portfolio/app/controllers/language_controller.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_web_portfolio/app/core/theme/app_fonts.dart';
+import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_config.dart';
 import 'package:flutter_web_portfolio/app/controllers/scroll_controller.dart';
-import 'package:flutter_web_portfolio/app/controllers/scene_director.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
 import 'package:flutter_web_portfolio/app/core/constants/breakpoints.dart';
 import 'package:flutter_web_portfolio/app/core/constants/cinematic_curves.dart';
@@ -14,6 +13,7 @@ import 'package:flutter_web_portfolio/app/core/constants/durations.dart';
 import 'package:flutter_web_portfolio/app/widgets/cinematic_focusable.dart';
 import 'package:flutter_web_portfolio/app/widgets/fullscreen_menu.dart';
 import 'package:flutter_web_portfolio/app/widgets/language_switcher.dart';
+import 'package:flutter_web_portfolio/app/widgets/scene_accent_builder.dart';
 
 /// Minimal floating navigation — cinematic, no numbered sections.
 /// Shrinks from 80px to 60px as the user scrolls down (200px threshold).
@@ -25,12 +25,12 @@ class CustomSliverAppBar extends StatefulWidget {
     this.actions,
   });
 
-  final LanguageController languageController;
+  final LanguageCubit languageController;
   final AppScrollController scrollController;
   final List<Widget>? actions;
 
   /// Nav sections derived at build-time from active sections (excludes 'home').
-  static List<String> navSections(LanguageController lc) =>
+  static List<String> navSections(LanguageCubit lc) =>
       lc.activeSections.where((s) => s != 'home').toList();
 
   /// Maximum (expanded) toolbar height.
@@ -50,8 +50,7 @@ class _CustomSliverAppBarState extends State<CustomSliverAppBar> {
   double _toolbarHeight = CustomSliverAppBar._maxHeight;
 
   /// Scale factor for logo and nav items: 1.0 at top, smaller when collapsed.
-  double get _scaleFactor =>
-      _toolbarHeight / CustomSliverAppBar._maxHeight;
+  double get _scaleFactor => _toolbarHeight / CustomSliverAppBar._maxHeight;
 
   @override
   void initState() {
@@ -69,7 +68,10 @@ class _CustomSliverAppBarState extends State<CustomSliverAppBar> {
     final controller = widget.scrollController.scrollController;
     if (!controller.hasClients) return;
 
-    final offset = controller.offset.clamp(0.0, CustomSliverAppBar._shrinkScrollExtent);
+    final offset = controller.offset.clamp(
+      0.0,
+      CustomSliverAppBar._shrinkScrollExtent,
+    );
     final t = offset / CustomSliverAppBar._shrinkScrollExtent;
     final newHeight = lerpDouble(
       CustomSliverAppBar._maxHeight,
@@ -105,10 +107,7 @@ class _CustomSliverAppBarState extends State<CustomSliverAppBar> {
                   decoration: BoxDecoration(
                     color: AppColors.background.withValues(alpha: 0.75),
                     border: const Border(
-                      bottom: BorderSide(
-                        color: Color(0x0DFFFFFF),
-                        width: 1,
-                      ),
+                      bottom: BorderSide(color: Color(0x0DFFFFFF), width: 1),
                     ),
                   ),
                 ),
@@ -125,6 +124,7 @@ class _CustomSliverAppBarState extends State<CustomSliverAppBar> {
       ),
       leading: isMobile
           ? IconButton(
+              tooltip: MaterialLocalizations.of(context).openAppDrawerTooltip,
               icon: Icon(
                 Icons.menu_rounded,
                 color: AppColors.textPrimary,
@@ -142,36 +142,51 @@ class _CustomSliverAppBarState extends State<CustomSliverAppBar> {
     );
   }
 
-  Widget _buildNavItems() => Obx(() {
-    final currentSection = widget.scrollController.activeSection.value;
-    final sections = CustomSliverAppBar.navSections(widget.languageController);
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.end,
-      children: [
-        for (final section in sections)
-          _NavItem(
-            label: widget.languageController.getText(
-              'nav.$section',
-              defaultValue: section.toUpperCase(),
-            ),
-            isActive: currentSection == section,
-            onTap: () => widget.scrollController.scrollToSection(section),
-            scaleFactor: _scaleFactor,
-          ),
-      ],
-    );
-  });
-
+  Widget _buildNavItems() => BlocBuilder<LanguageCubit, LanguageState>(
+    buildWhen: (previous, current) =>
+        previous.languageCode != current.languageCode ||
+        !identical(previous.translations, current.translations),
+    builder: (context, languageState) =>
+        BlocBuilder<AppScrollController, AppScrollState>(
+          buildWhen: (previous, current) =>
+              previous.activeSection != current.activeSection,
+          builder: (context, scrollState) {
+            final sections = CustomSliverAppBar.navSections(
+              widget.languageController,
+            );
+            return Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                for (final section in sections)
+                  _NavItem(
+                    label: widget.languageController.getText(
+                      'nav.$section',
+                      defaultValue: section.toUpperCase(),
+                    ),
+                    isActive: scrollState.activeSection == section,
+                    onTap: () =>
+                        widget.scrollController.scrollToSection(section),
+                    scaleFactor: _scaleFactor,
+                  ),
+              ],
+            );
+          },
+        ),
+  );
 }
 
 // ---------------------------------------------------------------------------
 // Logo: "YG" — Space Grotesk Bold, hover glow
 // ---------------------------------------------------------------------------
 class _LogoText extends StatefulWidget {
-  const _LogoText({required this.onTap, this.scaleFactor = 1.0, required this.languageController});
+  const _LogoText({
+    required this.onTap,
+    this.scaleFactor = 1.0,
+    required this.languageController,
+  });
   final VoidCallback onTap;
   final double scaleFactor;
-  final LanguageController languageController;
+  final LanguageCubit languageController;
 
   @override
   State<_LogoText> createState() => _LogoTextState();
@@ -195,7 +210,7 @@ class _LogoTextState extends State<_LogoText> {
           duration: AppDurations.buttonHover,
           child: Text(
             AppConfig.initials(widget.languageController),
-            style: GoogleFonts.spaceGrotesk(
+            style: AppFonts.spaceGrotesk(
               fontSize: 20 * widget.scaleFactor,
               fontWeight: FontWeight.w700,
               color: _hovered ? hoverColor : baseColor,
@@ -258,9 +273,11 @@ class _NavItemState extends State<_NavItem> {
             children: [
               Text(
                 widget.label.toUpperCase(),
-                style: GoogleFonts.spaceGrotesk(
+                style: AppFonts.spaceGrotesk(
                   fontSize: 12 * widget.scaleFactor,
-                  fontWeight: widget.isActive ? FontWeight.w600 : FontWeight.w400,
+                  fontWeight: widget.isActive
+                      ? FontWeight.w600
+                      : FontWeight.w400,
                   color: widget.isActive
                       ? activeColor
                       : (_hovered ? activeColor : inactiveColor),
@@ -329,9 +346,8 @@ class _SceneProgressBarState extends State<_SceneProgressBar> {
   Widget build(BuildContext context) => SizedBox(
     height: 1,
     child: LayoutBuilder(
-      builder: (context, constraints) => Obx(() {
-        final accent = Get.find<SceneDirector>().currentAccent.value;
-        return Stack(
+      builder: (context, constraints) => SceneAccentBuilder(
+        builder: (context, accent) => Stack(
           children: [
             AnimatedContainer(
               duration: AppDurations.microFast,
@@ -339,10 +355,7 @@ class _SceneProgressBarState extends State<_SceneProgressBar> {
               height: 1,
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [
-                    accent.withValues(alpha: 0.2),
-                    accent,
-                  ],
+                  colors: [accent.withValues(alpha: 0.2), accent],
                 ),
                 boxShadow: [
                   BoxShadow(
@@ -353,9 +366,8 @@ class _SceneProgressBarState extends State<_SceneProgressBar> {
               ),
             ),
           ],
-        );
-      }),
+        ),
+      ),
     ),
   );
 }
-

@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_web_portfolio/app/core/theme/app_fonts.dart';
 
 /// Matrix digital rain overlay — green falling characters on a black backdrop.
 ///
@@ -72,36 +72,37 @@ class _MatrixRainState extends State<MatrixRain>
     final rowCount = (height / _columnWidth).ceil() + 4;
 
     for (var i = 0; i < columnCount; i++) {
-      _columns.add(_RainColumn(
-        rowCount: rowCount,
-        initialOffset: _random.nextInt(rowCount),
-        speed: 0.3 + _random.nextDouble() * 0.7,
-        random: _random,
-      ));
+      _columns.add(
+        _RainColumn(
+          rowCount: rowCount,
+          initialOffset: _random.nextInt(rowCount),
+          speed: 0.3 + _random.nextDouble() * 0.7,
+          random: _random,
+        ),
+      );
     }
   }
 
   @override
   Widget build(BuildContext context) => LayoutBuilder(
-        builder: (context, constraints) {
-          _initColumns(constraints.maxWidth, constraints.maxHeight);
-          final rowCount =
-              (constraints.maxHeight / _columnWidth).ceil() + 4;
+    builder: (context, constraints) {
+      _initColumns(constraints.maxWidth, constraints.maxHeight);
+      final rowCount = (constraints.maxHeight / _columnWidth).ceil() + 4;
 
-          return Container(
-            color: Colors.black.withValues(alpha: 0.92),
-            child: CustomPaint(
-              size: Size(constraints.maxWidth, constraints.maxHeight),
-              painter: _MatrixPainter(
-                columns: _columns,
-                columnWidth: _columnWidth,
-                rowCount: rowCount,
-                textStyle: GoogleFonts.jetBrainsMono(fontSize: 13),
-              ),
-            ),
-          );
-        },
+      return Container(
+        color: Colors.black.withValues(alpha: 0.92),
+        child: CustomPaint(
+          size: Size(constraints.maxWidth, constraints.maxHeight),
+          painter: _MatrixPainter(
+            columns: _columns,
+            columnWidth: _columnWidth,
+            rowCount: rowCount,
+            textStyle: AppFonts.jetBrainsMono(fontSize: 13),
+          ),
+        ),
       );
+    },
+  );
 }
 
 /// Tracks a single column's rain state.
@@ -112,10 +113,7 @@ class _RainColumn {
     required this.speed,
     required Random random,
   }) : headPosition = initialOffset.toDouble() {
-    chars = List.generate(
-      rowCount,
-      (_) => _randomChar(random),
-    );
+    chars = List.generate(rowCount, (_) => _randomChar(random));
   }
 
   final int rowCount;
@@ -206,8 +204,7 @@ class _MatrixPainter extends CustomPainter {
           color = Color.fromRGBO(0, 180, 40, alpha);
         }
 
-        _getPainter(column.chars[row], color)
-            .paint(canvas, Offset(x + 1, y));
+        _getPainter(column.chars[row], color).paint(canvas, Offset(x + 1, y));
       }
     }
   }

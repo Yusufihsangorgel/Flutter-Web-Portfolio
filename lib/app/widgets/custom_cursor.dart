@@ -1,6 +1,8 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
-import 'package:get/get.dart';
 import 'package:flutter_web_portfolio/app/controllers/cursor_controller.dart';
 import 'package:flutter_web_portfolio/app/controllers/scene_director.dart';
 import 'package:flutter_web_portfolio/app/core/constants/cinematic_curves.dart';
@@ -49,10 +51,7 @@ class _CustomCursorState extends State<CustomCursor> {
 }
 
 class _CursorOverlay extends StatefulWidget {
-  const _CursorOverlay({
-    required this.position,
-    required this.visible,
-  });
+  const _CursorOverlay({required this.position, required this.visible});
 
   final ValueNotifier<Offset> position;
   final ValueNotifier<bool> visible;
@@ -72,8 +71,8 @@ class _CursorOverlayState extends State<_CursorOverlay>
   static const double _dotMin = 4.0;
   static const double _dotMax = 6.0;
   late Color _sceneAccent;
-  late Worker _accentWorker;
-  late Worker _hoverWorker;
+  StreamSubscription<SceneState>? _accentSubscription;
+  StreamSubscription<CursorUiState>? _hoverSubscription;
   final List<Offset> _trail = [];
 
   @override
@@ -85,76 +84,83 @@ class _CursorOverlayState extends State<_CursorOverlay>
     );
     _ringSize = Tween<double>(begin: _ringMin, end: _ringMax).animate(
       CurvedAnimation(
-          parent: _expandController, curve: CinematicCurves.hoverLift),
+        parent: _expandController,
+        curve: CinematicCurves.hoverLift,
+      ),
     );
     _dotSize = Tween<double>(begin: _dotMin, end: _dotMax).animate(
       CurvedAnimation(
-          parent: _expandController, curve: CinematicCurves.hoverLift),
+        parent: _expandController,
+        curve: CinematicCurves.hoverLift,
+      ),
     );
+  }
 
-    final cursorCtrl = Get.find<CursorController>();
-    _hoverWorker = ever(cursorCtrl.isHovering, (bool hovering) {
-      if (hovering) {
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _hoverSubscription ??= context.read<CursorController>().stream.listen((
+      state,
+    ) {
+      if (state.isHovering) {
         _expandController.forward();
       } else {
         _expandController.reverse();
       }
     });
 
-    _sceneAccent = Get.find<SceneDirector>().currentAccent.value;
-    _accentWorker =
-        ever(Get.find<SceneDirector>().currentAccent, (Color color) {
-      _sceneAccent = color;
+    final sceneDirector = context.read<SceneDirector>();
+    _sceneAccent = sceneDirector.state.currentAccent;
+    _accentSubscription ??= sceneDirector.stream.listen((state) {
+      _sceneAccent = state.currentAccent;
     });
   }
 
   @override
   void dispose() {
-    _hoverWorker.dispose();
-    _accentWorker.dispose();
+    _hoverSubscription?.cancel();
+    _accentSubscription?.cancel();
     _expandController.dispose();
     super.dispose();
   }
 
   @override
-  Widget build(BuildContext context) =>
-      ValueListenableBuilder<bool>(
-      valueListenable: widget.visible,
-      builder: (_, visible, child) {
-        if (!visible) return const SizedBox.shrink();
-        return child!;
-      },
-      child: Positioned.fill(
-        child: IgnorePointer(
-          child: ValueListenableBuilder<Offset>(
-            valueListenable: widget.position,
-            builder: (_, position, __) {
-              // Update trail history
-              if (_trail.isEmpty || (_trail.first - position).distance > 4) {
-                _trail.insert(0, position);
-                if (_trail.length > 8) _trail.removeLast();
-              }
-              return AnimatedBuilder(
-                animation: _expandController,
-                builder: (_, __) {
-                  final cursorCtrl = Get.find<CursorController>();
-                  return CustomPaint(
-                    painter: _CursorPainter(
-                      position: position,
-                      ringSize: _ringSize.value,
-                      dotSize: _dotSize.value,
-                      accentColor:
-                          cursorCtrl.hoverAccent.value ?? _sceneAccent,
-                      trail: List.of(_trail.skip(1)),
-                    ),
-                  );
-                },
-              );
-            },
-          ),
+  Widget build(BuildContext context) => ValueListenableBuilder<bool>(
+    valueListenable: widget.visible,
+    builder: (_, visible, child) {
+      if (!visible) return const SizedBox.shrink();
+      return child!;
+    },
+    child: Positioned.fill(
+      child: IgnorePointer(
+        child: ValueListenableBuilder<Offset>(
+          valueListenable: widget.position,
+          builder: (_, position, _) {
+            // Update trail history
+            if (_trail.isEmpty || (_trail.first - position).distance > 4) {
+              _trail.insert(0, position);
+              if (_trail.length > 8) _trail.removeLast();
+            }
+            return AnimatedBuilder(
+              animation: _expandController,
+              builder: (_, _) {
+                final cursorCtrl = context.read<CursorController>();
+                return CustomPaint(
+                  painter: _CursorPainter(
+                    position: position,
+                    ringSize: _ringSize.value,
+                    dotSize: _dotSize.value,
+                    accentColor: cursorCtrl.state.hoverAccent ?? _sceneAccent,
+                    trail: List.of(_trail.skip(1)),
+                  ),
+                );
+              },
+            );
+          },
         ),
       ),
-    );
+    ),
+  );
 }
 
 class _CursorPainter extends CustomPainter {
@@ -211,46 +217,36 @@ class _CursorPainter extends CustomPainter {
 // ---------------------------------------------------------------------------
 
 class _SpotlightLayer extends StatelessWidget {
-  const _SpotlightLayer({
-    required this.position,
-    required this.visible,
-  });
+  const _SpotlightLayer({required this.position, required this.visible});
 
   final ValueNotifier<Offset> position;
   final ValueNotifier<bool> visible;
 
   @override
   Widget build(BuildContext context) => ValueListenableBuilder<bool>(
-        valueListenable: visible,
-        builder: (_, isVisible, child) {
-          if (!isVisible) return const SizedBox.shrink();
-          return child!;
-        },
-        child: Positioned.fill(
-          child: IgnorePointer(
-            child: ValueListenableBuilder<Offset>(
-              valueListenable: position,
-              builder: (_, pos, __) {
-                final accent =
-                    Get.find<SceneDirector>().currentAccent.value;
-                return CustomPaint(
-                  painter: _SpotlightPainter(
-                    position: pos,
-                    accentColor: accent,
-                  ),
-                );
-              },
-            ),
-          ),
+    valueListenable: visible,
+    builder: (_, isVisible, child) {
+      if (!isVisible) return const SizedBox.shrink();
+      return child!;
+    },
+    child: Positioned.fill(
+      child: IgnorePointer(
+        child: ValueListenableBuilder<Offset>(
+          valueListenable: position,
+          builder: (_, pos, _) {
+            final accent = context.read<SceneDirector>().state.currentAccent;
+            return CustomPaint(
+              painter: _SpotlightPainter(position: pos, accentColor: accent),
+            );
+          },
         ),
-      );
+      ),
+    ),
+  );
 }
 
 class _SpotlightPainter extends CustomPainter {
-  _SpotlightPainter({
-    required this.position,
-    required this.accentColor,
-  });
+  _SpotlightPainter({required this.position, required this.accentColor});
 
   final Offset position;
   final Color accentColor;
@@ -266,9 +262,7 @@ class _SpotlightPainter extends CustomPainter {
           accentColor.withValues(alpha: 0.0),
         ],
         stops: const [0.0, 1.0],
-      ).createShader(
-        Rect.fromCircle(center: position, radius: _radius),
-      );
+      ).createShader(Rect.fromCircle(center: position, radius: _radius));
     canvas.drawCircle(position, _radius, paint);
   }
 

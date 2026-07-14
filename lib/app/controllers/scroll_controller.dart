@@ -1,191 +1,182 @@
 import 'dart:async';
 import 'dart:developer' as dev;
+
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:flutter_web_portfolio/app/core/constants/app_dimensions.dart';
 import 'package:flutter_web_portfolio/app/core/constants/durations.dart';
-import 'package:flutter_web_portfolio/app/routes/app_pages.dart';
+import 'package:flutter_web_portfolio/app/routes/app_routes.dart';
 import 'package:flutter_web_portfolio/app/utils/web_url_strategy.dart'
     as url_strategy;
 
-/// Owns the main ScrollController, tracks section offsets, and drives smooth-scroll.
-///
-/// Deep-linking: keeps the browser URL in sync with the visible section and
-/// scrolls to the correct section when the page is loaded via a direct URL or
-/// browser back/forward navigation.
-class AppScrollController extends GetxController with WidgetsBindingObserver {
-  static AppScrollController get to => Get.find();
+@immutable
+final class AppScrollState {
+  const AppScrollState({this.activeSection = 'home'});
 
-  final homeKey = GlobalKey();
-  final aboutKey = GlobalKey();
-  final experienceKey = GlobalKey();
-  final testimonialsKey = GlobalKey();
-  final blogKey = GlobalKey();
-  final projectsKey = GlobalKey();
-  final contactKey = GlobalKey();
-
-  final ScrollController scrollController = ScrollController();
-  final RxString activeSection = 'home'.obs;
-
-  final Map<String, double> _sectionOffsets = {};
-  final Map<String, double> _sectionHeights = {};
-  bool _isManualScrolling = false;
-
-  Timer? _debounceTimer;
-
-  /// Pending section to scroll to on first layout (set from initial URL).
-  String? _pendingSection;
-
-  /// Dispose function for the browser popstate listener.
-  void Function()? _disposePopState;
+  final String activeSection;
 
   @override
-  void onInit() {
-    super.onInit();
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is AppScrollState && activeSection == other.activeSection;
 
-    // Determine initial section from URL before any frame renders.
+  @override
+  int get hashCode => activeSection.hashCode;
+}
+
+/// Owns the primary scroll position, section geometry and URL synchronization.
+///
+/// Section changes are exposed as immutable Cubit state. Pixel-level scroll
+/// movement stays on Flutter's [ScrollController], so cinematic painters can
+/// subscribe without rebuilding navigation widgets every frame.
+final class AppScrollController extends Cubit<AppScrollState>
+    with WidgetsBindingObserver {
+  AppScrollController() : super(const AppScrollState()) {
     _readInitialRoute();
-
     WidgetsBinding.instance
       ..addObserver(this)
-      ..addPostFrameCallback((_) {
-        _updateSectionInfo();
-      });
+      ..addPostFrameCallback((_) => _updateSectionInfo());
     scrollController.addListener(_handleScroll);
 
-    // Listen to activeSection changes and push URL updates.
-    ever(activeSection, _onActiveSectionChanged);
-
-    // Listen for browser back/forward.
     if (kIsWeb) {
       _disposePopState = url_strategy.onPopState(_onBrowserNavigation);
     }
   }
 
-  @override
-  void onClose() {
-    WidgetsBinding.instance.removeObserver(this);
-    _debounceTimer?.cancel();
-    _disposePopState?.call();
-    scrollController
-      ..removeListener(_handleScroll)
-      ..dispose();
-    super.onClose();
-  }
+  final homeKey = GlobalKey();
+  final aboutKey = GlobalKey();
+  final experienceKey = GlobalKey();
+  final proofKey = GlobalKey();
+  final blogKey = GlobalKey();
+  final projectsKey = GlobalKey();
+  final contactKey = GlobalKey();
 
-  // ---------------------------------------------------------------------------
-  // Deep-link helpers
-  // ---------------------------------------------------------------------------
+  final ScrollController scrollController = ScrollController();
 
-  /// Reads the initial URL hash and stores the target section for deferred scroll.
+  String get activeSection => state.activeSection;
+
+  final Map<String, double> _sectionOffsets = {};
+  final Map<String, double> _sectionHeights = {};
+  bool _isManualScrolling = false;
+  bool _suppressNextHistoryUpdate = false;
+  Timer? _debounceTimer;
+  String? _pendingSection;
+  void Function()? _disposePopState;
+
   void _readInitialRoute() {
     if (!kIsWeb) return;
 
     final hash = url_strategy.getUrlHash();
     if (hash.isNotEmpty && Routes.sectionIds.contains(hash)) {
       _pendingSection = hash;
-      activeSection.value = hash;
+      _setActiveSection(hash, syncUrl: false);
     }
   }
 
-  /// Scrolls to the pending section once layout is ready.
-  ///
-  /// Called from [HomeView] after its first frame to guarantee that all
-  /// section GlobalKeys are attached before we attempt to scroll.
   void handleInitialDeepLink() {
     final target = _pendingSection;
     _pendingSection = null;
     if (target == null || target == 'home') return;
 
     _updateSectionInfo();
-    // Short delay ensures section render boxes have valid sizes.
-    Future.delayed(const Duration(milliseconds: 100), () {
-      scrollToSection(target);
+    Future<void>.delayed(const Duration(milliseconds: 100), () {
+      if (!isClosed) scrollToSection(target);
     });
   }
 
-  /// Pushes a new browser URL when the active section changes.
+  void _setActiveSection(String section, {bool syncUrl = true}) {
+    if (state.activeSection == section) return;
+    emit(AppScrollState(activeSection: section));
+    if (syncUrl) _onActiveSectionChanged(section);
+  }
+
   void _onActiveSectionChanged(String section) {
     if (!kIsWeb) return;
+    if (_suppressNextHistoryUpdate) {
+      _suppressNextHistoryUpdate = false;
+      return;
+    }
     url_strategy.setUrlHash(section);
   }
 
-  /// Called when the user presses browser back/forward.
   void _onBrowserNavigation(String hash) {
-    final section =
-        (hash.isNotEmpty && Routes.sectionIds.contains(hash)) ? hash : 'home';
+    final section = hash.isNotEmpty && Routes.sectionIds.contains(hash)
+        ? hash
+        : 'home';
+    _suppressNextHistoryUpdate = state.activeSection != section;
     scrollToSection(section);
   }
 
   @override
-  void didChangeMetrics() {
-    _updateSectionInfo();
-  }
+  void didChangeMetrics() => _updateSectionInfo();
 
   void _updateSectionInfo() {
     _updateKeyInfo('home', homeKey);
     _updateKeyInfo('about', aboutKey);
     _updateKeyInfo('experience', experienceKey);
-    _updateKeyInfo('testimonials', testimonialsKey);
+    _updateKeyInfo('proof', proofKey);
     _updateKeyInfo('blog', blogKey);
     _updateKeyInfo('projects', projectsKey);
     _updateKeyInfo('contact', contactKey);
   }
 
   void _updateKeyInfo(String sectionId, GlobalKey key) {
-    if (key.currentContext == null) return;
+    final context = key.currentContext;
+    final renderObject = context?.findRenderObject();
+    if (renderObject is! RenderBox || !renderObject.hasSize) return;
 
-    final renderBox = key.currentContext!.findRenderObject() as RenderBox;
-    final position = renderBox.localToGlobal(Offset.zero);
-    final currentOffset = scrollController.hasClients ? scrollController.offset : 0.0;
+    final position = renderObject.localToGlobal(Offset.zero);
+    final currentOffset = scrollController.hasClients
+        ? scrollController.offset
+        : 0.0;
     _sectionOffsets[sectionId] = position.dy + currentOffset;
-    _sectionHeights[sectionId] = renderBox.size.height;
+    _sectionHeights[sectionId] = renderObject.size.height;
   }
 
   void _handleScroll() {
-    if (_isManualScrolling) return;
-    if (!scrollController.hasClients) return;
-
+    if (_isManualScrolling || !scrollController.hasClients) return;
     _debounceTimer?.cancel();
     _debounceTimer = Timer(AppDurations.scrollDebounce, _detectActiveSection);
   }
 
   void _detectActiveSection() {
-    if (!scrollController.hasClients) return;
-    if (scrollController.positions.isEmpty) return;
+    if (!scrollController.hasClients || scrollController.positions.isEmpty) {
+      return;
+    }
 
     try {
-      // Refresh offsets every detection cycle to avoid stale data
       _updateSectionInfo();
-
       if (_sectionOffsets.isEmpty) return;
 
       const appBarHeight = AppDimensions.appBarHeight;
       final scrollOffset = scrollController.offset;
-      final viewportHeight = Get.height - appBarHeight;
+      final rawViewportHeight = scrollController.position.viewportDimension;
+      final viewportHeight = rawViewportHeight > appBarHeight
+          ? rawViewportHeight - appBarHeight
+          : 0.0;
       final viewportCenter = scrollOffset + appBarHeight + viewportHeight / 2;
 
       var bestSection = 'home';
       var bestDistance = double.infinity;
-
       _sectionOffsets.forEach((sectionId, top) {
         final height = _sectionHeights[sectionId] ?? 0;
-        final sectionCenter = top + height / 2;
-        final distance = (sectionCenter - viewportCenter).abs();
-
+        final distance = (top + height / 2 - viewportCenter).abs();
         if (distance < bestDistance) {
           bestDistance = distance;
           bestSection = sectionId;
         }
       });
 
-      if (activeSection.value != bestSection) {
-        activeSection.value = bestSection;
-      }
-    } catch (e) {
-      dev.log('Section detection failed', name: 'AppScrollController', error: e);
+      _setActiveSection(bestSection);
+    } catch (error, stackTrace) {
+      dev.log(
+        'Section detection failed',
+        name: 'AppScrollController',
+        error: error,
+        stackTrace: stackTrace,
+      );
     }
   }
 
@@ -197,49 +188,64 @@ class AppScrollController extends GetxController with WidgetsBindingObserver {
         'home' => homeKey,
         'about' => aboutKey,
         'experience' => experienceKey,
-        'testimonials' => testimonialsKey,
+        'proof' => proofKey,
         'blog' => blogKey,
         'projects' => projectsKey,
         'contact' => contactKey,
         _ => null,
       };
-      if (sectionKey == null) return;
-
-      if (sectionKey.currentContext == null) return;
+      final sectionContext = sectionKey?.currentContext;
+      final renderObject = sectionContext?.findRenderObject();
+      if (renderObject is! RenderBox || !renderObject.hasSize) return;
 
       _isManualScrolling = true;
-      activeSection.value = sectionId;
+      _setActiveSection(sectionId);
 
-      final renderBox =
-          sectionKey.currentContext!.findRenderObject() as RenderBox;
       const appBarHeight = AppDimensions.appBarHeight;
+      final globalY = renderObject.localToGlobal(Offset.zero).dy;
+      final targetScrollOffset =
+          (globalY + scrollController.offset - appBarHeight).clamp(
+            0.0,
+            scrollController.position.maxScrollExtent,
+          );
 
-      // Convert global screen position to scroll-space offset
-      final globalY = renderBox.localToGlobal(Offset.zero).dy;
-      var targetScrollOffset = globalY + scrollController.offset - appBarHeight;
-      targetScrollOffset = targetScrollOffset.clamp(
-        0.0,
-        scrollController.position.maxScrollExtent,
+      unawaited(
+        scrollController
+            .animateTo(
+              targetScrollOffset,
+              duration: AppDurations.sectionScroll,
+              curve: Curves.easeInOut,
+            )
+            .then((_) => _finishScrolling()),
       );
-
-      scrollController
-          .animateTo(
-            targetScrollOffset,
-            duration: AppDurations.sectionScroll,
-            curve: Curves.easeInOut,
-          )
-          .then((_) => _finishScrolling());
-    } catch (e) {
-      dev.log('Scroll to section failed', name: 'AppScrollController', error: e);
+    } catch (error, stackTrace) {
+      dev.log(
+        'Scroll to section failed',
+        name: 'AppScrollController',
+        error: error,
+        stackTrace: stackTrace,
+      );
       _isManualScrolling = false;
     }
   }
 
   void _finishScrolling() {
-    Future.delayed(AppDurations.heroDebounce, () {
+    Future<void>.delayed(AppDurations.heroDebounce, () {
+      if (isClosed) return;
       _isManualScrolling = false;
       _updateSectionInfo();
       _detectActiveSection();
     });
+  }
+
+  @override
+  Future<void> close() {
+    WidgetsBinding.instance.removeObserver(this);
+    _debounceTimer?.cancel();
+    _disposePopState?.call();
+    scrollController
+      ..removeListener(_handleScroll)
+      ..dispose();
+    return super.close();
   }
 }

@@ -8,20 +8,19 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:flutter_i18n/loaders/decoders/json_decode_strategy.dart';
-import 'package:get/get.dart';
+import 'package:flutter_bloc/flutter_bloc.dart' show BlocBuilder, BlocProvider;
 
-import 'package:flutter_web_portfolio/app/bindings/app_bindings.dart';
-import 'package:flutter_web_portfolio/app/controllers/loading_controller.dart';
-import 'package:flutter_web_portfolio/app/controllers/language_controller.dart';
-import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
+import 'package:flutter_web_portfolio/app/app_dependencies.dart';
+import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
 import 'package:flutter_web_portfolio/app/core/theme/app_theme.dart';
-import 'package:flutter_web_portfolio/app/routes/app_pages.dart';
-import 'package:flutter_web_portfolio/app/widgets/loading_animation.dart';
+import 'package:flutter_web_portfolio/app/modules/home/home_view.dart';
+import 'package:flutter_web_portfolio/app/utils/web_url_strategy.dart'
+    as url_strategy;
 import 'package:flutter_web_portfolio/app/widgets/mouse_interaction_wrapper.dart';
 
 void main() {
   runZonedGuarded(
-    () {
+    () async {
       WidgetsFlutterBinding.ensureInitialized();
       // Force the semantics tree to stay populated — screen readers and
       // Playwright semantics snapshots both rely on this on Flutter Web.
@@ -34,10 +33,6 @@ void main() {
 
       _printConsoleAsciiArt();
 
-      AppBindings().dependencies();
-
-      final loadingController = Get.put(LoadingController(), permanent: true);
-
       SystemChrome.setSystemUIOverlayStyle(
         const SystemUiOverlayStyle(
           statusBarColor: Colors.transparent,
@@ -46,13 +41,73 @@ void main() {
         ),
       );
 
-      initializeApp(loadingController).then((_) {
-        runApp(const MyApp());
-      });
+      try {
+        final dependencies = await AppDependencies.bootstrap();
+        runApp(AppRuntime(dependencies: dependencies, child: const MyApp()));
+      } catch (error, stackTrace) {
+        dev.log(
+          'Application bootstrap failed',
+          name: 'Main',
+          error: error,
+          stackTrace: stackTrace,
+        );
+        runApp(const _BootstrapFailureApp());
+      }
     },
     (error, stack) {
       dev.log('Uncaught error', name: 'Main', error: error, stackTrace: stack);
     },
+  );
+}
+
+class _BootstrapFailureApp extends StatelessWidget {
+  const _BootstrapFailureApp();
+
+  @override
+  Widget build(BuildContext context) => MaterialApp(
+    debugShowCheckedModeBanner: false,
+    theme: AppTheme.dark,
+    home: Scaffold(
+      backgroundColor: const Color(0xFF00101F),
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 420),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(
+                  Icons.sync_problem_rounded,
+                  size: 42,
+                  color: Color(0xFF12B8D0),
+                ),
+                const SizedBox(height: 20),
+                Text(
+                  'The experience could not start',
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.headlineSmall,
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  'No data was changed. Reload the page to try the bootstrap sequence again.',
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+                if (kIsWeb) ...[
+                  const SizedBox(height: 24),
+                  FilledButton.icon(
+                    onPressed: url_strategy.reloadPage,
+                    icon: const Icon(Icons.refresh_rounded),
+                    label: const Text('Reload page'),
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ),
+      ),
+    ),
   );
 }
 
@@ -64,23 +119,12 @@ void _printConsoleAsciiArt() {
 
  ╔═══════════════════════════════╗
  ║   Flutter Developer Portfolio ║
- ║   Built with Clean Architecture
+ ║   Dart + Flutter WebAssembly   ║
  ║   ─────────────────────────── ║
- ║   Psst... try Ctrl+K         ║
+ ║   Ctrl+K · Ctrl+Shift+L       ║
  ╚═══════════════════════════════╝
 
 ''');
-  }
-}
-
-Future<void> initializeApp(LoadingController loadingController) async {
-  try {
-    final languageController = Get.find<LanguageController>();
-    await languageController.loadSavedLanguage();
-  } catch (e) {
-    dev.log('App initialization failed', name: 'Main', error: e);
-  } finally {
-    loadingController.setLoading(false);
   }
 }
 
@@ -89,81 +133,58 @@ class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final loadingController = Get.find<LoadingController>();
+  Widget build(BuildContext context) =>
+      BlocBuilder<LanguageCubit, LanguageState>(
+        builder: (context, state) {
+          final languageCubit = BlocProvider.of<LanguageCubit>(context);
+          final currentLocale = state.locale;
+          final appTitle = languageCubit.appName;
+          final textDirection = state.languageCode == 'ar'
+              ? TextDirection.rtl
+              : TextDirection.ltr;
 
-    return Obx(() {
-      var currentLocale = const Locale('en');
-      var appTitle = 'Portfolio';
-      var textDirection = TextDirection.ltr;
+          return MaterialApp(
+            title: appTitle,
+            debugShowCheckedModeBanner: false,
+            theme: AppTheme.dark,
+            darkTheme: AppTheme.dark,
+            themeMode: ThemeMode.dark,
+            locale: currentLocale,
+            localizationsDelegates: [
+              FlutterI18nDelegate(
+                translationLoader: FileTranslationLoader(
+                  fallbackFile: 'en',
+                  basePath: 'assets/i18n',
+                  forcedLocale: currentLocale,
+                  decodeStrategies: [JsonDecodeStrategy()],
+                ),
+              ),
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: const [
+              Locale('en'),
+              Locale('tr'),
+              Locale('de'),
+              Locale('fr'),
+              Locale('es'),
+              Locale('ar'),
+              Locale('hi'),
+            ],
+            home: const HomeView(),
+            builder: (context, child) {
+              final wrappedApp = FlutterI18n.rootAppBuilder()(context, child);
 
-      if (Get.isRegistered<LanguageController>()) {
-        final languageController = Get.find<LanguageController>();
-        currentLocale = languageController.currentLocale;
-        appTitle = languageController.appName;
-        // Arabic is RTL
-        if (languageController.currentLanguage == 'ar') {
-          textDirection = TextDirection.rtl;
-        }
-      }
+              final content = Directionality(
+                textDirection: textDirection,
+                child: wrappedApp,
+              );
 
-      return GetMaterialApp(
-        title: appTitle,
-        debugShowCheckedModeBanner: false,
-        theme: AppTheme.dark,
-        darkTheme: AppTheme.dark,
-        themeMode: ThemeMode.dark,
-        transitionDuration: const Duration(milliseconds: 400),
-        locale: currentLocale,
-        fallbackLocale: const Locale('en'),
-        localizationsDelegates: [
-          FlutterI18nDelegate(
-            translationLoader: FileTranslationLoader(
-              fallbackFile: 'en',
-              basePath: 'assets/i18n',
-              forcedLocale: currentLocale,
-              decodeStrategies: [JsonDecodeStrategy()],
-            ),
-          ),
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
-        ],
-        supportedLocales: const [
-          Locale('en'),
-          Locale('tr'),
-          Locale('de'),
-          Locale('fr'),
-          Locale('es'),
-          Locale('ar'),
-          Locale('hi'),
-        ],
-        getPages: AppPages.routes,
-        unknownRoute: AppPages.unknownRoute,
-        initialRoute: AppPages.initial,
-        defaultTransition: Transition.fadeIn,
-        builder: (context, child) {
-          final wrappedApp = FlutterI18n.rootAppBuilder()(context, child);
-
-          Widget content = Container(
-            color: loadingController.isLoading
-                ? AppColors.background
-                : Colors.transparent,
-            child: loadingController.isLoading
-                ? const LoadingAnimation()
-                : wrappedApp,
+              if (!kIsWeb) return content;
+              return MouseInteractionWrapper(child: content);
+            },
           );
-
-          // Wrap with Directionality for RTL languages (Arabic)
-          content = Directionality(
-            textDirection: textDirection,
-            child: content,
-          );
-
-          if (!kIsWeb) return content;
-          return MouseInteractionWrapper(child: content);
         },
       );
-    });
-  }
 }

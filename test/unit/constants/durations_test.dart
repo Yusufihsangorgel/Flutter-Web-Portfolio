@@ -34,8 +34,7 @@ void main() {
       ];
 
       for (final d in durations) {
-        expect(d.inMilliseconds, greaterThan(0),
-            reason: '$d must be positive');
+        expect(d.inMilliseconds, greaterThan(0), reason: '$d must be positive');
       }
     });
   });
@@ -50,39 +49,62 @@ void main() {
     });
 
     test('buttonHover sits between fast and medium', () {
-      expect(AppDurations.buttonHover.inMilliseconds,
-          greaterThanOrEqualTo(AppDurations.fast.inMilliseconds));
-      expect(AppDurations.buttonHover.inMilliseconds,
-          lessThanOrEqualTo(AppDurations.medium.inMilliseconds));
+      expect(
+        AppDurations.buttonHover.inMilliseconds,
+        greaterThanOrEqualTo(AppDurations.fast.inMilliseconds),
+      );
+      expect(
+        AppDurations.buttonHover.inMilliseconds,
+        lessThanOrEqualTo(AppDurations.medium.inMilliseconds),
+      );
     });
   });
 
   group('AppDurations — hero sequence ordering', () {
     test('hero delays are in chronological order', () {
-      expect(AppDurations.heroInitialPause, lessThan(AppDurations.heroNameRevealDelay));
       expect(
-          AppDurations.heroNameRevealDelay, lessThan(AppDurations.heroSubtitleDelay));
-      expect(AppDurations.heroSubtitleDelay, lessThan(AppDurations.heroLocationDelay));
-      expect(AppDurations.heroLocationDelay, lessThan(AppDurations.heroCTADelay));
-      expect(AppDurations.heroCTADelay, lessThan(AppDurations.heroScrollIndicator));
+        AppDurations.heroInitialPause,
+        lessThan(AppDurations.heroNameRevealDelay),
+      );
+      expect(
+        AppDurations.heroNameRevealDelay,
+        lessThan(AppDurations.heroSubtitleDelay),
+      );
+      expect(
+        AppDurations.heroSubtitleDelay,
+        lessThan(AppDurations.heroLocationDelay),
+      );
+      expect(
+        AppDurations.heroLocationDelay,
+        lessThan(AppDurations.heroCTADelay),
+      );
+      expect(
+        AppDurations.heroCTADelay,
+        lessThan(AppDurations.heroScrollIndicator),
+      );
     });
 
     test('heroEntrance encompasses the full sequence', () {
-      expect(AppDurations.heroEntrance.inMilliseconds,
-          greaterThanOrEqualTo(AppDurations.heroScrollIndicator.inMilliseconds));
+      expect(
+        AppDurations.heroEntrance.inMilliseconds,
+        greaterThanOrEqualTo(AppDurations.heroScrollIndicator.inMilliseconds),
+      );
     });
 
-    test('hero reveal durations are positive and shorter than total entrance', () {
-      final reveals = [
-        AppDurations.heroNameRevealDuration,
-        AppDurations.heroSubtitleDuration,
-        AppDurations.heroLocationDuration,
-      ];
-      for (final d in reveals) {
-        expect(d.inMilliseconds, greaterThan(0));
-        expect(d, lessThan(AppDurations.heroEntrance));
-      }
-    });
+    test(
+      'hero reveal durations are positive and shorter than total entrance',
+      () {
+        final reveals = [
+          AppDurations.heroNameRevealDuration,
+          AppDurations.heroSubtitleDuration,
+          AppDurations.heroLocationDuration,
+        ];
+        for (final d in reveals) {
+          expect(d.inMilliseconds, greaterThan(0));
+          expect(d, lessThan(AppDurations.heroEntrance));
+        }
+      },
+    );
   });
 
   group('AppDurations — stagger delays', () {

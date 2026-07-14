@@ -1,11 +1,11 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_web_portfolio/app/core/theme/app_fonts.dart';
 
 import 'package:flutter_web_portfolio/app/controllers/scroll_controller.dart';
-import 'package:flutter_web_portfolio/app/controllers/language_controller.dart';
+import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
 import 'package:flutter_web_portfolio/app/controllers/sound_controller.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
 import 'package:flutter_web_portfolio/app/core/constants/breakpoints.dart';
@@ -32,7 +32,7 @@ class FullscreenMenu extends StatefulWidget {
         barrierColor: Colors.transparent,
         transitionDuration: const Duration(milliseconds: 600),
         reverseTransitionDuration: const Duration(milliseconds: 400),
-        pageBuilder: (_, __, ___) => const FullscreenMenu(),
+        pageBuilder: (_, _, _) => const FullscreenMenu(),
       ),
     );
   }
@@ -55,14 +55,15 @@ class _FullscreenMenuState extends State<FullscreenMenu>
     'experience': Icons.work_outline,
     'projects': Icons.code_outlined,
     'blog': Icons.article_outlined,
-    'testimonials': Icons.format_quote_outlined,
+    'proof': Icons.verified_outlined,
     'contact': Icons.mail_outline,
   };
 
   List<_MenuItem> _buildMenuItems() {
     // Drop 'home' — the logo already scrolls to top, so listing it here
     // produces a confusing duplicate row at the top of the drawer.
-    final sections = Get.find<LanguageController>()
+    final sections = context
+        .read<LanguageCubit>()
         .activeSections
         .where((s) => s != 'home')
         .toList();
@@ -100,9 +101,7 @@ class _FullscreenMenuState extends State<FullscreenMenu>
     );
 
     _masterController.forward();
-    if (Get.isRegistered<SoundController>()) {
-      Get.find<SoundController>().playTransition();
-    }
+    context.read<SoundController>().playTransition();
   }
 
   @override
@@ -118,15 +117,16 @@ class _FullscreenMenuState extends State<FullscreenMenu>
   }
 
   void _navigateToSection(String key) {
+    final scrollController = context.read<AppScrollController>();
     _close();
     Future.delayed(const Duration(milliseconds: 300), () {
-      Get.find<AppScrollController>().scrollToSection(key);
+      scrollController.scrollToSection(key);
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final languageController = Get.find<LanguageController>();
+    final languageController = context.read<LanguageCubit>();
     final screenWidth = MediaQuery.sizeOf(context).width;
     final isMobile = screenWidth < Breakpoints.tablet;
     final menuItems = _buildMenuItems();
@@ -144,8 +144,9 @@ class _FullscreenMenuState extends State<FullscreenMenu>
                   sigmaY: _backdropBlur.value,
                 ),
                 child: Container(
-                  color: Colors.black
-                      .withValues(alpha: 0.7 * _overlayOpacity.value),
+                  color: Colors.black.withValues(
+                    alpha: 0.7 * _overlayOpacity.value,
+                  ),
                 ),
               ),
             ),
@@ -158,11 +159,7 @@ class _FullscreenMenuState extends State<FullscreenMenu>
               opacity: _overlayOpacity.value,
               child: IconButton(
                 onPressed: _close,
-                icon: const Icon(
-                  Icons.close,
-                  color: Colors.white,
-                  size: 32,
-                ),
+                icon: const Icon(Icons.close, color: Colors.white, size: 32),
               ),
             ),
           ),
@@ -194,7 +191,9 @@ class _FullscreenMenuState extends State<FullscreenMenu>
 
                   final label = languageController.getText(
                     'nav.${item.sectionId}',
-                    defaultValue: item.sectionId[0].toUpperCase() + item.sectionId.substring(1),
+                    defaultValue:
+                        item.sectionId[0].toUpperCase() +
+                        item.sectionId.substring(1),
                   );
 
                   return Opacity(
@@ -283,10 +282,12 @@ class _MenuItemWidget extends StatelessWidget {
               // Number
               AnimatedDefaultTextStyle(
                 duration: const Duration(milliseconds: 200),
-                style: GoogleFonts.jetBrainsMono(
+                style: AppFonts.jetBrainsMono(
                   fontSize: isMobile ? 12 : 14,
                   fontWeight: FontWeight.w400,
-                  color: isHovered ? accentColor : textColor.withValues(alpha: 0.4),
+                  color: isHovered
+                      ? accentColor
+                      : textColor.withValues(alpha: 0.4),
                   letterSpacing: 2,
                 ),
                 child: Text(item.number),
@@ -299,7 +300,9 @@ class _MenuItemWidget extends StatelessWidget {
                 child: Icon(
                   item.icon,
                   size: isMobile ? 20 : 24,
-                  color: isHovered ? accentColor : textColor.withValues(alpha: 0.5),
+                  color: isHovered
+                      ? accentColor
+                      : textColor.withValues(alpha: 0.5),
                 ),
               ),
               SizedBox(width: isMobile ? 12 : 24),
@@ -308,7 +311,7 @@ class _MenuItemWidget extends StatelessWidget {
               Expanded(
                 child: AnimatedDefaultTextStyle(
                   duration: const Duration(milliseconds: 200),
-                  style: GoogleFonts.spaceGrotesk(
+                  style: AppFonts.spaceGrotesk(
                     fontSize: fontSize,
                     fontWeight: isHovered ? FontWeight.w700 : FontWeight.w300,
                     color: isHovered ? accentColor : textColor,

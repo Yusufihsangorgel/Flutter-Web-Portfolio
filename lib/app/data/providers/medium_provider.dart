@@ -18,7 +18,8 @@ final class MediumProvider {
     final apiUrl = '$_rss2jsonBase${Uri.encodeComponent(feedUrl)}';
 
     try {
-      final response = await http.get(Uri.parse(apiUrl))
+      final response = await http
+          .get(Uri.parse(apiUrl))
           .timeout(const Duration(seconds: 10));
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body) as Map<String, dynamic>;
@@ -33,7 +34,8 @@ final class MediumProvider {
             pubDate: _formatDate(raw['pubDate'] as String?),
             description: _stripHtml(raw['description'] as String? ?? ''),
             thumbnail: (raw['thumbnail'] as String?) ?? '',
-            categories: (raw['categories'] as List?)
+            categories:
+                (raw['categories'] as List?)
                     ?.whereType<String>()
                     .take(4)
                     .toList() ??
@@ -45,8 +47,11 @@ final class MediumProvider {
         return posts;
       }
     } catch (e) {
-      dev.log('Medium fetch failed for @$mediumUsername',
-          name: 'MediumProvider', error: e);
+      dev.log(
+        'Medium fetch failed for @$mediumUsername',
+        name: 'MediumProvider',
+        error: e,
+      );
     }
 
     return [];
@@ -57,8 +62,18 @@ final class MediumProvider {
     try {
       final dt = DateTime.parse(raw);
       const months = [
-        'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-        'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+        'Jan',
+        'Feb',
+        'Mar',
+        'Apr',
+        'May',
+        'Jun',
+        'Jul',
+        'Aug',
+        'Sep',
+        'Oct',
+        'Nov',
+        'Dec',
       ];
       return '${months[dt.month - 1]} ${dt.day}, ${dt.year}';
     } on FormatException catch (e) {

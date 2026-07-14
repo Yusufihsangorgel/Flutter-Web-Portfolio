@@ -64,7 +64,6 @@ class ResponsiveUtils {
 }
 
 class ResponsiveBuilder extends StatelessWidget {
-
   const ResponsiveBuilder({
     super.key,
     required this.mobile,

@@ -1,5 +1,5 @@
 {
-  "app_name": "Yusuf İhsan Görgel - Portföy",
+  "app_name": "Sistemler Portföyü",
   "navigation": {
     "items": [
       {
@@ -35,11 +35,11 @@
     "experience": "Deneyim",
     "projects": "Projeler",
     "contact": "İletişim",
-    "testimonials": "Referanslar",
+    "proof": "Kanıt",
     "blog": "Blog"
   },
   "translations": {
-    "app_name": "Yusuf İhsan Görgel - Portföy",
+    "app_name": "Sistemler Portföyü",
     "home": "Ana Sayfa",
     "about": "Hakkımda",
     "experience": "Deneyim",
@@ -75,222 +75,147 @@
     "page_transition_duration": 300
   },
   "social_links": {
-    "github": "https://github.com/Yusufihsangorgel",
-    "linkedin": "https://linkedin.com/in/yusuf-ihsan-görgel/",
-    "medium": "https://medium.com/@developeryusufihsan"
+    "github": "",
+    "linkedin": "",
+    "medium": ""
   },
   "cv_data": {
     "personal_info": {
-      "name": "Yusuf İhsan Görgel",
-      "title": "Software Engineer",
-      "phone": "+90 544 953 0128",
-      "email": "developeryusuf@icloud.com",
-      "location": "Antalya, Türkiye (Remote)",
-      "github": "https://github.com/Yusufihsangorgel",
-      "linkedin": "https://linkedin.com/in/yusuf-ihsan-görgel/",
-      "bio": "Türkiye'den, Flutter ve Go odaklı bir yazılım mühendisiyim. Mobil uygulamalar, web arayüzleri ve bunları destekleyen backend sistemleri geliştiriyorum — veritabanı şemalarından Docker dağıtımlarına kadar. Şu anda SaaS ürünleri ve açık kaynak geliştirici araçları üzerinde çalışıyorum.",
-      "tagline": "Kod ve yaratıcılıkla dijital deneyimler oluşturuyorum",
-      "medium": "developeryusufihsan",
-      "stats": {
-        "years_experience": 5,
-        "projects_completed": 12,
-        "technologies": 20
-      },
+      "name": "Sistemler Portföyü",
+      "title": "Bağımsız Yazılım Mühendisliği",
+      "phone": "",
+      "email": "",
+      "location": "Remote",
+      "github": "",
+      "linkedin": "",
+      "bio": "Flutter, Go, veri sistemleri ve ölçülebilir üretim güvenilirliğine odaklanan anonim bir mühendislik portföyü.",
+      "tagline": "İncelenebilir yazılım sistemleri, üretimde ölçülmüş",
+      "medium": "",
       "subtitles": [
-        "Yazılım Mühendisi",
-        "Flutter & Go Geliştirici",
-        "SaaS Geliştirici"
+        "Flutter systems",
+        "Go services",
+        "Production reliability"
       ]
     },
     "experiences": [
       {
-        "title": "Flutter Geliştirici",
-        "company": "Uzman Adres",
-        "position": "Flutter Geliştirici",
-        "start_date": "Mar 2022",
-        "end_date": "Devam Ediyor",
-        "period": "Mart 2022 – Devam Ediyor",
-        "description": "FugaSoft — cross-platform POS ve satış yönetim sistemi geliştirme\nSQLite-Drift ile karmaşık SQL mimarileri oluşturma\nMediator Pattern ve GetX ile reaktif programlama implementasyonu\nAndroid/iOS tablet ve masaüstü platformlarına (Linux, macOS, Windows) dağıtım\nGerçek zamanlı veri senkronizasyonu için socket teknolojisi ve barkod tarama sistemleri entegrasyonu",
+        "title": "Client engineering",
+        "company": "Cross-platform applications",
+        "position": "Flutter systems",
+        "start_date": "",
+        "end_date": "",
+        "period": "Selected production work",
+        "description": "Flutter · offline-first data · native integrations · realtime synchronization",
         "technologies": [
           "Flutter",
           "Dart",
-          "SQLite-Drift",
-          "GetX",
+          "SQLite",
           "WebSocket",
           "i18n"
         ]
       },
       {
-        "title": "Full Stack Geliştirici",
-        "company": "Junius Tech",
-        "position": "Full Stack Geliştirici",
-        "start_date": "Haz 2023",
-        "end_date": "Şub 2025",
-        "period": "Haziran 2023 – Şubat 2025",
-        "description": "Dorse — lojistik takip uygulamasında mobil geliştirme ekibini yönettim\nAndroid, iOS ve web platformlarına Flutter uygulamaları geliştirdim\nGoogle/Apple Maps ile WebSocket tabanlı gerçek zamanlı araç takibi implementasyonu\nMobile Team Lead olarak frontend, backend ve QA iş akışlarını koordine ettim",
+        "title": "Backend engineering",
+        "company": "API and data systems",
+        "position": "Go services",
+        "start_date": "",
+        "end_date": "",
+        "period": "Selected production work",
+        "description": "Go Fiber · PostgreSQL · Redis · object storage · background jobs",
         "technologies": [
-          "Flutter",
-          "React",
-          "Node.js",
-          "WebSocket",
-          "REST API",
-          "Maps SDK"
+          "Go",
+          "PostgreSQL",
+          "Redis",
+          "MinIO",
+          "Asynq"
         ]
       },
       {
-        "title": "Flutter Geliştirici",
-        "company": "Promob TR",
-        "position": "Flutter Geliştirici (Serbest)",
-        "start_date": "Eki 2022",
-        "end_date": "Haz 2024",
-        "period": "Ekim 2022 – Haziran 2024",
-        "description": "Aydınlık E-Gazete ve Bilim ve Ütopya E-Dergi mobil uygulamalarını geliştirdim\nGetX ve Dio ile MVVM mimarisi implementasyonu\nHem Google Play hem App Store'da yayınladım",
+        "title": "Reliability engineering",
+        "company": "Self-hosted runtime",
+        "position": "Production operations",
+        "start_date": "",
+        "end_date": "",
+        "period": "Selected production work",
+        "description": "Docker Swarm · immutable images · backup drills · observability · incident recovery",
         "technologies": [
-          "Flutter",
-          "Dart",
-          "GetX",
-          "Dio",
-          "MVVM"
+          "Docker",
+          "Nginx",
+          "Prometheus",
+          "Grafana",
+          "PostgreSQL"
         ]
       }
     ],
     "projects": [
       {
-        "title": "FugaSoft (Pos - Sales Management Software)",
-        "description": "Çapraz platform POS ve satış yönetim sistemi — Flutter arayüz, SQLite-Drift yerel veritabanı, GetX reaktif durum yönetimi; Android/iOS tablet ve masaüstü (Linux, macOS, Windows)",
-        "category": "Mobile",
-        "url": "https://fugasoft.com/",
-        "image": "assets/images/fugasoft.png",
-        "case_study": {
-          "problem": "İşletmelerin Android/iOS tablet ve masaüstü platformlarında (Linux, macOS, Windows) güvenilir şekilde çalışan, 50+ perakende lokasyonunda envanter yönetimi, barkod tarama ve çevrimdışı veri senkronizasyonu sunan birleşik bir POS ve satış yönetim sistemine ihtiyacı vardı.",
-          "solution": "Karmaşık yerel SQL sorguları için SQLite-Drift, Mediator Pattern ile reaktif durum yönetimi için GetX, sıfır veri kaybıyla çevrimdışı öncelikli senkronizasyon motoru ve çok dilli dağıtım için tam i18n desteği kullanılarak cross-platform Flutter uygulaması geliştirildi.",
-          "result": "5 platforma dağıtılarak günlük 100K+ işlem işleniyor — reaktif veri akışları ve gerçek zamanlı barkod tarama ile karmaşık SQL mimarilerini yöneten, güvenilir çevrimdışı yeteneğe sahip production-grade POS sistemi."
-        }
-      },
-      {
-        "title": "Aydınlık E-Newspaper",
-        "description": "Aydınlık Gazetesi için Flutter mobil uygulaması — MVVM mimarisi, GetX durum yönetimi, Dio API entegrasyonu",
-        "category": "Mobile",
-        "url": {
-          "google_play": "https://play.google.com/store/apps/details?id=com.aydinlikgazetesi.egazete&hl=tr",
-          "app_store": "https://apps.apple.com/us/app/ayd%C4%B1nl%C4%B1k-e-gazete/id1560103805"
-        },
-        "image": "assets/images/aydinlik.png",
-        "case_study": {
-          "problem": "Büyük bir Türk gazetesinin mobil kullanıcılar için sorunsuz sayfa görüntüleme, abonelik yönetimi ve çevrimdışı erişim sunan modern bir dijital okuma deneyimine ihtiyacı vardı.",
-          "solution": "MVVM mimarisi, GetX durum yönetimi ve API entegrasyonu için Dio kullanılarak Flutter mobil uygulaması geliştirildi. Sorunsuz okuma deneyimi için verimli sayfa görüntüleme ve önbellekleme uygulandı.",
-          "result": "Her iki mağazada 10K+ indirme ve 4.5+ yıldız puanıyla, binlerce okuyucuya iOS ve Android'de güvenilir ve performanslı bir dijital gazete deneyimi sunuluyor."
-        }
-      },
-      {
-        "title": "Bilim ve Ütopya E-Magazine",
-        "description": "Bilim ve Ütopya dergisi için Flutter mobil uygulaması — MVVM, GetX ve Dio ile dergi okuma deneyimi",
-        "category": "Mobile",
-        "url": {
-          "google_play": "https://play.google.com/store/apps/details?id=com.aydinlikgazetesi.edergi_v1_bvu&pcampaignid=web_share",
-          "app_store": "https://apps.apple.com/tr/app/bilim-ve-%C3%BCtopya-e-dergi/id6478221195"
-        },
-        "image": "assets/images/bilim_utopya.png",
-        "case_study": {
-          "problem": "Bir bilim dergisi, okuyucuların aylık sayılara erişebileceği, aboneliklerini yönetebileceği ve zengin bilimsel içeriğin keyfini çıkarabileceği özel bir dijital platforma ihtiyaç duyuyordu.",
-          "solution": "Dio API entegrasyonu ile kanıtlanmış MVVM mimarisini paylaşan, dergi formatındaki içerik için yüksek kaliteli görsel işleme ve sayı navigasyonu ile optimize edilmiş Flutter uygulaması geliştirildi.",
-          "result": "Google Play ve App Store'da aylık binlerce okuyucuya hizmet vererek, bilim meraklılarına Bilim ve Ütopya dergisi için özel ve cilalı bir mobil okuma deneyimi sunuluyor."
-        }
-      },
-      {
-        "title": "Dorse App",
-        "description": "Lojistik araç takip platformu — Flutter mobil, React web, WebSocket ile gerçek zamanlı takip, Google ve Apple Maps entegrasyonu",
-        "category": "Web",
-        "url": {
-          "website": "https://dorseapp.com/",
-          "google_play": "https://play.google.com/store/apps/details?id=com.juniustech.dorse",
-          "app_store": "https://apps.apple.com/tr/app/dorse/id6670605686"
-        },
-        "image": "assets/images/dorse.png",
-        "case_study": {
-          "problem": "Lojistik sektörü, mobil platformlarda ve web'de çalışan, canlı konum güncellemeleri ve rota optimizasyonu sunan gerçek zamanlı araç takip ve filo yönetim çözümüne ihtiyaç duyuyordu.",
-          "solution": "WebSocket tabanlı gerçek zamanlı araç takibi, Google ve Apple Maps SDK entegrasyonu, SOLID prensiplerine uygun RESTful API mimarisi ve eşlik eden React web panosu ile Flutter kullanılarak mobil geliştirme yönetildi.",
-          "result": "Android, iOS ve web platformlarında <200ms gecikmeyle 5.000+ eşzamanlı aracı takip ediyor — lojistik şirketlerinin araçları gerçek zamanlı takip etmesini, rotaları optimize etmesini ve filoları yönetmesini güvenilir WebSocket bağlantılarıyla sağlıyor."
-        }
-      },
-      {
         "title": "FakeCallApp",
-        "description": "80+ karakterli şaka görüntülü arama uygulaması — Flutter mobil + Next.js web",
+        "description": "Flutter · Next.js · Go",
         "category": "Web",
         "url": "https://fakecallapp.com"
       },
       {
         "title": "CleanMyGallery",
-        "description": "Akıllı telefon galeri temizleyici — sıkıştırma, filigran, EXIF temizleme",
+        "description": "Flutter · image pipeline · EXIF",
         "category": "Web",
         "url": "https://cleanmygallery.com"
       },
       {
         "title": "FocusGroves",
-        "description": "Pomodoro odaklanma zamanlayıcısı — çalışma odaları ve verimlilik takibi",
+        "description": "Flutter · focus systems · realtime rooms",
         "category": "Web",
         "url": "https://focusgroves.com"
       },
       {
         "title": "MoodGrade",
-        "description": "Duygu durum takibi — ilaç kayıtları, AI içgörüler ve veri dışa aktarma",
+        "description": "Flutter · health journal · export",
         "category": "Web",
         "url": "https://moodgrade.com"
       },
       {
         "title": "GetQrivo",
-        "description": "QR kod oluşturucu — kısa linkler ve tarama analizleri",
+        "description": "QR · short links · analytics",
         "category": "Web",
         "url": "https://getqrivo.com"
       },
       {
         "title": "OverlayPhoto",
-        "description": "Fotoğraf düzenleyici — filtreler, çerçeveler ve zaman kapsülleri",
+        "description": "Flutter · compositing · time capsules",
         "category": "Web",
         "url": "https://overlayphoto.com"
       },
       {
         "title": "DistractionKiller",
-        "description": "Uygulama engelleyici ve dijital sağlık aracı",
+        "description": "Flutter · digital wellbeing · schedules",
         "category": "Web",
         "url": "https://distractionkiller.com"
       },
       {
         "title": "KPSSHazirlan",
-        "description": "KPSS hazırlık platformu — çalışma planları ve deneme sınavları",
+        "description": "Learning plans · practice engine · analytics",
         "category": "Web",
         "url": "https://kpsshazirlan.com"
       },
       {
         "title": "EhliyetCoz",
-        "description": "Ehliyet sınavı hazırlık — günlük quizler ve ilerleme takibi",
+        "description": "Daily quizzes · progress model · content QA",
         "category": "Web",
         "url": "https://ehliyetcoz.com"
       },
       {
         "title": "Kazanamazi",
-        "description": "Kaza namazı ve oruç takipçisi — ısı haritaları ve hatırlatıcılar",
+        "description": "Habit ledger · heatmaps · reminders",
         "category": "Web",
         "url": "https://kazanamazi.net"
       },
       {
         "title": "PDFScanPro",
-        "description": "PDF araç seti — dönüştürme, sıkıştırma, birleştirme, bölme",
+        "description": "PDF pipeline · conversion · compression",
         "category": "Web",
         "url": "https://pdfscanpro.com"
       }
     ],
-    "education": [
-      {
-        "school": "Mehmet Akif Ersoy University",
-        "degree": "Yazılım Mühendisliği",
-        "period": "2021-2025"
-      },
-      {
-        "school": "Dursun Yalım Science High School",
-        "period": "2015-2020"
-      }
-    ],
+    "education": [],
     "skills": [
       {
         "category": "Mobil",
@@ -347,31 +272,23 @@
         "level": "B2"
       }
     ],
-    "testimonials": [
+    "proof": [
       {
-        "quote": "Yusuf ile Dorse lojistik platformunda çalışmak harika bir deneyimdi. Mobil ekibi etkili bir şekilde yönetti ve WebSocket entegrasyonu ile hem iOS hem Android üzerinde gerçek zamanlı araç takibi sundu. Flutter konusundaki teknik derinliği olağanüstü.",
-        "name": "Emrah Türk",
-        "position": "Kıdemli Yazılım Geliştirici",
-        "company": "Junius Tech (Dorse)"
+        "title": "Çift çalışma zamanı",
+        "detail": "SkWasm kullanan WebAssembly birincil çıktıdır; bunu çalıştıramayan tarayıcılar için JavaScript ve CanvasKit alternatifi bulunur.",
+        "verification": "Build manifestini incele"
       },
       {
-        "quote": "Yusuf hem mobil hem backend sistemlere hâkim. Promob e-dergi ve e-gazete platformunda Flutter arayüzden API katmanına kadar kritik özellikleri uçtan uca geliştirdi — temiz, bakımı kolay kodlarla. Zamanında teslim eden güvenilir bir mühendis.",
-        "name": "Ferhat Balaban",
-        "position": "Kıdemli Bilgisayar Mühendisi",
-        "company": "Promob.tr"
+        "title": "Tarayıcıda ölçüm",
+        "detail": "Engineering Lab, canlı uygulamadaki çalışma zamanını, renderer'ı, izolasyon durumunu ve kayan frame timing yüzdeliklerini gösterir.",
+        "verification": "Engineering Lab'i aç"
+      },
+      {
+        "title": "Üretim için sertleştirilmiş",
+        "detail": "Otomatik testler state, erişilebilirlik, deep link, hata kurtarma ve mobil yerleşimleri kapsar; sunucu CSP, COOP, COEP ve doğru Wasm MIME türlerini uygular.",
+        "verification": "Testleri ve Nginx ayarını incele"
       }
-    ],
-    "contact": {
-      "formspree_id": "YOUR_FORMSPREE_ID",
-      "form": {
-        "name_label": "İsim",
-        "email_label": "E-posta",
-        "message_label": "Mesaj",
-        "submit_button": "Gönder"
-      },
-      "success_message": "Mesajınız başarıyla gönderildi!",
-      "error_message": "Bir hata oluştu. Lütfen tekrar deneyin."
-    }
+    ]
   },
   "language_info": {
     "code": "tr",
@@ -379,68 +296,9 @@
     "flag": "🇹🇷",
     "direction": "ltr"
   },
-  "terminal": {
-    "title": "Terminal",
-    "welcome": "Interactive terminal portföyüme hoş geldiniz!",
-    "welcome_title": "Yusuf İhsan Görgel - Terminal",
-    "welcome_text": "Hoş geldiniz! Kullanılabilir komutları görmek için 'help' yazın.",
-    "help_hint": "İpucu: Kullanılabilir komutları görmek için 'help' yazın",
-    "greeting": "Terminal",
-    "type_help": "Kullanılabilir komutları görmek için 'help' yazın.",
-    "help_title": "Kullanılabilir Komutlar:",
-    "cleared": "Terminal temizlendi...",
-    "command_not_found": "'%s' komutu bulunamadı. Kullanılabilir komutları görmek için 'help' yazın.",
-    "prefix": "> ",
-    "type_command": "Bir komut yazın...",
-    "url": {
-      "success": "Bağlantı tarayıcıda açılıyor...",
-      "error": "Bağlantı açılamadı",
-      "error_with_details": "Bağlantı açılırken hata oluştu"
-    },
-    "download_cv_start": "CV indirme başlatılıyor...",
-    "download_cv_success": "CV indirme tarayıcınızda başlatıldı.",
-    "download_cv_error": "CV indirilirken hata oluştu. Lütfen daha sonra tekrar deneyin.",
-    "commands": {
-      "help": "kullanılabilir komutları gösterir",
-      "about": "kişisel bilgilerimi gösterir",
-      "skills": "teknik yeteneklerimi gösterir",
-      "experience": "iş deneyimlerimi gösterir",
-      "education": "eğitim geçmişimi gösterir",
-      "projects": "tamamlanmış projelerimi gösterir",
-      "contact": "iletişim bilgilerimi gösterir",
-      "social": "sosyal medya hesaplarımı gösterir",
-      "download_cv": "özgeçmişimi indirir",
-      "clear": "terminal ekranını temizler",
-      "help_cmd": "yardım",
-      "about_cmd": "hakkımda",
-      "skills_cmd": "yetenekler",
-      "experience_cmd": "deneyim",
-      "education_cmd": "eğitim",
-      "projects_cmd": "projeler",
-      "contact_cmd": "iletişim",
-      "social_cmd": "sosyal",
-      "download_cv_cmd": "cv-indir",
-      "clear_cmd": "temizle"
-    },
-    "projects": {
-      "title": "PROJELERİM",
-      "untitled": "İsimsiz Proje",
-      "not_found": "Proje bulunamadı."
-    },
-    "contact": {
-      "email": "E-posta",
-      "phone": "Telefon",
-      "location": "Konum"
-    },
-    "social": {
-      "github": "GitHub",
-      "linkedin": "LinkedIn",
-      "twitter": "Twitter"
-    }
-  },
   "about_section": {
     "title": "Hakkımda",
-    "bio": "4+ yıllık deneyime sahip, production-grade mobil uygulamalar geliştirmeye odaklanan bir Yazılım Mühendisiyim. Mimari, performans ve güvenilirlik odaklı çalışıyorum — Flutter ile cross-platform, Swift ve Kotlin ile native iOS/Android uygulamalar geliştiriyorum.",
+    "bio": "Bu portföy, kişisel kimliği açığa çıkarmadan yazılımın nasıl tasarlandığını, ölçüldüğünü, test edildiğini ve işletildiğini belgeler.",
     "bio2": "Son zamanlarda çalıştığım teknolojilerden bazıları:",
     "github_title": "GitHub Aktivitesi",
     "github_repos": "Repo",
@@ -468,12 +326,12 @@
     "flip_hint": "Vaka çalışmasını görmek için tıklayın"
   },
   "home_section": {
-    "greeting": "Merhaba, ben",
-    "title": "Yusuf İhsan Görgel.",
-    "subtitle": "Mobil için geliştiriyorum.",
-    "bio": "Production-grade mobil uygulamalar geliştirmeye odaklanan bir yazılım mühendisiyim. Şu anda Uzman Adres'te Flutter ile cross-platform geliştirme üzerine çalışıyorum — Android, iOS ve masaüstü platformlarında piksel-mükemmel, performanslı deneyimler oluşturuyorum.",
+    "greeting": "BUILD / MEASURE / OPERATE",
+    "title": "SİSTEMLER PORTFÖYÜ.",
+    "subtitle": "Bağımsız Yazılım Mühendisliği",
+    "bio": "Cross-platform istemciler, servis API’leri ve self-hosted altyapı için üretim odaklı bir yazılım portföyü.",
     "view_work": "Çalışmalarımı Gör",
-    "download_cv": "CV İndir",
+    "inspect_runtime": "Inspect runtime",
     "contact": "İletişim"
   },
   "experience_section": {
@@ -492,7 +350,7 @@
       "name_error": "Lütfen adınızı girin",
       "email_error": "Lütfen geçerli bir e-posta adresi girin",
       "message_error": "Lütfen mesajınızı girin",
-      "success": "Mesajınız başarıyla gönderildi!",
+      "success": "E-posta uygulamanız açıldı. Mesajınızı kontrol edip gönderin.",
       "error": "Bir hata oluştu. Lütfen tekrar deneyin.",
       "or_divider": "veya doğrudan mesaj gönderin"
     }
@@ -506,9 +364,9 @@
     "error": "Blog yazıları yüklenemedi",
     "retry": "Tekrar Dene"
   },
-  "testimonials_section": {
-    "title": "Referanslar",
-    "subtitle": "Birlikte çalıştığım iş arkadaşları ve mentorlardan geri bildirimler"
+  "proof_section": {
+    "title": "Mühendislik Kanıtı",
+    "subtitle": "Repoda ve canlı çalışma zamanında doğrudan inceleyebileceğiniz özellikler"
   },
   "skills_section": {
     "title": "Beceriler",

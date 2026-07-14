@@ -22,14 +22,20 @@ final class SceneConfig {
   final double vignetteIntensity;
 
   /// Lerp between two scene configs for crossfade
-  static SceneConfig lerp(SceneConfig a, SceneConfig b, double t) => SceneConfig(
+  static SceneConfig lerp(
+    SceneConfig a,
+    SceneConfig b,
+    double t,
+  ) => SceneConfig(
     gradient1: Color.lerp(a.gradient1, b.gradient1, t)!,
     gradient2: Color.lerp(a.gradient2, b.gradient2, t)!,
     gradient3: Color.lerp(a.gradient3, b.gradient3, t)!,
     accent: Color.lerp(a.accent, b.accent, t)!,
-    particleDensity: a.particleDensity + (b.particleDensity - a.particleDensity) * t,
+    particleDensity:
+        a.particleDensity + (b.particleDensity - a.particleDensity) * t,
     particleSpeed: a.particleSpeed + (b.particleSpeed - a.particleSpeed) * t,
-    vignetteIntensity: a.vignetteIntensity + (b.vignetteIntensity - a.vignetteIntensity) * t,
+    vignetteIntensity:
+        a.vignetteIntensity + (b.vignetteIntensity - a.vignetteIntensity) * t,
   );
 }
 
@@ -37,7 +43,7 @@ final class SceneConfig {
 final class SceneConfigs {
   const SceneConfigs._();
 
-  static const scenes = [hero, about, experience, projects, contact];
+  static const scenes = [hero, about, experience, proof, projects];
 
   // Scene 0: Hero — Blade Runner 2049
   static const hero = SceneConfig(
@@ -72,8 +78,8 @@ final class SceneConfigs {
     vignetteIntensity: 0.3,
   );
 
-  // Scene 3: Projects — Spider-Verse
-  static const projects = SceneConfig(
+  // Scene 3: Proof — Spider-Verse
+  static const proof = SceneConfig(
     gradient1: AppColors.projGradient1,
     gradient2: AppColors.projGradient2,
     gradient3: AppColors.projGradient3,
@@ -83,8 +89,8 @@ final class SceneConfigs {
     vignetteIntensity: 0.25,
   );
 
-  // Scene 4: Contact — Interstellar
-  static const contact = SceneConfig(
+  // Scene 4: Projects — Interstellar
+  static const projects = SceneConfig(
     gradient1: AppColors.contactGradient1,
     gradient2: AppColors.contactGradient2,
     gradient3: AppColors.contactGradient3,

@@ -1,215 +1,180 @@
 import 'dart:developer' as dev;
 
-import 'package:get/get.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
 import 'package:flutter_web_portfolio/app/services/visitor_analytics.dart';
 
-/// Personalisation signals derived from [VisitorAnalytics].
-///
-/// The controller is reactive (GetX) and exposes observable properties that
-/// widgets can bind to. All personalisation is subtle, privacy-respecting,
-/// and entirely client-side.
-class PersonalizationController extends GetxController {
-  PersonalizationController({VisitorAnalytics? analytics})
-      : _analytics = analytics ?? VisitorAnalytics();
+@immutable
+final class PersonalizationState {
+  const PersonalizationState({
+    required this.greeting,
+    required this.introText,
+    required this.showFullIntro,
+    required this.suggestedDarkMode,
+    required this.ctaText,
+    required this.sectionOrder,
+    required this.recommendedProjectIds,
+    required this.timeGreeting,
+    required this.visitCount,
+    required this.engagement,
+    required this.isFromGitHub,
+  });
+
+  const PersonalizationState.initial()
+    : greeting = '',
+      introText = '',
+      showFullIntro = true,
+      suggestedDarkMode = null,
+      ctaText = 'See What I Can Do',
+      sectionOrder = const [],
+      recommendedProjectIds = const [],
+      timeGreeting = '',
+      visitCount = 0,
+      engagement = EngagementLevel.low,
+      isFromGitHub = false;
+
+  final String greeting;
+  final String introText;
+  final bool showFullIntro;
+  final bool? suggestedDarkMode;
+  final String ctaText;
+  final List<String> sectionOrder;
+  final List<String> recommendedProjectIds;
+  final String timeGreeting;
+  final int visitCount;
+  final EngagementLevel engagement;
+  final bool isFromGitHub;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is PersonalizationState &&
+          greeting == other.greeting &&
+          introText == other.introText &&
+          showFullIntro == other.showFullIntro &&
+          suggestedDarkMode == other.suggestedDarkMode &&
+          ctaText == other.ctaText &&
+          listEquals(sectionOrder, other.sectionOrder) &&
+          listEquals(recommendedProjectIds, other.recommendedProjectIds) &&
+          timeGreeting == other.timeGreeting &&
+          visitCount == other.visitCount &&
+          engagement == other.engagement &&
+          isFromGitHub == other.isFromGitHub;
+
+  @override
+  int get hashCode => Object.hash(
+    greeting,
+    introText,
+    showFullIntro,
+    suggestedDarkMode,
+    ctaText,
+    Object.hashAll(sectionOrder),
+    Object.hashAll(recommendedProjectIds),
+    timeGreeting,
+    visitCount,
+    engagement,
+    isFromGitHub,
+  );
+}
+
+/// Derives privacy-preserving presentation hints from local-only analytics.
+final class PersonalizationController extends Cubit<PersonalizationState> {
+  PersonalizationController({required VisitorAnalytics analytics})
+    : _analytics = analytics,
+      super(const PersonalizationState.initial()) {
+    _analytics.init();
+    refresh();
+  }
 
   final VisitorAnalytics _analytics;
 
-  // ─── Observables ─────────────────────────────────────────────────
-
-  /// Personalised greeting line (e.g. "Welcome back").
-  final greeting = ''.obs;
-
-  /// Secondary intro text adjusted to visitor familiarity.
-  final introText = ''.obs;
-
-  /// Whether to show the full (expanded) intro or a condensed variant.
-  final showFullIntro = true.obs;
-
-  /// Suggested theme mode — true = dark, false = light, null = no suggestion.
-  final Rxn<bool> suggestedDarkMode = Rxn<bool>();
-
-  /// CTA button label adjusted by engagement.
-  final ctaText = 'See What I Can Do'.obs;
-
-  /// Ordered section IDs — may be re-arranged based on interests.
-  final RxList<String> sectionOrder = <String>[].obs;
-
-  /// Project IDs recommended based on previous views.
-  final RxList<String> recommendedProjectIds = <String>[].obs;
-
-  /// Time-appropriate greeting prefix (Good morning / afternoon / evening).
-  final timeGreeting = ''.obs;
-
-  /// Visitor's total visit count (for optional display).
-  final visitCount = 0.obs;
-
-  /// Current engagement level.
-  final Rx<EngagementLevel> engagement = EngagementLevel.low.obs;
-
-  /// Whether the visitor arrived from GitHub.
-  final isFromGitHub = false.obs;
-
-  // Default section ordering — matches Routes.sectionIds.
   static const _defaultOrder = [
     'home',
     'about',
     'experience',
-    'testimonials',
+    'proof',
     'blog',
     'projects',
     'contact',
   ];
 
-  // ─── Lifecycle ───────────────────────────────────────────────────
-
-  @override
-  void onInit() {
-    super.onInit();
-    _analytics.init();
-    _refresh();
-  }
-
-  @override
-  void onClose() {
-    _analytics.flush();
-    super.onClose();
-  }
-
-  /// Re-derive all personalisation signals from the current analytics state.
-  @override
-  void refresh() => _refresh();
-
-  // ─── Core logic ──────────────────────────────────────────────────
-
-  void _refresh() {
+  void refresh() {
     try {
       final profile = _analytics.profile;
+      final timeGreeting = switch (profile.visitHour) {
+        >= 5 && < 12 => 'Good morning',
+        >= 12 && < 18 => 'Good afternoon',
+        _ => 'Good evening',
+      };
 
-      visitCount.value = profile.visitCount;
-      engagement.value = profile.engagement;
+      final (greeting, introText, showFullIntro) = switch (profile.visitCount) {
+        <= 1 => (
+          'Welcome',
+          "I'm a developer who crafts polished digital experiences.",
+          true,
+        ),
+        <= 4 => ('Welcome back', 'Good to see you again.', false),
+        _ => ('Hey again!', 'You know the way around.', false),
+      };
 
-      _applyGreeting(profile);
-      _applyThemeSuggestion(profile);
-      _applyCta(profile);
-      _applySectionOrder(profile);
-      _applyRecommendations(profile);
-      _detectGitHub(profile);
-    } catch (e) {
-      dev.log('Personalisation refresh failed',
-          name: 'PersonalizationController', error: e);
+      final ctaText = switch (profile.engagement) {
+        EngagementLevel.high => "Let's Work Together",
+        EngagementLevel.medium => 'Explore My Work',
+        EngagementLevel.low => 'See What I Can Do',
+      };
+
+      final sectionOrder = _deriveSectionOrder(profile);
+      emit(
+        PersonalizationState(
+          greeting: greeting,
+          introText: introText,
+          showFullIntro: showFullIntro,
+          suggestedDarkMode: profile.visitHour >= 20 || profile.visitHour < 6,
+          ctaText: ctaText,
+          sectionOrder: List.unmodifiable(sectionOrder),
+          recommendedProjectIds: List.unmodifiable(profile.viewedProjectIds),
+          timeGreeting: timeGreeting,
+          visitCount: profile.visitCount,
+          engagement: profile.engagement,
+          isFromGitHub: profile.referrerSource.contains('github'),
+        ),
+      );
+    } catch (error, stackTrace) {
+      dev.log(
+        'Personalisation refresh failed',
+        name: 'PersonalizationController',
+        error: error,
+        stackTrace: stackTrace,
+      );
     }
   }
 
-  // ─── Greeting personalisation ────────────────────────────────────
-
-  void _applyGreeting(VisitorProfile profile) {
-    // Time-appropriate prefix.
-    final hour = profile.visitHour;
-    if (hour >= 5 && hour < 12) {
-      timeGreeting.value = 'Good morning';
-    } else if (hour >= 12 && hour < 18) {
-      timeGreeting.value = 'Good afternoon';
-    } else {
-      timeGreeting.value = 'Good evening';
-    }
-
-    // Familiarity-based greeting.
-    if (profile.visitCount <= 1) {
-      greeting.value = 'Welcome';
-      introText.value =
-          "I'm a developer who crafts polished digital experiences.";
-      showFullIntro.value = true;
-    } else if (profile.visitCount <= 4) {
-      greeting.value = 'Welcome back';
-      introText.value = 'Good to see you again.';
-      showFullIntro.value = false;
-    } else {
-      greeting.value = 'Hey again!';
-      introText.value = 'You know the way around.';
-      showFullIntro.value = false;
-    }
-  }
-
-  // ─── Theme suggestion ───────────────────────────────────────────
-
-  void _applyThemeSuggestion(VisitorProfile profile) {
-    final hour = profile.visitHour;
-    // Suggest dark mode at night (20:00 – 06:00).
-    if (hour >= 20 || hour < 6) {
-      suggestedDarkMode.value = true;
-    } else {
-      suggestedDarkMode.value = false;
-    }
-  }
-
-  // ─── CTA personalisation ────────────────────────────────────────
-
-  void _applyCta(VisitorProfile profile) {
-    ctaText.value = switch (profile.engagement) {
-      EngagementLevel.high => "Let's Work Together",
-      EngagementLevel.medium => 'Explore My Work',
-      EngagementLevel.low => 'See What I Can Do',
-    };
-  }
-
-  // ─── Content ordering ───────────────────────────────────────────
-
-  void _applySectionOrder(VisitorProfile profile) {
+  static List<String> _deriveSectionOrder(VisitorProfile profile) {
     final order = List<String>.from(_defaultOrder);
-
     if (profile.interests.isNotEmpty) {
       final topInterest = profile.interests.first;
-
-      // If the visitor's primary interest is a movable section, promote it
-      // to just after 'home' + 'about' (we always keep those on top).
       if (topInterest != 'home' &&
           topInterest != 'about' &&
-          topInterest != 'contact') {
-        order.remove(topInterest);
-        // Insert after 'about' (index 2 in default order).
-        final insertAt = order.indexOf('about') + 1;
-        order.insert(insertAt.clamp(0, order.length), topInterest);
+          topInterest != 'contact' &&
+          order.remove(topInterest)) {
+        order.insert(order.indexOf('about') + 1, topInterest);
       }
     }
 
-    // If referrer is GitHub, promote projects.
-    if (profile.referrerSource.contains('github')) {
-      if (order.remove('projects')) {
-        final insertAt = order.indexOf('about') + 1;
-        order.insert(insertAt.clamp(0, order.length), 'projects');
-      }
+    if (profile.referrerSource.contains('github') && order.remove('projects')) {
+      order.insert(order.indexOf('about') + 1, 'projects');
     }
-
-    sectionOrder.assignAll(order);
+    return order;
   }
 
-  // ─── Project recommendations ─────────────────────────────────────
-
-  void _applyRecommendations(VisitorProfile profile) {
-    // Simple collaborative-filtering stand-in: if the visitor has viewed
-    // projects, recommend other projects they haven't seen yet.
-    //
-    // Without a full project list we can only expose viewed IDs so that
-    // downstream widgets can filter. A more sophisticated implementation
-    // would match technologies between viewed and unviewed projects.
-    recommendedProjectIds.assignAll(profile.viewedProjectIds);
-  }
-
-  // ─── GitHub detection ────────────────────────────────────────────
-
-  void _detectGitHub(VisitorProfile profile) {
-    isFromGitHub.value = profile.referrerSource.contains('github');
-  }
-
-  // ─── Public convenience accessors ────────────────────────────────
-
-  /// The underlying analytics service, exposed for widgets that need to
-  /// record events (e.g. project clicks, section enter).
   VisitorAnalytics get analytics => _analytics;
+  bool get isFirstVisit => state.visitCount <= 1;
+  bool get isFrequentVisitor => state.visitCount >= 5;
 
-  /// Whether the visitor is on their first-ever visit.
-  bool get isFirstVisit => visitCount.value <= 1;
-
-  /// Whether the visitor qualifies as a frequent visitor.
-  bool get isFrequentVisitor => visitCount.value >= 5;
+  @override
+  Future<void> close() {
+    _analytics.flush();
+    return super.close();
+  }
 }

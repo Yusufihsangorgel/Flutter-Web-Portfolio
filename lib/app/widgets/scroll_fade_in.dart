@@ -47,8 +47,10 @@ class _ScrollFadeInState extends State<ScrollFadeIn>
       end: Offset.zero,
     ).animate(CurvedAnimation(parent: _controller, curve: widget.curve));
     _scale = widget.enableScale
-        ? Tween<double>(begin: 0.95, end: 1.0)
-            .animate(CurvedAnimation(parent: _controller, curve: widget.curve))
+        ? Tween<double>(
+            begin: 0.95,
+            end: 1.0,
+          ).animate(CurvedAnimation(parent: _controller, curve: widget.curve))
         : const AlwaysStoppedAnimation<double>(1.0);
 
     WidgetsBinding.instance.addPostFrameCallback((_) => _checkVisibility());
@@ -79,7 +81,8 @@ class _ScrollFadeInState extends State<ScrollFadeIn>
     final position = renderBox.localToGlobal(Offset.zero);
     final screenHeight = MediaQuery.sizeOf(context).height;
 
-    if (position.dy < screenHeight * 0.9 && position.dy > -renderBox.size.height) {
+    if (position.dy < screenHeight * 0.9 &&
+        position.dy > -renderBox.size.height) {
       _triggered = true;
       _scrollPosition?.removeListener(_checkVisibility);
 

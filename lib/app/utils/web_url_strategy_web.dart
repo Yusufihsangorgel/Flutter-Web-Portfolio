@@ -34,6 +34,9 @@ void setHtmlLang(String languageCode) {
   web.document.documentElement?.setAttribute('lang', languageCode);
 }
 
+/// Reloads the current document after an unrecoverable bootstrap failure.
+void reloadPage() => web.window.location.reload();
+
 /// Registers a listener for browser back/forward navigation.
 ///
 /// Returns a dispose function that removes the listener.

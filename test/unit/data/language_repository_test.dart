@@ -5,11 +5,10 @@ import 'package:flutter_web_portfolio/app/domain/providers/i_local_storage_provi
 
 class _MockAssetsProvider implements IAssetsProvider {
   @override
-  Future<List<Map<String, dynamic>>> loadProjectsData() async => [];
-
-  @override
-  Future<Map<String, dynamic>> loadTranslations(String langCode) async =>
-      {'key': 'value', 'lang': langCode};
+  Future<Map<String, dynamic>> loadTranslations(String langCode) async => {
+    'key': 'value',
+    'lang': langCode,
+  };
 }
 
 class _MockLocalStorage implements ILocalStorageProvider {
@@ -88,8 +87,11 @@ void main() {
       test('each language has a non-empty flag value', () {
         final languages = repository.getSupportedLanguages();
         for (final entry in languages.entries) {
-          expect(entry.value.isNotEmpty, isTrue,
-              reason: 'Flag for ${entry.key} should not be empty');
+          expect(
+            entry.value.isNotEmpty,
+            isTrue,
+            reason: 'Flag for ${entry.key} should not be empty',
+          );
         }
       });
     });

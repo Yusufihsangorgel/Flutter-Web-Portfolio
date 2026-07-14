@@ -5,6 +5,36 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- **Engineering Lab** with live runtime, renderer, isolation, and rolling Flutter `FrameTiming` telemetry
+- **Deterministic application bootstrap** and concurrency-safe `LanguageCubit`
+- **Desktop and mobile Playwright smoke tests** for Wasm, first frame, runtime inspection, and browser history
+- **Bundle integrity gate** with explicit Wasm and JavaScript budgets
+- **Accessible bootstrap recovery** when the Flutter engine cannot start
+
+### Changed
+
+- Release builds now ship Dart WebAssembly + SkWasm with a JavaScript/CanvasKit fallback
+- Renderer binaries are self-hosted instead of fetched from Flutter's public CDN
+- Inter, Space Grotesk, and JetBrains Mono are bundled as local variable fonts; the font CDN preconnect was removed
+- Dart sources and tests use the Dart 3.11 formatter as a CI-enforced baseline
+- Contact drafts open the visitor's mail client; the UI no longer claims delivery before the visitor sends
+- Browser history is synchronized directly by the scroll controller instead of a page router
+- Reduced-motion preferences stop continuous scene animation and bypass the cinematic preloader
+- Generated `build/web` output is no longer kept as source
+- Unverifiable named endorsements were replaced by repository-backed engineering evidence
+
+### Fixed
+
+- Slow locale requests can no longer overwrite a newer language choice
+- Browser back/forward no longer pushes a duplicate history entry
+- Stable Wasm filenames are revalidated instead of receiving a one-year immutable cache policy
+- Nginx serves Dart's `.mjs` support runtime with a JavaScript MIME type under `nosniff`
+- Unsupported public project metrics were removed from all seven locale documents
+
 ## [1.1.0] - 2026-03-23
 
 ### Added

@@ -1,10 +1,11 @@
 import 'dart:developer' as dev;
 import 'dart:js_interop';
 
-import 'package:get/get.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:web/web.dart' as web;
 
 import 'package:flutter_web_portfolio/app/core/constants/sound_constants.dart';
+import 'package:flutter_web_portfolio/app/controllers/sound_state.dart';
 
 /// Web Audio API-based sound design controller.
 ///
@@ -13,13 +14,17 @@ import 'package:flutter_web_portfolio/app/core/constants/sound_constants.dart';
 /// interaction) and pooled so overlapping playback works correctly.
 ///
 /// Muted by default; user opts in via the sound toggle widget.
-class SoundController extends GetxController {
-  // ── Reactive state ──────────────────────────────────────────────────
+final class SoundController extends Cubit<SoundState> {
+  SoundController()
+    : super(
+        const SoundState.initial(
+          masterVolume: SoundConstants.defaultMasterVolume,
+        ),
+      ) {
+    _loadPreferences();
+  }
 
-  final RxBool isEnabled = false.obs;
   bool _hasUserInteracted = false;
-  final RxDouble masterVolume = SoundConstants.defaultMasterVolume.obs;
-  final RxBool isAmbientPlaying = false.obs;
 
   // ── Internals ───────────────────────────────────────────────────────
 
@@ -32,20 +37,12 @@ class SoundController extends GetxController {
   web.OscillatorNode? _ambientOsc;
   web.GainNode? _ambientGain;
 
-  // ── Lifecycle ───────────────────────────────────────────────────────
-
   @override
-  void onInit() {
-    super.onInit();
-    _loadPreferences();
-  }
-
-  @override
-  void onClose() {
+  Future<void> close() {
     stopAmbient();
     _ctx?.close();
     _ctx = null;
-    super.onClose();
+    return super.close();
   }
 
   // ── Persistence via localStorage ────────────────────────────────────
@@ -56,7 +53,7 @@ class SoundController extends GetxController {
         SoundConstants.storageKeyEnabled,
       );
       if (storedEnabled != null) {
-        isEnabled.value = storedEnabled == 'true';
+        emit(state.copyWith(isEnabled: storedEnabled == 'true'));
       }
 
       final storedVolume = web.window.localStorage.getItem(
@@ -65,14 +62,22 @@ class SoundController extends GetxController {
       if (storedVolume != null) {
         final parsed = double.tryParse(storedVolume);
         if (parsed != null) {
-          masterVolume.value = parsed.clamp(
-            SoundConstants.minVolume,
-            SoundConstants.maxVolume,
+          emit(
+            state.copyWith(
+              masterVolume: parsed.clamp(
+                SoundConstants.minVolume,
+                SoundConstants.maxVolume,
+              ),
+            ),
           );
         }
       }
     } catch (e) {
-      dev.log('Failed to load sound preferences from localStorage', name: 'SoundController', error: e);
+      dev.log(
+        'Failed to load sound preferences from localStorage',
+        name: 'SoundController',
+        error: e,
+      );
     }
   }
 
@@ -80,14 +85,18 @@ class SoundController extends GetxController {
     try {
       web.window.localStorage.setItem(
         SoundConstants.storageKeyEnabled,
-        isEnabled.value.toString(),
+        state.isEnabled.toString(),
       );
       web.window.localStorage.setItem(
         SoundConstants.storageKeyVolume,
-        masterVolume.value.toString(),
+        state.masterVolume.toString(),
       );
     } catch (e) {
-      dev.log('Failed to save sound preferences to localStorage', name: 'SoundController', error: e);
+      dev.log(
+        'Failed to save sound preferences to localStorage',
+        name: 'SoundController',
+        error: e,
+      );
     }
   }
 
@@ -96,10 +105,10 @@ class SoundController extends GetxController {
   /// Toggle sound on/off and persist.
   void toggleSound() {
     _hasUserInteracted = true;
-    isEnabled.value = !isEnabled.value;
+    emit(state.copyWith(isEnabled: !state.isEnabled));
     _savePreferences();
 
-    if (isEnabled.value) {
+    if (state.isEnabled) {
       _ensureContext();
     } else {
       stopAmbient();
@@ -108,16 +117,20 @@ class SoundController extends GetxController {
 
   /// Set master volume (0.0–1.0) and persist.
   void setMasterVolume(double volume) {
-    masterVolume.value = volume.clamp(
-      SoundConstants.minVolume,
-      SoundConstants.maxVolume,
+    emit(
+      state.copyWith(
+        masterVolume: volume.clamp(
+          SoundConstants.minVolume,
+          SoundConstants.maxVolume,
+        ),
+      ),
     );
     _savePreferences();
 
     // Update ambient gain in real time if playing.
     final ag = _ambientGain;
-    if (ag != null && isAmbientPlaying.value) {
-      ag.gain.value = SoundConstants.ambientGain * masterVolume.value;
+    if (ag != null && state.isAmbientPlaying) {
+      ag.gain.value = SoundConstants.ambientGain * state.masterVolume;
     }
   }
 
@@ -155,7 +168,8 @@ class SoundController extends GetxController {
     final now = ctx.currentTime;
     final gain = _scaledGain(SoundConstants.transitionGain);
 
-    final osc = ctx.createOscillator()..type = SoundConstants.transitionWaveform;
+    final osc = ctx.createOscillator()
+      ..type = SoundConstants.transitionWaveform;
     osc.frequency.value = SoundConstants.transitionStartFrequency;
     osc.frequency.exponentialRampToValueAtTime(
       SoundConstants.transitionEndFrequency,
@@ -184,8 +198,12 @@ class SoundController extends GetxController {
 
     final now = ctx.currentTime;
     final gain = _scaledGain(SoundConstants.toggleGain);
-    final freq1 = on ? SoundConstants.toggleFrequencyOff : SoundConstants.toggleFrequencyOn;
-    final freq2 = on ? SoundConstants.toggleFrequencyOn : SoundConstants.toggleFrequencyOff;
+    final freq1 = on
+        ? SoundConstants.toggleFrequencyOff
+        : SoundConstants.toggleFrequencyOn;
+    final freq2 = on
+        ? SoundConstants.toggleFrequencyOn
+        : SoundConstants.toggleFrequencyOff;
 
     // First note.
     _playToneAt(
@@ -217,8 +235,11 @@ class SoundController extends GetxController {
     final gain = _scaledGain(SoundConstants.successGain);
 
     for (var i = 0; i < SoundConstants.successFrequencies.length; i++) {
-      final noteStart = now +
-          i * (SoundConstants.successNoteDuration + SoundConstants.successNoteGap);
+      final noteStart =
+          now +
+          i *
+              (SoundConstants.successNoteDuration +
+                  SoundConstants.successNoteGap);
       _playToneAt(
         time: noteStart,
         frequency: SoundConstants.successFrequencies[i],
@@ -242,7 +263,7 @@ class SoundController extends GetxController {
 
   /// Low-frequency drone with subtle LFO wobble — optional ambient loop.
   void playAmbient() {
-    if (!_canPlay() || isAmbientPlaying.value) return;
+    if (!_canPlay() || state.isAmbientPlaying) return;
     _ensureContext();
     final ctx = _ctx;
     if (ctx == null) return;
@@ -251,16 +272,17 @@ class SoundController extends GetxController {
     final gain = _scaledGain(SoundConstants.ambientGain);
 
     // Main drone oscillator with frequency wobble baked into the schedule.
-    final osc = ctx.createOscillator()
-      ..type = SoundConstants.ambientWaveform;
+    final osc = ctx.createOscillator()..type = SoundConstants.ambientWaveform;
     osc.frequency.value = SoundConstants.ambientBaseFrequency;
 
     // Simulate LFO by scheduling repeating frequency ramps.
     // Each cycle: base → base+depth → base over 1/lfoFreq seconds.
     const cycleDuration = 1.0 / SoundConstants.ambientLfoFrequency;
     const halfCycle = cycleDuration / 2.0;
-    const lo = SoundConstants.ambientBaseFrequency - SoundConstants.ambientLfoDepth;
-    const hi = SoundConstants.ambientBaseFrequency + SoundConstants.ambientLfoDepth;
+    const lo =
+        SoundConstants.ambientBaseFrequency - SoundConstants.ambientLfoDepth;
+    const hi =
+        SoundConstants.ambientBaseFrequency + SoundConstants.ambientLfoDepth;
 
     // Schedule several cycles ahead (browser will loop naturally).
     const scheduledCycles = 120; // ~6–7 minutes at 0.3 Hz
@@ -284,12 +306,12 @@ class SoundController extends GetxController {
 
     _ambientOsc = osc;
     _ambientGain = masterGain;
-    isAmbientPlaying.value = true;
+    emit(state.copyWith(isAmbientPlaying: true));
   }
 
   /// Fade out and stop the ambient drone.
   void stopAmbient() {
-    if (!isAmbientPlaying.value) return;
+    if (!state.isAmbientPlaying) return;
 
     final ctx = _ctx;
     final osc = _ambientOsc;
@@ -306,14 +328,14 @@ class SoundController extends GetxController {
 
     _ambientOsc = null;
     _ambientGain = null;
-    isAmbientPlaying.value = false;
+    emit(state.copyWith(isAmbientPlaying: false));
   }
 
   // ── Internal helpers ────────────────────────────────────────────────
 
   /// Whether we should play a sound right now.
   bool _canPlay() {
-    if (!isEnabled.value) return false;
+    if (!state.isEnabled) return false;
     if (!_hasUserInteracted) return false;
     if (_prefersReducedMotion()) return false;
     return true;
@@ -323,11 +345,13 @@ class SoundController extends GetxController {
   /// reduced-sound preferences — many accessibility users prefer both.
   bool _prefersReducedMotion() {
     try {
-      return web.window
-          .matchMedia('(prefers-reduced-motion: reduce)')
-          .matches;
+      return web.window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     } catch (e) {
-      dev.log('Failed to query prefers-reduced-motion', name: 'SoundController', error: e);
+      dev.log(
+        'Failed to query prefers-reduced-motion',
+        name: 'SoundController',
+        error: e,
+      );
       return false;
     }
   }
@@ -342,7 +366,7 @@ class SoundController extends GetxController {
   }
 
   /// Scale a per-sound gain by master volume.
-  double _scaledGain(double baseGain) => baseGain * masterVolume.value;
+  double _scaledGain(double baseGain) => baseGain * state.masterVolume;
 
   /// Play a single oscillator tone immediately.
   void _playTone({
@@ -398,7 +422,10 @@ class SoundController extends GetxController {
 
     // Use the ended event to decrement voice count.
     void onEnded(web.Event _) {
-      _activeVoices = (_activeVoices - 1).clamp(0, SoundConstants.maxConcurrentSounds);
+      _activeVoices = (_activeVoices - 1).clamp(
+        0,
+        SoundConstants.maxConcurrentSounds,
+      );
     }
 
     osc.addEventListener('ended', onEnded.toJS);

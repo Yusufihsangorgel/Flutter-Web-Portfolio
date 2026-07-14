@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_web_portfolio/app/core/theme/app_fonts.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
 import 'package:flutter_web_portfolio/app/core/constants/cinematic_curves.dart';
 import 'package:flutter_web_portfolio/app/core/constants/durations.dart';
@@ -32,18 +32,18 @@ class _CinematicButtonState extends State<CinematicButton> {
     button: true,
     label: widget.label,
     child: GestureDetector(
-    onTapDown: (_) => setState(() => _pressed = true),
-    onTapUp: (_) => setState(() => _pressed = false),
-    onTapCancel: () => setState(() => _pressed = false),
-    behavior: HitTestBehavior.translucent,
-    child: AnimatedScale(
-      scale: _pressed ? 0.97 : 1.0,
-      duration: AppDurations.microFast,
-      curve: CinematicCurves.hoverLift,
-      child: CinematicFocusable(
-        onTap: widget.onTap,
-        onHoverChanged: (h) => setState(() => _hovered = h),
-        child: AnimatedContainer(
+      onTapDown: (_) => setState(() => _pressed = true),
+      onTapUp: (_) => setState(() => _pressed = false),
+      onTapCancel: () => setState(() => _pressed = false),
+      behavior: HitTestBehavior.translucent,
+      child: AnimatedScale(
+        scale: _pressed ? 0.97 : 1.0,
+        duration: AppDurations.microFast,
+        curve: CinematicCurves.hoverLift,
+        child: CinematicFocusable(
+          onTap: widget.onTap,
+          onHoverChanged: (h) => setState(() => _hovered = h),
+          child: AnimatedContainer(
             duration: AppDurations.buttonHover,
             curve: CinematicCurves.hoverLift,
             padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
@@ -80,7 +80,7 @@ class _CinematicButtonState extends State<CinematicButton> {
                   ),
             child: Text(
               widget.label,
-              style: GoogleFonts.spaceGrotesk(
+              style: AppFonts.spaceGrotesk(
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
                 color: widget.isPrimary
@@ -88,10 +88,10 @@ class _CinematicButtonState extends State<CinematicButton> {
                     : (_hovered ? AppColors.white : AppColors.textPrimary),
                 letterSpacing: 2,
               ),
+            ),
           ),
         ),
       ),
     ),
-  ),
   );
 }

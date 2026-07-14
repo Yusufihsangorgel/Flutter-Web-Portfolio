@@ -3,10 +3,11 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_web_portfolio/app/utils/responsive_utils.dart';
 import 'package:flutter_web_portfolio/app/core/constants/breakpoints.dart';
 
-Widget _wrapWithMediaQuery({required double width, required Widget child}) => MediaQuery(
-    data: MediaQueryData(size: Size(width, 800)),
-    child: MaterialApp(home: Builder(builder: (context) => child)),
-  );
+Widget _wrapWithMediaQuery({required double width, required Widget child}) =>
+    MediaQuery(
+      data: MediaQueryData(size: Size(width, 800)),
+      child: MaterialApp(home: Builder(builder: (context) => child)),
+    );
 
 void main() {
   group('ResponsiveUtils', () {
@@ -15,10 +16,12 @@ void main() {
       await tester.pumpWidget(
         _wrapWithMediaQuery(
           width: Breakpoints.mobile - 1,
-          child: Builder(builder: (context) {
-            result = ResponsiveUtils.isMobile(context);
-            return const SizedBox();
-          }),
+          child: Builder(
+            builder: (context) {
+              result = ResponsiveUtils.isMobile(context);
+              return const SizedBox();
+            },
+          ),
         ),
       );
       expect(result, isTrue);
@@ -29,24 +32,30 @@ void main() {
       await tester.pumpWidget(
         _wrapWithMediaQuery(
           width: Breakpoints.mobile + 1,
-          child: Builder(builder: (context) {
-            result = ResponsiveUtils.isMobile(context);
-            return const SizedBox();
-          }),
+          child: Builder(
+            builder: (context) {
+              result = ResponsiveUtils.isMobile(context);
+              return const SizedBox();
+            },
+          ),
         ),
       );
       expect(result, isFalse);
     });
 
-    testWidgets('isTablet returns true for tablet-width screens', (tester) async {
+    testWidgets('isTablet returns true for tablet-width screens', (
+      tester,
+    ) async {
       late bool result;
       await tester.pumpWidget(
         _wrapWithMediaQuery(
           width: (Breakpoints.mobile + Breakpoints.tablet) / 2,
-          child: Builder(builder: (context) {
-            result = ResponsiveUtils.isTablet(context);
-            return const SizedBox();
-          }),
+          child: Builder(
+            builder: (context) {
+              result = ResponsiveUtils.isTablet(context);
+              return const SizedBox();
+            },
+          ),
         ),
       );
       expect(result, isTrue);
@@ -57,46 +66,56 @@ void main() {
       await tester.pumpWidget(
         _wrapWithMediaQuery(
           width: Breakpoints.desktop + 100,
-          child: Builder(builder: (context) {
-            result = ResponsiveUtils.isLargeDesktop(context);
-            return const SizedBox();
-          }),
+          child: Builder(
+            builder: (context) {
+              result = ResponsiveUtils.isLargeDesktop(context);
+              return const SizedBox();
+            },
+          ),
         ),
       );
       expect(result, isTrue);
     });
 
-    testWidgets('getValueForScreenType returns correct value per breakpoint', (tester) async {
+    testWidgets('getValueForScreenType returns correct value per breakpoint', (
+      tester,
+    ) async {
       late String result;
       await tester.pumpWidget(
         _wrapWithMediaQuery(
           width: Breakpoints.mobile - 1,
-          child: Builder(builder: (context) {
-            result = ResponsiveUtils.getValueForScreenType(
-              context: context,
-              mobile: 'mobile',
-              tablet: 'tablet',
-              desktop: 'desktop',
-            );
-            return const SizedBox();
-          }),
+          child: Builder(
+            builder: (context) {
+              result = ResponsiveUtils.getValueForScreenType(
+                context: context,
+                mobile: 'mobile',
+                tablet: 'tablet',
+                desktop: 'desktop',
+              );
+              return const SizedBox();
+            },
+          ),
         ),
       );
       expect(result, 'mobile');
     });
 
-    testWidgets('getValueForScreenType falls back when value is null', (tester) async {
+    testWidgets('getValueForScreenType falls back when value is null', (
+      tester,
+    ) async {
       late String result;
       await tester.pumpWidget(
         _wrapWithMediaQuery(
           width: (Breakpoints.mobile + Breakpoints.tablet) / 2,
-          child: Builder(builder: (context) {
-            result = ResponsiveUtils.getValueForScreenType(
-              context: context,
-              mobile: 'mobile',
-            );
-            return const SizedBox();
-          }),
+          child: Builder(
+            builder: (context) {
+              result = ResponsiveUtils.getValueForScreenType(
+                context: context,
+                mobile: 'mobile',
+              );
+              return const SizedBox();
+            },
+          ),
         ),
       );
       expect(result, 'mobile');

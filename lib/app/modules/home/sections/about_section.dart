@@ -1,9 +1,9 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:flutter_web_portfolio/app/controllers/language_controller.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_web_portfolio/app/core/theme/app_fonts.dart';
+import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
 import 'package:flutter_web_portfolio/app/controllers/scene_director.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
 import 'package:flutter_web_portfolio/app/core/constants/cinematic_curves.dart';
@@ -11,9 +11,8 @@ import 'package:flutter_web_portfolio/app/core/constants/durations.dart';
 import 'package:flutter_web_portfolio/app/core/theme/app_typography.dart';
 import 'package:flutter_web_portfolio/app/utils/responsive_utils.dart';
 import 'package:flutter_web_portfolio/app/widgets/numbered_section_heading.dart';
-import 'package:flutter_web_portfolio/app/core/constants/app_config.dart';
-import 'package:flutter_web_portfolio/app/widgets/animated_stats.dart';
 import 'package:flutter_web_portfolio/app/widgets/scroll_fade_in.dart';
+import 'package:flutter_web_portfolio/app/widgets/scene_accent_builder.dart';
 import 'package:flutter_web_portfolio/app/widgets/skill_bar_chart.dart';
 import 'package:flutter_web_portfolio/app/widgets/skill_orbit.dart';
 
@@ -23,11 +22,18 @@ class AboutSection extends StatelessWidget {
   const AboutSection({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final languageController = Get.find<LanguageController>();
+  Widget build(BuildContext context) =>
+      BlocBuilder<LanguageCubit, LanguageState>(
+        builder: (context, _) => _buildContent(context),
+      );
+
+  Widget _buildContent(BuildContext context) {
+    final languageController = context.read<LanguageCubit>();
     final isMobile = ResponsiveUtils.isMobile(context);
     final screenWidth = MediaQuery.sizeOf(context).width;
-    final data = languageController.cvData['personal_info'] as Map<String, dynamic>? ?? <String, dynamic>{};
+    final data =
+        languageController.cvData['personal_info'] as Map<String, dynamic>? ??
+        <String, dynamic>{};
 
     return Container(
       width: double.infinity,
@@ -37,9 +43,11 @@ class AboutSection extends StatelessWidget {
           Positioned(
             top: -20,
             left: -10,
-            child: Obx(() => Text(
-              languageController.getText('nav.about', defaultValue: 'About').toUpperCase(),
-              style: GoogleFonts.spaceGrotesk(
+            child: Text(
+              languageController
+                  .getText('nav.about', defaultValue: 'About')
+                  .toUpperCase(),
+              style: AppFonts.spaceGrotesk(
                 fontSize: ResponsiveUtils.getValueForScreenType<double>(
                   context: context,
                   mobile: 48.0,
@@ -50,7 +58,7 @@ class AboutSection extends StatelessWidget {
                 color: Colors.white.withValues(alpha: 0.05),
                 letterSpacing: -4,
               ),
-            )),
+            ),
           ),
           // Content
           Column(
@@ -61,53 +69,6 @@ class AboutSection extends StatelessWidget {
                 _buildMobileLayout(data, languageController)
               else
                 _buildDesktopLayout(data, languageController),
-              // Animated stats row
-              if (AppConfig.hasStats(languageController))
-                ScrollFadeIn(
-                  delay: AppDurations.staggerShort,
-                  child: Obx(() {
-                    final accent = Get.find<SceneDirector>().currentAccent.value;
-                    return Wrap(
-                      spacing: 16,
-                      runSpacing: 16,
-                      alignment: WrapAlignment.center,
-                      children: [
-                        if (AppConfig.yearsExperience(languageController) > 0)
-                          AnimatedStatCard(
-                            value: AppConfig.yearsExperience(languageController),
-                            suffix: '+',
-                            label: languageController.getText(
-                              'about_section.years_exp',
-                              defaultValue: 'Years Experience',
-                            ),
-                            accentColor: accent,
-                          ),
-                        if (AppConfig.projectsCompleted(languageController) > 0)
-                          AnimatedStatCard(
-                            value: AppConfig.projectsCompleted(languageController),
-                            suffix: '+',
-                            label: languageController.getText(
-                              'about_section.projects',
-                              defaultValue: 'Projects Completed',
-                            ),
-                            accentColor: accent,
-                            delay: const Duration(milliseconds: 200),
-                          ),
-                        if (AppConfig.technologies(languageController) > 0)
-                          AnimatedStatCard(
-                            value: AppConfig.technologies(languageController),
-                            suffix: '+',
-                            label: languageController.getText(
-                              'about_section.technologies',
-                              defaultValue: 'Technologies',
-                            ),
-                            accentColor: accent,
-                            delay: const Duration(milliseconds: 400),
-                          ),
-                      ],
-                    );
-                  }),
-                ),
             ],
           ),
         ],
@@ -115,13 +76,19 @@ class AboutSection extends StatelessWidget {
     );
   }
 
-  Widget _buildDesktopLayout(Map<String, dynamic> data, LanguageController languageController) => Row(
+  Widget _buildDesktopLayout(
+    Map<String, dynamic> data,
+    LanguageCubit languageController,
+  ) => Row(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
       Expanded(
         flex: 3,
         child: ScrollFadeIn(
-          child: _BioContent(data: data, languageController: languageController),
+          child: _BioContent(
+            data: data,
+            languageController: languageController,
+          ),
         ),
       ),
       const SizedBox(width: 48),
@@ -129,15 +96,18 @@ class AboutSection extends StatelessWidget {
         flex: 2,
         child: ScrollFadeIn(
           delay: AppDurations.staggerMedium,
-          child: _FlashlightPhoto(),
+          child: _SystemsPortrait(),
         ),
       ),
     ],
   );
 
-  Widget _buildMobileLayout(Map<String, dynamic> data, LanguageController languageController) => Column(
+  Widget _buildMobileLayout(
+    Map<String, dynamic> data,
+    LanguageCubit languageController,
+  ) => Column(
     children: [
-      ScrollFadeIn(child: _FlashlightPhoto()),
+      ScrollFadeIn(child: _SystemsPortrait()),
       const SizedBox(height: 32),
       ScrollFadeIn(
         delay: AppDurations.staggerMedium,
@@ -152,7 +122,7 @@ class _BioContent extends StatefulWidget {
   const _BioContent({required this.data, required this.languageController});
 
   final Map<String, dynamic> data;
-  final LanguageController languageController;
+  final LanguageCubit languageController;
 
   @override
   State<_BioContent> createState() => _BioContentState();
@@ -187,8 +157,7 @@ class _BioContentState extends State<_BioContent>
   }
 
   List<String> _categoryLabels() {
-    final skills =
-        widget.languageController.cvData['skills'] as List? ?? [];
+    final skills = widget.languageController.cvData['skills'] as List? ?? [];
     return skills
         .map<String>((s) => (s as Map<String, dynamic>)['category'] as String)
         .toList();
@@ -199,21 +168,23 @@ class _BioContentState extends State<_BioContent>
 
   @override
   Widget build(BuildContext context) {
-    final sceneDirector = Get.find<SceneDirector>();
+    final sceneDirector = context.read<SceneDirector>();
     final isMobile = ResponsiveUtils.isMobile(context);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Section label
-        Obx(() => NumberedSectionHeading(
-          number: '01',
-          title: widget.languageController.getText(
-            'about_section.title',
-            defaultValue: 'About Me',
+        SceneAccentBuilder(
+          builder: (context, accent) => NumberedSectionHeading(
+            number: '01',
+            title: widget.languageController.getText(
+              'about_section.title',
+              defaultValue: 'About Me',
+            ),
+            accent: accent,
           ),
-          accent: sceneDirector.currentAccent.value,
-        )),
+        ),
         const SizedBox(height: 24),
         Text(
           (widget.data['bio'] as String?) ??
@@ -247,32 +218,36 @@ class _BioContentState extends State<_BioContent>
         if (!isMobile) ...[
           ScrollFadeIn(
             delay: AppDurations.staggerMedium,
-            child: Obx(() {
-              final accent = sceneDirector.currentAccent.value;
-              final rawSkills =
-                  widget.languageController.cvData['skills'] as List? ?? [];
-              if (rawSkills.isEmpty) return const SizedBox.shrink();
-              final skills = rawSkills.cast<Map<String, dynamic>>();
-              return ClipRect(child: SkillOrbit(skills: skills, accent: accent));
-            }),
+            child: SceneAccentBuilder(
+              builder: (context, accent) {
+                final rawSkills =
+                    widget.languageController.cvData['skills'] as List? ?? [];
+                if (rawSkills.isEmpty) return const SizedBox.shrink();
+                final skills = rawSkills.cast<Map<String, dynamic>>();
+                return ClipRect(
+                  child: SkillOrbit(skills: skills, accent: accent),
+                );
+              },
+            ),
           ),
           const SizedBox(height: 32),
         ],
         // Skill proficiency chart
         ScrollFadeIn(
           delay: AppDurations.staggerMedium,
-          child: Obx(() {
-            final accent = sceneDirector.currentAccent.value;
-            final labels = _categoryLabels();
-            if (labels.isEmpty) return const SizedBox.shrink();
-            return _SkillChartAnimator(
-              controller: _barController,
-              accent: accent,
-              categories: labels,
-              proficiencies: _categoryProficiencies(labels),
-              barHeight: isMobile ? 20.0 : 28.0,
-            );
-          }),
+          child: SceneAccentBuilder(
+            builder: (context, accent) {
+              final labels = _categoryLabels();
+              if (labels.isEmpty) return const SizedBox.shrink();
+              return _SkillChartAnimator(
+                controller: _barController,
+                accent: accent,
+                categories: labels,
+                proficiencies: _categoryProficiencies(labels),
+                barHeight: isMobile ? 20.0 : 28.0,
+              );
+            },
+          ),
         ),
       ],
     );
@@ -313,12 +288,12 @@ class _SkillChartAnimatorState extends State<_SkillChartAnimator> {
 
   @override
   Widget build(BuildContext context) => SkillBarChart(
-        categories: widget.categories,
-        proficiencies: widget.proficiencies,
-        accent: widget.accent,
-        animation: widget.controller,
-        barHeight: widget.barHeight,
-      );
+    categories: widget.categories,
+    proficiencies: widget.proficiencies,
+    accent: widget.accent,
+    animation: widget.controller,
+    barHeight: widget.barHeight,
+  );
 }
 
 // Floating tech pills — data-driven from cvData skills
@@ -328,7 +303,7 @@ class _FloatingTechPills extends StatelessWidget {
     required this.languageController,
   });
   final SceneDirector sceneDirector;
-  final LanguageController languageController;
+  final LanguageCubit languageController;
 
   List<String> _getTechnologies() {
     final skills = languageController.cvData['skills'] as List? ?? [];
@@ -339,40 +314,45 @@ class _FloatingTechPills extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) => Obx(() {
-    final accent = sceneDirector.currentAccent.value;
-    final technologies = _getTechnologies();
-    return Wrap(
-      spacing: 10,
-      runSpacing: 10,
-      children: technologies.map((tech) => Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        decoration: BoxDecoration(
-          color: accent.withValues(alpha: 0.08),
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color: accent.withValues(alpha: 0.15),
-            width: 1,
-          ),
-        ),
-        child: Text(
-          tech,
-          style: GoogleFonts.jetBrainsMono(
-            fontSize: 13,
-            color: accent,
-          ),
-        ),
-      )).toList(),
-    );
-  });
+  Widget build(BuildContext context) => SceneAccentBuilder(
+    builder: (context, accent) {
+      final technologies = _getTechnologies();
+      return Wrap(
+        spacing: 10,
+        runSpacing: 10,
+        children: technologies
+            .map(
+              (tech) => Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
+                decoration: BoxDecoration(
+                  color: accent.withValues(alpha: 0.08),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: accent.withValues(alpha: 0.15),
+                    width: 1,
+                  ),
+                ),
+                child: Text(
+                  tech,
+                  style: AppFonts.jetBrainsMono(fontSize: 13, color: accent),
+                ),
+              ),
+            )
+            .toList(),
+      );
+    },
+  );
 }
 
-class _FlashlightPhoto extends StatefulWidget {
+class _SystemsPortrait extends StatefulWidget {
   @override
-  State<_FlashlightPhoto> createState() => _FlashlightPhotoState();
+  State<_SystemsPortrait> createState() => _SystemsPortraitState();
 }
 
-class _FlashlightPhotoState extends State<_FlashlightPhoto> {
+class _SystemsPortraitState extends State<_SystemsPortrait> {
   final _mousePos = ValueNotifier<Offset>(const Offset(0.5, 0.5));
   final _hovered = ValueNotifier<bool>(false);
 
@@ -390,128 +370,231 @@ class _FlashlightPhotoState extends State<_FlashlightPhoto> {
 
   @override
   Widget build(BuildContext context) => MouseRegion(
-      onEnter: (_) => _hovered.value = true,
-      onHover: (e) {
-        final box = context.findRenderObject() as RenderBox?;
-        if (box == null) return;
-        _mousePos.value = Offset(
-          e.localPosition.dx / box.size.width,
-          e.localPosition.dy / box.size.height,
-        );
-      },
-      onExit: (_) {
-        _hovered.value = false;
-        _mousePos.value = const Offset(0.5, 0.5);
-      },
-      child: ValueListenableBuilder<Offset>(
-        valueListenable: _mousePos,
-        builder: (context, mousePos, child) =>
-            ValueListenableBuilder<bool>(
-          valueListenable: _hovered,
-          builder: (context, hovered, _) {
-            // Normalized values centered around 0 (-1 to 1 range)
-            final dx = (mousePos.dx - 0.5) * 2.0;
-            final dy = (mousePos.dy - 0.5) * 2.0;
+    onEnter: (_) => _hovered.value = true,
+    onHover: (e) {
+      final box = context.findRenderObject() as RenderBox?;
+      if (box == null) return;
+      _mousePos.value = Offset(
+        e.localPosition.dx / box.size.width,
+        e.localPosition.dy / box.size.height,
+      );
+    },
+    onExit: (_) {
+      _hovered.value = false;
+      _mousePos.value = const Offset(0.5, 0.5);
+    },
+    child: ValueListenableBuilder<Offset>(
+      valueListenable: _mousePos,
+      builder: (context, mousePos, child) => ValueListenableBuilder<bool>(
+        valueListenable: _hovered,
+        builder: (context, hovered, _) {
+          // Normalized values centered around 0 (-1 to 1 range)
+          final dx = (mousePos.dx - 0.5) * 2.0;
+          final dy = (mousePos.dy - 0.5) * 2.0;
 
-            // Tilt transform: rotateY follows horizontal, rotateX follows vertical
-            final tiltTransform = Matrix4.identity()
-              ..setEntry(3, 2, _perspective)
-              ..rotateY(hovered ? dx * _maxTilt : 0)
-              ..rotateX(hovered ? -dy * _maxTilt : 0);
+          // Tilt transform: rotateY follows horizontal, rotateX follows vertical
+          final tiltTransform = Matrix4.identity()
+            ..setEntry(3, 2, _perspective)
+            ..rotateY(hovered ? dx * _maxTilt : 0)
+            ..rotateX(hovered ? -dy * _maxTilt : 0);
 
-            // Shadow shifts opposite to tilt direction
-            final shadowOffsetX = hovered ? -dx * _shadowMultiplier : 0.0;
-            final shadowOffsetY = hovered ? -dy * _shadowMultiplier : 0.0;
+          // Shadow shifts opposite to tilt direction
+          final shadowOffsetX = hovered ? -dx * _shadowMultiplier : 0.0;
+          final shadowOffsetY = hovered ? -dy * _shadowMultiplier : 0.0;
 
-            return AnimatedContainer(
-              duration: AppDurations.medium,
-              curve: CinematicCurves.hoverLift,
-              transform: tiltTransform,
-              transformAlignment: Alignment.center,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(8),
-                boxShadow: hovered
-                    ? [
-                        BoxShadow(
-                          color: AppColors.heroAccent.withValues(alpha: 0.12),
-                          blurRadius: 30,
-                          spreadRadius: 0,
-                          offset: Offset(shadowOffsetX, shadowOffsetY),
+          return AnimatedContainer(
+            duration: AppDurations.medium,
+            curve: CinematicCurves.hoverLift,
+            transform: tiltTransform,
+            transformAlignment: Alignment.center,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8),
+              boxShadow: hovered
+                  ? [
+                      BoxShadow(
+                        color: AppColors.heroAccent.withValues(alpha: 0.12),
+                        blurRadius: 30,
+                        spreadRadius: 0,
+                        offset: Offset(shadowOffsetX, shadowOffsetY),
+                      ),
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.3),
+                        blurRadius: 20,
+                        spreadRadius: -4,
+                        offset: Offset(
+                          shadowOffsetX * 0.5,
+                          shadowOffsetY * 0.5,
                         ),
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.3),
-                          blurRadius: 20,
-                          spreadRadius: -4,
-                          offset: Offset(shadowOffsetX * 0.5, shadowOffsetY * 0.5),
-                        ),
-                      ]
-                    : [],
-              ),
-              child: child,
-            );
-          },
-        ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(8),
-          child: ValueListenableBuilder<Offset>(
-            valueListenable: _mousePos,
-            builder: (context, mousePos, child) =>
-                ValueListenableBuilder<bool>(
-              valueListenable: _hovered,
-              builder: (context, hovered, _) => ShaderMask(
-                blendMode: BlendMode.dstIn,
-                shaderCallback: (bounds) => RadialGradient(
-                  center: Alignment(
-                    mousePos.dx * 2 - 1,
-                    mousePos.dy * 2 - 1,
-                  ),
-                  radius: hovered ? 1.2 : 2.0,
-                  colors: [
-                    Colors.white,
-                    Colors.white.withValues(alpha: 0.8),
-                    Colors.white.withValues(alpha: hovered ? 0.2 : 0.5),
-                  ],
-                  stops: const [0.0, 0.4, 1.0],
-                ).createShader(bounds),
-                child: child,
-              ),
+                      ),
+                    ]
+                  : [],
             ),
-            child: Semantics(
-              image: true,
-              label: 'Profile photo',
-              child: Image.asset(
-                'assets/images/me.jpeg',
-                width: double.infinity,
-                fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) => AspectRatio(
-                  aspectRatio: 1,
-                  child: Container(
-                    color: AppColors.backgroundLight,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.person_outline_rounded,
-                          size: 64,
-                          color: AppColors.textSecondary.withValues(alpha: 0.3),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'YG',
-                          style: GoogleFonts.spaceGrotesk(
-                            fontSize: 24,
-                            fontWeight: FontWeight.w700,
-                            color: AppColors.textSecondary.withValues(alpha: 0.4),
-                          ),
-                        ),
-                      ],
-                    ),
+            child: child,
+          );
+        },
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(8),
+        child: ValueListenableBuilder<Offset>(
+          valueListenable: _mousePos,
+          builder: (context, mousePos, child) => ValueListenableBuilder<bool>(
+            valueListenable: _hovered,
+            builder: (context, hovered, _) => ShaderMask(
+              blendMode: BlendMode.dstIn,
+              shaderCallback: (bounds) => RadialGradient(
+                center: Alignment(mousePos.dx * 2 - 1, mousePos.dy * 2 - 1),
+                radius: hovered ? 1.2 : 2.0,
+                colors: [
+                  Colors.white,
+                  Colors.white.withValues(alpha: 0.8),
+                  Colors.white.withValues(alpha: hovered ? 0.2 : 0.5),
+                ],
+                stops: const [0.0, 0.4, 1.0],
+              ).createShader(bounds),
+              child: child,
+            ),
+          ),
+          child: const _SystemBlueprint(),
+        ),
+      ),
+    ),
+  );
+}
+
+class _SystemBlueprint extends StatelessWidget {
+  const _SystemBlueprint();
+
+  @override
+  Widget build(BuildContext context) => SceneAccentBuilder(
+    builder: (context, accent) => Semantics(
+      image: true,
+      label:
+          'System architecture: Flutter clients, Go services, PostgreSQL '
+          'state, and an observable Docker runtime.',
+      child: AspectRatio(
+        aspectRatio: 1,
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                AppColors.backgroundLight,
+                accent.withValues(alpha: 0.08),
+                AppColors.backgroundDark,
+              ],
+            ),
+            border: Border.all(color: accent.withValues(alpha: 0.24)),
+          ),
+          child: Stack(
+            children: [
+              Positioned.fill(
+                child: CustomPaint(painter: _BlueprintGridPainter(accent)),
+              ),
+              Positioned(
+                top: 20,
+                left: 20,
+                child: Text(
+                  'LIVE SYSTEM / 01',
+                  style: AppFonts.jetBrainsMono(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                    color: accent,
+                    letterSpacing: 1.6,
                   ),
                 ),
               ),
-            ),
+              Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(28),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.account_tree_outlined,
+                        color: accent,
+                        size: 42,
+                      ),
+                      const SizedBox(height: 22),
+                      const Wrap(
+                        alignment: WrapAlignment.center,
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: [
+                          _SystemNode('FLUTTER'),
+                          _SystemNode('GO'),
+                          _SystemNode('POSTGRES'),
+                          _SystemNode('DOCKER'),
+                        ],
+                      ),
+                      const SizedBox(height: 22),
+                      Text(
+                        'MEASURE  ·  VERIFY  ·  OPERATE',
+                        textAlign: TextAlign.center,
+                        style: AppFonts.jetBrainsMono(
+                          fontSize: 10,
+                          color: AppColors.textSecondary,
+                          letterSpacing: 1.2,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ),
-    );
+    ),
+  );
+}
+
+class _SystemNode extends StatelessWidget {
+  const _SystemNode(this.label);
+
+  final String label;
+
+  @override
+  Widget build(BuildContext context) => SceneAccentBuilder(
+    builder: (context, accent) => Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+      decoration: BoxDecoration(
+        color: accent.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(4),
+        border: Border.all(color: accent.withValues(alpha: 0.25)),
+      ),
+      child: Text(
+        label,
+        style: AppFonts.jetBrainsMono(
+          fontSize: 10,
+          fontWeight: FontWeight.w600,
+          color: accent,
+        ),
+      ),
+    ),
+  );
+}
+
+class _BlueprintGridPainter extends CustomPainter {
+  const _BlueprintGridPainter(this.color);
+
+  final Color color;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color.withValues(alpha: 0.07)
+      ..strokeWidth = 1;
+    const step = 24.0;
+    for (var x = 0.0; x <= size.width; x += step) {
+      canvas.drawLine(Offset(x, 0), Offset(x, size.height), paint);
+    }
+    for (var y = 0.0; y <= size.height; y += step) {
+      canvas.drawLine(Offset(0, y), Offset(size.width, y), paint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(_BlueprintGridPainter oldDelegate) =>
+      color != oldDelegate.color;
 }

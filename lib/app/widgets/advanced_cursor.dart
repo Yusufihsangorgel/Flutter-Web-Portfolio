@@ -1,10 +1,11 @@
+import 'dart:async';
 import 'dart:math' as math;
 import 'dart:ui' as ui;
 
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:get/get.dart';
 
 import 'package:flutter_web_portfolio/app/controllers/cursor_controller.dart';
 import 'package:flutter_web_portfolio/app/controllers/scene_director.dart';
@@ -82,22 +83,37 @@ class _Spring {
 
 /// Extended cursor controller that stores [CursorState], label text,
 /// and magnetic-snap target. Drop-in companion to [CursorController].
-class AdvancedCursorController extends GetxController {
-  final state = CursorState.default_.obs;
-  final label = RxnString();
-  final magnetTarget = Rxn<Offset>();
+final class AdvancedCursorController extends ChangeNotifier {
+  CursorState state = CursorState.default_;
+  String? label;
+  Offset? magnetTarget;
 
   /// Convenience setter – updates state + optional label in one call.
   void setCursor(CursorState s, {String? text}) {
-    state.value = s;
-    label.value = text;
+    if (state == s && label == text) return;
+    state = s;
+    label = text;
+    notifyListeners();
   }
 
   void reset() {
-    state.value = CursorState.default_;
-    label.value = null;
-    magnetTarget.value = null;
+    state = CursorState.default_;
+    label = null;
+    magnetTarget = null;
+    notifyListeners();
   }
+}
+
+final class _AdvancedCursorScope
+    extends InheritedNotifier<AdvancedCursorController> {
+  const _AdvancedCursorScope({
+    required AdvancedCursorController controller,
+    required super.child,
+  }) : super(notifier: controller);
+
+  static AdvancedCursorController? maybeOf(BuildContext context) => context
+      .dependOnInheritedWidgetOfExactType<_AdvancedCursorScope>()
+      ?.notifier;
 }
 
 // ---------------------------------------------------------------------------
@@ -174,18 +190,14 @@ class _AdvancedCursorState extends State<AdvancedCursor>
 
   // ---- controllers ----
   late final AdvancedCursorController _advCtrl;
-  late final Worker _stateWorker;
-  late final Worker _accentWorker;
+  StreamSubscription<SceneState>? _accentSubscription;
+  SceneDirector? _sceneDirector;
 
   @override
   void initState() {
     super.initState();
 
-    // Ensure the advanced controller is registered
-    if (!Get.isRegistered<AdvancedCursorController>()) {
-      Get.put(AdvancedCursorController());
-    }
-    _advCtrl = Get.find<AdvancedCursorController>();
+    _advCtrl = AdvancedCursorController()..addListener(_handleCursorState);
 
     // Springs
     _springX = _Spring(value: 0, target: 0, stiffness: 200, damping: 24);
@@ -217,22 +229,31 @@ class _AdvancedCursorState extends State<AdvancedCursor>
 
     // Ticker for 60 fps updates — starts only when pointer enters
     _ticker = createTicker(_onTick);
+  }
 
-    // React to cursor state changes
-    _stateWorker = ever(_advCtrl.state, _onStateChanged);
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final director = context.read<SceneDirector>();
+    if (identical(director, _sceneDirector)) return;
 
-    // React to scene accent changes
-    _accentColor = Get.find<SceneDirector>().currentAccent.value;
-    _accentWorker = ever(Get.find<SceneDirector>().currentAccent, (Color c) {
-      _accentColor = c;
+    _accentSubscription?.cancel();
+    _sceneDirector = director;
+    _accentColor = director.state.currentAccent;
+    _accentSubscription = director.stream.listen((state) {
+      _accentColor = state.currentAccent;
     });
   }
+
+  void _handleCursorState() => _onStateChanged(_advCtrl.state);
 
   @override
   void dispose() {
     _ticker.dispose();
-    _stateWorker.dispose();
-    _accentWorker.dispose();
+    _advCtrl
+      ..removeListener(_handleCursorState)
+      ..dispose();
+    _accentSubscription?.cancel();
     super.dispose();
   }
 
@@ -280,7 +301,7 @@ class _AdvancedCursorState extends State<AdvancedCursor>
     }
 
     // Update label spring target if label text present
-    if (_advCtrl.label.value != null &&
+    if (_advCtrl.label != null &&
         s != CursorState.hidden &&
         s != CursorState.default_) {
       _labelOpacitySpring.target = 1.0;
@@ -308,7 +329,7 @@ class _AdvancedCursorState extends State<AdvancedCursor>
 
     // ---- Magnetic snap ----
     var targetPos = _rawPosition;
-    final magnetTarget = _advCtrl.magnetTarget.value;
+    final magnetTarget = _advCtrl.magnetTarget;
     if (magnetTarget != null) {
       final dist = (targetPos - magnetTarget).distance;
       if (dist < 100) {
@@ -337,7 +358,10 @@ class _AdvancedCursorState extends State<AdvancedCursor>
     _labelOpacitySpring.step(safeDt);
 
     // Trail
-    _trail.insert(0, _TrailPoint(Offset(_smoothPosition.dx, _smoothPosition.dy), _elapsed));
+    _trail.insert(
+      0,
+      _TrailPoint(Offset(_smoothPosition.dx, _smoothPosition.dy), _elapsed),
+    );
     while (_trail.length > _maxTrailPoints) {
       _trail.removeLast();
     }
@@ -387,62 +411,69 @@ class _AdvancedCursorState extends State<AdvancedCursor>
         final isDesktop = constraints.maxWidth >= _desktopMinWidth;
         if (!isDesktop) return widget.child;
 
-        return MouseRegion(
-          cursor: SystemMouseCursors.none,
-          onHover: _onPointerMove,
-          onExit: _onPointerExit,
-          child: Listener(
-            onPointerMove: _onPointerMove,
-            child: Stack(
-              children: [
-                widget.child,
-                if (_visible) ...[
-                  // Spotlight glow
-                  Positioned.fill(
-                    child: IgnorePointer(
-                      child: CustomPaint(
-                        painter: _SpotlightPainter(
-                          position: _smoothPosition,
-                          radius: _spotlightRadius,
-                          color: _accentColor,
+        return _AdvancedCursorScope(
+          controller: _advCtrl,
+          child: MouseRegion(
+            cursor: SystemMouseCursors.none,
+            onHover: _onPointerMove,
+            onExit: _onPointerExit,
+            child: Listener(
+              onPointerMove: _onPointerMove,
+              child: Stack(
+                children: [
+                  widget.child,
+                  if (_visible) ...[
+                    // Spotlight glow
+                    Positioned.fill(
+                      child: IgnorePointer(
+                        child: CustomPaint(
+                          painter: _SpotlightPainter(
+                            position: _smoothPosition,
+                            radius: _spotlightRadius,
+                            color: _accentColor,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                  // Trail ribbon
-                  Positioned.fill(
-                    child: IgnorePointer(
-                      child: CustomPaint(
-                        painter: _TrailPainter(
-                          points: List.of(_trail),
-                          color: _accentColor,
-                          velocity: _velocity,
+                    // Trail ribbon
+                    Positioned.fill(
+                      child: IgnorePointer(
+                        child: CustomPaint(
+                          painter: _TrailPainter(
+                            points: List.of(_trail),
+                            color: _accentColor,
+                            velocity: _velocity,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                  // Cursor dot + ring + label
-                  Positioned.fill(
-                    child: IgnorePointer(
-                      child: CustomPaint(
-                        painter: _CursorMorphPainter(
-                          position: _smoothPosition,
-                          ringSize: _ringSpring.value,
-                          dotSize: _dotSpring.value,
-                          fillOpacity: _fillOpacitySpring.value
-                              .clamp(0.0, 1.0),
-                          accentColor: _accentColor,
-                          state: _advCtrl.state.value,
-                          labelText: _advCtrl.label.value,
-                          labelOpacity: _labelOpacitySpring.value
-                              .clamp(0.0, 1.0),
-                          velocity: _velocity,
+                    // Cursor dot + ring + label
+                    Positioned.fill(
+                      child: IgnorePointer(
+                        child: CustomPaint(
+                          painter: _CursorMorphPainter(
+                            position: _smoothPosition,
+                            ringSize: _ringSpring.value,
+                            dotSize: _dotSpring.value,
+                            fillOpacity: _fillOpacitySpring.value.clamp(
+                              0.0,
+                              1.0,
+                            ),
+                            accentColor: _accentColor,
+                            state: _advCtrl.state,
+                            labelText: _advCtrl.label,
+                            labelOpacity: _labelOpacitySpring.value.clamp(
+                              0.0,
+                              1.0,
+                            ),
+                            velocity: _velocity,
+                          ),
                         ),
                       ),
                     ),
-                  ),
+                  ],
                 ],
-              ],
+              ),
             ),
           ),
         );
@@ -600,18 +631,21 @@ class _CursorMorphPainter extends CustomPainter {
     final text = labelText;
     if (text == null || text.isEmpty) return;
 
-    final paragraphBuilder = ui.ParagraphBuilder(
-      ui.ParagraphStyle(
-        textAlign: TextAlign.left,
-        fontSize: 12,
-        fontWeight: FontWeight.w500,
-      ),
-    )
-      ..pushStyle(ui.TextStyle(
-        color: Colors.white.withValues(alpha: labelOpacity * 0.9),
-        letterSpacing: 1.2,
-      ))
-      ..addText(text.toUpperCase());
+    final paragraphBuilder =
+        ui.ParagraphBuilder(
+            ui.ParagraphStyle(
+              textAlign: TextAlign.left,
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+            ),
+          )
+          ..pushStyle(
+            ui.TextStyle(
+              color: Colors.white.withValues(alpha: labelOpacity * 0.9),
+              letterSpacing: 1.2,
+            ),
+          )
+          ..addText(text.toUpperCase());
 
     final paragraph = paragraphBuilder.build()
       ..layout(const ui.ParagraphConstraints(width: 200));
@@ -625,18 +659,21 @@ class _CursorMorphPainter extends CustomPainter {
   }
 
   void _drawCenteredText(Canvas canvas, String text, double ringSize) {
-    final paragraphBuilder = ui.ParagraphBuilder(
-      ui.ParagraphStyle(
-        textAlign: TextAlign.center,
-        fontSize: 11,
-        fontWeight: FontWeight.w600,
-      ),
-    )
-      ..pushStyle(ui.TextStyle(
-        color: Colors.white.withValues(alpha: 0.9),
-        letterSpacing: 2.0,
-      ))
-      ..addText(text.toUpperCase());
+    final paragraphBuilder =
+        ui.ParagraphBuilder(
+            ui.ParagraphStyle(
+              textAlign: TextAlign.center,
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+            ),
+          )
+          ..pushStyle(
+            ui.TextStyle(
+              color: Colors.white.withValues(alpha: 0.9),
+              letterSpacing: 2.0,
+            ),
+          )
+          ..addText(text.toUpperCase());
 
     final paragraph = paragraphBuilder.build()
       ..layout(ui.ParagraphConstraints(width: ringSize));
@@ -689,10 +726,7 @@ class _TrailPainter extends CustomPainter {
 
       // Quadratic bezier through three consecutive points
       final controlPoint = p1;
-      final endPoint = Offset(
-        (p1.dx + p2.dx) / 2,
-        (p1.dy + p2.dy) / 2,
-      );
+      final endPoint = Offset((p1.dx + p2.dx) / 2, (p1.dy + p2.dy) / 2);
 
       final path = Path()
         ..moveTo(
@@ -746,9 +780,7 @@ class _SpotlightPainter extends CustomPainter {
           color.withValues(alpha: 0.0),
         ],
         stops: const [0.0, 0.5, 1.0],
-      ).createShader(
-        Rect.fromCircle(center: position, radius: radius),
-      )
+      ).createShader(Rect.fromCircle(center: position, radius: radius))
       ..blendMode = BlendMode.screen;
 
     canvas.drawCircle(position, radius, paint);
@@ -802,12 +834,7 @@ class _CursorHoverRegionState extends State<CursorHoverRegion> {
   final _key = GlobalKey();
   Offset _displacement = Offset.zero;
 
-  AdvancedCursorController? get _ctrl {
-    if (Get.isRegistered<AdvancedCursorController>()) {
-      return Get.find<AdvancedCursorController>();
-    }
-    return null;
-  }
+  AdvancedCursorController? get _ctrl => _AdvancedCursorScope.maybeOf(context);
 
   Offset? _elementCenter() {
     final box = _key.currentContext?.findRenderObject() as RenderBox?;
@@ -820,10 +847,7 @@ class _CursorHoverRegionState extends State<CursorHoverRegion> {
     if (ctrl == null) return;
     ctrl.setCursor(widget.state, text: widget.label);
 
-    // Also update legacy CursorController for backward compat
-    if (Get.isRegistered<CursorController>()) {
-      Get.find<CursorController>().isHovering.value = true;
-    }
+    context.read<CursorController>().setHovering(true);
   }
 
   void _onHover(PointerEvent event) {
@@ -832,7 +856,7 @@ class _CursorHoverRegionState extends State<CursorHoverRegion> {
     if (center == null) return;
 
     // Set magnetic target for the cursor
-    _ctrl?.magnetTarget.value = center;
+    if (_ctrl != null) _ctrl!.magnetTarget = center;
 
     // Element displacement toward cursor
     final box = _key.currentContext?.findRenderObject() as RenderBox?;
@@ -858,11 +882,8 @@ class _CursorHoverRegionState extends State<CursorHoverRegion> {
 
   void _onExit(PointerEvent _) {
     _ctrl?.reset();
-    _ctrl?.magnetTarget.value = null;
-
-    if (Get.isRegistered<CursorController>()) {
-      Get.find<CursorController>().isHovering.value = false;
-    }
+    if (_ctrl != null) _ctrl!.magnetTarget = null;
+    context.read<CursorController>().setHovering(false);
 
     if (widget.magneticSnap) {
       setState(() => _displacement = Offset.zero);

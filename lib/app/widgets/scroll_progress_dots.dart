@@ -1,13 +1,13 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'package:flutter_web_portfolio/app/controllers/language_controller.dart';
 import 'package:flutter_web_portfolio/app/controllers/scene_director.dart';
 import 'package:flutter_web_portfolio/app/controllers/scroll_controller.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
 import 'package:flutter_web_portfolio/app/core/constants/durations.dart';
+import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
 
 /// Vertical column of dots fixed on the right side of the viewport.
 ///
@@ -25,23 +25,27 @@ class ScrollProgressDots extends StatelessWidget {
     final screenWidth = MediaQuery.sizeOf(context).width;
     if (screenWidth < 900) return const SizedBox.shrink();
 
-    return Obx(() {
-      final sections = Get.find<LanguageController>().activeSections;
-      return AnimatedOpacity(
-        opacity: visible ? 1.0 : 0.0,
-        duration: AppDurations.entrance,
-        child: IgnorePointer(
-          ignoring: !visible,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              for (final section in sections)
-                _Dot(sectionId: section),
-            ],
+    return BlocBuilder<LanguageCubit, LanguageState>(
+      buildWhen: (previous, current) =>
+          previous.languageCode != current.languageCode ||
+          !identical(previous.translations, current.translations),
+      builder: (context, state) {
+        final sections = context.read<LanguageCubit>().activeSections;
+        return AnimatedOpacity(
+          opacity: visible ? 1.0 : 0.0,
+          duration: AppDurations.entrance,
+          child: IgnorePointer(
+            ignoring: !visible,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                for (final section in sections) _Dot(sectionId: section),
+              ],
+            ),
           ),
-        ),
-      );
-    });
+        );
+      },
+    );
   }
 }
 
@@ -61,60 +65,70 @@ class _DotState extends State<_Dot> {
 
   @override
   Widget build(BuildContext context) {
-    final scrollController = Get.find<AppScrollController>();
+    final scrollController = context.read<AppScrollController>();
 
-    return Obx(() {
-      final isActive = scrollController.activeSection.value == widget.sectionId;
-      final dotSize = isActive ? 8.0 : 4.0;
-      final color = isActive ? AppColors.accent : AppColors.textSecondary;
-      final sceneProgress = Get.find<SceneDirector>().sceneProgress.value;
+    return BlocBuilder<AppScrollController, AppScrollState>(
+      buildWhen: (previous, current) =>
+          previous.activeSection != current.activeSection,
+      builder: (context, scrollState) {
+        final isActive = scrollState.activeSection == widget.sectionId;
+        final dotSize = isActive ? 8.0 : 4.0;
+        final color = isActive ? AppColors.accent : AppColors.textSecondary;
 
-      return Padding(
-        padding: const EdgeInsets.symmetric(vertical: 6),
-        child: MouseRegion(
-          onEnter: (_) => setState(() => _hovered = true),
-          onExit: (_) => setState(() => _hovered = false),
-          cursor: SystemMouseCursors.click,
-          child: GestureDetector(
-            onTap: () => scrollController.scrollToSection(widget.sectionId),
-            behavior: HitTestBehavior.opaque,
-            child: SizedBox(
-              width: 20,
-              height: 20,
-              child: CustomPaint(
-                painter: isActive
-                    ? _ProgressArcPainter(
-                        progress: sceneProgress,
-                        color: AppColors.accent.withValues(alpha: 0.6),
-                      )
-                    : null,
-                child: Center(
-                  child: AnimatedContainer(
-                    duration: _hovered ? AppDurations.microFast : AppDurations.medium,
-                    curve: Curves.easeOutCubic,
-                    width: _hovered && !isActive ? 6.0 : dotSize,
-                    height: _hovered && !isActive ? 6.0 : dotSize,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: color,
-                      boxShadow: isActive
-                          ? [
-                              BoxShadow(
-                                color: AppColors.accent.withValues(alpha: 0.5),
-                                blurRadius: 8,
-                                spreadRadius: 1,
-                              ),
-                            ]
-                          : null,
+        return BlocSelector<SceneDirector, SceneState, double>(
+          selector: (state) => state.sceneProgress,
+          builder: (context, sceneProgress) => Padding(
+            padding: const EdgeInsets.symmetric(vertical: 6),
+            child: MouseRegion(
+              onEnter: (_) => setState(() => _hovered = true),
+              onExit: (_) => setState(() => _hovered = false),
+              cursor: SystemMouseCursors.click,
+              child: GestureDetector(
+                onTap: () => scrollController.scrollToSection(widget.sectionId),
+                behavior: HitTestBehavior.opaque,
+                child: SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CustomPaint(
+                    painter: isActive
+                        ? _ProgressArcPainter(
+                            progress: sceneProgress,
+                            color: AppColors.accent.withValues(alpha: 0.6),
+                          )
+                        : null,
+                    child: Center(
+                      child: AnimatedContainer(
+                        duration: _hovered
+                            ? AppDurations.microFast
+                            : AppDurations.medium,
+                        curve: Curves.easeOutCubic,
+                        width: _hovered && !isActive ? 6.0 : dotSize,
+                        height: _hovered && !isActive ? 6.0 : dotSize,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: color,
+                          boxShadow: isActive
+                              ? [
+                                  BoxShadow(
+                                    color: AppColors.accent.withValues(
+                                      alpha: 0.5,
+                                    ),
+                                    blurRadius: 8,
+                                    spreadRadius: 1,
+                                  ),
+                                ]
+                              : null,
+                        ),
+                      ),
                     ),
                   ),
                 ),
               ),
             ),
           ),
-        ),
-      );
-    });
+        );
+      },
+    );
   }
 }
 

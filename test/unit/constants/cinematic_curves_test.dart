@@ -18,7 +18,11 @@ void main() {
 
     test('all curve constants are non-null', () {
       for (final entry in namedCurves.entries) {
-        expect(entry.value, isNotNull, reason: '${entry.key} should be non-null');
+        expect(
+          entry.value,
+          isNotNull,
+          reason: '${entry.key} should be non-null',
+        );
         expect(entry.value, isA<Curve>());
       }
     });
@@ -26,10 +30,16 @@ void main() {
     for (final entry in namedCurves.entries) {
       test('${entry.key} returns 0.0 at t=0 and 1.0 at t=1', () {
         final curve = entry.value;
-        expect(curve.transform(0.0), closeTo(0.0, 0.001),
-            reason: '${entry.key} should start at 0.0');
-        expect(curve.transform(1.0), closeTo(1.0, 0.001),
-            reason: '${entry.key} should end at 1.0');
+        expect(
+          curve.transform(0.0),
+          closeTo(0.0, 0.001),
+          reason: '${entry.key} should start at 0.0',
+        );
+        expect(
+          curve.transform(1.0),
+          closeTo(1.0, 0.001),
+          reason: '${entry.key} should end at 1.0',
+        );
       });
     }
 
@@ -43,7 +53,8 @@ void main() {
           expect(
             values[i],
             greaterThanOrEqualTo(values[i - 1]),
-            reason: '${entry.key} should be monotonically increasing: '
+            reason:
+                '${entry.key} should be monotonically increasing: '
                 'value at ${samples[i]} (${values[i]}) should be >= '
                 'value at ${samples[i - 1]} (${values[i - 1]})',
           );
@@ -53,18 +64,27 @@ void main() {
 
     test('all curves are Cubic instances', () {
       for (final entry in namedCurves.entries) {
-        expect(entry.value, isA<Cubic>(),
-            reason: '${entry.key} should be a Cubic curve');
+        expect(
+          entry.value,
+          isA<Cubic>(),
+          reason: '${entry.key} should be a Cubic curve',
+        );
       }
     });
 
     test('curves produce intermediate values between 0 and 1', () {
       for (final entry in namedCurves.entries) {
         final midValue = entry.value.transform(0.5);
-        expect(midValue, greaterThan(0.0),
-            reason: '${entry.key} at t=0.5 should be > 0');
-        expect(midValue, lessThan(1.0),
-            reason: '${entry.key} at t=0.5 should be < 1');
+        expect(
+          midValue,
+          greaterThan(0.0),
+          reason: '${entry.key} at t=0.5 should be > 0',
+        );
+        expect(
+          midValue,
+          lessThan(1.0),
+          reason: '${entry.key} at t=0.5 should be < 1',
+        );
       }
     });
   });

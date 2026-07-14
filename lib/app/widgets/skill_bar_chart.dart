@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_web_portfolio/app/core/theme/app_fonts.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
 import 'package:flutter_web_portfolio/app/core/constants/cinematic_curves.dart';
 
@@ -46,9 +46,7 @@ class SkillBarChart extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.backgroundLight.withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: accent.withValues(alpha: 0.1),
-        ),
+        border: Border.all(color: accent.withValues(alpha: 0.1)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -104,57 +102,57 @@ class _SkillBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => AnimatedBuilder(
-      animation: animation,
-      builder: (_, __) {
-        final progress = animation.value;
-        final displayPercent = (proficiency * progress * 100).round();
+    animation: animation,
+    builder: (_, _) {
+      final progress = animation.value;
+      final displayPercent = (proficiency * progress * 100).round();
 
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Label row: category on left, percentage on right.
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  label,
-                  style: GoogleFonts.spaceGrotesk(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.textBright,
-                  ),
-                ),
-                Opacity(
-                  opacity: progress.clamp(0.0, 1.0),
-                  child: Text(
-                    '$displayPercent%',
-                    style: GoogleFonts.jetBrainsMono(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w500,
-                      color: accent,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            // Bar track + fill via CustomPaint.
-            ClipRRect(
-              borderRadius: BorderRadius.circular(barHeight / 2),
-              child: CustomPaint(
-                size: Size(double.infinity, barHeight),
-                painter: _BarPainter(
-                  fillFraction: proficiency * progress,
-                  accent: accent,
-                  trackColor: AppColors.backgroundDark.withValues(alpha: 0.6),
-                  borderRadius: barHeight / 2,
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Label row: category on left, percentage on right.
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                label,
+                style: AppFonts.spaceGrotesk(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.textBright,
                 ),
               ),
+              Opacity(
+                opacity: progress.clamp(0.0, 1.0),
+                child: Text(
+                  '$displayPercent%',
+                  style: AppFonts.jetBrainsMono(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                    color: accent,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          // Bar track + fill via CustomPaint.
+          ClipRRect(
+            borderRadius: BorderRadius.circular(barHeight / 2),
+            child: CustomPaint(
+              size: Size(double.infinity, barHeight),
+              painter: _BarPainter(
+                fillFraction: proficiency * progress,
+                accent: accent,
+                trackColor: AppColors.backgroundDark.withValues(alpha: 0.6),
+                borderRadius: barHeight / 2,
+              ),
             ),
-          ],
-        );
-      },
-    );
+          ),
+        ],
+      );
+    },
+  );
 }
 
 // ─── CustomPainter ───────────────────────────────────────────────────────────
@@ -180,10 +178,7 @@ class _BarPainter extends CustomPainter {
     );
 
     // Track background.
-    canvas.drawRRect(
-      trackRRect,
-      Paint()..color = trackColor,
-    );
+    canvas.drawRRect(trackRRect, Paint()..color = trackColor);
 
     // Filled portion with gradient.
     final fillWidth = size.width * fillFraction.clamp(0.0, 1.0);
@@ -211,20 +206,12 @@ class _BarPainter extends CustomPainter {
 
     // Subtle glow at the leading edge.
     if (fillWidth > 4) {
-      final glowRect = Rect.fromLTWH(
-        fillWidth - 4,
-        0,
-        4,
-        size.height,
-      );
+      final glowRect = Rect.fromLTWH(fillWidth - 4, 0, 4, size.height);
       canvas.drawRect(
         glowRect,
         Paint()
           ..shader = LinearGradient(
-            colors: [
-              Colors.transparent,
-              accent.withValues(alpha: 0.4),
-            ],
+            colors: [Colors.transparent, accent.withValues(alpha: 0.4)],
           ).createShader(glowRect),
       );
     }

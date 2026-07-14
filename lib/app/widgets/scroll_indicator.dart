@@ -20,16 +20,16 @@ class _ScrollIndicatorState extends State<ScrollIndicator>
   @override
   void initState() {
     super.initState();
-    _fadeCtrl = AnimationController(
-      vsync: this,
-      duration: AppDurations.fadeIn,
-    );
+    _fadeCtrl = AnimationController(vsync: this, duration: AppDurations.fadeIn);
     _dotCtrl = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 2),
     )..repeat();
     _dotY = Tween<double>(begin: 0, end: 40).animate(
-      CurvedAnimation(parent: _dotCtrl, curve: CinematicCurves.easeInOutCinematic),
+      CurvedAnimation(
+        parent: _dotCtrl,
+        curve: CinematicCurves.easeInOutCinematic,
+      ),
     );
 
     Future.delayed(widget.delay, () {
@@ -47,7 +47,7 @@ class _ScrollIndicatorState extends State<ScrollIndicator>
   @override
   Widget build(BuildContext context) => AnimatedBuilder(
     animation: _fadeCtrl,
-    builder: (_, __) => Opacity(
+    builder: (_, _) => Opacity(
       opacity: _fadeCtrl.value,
       child: Center(
         child: SizedBox(
@@ -74,7 +74,7 @@ class _ScrollIndicatorState extends State<ScrollIndicator>
               // Floating dot
               AnimatedBuilder(
                 animation: _dotY,
-                builder: (_, __) => Positioned(
+                builder: (_, _) => Positioned(
                   top: _dotY.value,
                   child: Container(
                     width: 3,
@@ -84,8 +84,11 @@ class _ScrollIndicatorState extends State<ScrollIndicator>
                       shape: BoxShape.circle,
                       boxShadow: [
                         BoxShadow(
-                          color: (Theme.of(context).brightness == Brightness.dark
-                              ? Colors.white : Colors.black).withValues(alpha: 0.4),
+                          color:
+                              (Theme.of(context).brightness == Brightness.dark
+                                      ? Colors.white
+                                      : Colors.black)
+                                  .withValues(alpha: 0.4),
                           blurRadius: 6,
                         ),
                       ],

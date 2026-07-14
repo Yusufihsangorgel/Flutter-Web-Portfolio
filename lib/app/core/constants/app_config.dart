@@ -1,12 +1,12 @@
 import 'dart:math' show min;
 
-import 'package:flutter_web_portfolio/app/controllers/language_controller.dart';
+import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
 
 /// Central configuration resolved from i18n JSON at runtime.
 ///
 /// **For fork users**: customise your portfolio by editing only the
-/// `assets/i18n/*.json` files. Every personal detail — name, email,
-/// stats, social links — is pulled from there at startup.
+/// `assets/i18n/*.json` files. Public-facing labels and optional links are
+/// pulled from there at startup.
 ///
 /// This class provides typed helpers so widgets never hard-code personal data.
 final class AppConfig {
@@ -14,12 +14,14 @@ final class AppConfig {
 
   // ─── Identity ──────────────────────────────────────────────────────
 
-  /// Full display name (e.g. "Jane Doe").
-  static String name(LanguageController lc) =>
-      lc.getText('cv_data.personal_info.name', defaultValue: 'Your Name');
+  /// Public display label.
+  static String name(LanguageCubit lc) => lc.getText(
+    'cv_data.personal_info.name',
+    defaultValue: 'Systems Portfolio',
+  );
 
   /// Two-letter initials derived from [name] (e.g. "JD").
-  static String initials(LanguageController lc) {
+  static String initials(LanguageCubit lc) {
     final full = name(lc);
     final parts = full.trim().split(RegExp(r'\s+'));
     if (parts.length >= 2) {
@@ -29,45 +31,20 @@ final class AppConfig {
   }
 
   /// Primary job title / tagline shown in the hero section.
-  static String title(LanguageController lc) => lc.getText(
-        'home_section.subtitle',
-        defaultValue: 'Software Engineer',
-      );
+  static String title(LanguageCubit lc) =>
+      lc.getText('home_section.subtitle', defaultValue: 'Software Engineer');
 
   /// Short brand tagline for the preloader and footer.
-  static String tagline(LanguageController lc) => lc.getText(
-        'cv_data.personal_info.tagline',
-        defaultValue: 'Building digital experiences',
-      );
+  static String tagline(LanguageCubit lc) => lc.getText(
+    'cv_data.personal_info.tagline',
+    defaultValue: 'Building digital experiences',
+  );
 
   /// Contact e-mail address.
-  static String email(LanguageController lc) =>
-      (lc.cvData['personal_info']?['email'] as String?) ?? 'hello@example.com';
+  static String email(LanguageCubit lc) =>
+      (lc.cvData['personal_info']?['email'] as String?) ?? '';
 
   /// Physical location string.
-  static String location(LanguageController lc) => lc.getText(
-        'cv_data.personal_info.location',
-        defaultValue: '',
-      );
-
-  // ─── Stats ─────────────────────────────────────────────────────────
-
-  static int yearsExperience(LanguageController lc) =>
-      _stat(lc, 'years_experience');
-
-  static int projectsCompleted(LanguageController lc) =>
-      _stat(lc, 'projects_completed');
-
-  static int technologies(LanguageController lc) =>
-      _stat(lc, 'technologies');
-
-  /// Returns `true` when at least one stat is non-zero, meaning
-  /// the section should be rendered.
-  static bool hasStats(LanguageController lc) =>
-      yearsExperience(lc) > 0 ||
-      projectsCompleted(lc) > 0 ||
-      technologies(lc) > 0;
-
-  static int _stat(LanguageController lc, String key) =>
-      (lc.cvData['personal_info']?['stats']?[key] as int?) ?? 0;
+  static String location(LanguageCubit lc) =>
+      lc.getText('cv_data.personal_info.location', defaultValue: '');
 }

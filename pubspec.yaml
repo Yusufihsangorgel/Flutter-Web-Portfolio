@@ -1,52 +1,97 @@
 name: flutter_web_portfolio
 description: 'Modern and responsive Flutter web portfolio application.'
-repository: https://github.com/Yusufihsangorgel/Flutter-Web-Portfolio
 publish_to: 'none'
 
 version: 1.0.0+1
 
 environment:
-  sdk: ^3.7.0
+  sdk: '>=3.11.0 <4.0.0'
+  flutter: '>=3.41.2'
 
 dependencies:
   flutter:
     sdk: flutter
   flutter_localizations:
     sdk: flutter
-  flutter_i18n: ^0.36.2
+  flutter_i18n: ^0.37.1
+  cupertino_icons: ^1.0.8
 
   # State management & navigation
-  get: ^4.6.6
+  flutter_bloc: ^9.1.1
 
   # UI components
-  google_fonts: ^6.1.0
-  url_launcher: ^6.2.2
+  url_launcher: ^6.3.2
   http: ^1.2.2
-
-  # Context extensions (responsive sizing helpers)
-  kartal: ^4.2.0
-
-  # Responsive layout (reserved)
 
   # Localization
   intl: ^0.20.2
 
   # Storage
-  shared_preferences: ^2.2.2
+  shared_preferences: ^2.5.5
   web: ^1.1.1
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^5.0.0
+  flutter_lints: ^6.0.0
 
 flutter:
   uses-material-design: true
 
   assets:
-    - assets/images/
     - assets/animations/
-    - assets/data/
     - assets/i18n/
+
+  fonts:
+    - family: Inter
+      fonts:
+        - asset: assets/fonts/inter/Inter-Variable.ttf
+          weight: 100
+        - asset: assets/fonts/inter/Inter-Variable.ttf
+          weight: 200
+        - asset: assets/fonts/inter/Inter-Variable.ttf
+          weight: 300
+        - asset: assets/fonts/inter/Inter-Variable.ttf
+          weight: 400
+        - asset: assets/fonts/inter/Inter-Variable.ttf
+          weight: 500
+        - asset: assets/fonts/inter/Inter-Variable.ttf
+          weight: 600
+        - asset: assets/fonts/inter/Inter-Variable.ttf
+          weight: 700
+        - asset: assets/fonts/inter/Inter-Variable.ttf
+          weight: 800
+        - asset: assets/fonts/inter/Inter-Variable.ttf
+          weight: 900
+    - family: Space Grotesk
+      fonts:
+        - asset: assets/fonts/space_grotesk/SpaceGrotesk-Variable.ttf
+          weight: 300
+        - asset: assets/fonts/space_grotesk/SpaceGrotesk-Variable.ttf
+          weight: 400
+        - asset: assets/fonts/space_grotesk/SpaceGrotesk-Variable.ttf
+          weight: 500
+        - asset: assets/fonts/space_grotesk/SpaceGrotesk-Variable.ttf
+          weight: 600
+        - asset: assets/fonts/space_grotesk/SpaceGrotesk-Variable.ttf
+          weight: 700
+    - family: JetBrains Mono
+      fonts:
+        - asset: assets/fonts/jetbrains_mono/JetBrainsMono-Variable.ttf
+          weight: 100
+        - asset: assets/fonts/jetbrains_mono/JetBrainsMono-Variable.ttf
+          weight: 200
+        - asset: assets/fonts/jetbrains_mono/JetBrainsMono-Variable.ttf
+          weight: 300
+        - asset: assets/fonts/jetbrains_mono/JetBrainsMono-Variable.ttf
+          weight: 400
+        - asset: assets/fonts/jetbrains_mono/JetBrainsMono-Variable.ttf
+          weight: 500
+        - asset: assets/fonts/jetbrains_mono/JetBrainsMono-Variable.ttf
+          weight: 600
+        - asset: assets/fonts/jetbrains_mono/JetBrainsMono-Variable.ttf
+          weight: 700
+        - asset: assets/fonts/jetbrains_mono/JetBrainsMono-Variable.ttf
+          weight: 800
 
   generate: true

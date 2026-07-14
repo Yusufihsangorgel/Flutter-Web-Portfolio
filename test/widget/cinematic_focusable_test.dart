@@ -1,19 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_web_portfolio/app/controllers/sound_controller.dart';
 import 'package:flutter_web_portfolio/app/widgets/cinematic_focusable.dart';
+
+Widget _buildSubject(Widget child) => BlocProvider(
+  create: (_) => SoundController(),
+  child: MaterialApp(home: Scaffold(body: child)),
+);
 
 void main() {
   group('CinematicFocusable', () {
     testWidgets('renders child widget', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: CinematicFocusable(
-              onTap: () {},
-              child: const Text('Hello'),
-            ),
-          ),
+        _buildSubject(
+          CinematicFocusable(onTap: () {}, child: const Text('Hello')),
         ),
       );
 
@@ -24,12 +26,10 @@ void main() {
       var tapped = false;
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: CinematicFocusable(
-              onTap: () => tapped = true,
-              child: const Text('Tap me'),
-            ),
+        _buildSubject(
+          CinematicFocusable(
+            onTap: () => tapped = true,
+            child: const Text('Tap me'),
           ),
         ),
       );
@@ -48,14 +48,12 @@ void main() {
       bool? lastHoverState;
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: Center(
-              child: CinematicFocusable(
-                onTap: () {},
-                onHoverChanged: (hovered) => lastHoverState = hovered,
-                child: const SizedBox(width: 200, height: 200),
-              ),
+        _buildSubject(
+          Center(
+            child: CinematicFocusable(
+              onTap: () {},
+              onHoverChanged: (hovered) => lastHoverState = hovered,
+              child: const SizedBox(width: 200, height: 200),
             ),
           ),
         ),
@@ -80,12 +78,10 @@ void main() {
       var activated = false;
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: CinematicFocusable(
-              onTap: () => activated = true,
-              child: const Text('Focus me'),
-            ),
+        _buildSubject(
+          CinematicFocusable(
+            onTap: () => activated = true,
+            child: const Text('Focus me'),
           ),
         ),
       );
@@ -105,12 +101,10 @@ void main() {
       var activated = false;
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: CinematicFocusable(
-              onTap: () => activated = true,
-              child: const Text('Focus me'),
-            ),
+        _buildSubject(
+          CinematicFocusable(
+            onTap: () => activated = true,
+            child: const Text('Focus me'),
           ),
         ),
       );
@@ -128,13 +122,11 @@ void main() {
 
     testWidgets('renders with custom borderRadius', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: CinematicFocusable(
-              onTap: () {},
-              borderRadius: BorderRadius.circular(16),
-              child: const Text('Rounded'),
-            ),
+        _buildSubject(
+          CinematicFocusable(
+            onTap: () {},
+            borderRadius: BorderRadius.circular(16),
+            child: const Text('Rounded'),
           ),
         ),
       );

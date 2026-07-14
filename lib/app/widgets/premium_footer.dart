@@ -3,16 +3,17 @@ import 'dart:math' as math;
 import 'package:flutter/foundation.dart'
     show defaultTargetPlatform, TargetPlatform;
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:flutter_web_portfolio/app/controllers/language_controller.dart';
+import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
 import 'package:flutter_web_portfolio/app/controllers/scroll_controller.dart';
 import 'package:flutter_web_portfolio/app/controllers/sound_controller.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
+import 'package:flutter_web_portfolio/app/core/theme/app_fonts.dart';
 import 'package:flutter_web_portfolio/app/core/constants/breakpoints.dart';
 import 'package:flutter_web_portfolio/app/core/constants/cinematic_curves.dart';
 import 'package:flutter_web_portfolio/app/core/constants/durations.dart';
+import 'package:flutter_web_portfolio/app/features/engineering_lab/presentation/engineering_lab.dart';
 import 'package:flutter_web_portfolio/app/widgets/neon_effects.dart';
 import 'package:flutter_web_portfolio/app/widgets/social_links_row.dart';
 
@@ -45,9 +46,7 @@ class PremiumFooter extends StatelessWidget {
         decoration: BoxDecoration(
           color: AppColors.backgroundDark.withValues(alpha: 0.85),
           border: Border(
-            top: BorderSide(
-              color: Colors.white.withValues(alpha: 0.04),
-            ),
+            top: BorderSide(color: Colors.white.withValues(alpha: 0.04)),
           ),
         ),
         child: Column(
@@ -69,8 +68,9 @@ class PremiumFooter extends StatelessWidget {
               ),
               child: ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 1200),
-                child:
-                    isDesktop ? const _DesktopLayout() : const _MobileLayout(),
+                child: isDesktop
+                    ? const _DesktopLayout()
+                    : const _MobileLayout(),
               ),
             ),
 
@@ -92,18 +92,18 @@ class _DesktopLayout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => const Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Left — brand identity
-        Expanded(flex: 3, child: _BrandColumn()),
-        SizedBox(width: 48),
-        // Center — quick navigation links
-        Expanded(flex: 2, child: _QuickLinksColumn()),
-        SizedBox(width: 48),
-        // Right — social icons + newsletter
-        Expanded(flex: 3, child: _ConnectColumn()),
-      ],
-    );
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      // Left — brand identity
+      Expanded(flex: 3, child: _BrandColumn()),
+      SizedBox(width: 48),
+      // Center — quick navigation links
+      Expanded(flex: 2, child: _QuickLinksColumn()),
+      SizedBox(width: 48),
+      // Right — social icons + newsletter
+      Expanded(flex: 3, child: _ConnectColumn()),
+    ],
+  );
 }
 
 // =============================================================================
@@ -115,13 +115,13 @@ class _MobileLayout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => const Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        _BrandColumn(centered: true),
-        SizedBox(height: 36),
-        _QuickLinksColumn(centered: true),
-        SizedBox(height: 36),
-        _ConnectColumn(centered: true),
-      ],
-    );
+    crossAxisAlignment: CrossAxisAlignment.center,
+    children: [
+      _BrandColumn(centered: true),
+      SizedBox(height: 36),
+      _QuickLinksColumn(centered: true),
+      SizedBox(height: 36),
+      _ConnectColumn(centered: true),
+    ],
+  );
 }

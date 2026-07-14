@@ -1,6 +1,5 @@
 /// Core project entity — id, title, description, tech stack, URLs.
 base class Project {
-
   const Project({
     required this.id,
     required this.title,

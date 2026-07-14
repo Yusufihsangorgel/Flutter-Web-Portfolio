@@ -6,11 +6,7 @@ void main() {
   group('AnimatedCounter', () {
     testWidgets('renders with initial value 0', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: AnimatedCounter(endValue: 50),
-          ),
-        ),
+        const MaterialApp(home: Scaffold(body: AnimatedCounter(endValue: 50))),
       );
 
       // At frame 0 the animation has not started, value is 0
@@ -19,11 +15,7 @@ void main() {
 
     testWidgets('animates to endValue after pump', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: AnimatedCounter(endValue: 42),
-          ),
-        ),
+        const MaterialApp(home: Scaffold(body: AnimatedCounter(endValue: 42))),
       );
 
       // Advance past the default 1200ms animation duration
@@ -34,11 +26,7 @@ void main() {
 
     testWidgets('shows integer without decimals', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: AnimatedCounter(endValue: 7),
-          ),
-        ),
+        const MaterialApp(home: Scaffold(body: AnimatedCounter(endValue: 7))),
       );
 
       await tester.pump(const Duration(seconds: 2));
@@ -50,11 +38,7 @@ void main() {
 
     testWidgets('re-triggers on value change', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: AnimatedCounter(endValue: 10),
-          ),
-        ),
+        const MaterialApp(home: Scaffold(body: AnimatedCounter(endValue: 10))),
       );
 
       await tester.pump(const Duration(seconds: 2));
@@ -62,11 +46,7 @@ void main() {
 
       // Rebuild with a new endValue
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: AnimatedCounter(endValue: 20),
-          ),
-        ),
+        const MaterialApp(home: Scaffold(body: AnimatedCounter(endValue: 20))),
       );
 
       // Animation resets to 0 on value change

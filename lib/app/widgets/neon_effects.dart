@@ -98,26 +98,32 @@ class _NeonTextState extends State<NeonText>
     return [
       // Inner core — tight white-ish glow
       Shadow(
-        color: Color.lerp(color, Colors.white, 0.6)!
-            .withValues(alpha: (0.9 * effectiveIntensity).clamp(0.0, 1.0)),
+        color: Color.lerp(
+          color,
+          Colors.white,
+          0.6,
+        )!.withValues(alpha: (0.9 * effectiveIntensity).clamp(0.0, 1.0)),
         blurRadius: widget.blurRadius * 0.15,
       ),
       // Mid glow
       Shadow(
-        color:
-            color.withValues(alpha: (0.7 * effectiveIntensity).clamp(0.0, 1.0)),
+        color: color.withValues(
+          alpha: (0.7 * effectiveIntensity).clamp(0.0, 1.0),
+        ),
         blurRadius: widget.blurRadius * 0.5,
       ),
       // Outer glow
       Shadow(
-        color:
-            color.withValues(alpha: (0.4 * effectiveIntensity).clamp(0.0, 1.0)),
+        color: color.withValues(
+          alpha: (0.4 * effectiveIntensity).clamp(0.0, 1.0),
+        ),
         blurRadius: widget.blurRadius,
       ),
       // Haze
       Shadow(
-        color:
-            color.withValues(alpha: (0.15 * effectiveIntensity).clamp(0.0, 1.0)),
+        color: color.withValues(
+          alpha: (0.15 * effectiveIntensity).clamp(0.0, 1.0),
+        ),
         blurRadius: widget.blurRadius * 1.8,
       ),
     ];
@@ -145,10 +151,9 @@ class _NeonTextState extends State<NeonText>
     return RepaintBoundary(
       child: AnimatedBuilder(
         animation: _ctrl,
-        builder: (_, __) {
+        builder: (_, _) {
           // Smooth sine-based pulse between 0.75 and 1.0
-          final pulse =
-              0.75 + 0.25 * math.sin(_ctrl.value * math.pi);
+          final pulse = 0.75 + 0.25 * math.sin(_ctrl.value * math.pi);
           return Text(
             widget.text,
             style: (widget.style ?? const TextStyle()).copyWith(
@@ -224,15 +229,19 @@ class _NeonLineState extends State<NeonLine>
     final isHorizontal = widget.direction == Axis.horizontal;
 
     final sizedBox = SizedBox(
-      width: isHorizontal ? (widget.width ?? double.infinity) : widget.thickness,
-      height: isHorizontal ? widget.thickness : (widget.height ?? double.infinity),
+      width: isHorizontal
+          ? (widget.width ?? double.infinity)
+          : widget.thickness,
+      height: isHorizontal
+          ? widget.thickness
+          : (widget.height ?? double.infinity),
     );
 
     return RepaintBoundary(
       child: widget.animated
           ? AnimatedBuilder(
               animation: _ctrl,
-              builder: (_, __) => CustomPaint(
+              builder: (_, _) => CustomPaint(
                 painter: _NeonLinePainter(
                   color: color,
                   progress: _ctrl.value,
@@ -325,34 +334,73 @@ class _NeonLinePainter extends CustomPainter {
     final hotspotRadius = length * 0.15;
 
     final hotspotPaint = Paint()
-      ..shader = (isHorizontal
-              ? LinearGradient(
-                  begin: Alignment(-1 + 2 * ((hotspotPos - hotspotRadius) / length).clamp(0.0, 1.0), 0),
-                  end: Alignment(-1 + 2 * ((hotspotPos + hotspotRadius) / length).clamp(0.0, 1.0), 0),
-                  colors: [
-                    Colors.transparent,
-                    color.withValues(alpha: 0.9 * intensity),
-                    Color.lerp(color, Colors.white, 0.5)!
-                        .withValues(alpha: intensity),
-                    color.withValues(alpha: 0.9 * intensity),
-                    Colors.transparent,
-                  ],
-                  stops: const [0.0, 0.3, 0.5, 0.7, 1.0],
-                )
-              : LinearGradient(
-                  begin: Alignment(0, -1 + 2 * ((hotspotPos - hotspotRadius) / length).clamp(0.0, 1.0)),
-                  end: Alignment(0, -1 + 2 * ((hotspotPos + hotspotRadius) / length).clamp(0.0, 1.0)),
-                  colors: [
-                    Colors.transparent,
-                    color.withValues(alpha: 0.9 * intensity),
-                    Color.lerp(color, Colors.white, 0.5)!
-                        .withValues(alpha: intensity),
-                    color.withValues(alpha: 0.9 * intensity),
-                    Colors.transparent,
-                  ],
-                  stops: const [0.0, 0.3, 0.5, 0.7, 1.0],
-                ))
-          .createShader(Offset.zero & size);
+      ..shader =
+          (isHorizontal
+                  ? LinearGradient(
+                      begin: Alignment(
+                        -1 +
+                            2 *
+                                ((hotspotPos - hotspotRadius) / length).clamp(
+                                  0.0,
+                                  1.0,
+                                ),
+                        0,
+                      ),
+                      end: Alignment(
+                        -1 +
+                            2 *
+                                ((hotspotPos + hotspotRadius) / length).clamp(
+                                  0.0,
+                                  1.0,
+                                ),
+                        0,
+                      ),
+                      colors: [
+                        Colors.transparent,
+                        color.withValues(alpha: 0.9 * intensity),
+                        Color.lerp(
+                          color,
+                          Colors.white,
+                          0.5,
+                        )!.withValues(alpha: intensity),
+                        color.withValues(alpha: 0.9 * intensity),
+                        Colors.transparent,
+                      ],
+                      stops: const [0.0, 0.3, 0.5, 0.7, 1.0],
+                    )
+                  : LinearGradient(
+                      begin: Alignment(
+                        0,
+                        -1 +
+                            2 *
+                                ((hotspotPos - hotspotRadius) / length).clamp(
+                                  0.0,
+                                  1.0,
+                                ),
+                      ),
+                      end: Alignment(
+                        0,
+                        -1 +
+                            2 *
+                                ((hotspotPos + hotspotRadius) / length).clamp(
+                                  0.0,
+                                  1.0,
+                                ),
+                      ),
+                      colors: [
+                        Colors.transparent,
+                        color.withValues(alpha: 0.9 * intensity),
+                        Color.lerp(
+                          color,
+                          Colors.white,
+                          0.5,
+                        )!.withValues(alpha: intensity),
+                        color.withValues(alpha: 0.9 * intensity),
+                        Colors.transparent,
+                      ],
+                      stops: const [0.0, 0.3, 0.5, 0.7, 1.0],
+                    ))
+              .createShader(Offset.zero & size);
 
     final hotspotGlowPaint = Paint()
       ..shader = hotspotPaint.shader
@@ -457,7 +505,7 @@ class _NeonBorderState extends State<NeonBorder>
           valueListenable: _hovered,
           builder: (_, hovered, child) => AnimatedBuilder(
             animation: _ctrl,
-            builder: (_, __) => CustomPaint(
+            builder: (_, _) => CustomPaint(
               painter: _NeonBorderPainter(
                 primary: primary,
                 secondary: secondary,
@@ -607,22 +655,27 @@ class _NeonIconState extends State<NeonIcon>
           boxShadow: [
             // Inner core glow
             BoxShadow(
-              color: Color.lerp(color, Colors.white, 0.4)!
-                  .withValues(alpha: (0.6 * effectiveIntensity).clamp(0.0, 1.0)),
+              color: Color.lerp(
+                color,
+                Colors.white,
+                0.4,
+              )!.withValues(alpha: (0.6 * effectiveIntensity).clamp(0.0, 1.0)),
               blurRadius: widget.blurRadius * 0.3,
               spreadRadius: 0,
             ),
             // Mid glow
             BoxShadow(
               color: color.withValues(
-                  alpha: (0.4 * effectiveIntensity).clamp(0.0, 1.0)),
+                alpha: (0.4 * effectiveIntensity).clamp(0.0, 1.0),
+              ),
               blurRadius: widget.blurRadius * 0.7,
               spreadRadius: 0,
             ),
             // Outer haze
             BoxShadow(
               color: color.withValues(
-                  alpha: (0.15 * effectiveIntensity).clamp(0.0, 1.0)),
+                alpha: (0.15 * effectiveIntensity).clamp(0.0, 1.0),
+              ),
               blurRadius: widget.blurRadius,
               spreadRadius: 0,
             ),
@@ -643,7 +696,7 @@ class _NeonIconState extends State<NeonIcon>
     return RepaintBoundary(
       child: AnimatedBuilder(
         animation: _ctrl,
-        builder: (_, __) {
+        builder: (_, _) {
           final pulse = 0.7 + 0.3 * math.sin(_ctrl.value * math.pi);
           return buildIcon(pulse);
         },
@@ -719,7 +772,8 @@ class _NeonCardState extends State<NeonCard>
   @override
   Widget build(BuildContext context) {
     final accent = widget.color ?? AppColors.accent;
-    final bg = widget.backgroundColor ??
+    final bg =
+        widget.backgroundColor ??
         AppColors.backgroundLight.withValues(alpha: 0.45);
 
     return RepaintBoundary(
@@ -734,17 +788,13 @@ class _NeonCardState extends State<NeonCard>
             }
             return AnimatedBuilder(
               animation: _ctrl,
-              builder: (_, __) {
-                final pulse =
-                    0.8 + 0.2 * math.sin(_ctrl.value * math.pi);
+              builder: (_, _) {
+                final pulse = 0.8 + 0.2 * math.sin(_ctrl.value * math.pi);
                 return _buildCard(accent, bg, pulse, hovered, child!);
               },
             );
           },
-          child: Padding(
-            padding: widget.padding,
-            child: widget.child,
-          ),
+          child: Padding(padding: widget.padding, child: widget.child),
         ),
       ),
     );
@@ -762,8 +812,9 @@ class _NeonCardState extends State<NeonCard>
 
     // Border decoration — top-only vs full
     final borderSide = BorderSide(
-      color:
-          accent.withValues(alpha: (0.7 * effectiveIntensity * hoverMultiplier).clamp(0.0, 1.0)),
+      color: accent.withValues(
+        alpha: (0.7 * effectiveIntensity * hoverMultiplier).clamp(0.0, 1.0),
+      ),
       width: widget.borderWidth,
     );
     final transparentSide = BorderSide(
@@ -780,7 +831,11 @@ class _NeonCardState extends State<NeonCard>
         border: widget.fullBorder
             ? Border.all(
                 color: accent.withValues(
-                    alpha: (0.5 * effectiveIntensity * hoverMultiplier).clamp(0.0, 1.0)),
+                  alpha: (0.5 * effectiveIntensity * hoverMultiplier).clamp(
+                    0.0,
+                    1.0,
+                  ),
+                ),
                 width: widget.borderWidth,
               )
             : Border(
@@ -793,7 +848,11 @@ class _NeonCardState extends State<NeonCard>
           // Neon glow under the card
           BoxShadow(
             color: accent.withValues(
-                alpha: (0.12 * effectiveIntensity * hoverMultiplier).clamp(0.0, 1.0)),
+              alpha: (0.12 * effectiveIntensity * hoverMultiplier).clamp(
+                0.0,
+                1.0,
+              ),
+            ),
             blurRadius: widget.blurRadius * hoverMultiplier,
             spreadRadius: 0,
             offset: const Offset(0, 2),
@@ -802,7 +861,8 @@ class _NeonCardState extends State<NeonCard>
           if (hovered)
             BoxShadow(
               color: accent.withValues(
-                  alpha: (0.06 * effectiveIntensity).clamp(0.0, 1.0)),
+                alpha: (0.06 * effectiveIntensity).clamp(0.0, 1.0),
+              ),
               blurRadius: widget.blurRadius * 0.5,
               spreadRadius: -2,
               blurStyle: BlurStyle.inner,

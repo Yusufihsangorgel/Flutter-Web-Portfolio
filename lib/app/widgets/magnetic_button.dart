@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/services.dart';
-import 'package:get/get.dart';
 import 'package:flutter_web_portfolio/app/controllers/cursor_controller.dart';
 import 'package:flutter_web_portfolio/app/core/constants/cinematic_curves.dart';
 import 'package:flutter_web_portfolio/app/core/constants/durations.dart';
@@ -52,51 +52,58 @@ class _MagneticButtonState extends State<MagneticButton> {
 
   @override
   Widget build(BuildContext context) {
-    final cursorCtrl = Get.find<CursorController>();
+    final cursorCtrl = context.read<CursorController>();
 
     return Semantics(
       button: true,
       child: LayoutBuilder(
-      builder: (context, constraints) {
-        _cachedSize = Size(constraints.maxWidth, constraints.maxHeight);
+        builder: (context, constraints) {
+          _cachedSize = Size(constraints.maxWidth, constraints.maxHeight);
 
-        return Shortcuts(
-          shortcuts: const {
-            SingleActivator(LogicalKeyboardKey.enter): ActivateIntent(),
-            SingleActivator(LogicalKeyboardKey.space): ActivateIntent(),
-          },
-          child: Actions(
-            actions: {
-              ActivateIntent: CallbackAction<ActivateIntent>(
-                onInvoke: (_) { widget.onTap(); return null; },
-              ),
+          return Shortcuts(
+            shortcuts: const {
+              SingleActivator(LogicalKeyboardKey.enter): ActivateIntent(),
+              SingleActivator(LogicalKeyboardKey.space): ActivateIntent(),
             },
-            child: Focus(
-              child: MouseRegion(
-                onEnter: (_) {
-                  cursorCtrl.isHovering.value = true;
-                },
-                onHover: _onHover,
-                onExit: (_) {
-                  setState(() => _displacement = Offset.zero);
-                  cursorCtrl.isHovering.value = false;
-                },
-                cursor: SystemMouseCursors.click,
-                child: GestureDetector(
-                  onTap: widget.onTap,
-                  child: AnimatedContainer(
-                    duration: AppDurations.fast,
-                    curve: CinematicCurves.magneticPull,
-                    transform: Matrix4.translationValues(_displacement.dx, _displacement.dy, 0),
-                    child: widget.child,
+            child: Actions(
+              actions: {
+                ActivateIntent: CallbackAction<ActivateIntent>(
+                  onInvoke: (_) {
+                    widget.onTap();
+                    return null;
+                  },
+                ),
+              },
+              child: Focus(
+                child: MouseRegion(
+                  onEnter: (_) {
+                    cursorCtrl.setHovering(true);
+                  },
+                  onHover: _onHover,
+                  onExit: (_) {
+                    setState(() => _displacement = Offset.zero);
+                    cursorCtrl.setHovering(false);
+                  },
+                  cursor: SystemMouseCursors.click,
+                  child: GestureDetector(
+                    onTap: widget.onTap,
+                    child: AnimatedContainer(
+                      duration: AppDurations.fast,
+                      curve: CinematicCurves.magneticPull,
+                      transform: Matrix4.translationValues(
+                        _displacement.dx,
+                        _displacement.dy,
+                        0,
+                      ),
+                      child: widget.child,
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
-        );
-      },
-    ),
+          );
+        },
+      ),
     );
   }
 }

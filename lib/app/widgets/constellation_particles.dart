@@ -1,8 +1,9 @@
+import 'dart:async';
 import 'dart:math' as math;
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_web_portfolio/app/controllers/scene_director.dart';
 import 'package:flutter_web_portfolio/app/core/constants/scene_configs.dart';
 
@@ -65,6 +66,7 @@ class _ConstellationParticlesState extends State<ConstellationParticles>
   Offset _mousePos = Offset.zero;
   bool _mouseInside = false;
   Size _lastSize = Size.zero;
+  bool _reduceMotion = false;
 
   /// Generation counter – incremented every tick so the painter knows to repaint.
   int _generation = 0;
@@ -72,9 +74,10 @@ class _ConstellationParticlesState extends State<ConstellationParticles>
   /// Spatial grid reused every tick (avoids allocation).
   late final _SpatialGrid _grid;
 
-  /// Cached scene config – updated via `ever()` instead of Obx.
+  /// Cached scene config, updated without rebuilding the particle widget.
   late SceneConfig _config;
-  Worker? _configWorker;
+  StreamSubscription<SceneState>? _configSubscription;
+  SceneDirector? _sceneDirector;
 
   static const _connectionDistance = 120.0;
   static const _mouseRepulsionRadius = 200.0;
@@ -88,26 +91,40 @@ class _ConstellationParticlesState extends State<ConstellationParticles>
     _particles = [];
     _grid = _SpatialGrid(_connectionDistance);
 
-    // Initialise config from SceneDirector and listen for changes.
-    final director = Get.find<SceneDirector>();
-    _config = director.blendedConfig.value;
-    _configWorker = ever(director.blendedConfig, (cfg) {
-      _config = cfg;
-    });
+    _config = SceneConfigs.hero;
 
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 1),
-    )..addListener(_tick)
-      ..repeat();
+    _controller =
+        AnimationController(vsync: this, duration: const Duration(seconds: 1))
+          ..addListener(_tick)
+          ..repeat();
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    final director = context.read<SceneDirector>();
+    if (!identical(director, _sceneDirector)) {
+      _configSubscription?.cancel();
+      _sceneDirector = director;
+      _config = director.state.blendedConfig;
+      _configSubscription = director.stream.listen((state) {
+        _config = state.blendedConfig;
+      });
+    }
+
     // Reduce particle count for high-contrast / accessibility mode
     // and for narrow (mobile) screens to improve performance.
     final highContrast = MediaQuery.highContrastOf(context);
+    final reduceMotion = MediaQuery.disableAnimationsOf(context);
+    if (_reduceMotion != reduceMotion) {
+      _reduceMotion = reduceMotion;
+      _mouseInside = false;
+      if (reduceMotion) {
+        _controller.stop();
+      } else if (!_controller.isAnimating) {
+        _controller.repeat();
+      }
+    }
     var effectiveCount = widget.particleCount;
     if (highContrast) {
       effectiveCount = (effectiveCount * 0.5).round();
@@ -121,7 +138,7 @@ class _ConstellationParticlesState extends State<ConstellationParticles>
   void didChangeAppLifecycleState(AppLifecycleState state) {
     switch (state) {
       case AppLifecycleState.resumed:
-        if (!_controller.isAnimating) {
+        if (!_reduceMotion && !_controller.isAnimating) {
           _controller.repeat();
         }
       case AppLifecycleState.hidden:
@@ -140,14 +157,17 @@ class _ConstellationParticlesState extends State<ConstellationParticles>
     if (size.isEmpty) return;
     final rng = math.Random(42);
     final effectiveCount = count ?? widget.particleCount;
-    _particles = List.generate(effectiveCount, (_) => _Particle(
+    _particles = List.generate(
+      effectiveCount,
+      (_) => _Particle(
         x: rng.nextDouble() * size.width,
         y: rng.nextDouble() * size.height,
         vx: (rng.nextDouble() - 0.5) * 0.4,
         vy: (rng.nextDouble() - 0.5) * 0.4,
         radius: rng.nextDouble() * 1.5 + 0.5,
         opacity: rng.nextDouble() * 0.4 + 0.1,
-      ));
+      ),
+    );
     _lastSize = size;
   }
 
@@ -193,7 +213,7 @@ class _ConstellationParticlesState extends State<ConstellationParticles>
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
-    _configWorker?.dispose();
+    _configSubscription?.cancel();
     _controller
       ..removeListener(_tick)
       ..dispose();
@@ -204,6 +224,7 @@ class _ConstellationParticlesState extends State<ConstellationParticles>
   Widget build(BuildContext context) => ExcludeSemantics(
     child: MouseRegion(
       onHover: (e) {
+        if (_reduceMotion) return;
         _mousePos = e.localPosition;
         _mouseInside = true;
       },
@@ -219,7 +240,7 @@ class _ConstellationParticlesState extends State<ConstellationParticles>
               }
               return AnimatedBuilder(
                 animation: _controller,
-                builder: (_, __) => CustomPaint(
+                builder: (_, _) => CustomPaint(
                   painter: _ConstellationPainter(
                     particles: _particles,
                     accentColor: _config.accent,
@@ -235,7 +256,7 @@ class _ConstellationParticlesState extends State<ConstellationParticles>
         ),
       ),
     ),
-    );
+  );
 }
 
 // ---------------------------------------------------------------------------
@@ -289,11 +310,7 @@ class _ConstellationPainter extends CustomPainter {
           final dist = math.sqrt(distSq);
           final opacity = (1.0 - dist / connectionDistance) * 0.15;
           _linePaint.color = lineColor.withValues(alpha: opacity);
-          canvas.drawLine(
-            Offset(pi.x, pi.y),
-            Offset(pj.x, pj.y),
-            _linePaint,
-          );
+          canvas.drawLine(Offset(pi.x, pi.y), Offset(pj.x, pj.y), _linePaint);
         }
       }
     }
@@ -301,7 +318,10 @@ class _ConstellationPainter extends CustomPainter {
     // Rebuild glow gradient cache when accent changes
     if (_cachedGlowColor != accentColor) {
       _cachedGlowColor = accentColor;
-      _cachedGlowStops = [accentColor.withValues(alpha: 0.05), Colors.transparent];
+      _cachedGlowStops = [
+        accentColor.withValues(alpha: 0.05),
+        Colors.transparent,
+      ];
     }
 
     // Draw particles

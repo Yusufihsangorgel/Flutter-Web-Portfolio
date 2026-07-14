@@ -4,13 +4,14 @@
 
 If you discover a security vulnerability, please report it responsibly.
 
-**Do not open a public issue.** Instead, email **developeryusuf@icloud.com** with:
+**Do not open a public issue.** Use the repository's private vulnerability
+reporting channel with:
 
 - A description of the vulnerability
 - Steps to reproduce
 - Potential impact
 
-I'll acknowledge receipt within 48 hours and work on a fix.
+Reports are reviewed privately and handled according to impact.
 
 ## Scope
 

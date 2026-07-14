@@ -45,7 +45,7 @@ class _SkeletonShimmerState extends State<SkeletonShimmer>
   @override
   Widget build(BuildContext context) => AnimatedBuilder(
     animation: _controller,
-    builder: (_, __) => Container(
+    builder: (_, _) => Container(
       width: widget.width,
       height: widget.height,
       decoration: BoxDecoration(
@@ -54,10 +54,10 @@ class _SkeletonShimmerState extends State<SkeletonShimmer>
           begin: Alignment(-1.0 + 2.0 * _controller.value, 0),
           end: Alignment(1.0 + 2.0 * _controller.value, 0),
           colors: const [
-                  AppColors.backgroundLight,
-                  Color(0xFF1A1145),
-                  AppColors.backgroundLight,
-                ],
+            AppColors.backgroundLight,
+            Color(0xFF1A1145),
+            AppColors.backgroundLight,
+          ],
           stops: const [0.0, 0.5, 1.0],
         ),
       ),

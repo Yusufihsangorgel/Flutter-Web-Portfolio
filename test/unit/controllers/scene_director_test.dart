@@ -1,82 +1,55 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:get/get.dart';
+
 import 'package:flutter_web_portfolio/app/controllers/scene_director.dart';
+import 'package:flutter_web_portfolio/app/controllers/scroll_controller.dart';
 import 'package:flutter_web_portfolio/app/core/constants/scene_configs.dart';
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
+  late AppScrollController scrollController;
+  late SceneDirector director;
+
+  setUp(() {
+    scrollController = AppScrollController();
+    director = SceneDirector(scrollController: scrollController);
+    addTearDown(() async {
+      await director.close();
+      await scrollController.close();
+    });
+  });
+
   group('SceneDirector', () {
-    setUp(() {
-      Get.testMode = true;
+    test('starts in the hero scene with zero progress', () {
+      expect(director.state.currentSceneIndex, 0);
+      expect(director.state.sceneProgress, 0);
+      expect(director.state.globalProgress, 0);
+      expect(director.state.blendFactor, 0);
     });
 
-    tearDown(Get.reset);
+    test('starts with the complete hero scene configuration', () {
+      final config = director.state.blendedConfig;
 
-    test('initial currentSceneIndex is 0', () {
-      final director = SceneDirector();
-      expect(director.currentSceneIndex.value, 0);
+      expect(config.gradient1, SceneConfigs.hero.gradient1);
+      expect(config.gradient2, SceneConfigs.hero.gradient2);
+      expect(config.gradient3, SceneConfigs.hero.gradient3);
+      expect(config.accent, SceneConfigs.hero.accent);
+      expect(config.particleDensity, SceneConfigs.hero.particleDensity);
+      expect(config.particleSpeed, SceneConfigs.hero.particleSpeed);
+      expect(config.vignetteIntensity, SceneConfigs.hero.vignetteIntensity);
     });
 
-    test('initial sceneProgress is 0.0', () {
-      final director = SceneDirector();
-      expect(director.sceneProgress.value, 0.0);
+    test('derives the current accent from the immutable scene snapshot', () {
+      expect(director.state.currentAccent, SceneConfigs.hero.accent);
     });
 
-    test('initial globalProgress is 0.0', () {
-      final director = SceneDirector();
-      expect(director.globalProgress.value, 0.0);
+    test('recalculate is safe before a scroll position is attached', () {
+      expect(director.recalculate, returnsNormally);
+      expect(director.state, const SceneState.initial());
     });
 
-    test('initial blendFactor is 0.0', () {
-      final director = SceneDirector();
-      expect(director.blendFactor.value, 0.0);
-    });
-
-    test('blendedConfig starts as SceneConfigs.hero', () {
-      final director = SceneDirector();
-      final config = director.blendedConfig.value;
-      expect(config.gradient1, equals(SceneConfigs.hero.gradient1));
-      expect(config.gradient2, equals(SceneConfigs.hero.gradient2));
-      expect(config.gradient3, equals(SceneConfigs.hero.gradient3));
-      expect(config.accent, equals(SceneConfigs.hero.accent));
-      expect(config.particleDensity, equals(SceneConfigs.hero.particleDensity));
-      expect(config.particleSpeed, equals(SceneConfigs.hero.particleSpeed));
-      expect(config.vignetteIntensity, equals(SceneConfigs.hero.vignetteIntensity));
-    });
-
-    test('currentAccent starts as SceneConfigs.hero.accent', () {
-      final director = SceneDirector();
-      expect(director.currentAccent.value, equals(SceneConfigs.hero.accent));
-    });
-
-    test('currentAccent is reactive (Rx<Color>)', () {
-      final director = SceneDirector();
-      expect(director.currentAccent, isA<Rx<Color>>());
-    });
-
-    test('currentSceneIndex is reactive (RxInt)', () {
-      final director = SceneDirector();
-      expect(director.currentSceneIndex, isA<RxInt>());
-    });
-
-    test('sceneProgress is reactive (RxDouble)', () {
-      final director = SceneDirector();
-      expect(director.sceneProgress, isA<RxDouble>());
-    });
-
-    test('globalProgress is reactive (RxDouble)', () {
-      final director = SceneDirector();
-      expect(director.globalProgress, isA<RxDouble>());
-    });
-
-    test('blendFactor is reactive (RxDouble)', () {
-      final director = SceneDirector();
-      expect(director.blendFactor, isA<RxDouble>());
-    });
-
-    test('blendedConfig is reactive (Rx<SceneConfig>)', () {
-      final director = SceneDirector();
-      expect(director.blendedConfig, isA<Rx<SceneConfig>>());
+    test('exposes typed scene snapshots through the Cubit stream', () {
+      expect(director.stream, isA<Stream<SceneState>>());
     });
   });
 }

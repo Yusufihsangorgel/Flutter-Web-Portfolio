@@ -1,63 +1,56 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:get/get.dart';
+
 import 'package:flutter_web_portfolio/app/controllers/cursor_controller.dart';
 
 void main() {
   late CursorController controller;
 
   setUp(() {
-    Get.testMode = true;
     controller = CursorController();
-    Get.put(controller);
+    addTearDown(controller.close);
   });
 
-  tearDown(Get.reset);
-
   group('CursorController', () {
-    test('initial isHovering is false', () {
-      expect(controller.isHovering.value, isFalse);
+    test('starts with a neutral cursor state', () {
+      expect(controller.state.isHovering, isFalse);
+      expect(controller.state.hoverAccent, isNull);
     });
 
-    test('initial hoverAccent is null', () {
-      expect(controller.hoverAccent.value, isNull);
+    test('publishes hover transitions as immutable state', () async {
+      final emitted = <CursorUiState>[];
+      final subscription = controller.stream.listen(emitted.add);
+      addTearDown(subscription.cancel);
+
+      controller
+        ..setHovering(true)
+        ..setHovering(false);
+      await Future<void>.delayed(Duration.zero);
+
+      expect(emitted.map((state) => state.isHovering), [isTrue, isFalse]);
     });
 
-    test('isHovering toggles to true and back', () {
-      controller.isHovering.value = true;
-      expect(controller.isHovering.value, isTrue);
+    test('sets, replaces and clears the hover accent', () {
+      controller.setHoverAccent(Colors.red);
+      expect(controller.state.hoverAccent, Colors.red);
 
-      controller.isHovering.value = false;
-      expect(controller.isHovering.value, isFalse);
+      controller.setHoverAccent(Colors.blue);
+      expect(controller.state.hoverAccent, Colors.blue);
+
+      controller.setHoverAccent(null);
+      expect(controller.state.hoverAccent, isNull);
     });
 
-    test('hoverAccent accepts a color and clears to null', () {
-      controller.hoverAccent.value = Colors.cyan;
-      expect(controller.hoverAccent.value, equals(Colors.cyan));
+    test('does not emit duplicate snapshots', () async {
+      controller.setHovering(true);
+      final emissions = <CursorUiState>[];
+      final subscription = controller.stream.listen(emissions.add);
+      addTearDown(subscription.cancel);
 
-      controller.hoverAccent.value = null;
-      expect(controller.hoverAccent.value, isNull);
-    });
+      controller.setHovering(true);
+      await Future<void>.delayed(Duration.zero);
 
-    test('hoverAccent can be changed to different colors', () {
-      controller.hoverAccent.value = Colors.red;
-      expect(controller.hoverAccent.value, equals(Colors.red));
-
-      controller.hoverAccent.value = Colors.blue;
-      expect(controller.hoverAccent.value, equals(Colors.blue));
-    });
-
-    test('isHovering is a reactive RxBool', () {
-      expect(controller.isHovering, isA<RxBool>());
-    });
-
-    test('hoverAccent is a reactive Rxn<Color>', () {
-      expect(controller.hoverAccent, isA<Rxn<Color>>());
-    });
-
-    test('controller is accessible via Get.find', () {
-      final found = Get.find<CursorController>();
-      expect(found, same(controller));
+      expect(emissions, isEmpty);
     });
   });
 }

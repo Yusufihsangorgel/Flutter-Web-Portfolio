@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_web_portfolio/app/core/theme/app_fonts.dart';
 
 /// Text scramble effect on hover.
 ///
@@ -32,7 +32,8 @@ class TextScramble extends StatefulWidget {
 }
 
 class _TextScrambleState extends State<TextScramble> {
-  static const _glyphs = '!<>-_\\/[]{}=+*^?#\u2588\u2593\u2591\u2592\u2502\u2500';
+  static const _glyphs =
+      '!<>-_\\/[]{}=+*^?#\u2588\u2593\u2591\u2592\u2502\u2500';
   static final _random = Random();
 
   late String _displayText;
@@ -119,7 +120,7 @@ class _TextScrambleState extends State<TextScramble> {
   Widget build(BuildContext context) {
     // During scramble we use a monospace font so character widths stay stable.
     final effectiveStyle = _scrambling
-        ? GoogleFonts.jetBrainsMono(
+        ? AppFonts.jetBrainsMono(
             fontSize: widget.style.fontSize,
             fontWeight: widget.style.fontWeight,
             color: widget.style.color,

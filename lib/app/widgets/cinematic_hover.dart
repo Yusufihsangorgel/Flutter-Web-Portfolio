@@ -1,6 +1,6 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_web_portfolio/app/controllers/cursor_controller.dart';
 import 'package:flutter_web_portfolio/app/core/constants/cinematic_curves.dart';
 import 'package:flutter_web_portfolio/app/core/constants/durations.dart';
@@ -61,14 +61,14 @@ class _CinematicHoverState extends State<CinematicHover>
   void _onEnter(PointerEvent e) {
     _hovered.value = true;
     _controller.forward();
-    Get.find<CursorController>().isHovering.value = true;
+    context.read<CursorController>().setHovering(true);
   }
 
   void _onExit(PointerEvent e) {
     _hovered.value = false;
     _localPos.value = Offset.zero;
     _controller.reverse();
-    Get.find<CursorController>().isHovering.value = false;
+    context.read<CursorController>().setHovering(false);
   }
 
   void _onHover(PointerEvent e) {
@@ -77,68 +77,62 @@ class _CinematicHoverState extends State<CinematicHover>
 
   @override
   Widget build(BuildContext context) => LayoutBuilder(
-      builder: (context, constraints) {
-        _size = Size(constraints.maxWidth, constraints.maxHeight);
+    builder: (context, constraints) {
+      _size = Size(constraints.maxWidth, constraints.maxHeight);
 
-        return MouseRegion(
-          onEnter: _onEnter,
-          onExit: _onExit,
-          onHover: _onHover,
-          child: ValueListenableBuilder<Offset>(
-            valueListenable: _localPos,
-            builder: (context, localPos, _) =>
-                ValueListenableBuilder<bool>(
-                valueListenable: _hovered,
-                builder: (context, hovered, __) {
-                  // Calculate tilt angles (radians)
-                  double tiltX = 0;
-                  double tiltY = 0;
-                  if (hovered && _size.width > 0 && _size.height > 0) {
-                    final normalizedX =
-                        (localPos.dx / _size.width - 0.5) * 2;
-                    final normalizedY =
-                        (localPos.dy / _size.height - 0.5) * 2;
-                    tiltY =
-                        normalizedX * widget.maxTilt * (math.pi / 180);
-                    tiltX =
-                        -normalizedY * widget.maxTilt * (math.pi / 180);
-                  }
+      return MouseRegion(
+        onEnter: _onEnter,
+        onExit: _onExit,
+        onHover: _onHover,
+        child: ValueListenableBuilder<Offset>(
+          valueListenable: _localPos,
+          builder: (context, localPos, _) => ValueListenableBuilder<bool>(
+            valueListenable: _hovered,
+            builder: (context, hovered, _) {
+              // Calculate tilt angles (radians)
+              double tiltX = 0;
+              double tiltY = 0;
+              if (hovered && _size.width > 0 && _size.height > 0) {
+                final normalizedX = (localPos.dx / _size.width - 0.5) * 2;
+                final normalizedY = (localPos.dy / _size.height - 0.5) * 2;
+                tiltY = normalizedX * widget.maxTilt * (math.pi / 180);
+                tiltX = -normalizedY * widget.maxTilt * (math.pi / 180);
+              }
 
-                  return AnimatedBuilder(
-                    animation: _liftAnim,
-                    builder: (_, child) {
-                      final transform = Matrix4.identity()
-                        ..setEntry(3, 2, 0.001) // perspective
-                        ..rotateX(tiltX)
-                        ..rotateY(tiltY);
-                      transform.storage[13] -= _liftAnim.value;
+              return AnimatedBuilder(
+                animation: _liftAnim,
+                builder: (_, child) {
+                  final transform = Matrix4.identity()
+                    ..setEntry(3, 2, 0.001) // perspective
+                    ..rotateX(tiltX)
+                    ..rotateY(tiltY);
+                  transform.storage[13] -= _liftAnim.value;
 
-                      return AnimatedContainer(
-                        duration: AppDurations.veryFast,
-                        transform: transform,
-                        transformAlignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          boxShadow: hovered
-                              ? [
-                                  BoxShadow(
-                                    color: (widget.glowColor ?? Colors.white)
-                                        .withValues(
-                                            alpha: widget.glowOpacity),
-                                    blurRadius: widget.glowBlur,
-                                    spreadRadius: 0,
-                                  ),
-                                ]
-                              : [],
-                        ),
-                        child: child,
-                      );
-                    },
-                    child: widget.child,
+                  return AnimatedContainer(
+                    duration: AppDurations.veryFast,
+                    transform: transform,
+                    transformAlignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      boxShadow: hovered
+                          ? [
+                              BoxShadow(
+                                color: (widget.glowColor ?? Colors.white)
+                                    .withValues(alpha: widget.glowOpacity),
+                                blurRadius: widget.glowBlur,
+                                spreadRadius: 0,
+                              ),
+                            ]
+                          : [],
+                    ),
+                    child: child,
                   );
                 },
-              ),
+                child: widget.child,
+              );
+            },
           ),
-        );
-      },
-    );
+        ),
+      );
+    },
+  );
 }

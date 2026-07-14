@@ -50,9 +50,7 @@ void main() {
       );
 
       // The divider is a Container with height 1 and width 100
-      final containers = tester.widgetList<Container>(
-        find.byType(Container),
-      );
+      final containers = tester.widgetList<Container>(find.byType(Container));
 
       final hasDivider = containers.any((container) {
         final constraints = container.constraints;

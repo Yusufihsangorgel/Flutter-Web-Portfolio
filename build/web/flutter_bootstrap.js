@@ -33,10 +33,49 @@ addEventListener("message", eventListener);
 if (!window._flutter) {
   window._flutter = {};
 }
-_flutter.buildConfig = {"engineRevision":"6c0baaebf70e0148f485f27d5616b3d3382da7bf","builds":[{"compileTarget":"dart2js","renderer":"canvaskit","mainJsPath":"main.dart.js"},{}]};
+_flutter.buildConfig = {"engineRevision":"6c0baaebf70e0148f485f27d5616b3d3382da7bf","builds":[{"compileTarget":"dart2wasm","renderer":"skwasm","mainWasmPath":"main.dart.wasm","jsSupportRuntimePath":"main.dart.mjs"},{"compileTarget":"dart2js","renderer":"canvaskit","mainJsPath":"main.dart.js"}],"useLocalCanvasKit":true};
+
+
+const removeBootstrapSurface = () => {
+  const splash = document.getElementById('bootstrap-surface');
+  if (!splash) return;
+  splash.classList.add('bootstrap-surface--done');
+  window.setTimeout(() => splash.remove(), 220);
+};
+
+const showBootstrapFailure = (error) => {
+  console.error('Flutter bootstrap failed', error);
+  const splash = document.getElementById('bootstrap-surface');
+  if (!splash) return;
+
+  splash.setAttribute('aria-label', 'The Flutter experience could not start');
+  const label = splash.querySelector('.bootstrap-label');
+  if (label) label.textContent = 'FLUTTER WEB / BOOT FAILED';
+  const track = splash.querySelector('.bootstrap-track');
+  if (track) {
+    const retry = document.createElement('button');
+    retry.type = 'button';
+    retry.className = 'bootstrap-retry';
+    retry.textContent = 'RETRY';
+    retry.addEventListener('click', () => window.location.reload());
+    track.replaceWith(retry);
+  }
+};
+
+const engineConfig = {
+  // Keep Flutter's implicit Roboto/emoji fallback fonts on the same origin.
+  // The application typography is bundled through pubspec fonts; this path
+  // covers glyphs outside those families without a fonts.gstatic.com fetch.
+  fontFallbackBaseUrl: 'assets/fallback_fonts/',
+};
 
 _flutter.loader.load({
-  serviceWorkerSettings: {
-    serviceWorkerVersion: "599589820" /* Flutter's service worker is deprecated and will be removed in a future Flutter release. */
-  }
-});
+  config: engineConfig,
+  onEntrypointLoaded: async function onEntrypointLoaded(engineInitializer) {
+    window.addEventListener('flutter-first-frame', removeBootstrapSurface, {
+      once: true,
+    });
+    const appRunner = await engineInitializer.initializeEngine(engineConfig);
+    await appRunner.runApp();
+  },
+}).catch(showBootstrapFailure);

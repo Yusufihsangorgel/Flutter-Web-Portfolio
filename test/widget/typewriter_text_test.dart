@@ -8,10 +8,7 @@ void main() {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
-            body: TypewriterText(
-              text: 'Hello',
-              style: TextStyle(fontSize: 16),
-            ),
+            body: TypewriterText(text: 'Hello', style: TextStyle(fontSize: 16)),
           ),
         ),
       );
@@ -27,10 +24,7 @@ void main() {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
-            body: TypewriterText(
-              text: 'Hello',
-              style: TextStyle(fontSize: 16),
-            ),
+            body: TypewriterText(text: 'Hello', style: TextStyle(fontSize: 16)),
           ),
         ),
       );
@@ -46,8 +40,9 @@ void main() {
       await tester.pump(const Duration(seconds: 5));
     });
 
-    testWidgets('eventually shows full text after enough pumps',
-        (tester) async {
+    testWidgets('eventually shows full text after enough pumps', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(

@@ -2,7 +2,7 @@ import 'dart:math' as math;
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_web_portfolio/app/core/theme/app_fonts.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
 import 'package:flutter_web_portfolio/app/core/constants/cinematic_curves.dart';
 
@@ -43,20 +43,22 @@ class LetterStaggerAnimation extends StatelessWidget {
 
     // Each letter occupies a window within [0..1].
     // The window start is staggered; the window length is the remainder.
-    final windowLength =
-        1.0 - (totalLetters - 1) * staggerFraction;
+    final windowLength = 1.0 - (totalLetters - 1) * staggerFraction;
     final clampedWindow = windowLength.clamp(0.2, 1.0);
 
     return AnimatedBuilder(
       animation: animation,
-      builder: (_, __) => Row(
+      builder: (_, _) => Row(
         mainAxisSize: MainAxisSize.min,
         children: List.generate(totalLetters, (i) {
           final start = (i * staggerFraction).clamp(0.0, 1.0 - clampedWindow);
           final end = (start + clampedWindow).clamp(0.0, 1.0);
 
-          final t = Interval(start, end, curve: CinematicCurves.dramaticEntrance)
-              .transform(animation.value);
+          final t = Interval(
+            start,
+            end,
+            curve: CinematicCurves.dramaticEntrance,
+          ).transform(animation.value);
 
           return Opacity(
             opacity: t,
@@ -166,11 +168,10 @@ class _GlowBarPainter extends CustomPainter {
     );
 
     final fillPaint = Paint()
-      ..shader = ui.Gradient.linear(
-        Offset.zero,
-        Offset(fillWidth, 0),
-        [barColor.withValues(alpha: 0.7), barColor],
-      );
+      ..shader = ui.Gradient.linear(Offset.zero, Offset(fillWidth, 0), [
+        barColor.withValues(alpha: 0.7),
+        barColor,
+      ]);
     canvas.drawRRect(fillRect, fillPaint);
 
     // Leading dot glow
@@ -202,11 +203,7 @@ class _GlowBarPainter extends CustomPainter {
 /// Drives its own implicit animation via [AnimatedBuilder] on the
 /// provided [animation] controller.
 class PercentageCounter extends StatelessWidget {
-  const PercentageCounter({
-    super.key,
-    required this.animation,
-    this.style,
-  });
+  const PercentageCounter({super.key, required this.animation, this.style});
 
   /// Driving animation (0 -> 1 maps to 0% -> 100%).
   final Animation<double> animation;
@@ -216,7 +213,7 @@ class PercentageCounter extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final defaultStyle = GoogleFonts.jetBrainsMono(
+    final defaultStyle = AppFonts.jetBrainsMono(
       fontSize: 14,
       fontWeight: FontWeight.w400,
       color: AppColors.accent.withValues(alpha: 0.7),
@@ -225,12 +222,9 @@ class PercentageCounter extends StatelessWidget {
 
     return AnimatedBuilder(
       animation: animation,
-      builder: (_, __) {
+      builder: (_, _) {
         final pct = (animation.value * 100).round();
-        return Text(
-          '$pct%',
-          style: style ?? defaultStyle,
-        );
+        return Text('$pct%', style: style ?? defaultStyle);
       },
     );
   }
@@ -296,11 +290,7 @@ class _CircleRevealClipper extends CustomClipper<Path> {
 /// Lightweight ambient particle field for the preloader background.
 /// Much simpler than the main constellation — just drifting dots.
 class PreloaderParticles extends StatefulWidget {
-  const PreloaderParticles({
-    super.key,
-    this.particleCount = 50,
-    this.color,
-  });
+  const PreloaderParticles({super.key, this.particleCount = 50, this.color});
 
   final int particleCount;
   final Color? color;
@@ -328,8 +318,9 @@ class _PreloaderParticlesState extends State<PreloaderParticles>
   void _initParticles(Size size) {
     if (size.isEmpty) return;
     final rng = math.Random(7);
-    _particles = List.generate(widget.particleCount, (_) =>
-      _FloatingParticle(
+    _particles = List.generate(
+      widget.particleCount,
+      (_) => _FloatingParticle(
         x: rng.nextDouble() * size.width,
         y: rng.nextDouble() * size.height,
         vx: (rng.nextDouble() - 0.5) * 0.3,
@@ -359,7 +350,7 @@ class _PreloaderParticlesState extends State<PreloaderParticles>
           }
           return AnimatedBuilder(
             animation: _controller,
-            builder: (_, __) {
+            builder: (_, _) {
               // Update positions
               for (final p in _particles) {
                 p
@@ -421,8 +412,8 @@ class _FloatingParticlePainter extends CustomPainter {
 
     for (final p in particles) {
       // Gentle twinkle
-      final twinkle =
-          (math.sin(time * math.pi * 2 + p.phase) * 0.3 + 0.7).clamp(0.0, 1.0);
+      final twinkle = (math.sin(time * math.pi * 2 + p.phase) * 0.3 + 0.7)
+          .clamp(0.0, 1.0);
       final alpha = (p.opacity * twinkle).clamp(0.0, 1.0);
 
       paint.color = color.withValues(alpha: alpha);
@@ -478,7 +469,7 @@ class _PreloaderFilmGrainState extends State<PreloaderFilmGrain>
   Widget build(BuildContext context) => IgnorePointer(
     child: AnimatedBuilder(
       animation: _controller,
-      builder: (_, __) => CustomPaint(
+      builder: (_, _) => CustomPaint(
         painter: _GrainPainter(
           seed: (_controller.value * 1000).toInt(),
           opacity: widget.opacity,

@@ -11,55 +11,62 @@ class _BrandColumn extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final languageController = Get.find<LanguageController>();
+    final languageController = context.read<LanguageCubit>();
     const secondaryColor = AppColors.textSecondary;
     const brightColor = AppColors.textBright;
 
-    return Obx(() {
-      final data = languageController.cvData['personal_info']
-              as Map<String, dynamic>? ??
-          <String, dynamic>{};
-      final name = (data['name'] as String?) ?? 'Your Name';
+    return BlocBuilder<LanguageCubit, LanguageState>(
+      buildWhen: (previous, current) =>
+          previous.languageCode != current.languageCode ||
+          !identical(previous.translations, current.translations),
+      builder: (context, state) {
+        final data =
+            languageController.cvData['personal_info']
+                as Map<String, dynamic>? ??
+            <String, dynamic>{};
+        final name = (data['name'] as String?) ?? 'Your Name';
 
-      return Column(
-        crossAxisAlignment:
-            centered ? CrossAxisAlignment.center : CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // ── Neon name / logo ──────────────────────────────────────
-          NeonText(
-            text: name,
-            style: GoogleFonts.jetBrainsMono(
-              fontSize: 20,
-              fontWeight: FontWeight.w700,
-              color: brightColor,
+        return Column(
+          crossAxisAlignment: centered
+              ? CrossAxisAlignment.center
+              : CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // ── Neon name / logo ──────────────────────────────────────
+            NeonText(
+              text: name,
+              style: AppFonts.jetBrainsMono(
+                fontSize: 20,
+                fontWeight: FontWeight.w700,
+                color: brightColor,
+              ),
+              intensity: 0.6,
+              blurRadius: 14,
+              animated: true,
             ),
-            intensity: 0.6,
-            blurRadius: 14,
-            animated: true,
-          ),
-          const SizedBox(height: 12),
+            const SizedBox(height: 12),
 
-          // ── Tagline ───────────────────────────────────────────────
-          Text(
-            languageController.getText(
-              'cv_data.personal_info.tagline',
-              defaultValue: 'Building digital experiences',
+            // ── Tagline ───────────────────────────────────────────────
+            Text(
+              languageController.getText(
+                'cv_data.personal_info.tagline',
+                defaultValue: 'Building digital experiences',
+              ),
+              textAlign: centered ? TextAlign.center : TextAlign.start,
+              style: AppFonts.jetBrainsMono(
+                fontSize: 13,
+                color: secondaryColor,
+                height: 1.6,
+              ),
             ),
-            textAlign: centered ? TextAlign.center : TextAlign.start,
-            style: GoogleFonts.jetBrainsMono(
-              fontSize: 13,
-              color: secondaryColor,
-              height: 1.6,
-            ),
-          ),
-          const SizedBox(height: 20),
+            const SizedBox(height: 20),
 
-          // ── Copyright with 5-click easter egg ─────────────────────
-          _CopyrightEasterEgg(name: name, centered: centered),
-        ],
-      );
-    });
+            // ── Copyright with 5-click easter egg ─────────────────────
+            _CopyrightEasterEgg(name: name, centered: centered),
+          ],
+        );
+      },
+    );
   }
 }
 
@@ -68,10 +75,7 @@ class _BrandColumn extends StatelessWidget {
 // =============================================================================
 
 class _CopyrightEasterEgg extends StatefulWidget {
-  const _CopyrightEasterEgg({
-    required this.name,
-    this.centered = false,
-  });
+  const _CopyrightEasterEgg({required this.name, this.centered = false});
 
   final String name;
   final bool centered;
@@ -146,19 +150,18 @@ class _CopyrightEasterEggState extends State<_CopyrightEasterEgg>
           onTap: _onTap,
           child: Text(
             '\u00A9 $year ${widget.name}',
-            style: GoogleFonts.jetBrainsMono(
-              fontSize: 12,
-              color: secondaryColor,
-            ),
+            style: AppFonts.jetBrainsMono(fontSize: 12, color: secondaryColor),
           ),
         ),
         if (_easterEggVisible)
           AnimatedBuilder(
             animation: _eggAnimation,
-            builder: (_, __) {
+            builder: (_, _) {
               final v = _eggAnimation.value;
-              final message = _easterEggMessages[
-                  math.Random().nextInt(_easterEggMessages.length)];
+              final message =
+                  _easterEggMessages[math.Random().nextInt(
+                    _easterEggMessages.length,
+                  )];
               return Opacity(
                 opacity: v,
                 child: Transform.translate(
@@ -167,7 +170,9 @@ class _CopyrightEasterEggState extends State<_CopyrightEasterEgg>
                     padding: const EdgeInsets.only(top: 8),
                     child: Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 8),
+                        horizontal: 12,
+                        vertical: 8,
+                      ),
                       decoration: BoxDecoration(
                         color: AppColors.accent.withValues(alpha: 0.08),
                         borderRadius: BorderRadius.circular(6),
@@ -177,7 +182,7 @@ class _CopyrightEasterEggState extends State<_CopyrightEasterEgg>
                       ),
                       child: Text(
                         message,
-                        style: GoogleFonts.jetBrainsMono(
+                        style: AppFonts.jetBrainsMono(
                           fontSize: 11,
                           color: AppColors.accent,
                           fontStyle: FontStyle.italic,

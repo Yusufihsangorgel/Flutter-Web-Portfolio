@@ -1,7 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_web_portfolio/app/core/theme/app_fonts.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
 import 'package:flutter_web_portfolio/app/core/constants/cinematic_curves.dart';
 import 'package:flutter_web_portfolio/app/widgets/preloader_animations.dart';
@@ -9,7 +9,7 @@ import 'package:flutter_web_portfolio/app/widgets/preloader_animations.dart';
 /// Cinematic preloader — a jaw-dropping intro sequence that plays once per
 /// session before revealing the main portfolio content.
 ///
-/// Sequence (across ~3.5 s master timeline):
+/// Sequence (across the short master timeline):
 ///   0.00–0.05  Fade-in background & particles
 ///   0.05–0.40  Letter-by-letter name reveal
 ///   0.30–0.55  Tagline fade-in below name
@@ -28,10 +28,10 @@ class CinematicPreloader extends StatefulWidget {
     super.key,
     required this.child,
     this.onLoadingComplete,
-    this.displayName = 'YUSUF IHSAN GORGEL',
+    this.displayName = 'SYSTEMS PORTFOLIO',
     this.tagline = 'Crafting digital experiences',
-    this.minimumDuration = const Duration(milliseconds: 1800),
-    this.exitDuration = const Duration(milliseconds: 500),
+    this.minimumDuration = const Duration(milliseconds: 700),
+    this.exitDuration = const Duration(milliseconds: 250),
   });
 
   /// The main content revealed after the preloader finishes.
@@ -82,6 +82,7 @@ class _CinematicPreloaderState extends State<CinematicPreloader>
 
   bool _showContent = false;
   bool _preloaderDone = false;
+  bool _reducedMotionHandled = false;
 
   @override
   void initState() {
@@ -129,22 +130,27 @@ class _CinematicPreloaderState extends State<CinematicPreloader>
     _taglineFade = Tween<double>(begin: 0, end: 1).animate(
       CurvedAnimation(
         parent: master,
-        curve: const Interval(0.32, 0.55, curve: CinematicCurves.easeInOutCinematic),
+        curve: const Interval(
+          0.32,
+          0.55,
+          curve: CinematicCurves.easeInOutCinematic,
+        ),
       ),
     );
 
     _progressAnim = Tween<double>(begin: 0, end: 1).animate(
       CurvedAnimation(
         parent: master,
-        curve: const Interval(0.10, 0.78, curve: CinematicCurves.easeInOutCinematic),
+        curve: const Interval(
+          0.10,
+          0.78,
+          curve: CinematicCurves.easeInOutCinematic,
+        ),
       ),
     );
 
     _exitReveal = Tween<double>(begin: 0, end: 1).animate(
-      CurvedAnimation(
-        parent: exit,
-        curve: CinematicCurves.dramaticEntrance,
-      ),
+      CurvedAnimation(parent: exit, curve: CinematicCurves.dramaticEntrance),
     );
 
     exit.addStatusListener((status) {
@@ -171,6 +177,25 @@ class _CinematicPreloaderState extends State<CinematicPreloader>
     super.dispose();
   }
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_reducedMotionHandled ||
+        !MediaQuery.disableAnimationsOf(context) ||
+        _preloaderDone) {
+      return;
+    }
+
+    _reducedMotionHandled = true;
+    _master?.stop();
+    _exit?.stop();
+    _showContent = true;
+    _preloaderDone = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      widget.onLoadingComplete?.call();
+    });
+  }
+
   // ── Build ────────────────────────────────────────────────────────────────
 
   @override
@@ -193,7 +218,7 @@ class _CinematicPreloaderState extends State<CinematicPreloader>
         // Exit reveal clips the preloader away
         AnimatedBuilder(
           animation: _exit!,
-          builder: (_, __) {
+          builder: (_, _) {
             if (_exitReveal!.value >= 1.0) return const SizedBox.shrink();
 
             // Inverse clip: we clip the *preloader* with an inverted circle
@@ -207,137 +232,128 @@ class _CinematicPreloaderState extends State<CinematicPreloader>
     );
   }
 
-  Widget _buildPreloaderSurface(BuildContext context) =>
-    AnimatedBuilder(
-      animation: _master!,
-      builder: (_, __) => Scaffold(
-        backgroundColor: Colors.transparent,
-        body: Container(
-          width: double.infinity,
-          height: double.infinity,
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                AppColors.backgroundDark
-                    .withValues(alpha: _bgFade!.value),
-                AppColors.background
-                    .withValues(alpha: _bgFade!.value),
-                const Color(0xFF0A0520)
-                    .withValues(alpha: _bgFade!.value),
-              ],
-            ),
-          ),
-          child: Stack(
-            children: [
-              // Layer 1: Ambient particles
-              Positioned.fill(
-                child: Opacity(
-                  opacity: _bgFade!.value,
-                  child: const PreloaderParticles(
-                    particleCount: 40,
-                    color: AppColors.heroAccent,
-                  ),
-                ),
-              ),
-
-              // Layer 2: Film grain
-              Positioned.fill(
-                child: Opacity(
-                  opacity: _bgFade!.value * 0.6,
-                  child: const PreloaderFilmGrain(opacity: 0.025),
-                ),
-              ),
-
-              // Layer 3: Vignette
-              Positioned.fill(
-                child: Opacity(
-                  opacity: _bgFade!.value,
-                  child: const _Vignette(),
-                ),
-              ),
-
-              // Layer 4: Center content
-              Center(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    // Name reveal
-                    LetterStaggerAnimation(
-                      text: widget.displayName,
-                      animation: _nameReveal!,
-                      style: GoogleFonts.spaceGrotesk(
-                        fontSize: _responsiveFontSize(context),
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: _responsiveLetterSpacing(context),
-                        color: AppColors.textBright,
-                        height: 1.0,
-                      ),
-                    ),
-
-                    const SizedBox(height: 8),
-
-                    // Accent line
-                    _AnimatedLine(animation: _nameReveal!),
-
-                    const SizedBox(height: 20),
-
-                    // Tagline
-                    Opacity(
-                      opacity: _taglineFade!.value,
-                      child: Transform.translate(
-                        offset: Offset(0, 8 * (1 - _taglineFade!.value)),
-                        child: Text(
-                          widget.tagline,
-                          style: GoogleFonts.inter(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w300,
-                            letterSpacing: 3,
-                            color: AppColors.textPrimary.withValues(
-                              alpha: 0.8,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-
-                    const SizedBox(height: 48),
-
-                    // Progress bar
-                    Opacity(
-                      opacity: _progressAnim!.value > 0 ? 1.0 : 0.0,
-                      child: GlowProgressBar(
-                        progress: _progressAnim!.value,
-                        width: _responsiveBarWidth(context),
-                        height: 1.5,
-                        color: AppColors.heroAccent,
-                      ),
-                    ),
-
-                    const SizedBox(height: 12),
-
-                    // Percentage counter
-                    Opacity(
-                      opacity: _progressAnim!.value > 0 ? 1.0 : 0.0,
-                      child: PercentageCounter(
-                        animation: _progressAnim!,
-                        style: GoogleFonts.jetBrainsMono(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w400,
-                          letterSpacing: 2,
-                          color: AppColors.heroAccent.withValues(alpha: 0.6),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+  Widget _buildPreloaderSurface(BuildContext context) => AnimatedBuilder(
+    animation: _master!,
+    builder: (_, _) => Scaffold(
+      backgroundColor: Colors.transparent,
+      body: Container(
+        width: double.infinity,
+        height: double.infinity,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              AppColors.backgroundDark.withValues(alpha: _bgFade!.value),
+              AppColors.background.withValues(alpha: _bgFade!.value),
+              const Color(0xFF0A0520).withValues(alpha: _bgFade!.value),
             ],
           ),
         ),
+        child: Stack(
+          children: [
+            // Layer 1: Ambient particles
+            Positioned.fill(
+              child: Opacity(
+                opacity: _bgFade!.value,
+                child: const PreloaderParticles(
+                  particleCount: 40,
+                  color: AppColors.heroAccent,
+                ),
+              ),
+            ),
+
+            // Layer 2: Film grain
+            Positioned.fill(
+              child: Opacity(
+                opacity: _bgFade!.value * 0.6,
+                child: const PreloaderFilmGrain(opacity: 0.025),
+              ),
+            ),
+
+            // Layer 3: Vignette
+            Positioned.fill(
+              child: Opacity(opacity: _bgFade!.value, child: const _Vignette()),
+            ),
+
+            // Layer 4: Center content
+            Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Name reveal
+                  LetterStaggerAnimation(
+                    text: widget.displayName,
+                    animation: _nameReveal!,
+                    style: AppFonts.spaceGrotesk(
+                      fontSize: _responsiveFontSize(context),
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: _responsiveLetterSpacing(context),
+                      color: AppColors.textBright,
+                      height: 1.0,
+                    ),
+                  ),
+
+                  const SizedBox(height: 8),
+
+                  // Accent line
+                  _AnimatedLine(animation: _nameReveal!),
+
+                  const SizedBox(height: 20),
+
+                  // Tagline
+                  Opacity(
+                    opacity: _taglineFade!.value,
+                    child: Transform.translate(
+                      offset: Offset(0, 8 * (1 - _taglineFade!.value)),
+                      child: Text(
+                        widget.tagline,
+                        style: AppFonts.inter(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w300,
+                          letterSpacing: 3,
+                          color: AppColors.textPrimary.withValues(alpha: 0.8),
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 48),
+
+                  // Progress bar
+                  Opacity(
+                    opacity: _progressAnim!.value > 0 ? 1.0 : 0.0,
+                    child: GlowProgressBar(
+                      progress: _progressAnim!.value,
+                      width: _responsiveBarWidth(context),
+                      height: 1.5,
+                      color: AppColors.heroAccent,
+                    ),
+                  ),
+
+                  const SizedBox(height: 12),
+
+                  // Percentage counter
+                  Opacity(
+                    opacity: _progressAnim!.value > 0 ? 1.0 : 0.0,
+                    child: PercentageCounter(
+                      animation: _progressAnim!,
+                      style: AppFonts.jetBrainsMono(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w400,
+                        letterSpacing: 2,
+                        color: AppColors.heroAccent.withValues(alpha: 0.6),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
-    );
+    ),
+  );
 
   // ── Responsive helpers ───────────────────────────────────────────────────
 
@@ -375,7 +391,7 @@ class _AnimatedLine extends StatelessWidget {
   @override
   Widget build(BuildContext context) => AnimatedBuilder(
     animation: animation,
-    builder: (_, __) {
+    builder: (_, _) {
       final width = 60.0 * animation.value;
       return Container(
         width: width,
@@ -405,10 +421,7 @@ class _Vignette extends StatelessWidget {
         gradient: RadialGradient(
           center: Alignment.center,
           radius: 1.0,
-          colors: [
-            Colors.transparent,
-            Colors.black.withValues(alpha: 0.4),
-          ],
+          colors: [Colors.transparent, Colors.black.withValues(alpha: 0.4)],
           stops: const [0.4, 1.0],
         ),
       ),
@@ -419,10 +432,7 @@ class _Vignette extends StatelessWidget {
 /// Clips the child to everything *outside* an expanding circle,
 /// effectively "eating away" the preloader from the center.
 class _InverseCircleClip extends StatelessWidget {
-  const _InverseCircleClip({
-    required this.progress,
-    required this.child,
-  });
+  const _InverseCircleClip({required this.progress, required this.child});
 
   final double progress;
   final Widget child;
@@ -432,10 +442,7 @@ class _InverseCircleClip extends StatelessWidget {
     if (progress <= 0) return child;
     if (progress >= 1) return const SizedBox.shrink();
 
-    return ClipPath(
-      clipper: _InverseCircleClipper(progress),
-      child: child,
-    );
+    return ClipPath(clipper: _InverseCircleClipper(progress), child: child);
   }
 }
 

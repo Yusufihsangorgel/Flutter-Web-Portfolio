@@ -1,8 +1,8 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_web_portfolio/app/core/theme/app_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_web_portfolio/app/controllers/scroll_controller.dart';
 import 'package:flutter_web_portfolio/app/controllers/sound_controller.dart';
@@ -41,39 +41,39 @@ class SocialPresets {
   const SocialPresets._();
 
   static SocialLinkData github(String url) => SocialLinkData(
-        label: 'GitHub',
-        url: url,
-        icon: Icons.code_rounded,
-        brandColor: const Color(0xFFE6EDF3),
-      );
+    label: 'GitHub',
+    url: url,
+    icon: Icons.code_rounded,
+    brandColor: const Color(0xFFE6EDF3),
+  );
 
   static SocialLinkData linkedin(String url) => SocialLinkData(
-        label: 'LinkedIn',
-        url: url,
-        icon: Icons.business_center_outlined,
-        brandColor: const Color(0xFF0A66C2),
-      );
+    label: 'LinkedIn',
+    url: url,
+    icon: Icons.business_center_outlined,
+    brandColor: const Color(0xFF0A66C2),
+  );
 
   static SocialLinkData twitter(String url) => SocialLinkData(
-        label: 'X / Twitter',
-        url: url,
-        icon: Icons.alternate_email_rounded,
-        brandColor: const Color(0xFF1DA1F2),
-      );
+    label: 'X / Twitter',
+    url: url,
+    icon: Icons.alternate_email_rounded,
+    brandColor: const Color(0xFF1DA1F2),
+  );
 
   static SocialLinkData medium(String url) => SocialLinkData(
-        label: 'Medium',
-        url: url,
-        icon: Icons.article_outlined,
-        brandColor: const Color(0xFF00AB6C),
-      );
+    label: 'Medium',
+    url: url,
+    icon: Icons.article_outlined,
+    brandColor: const Color(0xFF00AB6C),
+  );
 
   static SocialLinkData email(String address) => SocialLinkData(
-        label: 'Email',
-        url: 'mailto:$address',
-        icon: Icons.email_outlined,
-        brandColor: const Color(0xFFEA4335),
-      );
+    label: 'Email',
+    url: 'mailto:$address',
+    icon: Icons.email_outlined,
+    brandColor: const Color(0xFFEA4335),
+  );
 }
 
 // =============================================================================
@@ -114,8 +114,9 @@ class _SocialLinksRowState extends State<SocialLinksRow>
     super.initState();
     final totalDuration = widget.animate
         ? Duration(
-            milliseconds: 400 +
-                widget.links.length * widget.staggerDelay.inMilliseconds)
+            milliseconds:
+                400 + widget.links.length * widget.staggerDelay.inMilliseconds,
+          )
         : Duration.zero;
     _entranceCtrl = AnimationController(vsync: this, duration: totalDuration);
     _buildStaggerAnimations();
@@ -144,38 +145,38 @@ class _SocialLinksRowState extends State<SocialLinksRow>
 
   @override
   Widget build(BuildContext context) => Wrap(
-      alignment: _wrapAlignment,
-      spacing: widget.spacing,
-      runSpacing: widget.spacing * 0.75,
-      children: List.generate(widget.links.length, (i) {
-        final child = _SocialIconButton(
-          data: widget.links[i],
-          iconSize: widget.iconSize,
-        );
+    alignment: _wrapAlignment,
+    spacing: widget.spacing,
+    runSpacing: widget.spacing * 0.75,
+    children: List.generate(widget.links.length, (i) {
+      final child = _SocialIconButton(
+        data: widget.links[i],
+        iconSize: widget.iconSize,
+      );
 
-        if (!widget.animate) return child;
+      if (!widget.animate) return child;
 
-        return AnimatedBuilder(
-          animation: _staggerAnimations[i],
-          builder: (_, __) {
-            final value = _staggerAnimations[i].value;
-            return Opacity(
-              opacity: value,
-              child: Transform.translate(
-                offset: Offset(-16 * (1 - value), 0),
-                child: child,
-              ),
-            );
-          },
-        );
-      }),
-    );
+      return AnimatedBuilder(
+        animation: _staggerAnimations[i],
+        builder: (_, _) {
+          final value = _staggerAnimations[i].value;
+          return Opacity(
+            opacity: value,
+            child: Transform.translate(
+              offset: Offset(-16 * (1 - value), 0),
+              child: child,
+            ),
+          );
+        },
+      );
+    }),
+  );
 
   WrapAlignment get _wrapAlignment => switch (widget.alignment) {
-        MainAxisAlignment.start => WrapAlignment.start,
-        MainAxisAlignment.end => WrapAlignment.end,
-        _ => WrapAlignment.center,
-      };
+    MainAxisAlignment.start => WrapAlignment.start,
+    MainAxisAlignment.end => WrapAlignment.end,
+    _ => WrapAlignment.center,
+  };
 }
 
 // =============================================================================
@@ -184,10 +185,7 @@ class _SocialLinksRowState extends State<SocialLinksRow>
 
 /// Individual social icon with hover effects: scale, color shift, magnetic pull.
 class _SocialIconButton extends StatefulWidget {
-  const _SocialIconButton({
-    required this.data,
-    required this.iconSize,
-  });
+  const _SocialIconButton({required this.data, required this.iconSize});
 
   final SocialLinkData data;
   final double iconSize;
@@ -220,16 +218,11 @@ class _SocialIconButtonState extends State<_SocialIconButton> {
     return Tooltip(
       message: widget.data.label,
       preferBelow: false,
-      textStyle: GoogleFonts.jetBrainsMono(
-        fontSize: 11,
-        color: Colors.white,
-      ),
+      textStyle: AppFonts.jetBrainsMono(fontSize: 11, color: Colors.white),
       decoration: BoxDecoration(
         color: AppColors.backgroundLight.withValues(alpha: 0.95),
         borderRadius: BorderRadius.circular(6),
-        border: Border.all(
-          color: AppColors.accent.withValues(alpha: 0.2),
-        ),
+        border: Border.all(color: AppColors.accent.withValues(alpha: 0.2)),
       ),
       child: MouseRegion(
         onEnter: (_) => setState(() => _hovered = true),
@@ -336,11 +329,11 @@ class _PremiumBackToTopButtonState extends State<PremiumBackToTopButton>
       parent: _entranceCtrl,
       curve: CinematicCurves.dramaticEntrance,
     );
-    Get.find<AppScrollController>().scrollController.addListener(_onScroll);
+    context.read<AppScrollController>().scrollController.addListener(_onScroll);
   }
 
   void _onScroll() {
-    final controller = Get.find<AppScrollController>().scrollController;
+    final controller = context.read<AppScrollController>().scrollController;
     if (!controller.hasClients) return;
 
     final offset = controller.offset;
@@ -357,8 +350,7 @@ class _PremiumBackToTopButtonState extends State<PremiumBackToTopButton>
     }
 
     // Update scroll progress (debounced to avoid excessive repaints)
-    final progress =
-        maxExtent > 0 ? (offset / maxExtent).clamp(0.0, 1.0) : 0.0;
+    final progress = maxExtent > 0 ? (offset / maxExtent).clamp(0.0, 1.0) : 0.0;
     if ((progress - _scrollProgress).abs() > 0.005) {
       setState(() => _scrollProgress = progress);
     }
@@ -366,20 +358,16 @@ class _PremiumBackToTopButtonState extends State<PremiumBackToTopButton>
 
   @override
   void dispose() {
-    if (Get.isRegistered<AppScrollController>()) {
-      Get.find<AppScrollController>()
-          .scrollController
-          .removeListener(_onScroll);
-    }
+    context.read<AppScrollController>().scrollController.removeListener(
+      _onScroll,
+    );
     _entranceCtrl.dispose();
     super.dispose();
   }
 
   void _scrollToTop() {
-    if (Get.isRegistered<SoundController>()) {
-      Get.find<SoundController>().playClick();
-    }
-    Get.find<AppScrollController>().scrollController.animateTo(
+    context.read<SoundController>().playClick();
+    context.read<AppScrollController>().scrollController.animateTo(
       0,
       duration: const Duration(milliseconds: 800),
       curve: Curves.easeInOutCubic,
@@ -399,7 +387,7 @@ class _PremiumBackToTopButtonState extends State<PremiumBackToTopButton>
       right: rightOffset,
       child: AnimatedBuilder(
         animation: _entranceAnimation,
-        builder: (_, __) {
+        builder: (_, _) {
           final v = _entranceAnimation.value;
           return Opacity(
             opacity: v,
@@ -469,10 +457,7 @@ class _PremiumBackToTopButtonState extends State<PremiumBackToTopButton>
 /// Paints a circular progress arc showing scroll position with optional
 /// hover glow effect.
 class _ScrollProgressPainter extends CustomPainter {
-  _ScrollProgressPainter({
-    required this.progress,
-    required this.hovered,
-  });
+  _ScrollProgressPainter({required this.progress, required this.hovered});
 
   final double progress;
   final bool hovered;
@@ -532,6 +517,5 @@ class _ScrollProgressPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(_ScrollProgressPainter old) =>
-      progress != old.progress ||
-      hovered != old.hovered;
+      progress != old.progress || hovered != old.hovered;
 }

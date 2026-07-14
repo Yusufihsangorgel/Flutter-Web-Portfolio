@@ -1,28 +1,25 @@
 {
   "name": "flutter-web-portfolio",
   "version": "1.0.0",
-  "description": "<div align=\"center\">",
-  "main": "index.js",
-  "directories": {
-    "doc": "doc",
-    "lib": "lib",
-    "test": "test"
-  },
+  "private": true,
+  "description": "Flutter WebAssembly portfolio with Playwright release verification.",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "playwright test",
+    "test:e2e": "playwright test",
+    "test:e2e:prod": "playwright test --config playwright.prod.config.ts",
+    "verify:bundle": "node tool/verify_web_build.mjs"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/Yusufihsangorgel/Flutter-Web-Portfolio.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": [
+    "flutter",
+    "flutter-web",
+    "webassembly",
+    "skwasm",
+    "playwright",
+    "portfolio"
+  ],
+  "license": "MIT",
   "type": "commonjs",
-  "bugs": {
-    "url": "https://github.com/Yusufihsangorgel/Flutter-Web-Portfolio/issues"
-  },
-  "homepage": "https://github.com/Yusufihsangorgel/Flutter-Web-Portfolio#readme",
+  "homepage": "https://developeryusuf.com",
   "devDependencies": {
     "@playwright/test": "^1.59.1"
   }

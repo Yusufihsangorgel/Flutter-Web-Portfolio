@@ -30,10 +30,12 @@ class _AnimatedCounterState extends State<AnimatedCounter>
     super.initState();
     _controller = AnimationController(vsync: this, duration: widget.duration);
     _animation = Tween<double>(begin: 0, end: widget.endValue.toDouble())
-        .animate(CurvedAnimation(
-      parent: _controller,
-      curve: CinematicCurves.revealDecel,
-    ));
+        .animate(
+          CurvedAnimation(
+            parent: _controller,
+            curve: CinematicCurves.revealDecel,
+          ),
+        );
     _controller.forward();
   }
 
@@ -42,10 +44,12 @@ class _AnimatedCounterState extends State<AnimatedCounter>
     super.didUpdateWidget(oldWidget);
     if (oldWidget.endValue != widget.endValue) {
       _animation = Tween<double>(begin: 0, end: widget.endValue.toDouble())
-          .animate(CurvedAnimation(
-        parent: _controller,
-        curve: CinematicCurves.revealDecel,
-      ));
+          .animate(
+            CurvedAnimation(
+              parent: _controller,
+              curve: CinematicCurves.revealDecel,
+            ),
+          );
       _controller
         ..reset()
         ..forward();
@@ -60,10 +64,7 @@ class _AnimatedCounterState extends State<AnimatedCounter>
 
   @override
   Widget build(BuildContext context) => AnimatedBuilder(
-        animation: _animation,
-        builder: (_, __) => Text(
-          '${_animation.value.toInt()}',
-          style: widget.style,
-        ),
-      );
+    animation: _animation,
+    builder: (_, _) => Text('${_animation.value.toInt()}', style: widget.style),
+  );
 }
