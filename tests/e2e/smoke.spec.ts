@@ -7,6 +7,7 @@ async function openPortfolio(page: Page) {
     timeout: 20000,
   });
   await expect(page.getByRole('heading').first()).toBeAttached();
+  await expect(page.locator('#bootstrap-surface')).toHaveCount(0);
 }
 
 test('boots the Flutter experience without browser errors', async ({ page }) => {
@@ -175,7 +176,9 @@ test('exposes the live Engineering Lab through the keyboard', async ({ page }) =
 test('keeps section hashes synchronized with browser history', async ({ page }) => {
   await openPortfolio(page);
   await page.keyboard.press('Control+KeyK');
-  await page.getByText('Go to Projects', { exact: true }).click({ force: true });
+  const projectsCommand = page.getByText('Go to Projects', { exact: true });
+  await expect(projectsCommand).toBeVisible();
+  await projectsCommand.click();
   await expect(page).toHaveURL(/#\/projects$/);
 
   await page.goBack();
