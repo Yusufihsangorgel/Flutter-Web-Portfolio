@@ -209,6 +209,8 @@ async function measureRun(browserInstance, run) {
 
     assertTimeline(pageMetrics.marks);
     const sortedIntervals = [...frameIntervals].sort((a, b) => a - b);
+    const medianFrameInterval = percentile(sortedIntervals, 0.5);
+    const p95FrameInterval = percentile(sortedIntervals, 0.95);
     const longTaskTotal = pageMetrics.vitals.longTasks.reduce(
       (total, duration) => total + duration,
       0,
@@ -249,7 +251,12 @@ async function measureRun(browserInstance, run) {
       dom_content_loaded_ms: round(pageMetrics.domContentLoaded),
       wasm_duration_ms: round(pageMetrics.wasmDuration),
       wasm_transfer_bytes: pageMetrics.wasmTransferBytes,
-      scroll_frame_p95_ms: round(percentile(sortedIntervals, 0.95)),
+      scroll_frame_median_ms: round(medianFrameInterval),
+      scroll_frame_p95_ms: round(p95FrameInterval),
+      scroll_frame_p95_over_median_ratio: round(
+        medianFrameInterval > 0 ? p95FrameInterval / medianFrameInterval : 0,
+        3,
+      ),
       scroll_frames_over_50_ms: frameIntervals.filter((value) => value > 50)
         .length,
       long_task_total_ms: round(longTaskTotal),
@@ -318,7 +325,13 @@ function assertTimeline(marks) {
 }
 
 function summarize(samples) {
-  const metrics = Object.keys(budget.maximum_median);
+  const metrics = [
+    ...new Set([
+      ...Object.keys(budget.maximum_median),
+      'scroll_frame_median_ms',
+      'scroll_frame_p95_ms',
+    ]),
+  ];
   return Object.fromEntries(
     metrics.map((metric) => [
       metric,

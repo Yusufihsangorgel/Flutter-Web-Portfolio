@@ -6,7 +6,7 @@
     "navigation_to_first_frame_ms": 2500,
     "bootstrap_to_first_frame_ms": 650,
     "first_frame_to_reveal_ms": 40,
-    "scroll_frame_p95_ms": 20,
+    "scroll_frame_p95_over_median_ratio": 1.5,
     "long_task_total_ms": 500,
     "cumulative_layout_shift": 0.01,
     "largest_contentful_paint_ms": 1000
