@@ -120,6 +120,33 @@ try {
   if (!index.includes('Preparing the portfolio')) {
     failures.push('the instant portfolio shell status is missing');
   }
+  const bootstrap = await readFile(
+    path.join(webRoot, 'flutter_bootstrap.js'),
+    'utf8',
+  );
+  const releaseId = bootstrap.match(
+    /"mainWasmPath":"main\.dart\.wasm\?v=([0-9a-f]{16})"/,
+  )?.[1];
+  const engineRevision = bootstrap.match(
+    /"engineRevision":"([0-9a-f]{40})"/,
+  )?.[1];
+  if (!releaseId || !engineRevision) {
+    failures.push('critical preload identifiers cannot be derived');
+  } else {
+    const expectedHints = [
+      `rel="preload" href="main.dart.wasm?v=${releaseId}" as="fetch" type="application/wasm" crossorigin fetchpriority="high"`,
+      `rel="modulepreload" href="main.dart.mjs?v=${releaseId}" crossorigin fetchpriority="high"`,
+      `rel="preload" href="canvaskit/${engineRevision}/skwasm.wasm" as="fetch" type="application/wasm" crossorigin fetchpriority="high"`,
+    ];
+    for (const hint of expectedHints) {
+      if (!index.includes(hint)) {
+        failures.push(`index.html is missing critical hint: ${hint}`);
+      }
+    }
+    if ((index.match(/<!-- release-preloads:start -->/g) ?? []).length !== 1) {
+      failures.push('index.html must contain exactly one critical preload block');
+    }
+  }
 } catch {
   failures.push('index.html is missing');
 }
@@ -165,6 +192,12 @@ try {
   }
   if (!bootstrap.includes("window.addEventListener('flutter-first-frame'")) {
     failures.push('custom first-frame bootstrap cleanup is missing');
+  }
+  if (
+    !bootstrap.includes('window.requestAnimationFrame(() => {') ||
+    !bootstrap.includes('window.requestAnimationFrame(removeBootstrapSurface)')
+  ) {
+    failures.push('the first-frame reveal is not compositor-safe');
   }
   if (
     !bootstrap.includes('fontFallbackBaseUrl: new URL(') ||

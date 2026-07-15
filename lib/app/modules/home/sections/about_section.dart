@@ -3,199 +3,306 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
 import 'package:flutter_web_portfolio/app/core/constants/breakpoints.dart';
 import 'package:flutter_web_portfolio/app/core/theme/app_fonts.dart';
-import 'package:flutter_web_portfolio/app/core/theme/app_typography.dart';
 import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
 import 'package:flutter_web_portfolio/app/widgets/numbered_section_heading.dart';
 import 'package:flutter_web_portfolio/app/widgets/scene_accent_builder.dart';
 
-/// Personal, professional context without publishing private identity details.
+/// Professional context and the complete capability ledger.
+///
+/// The public surface remains identity-safe, while preserving the substantive
+/// career history, scope, and technical profile expected from a portfolio.
 class AboutSection extends StatelessWidget {
   const AboutSection({super.key});
 
   @override
-  Widget build(BuildContext context) =>
-      BlocBuilder<LanguageCubit, LanguageState>(
-        builder: (context, _) {
-          final language = context.read<LanguageCubit>();
-          final personal =
-              language.cvData['personal_info'] as Map<String, dynamic>? ??
-              const <String, dynamic>{};
-          final skills = (language.cvData['skills'] as List? ?? const [])
-              .whereType<Map<String, dynamic>>()
-              .toList();
-
-          return ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 1100),
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                final stacked = constraints.maxWidth < Breakpoints.desktop;
-                final biography = _Biography(
-                  personal: personal,
-                  language: language,
-                );
-                final skillSummary = _SkillSummary(skills: skills);
-
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SceneAccentBuilder(
-                      builder: (context, accent) => NumberedSectionHeading(
-                        number: '01',
-                        title: language.getText(
-                          'about_section.title',
-                          defaultValue: 'About Me',
-                        ),
-                        accent: accent,
-                      ),
-                    ),
-                    const SizedBox(height: 36),
-                    if (stacked)
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          biography,
-                          const SizedBox(height: 32),
-                          skillSummary,
-                        ],
-                      )
-                    else
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Expanded(flex: 5, child: biography),
-                          const SizedBox(width: 64),
-                          Expanded(flex: 4, child: skillSummary),
-                        ],
-                      ),
-                  ],
-                );
-              },
-            ),
+  Widget build(
+    BuildContext context,
+  ) => BlocBuilder<LanguageCubit, LanguageState>(
+    builder: (context, _) {
+      final language = context.read<LanguageCubit>();
+      final personal =
+          language.cvData['personal_info'] as Map<String, dynamic>? ??
+          const <String, dynamic>{};
+      final skills = (language.cvData['skills'] as List? ?? const [])
+          .whereType<Map<String, dynamic>>()
+          .toList();
+      final bio =
+          personal['bio'] as String? ??
+          language.getText(
+            'about_section.bio',
+            defaultValue:
+                'I build production Flutter applications across mobile, desktop, and web.',
           );
-        },
+
+      return ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 1160),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SceneAccentBuilder(
+              builder: (context, accent) => NumberedSectionHeading(
+                number: '01',
+                title: language.getText(
+                  'about_section.title',
+                  defaultValue: 'About Me',
+                ),
+                accent: accent,
+              ),
+            ),
+            SizedBox(
+              height: MediaQuery.sizeOf(context).width < Breakpoints.tablet
+                  ? 46
+                  : 76,
+            ),
+            Semantics(
+              label: bio,
+              excludeSemantics: true,
+              child: ExcludeSemantics(
+                child: Text(
+                  bio,
+                  style: AppFonts.spaceGrotesk(
+                    fontSize:
+                        MediaQuery.sizeOf(context).width < Breakpoints.tablet
+                        ? 30
+                        : 47,
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.textBright,
+                    height: 1.13,
+                    letterSpacing: -1.5,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 42),
+            _ContextRail(personal: personal, language: language),
+            const SizedBox(height: 72),
+            _CapabilityLedger(skills: skills),
+          ],
+        ),
       );
+    },
+  );
 }
 
-class _Biography extends StatelessWidget {
-  const _Biography({required this.personal, required this.language});
+class _ContextRail extends StatelessWidget {
+  const _ContextRail({required this.personal, required this.language});
 
   final Map<String, dynamic> personal;
   final LanguageCubit language;
+
+  @override
+  Widget build(BuildContext context) {
+    final compact = MediaQuery.sizeOf(context).width < Breakpoints.tablet;
+    final detail = language.getText(
+      'about_section.bio2',
+      defaultValue:
+          'Alongside client work, I design and operate independent SaaS products end to end.',
+    );
+    final location = personal['location'] as String? ?? 'Remote';
+    final tagline = personal['tagline'] as String? ?? '';
+    final metadata = _AtlasMetadata(location: location, tagline: tagline);
+
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 22),
+      decoration: const BoxDecoration(
+        border: Border(
+          top: BorderSide(color: Color(0x36DFFF3F)),
+          bottom: BorderSide(color: Color(0x24F2F0E9)),
+        ),
+      ),
+      child: compact
+          ? Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  detail,
+                  style: AppFonts.inter(
+                    fontSize: 15,
+                    color: AppColors.textPrimary,
+                    height: 1.7,
+                  ),
+                ),
+                const SizedBox(height: 26),
+                metadata,
+              ],
+            )
+          : Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  flex: 7,
+                  child: Text(
+                    detail,
+                    style: AppFonts.inter(
+                      fontSize: 16,
+                      color: AppColors.textPrimary,
+                      height: 1.75,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 80),
+                Expanded(flex: 4, child: metadata),
+              ],
+            ),
+    );
+  }
+}
+
+class _AtlasMetadata extends StatelessWidget {
+  const _AtlasMetadata({required this.location, required this.tagline});
+
+  final String location;
+  final String tagline;
+
+  @override
+  Widget build(BuildContext context) => ExcludeSemantics(
+    child: Row(
+      children: [
+        Expanded(
+          child: _MetadataField(label: 'BASE', value: location),
+        ),
+        const SizedBox(width: 22),
+        Expanded(
+          child: _MetadataField(label: 'MODE', value: tagline),
+        ),
+        const SizedBox(width: 22),
+        const Expanded(
+          child: _MetadataField(label: 'SINCE', value: '2021'),
+        ),
+      ],
+    ),
+  );
+}
+
+class _MetadataField extends StatelessWidget {
+  const _MetadataField({required this.label, required this.value});
+  final String label;
+  final String value;
 
   @override
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
       Text(
-        personal['bio'] as String? ??
-            language.getText(
-              'about_section.bio',
-              defaultValue:
-                  'I build production Flutter applications across mobile, desktop, and web.',
-            ),
-        style: AppFonts.spaceGrotesk(
-          fontSize: 27,
-          fontWeight: FontWeight.w500,
-          color: AppColors.textBright,
-          height: 1.45,
-          letterSpacing: -0.5,
+        label,
+        style: AppFonts.jetBrainsMono(
+          fontSize: 8,
+          color: AppColors.aboutAccent,
+          letterSpacing: 1.2,
         ),
       ),
-      const SizedBox(height: 24),
+      const SizedBox(height: 8),
       Text(
-        language.getText(
-          'about_section.bio2',
-          defaultValue:
-              'Alongside client work, I design and operate independent SaaS products end to end.',
+        value.toUpperCase(),
+        maxLines: 2,
+        overflow: TextOverflow.ellipsis,
+        style: AppFonts.jetBrainsMono(
+          fontSize: 9,
+          fontWeight: FontWeight.w600,
+          color: AppColors.textBright,
+          height: 1.45,
+          letterSpacing: 0.55,
         ),
-        style: AppTypography.body.copyWith(height: 1.75),
       ),
     ],
   );
 }
 
-class _SkillSummary extends StatelessWidget {
-  const _SkillSummary({required this.skills});
-
+class _CapabilityLedger extends StatelessWidget {
+  const _CapabilityLedger({required this.skills});
   final List<Map<String, dynamic>> skills;
 
   @override
-  Widget build(BuildContext context) => SceneAccentBuilder(
-    builder: (context, accent) => Container(
-      padding: const EdgeInsets.all(26),
-      decoration: BoxDecoration(
-        color: AppColors.backgroundLight.withValues(alpha: 0.68),
-        borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.09)),
-      ),
-      child: Column(
+  Widget build(BuildContext context) => LayoutBuilder(
+    builder: (context, constraints) {
+      final desktop = constraints.maxWidth >= 900;
+      if (!desktop) {
+        return Column(
+          children: [
+            for (var index = 0; index < skills.length; index++)
+              _CapabilityField(skill: skills[index], index: index),
+          ],
+        );
+      }
+      return Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           for (var index = 0; index < skills.length; index++) ...[
-            _SkillRow(skill: skills[index], accent: accent),
-            if (index < skills.length - 1)
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 18),
-                child: Divider(
-                  height: 1,
-                  color: Colors.white.withValues(alpha: 0.07),
-                ),
-              ),
+            Expanded(
+              child: _CapabilityField(skill: skills[index], index: index),
+            ),
+            if (index < skills.length - 1) const SizedBox(width: 28),
           ],
         ],
-      ),
-    ),
+      );
+    },
   );
 }
 
-class _SkillRow extends StatelessWidget {
-  const _SkillRow({required this.skill, required this.accent});
+class _CapabilityField extends StatelessWidget {
+  const _CapabilityField({required this.skill, required this.index});
 
   final Map<String, dynamic> skill;
-  final Color accent;
+  final int index;
 
   @override
   Widget build(BuildContext context) {
     final category = skill['category'] as String? ?? '';
-    final items = (skill['items'] as List? ?? const [])
-        .whereType<String>()
-        .take(4)
-        .join(' · ');
-
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
-          width: 7,
-          height: 7,
-          margin: const EdgeInsets.only(top: 7),
-          decoration: BoxDecoration(color: accent, shape: BoxShape.circle),
-        ),
-        const SizedBox(width: 14),
-        Expanded(
-          child: Column(
+    final items = (skill['items'] as List? ?? const []).whereType<String>();
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 22),
+      decoration: const BoxDecoration(
+        border: Border(top: BorderSide(color: Color(0x3DDFFF3F))),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                category,
-                style: AppFonts.spaceGrotesk(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.textBright,
+                '${index + 1}'.padLeft(2, '0'),
+                style: AppFonts.jetBrainsMono(
+                  fontSize: 9,
+                  color: AppColors.aboutAccent,
                 ),
               ),
-              const SizedBox(height: 5),
+              const Spacer(),
               Text(
-                items,
+                'FIELD',
                 style: AppFonts.jetBrainsMono(
-                  fontSize: 12,
+                  fontSize: 8,
                   color: AppColors.textSecondary,
-                  height: 1.55,
+                  letterSpacing: 1,
                 ),
               ),
             ],
           ),
-        ),
-      ],
+          const SizedBox(height: 28),
+          Text(
+            category,
+            style: AppFonts.instrumentSerif(
+              fontSize: 34,
+              fontStyle: FontStyle.italic,
+              color: AppColors.textBright,
+              height: 0.95,
+            ),
+          ),
+          const SizedBox(height: 18),
+          for (final item in items)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: Text(
+                item,
+                style: AppFonts.jetBrainsMono(
+                  fontSize: 10,
+                  color: AppColors.textPrimary,
+                  height: 1.4,
+                ),
+              ),
+            ),
+        ],
+      ),
     );
   }
 }

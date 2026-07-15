@@ -87,5 +87,20 @@ flutter:
           weight: 700
         - asset: assets/fonts/jetbrains_mono/JetBrainsMono-Variable.ttf
           weight: 800
+    - family: Instrument Serif
+      fonts:
+        - asset: assets/fonts/instrument_serif/InstrumentSerif-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/instrument_serif/InstrumentSerif-Italic.ttf
+          weight: 400
+          style: italic
+    - family: Noto Sans Arabic
+      fonts:
+        - asset: assets/fonts/noto_sans_arabic/NotoSansArabic-Variable.ttf
+          weight: 400
+    - family: Noto Sans Devanagari
+      fonts:
+        - asset: assets/fonts/noto_sans_devanagari/NotoSansDevanagari-Variable.ttf
+          weight: 400
 
   generate: true

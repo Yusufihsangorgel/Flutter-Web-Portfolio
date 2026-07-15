@@ -17,7 +17,7 @@ void main() {
         ),
       );
 
-      expect(find.text('01.'), findsOneWidget);
+      expect(find.text('CHAPTER / 01'), findsOneWidget);
     });
 
     testWidgets('renders title text', (tester) async {
@@ -49,18 +49,7 @@ void main() {
         ),
       );
 
-      // The divider is a Container with height 1 and width 100
-      final containers = tester.widgetList<Container>(find.byType(Container));
-
-      final hasDivider = containers.any((container) {
-        final constraints = container.constraints;
-        if (constraints != null) {
-          return constraints.maxHeight == 1 && constraints.maxWidth == 100;
-        }
-        return false;
-      });
-
-      expect(hasDivider, isTrue);
+      expect(find.byKey(const ValueKey('chapter-divider')), findsOneWidget);
     });
 
     testWidgets('exposes one level-two heading', (tester) async {

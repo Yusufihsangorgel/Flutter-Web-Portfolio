@@ -9,6 +9,15 @@ const removeBootstrapSurface = () => {
   window.setTimeout(() => splash.remove(), 220);
 };
 
+// Flutter dispatches its first-frame event while the browser is still
+// compositing that frame. Keeping the matching HTML surface for two browser
+// frames prevents a one-frame dark flash on cold GPU/Wasm starts.
+const revealFlutterSurface = () => {
+  window.requestAnimationFrame(() => {
+    window.requestAnimationFrame(removeBootstrapSurface);
+  });
+};
+
 const showBootstrapFailure = (error) => {
   console.error('Flutter bootstrap failed', error);
   const splash = document.getElementById('bootstrap-surface');
@@ -54,7 +63,7 @@ const engineConfig = {
 _flutter.loader.load({
   config: engineConfig,
   onEntrypointLoaded: async function onEntrypointLoaded(engineInitializer) {
-    window.addEventListener('flutter-first-frame', removeBootstrapSurface, {
+    window.addEventListener('flutter-first-frame', revealFlutterSurface, {
       once: true,
     });
     const appRunner = await engineInitializer.initializeEngine(engineConfig);

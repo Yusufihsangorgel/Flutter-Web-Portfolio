@@ -21,10 +21,9 @@ import 'package:flutter_web_portfolio/app/widgets/command_palette.dart';
 import 'package:flutter_web_portfolio/app/widgets/custom_sliver_app_bar.dart';
 import 'package:flutter_web_portfolio/app/widgets/premium_footer.dart';
 import 'package:flutter_web_portfolio/app/widgets/background/cinematic_background.dart';
-import 'package:flutter_web_portfolio/app/widgets/constellation_particles.dart';
 
 /// Single-document portfolio with chapter-aware background transitions.
-/// Layer stack: dark base, mesh gradient, particles, and content.
+/// Layer stack: procedural Render Atlas and one semantic content document.
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
 
@@ -99,44 +98,8 @@ class _HomeViewState extends State<HomeView> {
     List<String> active,
   ) => Stack(
     children: [
-      Positioned.fill(
-        child: RepaintBoundary(
-          child: ListenableBuilder(
-            listenable: scrollController.scrollController,
-            builder: (_, child) {
-              final offset = scrollController.scrollController.hasClients
-                  ? scrollController.scrollController.offset
-                  : 0.0;
-              return Transform.translate(
-                offset: Offset(0, -offset * 0.3),
-                child: child,
-              );
-            },
-            child: const CinematicBackground(),
-          ),
-        ),
-      ),
-      Positioned.fill(
-        child: RepaintBoundary(
-          child: ListenableBuilder(
-            listenable: scrollController.scrollController,
-            builder: (_, child) {
-              final offset = scrollController.scrollController.hasClients
-                  ? scrollController.scrollController.offset
-                  : 0.0;
-              return Transform.translate(
-                offset: Offset(0, -offset * 0.15),
-                child: child,
-              );
-            },
-            child: ConstellationParticles(
-              particleCount:
-                  MediaQuery.sizeOf(context).width < Breakpoints.mobile
-                  ? 10
-                  : 20,
-            ),
-          ),
-        ),
+      const Positioned.fill(
+        child: RepaintBoundary(child: CinematicBackground()),
       ),
       // Skip-to-content link (accessibility)
       Positioned(
@@ -233,7 +196,7 @@ class _HomeViewState extends State<HomeView> {
         : (width > Breakpoints.tablet
               ? AppDimensions.sectionPaddingTablet
               : AppDimensions.sectionPaddingMobile);
-    final vertical = width > Breakpoints.tablet ? 40.0 : 28.0;
+    final vertical = width > Breakpoints.tablet ? 96.0 : 58.0;
     return EdgeInsets.symmetric(vertical: vertical, horizontal: horizontal);
   }
 
@@ -273,7 +236,7 @@ class _NarrativeBridge extends StatelessWidget {
         child: Padding(
           padding: EdgeInsets.symmetric(horizontal: horizontal),
           child: SizedBox(
-            height: width > Breakpoints.tablet ? 64 : 48,
+            height: width > Breakpoints.tablet ? 116 : 72,
             child: Row(
               children: [
                 _ChapterIndex(value: from, color: fromColor),

@@ -1,4 +1,4 @@
-import 'dart:ui';
+import 'dart:ui' show lerpDouble;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -15,7 +15,7 @@ import 'package:flutter_web_portfolio/app/widgets/fullscreen_menu.dart';
 import 'package:flutter_web_portfolio/app/widgets/language_switcher.dart';
 import 'package:flutter_web_portfolio/app/widgets/scene_accent_builder.dart';
 
-/// Minimal floating navigation for the single-page document.
+/// Compact atlas navigation for the single-page document.
 /// Shrinks from 80px to 60px as the user scrolls down (200px threshold).
 class CustomSliverAppBar extends StatefulWidget {
   const CustomSliverAppBar({
@@ -101,16 +101,11 @@ class _CustomSliverAppBarState extends State<CustomSliverAppBar> {
       flexibleSpace: Column(
         children: [
           Expanded(
-            child: ClipRect(
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: AppColors.background.withValues(alpha: 0.75),
-                    border: const Border(
-                      bottom: BorderSide(color: Color(0x0DFFFFFF), width: 1),
-                    ),
-                  ),
+            child: Container(
+              decoration: BoxDecoration(
+                color: AppColors.background.withValues(alpha: 0.94),
+                border: const Border(
+                  bottom: BorderSide(color: Color(0x24F2F0E9), width: 1),
                 ),
               ),
             ),
@@ -181,7 +176,7 @@ class _CustomSliverAppBarState extends State<CustomSliverAppBar> {
 }
 
 // ---------------------------------------------------------------------------
-// Logo: "YG" — Space Grotesk Bold, hover glow
+// Identity-safe role mark.
 // ---------------------------------------------------------------------------
 class _LogoText extends StatefulWidget {
   const _LogoText({
@@ -205,7 +200,7 @@ class _LogoTextState extends State<_LogoText> {
   @override
   Widget build(BuildContext context) {
     const baseColor = AppColors.textBright;
-    const hoverColor = Colors.white;
+    const hoverColor = AppColors.heroAccent;
 
     return CinematicFocusable(
       onTap: widget.onTap,
@@ -215,19 +210,11 @@ class _LogoTextState extends State<_LogoText> {
         duration: AppDurations.buttonHover,
         child: Text(
           AppConfig.initials(widget.languageController),
-          style: AppFonts.spaceGrotesk(
-            fontSize: 20 * widget.scaleFactor,
-            fontWeight: FontWeight.w700,
+          style: AppFonts.jetBrainsMono(
+            fontSize: 11 * widget.scaleFactor,
+            fontWeight: FontWeight.w600,
             color: _hovered ? hoverColor : baseColor,
-            letterSpacing: 1,
-            shadows: _hovered
-                ? [
-                    Shadow(
-                      color: hoverColor.withValues(alpha: 0.3),
-                      blurRadius: 12,
-                    ),
-                  ]
-                : [],
+            letterSpacing: 1.8,
           ),
         ),
       ),
@@ -276,13 +263,13 @@ class _NavItemState extends State<_NavItem> {
           children: [
             Text(
               widget.label.toUpperCase(),
-              style: AppFonts.spaceGrotesk(
-                fontSize: 12 * widget.scaleFactor,
+              style: AppFonts.jetBrainsMono(
+                fontSize: 9 * widget.scaleFactor,
                 fontWeight: widget.isActive ? FontWeight.w600 : FontWeight.w400,
                 color: widget.isActive
                     ? activeColor
                     : (_hovered ? activeColor : inactiveColor),
-                letterSpacing: 2,
+                letterSpacing: 1.25,
               ),
             ),
             const SizedBox(height: 4),
@@ -357,12 +344,6 @@ class _SceneProgressBarState extends State<_SceneProgressBar> {
                 gradient: LinearGradient(
                   colors: [accent.withValues(alpha: 0.2), accent],
                 ),
-                boxShadow: [
-                  BoxShadow(
-                    color: accent.withValues(alpha: 0.3),
-                    blurRadius: 4,
-                  ),
-                ],
               ),
             ),
           ],

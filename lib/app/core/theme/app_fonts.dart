@@ -11,6 +11,63 @@ abstract final class AppFonts {
   static const interFamily = 'Inter';
   static const spaceGroteskFamily = 'Space Grotesk';
   static const jetBrainsMonoFamily = 'JetBrains Mono';
+  static const instrumentSerifFamily = 'Instrument Serif';
+  static const notoSansArabicFamily = 'Noto Sans Arabic';
+  static const notoSansDevanagariFamily = 'Noto Sans Devanagari';
+  static const scriptFallbackFamilies = [
+    notoSansArabicFamily,
+    notoSansDevanagariFamily,
+  ];
+
+  static TextStyle instrumentSerif({
+    TextStyle? textStyle,
+    Color? color,
+    Color? backgroundColor,
+    double? fontSize,
+    FontWeight? fontWeight,
+    FontStyle? fontStyle,
+    double? letterSpacing,
+    double? wordSpacing,
+    TextBaseline? textBaseline,
+    double? height,
+    Locale? locale,
+    Paint? foreground,
+    Paint? background,
+    List<ui.Shadow>? shadows,
+    List<ui.FontFeature>? fontFeatures,
+    TextDecoration? decoration,
+    Color? decorationColor,
+    TextDecorationStyle? decorationStyle,
+    double? decorationThickness,
+  }) => _style(
+    family: instrumentSerifFamily,
+    fallback: const [
+      spaceGroteskFamily,
+      interFamily,
+      notoSansArabicFamily,
+      notoSansDevanagariFamily,
+      'serif',
+    ],
+    textStyle: textStyle,
+    color: color,
+    backgroundColor: backgroundColor,
+    fontSize: fontSize,
+    fontWeight: fontWeight,
+    fontStyle: fontStyle,
+    letterSpacing: letterSpacing,
+    wordSpacing: wordSpacing,
+    textBaseline: textBaseline,
+    height: height,
+    locale: locale,
+    foreground: foreground,
+    background: background,
+    shadows: shadows,
+    fontFeatures: fontFeatures,
+    decoration: decoration,
+    decorationColor: decorationColor,
+    decorationStyle: decorationStyle,
+    decorationThickness: decorationThickness,
+  );
 
   static TextStyle inter({
     TextStyle? textStyle,
@@ -34,7 +91,12 @@ abstract final class AppFonts {
     double? decorationThickness,
   }) => _style(
     family: interFamily,
-    fallback: const ['Arial', 'sans-serif'],
+    fallback: const [
+      notoSansArabicFamily,
+      notoSansDevanagariFamily,
+      'Arial',
+      'sans-serif',
+    ],
     textStyle: textStyle,
     color: color,
     backgroundColor: backgroundColor,
@@ -78,7 +140,13 @@ abstract final class AppFonts {
     double? decorationThickness,
   }) => _style(
     family: spaceGroteskFamily,
-    fallback: const [interFamily, 'Arial', 'sans-serif'],
+    fallback: const [
+      interFamily,
+      notoSansArabicFamily,
+      notoSansDevanagariFamily,
+      'Arial',
+      'sans-serif',
+    ],
     textStyle: textStyle,
     color: color,
     backgroundColor: backgroundColor,
@@ -122,7 +190,11 @@ abstract final class AppFonts {
     double? decorationThickness,
   }) => _style(
     family: jetBrainsMonoFamily,
-    fallback: const ['monospace'],
+    fallback: const [
+      notoSansArabicFamily,
+      notoSansDevanagariFamily,
+      'monospace',
+    ],
     textStyle: textStyle,
     color: color,
     backgroundColor: backgroundColor,

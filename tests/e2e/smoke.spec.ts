@@ -195,6 +195,40 @@ test('runs the Wasm/SkWasm path with cross-origin isolation', async ({ page }) =
   expect(runtime.url()).toMatch(/main\.dart\.mjs\?v=[0-9a-f]{16}$/);
   expect(runtime.headers()['content-type']).toContain('javascript');
   expect(renderer.status()).toBe(200);
+  const preloadHints = await page.locator('head link').evaluateAll((links) =>
+    links.map((link) => ({
+      rel: link.getAttribute('rel'),
+      href: link.getAttribute('href'),
+      as: link.getAttribute('as'),
+      type: link.getAttribute('type'),
+      fetchpriority: link.getAttribute('fetchpriority'),
+    })),
+  );
+  expect(preloadHints).toEqual(
+    expect.arrayContaining([
+      expect.objectContaining({
+        rel: 'preload',
+        href: expect.stringMatching(/^main\.dart\.wasm\?v=[0-9a-f]{16}$/),
+        as: 'fetch',
+        type: 'application/wasm',
+        fetchpriority: 'high',
+      }),
+      expect.objectContaining({
+        rel: 'modulepreload',
+        href: expect.stringMatching(/^main\.dart\.mjs\?v=[0-9a-f]{16}$/),
+        fetchpriority: 'high',
+      }),
+      expect.objectContaining({
+        rel: 'preload',
+        href: expect.stringMatching(
+          /^canvaskit\/[0-9a-f]{40}\/skwasm\.wasm$/,
+        ),
+        as: 'fetch',
+        type: 'application/wasm',
+        fetchpriority: 'high',
+      }),
+    ]),
+  );
   expect(documentResponse?.headers()['cross-origin-opener-policy']).toBe(
     'same-origin',
   );
@@ -239,6 +273,17 @@ test('serves same-origin fallback fonts without masking missing assets', async (
   );
   expect(font.status()).toBe(200);
   expect(font.headers()['content-type']).toContain('font/woff2');
+
+  for (const path of [
+    '/assets/assets/fonts/inter/Inter-Variable.ttf',
+    '/assets/assets/fonts/instrument_serif/InstrumentSerif-Regular.ttf',
+    '/assets/assets/fonts/noto_sans_arabic/NotoSansArabic-Variable.ttf',
+    '/assets/assets/fonts/noto_sans_devanagari/NotoSansDevanagari-Variable.ttf',
+  ]) {
+    const appFont = await request.get(path);
+    expect(appFont.status(), path).toBe(200);
+    expect(appFont.headers()['content-type'], path).toContain('font/ttf');
+  }
 
   const missing = await request.get('/assets/fallback_fonts/missing.woff2');
   expect(missing.status()).toBe(404);
@@ -294,6 +339,18 @@ test('switches to the application-owned Arabic catalog', async ({ page }) => {
   await expect(
     page.getByText('الانتقال إلى المشاريع', { exact: true }),
   ).toBeVisible();
+});
+
+test('switches to the application-owned Hindi catalog', async ({ page }) => {
+  await openPortfolio(page);
+  await page.keyboard.press('Control+KeyK');
+  await page.getByText('Switch to हिन्दी', { exact: true }).click();
+
+  await expect
+    .poll(() => page.locator('html').getAttribute('lang'))
+    .toBe('hi');
+  await expect(page.locator('html')).toHaveAttribute('dir', 'ltr');
+  await expect(page.getByText('प्रोजेक्ट देखें', { exact: true })).toBeAttached();
 });
 
 test('keeps section hashes synchronized with browser history', async ({ page }) => {

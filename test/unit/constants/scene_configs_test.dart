@@ -39,16 +39,11 @@ void main() {
       }
     });
 
-    test('particleDensity is positive for all scenes', () {
-      for (final scene in SceneConfigs.scenes) {
-        expect(scene.particleDensity, greaterThan(0.0));
-      }
-    });
-
-    test('particleSpeed is positive for all scenes', () {
-      for (final scene in SceneConfigs.scenes) {
-        expect(scene.particleSpeed, greaterThan(0.0));
-      }
+    test('atlas morph advances once per chapter', () {
+      expect(
+        SceneConfigs.scenes.map((scene) => scene.atlasMorph),
+        orderedEquals(const [0, 1, 2, 3, 4]),
+      );
     });
 
     test('vignetteIntensity is between 0 and 1 for all scenes', () {
@@ -70,8 +65,7 @@ void main() {
       expect(result.gradient2, equals(a.gradient2));
       expect(result.gradient3, equals(a.gradient3));
       expect(result.accent, equals(a.accent));
-      expect(result.particleDensity, equals(a.particleDensity));
-      expect(result.particleSpeed, equals(a.particleSpeed));
+      expect(result.atlasMorph, equals(a.atlasMorph));
       expect(result.vignetteIntensity, equals(a.vignetteIntensity));
     });
 
@@ -82,8 +76,7 @@ void main() {
       expect(result.gradient2, equals(b.gradient2));
       expect(result.gradient3, equals(b.gradient3));
       expect(result.accent, equals(b.accent));
-      expect(result.particleDensity, equals(b.particleDensity));
-      expect(result.particleSpeed, equals(b.particleSpeed));
+      expect(result.atlasMorph, equals(b.atlasMorph));
       expect(result.vignetteIntensity, equals(b.vignetteIntensity));
     });
 
@@ -107,16 +100,12 @@ void main() {
 
     test('t=0.5 interpolates numeric values to midpoint', () {
       final result = SceneConfig.lerp(a, b, 0.5);
-      final expectedDensity =
-          a.particleDensity + (b.particleDensity - a.particleDensity) * 0.5;
-      final expectedSpeed =
-          a.particleSpeed + (b.particleSpeed - a.particleSpeed) * 0.5;
+      final expectedMorph = a.atlasMorph + (b.atlasMorph - a.atlasMorph) * 0.5;
       final expectedVignette =
           a.vignetteIntensity +
           (b.vignetteIntensity - a.vignetteIntensity) * 0.5;
 
-      expect(result.particleDensity, closeTo(expectedDensity, 0.001));
-      expect(result.particleSpeed, closeTo(expectedSpeed, 0.001));
+      expect(result.atlasMorph, closeTo(expectedMorph, 0.001));
       expect(result.vignetteIntensity, closeTo(expectedVignette, 0.001));
     });
 
@@ -125,8 +114,7 @@ void main() {
 
       expect(result.gradient1, equals(a.gradient1));
       expect(result.accent, equals(a.accent));
-      expect(result.particleDensity, equals(a.particleDensity));
-      expect(result.particleSpeed, equals(a.particleSpeed));
+      expect(result.atlasMorph, equals(a.atlasMorph));
     });
   });
 }

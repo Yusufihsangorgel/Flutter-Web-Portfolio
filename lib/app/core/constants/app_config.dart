@@ -4,9 +4,8 @@ import 'package:flutter_web_portfolio/app/features/language/application/language
 
 /// Central configuration resolved from i18n JSON at runtime.
 ///
-/// **For fork users**: customise your portfolio by editing only the
-/// `assets/i18n/*.json` files. Public-facing labels and optional links are
-/// pulled from there at startup.
+/// Public content remains data-driven through `assets/i18n/*.json`, keeping
+/// locale changes separate from layout and rendering code.
 ///
 /// This class provides typed helpers so widgets never hard-code personal data.
 final class AppConfig {

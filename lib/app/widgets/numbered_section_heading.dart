@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
 import 'package:flutter_web_portfolio/app/core/theme/app_fonts.dart';
-import 'package:flutter_web_portfolio/app/core/theme/app_typography.dart';
+import 'package:flutter_web_portfolio/app/core/constants/breakpoints.dart';
 
-/// Numbered section heading — monospace number prefix + title + accent line.
-///
-/// Pattern: `01. About Me` with a thin accent-colored divider below.
+/// Editorial chapter marker shared by the long-form portfolio document.
 class NumberedSectionHeading extends StatelessWidget {
   const NumberedSectionHeading({
     super.key,
@@ -34,33 +33,55 @@ class NumberedSectionHeading extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Row(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.baseline,
-            textBaseline: TextBaseline.alphabetic,
             children: [
               Text(
-                '$number.',
+                'CHAPTER / $number',
                 style: AppFonts.jetBrainsMono(
-                  fontSize: AppTypography.h1.fontSize,
-                  fontWeight: FontWeight.w400,
-                  height: AppTypography.h1.height,
+                  fontSize: 9,
+                  fontWeight: FontWeight.w600,
                   color: accent,
+                  letterSpacing: 1.3,
                 ),
               ),
-              const SizedBox(width: 8),
-              Flexible(
-                child: Text(
-                  title,
-                  style: AppTypography.h1.copyWith(color: accent),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Container(
+                  key: const ValueKey('chapter-divider'),
+                  height: 1,
+                  color: accent.withValues(alpha: 0.32),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 8),
-          Container(
-            width: 100,
-            height: 1,
-            color: accent.withValues(alpha: 0.15),
+          const SizedBox(height: 18),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Expanded(
+                child: Text(
+                  title,
+                  style: AppFonts.instrumentSerif(
+                    fontSize:
+                        MediaQuery.sizeOf(context).width < Breakpoints.tablet
+                        ? 48
+                        : 72,
+                    fontStyle: FontStyle.italic,
+                    color: AppColors.textBright,
+                    height: 0.9,
+                    letterSpacing: -1.8,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 18),
+              Text(
+                '$number / 04',
+                style: AppFonts.jetBrainsMono(
+                  fontSize: 9,
+                  color: accent,
+                  letterSpacing: 0.9,
+                ),
+              ),
+            ],
           ),
         ],
       ),

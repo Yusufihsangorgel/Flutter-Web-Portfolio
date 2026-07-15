@@ -33,7 +33,7 @@ addEventListener("message", eventListener);
 if (!window._flutter) {
   window._flutter = {};
 }
-_flutter.buildConfig = {"engineRevision":"6c0baaebf70e0148f485f27d5616b3d3382da7bf","builds":[{"compileTarget":"dart2wasm","renderer":"skwasm","mainWasmPath":"main.dart.wasm?v=30b8883394867a1e","jsSupportRuntimePath":"main.dart.mjs?v=30b8883394867a1e"},{"compileTarget":"dart2js","renderer":"canvaskit","mainJsPath":"main.dart.js?v=30b8883394867a1e"}],"useLocalCanvasKit":true};
+_flutter.buildConfig = {"engineRevision":"6c0baaebf70e0148f485f27d5616b3d3382da7bf","builds":[{"compileTarget":"dart2wasm","renderer":"skwasm","mainWasmPath":"main.dart.wasm?v=3455685cf0335628","jsSupportRuntimePath":"main.dart.mjs?v=3455685cf0335628"},{"compileTarget":"dart2js","renderer":"canvaskit","mainJsPath":"main.dart.js?v=3455685cf0335628"}],"useLocalCanvasKit":true};
 
 
 const removeBootstrapSurface = () => {
@@ -42,6 +42,15 @@ const removeBootstrapSurface = () => {
   splash.setAttribute('aria-busy', 'false');
   splash.classList.add('bootstrap-surface--done');
   window.setTimeout(() => splash.remove(), 220);
+};
+
+// Flutter dispatches its first-frame event while the browser is still
+// compositing that frame. Keeping the matching HTML surface for two browser
+// frames prevents a one-frame dark flash on cold GPU/Wasm starts.
+const revealFlutterSurface = () => {
+  window.requestAnimationFrame(() => {
+    window.requestAnimationFrame(removeBootstrapSurface);
+  });
 };
 
 const showBootstrapFailure = (error) => {
@@ -89,7 +98,7 @@ const engineConfig = {
 _flutter.loader.load({
   config: engineConfig,
   onEntrypointLoaded: async function onEntrypointLoaded(engineInitializer) {
-    window.addEventListener('flutter-first-frame', removeBootstrapSurface, {
+    window.addEventListener('flutter-first-frame', revealFlutterSurface, {
       once: true,
     });
     const appRunner = await engineInitializer.initializeEngine(engineConfig);

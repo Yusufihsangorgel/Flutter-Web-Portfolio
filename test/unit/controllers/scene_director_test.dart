@@ -34,8 +34,7 @@ void main() {
       expect(config.gradient2, SceneConfigs.hero.gradient2);
       expect(config.gradient3, SceneConfigs.hero.gradient3);
       expect(config.accent, SceneConfigs.hero.accent);
-      expect(config.particleDensity, SceneConfigs.hero.particleDensity);
-      expect(config.particleSpeed, SceneConfigs.hero.particleSpeed);
+      expect(config.atlasMorph, SceneConfigs.hero.atlasMorph);
       expect(config.vignetteIntensity, SceneConfigs.hero.vignetteIntensity);
     });
 

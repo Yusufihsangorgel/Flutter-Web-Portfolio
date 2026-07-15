@@ -56,6 +56,40 @@ test('boots the production Wasm release with its security contract', async ({
   expect(runtime.headers()['content-type']).toContain('javascript');
   expect(renderer.status()).toBe(200);
   expect(renderer.headers()['cache-control']).toContain('max-age=31536000');
+  const preloadHints = await page.locator('head link').evaluateAll((links) =>
+    links.map((link) => ({
+      rel: link.getAttribute('rel'),
+      href: link.getAttribute('href'),
+      as: link.getAttribute('as'),
+      type: link.getAttribute('type'),
+      fetchpriority: link.getAttribute('fetchpriority'),
+    })),
+  );
+  expect(preloadHints).toEqual(
+    expect.arrayContaining([
+      expect.objectContaining({
+        rel: 'preload',
+        href: expect.stringMatching(/^main\.dart\.wasm\?v=[0-9a-f]{16}$/),
+        as: 'fetch',
+        type: 'application/wasm',
+        fetchpriority: 'high',
+      }),
+      expect.objectContaining({
+        rel: 'modulepreload',
+        href: expect.stringMatching(/^main\.dart\.mjs\?v=[0-9a-f]{16}$/),
+        fetchpriority: 'high',
+      }),
+      expect.objectContaining({
+        rel: 'preload',
+        href: expect.stringMatching(
+          /^canvaskit\/[0-9a-f]{40}\/skwasm\.wasm$/,
+        ),
+        as: 'fetch',
+        type: 'application/wasm',
+        fetchpriority: 'high',
+      }),
+    ]),
+  );
   expect(documentResponse?.headers()['cross-origin-opener-policy']).toBe(
     'same-origin',
   );
@@ -187,6 +221,13 @@ test('serves the declared production sharing and font assets', async ({
   );
   expect(font.status()).toBe(200);
   expect(font.headers()['content-type']).toContain('font/woff2');
+
+  const appFont = await request.get(
+    '/assets/assets/fonts/inter/Inter-Variable.ttf',
+  );
+  expect(appFont.status()).toBe(200);
+  expect(appFont.headers()['content-type']).toContain('font/ttf');
+  expect(appFont.headers()['content-encoding']).toBe('gzip');
 
   const missing = await request.get('/assets/fallback_fonts/missing.woff2');
   expect(missing.status()).toBe(404);

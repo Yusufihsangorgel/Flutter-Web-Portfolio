@@ -2,7 +2,7 @@
   "name": "flutter-web-portfolio",
   "version": "1.1.0",
   "private": true,
-  "description": "Data-driven Flutter portfolio template with accessible multilingual layouts and release verification.",
+  "description": "A code-native Flutter render atlas for production experience and selected product work.",
   "scripts": {
     "test": "playwright test",
     "test:e2e": "playwright test",

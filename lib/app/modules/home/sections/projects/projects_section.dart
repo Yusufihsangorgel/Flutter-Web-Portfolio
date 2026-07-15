@@ -1,17 +1,21 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
 import 'package:flutter_web_portfolio/app/core/constants/breakpoints.dart';
 import 'package:flutter_web_portfolio/app/core/constants/durations.dart';
 import 'package:flutter_web_portfolio/app/core/theme/app_fonts.dart';
-import 'package:flutter_web_portfolio/app/core/theme/app_typography.dart';
 import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
 import 'package:flutter_web_portfolio/app/widgets/cinematic_focusable.dart';
 import 'package:flutter_web_portfolio/app/widgets/numbered_section_heading.dart';
 import 'package:flutter_web_portfolio/app/widgets/scene_accent_builder.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-/// Selected products with four visual highlights and a compact product index.
+/// A spatial product archive: four full-width stages followed by an index.
+///
+/// There are deliberately no floating dashboard cards or device mock-ups.
+/// Each featured product owns a distinct code-native signal composition.
 class ProjectsSection extends StatelessWidget {
   const ProjectsSection({super.key});
 
@@ -25,12 +29,11 @@ class ProjectsSection extends StatelessWidget {
           .whereType<Map<String, dynamic>>()
           .toList();
       if (projects.isEmpty) return const SizedBox.shrink();
-
       final featured = projects.take(4).toList();
-      final archive = projects.skip(4).toList();
+      final archive = projects.skip(featured.length).toList();
 
       return ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 1120),
+        constraints: const BoxConstraints(maxWidth: 1200),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -44,23 +47,34 @@ class ProjectsSection extends StatelessWidget {
                 accent: accent,
               ),
             ),
-            const SizedBox(height: 18),
+            const SizedBox(height: 22),
             ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 650),
+              constraints: const BoxConstraints(maxWidth: 620),
               child: Text(
                 language.getText(
                   'projects_section.subtitle',
                   defaultValue:
                       'Products I designed, built, and continue to improve.',
                 ),
-                style: AppTypography.body.copyWith(height: 1.65),
+                style: AppFonts.spaceGrotesk(
+                  fontSize: 19,
+                  fontWeight: FontWeight.w400,
+                  color: AppColors.textPrimary,
+                  height: 1.5,
+                  letterSpacing: -0.2,
+                ),
               ),
             ),
-            const SizedBox(height: 44),
-            _FeaturedWork(projects: featured, language: language),
+            const SizedBox(height: 58),
+            for (var index = 0; index < featured.length; index++)
+              _ProjectStage(
+                project: featured[index],
+                index: index,
+                language: language,
+              ),
             if (archive.isNotEmpty) ...[
-              const SizedBox(height: 72),
-              _ProjectArchive(
+              const SizedBox(height: 88),
+              _ProjectIndex(
                 projects: archive,
                 startIndex: featured.length,
                 title: language.getText(
@@ -77,120 +91,27 @@ class ProjectsSection extends StatelessWidget {
   );
 }
 
-class _FeaturedWork extends StatelessWidget {
-  const _FeaturedWork({required this.projects, required this.language});
-
-  final List<Map<String, dynamic>> projects;
-  final LanguageCubit language;
-
-  @override
-  Widget build(BuildContext context) => LayoutBuilder(
-    builder: (context, constraints) {
-      final desktop = constraints.maxWidth >= 980;
-      if (!desktop) {
-        return Column(
-          children: [
-            for (var index = 0; index < projects.length; index++) ...[
-              SizedBox(
-                height: 440,
-                child: _ProjectFeatureCard(
-                  project: projects[index],
-                  index: index,
-                  language: language,
-                  wide: false,
-                ),
-              ),
-              if (index < projects.length - 1) const SizedBox(height: 18),
-            ],
-          ],
-        );
-      }
-
-      return Column(
-        children: [
-          if (projects.isNotEmpty)
-            SizedBox(
-              height: 410,
-              child: _ProjectFeatureCard(
-                project: projects[0],
-                index: 0,
-                language: language,
-                wide: true,
-              ),
-            ),
-          if (projects.length > 1) ...[
-            const SizedBox(height: 18),
-            SizedBox(
-              height: 430,
-              child: Row(
-                children: [
-                  Expanded(
-                    child: _ProjectFeatureCard(
-                      project: projects[1],
-                      index: 1,
-                      language: language,
-                      wide: false,
-                    ),
-                  ),
-                  if (projects.length > 2) ...[
-                    const SizedBox(width: 18),
-                    Expanded(
-                      child: _ProjectFeatureCard(
-                        project: projects[2],
-                        index: 2,
-                        language: language,
-                        wide: false,
-                      ),
-                    ),
-                  ],
-                ],
-              ),
-            ),
-          ],
-          if (projects.length > 3) ...[
-            const SizedBox(height: 18),
-            SizedBox(
-              height: 330,
-              child: _ProjectFeatureCard(
-                project: projects[3],
-                index: 3,
-                language: language,
-                wide: true,
-                reverse: true,
-              ),
-            ),
-          ],
-        ],
-      );
-    },
-  );
-}
-
-class _ProjectFeatureCard extends StatefulWidget {
-  const _ProjectFeatureCard({
+class _ProjectStage extends StatefulWidget {
+  const _ProjectStage({
     required this.project,
     required this.index,
     required this.language,
-    required this.wide,
-    this.reverse = false,
   });
 
   final Map<String, dynamic> project;
   final int index;
   final LanguageCubit language;
-  final bool wide;
-  final bool reverse;
 
   @override
-  State<_ProjectFeatureCard> createState() => _ProjectFeatureCardState();
+  State<_ProjectStage> createState() => _ProjectStageState();
 }
 
-class _ProjectFeatureCardState extends State<_ProjectFeatureCard> {
-  static const _palette = [
-    Color(0xFF8B5CF6),
-    Color(0xFF06B6D4),
-    Color(0xFF10B981),
-    Color(0xFFF43F5E),
+class _ProjectStageState extends State<_ProjectStage> {
+  static const _signals = [
+    AppColors.electricCobalt,
+    AppColors.signalLime,
+    AppColors.hotCoral,
+    AppColors.digitalIce,
   ];
 
   bool _hovered = false;
@@ -202,476 +123,340 @@ class _ProjectFeatureCardState extends State<_ProjectFeatureCard> {
     final description = project['description'] as String? ?? '';
     final category = project['category'] as String? ?? 'Product';
     final url = project['url'] as String? ?? '';
-    final accent = _palette[widget.index % _palette.length];
     final domain = _domain(url);
-    final semanticLabel = widget.language.getText(
+    final accent = _signals[widget.index % _signals.length];
+    final openLabel = widget.language.getText(
       'projects_section.open_project',
       defaultValue: 'Open Project',
     );
 
-    final copy = _ProjectCopy(
-      index: widget.index,
-      title: title,
-      description: description,
-      category: category,
-      domain: domain,
-      accent: accent,
-    );
-    final preview = _ProjectPreview(kind: widget.index, accent: accent);
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final desktop = constraints.maxWidth >= 880;
+        final signal = _ProjectSignal(
+          kind: widget.index,
+          accent: accent,
+          active: _hovered,
+        );
+        final copy = _ProjectStageCopy(
+          title: title,
+          description: description,
+          category: category,
+          domain: domain,
+          index: widget.index,
+          accent: accent,
+          active: _hovered,
+        );
 
-    return CinematicFocusable(
-      onTap: () => _openProject(url),
-      onHoverChanged: (hovered) => setState(() => _hovered = hovered),
-      semanticLabel: '$semanticLabel: $title',
-      semanticRole: CinematicControlRole.link,
-      borderRadius: BorderRadius.circular(26),
-      child: AnimatedContainer(
-        duration: AppDurations.fast,
-        curve: Curves.easeOutCubic,
-        transform: Matrix4.translationValues(0, _hovered ? -5 : 0, 0),
-        clipBehavior: Clip.antiAlias,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(26),
-          border: Border.all(
-            color: _hovered
-                ? accent.withValues(alpha: 0.46)
-                : Colors.white.withValues(alpha: 0.1),
-          ),
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              accent.withValues(alpha: _hovered ? 0.2 : 0.13),
-              AppColors.backgroundLight.withValues(alpha: 0.88),
-              AppColors.background.withValues(alpha: 0.96),
-            ],
-          ),
-          boxShadow: _hovered
-              ? [
-                  BoxShadow(
-                    color: accent.withValues(alpha: 0.12),
-                    blurRadius: 36,
-                    offset: const Offset(0, 18),
-                  ),
-                ]
-              : const [],
-        ),
-        child: widget.wide
-            ? Row(
-                textDirection: widget.reverse
-                    ? TextDirection.rtl
-                    : TextDirection.ltr,
-                children: [
-                  Expanded(
-                    flex: 5,
-                    child: Directionality(
-                      textDirection: Directionality.of(context),
-                      child: Padding(
-                        padding: const EdgeInsets.all(36),
-                        child: copy,
-                      ),
-                    ),
-                  ),
-                  Expanded(flex: 5, child: preview),
-                ],
-              )
-            : Column(
-                children: [
-                  Expanded(flex: 5, child: preview),
-                  Expanded(
-                    flex: 6,
-                    child: Padding(
-                      padding: const EdgeInsets.fromLTRB(26, 22, 26, 26),
-                      child: copy,
-                    ),
-                  ),
-                ],
+        return CinematicFocusable(
+          onTap: () => _openProject(url),
+          onHoverChanged: (value) => setState(() => _hovered = value),
+          semanticLabel: '$openLabel: $title',
+          semanticRole: CinematicControlRole.link,
+          focusColor: accent,
+          child: AnimatedContainer(
+            duration: AppDurations.fast,
+            height: desktop ? 440 : 520,
+            decoration: BoxDecoration(
+              color: _hovered
+                  ? accent.withValues(alpha: 0.055)
+                  : AppColors.backgroundDark.withValues(alpha: 0.42),
+              border: Border(
+                top: BorderSide(
+                  color: _hovered
+                      ? accent.withValues(alpha: 0.82)
+                      : AppColors.textBright.withValues(alpha: 0.18),
+                ),
               ),
-      ),
+            ),
+            child: desktop
+                ? Row(
+                    textDirection: widget.index.isOdd
+                        ? TextDirection.rtl
+                        : TextDirection.ltr,
+                    children: [
+                      Expanded(
+                        flex: 11,
+                        child: Directionality(
+                          textDirection: Directionality.of(context),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 46,
+                              vertical: 40,
+                            ),
+                            child: copy,
+                          ),
+                        ),
+                      ),
+                      Expanded(flex: 9, child: signal),
+                    ],
+                  )
+                : Column(
+                    children: [
+                      Expanded(flex: 5, child: signal),
+                      Expanded(
+                        flex: 6,
+                        child: Padding(
+                          padding: const EdgeInsets.fromLTRB(22, 24, 22, 30),
+                          child: copy,
+                        ),
+                      ),
+                    ],
+                  ),
+          ),
+        );
+      },
     );
   }
 }
 
-class _ProjectCopy extends StatelessWidget {
-  const _ProjectCopy({
-    required this.index,
+class _ProjectStageCopy extends StatelessWidget {
+  const _ProjectStageCopy({
     required this.title,
     required this.description,
     required this.category,
     required this.domain,
+    required this.index,
     required this.accent,
+    required this.active,
   });
 
-  final int index;
   final String title;
   final String description;
   final String category;
   final String domain;
+  final int index;
   final Color accent;
+  final bool active;
 
   @override
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
-    mainAxisAlignment: MainAxisAlignment.center,
     children: [
       Row(
         children: [
-          Container(
-            width: 7,
-            height: 7,
-            decoration: BoxDecoration(color: accent, shape: BoxShape.circle),
-          ),
-          const SizedBox(width: 10),
-          Text(
-            category.toUpperCase(),
-            style: AppFonts.jetBrainsMono(
-              fontSize: 9,
-              fontWeight: FontWeight.w700,
-              color: accent,
-              letterSpacing: 1.4,
-            ),
-          ),
-          const Spacer(),
           Text(
             '${index + 1}'.padLeft(2, '0'),
             style: AppFonts.jetBrainsMono(
               fontSize: 10,
-              color: AppColors.textSecondary,
+              fontWeight: FontWeight.w700,
+              color: accent,
+              letterSpacing: 1.2,
             ),
           ),
-          const SizedBox(width: 10),
-          const Icon(
-            Icons.north_east_rounded,
-            size: 17,
-            color: AppColors.textSecondary,
+          const SizedBox(width: 12),
+          Container(width: 34, height: 1, color: accent),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              category.toUpperCase(),
+              overflow: TextOverflow.ellipsis,
+              style: AppFonts.jetBrainsMono(
+                fontSize: 9,
+                color: AppColors.textPrimary,
+                letterSpacing: 1.3,
+              ),
+            ),
+          ),
+          AnimatedRotation(
+            turns: active ? 0.125 : 0,
+            duration: AppDurations.fast,
+            child: Icon(
+              Icons.north_east_rounded,
+              size: 19,
+              color: active ? accent : AppColors.textSecondary,
+            ),
           ),
         ],
       ),
-      const SizedBox(height: 26),
-      Text(
-        title,
-        style: AppFonts.spaceGrotesk(
-          fontSize: 30,
-          fontWeight: FontWeight.w700,
-          color: AppColors.textBright,
-          height: 1.05,
-          letterSpacing: -0.7,
+      const Spacer(),
+      AnimatedSlide(
+        offset: active ? const Offset(0.02, 0) : Offset.zero,
+        duration: AppDurations.fast,
+        curve: Curves.easeOutCubic,
+        child: Text(
+          title,
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+          style: AppFonts.instrumentSerif(
+            fontSize: MediaQuery.sizeOf(context).width < Breakpoints.tablet
+                ? 48
+                : 68,
+            fontStyle: FontStyle.italic,
+            color: AppColors.textBright,
+            height: 0.9,
+            letterSpacing: -1.6,
+          ),
         ),
       ),
-      const SizedBox(height: 13),
+      const SizedBox(height: 20),
       Text(
         description,
         maxLines: 3,
         overflow: TextOverflow.ellipsis,
-        style: AppTypography.bodySmall.copyWith(height: 1.6),
+        style: AppFonts.inter(
+          fontSize: 14,
+          color: AppColors.textPrimary,
+          height: 1.6,
+        ),
       ),
-      const SizedBox(height: 20),
+      const SizedBox(height: 18),
       Text(
-        domain,
+        domain.toUpperCase(),
+        overflow: TextOverflow.ellipsis,
         style: AppFonts.jetBrainsMono(
-          fontSize: 10,
-          color: AppColors.textSecondary,
-          letterSpacing: 0.6,
+          fontSize: 9,
+          color: active ? accent : AppColors.textSecondary,
+          letterSpacing: 0.9,
         ),
       ),
     ],
   );
 }
 
-class _ProjectPreview extends StatelessWidget {
-  const _ProjectPreview({required this.kind, required this.accent});
+class _ProjectSignal extends StatelessWidget {
+  const _ProjectSignal({
+    required this.kind,
+    required this.accent,
+    required this.active,
+  });
 
   final int kind;
   final Color accent;
+  final bool active;
 
   @override
-  Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.all(24),
-    child: DecoratedBox(
-      decoration: BoxDecoration(
-        color: const Color(0xFF050412).withValues(alpha: 0.78),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(22),
-        child: switch (kind % 4) {
-          0 => _CallPreview(accent: accent),
-          1 => _GalleryPreview(accent: accent),
-          2 => _FocusPreview(accent: accent),
-          _ => _MoodPreview(accent: accent),
-        },
+  Widget build(BuildContext context) => RepaintBoundary(
+    child: AnimatedContainer(
+      duration: AppDurations.fast,
+      color: accent.withValues(alpha: active ? 0.16 : 0.075),
+      child: CustomPaint(
+        painter: _ProjectSignalPainter(
+          kind: kind,
+          accent: accent,
+          active: active,
+        ),
+        size: Size.infinite,
       ),
     ),
   );
 }
 
-class _CallPreview extends StatelessWidget {
-  const _CallPreview({required this.accent});
+class _ProjectSignalPainter extends CustomPainter {
+  const _ProjectSignalPainter({
+    required this.kind,
+    required this.accent,
+    required this.active,
+  });
+
+  final int kind;
   final Color accent;
+  final bool active;
 
   @override
-  Widget build(BuildContext context) => Column(
-    mainAxisAlignment: MainAxisAlignment.center,
-    children: [
-      Container(
-        width: 74,
-        height: 74,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          gradient: LinearGradient(colors: [accent, const Color(0xFF06B6D4)]),
-          boxShadow: [
-            BoxShadow(color: accent.withValues(alpha: 0.28), blurRadius: 28),
-          ],
-        ),
-      ),
-      const SizedBox(height: 18),
-      Container(
-        width: 120,
-        height: 7,
-        decoration: _barDecoration(Colors.white),
-      ),
-      const SizedBox(height: 9),
-      Container(
-        width: 74,
-        height: 5,
-        decoration: _barDecoration(AppColors.textSecondary),
-      ),
-      const Spacer(),
-      const Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          _RoundAction(color: Color(0xFFF43F5E), icon: Icons.call_end_rounded),
-          SizedBox(width: 28),
-          _RoundAction(color: Color(0xFF10B981), icon: Icons.videocam_rounded),
-        ],
-      ),
-    ],
-  );
-}
+  void paint(Canvas canvas, Size size) {
+    final center = Offset(size.width / 2, size.height / 2);
+    final unit = math.min(size.width, size.height);
+    final line = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = active ? 1.8 : 1.1
+      ..color = accent.withValues(alpha: active ? 0.88 : 0.58);
+    final ghost = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 0.75
+      ..color = AppColors.textBright.withValues(alpha: 0.16);
+    final fill = Paint()
+      ..style = PaintingStyle.fill
+      ..color = accent.withValues(alpha: active ? 0.22 : 0.11);
 
-class _GalleryPreview extends StatelessWidget {
-  const _GalleryPreview({required this.accent});
-  final Color accent;
-
-  @override
-  Widget build(BuildContext context) => Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Row(
-        children: [
-          Container(
-            width: 78,
-            height: 6,
-            decoration: _barDecoration(Colors.white),
-          ),
-          const Spacer(),
-          Container(
-            width: 42,
-            height: 20,
-            decoration: BoxDecoration(
-              color: accent.withValues(alpha: 0.2),
-              borderRadius: BorderRadius.circular(10),
+    _drawGrid(canvas, size, ghost);
+    switch (kind % 4) {
+      case 0:
+        for (var index = 1; index <= 4; index++) {
+          canvas.drawCircle(
+            center,
+            unit * index * 0.085,
+            index.isEven ? line : ghost,
+          );
+        }
+        canvas.drawLine(
+          Offset(center.dx - unit * 0.32, center.dy + unit * 0.24),
+          Offset(center.dx + unit * 0.32, center.dy - unit * 0.24),
+          line,
+        );
+        canvas.drawCircle(center, unit * 0.055, fill);
+      case 1:
+        for (var index = 0; index < 7; index++) {
+          final width = unit * (0.54 - index * 0.045);
+          final height = unit * (0.1 + index * 0.025);
+          final rect = Rect.fromCenter(
+            center: center + Offset((index - 3) * 8, (index - 3) * 12),
+            width: width,
+            height: height,
+          );
+          canvas
+            ..save()
+            ..translate(rect.center.dx, rect.center.dy)
+            ..rotate(-0.16)
+            ..translate(-rect.center.dx, -rect.center.dy)
+            ..drawRect(rect, index == 3 ? fill : line)
+            ..restore();
+        }
+      case 2:
+        final rect = Rect.fromCircle(center: center, radius: unit * 0.3);
+        for (var index = 0; index < 5; index++) {
+          canvas.drawArc(
+            rect.deflate(index * unit * 0.035),
+            -math.pi / 2 + index * 0.34,
+            math.pi * (0.48 + index * 0.12),
+            false,
+            index.isEven ? line : ghost,
+          );
+        }
+        canvas.drawLine(
+          center,
+          center + Offset(unit * 0.18, -unit * 0.12),
+          line,
+        );
+      default:
+        final barWidth = unit * 0.055;
+        const heights = [0.18, 0.32, 0.48, 0.28, 0.58, 0.38, 0.22];
+        for (var index = 0; index < heights.length; index++) {
+          final x = center.dx + (index - 3) * barWidth * 1.65;
+          final height = unit * heights[index];
+          canvas.drawRect(
+            Rect.fromLTWH(
+              x - barWidth / 2,
+              center.dy - height / 2,
+              barWidth,
+              height,
             ),
-          ),
-        ],
-      ),
-      const SizedBox(height: 16),
-      Expanded(
-        child: GridView.count(
-          crossAxisCount: 3,
-          physics: const NeverScrollableScrollPhysics(),
-          mainAxisSpacing: 7,
-          crossAxisSpacing: 7,
-          children: [
-            for (var index = 0; index < 6; index++)
-              DecoratedBox(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      accent.withValues(alpha: 0.22 + index * 0.035),
-                      const Color(0xFF1E1B4B),
-                    ],
-                  ),
-                ),
-              ),
-          ],
-        ),
-      ),
-      const SizedBox(height: 14),
-      ClipRRect(
-        borderRadius: BorderRadius.circular(5),
-        child: LinearProgressIndicator(
-          value: 0.72,
-          minHeight: 5,
-          color: accent,
-          backgroundColor: Colors.white.withValues(alpha: 0.07),
-        ),
-      ),
-    ],
-  );
-}
+            index == 4 ? fill : line,
+          );
+        }
+    }
+  }
 
-class _FocusPreview extends StatelessWidget {
-  const _FocusPreview({required this.accent});
-  final Color accent;
+  void _drawGrid(Canvas canvas, Size size, Paint paint) {
+    const divisions = 8;
+    for (var index = 1; index < divisions; index++) {
+      final x = size.width * index / divisions;
+      final y = size.height * index / divisions;
+      canvas
+        ..drawLine(Offset(x, 0), Offset(x, size.height), paint)
+        ..drawLine(Offset(0, y), Offset(size.width, y), paint);
+    }
+  }
 
   @override
-  Widget build(BuildContext context) => Row(
-    children: [
-      Expanded(
-        child: Center(
-          child: SizedBox.square(
-            dimension: 118,
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                CircularProgressIndicator(
-                  value: 0.76,
-                  strokeWidth: 8,
-                  strokeCap: StrokeCap.round,
-                  color: accent,
-                  backgroundColor: Colors.white.withValues(alpha: 0.07),
-                ),
-                Text(
-                  '25:00',
-                  style: AppFonts.spaceGrotesk(
-                    fontSize: 21,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.textBright,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-      const SizedBox(width: 18),
-      Expanded(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            for (final width in const [82.0, 112.0, 94.0]) ...[
-              Row(
-                children: [
-                  Container(
-                    width: 7,
-                    height: 7,
-                    decoration: BoxDecoration(
-                      color: accent,
-                      shape: BoxShape.circle,
-                    ),
-                  ),
-                  const SizedBox(width: 9),
-                  Container(
-                    width: width,
-                    height: 5,
-                    decoration: _barDecoration(AppColors.textPrimary),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 18),
-            ],
-          ],
-        ),
-      ),
-    ],
-  );
+  bool shouldRepaint(_ProjectSignalPainter oldDelegate) =>
+      kind != oldDelegate.kind ||
+      accent != oldDelegate.accent ||
+      active != oldDelegate.active;
 }
 
-class _MoodPreview extends StatelessWidget {
-  const _MoodPreview({required this.accent});
-  final Color accent;
-
-  @override
-  Widget build(BuildContext context) => Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Text(
-        'WEEKLY PATTERN',
-        style: AppFonts.jetBrainsMono(
-          fontSize: 9,
-          fontWeight: FontWeight.w600,
-          color: accent,
-          letterSpacing: 1.1,
-        ),
-      ),
-      const Spacer(),
-      Expanded(
-        flex: 4,
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            for (final height in const [
-              0.42,
-              0.65,
-              0.5,
-              0.82,
-              0.74,
-              0.92,
-              0.68,
-            ])
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 4),
-                  child: FractionallySizedBox(
-                    heightFactor: height,
-                    alignment: Alignment.bottomCenter,
-                    child: DecoratedBox(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(8),
-                        gradient: LinearGradient(
-                          begin: Alignment.bottomCenter,
-                          end: Alignment.topCenter,
-                          colors: [accent.withValues(alpha: 0.35), accent],
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-          ],
-        ),
-      ),
-      const SizedBox(height: 16),
-      Row(
-        children: [
-          for (var index = 0; index < 4; index++) ...[
-            Container(
-              width: 22,
-              height: 22,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: accent.withValues(alpha: 0.12 + index * 0.08),
-              ),
-            ),
-            const SizedBox(width: 8),
-          ],
-        ],
-      ),
-    ],
-  );
-}
-
-class _RoundAction extends StatelessWidget {
-  const _RoundAction({required this.color, required this.icon});
-  final Color color;
-  final IconData icon;
-
-  @override
-  Widget build(BuildContext context) => Container(
-    width: 42,
-    height: 42,
-    decoration: BoxDecoration(color: color, shape: BoxShape.circle),
-    child: Icon(icon, color: Colors.white, size: 20),
-  );
-}
-
-class _ProjectArchive extends StatelessWidget {
-  const _ProjectArchive({
+class _ProjectIndex extends StatelessWidget {
+  const _ProjectIndex({
     required this.projects,
     required this.startIndex,
     required this.title,
@@ -687,18 +472,33 @@ class _ProjectArchive extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      Text(
-        title.toUpperCase(),
-        style: AppFonts.jetBrainsMono(
-          fontSize: 11,
-          fontWeight: FontWeight.w700,
-          color: AppColors.textSecondary,
-          letterSpacing: 1.5,
-        ),
+      Row(
+        children: [
+          Text(
+            title.toUpperCase(),
+            style: AppFonts.jetBrainsMono(
+              fontSize: 10,
+              fontWeight: FontWeight.w700,
+              color: AppColors.contactAccent,
+              letterSpacing: 1.45,
+            ),
+          ),
+          const SizedBox(width: 16),
+          const Expanded(child: Divider(color: Color(0x2EF2F0E9))),
+          const SizedBox(width: 16),
+          Text(
+            '${projects.length.toString().padLeft(2, '0')} ENTRIES',
+            style: AppFonts.jetBrainsMono(
+              fontSize: 9,
+              color: AppColors.textSecondary,
+              letterSpacing: 0.8,
+            ),
+          ),
+        ],
       ),
-      const SizedBox(height: 20),
+      const SizedBox(height: 24),
       for (var index = 0; index < projects.length; index++)
-        _ArchiveRow(
+        _IndexRow(
           project: projects[index],
           index: startIndex + index,
           language: language,
@@ -708,8 +508,8 @@ class _ProjectArchive extends StatelessWidget {
   );
 }
 
-class _ArchiveRow extends StatefulWidget {
-  const _ArchiveRow({
+class _IndexRow extends StatefulWidget {
+  const _IndexRow({
     required this.project,
     required this.index,
     required this.language,
@@ -722,85 +522,102 @@ class _ArchiveRow extends StatefulWidget {
   final bool isLast;
 
   @override
-  State<_ArchiveRow> createState() => _ArchiveRowState();
+  State<_IndexRow> createState() => _IndexRowState();
 }
 
-class _ArchiveRowState extends State<_ArchiveRow> {
+class _IndexRowState extends State<_IndexRow> {
   bool _hovered = false;
 
   @override
   Widget build(BuildContext context) {
-    final title = widget.project['title'] as String? ?? '';
-    final description = widget.project['description'] as String? ?? '';
-    final url = widget.project['url'] as String? ?? '';
+    final project = widget.project;
+    final title = project['title'] as String? ?? '';
+    final category = project['category'] as String? ?? '';
+    final url = project['url'] as String? ?? '';
     final domain = _domain(url);
     final compact = MediaQuery.sizeOf(context).width < Breakpoints.tablet;
-    final semanticLabel = widget.language.getText(
+    final openLabel = widget.language.getText(
       'projects_section.open_project',
       defaultValue: 'Open Project',
     );
 
     return CinematicFocusable(
       onTap: () => _openProject(url),
-      onHoverChanged: (hovered) => setState(() => _hovered = hovered),
-      semanticLabel: '$semanticLabel: $title',
+      onHoverChanged: (value) => setState(() => _hovered = value),
+      semanticLabel: '$openLabel: $title',
       semanticRole: CinematicControlRole.link,
+      focusColor: AppColors.contactAccent,
       child: AnimatedContainer(
         duration: AppDurations.fast,
         padding: EdgeInsets.symmetric(
-          horizontal: _hovered ? 14 : 0,
-          vertical: compact ? 24 : 28,
+          horizontal: _hovered ? 16 : 0,
+          vertical: compact ? 22 : 28,
         ),
         decoration: BoxDecoration(
           color: _hovered
-              ? Colors.white.withValues(alpha: 0.035)
+              ? AppColors.contactAccent.withValues(alpha: 0.07)
               : Colors.transparent,
           border: Border(
-            top: BorderSide(color: Colors.white.withValues(alpha: 0.09)),
+            top: const BorderSide(color: Color(0x2EF2F0E9)),
             bottom: widget.isLast
-                ? BorderSide(color: Colors.white.withValues(alpha: 0.09))
+                ? const BorderSide(color: Color(0x2EF2F0E9))
                 : BorderSide.none,
           ),
         ),
         child: compact
-            ? Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+            ? Row(
                 children: [
-                  Row(
-                    children: [
-                      _ArchiveNumber(index: widget.index),
-                      const SizedBox(width: 14),
-                      Expanded(child: _ArchiveTitle(title: title)),
-                      const Icon(
-                        Icons.north_east_rounded,
-                        size: 17,
-                        color: AppColors.textSecondary,
-                      ),
-                    ],
+                  SizedBox(width: 38, child: _IndexNumber(index: widget.index)),
+                  Expanded(
+                    child: _IndexTitle(title: title, active: _hovered),
                   ),
-                  const SizedBox(height: 12),
-                  Text(description, style: AppTypography.bodySmall),
-                  const SizedBox(height: 12),
-                  _ArchiveDomain(domain: domain),
+                  const SizedBox(width: 12),
+                  Icon(
+                    Icons.north_east_rounded,
+                    size: 17,
+                    color: _hovered
+                        ? AppColors.contactAccent
+                        : AppColors.textSecondary,
+                  ),
                 ],
               )
             : Row(
                 children: [
-                  SizedBox(
-                    width: 58,
-                    child: _ArchiveNumber(index: widget.index),
-                  ),
-                  SizedBox(width: 210, child: _ArchiveTitle(title: title)),
-                  const SizedBox(width: 26),
+                  SizedBox(width: 70, child: _IndexNumber(index: widget.index)),
                   Expanded(
-                    child: Text(description, style: AppTypography.bodySmall),
+                    flex: 4,
+                    child: _IndexTitle(title: title, active: _hovered),
                   ),
-                  const SizedBox(width: 28),
-                  SizedBox(width: 160, child: _ArchiveDomain(domain: domain)),
-                  const Icon(
+                  Expanded(
+                    flex: 2,
+                    child: Text(
+                      category.toUpperCase(),
+                      style: AppFonts.jetBrainsMono(
+                        fontSize: 9,
+                        color: AppColors.textSecondary,
+                        letterSpacing: 1,
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    flex: 3,
+                    child: Text(
+                      domain.toUpperCase(),
+                      overflow: TextOverflow.ellipsis,
+                      style: AppFonts.jetBrainsMono(
+                        fontSize: 9,
+                        color: _hovered
+                            ? AppColors.contactAccent
+                            : AppColors.textSecondary,
+                      ),
+                    ),
+                  ),
+                  Icon(
                     Icons.north_east_rounded,
                     size: 17,
-                    color: AppColors.textSecondary,
+                    color: _hovered
+                        ? AppColors.contactAccent
+                        : AppColors.textSecondary,
                   ),
                 ],
               ),
@@ -809,48 +626,34 @@ class _ArchiveRowState extends State<_ArchiveRow> {
   }
 }
 
-class _ArchiveNumber extends StatelessWidget {
-  const _ArchiveNumber({required this.index});
+class _IndexNumber extends StatelessWidget {
+  const _IndexNumber({required this.index});
   final int index;
 
   @override
   Widget build(BuildContext context) => Text(
     '${index + 1}'.padLeft(2, '0'),
-    style: AppFonts.jetBrainsMono(fontSize: 10, color: AppColors.textSecondary),
+    style: AppFonts.jetBrainsMono(fontSize: 9, color: AppColors.textSecondary),
   );
 }
 
-class _ArchiveTitle extends StatelessWidget {
-  const _ArchiveTitle({required this.title});
+class _IndexTitle extends StatelessWidget {
+  const _IndexTitle({required this.title, required this.active});
   final String title;
+  final bool active;
 
   @override
   Widget build(BuildContext context) => Text(
     title,
+    overflow: TextOverflow.ellipsis,
     style: AppFonts.spaceGrotesk(
-      fontSize: 19,
+      fontSize: MediaQuery.sizeOf(context).width < Breakpoints.tablet ? 19 : 25,
       fontWeight: FontWeight.w600,
-      color: AppColors.textBright,
+      color: active ? AppColors.contactAccent : AppColors.textBright,
+      letterSpacing: -0.45,
     ),
   );
 }
-
-class _ArchiveDomain extends StatelessWidget {
-  const _ArchiveDomain({required this.domain});
-  final String domain;
-
-  @override
-  Widget build(BuildContext context) => Text(
-    domain,
-    overflow: TextOverflow.ellipsis,
-    style: AppFonts.jetBrainsMono(fontSize: 10, color: AppColors.textSecondary),
-  );
-}
-
-BoxDecoration _barDecoration(Color color) => BoxDecoration(
-  color: color.withValues(alpha: 0.6),
-  borderRadius: BorderRadius.circular(8),
-);
 
 String _domain(String url) =>
     Uri.tryParse(url)?.host.replaceFirst('www.', '') ?? url;

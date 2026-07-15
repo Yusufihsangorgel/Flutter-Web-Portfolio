@@ -33,6 +33,7 @@ const engineRevision = extractEngineRevision(bootstrap);
 const versionedBootstrap = versionEntrypoints(bootstrap, releaseId);
 await writeFile(bootstrapPath, versionedBootstrap);
 await versionRendererDirectory(engineRevision);
+await injectReleasePreloads(releaseId, engineRevision);
 await normalizeNoticeWhitespace();
 
 console.log(
@@ -111,6 +112,28 @@ async function versionRendererDirectory(engineRevision) {
         path.join(versionDirectory, entry.name),
       ),
     ),
+  );
+}
+
+async function injectReleasePreloads(releaseId, engineRevision) {
+  const indexPath = path.join(webRoot, 'index.html');
+  const index = await readFile(indexPath, 'utf8');
+  const withoutPreviousHints = index.replace(
+    /\n?\s*<!-- release-preloads:start -->[\s\S]*?<!-- release-preloads:end -->\n?/,
+    '\n',
+  );
+  const preloadBlock = `  <!-- release-preloads:start -->
+  <link rel="preload" href="main.dart.wasm?v=${releaseId}" as="fetch" type="application/wasm" crossorigin fetchpriority="high">
+  <link rel="modulepreload" href="main.dart.mjs?v=${releaseId}" crossorigin fetchpriority="high">
+  <link rel="preload" href="canvaskit/${engineRevision}/skwasm.wasm" as="fetch" type="application/wasm" crossorigin fetchpriority="high">
+  <!-- release-preloads:end -->`;
+
+  if (!withoutPreviousHints.includes('</head>')) {
+    throw new Error('index.html does not contain a closing head tag');
+  }
+  await writeFile(
+    indexPath,
+    withoutPreviousHints.replace('</head>', `${preloadBlock}\n</head>`),
   );
 }
 

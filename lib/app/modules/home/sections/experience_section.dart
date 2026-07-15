@@ -3,15 +3,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
 import 'package:flutter_web_portfolio/app/core/constants/breakpoints.dart';
 import 'package:flutter_web_portfolio/app/core/theme/app_fonts.dart';
-import 'package:flutter_web_portfolio/app/core/theme/app_typography.dart';
 import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
 import 'package:flutter_web_portfolio/app/widgets/numbered_section_heading.dart';
 import 'package:flutter_web_portfolio/app/widgets/scene_accent_builder.dart';
 
-/// A chronological, fully visible account of professional work.
-///
-/// Every entry is part of the document flow. There are no hidden tabs or
-/// oversized decorative labels competing with the actual experience.
+/// An editorial career ledger with every entry visible in document order.
 class ExperienceSection extends StatelessWidget {
   const ExperienceSection({super.key});
 
@@ -25,42 +21,40 @@ class ExperienceSection extends StatelessWidget {
                   .whereType<Map<String, dynamic>>()
                   .toList();
 
-          return Center(
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 1100),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
+          return ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 1160),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SceneAccentBuilder(
+                  builder: (context, accent) => NumberedSectionHeading(
+                    number: '02',
+                    title: language.getText(
+                      'experience_section.title',
+                      defaultValue: 'Experience',
+                    ),
+                    accent: accent,
+                  ),
+                ),
+                const SizedBox(height: 66),
+                for (var index = 0; index < experiences.length; index++)
                   SceneAccentBuilder(
-                    builder: (context, accent) => NumberedSectionHeading(
-                      number: '02',
-                      title: language.getText(
-                        'experience_section.title',
-                        defaultValue: 'Experience',
-                      ),
+                    builder: (context, accent) => _ExperienceLedgerRow(
+                      index: index,
+                      experience: experiences[index],
                       accent: accent,
+                      isLast: index == experiences.length - 1,
                     ),
                   ),
-                  const SizedBox(height: 52),
-                  for (var index = 0; index < experiences.length; index++)
-                    SceneAccentBuilder(
-                      builder: (context, accent) => _ExperienceEntry(
-                        index: index,
-                        experience: experiences[index],
-                        accent: accent,
-                        isLast: index == experiences.length - 1,
-                      ),
-                    ),
-                ],
-              ),
+              ],
             ),
           );
         },
       );
 }
 
-class _ExperienceEntry extends StatelessWidget {
-  const _ExperienceEntry({
+class _ExperienceLedgerRow extends StatelessWidget {
+  const _ExperienceLedgerRow({
     required this.index,
     required this.experience,
     required this.accent,
@@ -74,8 +68,7 @@ class _ExperienceEntry extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final width = MediaQuery.sizeOf(context).width;
-    final isCompact = width < Breakpoints.tablet;
+    final compact = MediaQuery.sizeOf(context).width < Breakpoints.tablet;
     final period = (experience['period'] as String?)?.trim() ?? '';
     final title = (experience['title'] as String?)?.trim() ?? '';
     final position = (experience['position'] as String?)?.trim() ?? '';
@@ -83,121 +76,126 @@ class _ExperienceEntry extends StatelessWidget {
     final description = (experience['description'] as String?)?.trim() ?? '';
     final technologies = (experience['technologies'] as List? ?? const [])
         .whereType<String>()
-        .toList();
+        .join(' / ');
 
-    final content = _ExperienceContent(
-      title: title,
-      position: position,
-      company: company,
-      description: description,
-      technologies: technologies,
-      accent: accent,
-    );
-
-    return IntrinsicHeight(
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          SizedBox(
-            width: isCompact ? 38 : 54,
-            child: Column(
-              children: [
-                Container(
-                  width: 28,
-                  height: 28,
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    color: accent.withValues(alpha: 0.1),
-                    shape: BoxShape.circle,
-                    border: Border.all(color: accent.withValues(alpha: 0.5)),
-                  ),
-                  child: Text(
-                    (index + 1).toString().padLeft(2, '0'),
-                    style: AppFonts.jetBrainsMono(
-                      fontSize: 9,
-                      fontWeight: FontWeight.w700,
-                      color: accent,
+    return Semantics(
+      container: true,
+      label: '$title. $position. $company. $period. $description',
+      child: ExcludeSemantics(
+        child: Container(
+          padding: EdgeInsets.symmetric(vertical: compact ? 34 : 42),
+          decoration: BoxDecoration(
+            border: Border(
+              top: BorderSide(color: accent.withValues(alpha: 0.34)),
+              bottom: isLast
+                  ? BorderSide(color: accent.withValues(alpha: 0.34))
+                  : BorderSide.none,
+            ),
+          ),
+          child: compact
+              ? Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _LedgerMeta(index: index, period: period, accent: accent),
+                    const SizedBox(height: 26),
+                    _LedgerRole(
+                      title: title,
+                      position: position,
+                      company: company,
                     ),
-                  ),
+                    const SizedBox(height: 22),
+                    _LedgerDetail(
+                      description: description,
+                      technologies: technologies,
+                    ),
+                  ],
+                )
+              : Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(
+                      width: 190,
+                      child: _LedgerMeta(
+                        index: index,
+                        period: period,
+                        accent: accent,
+                      ),
+                    ),
+                    const SizedBox(width: 42),
+                    SizedBox(
+                      width: 310,
+                      child: _LedgerRole(
+                        title: title,
+                        position: position,
+                        company: company,
+                      ),
+                    ),
+                    const SizedBox(width: 56),
+                    Expanded(
+                      child: _LedgerDetail(
+                        description: description,
+                        technologies: technologies,
+                      ),
+                    ),
+                  ],
                 ),
-                if (!isLast)
-                  Expanded(
-                    child: Container(
-                      width: 1,
-                      margin: const EdgeInsets.symmetric(vertical: 10),
-                      color: Colors.white.withValues(alpha: 0.1),
-                    ),
-                  ),
-              ],
-            ),
-          ),
-          SizedBox(width: isCompact ? 14 : 28),
-          Expanded(
-            child: Padding(
-              padding: EdgeInsets.only(bottom: isLast ? 0 : 58),
-              child: isCompact
-                  ? Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _Period(period: period, accent: accent),
-                        const SizedBox(height: 14),
-                        content,
-                      ],
-                    )
-                  : Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        SizedBox(
-                          width: 210,
-                          child: _Period(period: period, accent: accent),
-                        ),
-                        const SizedBox(width: 34),
-                        Expanded(child: content),
-                      ],
-                    ),
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
 }
 
-class _Period extends StatelessWidget {
-  const _Period({required this.period, required this.accent});
+class _LedgerMeta extends StatelessWidget {
+  const _LedgerMeta({
+    required this.index,
+    required this.period,
+    required this.accent,
+  });
 
+  final int index;
   final String period;
   final Color accent;
 
   @override
-  Widget build(BuildContext context) => Text(
-    period,
-    style: AppFonts.jetBrainsMono(
-      fontSize: 11,
-      fontWeight: FontWeight.w600,
-      color: accent,
-      letterSpacing: 0.7,
-      height: 1.5,
-    ),
+  Widget build(BuildContext context) => Row(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text(
+        '${index + 1}'.padLeft(2, '0'),
+        style: AppFonts.instrumentSerif(
+          fontSize: 40,
+          fontStyle: FontStyle.italic,
+          color: accent,
+          height: 0.8,
+        ),
+      ),
+      const SizedBox(width: 18),
+      Expanded(
+        child: Text(
+          period.toUpperCase(),
+          style: AppFonts.jetBrainsMono(
+            fontSize: 9,
+            fontWeight: FontWeight.w600,
+            color: AppColors.textPrimary,
+            letterSpacing: 0.65,
+            height: 1.55,
+          ),
+        ),
+      ),
+    ],
   );
 }
 
-class _ExperienceContent extends StatelessWidget {
-  const _ExperienceContent({
+class _LedgerRole extends StatelessWidget {
+  const _LedgerRole({
     required this.title,
     required this.position,
     required this.company,
-    required this.description,
-    required this.technologies,
-    required this.accent,
   });
 
   final String title;
   final String position;
   final String company;
-  final String description;
-  final List<String> technologies;
-  final Color accent;
 
   @override
   Widget build(BuildContext context) => Column(
@@ -205,52 +203,65 @@ class _ExperienceContent extends StatelessWidget {
     children: [
       Text(
         title,
-        style: AppFonts.spaceGrotesk(
-          fontSize: 27,
-          fontWeight: FontWeight.w700,
+        style: AppFonts.instrumentSerif(
+          fontSize: 36,
+          fontStyle: FontStyle.italic,
           color: AppColors.textBright,
-          height: 1.15,
-          letterSpacing: -0.5,
+          height: 0.95,
+          letterSpacing: -0.65,
         ),
       ),
-      const SizedBox(height: 8),
+      const SizedBox(height: 14),
       Text(
-        '$position · $company',
+        position,
         style: AppFonts.spaceGrotesk(
-          fontSize: 16,
-          fontWeight: FontWeight.w500,
+          fontSize: 13,
+          fontWeight: FontWeight.w600,
           color: AppColors.textPrimary,
           height: 1.4,
         ),
       ),
-      const SizedBox(height: 18),
-      Text(description, style: AppTypography.body.copyWith(height: 1.7)),
+      const SizedBox(height: 5),
+      Text(
+        company.toUpperCase(),
+        style: AppFonts.jetBrainsMono(
+          fontSize: 9,
+          color: AppColors.textSecondary,
+          letterSpacing: 0.75,
+        ),
+      ),
+    ],
+  );
+}
+
+class _LedgerDetail extends StatelessWidget {
+  const _LedgerDetail({required this.description, required this.technologies});
+
+  final String description;
+  final String technologies;
+
+  @override
+  Widget build(BuildContext context) => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text(
+        description,
+        style: AppFonts.inter(
+          fontSize: 14,
+          color: AppColors.textPrimary,
+          height: 1.72,
+        ),
+      ),
       if (technologies.isNotEmpty) ...[
         const SizedBox(height: 22),
-        Wrap(
-          spacing: 8,
-          runSpacing: 8,
-          children: [
-            for (final technology in technologies)
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 11,
-                  vertical: 7,
-                ),
-                decoration: BoxDecoration(
-                  color: accent.withValues(alpha: 0.07),
-                  borderRadius: BorderRadius.circular(999),
-                  border: Border.all(color: accent.withValues(alpha: 0.16)),
-                ),
-                child: Text(
-                  technology,
-                  style: AppFonts.jetBrainsMono(
-                    fontSize: 10,
-                    color: AppColors.textPrimary,
-                  ),
-                ),
-              ),
-          ],
+        Text(
+          technologies.toUpperCase(),
+          style: AppFonts.jetBrainsMono(
+            fontSize: 9,
+            color: AppColors.textSecondary,
+            height: 1.55,
+            letterSpacing: 0.45,
+          ),
         ),
       ],
     ],

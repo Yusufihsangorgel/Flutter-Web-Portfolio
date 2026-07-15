@@ -17,6 +17,7 @@ final class AppTheme {
 
     return ThemeData(
       useMaterial3: true,
+      fontFamilyFallback: AppFonts.scriptFallbackFamilies,
       colorScheme: colorScheme,
       brightness: Brightness.dark,
       scaffoldBackgroundColor: AppColors.background,

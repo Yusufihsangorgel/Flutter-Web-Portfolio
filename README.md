@@ -1,22 +1,22 @@
 <div align="center">
 
-# Flutter Portfolio Template
+# Flutter Render Atlas
 
-A production-ready personal portfolio template built with Flutter. The current demo presents a senior Flutter engineer's experience and selected products; forks can replace the public content through the locale JSON files without rewriting the interface.
+A code-native Flutter Web portfolio built as one procedural render atlas. Scroll geometry moves the same canvas scene through five visual states while the document presents production experience, engineering principles, and selected products.
 
 ![Flutter](https://img.shields.io/badge/Flutter-3.41-02569B?logo=flutter)
 ![Dart](https://img.shields.io/badge/Dart-3.11-0175C2?logo=dart)
 ![License](https://img.shields.io/badge/License-MIT-green)
 
-[**Live Demo**](https://developeryusuf.com)
+[**Live Site**](https://developeryusuf.com)
 
 </div>
 
-## Customize the portfolio
+## Content model
 
 Edit `assets/i18n/*.json` to change the role, biography, experience, skills, working principles, projects, and interface labels. Keep the same keys in every locale so the translation catalog remains type-safe.
 
-The public demo intentionally avoids personal contact details. Add only the identity and links you are comfortable publishing.
+The public site intentionally avoids personal contact details. Publish only the identity and links you are comfortable exposing.
 
 Useful keyboard shortcuts:
 
@@ -28,7 +28,8 @@ Useful keyboard shortcuts:
 - English, Turkish, German, French, Spanish, Arabic with RTL, and Hindi.
 - Accessible headings, keyboard navigation, skip links, focus states, and reduced-motion support.
 - Data-driven experience, skills, principles, and project sections.
-- A single first-frame handoff from the HTML loading shell to the Flutter hero.
+- A matching first-frame handoff from the HTML render-atlas shell to Flutter.
+- Scroll-directed procedural planes, perspective geometry, and registration marks rendered with `CustomPainter`.
 - Dart WebAssembly and SkWasm release with a JavaScript and CanvasKit fallback.
 - Playwright coverage for loading, accessibility, localization, routing, and release assets.
 
@@ -53,7 +54,7 @@ npm run verify:bundle
 
 The output contains both `main.dart.wasm` and `main.dart.js`. Compatible browsers run the Wasm/SkWasm path; Flutter selects the JavaScript/CanvasKit path when needed.
 
-Typography is bundled locally as variable Inter, Space Grotesk, and JetBrains Mono assets. Their SIL Open Font License texts are kept beside the font files under `assets/fonts/`, so the first render does not depend on a font CDN.
+Typography is bundled locally as Inter, Space Grotesk, JetBrains Mono, Instrument Serif, Noto Sans Arabic, and Noto Sans Devanagari. Their SIL Open Font License texts are kept beside the font files under `assets/fonts/`, so every locale renders without a font CDN.
 
 ### Required headers for threaded SkWasm
 
@@ -73,7 +74,7 @@ These headers make the page cross-origin isolated where the browser supports it.
 | Public content | `assets/i18n/*.json` | Project evidence, skills, and localized interface copy |
 | Your meta tags | `web/index.html` | Title, OG tags, analytics, structured data |
 | Social preview | `tool/social_card.html` | Deterministic 1200×630 source; run `npm run render:social-card` after editing |
-| Scene palette | `lib/app/core/constants/scene_configs.dart` | Gradients, accents, particle speed, vignette |
+| Scene palette | `lib/app/core/constants/scene_configs.dart` | Gradients, accents, atlas morph, vignette |
 
 ---
 
@@ -89,7 +90,7 @@ main.dart
             └── HomeView
                 ├── AppScrollController → URL history + measured chapter geometry
                 ├── SceneDirector → geometry-aligned SceneConfig interpolation
-                └── CustomPaint layers → mesh, grain, and particles
+                └── CustomPaint → grid, atlas planes, grain, and registration marks
 ```
 
 The state boundary is intentional:
@@ -107,8 +108,8 @@ Key implementation files:
 | Locale state and concurrency | `lib/app/features/language/application/language_cubit.dart` |
 | Browser history + section detection | `lib/app/controllers/scroll_controller.dart` |
 | Geometry-aligned scene interpolation | `lib/app/controllers/scene_director.dart` |
-| Particle spatial grid | `lib/app/widgets/constellation_particles.dart` |
-| Custom mesh and grain painter | `lib/app/widgets/background/cinematic_background.dart` |
+| Procedural render atlas | `lib/app/widgets/background/cinematic_background.dart` |
+| Spatial product archive | `lib/app/modules/home/sections/projects/projects_section.dart` |
 
 ---
 
@@ -120,7 +121,7 @@ Key implementation files:
 | **Application state** | `flutter_bloc` — explicit dependencies and immutable snapshots |
 | **Render coordination** | Cubit selectors + painter-local `Listenable` updates |
 | **i18n** | Application-owned JSON repository + `LanguageCubit` — 7 languages, ordered runtime switching |
-| **Fonts** | Local variable Inter, JetBrains Mono, and Space Grotesk assets with adjacent SIL Open Font Licenses |
+| **Fonts** | Six local Latin, Arabic, and Devanagari families with adjacent SIL Open Font Licenses |
 | **CI/CD** | GitHub Actions — pinned Flutter toolchain, fatal-info analysis, tests, bundle budget, browser smoke tests |
 | **UI layer** | Flutter widgets and custom painters; no web component library |
 
