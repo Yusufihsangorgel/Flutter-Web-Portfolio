@@ -7,6 +7,8 @@
     "test": "playwright test",
     "test:e2e": "playwright test",
     "test:e2e:prod": "playwright test --config playwright.prod.config.ts",
+    "test:visual": "playwright test tests/e2e/visual.spec.ts",
+    "test:visual:update": "playwright test tests/e2e/visual.spec.ts --update-snapshots",
     "sync:content": "node tool/sync_public_content.mjs",
     "verify:content": "node tool/sync_public_content.mjs --check",
     "render:social-card": "node tool/render_social_card.mjs",

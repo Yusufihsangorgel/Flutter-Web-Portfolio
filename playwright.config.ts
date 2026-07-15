@@ -2,8 +2,19 @@ import { defineConfig, devices } from '@playwright/test';
 
 export default defineConfig({
   testDir: './tests/e2e',
+  snapshotPathTemplate:
+    '{testDir}/{testFilePath}-snapshots/{arg}{-projectName}{ext}',
   timeout: 60000,
-  expect: { timeout: 10000 },
+  expect: {
+    timeout: 10000,
+    toHaveScreenshot: {
+      animations: 'disabled',
+      caret: 'hide',
+      maxDiffPixelRatio: 0.003,
+      scale: 'css',
+      threshold: 0.2,
+    },
+  },
   fullyParallel: true,
   // Each worker boots and compiles an isolated Wasm renderer. Serial execution
   // keeps cold-cache CI runs deterministic on constrained hosts.
@@ -29,9 +40,30 @@ export default defineConfig({
       name: 'desktop',
       use: {
         ...devices['Desktop Chrome'],
+        colorScheme: 'dark',
+        locale: 'en-US',
+        timezoneId: 'UTC',
         viewport: { width: 1440, height: 900 },
       },
     },
-    { name: 'mobile', use: { ...devices['Pixel 7'] } },
+    {
+      name: 'mobile',
+      use: {
+        ...devices['Pixel 7'],
+        colorScheme: 'dark',
+        locale: 'en-US',
+        timezoneId: 'UTC',
+      },
+    },
+    {
+      name: 'tablet-visual',
+      testMatch: /visual\.spec\.ts/,
+      use: {
+        ...devices['iPad Pro 11'],
+        colorScheme: 'dark',
+        locale: 'en-US',
+        timezoneId: 'UTC',
+      },
+    },
   ],
 });

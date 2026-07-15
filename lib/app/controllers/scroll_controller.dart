@@ -222,11 +222,14 @@ final class AppScrollController extends Cubit<AppScrollState>
       _isManualScrolling = true;
       _setActiveSection(sectionId, syncUrl: syncUrl);
 
-      final targetOffset =
-          (sectionId == 'home'
-                  ? 0.0
-                  : sectionTop - AppDimensions.appBarHeightMobile)
-              .clamp(0.0, scrollController.position.maxScrollExtent);
+      // The measured reveal offset is the chapter destination. Applying a
+      // second toolbar subtraction leaves the previous narrative bridge in
+      // view on compact layouts and makes chapter links settle one bar-height
+      // too early.
+      final targetOffset = (sectionId == 'home' ? 0.0 : sectionTop).clamp(
+        0.0,
+        scrollController.position.maxScrollExtent,
+      );
       final Future<void> scrollFuture;
       if (_reduceMotion) {
         scrollController.jumpTo(targetOffset);

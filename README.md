@@ -85,15 +85,15 @@ The document and render loop have deliberately different update paths:
 
 ## First meaningful frame
 
-The HTML layer is only a neutral compositor bed. It has no duplicate hero, navigation, or professional copy, and it never forces a service-worker cleanup reload. Flutter owns the first meaningful frame.
+The HTML layer contains a critical shell generated from the canonical portfolio manifest during release preparation. It is not a second content source: role, headline, focus areas, and content version are injected from `assets/content/portfolio.json`, then verified against that record. The shell gives a cold Wasm visit a meaningful first paint while Flutter initializes, and it never forces a service-worker cleanup reload.
 
 Cold SkWasm measurements showed that `flutter-first-frame` could precede visible compositor output by 90.3–143.0 ms. The reproducible finding is tracked in [flutter/flutter#189499](https://github.com/flutter/flutter/issues/189499); [flutter/flutter#189500](https://github.com/flutter/flutter/pull/189500) proposes waiting for outstanding scene renders and the next browser frame. The patch is under review with its engine tests passing across seven Chrome renderer/compiler suites.
 
-The local handoff retains the neutral background for two browser frames after Flutter's event. This avoids a blank flash without presenting a second portfolio screen.
+The handoff retains the visually aligned critical shell for two browser frames after Flutter's event. This avoids a blank flash while the Flutter surface reaches the compositor, then removes the HTML layer once.
 
 ### Runtime measurement
 
-The bootstrap publishes ordered User Timing marks for entrypoint loading, engine initialization, Flutter's first-frame event, compositor-safe reveal, and final bootstrap removal. A separate cold-context runner samples three launches plus a frame-by-frame full-document scroll, then reports median startup, p95 frame interval, long-task time, layout shift, and renderer transfer data.
+The bootstrap publishes ordered User Timing marks for entrypoint loading, engine initialization, Flutter's first-frame event, compositor-safe reveal, and final bootstrap removal. A separate cold-context runner samples three launches plus a frame-by-frame full-document scroll, then reports median startup, refresh-cadence-normalized frame misses, long-task time, layout shift, and renderer transfer data. Raw frame intervals remain in the report.
 
 ```bash
 # Serve build/web separately, then collect a three-run JSON report.
@@ -127,10 +127,11 @@ flutter test
 flutter build web --release --wasm --no-web-resources-cdn
 npm run prepare:bundle
 npm run verify:bundle
+npm run test:visual
 npm test
 ```
 
-The bundle gate checks Wasm headers, dual-runtime configuration, versioned entry points, self-hosted renderer assets, local font coverage, first-frame cleanup, service-worker retirement, and explicit size budgets. Playwright then exercises desktop and mobile semantics, locale/RTL switching, URL history, security headers, and release assets.
+The bundle gate checks Wasm headers, dual-runtime configuration, versioned entry points, self-hosted renderer assets, local font coverage, first-frame cleanup, service-worker retirement, and explicit size budgets. Playwright then exercises desktop and mobile semantics, locale/RTL switching, URL history, security headers, and release assets. Twelve checked-in screenshots lock the critical shell, hero, open-source chapter, and systems chapter across desktop, mobile, and tablet viewports with reduced motion enabled.
 
 ## Local development
 
@@ -159,6 +160,7 @@ Useful controls:
 | Full-width system studies | `lib/app/modules/home/sections/projects/projects_section.dart` |
 | Content synchronization | `tool/sync_public_content.mjs` |
 | Runtime measurement | `tool/measure_web_runtime.mjs`, `tool/performance_budget.json` |
+| Responsive visual regression | `tests/e2e/visual.spec.ts`, `tests/e2e/visual.spec.ts-snapshots/` |
 | Release integrity | `tool/prepare_web_release.mjs`, `tool/verify_web_build.mjs` |
 
 ## License
