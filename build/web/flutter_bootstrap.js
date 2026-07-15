@@ -33,7 +33,7 @@ addEventListener("message", eventListener);
 if (!window._flutter) {
   window._flutter = {};
 }
-_flutter.buildConfig = {"engineRevision":"6c0baaebf70e0148f485f27d5616b3d3382da7bf","builds":[{"compileTarget":"dart2wasm","renderer":"skwasm","mainWasmPath":"main.dart.wasm?v=ffbc74fa3309f6db","jsSupportRuntimePath":"main.dart.mjs?v=ffbc74fa3309f6db"},{"compileTarget":"dart2js","renderer":"canvaskit","mainJsPath":"main.dart.js?v=ffbc74fa3309f6db"}],"useLocalCanvasKit":true};
+_flutter.buildConfig = {"engineRevision":"6c0baaebf70e0148f485f27d5616b3d3382da7bf","builds":[{"compileTarget":"dart2wasm","renderer":"skwasm","mainWasmPath":"main.dart.wasm?v=24b50c04a6f1657c","jsSupportRuntimePath":"main.dart.mjs?v=24b50c04a6f1657c"},{"compileTarget":"dart2js","renderer":"canvaskit","mainJsPath":"main.dart.js?v=24b50c04a6f1657c"}],"useLocalCanvasKit":true};
 
 
 const removeBootstrapSurface = () => {
@@ -58,21 +58,20 @@ const showBootstrapFailure = (error) => {
   const splash = document.getElementById('bootstrap-surface');
   if (!splash) return;
 
-  splash.classList.add('bootstrap-surface--failed');
   splash.setAttribute('aria-busy', 'false');
   splash.setAttribute('aria-label', 'The portfolio could not start');
-  const label = splash.querySelector('.bootstrap-kicker');
-  if (label) label.textContent = 'The portfolio could not start';
-  const status = splash.querySelector('.bootstrap-status');
-  if (status) {
-    status.textContent = 'The portfolio could not load. Please try again.';
-    const retry = document.createElement('button');
-    retry.type = 'button';
-    retry.className = 'bootstrap-retry';
-    retry.textContent = 'Retry';
-    retry.addEventListener('click', () => window.location.reload());
-    status.appendChild(retry);
-  }
+  splash.replaceChildren();
+  const status = document.createElement('div');
+  status.className = 'bootstrap-error';
+  status.setAttribute('role', 'alert');
+  status.textContent = 'The portfolio could not load. Please try again.';
+  const retry = document.createElement('button');
+  retry.type = 'button';
+  retry.className = 'bootstrap-retry';
+  retry.textContent = 'Retry';
+  retry.addEventListener('click', () => window.location.reload());
+  status.appendChild(retry);
+  splash.appendChild(status);
 };
 
 const engineConfig = {

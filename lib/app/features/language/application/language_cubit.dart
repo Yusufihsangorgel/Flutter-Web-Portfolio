@@ -86,24 +86,8 @@ final class LanguageCubit extends Cubit<LanguageState> {
   Map<String, String> get supportedLanguages =>
       _languageRepository.getSupportedLanguages();
 
-  Map<String, dynamic> get cvData => switch (state.translations['cv_data']) {
-    final Map<String, dynamic> data => data,
-    _ => const <String, dynamic>{},
-  };
-
   String get appName =>
       state.translations['app_name']?.toString() ?? 'Portfolio';
-
-  List<String> get activeSections {
-    final data = cvData;
-    return [
-      'home',
-      if (data['personal_info'] is Map) 'about',
-      if (data['experiences'] case final List l when l.isNotEmpty) 'experience',
-      if (data['proof'] case final List l when l.isNotEmpty) 'proof',
-      if (data['projects'] case final List l when l.isNotEmpty) 'projects',
-    ];
-  }
 
   String getText(String key, {String defaultValue = ''}) {
     final parts = key.split('.');

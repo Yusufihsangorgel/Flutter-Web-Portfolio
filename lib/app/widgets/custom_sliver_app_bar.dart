@@ -3,6 +3,7 @@ import 'dart:ui' show lerpDouble;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_web_portfolio/app/core/theme/app_fonts.dart';
+import 'package:flutter_web_portfolio/app/domain/models/portfolio_document.dart';
 import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_config.dart';
 import 'package:flutter_web_portfolio/app/controllers/scroll_controller.dart';
@@ -30,8 +31,8 @@ class CustomSliverAppBar extends StatefulWidget {
   final List<Widget>? actions;
 
   /// Nav sections derived at build-time from active sections (excludes 'home').
-  static List<String> navSections(LanguageCubit lc) =>
-      lc.activeSections.where((s) => s != 'home').toList();
+  static List<String> navSections(PortfolioDocument portfolio) =>
+      portfolio.activeSections.where((section) => section != 'home').toList();
 
   /// Maximum (expanded) toolbar height.
   static const _maxHeight = 80.0;
@@ -102,9 +103,12 @@ class _CustomSliverAppBarState extends State<CustomSliverAppBar> {
         children: [
           Expanded(
             child: Container(
-              decoration: BoxDecoration(
-                color: AppColors.background.withValues(alpha: 0.94),
-                border: const Border(
+              decoration: const BoxDecoration(
+                // Pinned chapter navigation is deliberately opaque. Long
+                // interlude headlines must never ghost through the toolbar
+                // while anchor navigation settles.
+                color: AppColors.background,
+                border: Border(
                   bottom: BorderSide(color: Color(0x24F2F0E9), width: 1),
                 ),
               ),
@@ -152,7 +156,7 @@ class _CustomSliverAppBarState extends State<CustomSliverAppBar> {
               previous.activeSection != current.activeSection,
           builder: (context, scrollState) {
             final sections = CustomSliverAppBar.navSections(
-              widget.languageController,
+              context.read<PortfolioDocument>(),
             );
             return Row(
               mainAxisAlignment: MainAxisAlignment.end,
@@ -209,7 +213,7 @@ class _LogoTextState extends State<_LogoText> {
       child: AnimatedContainer(
         duration: AppDurations.buttonHover,
         child: Text(
-          AppConfig.initials(widget.languageController),
+          AppConfig.initials(context.read<PortfolioDocument>()),
           style: AppFonts.jetBrainsMono(
             fontSize: 11 * widget.scaleFactor,
             fontWeight: FontWeight.w600,

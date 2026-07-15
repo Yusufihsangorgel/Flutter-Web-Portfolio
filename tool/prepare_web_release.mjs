@@ -34,6 +34,7 @@ const versionedBootstrap = versionEntrypoints(bootstrap, releaseId);
 await writeFile(bootstrapPath, versionedBootstrap);
 await versionRendererDirectory(engineRevision);
 await injectReleasePreloads(releaseId, engineRevision);
+await writeLegacyServiceWorkerKillSwitch();
 await normalizeNoticeWhitespace();
 
 console.log(
@@ -142,6 +143,24 @@ async function normalizeNoticeWhitespace() {
   const notices = await readFile(noticesPath, 'utf8');
   const normalized = notices.replace(/[\t ]+$/gm, '');
   if (normalized !== notices) await writeFile(noticesPath, normalized);
+}
+
+async function writeLegacyServiceWorkerKillSwitch() {
+  const source = `'use strict';
+
+self.addEventListener('install', (event) => {
+  self.skipWaiting();
+});
+
+self.addEventListener('activate', (event) => {
+  event.waitUntil((async () => {
+    await self.registration.unregister();
+    const names = await caches.keys();
+    await Promise.all(names.map((name) => caches.delete(name)));
+  })());
+});
+`;
+  await writeFile(path.join(webRoot, 'flutter_service_worker.js'), source);
 }
 
 async function collectFiles(directory) {

@@ -117,9 +117,11 @@ test('serves the complete professional narrative in production', async ({
   await openPortfolio(page);
   await expect(page.getByRole('heading', { name: 'About Me' })).toBeAttached();
   await expect(page.getByRole('heading', { name: 'Experience' })).toBeAttached();
-  await expect(page.getByRole('heading', { name: 'How I Work' })).toBeAttached();
-  await expect(page.getByRole('heading', { name: 'Selected Work' })).toBeAttached();
-  await expect(page.getByText('Mobile Team Lead')).toBeAttached();
+  await expect(page.getByRole('heading', { name: 'Open Source' })).toBeAttached();
+  await expect(page.getByRole('heading', { name: 'Selected Systems' })).toBeAttached();
+  await expect(
+    page.getByText('Software Engineer — Cross-platform'),
+  ).toBeAttached();
 });
 
 test('serves the production accessibility hierarchy', async ({
@@ -144,14 +146,14 @@ test('serves the production accessibility hierarchy', async ({
     .filter((node) => ['button', 'link'].includes(node.role?.value ?? ''))
     .map((node) => node.name?.value ?? '');
 
-  expect(headings).toContainEqual({ name: 'SENIOR FLUTTER ENGINEER.', level: 1 });
+  expect(headings).toContainEqual({ name: 'SOFTWARE ENGINEER.', level: 1 });
   expect(controls).toEqual(
     expect.arrayContaining([
       'Skip to content',
       'Back to top',
       ...(isMobile
         ? ['Open navigation menu']
-        : ['About', 'Experience', 'Approach', 'Projects']),
+        : ['About', 'Experience', 'Open Source', 'Systems']),
       'Language menu: English',
     ]),
   );
@@ -161,7 +163,7 @@ test('serves the production accessibility hierarchy', async ({
   );
 
   await expect(
-    page.getByRole('heading', { name: 'Selected Work' }),
+    page.getByRole('heading', { name: 'Selected Systems' }),
   ).toBeAttached();
 
   const projectsTree = await accessibility.send(
@@ -170,12 +172,15 @@ test('serves the production accessibility hierarchy', async ({
   const projectLinks = projectsTree.nodes
     .filter((node) => !node.ignored && node.role?.value === 'link')
     .map((node) => node.name?.value ?? '');
-  expect(projectLinks).toContain('Open Project: FakeCallApp');
+  expect(projectLinks).toContain('View source: Flutter Web Portfolio');
   expect(projectLinks).toContain(
-    'Inspect upstream patch. Fix the layer beneath the product. '
-      + 'flutter/flutter issue #189499 · draft PR #189500',
+    'Open pull request. Wait for web rendering before the first-frame event. '
+      + 'Flutter · under review · 2026-07-15',
   );
-  expect(projectLinks).not.toContain('Open Project');
+  expect(projectLinks).toEqual(
+    expect.arrayContaining(['GitHub', 'LinkedIn', 'Writing']),
+  );
+  expect(projectLinks).not.toContain('View source');
   expect(projectLinks).not.toContain('Website');
 });
 
@@ -206,9 +211,9 @@ test('serves the declared production sharing and font assets', async ({
   const document = await request.get('/');
   expect(document.status()).toBe(200);
   const html = await document.text();
-  expect(html).toContain('class="bootstrap-title"');
+  expect(html).toContain('class="bootstrap-progress"');
   expect(html).toContain('aria-busy="true"');
-  expect(html).toContain('Preparing the portfolio');
+  expect(html).not.toContain('class="bootstrap-title"');
   expect(html).toContain(
     'content="https://developeryusuf.com/assets/og/engineering-showcase.png"',
   );
@@ -252,5 +257,5 @@ test('serves the declared production sharing and font assets', async ({
 
   const version = await request.get('/version.json');
   expect(version.status()).toBe(200);
-  expect(await version.json()).toMatchObject({ version: '1.1.0' });
+  expect(await version.json()).toMatchObject({ version: '1.2.0' });
 });

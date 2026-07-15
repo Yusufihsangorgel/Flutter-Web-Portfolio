@@ -8,6 +8,7 @@ import 'package:flutter_web_portfolio/app/domain/repositories/i_language_reposit
 import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
 import 'package:flutter_web_portfolio/app/modules/home/sections/proof_section.dart';
 import 'package:flutter_web_portfolio/app/widgets/cinematic_focusable.dart';
+import '../helpers/portfolio_fixture.dart';
 
 final class _ProofLanguageRepository implements ILanguageRepository {
   @override
@@ -18,37 +19,8 @@ final class _ProofLanguageRepository implements ILanguageRepository {
 
   @override
   Future<Map<String, dynamic>> getTranslations(String languageCode) async => {
-    'nav': {'proof': 'Approach'},
-    'proof_section': {
-      'title': 'How I Work',
-      'subtitle': 'A practical approach',
-    },
-    'cv_data': {
-      'proof': [
-        {
-          'title': 'Own the product',
-          'detail': 'Stay close to the problem.',
-          'verification': 'Product before ceremony',
-        },
-        {
-          'title': 'Design for real conditions',
-          'detail': 'Build for unreliable networks.',
-          'verification': 'Resilience by design',
-        },
-        {
-          'title': 'Keep it maintainable',
-          'detail': 'Make the next change easier.',
-          'verification': 'Built for the next change',
-        },
-        {
-          'title': 'Fix the layer beneath the product',
-          'detail': 'Turn a renderer gap into an upstream fix.',
-          'verification': 'flutter/flutter issue #189499 · draft PR #189500',
-          'action': 'Inspect upstream patch',
-          'url': 'https://github.com/flutter/flutter/pull/189500',
-        },
-      ],
-    },
+    'nav': {'proof': 'Open Source'},
+    'proof_section': {'title': 'Open Source'},
   };
 
   @override
@@ -73,27 +45,38 @@ void main() {
     expect(scroll.activeSection, 'home');
   });
 
-  Widget buildSubject() => MultiBlocProvider(
-    providers: [
-      BlocProvider.value(value: language),
-      BlocProvider.value(value: scroll),
-      BlocProvider.value(value: scene),
-    ],
-    child: const MaterialApp(
-      home: Scaffold(body: SingleChildScrollView(child: ProofSection())),
+  Widget buildSubject() => RepositoryProvider.value(
+    value: loadPortfolioFixture(),
+    child: MultiBlocProvider(
+      providers: [
+        BlocProvider.value(value: language),
+        BlocProvider.value(value: scroll),
+        BlocProvider.value(value: scene),
+      ],
+      child: const MaterialApp(
+        home: Scaffold(body: SingleChildScrollView(child: ProofSection())),
+      ),
     ),
   );
 
-  testWidgets('renders practical working principles', (tester) async {
+  testWidgets('renders verified open-source contributions', (tester) async {
     await tester.pumpWidget(buildSubject());
     await tester.pump(const Duration(seconds: 1));
 
-    expect(find.text('How I Work'), findsOneWidget);
-    expect(find.text('Own the product'), findsOneWidget);
-    expect(find.text('Design for real conditions'), findsOneWidget);
-    expect(find.text('Keep it maintainable'), findsOneWidget);
-    expect(find.text('Fix the layer beneath the product'), findsOneWidget);
-    expect(find.text('INSPECT UPSTREAM PATCH'), findsOneWidget);
+    expect(find.text('Open Source'), findsOneWidget);
+    expect(
+      find.text('Make Firebase core loading deterministic on WebKit'),
+      findsOneWidget,
+    );
+    expect(
+      find.text('Treat SQLite TRUE and 1 defaults as the same schema'),
+      findsOneWidget,
+    );
+    expect(
+      find.text('Wait for web rendering before the first-frame event'),
+      findsOneWidget,
+    );
+    expect(find.text('PULL REQUEST'), findsNWidgets(5));
     expect(find.textContaining('testimonial'), findsNothing);
     expect(tester.takeException(), isNull);
   });
@@ -109,8 +92,8 @@ void main() {
         (widget) =>
             widget is CinematicFocusable &&
             widget.semanticRole == CinematicControlRole.link &&
-            widget.semanticLabel?.contains('Inspect upstream patch') == true &&
-            widget.semanticLabel?.contains('draft PR #189500') == true,
+            widget.semanticLabel?.contains('Open pull request') == true &&
+            widget.semanticLabel?.contains('first-frame event') == true,
       ),
       findsOneWidget,
     );
@@ -127,10 +110,14 @@ void main() {
     await tester.pumpWidget(buildSubject());
     await tester.pump(const Duration(seconds: 1));
 
-    expect(find.text('Own the product'), findsOneWidget);
-    expect(find.text('Design for real conditions'), findsOneWidget);
-    expect(find.text('Keep it maintainable'), findsOneWidget);
-    expect(find.text('Fix the layer beneath the product'), findsOneWidget);
+    expect(
+      find.text('Make Firebase core loading deterministic on WebKit'),
+      findsOneWidget,
+    );
+    expect(
+      find.text('Wait for web rendering before the first-frame event'),
+      findsOneWidget,
+    );
     expect(tester.takeException(), isNull);
   });
 }

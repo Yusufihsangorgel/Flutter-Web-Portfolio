@@ -5,6 +5,10 @@ import 'package:flutter_web_portfolio/app/domain/providers/i_local_storage_provi
 
 class _MockAssetsProvider implements IAssetsProvider {
   @override
+  Future<Map<String, dynamic>> loadPortfolio() =>
+      throw UnimplementedError('Not used by language repository tests');
+
+  @override
   Future<Map<String, dynamic>> loadTranslations(String langCode) async => {
     'key': 'value',
     'lang': langCode,

@@ -10,6 +10,7 @@ import 'package:flutter_web_portfolio/app/core/constants/app_dimensions.dart';
 import 'package:flutter_web_portfolio/app/core/constants/durations.dart';
 import 'package:flutter_web_portfolio/app/core/constants/breakpoints.dart';
 import 'package:flutter_web_portfolio/app/core/constants/scene_configs.dart';
+import 'package:flutter_web_portfolio/app/domain/models/portfolio_document.dart';
 import 'package:flutter_web_portfolio/app/core/theme/app_fonts.dart';
 import 'package:flutter_web_portfolio/app/modules/home/sections/home_section.dart';
 import 'package:flutter_web_portfolio/app/modules/home/sections/about_section.dart';
@@ -76,7 +77,7 @@ class _HomeViewState extends State<HomeView> {
       onKeyEvent: _handleKeyEvent,
       child: BlocBuilder<LanguageCubit, LanguageState>(
         builder: (context, state) {
-          final active = languageController.activeSections;
+          final active = context.read<PortfolioDocument>().activeSections;
           return Scaffold(
             backgroundColor: AppColors.background,
             body: _buildBody(
@@ -96,98 +97,101 @@ class _HomeViewState extends State<HomeView> {
     AppScrollController scrollController,
     LanguageCubit languageController,
     List<String> active,
-  ) => Stack(
-    children: [
-      const Positioned.fill(
-        child: RepaintBoundary(child: CinematicBackground()),
-      ),
-      // Skip-to-content link (accessibility)
-      Positioned(
-        top: 0,
-        left: 0,
-        right: 0,
-        child: _SkipToContentLink(
-          label: languageController.getText(
-            'accessibility.skip_to_content',
-            defaultValue: 'Skip to content',
+  ) {
+    final story = context.read<PortfolioDocument>().story;
+    return Stack(
+      children: [
+        const Positioned.fill(
+          child: RepaintBoundary(child: CinematicBackground()),
+        ),
+        // Skip-to-content link (accessibility)
+        Positioned(
+          top: 0,
+          left: 0,
+          right: 0,
+          child: _SkipToContentLink(
+            label: languageController.getText(
+              'accessibility.skip_to_content',
+              defaultValue: 'Skip to content',
+            ),
+            visible: _skipLinkVisible,
+            focusNode: _skipLinkFocusNode,
+            onFocusChanged: (focused) {
+              setState(() => _skipLinkVisible = focused);
+            },
+            onActivate: () {
+              scrollController.scrollToSection('about');
+            },
           ),
-          visible: _skipLinkVisible,
-          focusNode: _skipLinkFocusNode,
-          onFocusChanged: (focused) {
-            setState(() => _skipLinkVisible = focused);
-          },
-          onActivate: () {
-            scrollController.scrollToSection('about');
-          },
         ),
-      ),
-      // Layer 3: one continuous, immediately interactive document.
-      ScrollConfiguration(
-        behavior: ScrollConfiguration.of(context).copyWith(
-          dragDevices: {
-            PointerDeviceKind.touch,
-            PointerDeviceKind.mouse,
-            PointerDeviceKind.trackpad,
-          },
+        // Layer 3: one continuous, immediately interactive document.
+        ScrollConfiguration(
+          behavior: ScrollConfiguration.of(context).copyWith(
+            dragDevices: {
+              PointerDeviceKind.touch,
+              PointerDeviceKind.mouse,
+              PointerDeviceKind.trackpad,
+            },
+          ),
+          child: CustomScrollView(
+            controller: scrollController.scrollController,
+            physics: const ClampingScrollPhysics(),
+            // This is a short, single-document portfolio. Keeping every chapter
+            // mounted makes global navigation, measured scene transitions, and
+            // the accessibility tree deterministic from the first frame.
+            cacheExtent: 16000,
+            slivers: [
+              CustomSliverAppBar(
+                scrollController: scrollController,
+                languageController: languageController,
+              ),
+              _buildSection(
+                scrollController.homeKey,
+                const HomeSection(),
+                context,
+                isHero: true,
+              ),
+              if (active.contains('about')) ...[
+                _NarrativeBridge(beat: story[0], from: 0, to: 1),
+                _buildSection(
+                  scrollController.aboutKey,
+                  const AboutSection(),
+                  context,
+                ),
+              ],
+              if (active.contains('experience')) ...[
+                _NarrativeBridge(beat: story[1], from: 1, to: 2),
+                _buildSection(
+                  scrollController.experienceKey,
+                  const ExperienceSection(),
+                  context,
+                ),
+              ],
+              if (active.contains('proof')) ...[
+                _NarrativeBridge(beat: story[2], from: 2, to: 3),
+                _buildSection(
+                  scrollController.proofKey,
+                  const ProofSection(),
+                  context,
+                ),
+              ],
+              if (active.contains('projects')) ...[
+                _NarrativeBridge(beat: story[3], from: 3, to: 4),
+                _buildSection(
+                  scrollController.projectsKey,
+                  const ProjectsSection(),
+                  context,
+                ),
+              ],
+              const SliverToBoxAdapter(child: PremiumFooter()),
+            ],
+          ),
         ),
-        child: CustomScrollView(
-          controller: scrollController.scrollController,
-          physics: const ClampingScrollPhysics(),
-          // This is a short, single-document portfolio. Keeping every chapter
-          // mounted makes global navigation, measured scene transitions, and
-          // the accessibility tree deterministic from the first frame.
-          cacheExtent: 16000,
-          slivers: [
-            CustomSliverAppBar(
-              scrollController: scrollController,
-              languageController: languageController,
-            ),
-            _buildSection(
-              scrollController.homeKey,
-              const HomeSection(),
-              context,
-              isHero: true,
-            ),
-            if (active.contains('about')) ...[
-              const _NarrativeBridge(from: 0, to: 1),
-              _buildSection(
-                scrollController.aboutKey,
-                const AboutSection(),
-                context,
-              ),
-            ],
-            if (active.contains('experience')) ...[
-              const _NarrativeBridge(from: 1, to: 2),
-              _buildSection(
-                scrollController.experienceKey,
-                const ExperienceSection(),
-                context,
-              ),
-            ],
-            if (active.contains('proof')) ...[
-              const _NarrativeBridge(from: 2, to: 3),
-              _buildSection(
-                scrollController.proofKey,
-                const ProofSection(),
-                context,
-              ),
-            ],
-            if (active.contains('projects')) ...[
-              const _NarrativeBridge(from: 3, to: 4),
-              _buildSection(
-                scrollController.projectsKey,
-                const ProjectsSection(),
-                context,
-              ),
-            ],
-            const SliverToBoxAdapter(child: PremiumFooter()),
-          ],
-        ),
-      ),
-      // Layer 4: Back-to-top button with scroll progress
-      const BackToTopButton(),
-    ],
-  );
+        // Layer 4: Back-to-top button with scroll progress
+        const BackToTopButton(),
+      ],
+    );
+  }
 
   EdgeInsets _sectionPadding(BuildContext context) {
     final width = MediaQuery.sizeOf(context).width;
@@ -215,8 +219,13 @@ class _HomeViewState extends State<HomeView> {
 }
 
 class _NarrativeBridge extends StatelessWidget {
-  const _NarrativeBridge({required this.from, required this.to});
+  const _NarrativeBridge({
+    required this.beat,
+    required this.from,
+    required this.to,
+  });
 
+  final PortfolioStoryBeat beat;
   final int from;
   final int to;
 
@@ -231,40 +240,124 @@ class _NarrativeBridge extends StatelessWidget {
     final fromColor = SceneConfigs.scenes[from].accent;
     final toColor = SceneConfigs.scenes[to].accent;
 
+    final compact = width < Breakpoints.tablet;
+
     return SliverToBoxAdapter(
-      child: ExcludeSemantics(
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: horizontal),
-          child: SizedBox(
-            height: width > Breakpoints.tablet ? 116 : 72,
-            child: Row(
-              children: [
-                _ChapterIndex(value: from, color: fromColor),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Container(
-                    height: 1,
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          fromColor.withValues(alpha: 0.18),
-                          fromColor.withValues(alpha: 0.8),
-                          toColor.withValues(alpha: 0.8),
-                          toColor.withValues(alpha: 0.18),
-                        ],
+      child: Semantics(
+        container: true,
+        label: '${beat.eyebrow}. ${beat.title}. ${beat.body}',
+        child: ExcludeSemantics(
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: horizontal),
+            child: SizedBox(
+              height: compact ? 430 : 560,
+              child: Stack(
+                children: [
+                  Positioned(
+                    top: compact ? 44 : 72,
+                    left: 0,
+                    right: 0,
+                    child: _BridgeRail(
+                      beat: beat,
+                      from: from,
+                      to: to,
+                      fromColor: fromColor,
+                      toColor: toColor,
+                    ),
+                  ),
+                  Positioned(
+                    top: compact ? 108 : 142,
+                    left: 0,
+                    right: compact ? 0 : width * 0.12,
+                    child: Text(
+                      beat.title,
+                      style: AppFonts.instrumentSerif(
+                        fontSize: compact ? 49 : 82,
+                        fontStyle: FontStyle.italic,
+                        color: AppColors.textBright,
+                        height: 0.98,
+                        letterSpacing: compact ? -1.2 : -2.6,
                       ),
                     ),
                   ),
-                ),
-                const SizedBox(width: 16),
-                _ChapterIndex(value: to, color: toColor),
-              ],
+                  Positioned(
+                    right: 0,
+                    bottom: compact ? 42 : 68,
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        maxWidth: compact ? width - horizontal * 2 : 520,
+                      ),
+                      child: Text(
+                        beat.body,
+                        style: AppFonts.spaceGrotesk(
+                          fontSize: compact ? 16 : 19,
+                          fontWeight: FontWeight.w400,
+                          color: AppColors.textPrimary,
+                          height: 1.55,
+                          letterSpacing: -0.2,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
       ),
     );
   }
+}
+
+class _BridgeRail extends StatelessWidget {
+  const _BridgeRail({
+    required this.beat,
+    required this.from,
+    required this.to,
+    required this.fromColor,
+    required this.toColor,
+  });
+
+  final PortfolioStoryBeat beat;
+  final int from;
+  final int to;
+  final Color fromColor;
+  final Color toColor;
+
+  @override
+  Widget build(BuildContext context) => Row(
+    children: [
+      _ChapterIndex(value: from, color: fromColor),
+      const SizedBox(width: 16),
+      Expanded(
+        child: Container(
+          height: 1,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                fromColor.withValues(alpha: 0.24),
+                fromColor.withValues(alpha: 0.9),
+                toColor.withValues(alpha: 0.9),
+                toColor.withValues(alpha: 0.24),
+              ],
+            ),
+          ),
+        ),
+      ),
+      const SizedBox(width: 18),
+      Text(
+        beat.eyebrow.toUpperCase(),
+        style: AppFonts.jetBrainsMono(
+          fontSize: 9,
+          fontWeight: FontWeight.w600,
+          color: toColor,
+          letterSpacing: 1.2,
+        ),
+      ),
+      const SizedBox(width: 18),
+      _ChapterIndex(value: to, color: toColor),
+    ],
+  );
 }
 
 class _ChapterIndex extends StatelessWidget {

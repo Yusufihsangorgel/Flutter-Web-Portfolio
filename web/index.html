@@ -6,30 +6,32 @@
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+  <!-- portfolio-meta:start -->
   <link rel="canonical" href="https://developeryusuf.com">
-  <title>Senior Flutter Engineer — Mobile, Desktop &amp; Web</title>
-  <meta name="description" content="Senior Flutter engineer building production applications across mobile, desktop, and web since 2021, with a focus on offline-first data and real-time products.">
-  <meta name="keywords" content="Senior Flutter Engineer, Flutter Developer, Dart, Mobile Apps, Desktop Apps, Offline First, Go">
+  <title>Software Engineer — Flutter, Dart &amp; Go</title>
+  <meta name="description" content="Software engineer building and operating cross-platform products and platform tooling with Flutter, Dart, Go, PostgreSQL, Redis, Docker, and Kubernetes.">
+  <meta name="keywords" content="Software Engineer, Flutter, Dart, Go, PostgreSQL, Redis, Docker, Kubernetes, Open Source">
   <meta name="author" content="Portfolio owner">
 
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://developeryusuf.com">
-  <meta property="og:title" content="Senior Flutter Engineer — Mobile, Desktop &amp; Web">
-  <meta property="og:description" content="Production Flutter applications, cross-platform product work, and selected independent SaaS projects.">
-  <meta property="og:site_name" content="Flutter Engineer Portfolio">
+  <meta property="og:title" content="Software Engineer — Flutter, Dart &amp; Go">
+  <meta property="og:description" content="Cross-platform product engineering, platform tooling, and verified open-source work.">
+  <meta property="og:site_name" content="Software Engineer Portfolio">
   <meta property="og:image" content="https://developeryusuf.com/assets/og/engineering-showcase.png">
   <meta property="og:image:secure_url" content="https://developeryusuf.com/assets/og/engineering-showcase.png">
   <meta property="og:image:type" content="image/png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
-  <meta property="og:image:alt" content="Senior Flutter Engineer — mobile, desktop, web, and selected product work">
+  <meta property="og:image:alt" content="Software Engineer — Flutter, Dart, Go, and selected open-source work">
   <meta property="og:locale" content="en_US">
 
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Senior Flutter Engineer — Mobile, Desktop &amp; Web">
-  <meta name="twitter:description" content="Production Flutter applications, cross-platform product work, and selected independent SaaS projects.">
+  <meta name="twitter:title" content="Software Engineer — Flutter, Dart &amp; Go">
+  <meta name="twitter:description" content="Cross-platform product engineering, platform tooling, and verified open-source work.">
   <meta name="twitter:image" content="https://developeryusuf.com/assets/og/engineering-showcase.png">
-  <meta name="twitter:image:alt" content="Senior Flutter Engineer — mobile, desktop, web, and selected product work">
+  <meta name="twitter:image:alt" content="Software Engineer — Flutter, Dart, Go, and selected open-source work">
+<!-- portfolio-meta:end -->
 
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
@@ -42,61 +44,48 @@
   <link rel="icon" type="image/png" href="favicon.png">
   <link rel="manifest" href="manifest.json">
 
+  <!-- portfolio-structured-data:start -->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    "name": "Senior Flutter Engineer Portfolio",
-    "description": "Production Flutter applications and selected product work across mobile, desktop, and web.",
+    "name": "Software Engineer Portfolio",
+    "description": "Cross-platform product engineering, platform tooling, and verified open-source work.",
     "url": "https://developeryusuf.com"
   }
   </script>
+<!-- portfolio-structured-data:end -->
 
   <style>
-    @font-face {
-      font-family: "Atlas Sans";
-      src: url("assets/assets/fonts/space_grotesk/SpaceGrotesk-Variable.ttf") format("truetype");
-      font-weight: 300 700;
-      font-display: swap;
-    }
-    @font-face {
-      font-family: "Atlas Serif";
-      src: url("assets/assets/fonts/instrument_serif/InstrumentSerif-Italic.ttf") format("truetype");
-      font-style: italic;
-      font-display: swap;
-    }
-    :root {
-      color-scheme: dark;
-      background: #0b0b0d;
-    }
+    :root { color-scheme: dark; background: #0b0b0d; }
     * { box-sizing: border-box; }
-    html { height: 100%; }
-    body {
-      min-height: 100%;
-      margin: 0;
-      overflow: hidden;
-      background: #0b0b0d;
-    }
+    html, body { height: 100%; }
+    body { margin: 0; overflow: hidden; background: #0b0b0d; }
+
+    /*
+      A neutral compositor bed, not a second portfolio screen. It has no
+      headline, navigation, or duplicated professional content; Flutter owns
+      the first meaningful frame.
+    */
     #bootstrap-surface {
       position: fixed;
       inset: 0;
       z-index: 9999;
       overflow: hidden;
-      color: #f2f0e9;
       background:
-        radial-gradient(circle at 65% 42%, rgba(91, 108, 255, 0.11), transparent 42%),
+        radial-gradient(circle at 62% 40%, rgba(91, 108, 255, 0.1), transparent 46%),
         #0b0b0d;
       opacity: 1;
-      transition: opacity 180ms ease;
+      transition: opacity 90ms linear;
     }
     #bootstrap-surface::before {
       position: absolute;
-      inset: 52% -16% -35%;
+      inset: 55% -18% -38%;
       content: "";
-      opacity: 0.28;
+      opacity: 0.22;
       background-image:
-        linear-gradient(rgba(91, 108, 255, 0.22) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(91, 108, 255, 0.22) 1px, transparent 1px);
+        linear-gradient(rgba(91, 108, 255, 0.18) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(91, 108, 255, 0.18) 1px, transparent 1px);
       background-size: 72px 54px;
       transform: perspective(520px) rotateX(64deg);
       transform-origin: center top;
@@ -106,315 +95,86 @@
       pointer-events: none;
       opacity: 0;
     }
-    .bootstrap-header {
-      position: relative;
-      z-index: 4;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      height: 78px;
-      padding: 0 28px;
-      border-bottom: 1px solid rgba(242, 240, 233, 0.13);
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-    }
-    .bootstrap-brand {
-      color: #f2f0e9;
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: 0.18em;
-    }
-    .bootstrap-nav {
-      display: flex;
-      gap: 34px;
-      color: rgba(242, 240, 233, 0.66);
-      font-size: 8px;
-      font-weight: 600;
-      letter-spacing: 0.15em;
-    }
-    .bootstrap-main {
-      position: relative;
-      z-index: 2;
-      width: min(1600px, calc(100% - 320px));
-      height: calc(100vh - 78px);
-      min-height: 650px;
-      margin: 0 auto;
-      padding: 28px 0 64px;
-    }
-    .bootstrap-data-rail {
-      display: flex;
-      align-items: center;
-      gap: 34px;
-      padding-bottom: 14px;
-      color: rgba(242, 240, 233, 0.68);
-      border-bottom: 1px solid rgba(242, 240, 233, 0.13);
-      font: 600 8px/1 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-      letter-spacing: 0.14em;
-    }
-    .bootstrap-data-rail span:first-child { margin-right: auto; }
-    .bootstrap-data-rail i {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: #dfff3f;
-    }
-    .bootstrap-copy {
-      position: absolute;
-      top: 30%;
-      right: 0;
-      left: 0;
-      z-index: 2;
-    }
-    .bootstrap-kicker {
-      margin: 0 0 18px;
-      color: #5b6cff;
-      font: 700 9px/1 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-    }
-    .bootstrap-title {
-      display: flex;
-      flex-direction: column;
-      margin: 0;
-      color: #f2f0e9;
-      font-family: "Atlas Sans", Inter, ui-sans-serif, system-ui, sans-serif;
-      font-size: clamp(92px, 8vw, 150px);
-      font-weight: 680;
-      line-height: 0.77;
-      letter-spacing: -0.06em;
-    }
-    .bootstrap-title-accent {
-      align-self: flex-end;
-      color: #5b6cff;
-      font-family: "Atlas Serif", Georgia, serif;
-      font-size: 1.06em;
-      font-style: italic;
-      font-weight: 400;
-      letter-spacing: -0.035em;
-    }
-    .bootstrap-atlas {
-      position: absolute;
-      top: 16%;
-      right: 5%;
-      width: min(660px, 48vw);
-      height: min(560px, 58vh);
-      pointer-events: none;
-    }
-    .bootstrap-plane {
-      position: absolute;
-      width: 190px;
-      height: 122px;
-      border: 1px solid rgba(91, 108, 255, 0.32);
-      background: rgba(91, 108, 255, 0.025);
-      transform: rotate(var(--r));
-    }
-    .bootstrap-plane:nth-child(1) { top: 10%; left: 26%; --r: 41deg; }
-    .bootstrap-plane:nth-child(2) { top: 18%; right: 8%; --r: -48deg; }
-    .bootstrap-plane:nth-child(3) { top: 42%; left: 3%; --r: 4deg; }
-    .bootstrap-plane:nth-child(4) { top: 44%; right: 2%; --r: 5deg; }
-    .bootstrap-plane:nth-child(5) { bottom: 4%; left: 28%; --r: -39deg; }
-    .bootstrap-plane:nth-child(6) { bottom: 2%; right: 18%; --r: 36deg; }
-    .bootstrap-bottom {
+    .bootstrap-progress {
       position: absolute;
       right: 0;
-      bottom: 64px;
+      bottom: 0;
       left: 0;
-      display: grid;
-      grid-template-columns: minmax(320px, 1fr) minmax(460px, 0.9fr);
-      gap: 80px;
-      align-items: end;
+      height: 2px;
+      overflow: hidden;
+      background: rgba(91, 108, 255, 0.08);
     }
-    .bootstrap-intro {
-      max-width: 560px;
-      margin: 0;
-      color: #f2f0e9;
-      font-family: "Atlas Sans", Inter, ui-sans-serif, system-ui, sans-serif;
-      font-size: clamp(18px, 1.45vw, 23px);
-      font-weight: 560;
-      line-height: 1.35;
-    }
-    .bootstrap-capabilities {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 28px;
-    }
-    .bootstrap-capabilities span {
-      padding-top: 10px;
-      color: rgba(242, 240, 233, 0.68);
-      border-top: 1px solid rgba(242, 240, 233, 0.22);
-      font: 600 8px/1.5 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-      letter-spacing: 0.08em;
-    }
-    .bootstrap-capabilities b {
+    .bootstrap-progress::after {
       display: block;
-      margin-bottom: 6px;
-      color: #5b6cff;
-      font-weight: 600;
-    }
-    .bootstrap-status {
-      position: absolute;
-      bottom: 20px;
-      left: 50%;
-      z-index: 5;
-      margin: 0;
-      color: rgba(242, 240, 233, 0.48);
-      font: 600 8px/1 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      transform: translateX(-50%);
-    }
-    .bootstrap-status::before {
-      display: inline-block;
-      width: 20px;
-      height: 1px;
-      margin: 0 10px 3px 0;
+      width: 28%;
+      height: 100%;
       content: "";
       background: #5b6cff;
-      animation: bootstrap-pulse 1.1s ease-in-out infinite alternate;
+      transform: translateX(-100%);
+      animation: bootstrap-progress 1.25s cubic-bezier(.22, 1, .36, 1) infinite;
+    }
+    .bootstrap-error {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: min(420px, calc(100% - 48px));
+      color: #f2f0e9;
+      font: 500 15px/1.6 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      text-align: center;
+      transform: translate(-50%, -50%);
     }
     .bootstrap-retry {
-      margin-left: 12px;
-      padding: 8px 12px;
+      display: block;
+      margin: 22px auto 0;
+      padding: 10px 16px;
       color: #f2f0e9;
       cursor: pointer;
-      background: rgba(91, 108, 255, 0.14);
+      background: rgba(91, 108, 255, 0.12);
       border: 1px solid rgba(91, 108, 255, 0.72);
+      font: inherit;
     }
-    @keyframes bootstrap-pulse {
-      from { opacity: 0.3; transform: scaleX(0.65); }
-      to { opacity: 1; transform: scaleX(1); }
-    }
-    @media (max-width: 1100px) {
-      .bootstrap-main { width: calc(100% - 96px); }
-      .bootstrap-bottom { grid-template-columns: 1fr 1fr; gap: 42px; }
-    }
-    @media (max-width: 700px) {
-      .bootstrap-header { height: 62px; padding: 0 20px; }
-      .bootstrap-nav { display: none; }
-      .bootstrap-main {
-        width: calc(100% - 48px);
-        height: calc(100vh - 62px);
-        min-height: 680px;
-        padding-top: 28px;
-      }
-      .bootstrap-data-rail span:nth-child(2) { display: none; }
-      .bootstrap-copy { top: 28%; }
-      .bootstrap-kicker { margin-bottom: 12px; font-size: 7px; }
-      .bootstrap-title {
-        max-width: 350px;
-        font-size: clamp(48px, 13.5vw, 68px);
-        line-height: 0.78;
-      }
-      .bootstrap-title-primary { max-width: 300px; }
-      .bootstrap-title-accent { align-self: flex-start; }
-      .bootstrap-atlas {
-        top: 12%;
-        right: -22%;
-        width: 112%;
-        height: 52%;
-        opacity: 0.88;
-      }
-      .bootstrap-plane { width: 120px; height: 78px; }
-      .bootstrap-bottom {
-        bottom: 54px;
-        display: block;
-      }
-      .bootstrap-intro { max-width: 340px; font-size: 17px; }
-      .bootstrap-capabilities { margin-top: 28px; gap: 16px; }
-      .bootstrap-capabilities span { font-size: 7px; }
-      .bootstrap-status { bottom: 15px; white-space: nowrap; }
+    @keyframes bootstrap-progress {
+      0% { transform: translateX(-100%); }
+      65%, 100% { transform: translateX(460%); }
     }
     @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after {
-        animation-duration: 0.01ms !important;
-        transition-duration: 0.01ms !important;
-      }
+      #bootstrap-surface { transition: none; }
+      .bootstrap-progress::after { animation: none; transform: none; width: 100%; opacity: 0.5; }
     }
   </style>
   <script defer src="https://analytics.developeryusuf.com/js/script.js" data-domain="developeryusuf.com"></script>
 </head>
 <body>
-  <div id="bootstrap-surface" role="region" aria-label="Loading portfolio" aria-busy="true">
-    <header class="bootstrap-header" aria-label="Portfolio loading screen">
-      <span class="bootstrap-brand">FLUTTER</span>
-      <span class="bootstrap-nav" aria-hidden="true">
-        <span>ABOUT</span><span>EXPERIENCE</span><span>APPROACH</span><span>PROJECTS</span>
-      </span>
-    </header>
-    <main class="bootstrap-main">
-      <div class="bootstrap-data-rail" aria-hidden="true">
-        <span>00 / RENDER ATLAS</span><span>FLUTTER / DART / GO</span><span>REMOTE</span><i></i>
-      </div>
-      <aside class="bootstrap-atlas" aria-hidden="true">
-        <i class="bootstrap-plane"></i><i class="bootstrap-plane"></i>
-        <i class="bootstrap-plane"></i><i class="bootstrap-plane"></i>
-        <i class="bootstrap-plane"></i><i class="bootstrap-plane"></i>
-      </aside>
-      <section class="bootstrap-copy">
-        <p class="bootstrap-kicker">Product-minded Flutter engineering</p>
-        <h1 class="bootstrap-title" aria-label="SENIOR FLUTTER ENGINEER.">
-          <span class="bootstrap-title-primary">SENIOR FLUTTER</span>
-          <span class="bootstrap-title-accent">ENGINEER.</span>
-        </h1>
-      </section>
-      <div class="bootstrap-bottom">
-        <p class="bootstrap-intro">Building useful products across mobile, desktop, and web.</p>
-        <div class="bootstrap-capabilities" aria-hidden="true">
-          <span><b>01</b>MOBILE PRODUCTS</span>
-          <span><b>02</b>OFFLINE-FIRST</span>
-          <span><b>03</b>CROSS-PLATFORM</span>
-        </div>
-      </div>
-    </main>
-    <p class="bootstrap-status" role="status" aria-live="polite">Preparing the portfolio</p>
+  <div id="bootstrap-surface" role="status" aria-label="Loading interactive portfolio" aria-busy="true">
+    <span class="bootstrap-progress" aria-hidden="true"></span>
   </div>
+  <script src="flutter_bootstrap.js"></script>
   <script>
-    (async function prepareCleanBootstrap() {
-      const loadFlutter = function() {
-        const script = document.createElement('script');
-        script.src = 'flutter_bootstrap.js';
-        document.body.appendChild(script);
-      };
-
-      if (!('serviceWorker' in navigator)) {
-        loadFlutter();
-        return;
-      }
-
-      const wasControlled = Boolean(navigator.serviceWorker.controller);
-      const registrations = await navigator.serviceWorker.getRegistrations();
-      await Promise.allSettled(
-        registrations.map(function(registration) {
-          return registration.unregister();
-        }),
-      );
-
-      if ('caches' in window) {
-        const names = await window.caches.keys();
-        await Promise.allSettled(
-          names.map(function(name) { return window.caches.delete(name); }),
-        );
-      }
-
-      if (wasControlled) {
-        try {
-          if (!window.sessionStorage.getItem('portfolio-sw-clean-reload-v2')) {
-            window.sessionStorage.setItem('portfolio-sw-clean-reload-v2', '1');
-            window.location.reload();
-            return;
-          }
-        } catch (_) {
-          // Strict privacy contexts can disable session storage. The explicit
-          // kill-switch worker still removes legacy cache ownership.
-        }
-      }
-
-      loadFlutter();
-    })().catch(function(error) {
-      console.warn('Legacy cache cleanup was unavailable', error);
-      const script = document.createElement('script');
-      script.src = 'flutter_bootstrap.js';
-      document.body.appendChild(script);
-    });
+    // Retire legacy Flutter service workers without delaying or reloading the
+    // current document. A prior controlled visit can therefore never create a
+    // visible double-start sequence.
+    window.addEventListener('load', function retireLegacyCacheOwnership() {
+      if (!('serviceWorker' in navigator)) return;
+      navigator.serviceWorker.getRegistrations()
+        .then(function(registrations) {
+          return Promise.allSettled(
+            registrations.map(function(registration) {
+              return registration.unregister();
+            }),
+          );
+        })
+        .then(function() {
+          if (!('caches' in window)) return [];
+          return window.caches.keys().then(function(names) {
+            return Promise.allSettled(
+              names.map(function(name) { return window.caches.delete(name); }),
+            );
+          });
+        })
+        .catch(function(error) {
+          console.warn('Legacy cache cleanup was unavailable', error);
+        });
+    }, { once: true });
   </script>
 </body>
 </html>

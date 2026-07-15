@@ -6,6 +6,7 @@ import 'package:flutter_web_portfolio/app/controllers/scroll_controller.dart';
 import 'package:flutter_web_portfolio/app/domain/repositories/i_language_repository.dart';
 import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
 import 'package:flutter_web_portfolio/app/widgets/command_palette.dart';
+import '../helpers/portfolio_fixture.dart';
 
 final class _PaletteLanguageRepository implements ILanguageRepository {
   @override
@@ -20,16 +21,10 @@ final class _PaletteLanguageRepository implements ILanguageRepository {
       'home': 'Home',
       'about': 'About',
       'experience': 'Experience',
-      'proof': 'Proof',
+      'proof': 'Open Source',
       'blog': 'Blog',
-      'projects': 'Projects',
+      'projects': 'Systems',
       'contact': 'Contact',
-    },
-    'cv_data': {
-      'personal_info': {'name': 'Senior Flutter Engineer'},
-      'projects': [
-        {'title': 'Selected product'},
-      ],
     },
   };
 
@@ -53,12 +48,15 @@ void main() {
     });
   });
 
-  Widget buildSubject() => MultiBlocProvider(
-    providers: [
-      BlocProvider.value(value: language),
-      BlocProvider.value(value: scroll),
-    ],
-    child: const MaterialApp(home: Scaffold(body: CommandPalette())),
+  Widget buildSubject() => RepositoryProvider.value(
+    value: loadPortfolioFixture(),
+    child: MultiBlocProvider(
+      providers: [
+        BlocProvider.value(value: language),
+        BlocProvider.value(value: scroll),
+      ],
+      child: const MaterialApp(home: Scaffold(body: CommandPalette())),
+    ),
   );
 
   group('CommandPalette', () {
@@ -77,10 +75,10 @@ void main() {
       await tester.pumpWidget(buildSubject());
       await tester.pump();
 
-      await tester.enterText(find.byType(TextField), 'projects');
+      await tester.enterText(find.byType(TextField), 'systems');
       await tester.pump();
 
-      expect(find.text('Go to Projects'), findsOneWidget);
+      expect(find.text('Go to Systems'), findsOneWidget);
       expect(find.text('Go to Home'), findsNothing);
     });
   });

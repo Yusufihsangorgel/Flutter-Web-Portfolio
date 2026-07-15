@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
 import 'package:flutter_web_portfolio/app/core/constants/breakpoints.dart';
 import 'package:flutter_web_portfolio/app/core/theme/app_fonts.dart';
+import 'package:flutter_web_portfolio/app/domain/models/portfolio_document.dart';
 import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
 import 'package:flutter_web_portfolio/app/widgets/numbered_section_heading.dart';
 import 'package:flutter_web_portfolio/app/widgets/scene_accent_builder.dart';
@@ -16,10 +17,7 @@ class ExperienceSection extends StatelessWidget {
       BlocBuilder<LanguageCubit, LanguageState>(
         builder: (context, _) {
           final language = context.read<LanguageCubit>();
-          final experiences =
-              (language.cvData['experiences'] as List? ?? const [])
-                  .whereType<Map<String, dynamic>>()
-                  .toList();
+          final experiences = context.read<PortfolioDocument>().experience;
 
           return ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 1160),
@@ -62,25 +60,22 @@ class _ExperienceLedgerRow extends StatelessWidget {
   });
 
   final int index;
-  final Map<String, dynamic> experience;
+  final PortfolioExperience experience;
   final Color accent;
   final bool isLast;
 
   @override
   Widget build(BuildContext context) {
     final compact = MediaQuery.sizeOf(context).width < Breakpoints.tablet;
-    final period = (experience['period'] as String?)?.trim() ?? '';
-    final title = (experience['title'] as String?)?.trim() ?? '';
-    final position = (experience['position'] as String?)?.trim() ?? '';
-    final company = (experience['company'] as String?)?.trim() ?? '';
-    final description = (experience['description'] as String?)?.trim() ?? '';
-    final technologies = (experience['technologies'] as List? ?? const [])
-        .whereType<String>()
-        .join(' / ');
+    final period = experience.period;
+    final title = experience.role;
+    final position = experience.domain;
+    final description = experience.summary;
+    final technologies = experience.evidence.join(' / ');
 
     return Semantics(
       container: true,
-      label: '$title. $position. $company. $period. $description',
+      label: '$title. $position. $period. $description',
       child: ExcludeSemantics(
         child: Container(
           padding: EdgeInsets.symmetric(vertical: compact ? 34 : 42),
@@ -98,11 +93,7 @@ class _ExperienceLedgerRow extends StatelessWidget {
                   children: [
                     _LedgerMeta(index: index, period: period, accent: accent),
                     const SizedBox(height: 26),
-                    _LedgerRole(
-                      title: title,
-                      position: position,
-                      company: company,
-                    ),
+                    _LedgerRole(title: title, position: position),
                     const SizedBox(height: 22),
                     _LedgerDetail(
                       description: description,
@@ -124,11 +115,7 @@ class _ExperienceLedgerRow extends StatelessWidget {
                     const SizedBox(width: 42),
                     SizedBox(
                       width: 310,
-                      child: _LedgerRole(
-                        title: title,
-                        position: position,
-                        company: company,
-                      ),
+                      child: _LedgerRole(title: title, position: position),
                     ),
                     const SizedBox(width: 56),
                     Expanded(
@@ -187,15 +174,10 @@ class _LedgerMeta extends StatelessWidget {
 }
 
 class _LedgerRole extends StatelessWidget {
-  const _LedgerRole({
-    required this.title,
-    required this.position,
-    required this.company,
-  });
+  const _LedgerRole({required this.title, required this.position});
 
   final String title;
   final String position;
-  final String company;
 
   @override
   Widget build(BuildContext context) => Column(
@@ -219,15 +201,6 @@ class _LedgerRole extends StatelessWidget {
           fontWeight: FontWeight.w600,
           color: AppColors.textPrimary,
           height: 1.4,
-        ),
-      ),
-      const SizedBox(height: 5),
-      Text(
-        company.toUpperCase(),
-        style: AppFonts.jetBrainsMono(
-          fontSize: 9,
-          color: AppColors.textSecondary,
-          letterSpacing: 0.75,
         ),
       ),
     ],

@@ -3,89 +3,88 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
 import 'package:flutter_web_portfolio/app/core/constants/breakpoints.dart';
 import 'package:flutter_web_portfolio/app/core/theme/app_fonts.dart';
+import 'package:flutter_web_portfolio/app/domain/models/portfolio_document.dart';
 import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
 import 'package:flutter_web_portfolio/app/widgets/cinematic_focusable.dart';
 import 'package:flutter_web_portfolio/app/widgets/numbered_section_heading.dart';
 import 'package:flutter_web_portfolio/app/widgets/scene_accent_builder.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-/// Operating principles and verifiable engineering evidence.
+/// Verified upstream work, ordered from accepted patches to work in review.
 class ProofSection extends StatelessWidget {
   const ProofSection({super.key});
 
   @override
-  Widget build(
-    BuildContext context,
-  ) => BlocBuilder<LanguageCubit, LanguageState>(
-    builder: (context, _) {
-      final language = context.read<LanguageCubit>();
-      final principles = (language.cvData['proof'] as List? ?? const [])
-          .whereType<Map<String, dynamic>>()
-          .toList();
-      if (principles.isEmpty) return const SizedBox.shrink();
+  Widget build(BuildContext context) =>
+      BlocBuilder<LanguageCubit, LanguageState>(
+        builder: (context, _) {
+          final language = context.read<LanguageCubit>();
+          final portfolio = context.read<PortfolioDocument>();
+          final contributions = portfolio.contributions;
+          if (contributions.isEmpty) return const SizedBox.shrink();
+          final merged = portfolio.mergedContributions.toList();
+          final mergedSummary =
+              '${merged.length} merged changes across '
+              '${merged.map((entry) => entry.project).join(', ')}.';
 
-      return ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 1160),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SceneAccentBuilder(
-              builder: (context, accent) => NumberedSectionHeading(
-                number: '03',
-                title: language.getText(
-                  'proof_section.title',
-                  defaultValue: 'How I Work',
-                ),
-                accent: accent,
-              ),
-            ),
-            const SizedBox(height: 30),
-            ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 720),
-              child: Text(
-                language.getText(
-                  'proof_section.subtitle',
-                  defaultValue:
-                      'A practical approach shaped by shipping and maintaining real products.',
-                ),
-                style: AppFonts.spaceGrotesk(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w400,
-                  color: AppColors.textPrimary,
-                  height: 1.55,
-                ),
-              ),
-            ),
-            const SizedBox(height: 72),
-            SceneAccentBuilder(
-              builder: (context, accent) => Column(
-                children: [
-                  for (var index = 0; index < principles.length; index++)
-                    _PrinciplePlate(
-                      principle: principles[index],
-                      index: index,
-                      accent: accent,
-                      isLast: index == principles.length - 1,
+          return ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 1160),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SceneAccentBuilder(
+                  builder: (context, accent) => NumberedSectionHeading(
+                    number: '03',
+                    title: language.getText(
+                      'proof_section.title',
+                      defaultValue: 'Open Source',
                     ),
-                ],
-              ),
+                    accent: accent,
+                  ),
+                ),
+                const SizedBox(height: 30),
+                ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 720),
+                  child: Text(
+                    mergedSummary,
+                    style: AppFonts.spaceGrotesk(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w400,
+                      color: AppColors.textPrimary,
+                      height: 1.55,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 72),
+                SceneAccentBuilder(
+                  builder: (context, accent) => Column(
+                    children: [
+                      for (var index = 0; index < contributions.length; index++)
+                        _PrinciplePlate(
+                          contribution: contributions[index],
+                          index: index,
+                          accent: accent,
+                          isLast: index == contributions.length - 1,
+                        ),
+                    ],
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
+          );
+        },
       );
-    },
-  );
 }
 
 class _PrinciplePlate extends StatelessWidget {
   const _PrinciplePlate({
-    required this.principle,
+    required this.contribution,
     required this.index,
     required this.accent,
     required this.isLast,
   });
 
-  final Map<String, dynamic> principle;
+  final PortfolioContribution contribution;
   final int index;
   final Color accent;
   final bool isLast;
@@ -93,11 +92,14 @@ class _PrinciplePlate extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final compact = MediaQuery.sizeOf(context).width < Breakpoints.tablet;
-    final title = principle['title'] as String? ?? '';
-    final detail = principle['detail'] as String? ?? '';
-    final verification = principle['verification'] as String? ?? '';
-    final action = principle['action'] as String? ?? '';
-    final url = principle['url'] as String? ?? '';
+    final title = contribution.title;
+    final detail = contribution.problem;
+    final verification = [
+      contribution.project,
+      contribution.status.wireValue.replaceAll('_', ' '),
+      contribution.date.toIso8601String().split('T').first,
+    ].join(' · ');
+    final action = contribution.change;
 
     final number = ExcludeSemantics(
       child: Text(
@@ -133,18 +135,24 @@ class _PrinciplePlate extends StatelessWidget {
             height: 1.72,
           ),
         ),
+        const SizedBox(height: 18),
+        Text(
+          action,
+          style: AppFonts.inter(
+            fontSize: 15,
+            color: AppColors.textBright,
+            height: 1.72,
+          ),
+        ),
       ],
     );
 
-    final verificationWidget = url.isEmpty
-        ? _Verification(value: verification, accent: accent)
-        : _EvidenceLink(
-            title: title,
-            verification: verification,
-            action: action,
-            url: url,
-            accent: accent,
-          );
+    final verificationWidget = _EvidenceLink(
+      title: title,
+      verification: verification,
+      url: contribution.url,
+      accent: accent,
+    );
     final plate = Container(
       padding: EdgeInsets.symmetric(vertical: compact ? 38 : 54),
       decoration: BoxDecoration(
@@ -162,10 +170,8 @@ class _PrinciplePlate extends StatelessWidget {
                 number,
                 const SizedBox(height: 32),
                 copy,
-                if (verification.isNotEmpty) ...[
-                  const SizedBox(height: 24),
-                  verificationWidget,
-                ],
+                const SizedBox(height: 24),
+                verificationWidget,
               ],
             )
           : Row(
@@ -179,14 +185,7 @@ class _PrinciplePlate extends StatelessWidget {
             ),
     );
 
-    if (url.isNotEmpty) {
-      return plate;
-    }
-    return Semantics(
-      container: true,
-      label: '$title. $detail. $verification',
-      child: ExcludeSemantics(child: plate),
-    );
+    return plate;
   }
 }
 
@@ -194,21 +193,19 @@ class _EvidenceLink extends StatelessWidget {
   const _EvidenceLink({
     required this.title,
     required this.verification,
-    required this.action,
     required this.url,
     required this.accent,
   });
 
   final String title;
   final String verification;
-  final String action;
-  final String url;
+  final Uri url;
   final Color accent;
 
   @override
   Widget build(BuildContext context) => CinematicFocusable(
     onTap: () => _openEvidence(url),
-    semanticLabel: '$action. $title. $verification',
+    semanticLabel: 'Open pull request. $title. $verification',
     semanticRole: CinematicControlRole.link,
     focusColor: accent,
     child: Padding(
@@ -217,39 +214,32 @@ class _EvidenceLink extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _Verification(value: verification, accent: accent),
-          if (action.isNotEmpty) ...[
-            const SizedBox(height: 18),
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Flexible(
-                  child: Text(
-                    action.toUpperCase(),
-                    style: AppFonts.jetBrainsMono(
-                      fontSize: 9,
-                      fontWeight: FontWeight.w700,
-                      color: accent,
-                      height: 1.4,
-                      letterSpacing: 0.9,
-                    ),
-                  ),
+          const SizedBox(height: 18),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'PULL REQUEST',
+                style: AppFonts.jetBrainsMono(
+                  fontSize: 9,
+                  fontWeight: FontWeight.w700,
+                  color: accent,
+                  height: 1.4,
+                  letterSpacing: 0.9,
                 ),
-                const SizedBox(width: 8),
-                Icon(Icons.north_east_rounded, size: 15, color: accent),
-              ],
-            ),
-          ],
+              ),
+              const SizedBox(width: 8),
+              Icon(Icons.north_east_rounded, size: 15, color: accent),
+            ],
+          ),
         ],
       ),
     ),
   );
 }
 
-Future<void> _openEvidence(String rawUrl) async {
-  final uri = Uri.tryParse(rawUrl);
-  if (uri == null || !(uri.isScheme('https') || uri.isScheme('http'))) return;
-  await launchUrl(uri, webOnlyWindowName: '_blank');
-}
+Future<void> _openEvidence(Uri uri) async =>
+    launchUrl(uri, webOnlyWindowName: '_blank');
 
 class _Verification extends StatelessWidget {
   const _Verification({required this.value, required this.accent});

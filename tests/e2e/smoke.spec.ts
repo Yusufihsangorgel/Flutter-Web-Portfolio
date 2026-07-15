@@ -62,14 +62,14 @@ test('publishes a clean heading and control hierarchy', async ({
     .filter((node) => ['button', 'link'].includes(node.role?.value ?? ''))
     .map((node) => node.name?.value ?? '');
 
-  expect(headings).toContainEqual({ name: 'SENIOR FLUTTER ENGINEER.', level: 1 });
+  expect(headings).toContainEqual({ name: 'SOFTWARE ENGINEER.', level: 1 });
   expect(controls).toEqual(
     expect.arrayContaining([
       'Skip to content',
       'Back to top',
       ...(isMobile
         ? ['Open navigation menu']
-        : ['About', 'Experience', 'Approach', 'Projects']),
+        : ['About', 'Experience', 'Open Source', 'Systems']),
       'Language menu: English',
     ]),
   );
@@ -106,7 +106,7 @@ test('publishes a clean heading and control hierarchy', async ({
   ).toBe(2);
 
   await expect(
-    page.getByRole('heading', { name: 'Selected Work' }),
+    page.getByRole('heading', { name: 'Selected Systems' }),
   ).toBeAttached();
 
   const projectsTree = await accessibility.send(
@@ -115,16 +115,19 @@ test('publishes a clean heading and control hierarchy', async ({
   const projectLinks = projectsTree.nodes
     .filter((node) => !node.ignored && node.role?.value === 'link')
     .map((node) => node.name?.value ?? '');
-  expect(projectLinks).toContain('Open Project: FakeCallApp');
+  expect(projectLinks).toContain('View source: Flutter Web Portfolio');
   expect(projectLinks).toContain(
-    'Inspect upstream patch. Fix the layer beneath the product. '
-      + 'flutter/flutter issue #189499 · draft PR #189500',
+    'Open pull request. Wait for web rendering before the first-frame event. '
+      + 'Flutter · under review · 2026-07-15',
   );
-  expect(projectLinks).not.toContain('Open Project');
+  expect(projectLinks).toEqual(
+    expect.arrayContaining(['GitHub', 'LinkedIn', 'Writing']),
+  );
+  expect(projectLinks).not.toContain('View source');
   expect(projectLinks).not.toContain('Website');
 });
 
-test('paints an accessible portfolio shell before the Wasm canvas', async ({
+test('holds a neutral compositor bed before the first Flutter frame', async ({
   page,
 }) => {
   let releaseWasm: (() => void) | undefined;
@@ -140,11 +143,9 @@ test('paints an accessible portfolio shell before the Wasm canvas', async ({
   const shell = page.locator('#bootstrap-surface');
   await expect(shell).toBeVisible();
   await expect(shell).toHaveAttribute('aria-busy', 'true');
-  await expect(
-    shell.getByRole('heading', { name: 'SENIOR FLUTTER ENGINEER.' }),
-  ).toBeVisible();
-  await expect(shell.getByText('Product-minded Flutter engineering')).toBeVisible();
-  await expect(shell.getByText('Preparing the portfolio')).toBeVisible();
+  await expect(shell).toHaveAttribute('aria-label', 'Loading interactive portfolio');
+  await expect(shell.locator('.bootstrap-progress')).toBeVisible();
+  await expect(shell.getByRole('heading')).toHaveCount(0);
 
   releaseWasm?.();
   await expect(shell).toHaveCount(0, { timeout: 20000 });
@@ -153,13 +154,14 @@ test('paints an accessible portfolio shell before the Wasm canvas', async ({
 test('offers an accessible retry when the Wasm artifact cannot load', async ({
   page,
 }) => {
-  await page.route('**/main.dart.wasm*', (route) => route.abort('failed'));
+  await page.route(/main\.dart\.(?:wasm|mjs|js)/, (route) =>
+    route.abort('failed'),
+  );
   await page.goto('/', { waitUntil: 'domcontentloaded' });
 
-  await expect(page.getByText('The portfolio could not start')).toBeVisible({
+  await expect(page.getByRole('button', { name: 'Retry' })).toBeVisible({
     timeout: 20000,
   });
-  await expect(page.getByRole('button', { name: 'Retry' })).toBeVisible();
   await expect(page.locator('#bootstrap-surface')).toHaveAttribute(
     'aria-label',
     'The portfolio could not start',
@@ -312,7 +314,7 @@ test('does not publish renderer debug symbols', async ({ request }) => {
 
   const version = await request.get('/version.json');
   expect(version.status()).toBe(200);
-  expect(await version.json()).toMatchObject({ version: '1.1.0' });
+  expect(await version.json()).toMatchObject({ version: '1.2.0' });
 });
 
 test('keeps every professional chapter in one accessible document', async ({
@@ -321,11 +323,13 @@ test('keeps every professional chapter in one accessible document', async ({
   await openPortfolio(page);
   await expect(page.getByRole('heading', { name: 'About Me' })).toBeAttached();
   await expect(page.getByRole('heading', { name: 'Experience' })).toBeAttached();
-  await expect(page.getByRole('heading', { name: 'How I Work' })).toBeAttached();
+  await expect(page.getByRole('heading', { name: 'Open Source' })).toBeAttached();
   await expect(
-    page.getByRole('heading', { name: 'Selected Work' }),
+    page.getByRole('heading', { name: 'Selected Systems' }),
   ).toBeAttached();
-  await expect(page.getByText('Mobile Team Lead')).toBeAttached();
+  await expect(
+    page.getByText('Software Engineer — Cross-platform'),
+  ).toBeAttached();
 });
 
 test('switches to the application-owned Arabic catalog', async ({ page }) => {
@@ -333,7 +337,7 @@ test('switches to the application-owned Arabic catalog', async ({ page }) => {
   page.on('pageerror', (error) => runtimeErrors.push(error.message));
   await openPortfolio(page);
   await page.keyboard.press('Control+KeyK');
-  await page.getByText('Go to Projects', { exact: true }).click();
+  await page.getByText('Go to Systems', { exact: true }).click();
   await expect(page).toHaveURL(/#\/projects$/);
 
   await page.keyboard.press('Control+KeyK');
@@ -346,12 +350,12 @@ test('switches to the application-owned Arabic catalog', async ({ page }) => {
   await expect(page.locator('html')).toHaveAttribute('dir', 'rtl');
   await expect(page.getByText('عرض المشاريع', { exact: true })).toBeAttached();
   await expect(
-    page.getByRole('heading', { name: 'مشاريع مختارة' }),
+    page.getByRole('heading', { name: 'أنظمة مختارة' }),
   ).toBeAttached();
 
   await page.keyboard.press('Control+KeyK');
   await expect(
-    page.getByText('الانتقال إلى المشاريع', { exact: true }),
+    page.getByText('الانتقال إلى الأنظمة', { exact: true }),
   ).toBeVisible();
   expect(runtimeErrors).toEqual([]);
 });
@@ -371,7 +375,7 @@ test('switches to the application-owned Hindi catalog', async ({ page }) => {
 test('keeps section hashes synchronized with browser history', async ({ page }) => {
   await openPortfolio(page);
   await page.keyboard.press('Control+KeyK');
-  const projectsCommand = page.getByText('Go to Projects', { exact: true });
+  const projectsCommand = page.getByText('Go to Systems', { exact: true });
   await expect(projectsCommand).toBeVisible();
   await projectsCommand.click();
   await expect(page).toHaveURL(/#\/projects$/);

@@ -1,12 +1,14 @@
 {
   "name": "flutter-web-portfolio",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "private": true,
-  "description": "A code-native Flutter render atlas for production experience and selected product work.",
+  "description": "A production Flutter Web document with typed external content, measured scroll geometry, and a dual-runtime Wasm release.",
   "scripts": {
     "test": "playwright test",
     "test:e2e": "playwright test",
     "test:e2e:prod": "playwright test --config playwright.prod.config.ts",
+    "sync:content": "node tool/sync_public_content.mjs",
+    "verify:content": "node tool/sync_public_content.mjs --check",
     "render:social-card": "node tool/render_social_card.mjs",
     "verify:source": "node tool/verify_dart_reachability.mjs",
     "prepare:bundle": "node tool/prepare_web_release.mjs",

@@ -1,0 +1,268 @@
+{
+  "schema_version": 1,
+  "content_version": "2026.07.15.1",
+  "verified_at": "2026-07-15",
+  "site": {
+    "url": "https://developeryusuf.com",
+    "title": "Software Engineer — Flutter, Dart & Go",
+    "description": "Software engineer building and operating cross-platform products and platform tooling with Flutter, Dart, Go, PostgreSQL, Redis, Docker, and Kubernetes.",
+    "social_description": "Cross-platform product engineering, platform tooling, and verified open-source work.",
+    "social_image": "/assets/og/engineering-showcase.png",
+    "domain_label": "DEVELOPERYUSUF.COM"
+  },
+  "sources": [
+    {
+      "id": "github",
+      "label": "GitHub",
+      "url": "https://github.com/Yusufihsangorgel",
+      "scope": "Public repositories, merged pull requests, and pull-request status"
+    },
+    {
+      "id": "linkedin",
+      "label": "LinkedIn",
+      "url": "https://www.linkedin.com/in/yusuf-ihsan-g%C3%B6rgel/",
+      "scope": "Current role, professional timeline, and public experience descriptions"
+    }
+  ],
+  "profile": {
+    "role": "Software Engineer",
+    "location": "Remote",
+    "since": "2021",
+    "headline": "I build cross-platform products and the systems that keep them reliable.",
+    "summary": "My work spans Flutter clients, local and real-time data, native integrations, Go services, queues, and production infrastructure. I stay close to the boundary where product behaviour becomes a systems problem.",
+    "focus": [
+      "Flutter and Dart",
+      "Go services",
+      "Offline-first data",
+      "Distributed queues",
+      "Production reliability"
+    ],
+    "links": [
+      {
+        "id": "github",
+        "label": "GitHub",
+        "url": "https://github.com/Yusufihsangorgel"
+      },
+      {
+        "id": "linkedin",
+        "label": "LinkedIn",
+        "url": "https://www.linkedin.com/in/yusuf-ihsan-g%C3%B6rgel/"
+      },
+      {
+        "id": "writing",
+        "label": "Writing",
+        "url": "https://yusufihsangorgel.github.io"
+      }
+    ]
+  },
+  "experience": [
+    {
+      "id": "cross-platform-retail",
+      "role": "Software Engineer — Cross-platform",
+      "domain": "Enterprise retail and point-of-sale systems",
+      "period": "2021 — Present",
+      "summary": "Build and maintain production applications across Android and iOS tablets plus Linux, macOS, and Windows desktops. The work includes offline-first SQLite and Drift data, native integrations, localisation, real-time synchronisation, release engineering, and reliability on point-of-sale hardware.",
+      "evidence": [
+        "Flutter",
+        "Dart",
+        "SQLite / Drift",
+        "Native integrations",
+        "Real-time sync"
+      ]
+    },
+    {
+      "id": "mobile-web-logistics",
+      "role": "Software Engineer — Mobile and web",
+      "domain": "Logistics platform",
+      "period": "2023 — 2025",
+      "summary": "Delivered mobile and web product work spanning Flutter, React and Next.js, REST and WebSocket data flows, vehicle tracking, and Google and Apple Maps integrations.",
+      "evidence": [
+        "Flutter",
+        "React / Next.js",
+        "REST",
+        "WebSocket",
+        "Maps"
+      ]
+    },
+    {
+      "id": "mobile-publishing",
+      "role": "Software Engineer — Mobile",
+      "domain": "Digital publishing products",
+      "period": "2022 — 2024",
+      "summary": "Shipped Android and iOS publishing applications with maintainable presentation boundaries, API integration, localisation, and store-ready release workflows.",
+      "evidence": [
+        "Flutter",
+        "Dart",
+        "MVVM",
+        "Dio",
+        "App Store / Play Store"
+      ]
+    },
+    {
+      "id": "software-engineering-education",
+      "role": "Software Engineering",
+      "domain": "Bachelor's degree",
+      "period": "2021 — 2025",
+      "summary": "Formal study in algorithms, data structures, databases, software design, and team-based product development.",
+      "evidence": [
+        "Algorithms",
+        "Data structures",
+        "Databases",
+        "Software design"
+      ]
+    }
+  ],
+  "capabilities": [
+    {
+      "id": "client",
+      "label": "Client systems",
+      "items": ["Flutter", "Dart", "BLoC", "Platform channels", "Offline-first"]
+    },
+    {
+      "id": "services",
+      "label": "Services",
+      "items": ["Go", "Fiber", "PostgreSQL", "Redis", "Asynq"]
+    },
+    {
+      "id": "web-runtime",
+      "label": "Web runtime",
+      "items": ["Dart Wasm", "SkWasm", "CanvasKit", "Semantics", "First-frame lifecycle"]
+    },
+    {
+      "id": "operations",
+      "label": "Operations",
+      "items": ["Docker", "Kubernetes", "Prometheus", "Grafana", "PostgreSQL HA"]
+    }
+  ],
+  "contributions": [
+    {
+      "id": "flutterfire-webkit-ordering",
+      "project": "FlutterFire",
+      "status": "merged",
+      "date": "2026-07-15",
+      "title": "Make Firebase core loading deterministic on WebKit",
+      "problem": "Component bundles could execute before firebase-app.js was available, producing an initialization race in WebKit browsers.",
+      "change": "Load the Firebase core script before component bundles and preserve deterministic dependency order.",
+      "url": "https://github.com/firebase/flutterfire/pull/18443"
+    },
+    {
+      "id": "form-builder-initial-value",
+      "project": "Flutter Form Builder",
+      "status": "merged",
+      "date": "2026-07-14",
+      "title": "Reset unknown dropdown initial values on first build",
+      "problem": "A dropdown could begin with a value that did not exist in its items and fail before normal field reset behaviour ran.",
+      "change": "Normalize the first build and cover the regression with widget tests.",
+      "url": "https://github.com/flutter-form-builder-ecosystem/flutter_form_builder/pull/1512"
+    },
+    {
+      "id": "drift-boolean-default",
+      "project": "Drift",
+      "status": "merged",
+      "date": "2026-07-14",
+      "title": "Treat SQLite TRUE and 1 defaults as the same schema",
+      "problem": "Schema verification reported equivalent SQLite boolean defaults as a migration difference.",
+      "change": "Normalize the verifier comparison and add regression coverage for both representations.",
+      "url": "https://github.com/simolus3/drift/pull/3835"
+    },
+    {
+      "id": "fiber-asynq-recipe",
+      "project": "Go Fiber Recipes",
+      "status": "merged",
+      "date": "2026-07-12",
+      "title": "Add a Fiber and Asynq background-jobs recipe",
+      "problem": "The recipe collection lacked a production-shaped example for enqueueing and processing Redis-backed work outside request handlers.",
+      "change": "Add a runnable producer, worker, queue configuration, and usage documentation.",
+      "url": "https://github.com/gofiber/recipes/pull/4997"
+    },
+    {
+      "id": "flutter-first-frame",
+      "project": "Flutter",
+      "status": "under_review",
+      "date": "2026-07-15",
+      "title": "Wait for web rendering before the first-frame event",
+      "problem": "On SkWasm, flutter-first-frame can fire before the compositor presents visible Flutter content, leaving a measurable blank handoff window.",
+      "change": "Wait for outstanding scene renders and the next browser frame before dispatching the event; the pull request remains a draft pending Flutter Web review and full engine CI.",
+      "url": "https://github.com/flutter/flutter/pull/189500",
+      "issue_url": "https://github.com/flutter/flutter/issues/189499"
+    }
+  ],
+  "systems": [
+    {
+      "id": "portfolio",
+      "name": "Flutter Web Portfolio",
+      "kind": "Render and accessibility system",
+      "visual": "frame-pipeline",
+      "summary": "A Wasm and SkWasm portfolio used to investigate first-frame timing, semantic document structure, locale transitions, and scroll-directed rendering in Flutter Web.",
+      "decision": "Keep the semantic document and high-frequency painter paths separate while one measured scroll model directs both.",
+      "url": "https://github.com/Yusufihsangorgel/Flutter-Web-Portfolio",
+      "technologies": ["Flutter", "Dart Wasm", "SkWasm", "Playwright"]
+    },
+    {
+      "id": "queue-inspector",
+      "name": "Queue Inspector MCP",
+      "kind": "Operations tooling",
+      "visual": "queue-states",
+      "summary": "An MCP server for inspecting and operating Redis-backed Asynq and BullMQ queues without reaching into storage by hand.",
+      "decision": "Expose queue state, job detail, retries, and dead letters through explicit operations with conservative defaults.",
+      "url": "https://github.com/Yusufihsangorgel/queue-inspector-mcp",
+      "technologies": ["TypeScript", "MCP", "Redis", "Asynq", "BullMQ"]
+    },
+    {
+      "id": "multitenant-gateway",
+      "name": "Multi-tenant Gateway",
+      "kind": "Go platform reference",
+      "visual": "tenant-routing",
+      "summary": "A small single-binary gateway that demonstrates tenant resolution, JWT authentication, per-tenant rate limits, and module boundaries.",
+      "decision": "Keep tenant context explicit from transport through policy rather than hiding it behind global state.",
+      "url": "https://github.com/Yusufihsangorgel/go-multitenant-gateway",
+      "technologies": ["Go", "JWT", "Rate limiting", "Multi-tenancy"]
+    },
+    {
+      "id": "redis-task-queue",
+      "name": "Redis Task Queue",
+      "kind": "Server-side Dart library",
+      "visual": "weighted-queue",
+      "summary": "A Redis-backed task queue for Dart with retries, dead-letter handling, and weighted queues.",
+      "decision": "Make failure states inspectable and scheduling behaviour deterministic without adding a runtime framework.",
+      "url": "https://github.com/Yusufihsangorgel/redis_task_queue",
+      "technologies": ["Dart", "Redis", "Retries", "Dead letters"]
+    },
+    {
+      "id": "constellation-particles",
+      "name": "Constellation Particles",
+      "kind": "Flutter rendering package",
+      "visual": "spatial-grid",
+      "summary": "A dependency-free particle field for Flutter with pointer interaction and spatial-grid neighbour lookup.",
+      "decision": "Use spatial partitioning to avoid comparing every particle pair as the scene grows.",
+      "url": "https://github.com/Yusufihsangorgel/constellation_particles",
+      "technologies": ["Flutter", "Dart", "CustomPainter", "Spatial grid"]
+    }
+  ],
+  "story": [
+    {
+      "id": "frame-zero",
+      "eyebrow": "Frame 00",
+      "title": "The interface begins before the first pixel.",
+      "body": "Product constraints, data boundaries, rendering, semantics, and recovery paths are one system—not separate polish passes."
+    },
+    {
+      "id": "runtime",
+      "eyebrow": "Frame 01",
+      "title": "Build for the conditions the product will actually meet.",
+      "body": "Unreliable networks, offline data, native integrations, and release failures belong in the design from the beginning."
+    },
+    {
+      "id": "upstream",
+      "eyebrow": "Frame 02",
+      "title": "When the boundary is wrong, move the boundary.",
+      "body": "Turn product-level failures into minimal reproductions, tests, and upstream patches instead of hiding them behind local workarounds."
+    },
+    {
+      "id": "systems",
+      "eyebrow": "Frame 03",
+      "title": "Leave the next engineer a system they can change.",
+      "body": "Explicit state, typed data, narrow interfaces, observable failure modes, and verified release paths keep software useful after launch."
+    }
+  ]
+}

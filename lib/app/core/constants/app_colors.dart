@@ -43,13 +43,13 @@ final class AppColors {
   static const expGradient3 = hotCoral;
   static const expAccent = hotCoral;
 
-  // ─── Approach palette ──────────────────────────────────────────────
+  // ─── Open-source palette ───────────────────────────────────────────
   static const projGradient1 = Color(0xFF191814);
   static const projGradient2 = Color(0xFF302F29);
   static const projGradient3 = paper;
   static const projAccent = paper;
 
-  // ─── Projects palette ──────────────────────────────────────────────
+  // ─── Systems palette ───────────────────────────────────────────────
   static const contactGradient1 = Color(0xFF07171C);
   static const contactGradient2 = Color(0xFF0C3540);
   static const contactGradient3 = digitalIce;

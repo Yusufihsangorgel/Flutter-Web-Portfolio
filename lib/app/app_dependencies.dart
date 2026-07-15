@@ -8,6 +8,8 @@ import 'package:flutter_web_portfolio/app/controllers/scroll_controller.dart';
 import 'package:flutter_web_portfolio/app/data/providers/assets_provider.dart';
 import 'package:flutter_web_portfolio/app/data/providers/local_storage_provider.dart';
 import 'package:flutter_web_portfolio/app/data/repositories/language_repository_impl.dart';
+import 'package:flutter_web_portfolio/app/data/repositories/portfolio_repository_impl.dart';
+import 'package:flutter_web_portfolio/app/domain/models/portfolio_document.dart';
 import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
 
 /// Explicit, application-owned dependency graph.
@@ -17,16 +19,21 @@ import 'package:flutter_web_portfolio/app/features/language/application/language
 final class AppDependencies {
   AppDependencies._({
     required this.languageCubit,
+    required this.portfolio,
     required this.scrollController,
     required this.sceneDirector,
   });
 
   final LanguageCubit languageCubit;
+  final PortfolioDocument portfolio;
   final AppScrollController scrollController;
   final SceneDirector sceneDirector;
 
   static Future<AppDependencies> bootstrap() async {
     final assetsProvider = AssetsProvider();
+    final portfolio = await PortfolioRepositoryImpl(
+      assetsProvider: assetsProvider,
+    ).load();
     final storageProvider = await LocalStorageProvider().init();
     final languageRepository = LanguageRepositoryImpl(
       assetsProvider: assetsProvider,
@@ -40,6 +47,7 @@ final class AppDependencies {
 
     return AppDependencies._(
       languageCubit: languageCubit,
+      portfolio: portfolio,
       scrollController: scrollController,
       sceneDirector: sceneDirector,
     );
@@ -75,18 +83,22 @@ final class _AppRuntimeState extends State<AppRuntime> {
   }
 
   @override
-  Widget build(BuildContext context) => MultiBlocProvider(
-    providers: [
-      BlocProvider<LanguageCubit>.value(
-        value: widget.dependencies.languageCubit,
-      ),
-      BlocProvider<AppScrollController>.value(
-        value: widget.dependencies.scrollController,
-      ),
-      BlocProvider<SceneDirector>.value(
-        value: widget.dependencies.sceneDirector,
-      ),
-    ],
-    child: widget.child,
-  );
+  Widget build(BuildContext context) =>
+      RepositoryProvider<PortfolioDocument>.value(
+        value: widget.dependencies.portfolio,
+        child: MultiBlocProvider(
+          providers: [
+            BlocProvider<LanguageCubit>.value(
+              value: widget.dependencies.languageCubit,
+            ),
+            BlocProvider<AppScrollController>.value(
+              value: widget.dependencies.scrollController,
+            ),
+            BlocProvider<SceneDirector>.value(
+              value: widget.dependencies.sceneDirector,
+            ),
+          ],
+          child: widget.child,
+        ),
+      );
 }

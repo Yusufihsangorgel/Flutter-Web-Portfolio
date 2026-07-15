@@ -124,9 +124,6 @@ try {
   if (!killSwitch.includes('self.registration.unregister()')) {
     failures.push('the legacy service-worker does not unregister itself');
   }
-  if (!killSwitch.includes('client.navigate(client.url)')) {
-    failures.push('the legacy service-worker does not return clients to the network');
-  }
   if (/addEventListener\(['"]fetch['"]/.test(killSwitch)) {
     failures.push('the legacy service-worker must not intercept fetches');
   }
@@ -136,14 +133,14 @@ try {
 
 try {
   const index = await readFile(path.join(webRoot, 'index.html'), 'utf8');
-  if (!index.includes('class="bootstrap-title"')) {
-    failures.push('the instant portfolio shell headline is missing');
+  if (!index.includes('class="bootstrap-progress"')) {
+    failures.push('the neutral first-frame progress cue is missing');
   }
   if (!index.includes('aria-busy="true"')) {
-    failures.push('the instant portfolio shell does not expose loading state');
+    failures.push('the neutral first-frame bed does not expose loading state');
   }
-  if (!index.includes('Preparing the portfolio')) {
-    failures.push('the instant portfolio shell status is missing');
+  if (/bootstrap-(?:title|nav|brand|intro)/.test(index)) {
+    failures.push('the HTML bootstrap duplicated meaningful portfolio content');
   }
   const bootstrap = await readFile(
     path.join(webRoot, 'flutter_bootstrap.js'),

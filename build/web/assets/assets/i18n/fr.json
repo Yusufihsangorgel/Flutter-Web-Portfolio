@@ -1,224 +1,11 @@
 {
-  "app_name": "Ingénieur Flutter senior",
-  "cv_data": {
-    "personal_info": {
-      "name": "Ingénieur Flutter senior",
-      "location": "À distance",
-      "bio": "Depuis 2021, je développe des applications Flutter en production pour mobile, ordinateur et web. Je privilégie un comportement produit clair, des données hors ligne robustes, la synchronisation en temps réel et un code maintenable.",
-      "tagline": "Ingénierie Flutter orientée produit",
-      "subtitles": [
-        "Produits mobiles",
-        "Applications hors ligne d’abord",
-        "Livraison multiplateforme"
-      ]
-    },
-    "experiences": [
-      {
-        "title": "Développeur Flutter",
-        "company": "Logiciels de vente au détail",
-        "position": "Applications mobiles et de bureau",
-        "start_date": "2022",
-        "end_date": "",
-        "period": "Mars 2022 — Aujourd’hui",
-        "description": "Développement d’applications en production pour tablettes Android et iOS, ainsi que pour Linux, macOS et Windows. Le travail couvre les données hors ligne avec SQLite et Drift, les intégrations natives et la synchronisation en temps réel.",
-        "technologies": [
-          "Flutter",
-          "Dart",
-          "SQLite",
-          "WebSocket",
-          "i18n"
-        ]
-      },
-      {
-        "title": "Responsable de l’équipe mobile",
-        "company": "Plateforme logistique",
-        "position": "Livraison produit multiplateforme",
-        "start_date": "2023",
-        "end_date": "2025",
-        "period": "Juin 2023 — Février 2025",
-        "description": "Pilotage de la livraison mobile d’un produit logistique avec suivi des véhicules par WebSocket, intégrations Google et Apple Maps et coordination avec une application web React.",
-        "technologies": [
-          "Flutter",
-          "WebSocket",
-          "Google Maps",
-          "Apple Maps",
-          "React"
-        ]
-      },
-      {
-        "title": "Développeur Flutter",
-        "company": "Produits d’édition numérique",
-        "position": "Applications Android et iOS",
-        "start_date": "2022",
-        "end_date": "2024",
-        "period": "Octobre 2022 — Juin 2024",
-        "description": "Livraison d’applications d’édition pour Android et iOS avec MVVM, GetX, Dio, localisation et processus de publication prêts pour les stores.",
-        "technologies": [
-          "Flutter",
-          "Dart",
-          "MVVM",
-          "GetX",
-          "Dio"
-        ]
-      },
-      {
-        "title": "Génie logiciel",
-        "company": "Formation universitaire",
-        "position": "Licence",
-        "start_date": "2021",
-        "end_date": "2025",
-        "period": "2021 — 2025",
-        "description": "Formation en génie logiciel couvrant les algorithmes, les structures de données, les bases de données, la conception logicielle et le développement de produits en équipe.",
-        "technologies": [
-          "Algorithmes",
-          "Structures de données",
-          "Bases de données",
-          "Conception logicielle",
-          "Projets d’équipe"
-        ]
-      }
-    ],
-    "projects": [
-      {
-        "title": "FakeCallApp",
-        "description": "Une expérience ludique de faux appel vidéo avec personnages, planification et interactions pensées pour le mobile.",
-        "category": "Web",
-        "url": "https://fakecallapp.com"
-      },
-      {
-        "title": "CleanMyGallery",
-        "description": "Un outil pratique pour repérer l’encombrement, compresser les photos et garder les métadonnées sous contrôle.",
-        "category": "Web",
-        "url": "https://cleanmygallery.com"
-      },
-      {
-        "title": "FocusGroves",
-        "description": "Un espace de concentration qui réunit minuteurs, tâches et salles d’étude partagées.",
-        "category": "Web",
-        "url": "https://focusgroves.com"
-      },
-      {
-        "title": "MoodGrade",
-        "description": "Un journal d’humeur privé avec suivi des médicaments, exports et tendances à long terme.",
-        "category": "Web",
-        "url": "https://moodgrade.com"
-      },
-      {
-        "title": "GetQrivo",
-        "description": "Une boîte à outils QR pour créer des codes, gérer des liens courts et comprendre les scans.",
-        "category": "Web",
-        "url": "https://getqrivo.com"
-      },
-      {
-        "title": "OverlayPhoto",
-        "description": "Un éditeur photo pour les superpositions, cadres, filtres et souvenirs en capsule temporelle.",
-        "category": "Web",
-        "url": "https://overlayphoto.com"
-      },
-      {
-        "title": "DistractionKiller",
-        "description": "Un outil de bien-être numérique pour bloquer les distractions et protéger le temps de concentration.",
-        "category": "Web",
-        "url": "https://distractionkiller.com"
-      },
-      {
-        "title": "KPSSHazirlan",
-        "description": "Un planificateur d’étude pour la préparation au KPSS, les exercices et le suivi des progrès.",
-        "category": "Web",
-        "url": "https://kpsshazirlan.com"
-      },
-      {
-        "title": "EhliyetCoz",
-        "description": "Un compagnon d’examen de conduite avec quiz quotidiens et retour clair sur la progression.",
-        "category": "Web",
-        "url": "https://ehliyetcoz.com"
-      },
-      {
-        "title": "Kazanamazi",
-        "description": "Un registre personnel apaisé pour les prières et jours de jeûne manqués, avec rappels et historique.",
-        "category": "Web",
-        "url": "https://kazanamazi.net"
-      },
-      {
-        "title": "PDFScanPro",
-        "description": "Une boîte à outils PDF ciblée pour numériser, compresser, fusionner, diviser et convertir des documents.",
-        "category": "Web",
-        "url": "https://pdfscanpro.com"
-      }
-    ],
-    "skills": [
-      {
-        "category": "Mobile",
-        "items": [
-          "Flutter",
-          "Dart",
-          "BLoC",
-          "Canaux de plateforme",
-          "Hors ligne d’abord"
-        ]
-      },
-      {
-        "category": "Back-end",
-        "items": [
-          "Go",
-          "Fiber",
-          "PostgreSQL",
-          "Redis",
-          "Asynq"
-        ]
-      },
-      {
-        "category": "Web",
-        "items": [
-          "Flutter Web",
-          "Dart Wasm",
-          "SkWasm",
-          "CanvasKit",
-          "Semantics"
-        ]
-      },
-      {
-        "category": "Exploitation",
-        "items": [
-          "Docker Swarm",
-          "Nginx",
-          "Prometheus",
-          "Grafana",
-          "PostgreSQL HA"
-        ]
-      }
-    ],
-    "proof": [
-      {
-        "title": "S’approprier le produit",
-        "detail": "Je reste proche du problème, de la première interaction à la publication, au support et à l’itération suivante.",
-        "verification": "Le produit avant le cérémonial"
-      },
-      {
-        "title": "Concevoir pour le réel",
-        "detail": "Les données hors ligne, les réseaux instables, les intégrations natives et les chemins de récupération font partie du produit.",
-        "verification": "La résilience dès la conception"
-      },
-      {
-        "title": "Rester maintenable",
-        "detail": "Des limites claires, une gestion d’état ciblée et des tests utiles facilitent les changements après la mise en ligne.",
-        "verification": "Prêt pour le prochain changement"
-      },
-      {
-        "title": "Corriger la couche sous le produit",
-        "detail": "Un vide au premier frame de SkWasm au niveau du compositeur est devenu une reproduction minimale, des mesures vérifiables et un correctif du moteur Flutter—pas un contournement propre au portfolio.",
-        "verification": "flutter/flutter issue #189499 · draft PR #189500",
-        "action": "Voir le correctif upstream",
-        "url": "https://github.com/flutter/flutter/pull/189500"
-      }
-    ]
-  },
+  "app_name": "Ingénieur logiciel",
   "nav": {
     "home": "Accueil",
     "about": "À propos",
     "experience": "Expérience",
-    "projects": "Projets",
-    "proof": "Approche"
+    "projects": "Systèmes",
+    "proof": "Open source"
   },
   "accessibility": {
     "skip_to_content": "Aller au contenu",
@@ -226,13 +13,9 @@
     "language_menu": "Menu des langues"
   },
   "about_section": {
-    "title": "À propos de moi",
-    "bio": "Depuis 2021, je développe des applications Flutter en production pour mobile, ordinateur et web. Je privilégie un comportement produit clair, des données hors ligne robustes, la synchronisation en temps réel et un code maintenable.",
-    "bio2": "En parallèle des projets clients, je conçois et exploite des produits SaaS indépendants de bout en bout, des interfaces Flutter et API Go au déploiement et au suivi."
+    "title": "À propos de moi"
   },
   "home_section": {
-    "title": "INGÉNIEUR FLUTTER SENIOR.",
-    "subtitle": "Des produits utiles pour mobile, ordinateur et web.",
     "view_work": "Voir les projets",
     "inspect_runtime": "À propos de moi"
   },
@@ -241,20 +24,17 @@
     "present": "En cours"
   },
   "projects_section": {
-    "title": "Projets sélectionnés",
-    "subtitle": "Des produits que j’ai conçus, développés et que je continue d’améliorer.",
+    "title": "Systèmes sélectionnés",
     "archive": "Autres produits",
-    "open_project": "Ouvrir le projet"
+    "open_project": "Voir le code source"
   },
   "proof_section": {
-    "title": "Ma façon de travailler",
-    "subtitle": "Une approche pratique façonnée par la livraison et la maintenance de vrais produits."
+    "title": "Open source"
   },
   "footer": {
     "command_hint_prefix": "Appuyez sur",
     "command_hint_suffix": "pour ouvrir la palette de commandes",
     "verification": "Objectif actuel",
-    "verification_body": "Créer des produits Flutter soignés et les services Go qui les accompagnent.",
     "quick_links": "Liens rapides"
   },
   "command_palette": {

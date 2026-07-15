@@ -1,8 +1,8 @@
 name: flutter_web_portfolio
-description: 'Modern and responsive Flutter web portfolio application.'
+description: 'A data-driven Flutter Web portfolio for verified engineering work.'
 publish_to: 'none'
 
-version: 1.1.0+1
+version: 1.2.0+2
 
 environment:
   sdk: '>=3.11.0 <4.0.0'
@@ -34,6 +34,7 @@ flutter:
 
   assets:
     - assets/animations/
+    - assets/content/
     - assets/i18n/
 
   fonts:

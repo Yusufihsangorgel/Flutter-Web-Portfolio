@@ -1,224 +1,11 @@
 {
-  "app_name": "مهندس Flutter أول",
-  "cv_data": {
-    "personal_info": {
-      "name": "مهندس Flutter أول",
-      "location": "عن بُعد",
-      "bio": "أطوّر منذ عام 2021 تطبيقات Flutter تعمل في الإنتاج للجوال وسطح المكتب والويب، مع اهتمام بسلوك المنتج الواضح والبيانات المتينة دون اتصال والمزامنة الفورية والكود القابل للصيانة.",
-      "tagline": "هندسة Flutter تركز على المنتج",
-      "subtitles": [
-        "منتجات الجوال",
-        "تطبيقات تعمل دون اتصال أولاً",
-        "تسليم متعدد المنصات"
-      ]
-    },
-    "experiences": [
-      {
-        "title": "مطور Flutter",
-        "company": "برمجيات مؤسسية للبيع بالتجزئة",
-        "position": "تطبيقات الجوال وسطح المكتب",
-        "start_date": "2022",
-        "end_date": "",
-        "period": "مارس 2022 — حتى الآن",
-        "description": "تطوير تطبيقات إنتاجية لأجهزة Android وiOS اللوحية وأنظمة Linux وmacOS وWindows، بما يشمل بيانات دون اتصال باستخدام SQLite وDrift وتكاملات أصلية ومزامنة فورية موثوقة.",
-        "technologies": [
-          "Flutter",
-          "Dart",
-          "SQLite",
-          "WebSocket",
-          "i18n"
-        ]
-      },
-      {
-        "title": "قائد فريق الجوال",
-        "company": "منصة لوجستية",
-        "position": "تسليم منتج متعدد المنصات",
-        "start_date": "2023",
-        "end_date": "2025",
-        "period": "يونيو 2023 — فبراير 2025",
-        "description": "قدت تسليم تطبيق جوال لمنتج لوجستي يتضمن تتبع المركبات عبر WebSocket وتكامل Google وApple Maps والتنسيق مع تطبيق ويب مبني بـ React.",
-        "technologies": [
-          "Flutter",
-          "WebSocket",
-          "Google Maps",
-          "Apple Maps",
-          "React"
-        ]
-      },
-      {
-        "title": "مطور Flutter",
-        "company": "منتجات نشر رقمي",
-        "position": "تطبيقات Android وiOS",
-        "start_date": "2022",
-        "end_date": "2024",
-        "period": "أكتوبر 2022 — يونيو 2024",
-        "description": "تسليم تطبيقات نشر للمستخدمين على Android وiOS باستخدام MVVM وGetX وDio والترجمة ومسارات إصدار جاهزة للمتاجر.",
-        "technologies": [
-          "Flutter",
-          "Dart",
-          "MVVM",
-          "GetX",
-          "Dio"
-        ]
-      },
-      {
-        "title": "هندسة البرمجيات",
-        "company": "تعليم جامعي",
-        "position": "درجة البكالوريوس",
-        "start_date": "2021",
-        "end_date": "2025",
-        "period": "2021 — 2025",
-        "description": "دراسة أكاديمية في هندسة البرمجيات تشمل الخوارزميات وهياكل البيانات وقواعد البيانات وتصميم البرمجيات وتطوير المنتجات ضمن فرق.",
-        "technologies": [
-          "الخوارزميات",
-          "هياكل البيانات",
-          "قواعد البيانات",
-          "تصميم البرمجيات",
-          "مشاريع الفريق"
-        ]
-      }
-    ],
-    "projects": [
-      {
-        "title": "FakeCallApp",
-        "description": "تجربة مرحة لمكالمة فيديو وهمية تضم شخصيات وجدولة وتفاعلات مصممة للجوال.",
-        "category": "ويب",
-        "url": "https://fakecallapp.com"
-      },
-      {
-        "title": "CleanMyGallery",
-        "description": "أداة عملية لاكتشاف فوضى المعرض وضغط الصور والتحكم في البيانات الوصفية.",
-        "category": "ويب",
-        "url": "https://cleanmygallery.com"
-      },
-      {
-        "title": "FocusGroves",
-        "description": "مساحة للتركيز تجمع المؤقتات والمهام وغرف الدراسة المشتركة.",
-        "category": "ويب",
-        "url": "https://focusgroves.com"
-      },
-      {
-        "title": "MoodGrade",
-        "description": "يوميات خاصة للمزاج مع متابعة الأدوية والتصدير واكتشاف الأنماط طويلة المدى.",
-        "category": "ويب",
-        "url": "https://moodgrade.com"
-      },
-      {
-        "title": "GetQrivo",
-        "description": "مجموعة أدوات QR لإنشاء الرموز وإدارة الروابط القصيرة وفهم عمليات المسح.",
-        "category": "ويب",
-        "url": "https://getqrivo.com"
-      },
-      {
-        "title": "OverlayPhoto",
-        "description": "محرر صور للطبقات والإطارات والمرشحات وذكريات الكبسولة الزمنية.",
-        "category": "ويب",
-        "url": "https://overlayphoto.com"
-      },
-      {
-        "title": "DistractionKiller",
-        "description": "أداة للرفاهية الرقمية تحظر المشتتات وتحمي وقت التركيز.",
-        "category": "ويب",
-        "url": "https://distractionkiller.com"
-      },
-      {
-        "title": "KPSSHazirlan",
-        "description": "مخطط دراسة للتحضير لاختبار KPSS وجلسات التدريب ومتابعة التقدم.",
-        "category": "ويب",
-        "url": "https://kpsshazirlan.com"
-      },
-      {
-        "title": "EhliyetCoz",
-        "description": "مساعد لاختبار القيادة يقدم اختبارات يومية وملاحظات واضحة عن التقدم.",
-        "category": "ويب",
-        "url": "https://ehliyetcoz.com"
-      },
-      {
-        "title": "Kazanamazi",
-        "description": "سجل شخصي هادئ للصلوات وأيام الصيام الفائتة مع التذكيرات والسجل التاريخي.",
-        "category": "ويب",
-        "url": "https://kazanamazi.net"
-      },
-      {
-        "title": "PDFScanPro",
-        "description": "مجموعة أدوات PDF لمسح المستندات وضغطها ودمجها وتقسيمها وتحويلها.",
-        "category": "ويب",
-        "url": "https://pdfscanpro.com"
-      }
-    ],
-    "skills": [
-      {
-        "category": "تطبيقات الجوال",
-        "items": [
-          "Flutter",
-          "Dart",
-          "BLoC",
-          "قنوات المنصة",
-          "العمل دون اتصال أولاً"
-        ]
-      },
-      {
-        "category": "الواجهة الخلفية",
-        "items": [
-          "Go",
-          "Fiber",
-          "PostgreSQL",
-          "Redis",
-          "Asynq"
-        ]
-      },
-      {
-        "category": "الويب",
-        "items": [
-          "Flutter Web",
-          "Dart Wasm",
-          "SkWasm",
-          "CanvasKit",
-          "Semantics"
-        ]
-      },
-      {
-        "category": "العمليات",
-        "items": [
-          "Docker Swarm",
-          "Nginx",
-          "Prometheus",
-          "Grafana",
-          "PostgreSQL HA"
-        ]
-      }
-    ],
-    "proof": [
-      {
-        "title": "تحمّل مسؤولية المنتج",
-        "detail": "أبقى قريباً من المشكلة منذ أول تفاعل وحتى الإطلاق والدعم والتحسين التالي.",
-        "verification": "المنتج قبل الإجراءات"
-      },
-      {
-        "title": "صمّم للظروف الحقيقية",
-        "detail": "البيانات دون اتصال والشبكات غير المستقرة والتكاملات الأصلية ومسارات الاستعادة أجزاء أساسية من المنتج.",
-        "verification": "المتانة تبدأ من التصميم"
-      },
-      {
-        "title": "حافظ على قابلية الصيانة",
-        "detail": "الحدود الواضحة وإدارة الحالة المركزة والاختبارات المفيدة تجعل التغيير بعد الإطلاق أسهل.",
-        "verification": "جاهز للتغيير التالي"
-      },
-      {
-        "title": "أصلح الطبقة أسفل المنتج",
-        "detail": "تحولت فجوة الإطار الأول في SkWasm على مستوى compositor إلى مثال مصغر قابل لإعادة الإنتاج وقياسات موثقة وتصحيح لمحرك Flutter، بدلاً من حل خاص بالموقع.",
-        "verification": "flutter/flutter issue #189499 · draft PR #189500",
-        "action": "عرض تصحيح Flutter",
-        "url": "https://github.com/flutter/flutter/pull/189500"
-      }
-    ]
-  },
+  "app_name": "مهندس برمجيات",
   "nav": {
     "home": "الرئيسية",
     "about": "عني",
     "experience": "الخبرة",
-    "projects": "المشاريع",
-    "proof": "المنهج"
+    "projects": "الأنظمة",
+    "proof": "المصدر المفتوح"
   },
   "accessibility": {
     "skip_to_content": "تخطي إلى المحتوى",
@@ -226,13 +13,9 @@
     "language_menu": "قائمة اللغات"
   },
   "about_section": {
-    "title": "عني",
-    "bio": "أطوّر منذ عام 2021 تطبيقات Flutter تعمل في الإنتاج للجوال وسطح المكتب والويب، مع اهتمام بسلوك المنتج الواضح والبيانات المتينة دون اتصال والمزامنة الفورية والكود القابل للصيانة.",
-    "bio2": "إلى جانب أعمال العملاء، أصمم وأشغّل منتجات SaaS مستقلة من واجهات Flutter وواجهات Go البرمجية إلى النشر والمراقبة."
+    "title": "عني"
   },
   "home_section": {
-    "title": "مهندس FLUTTER أول.",
-    "subtitle": "منتجات مفيدة للجوال وسطح المكتب والويب.",
     "view_work": "عرض المشاريع",
     "inspect_runtime": "عني"
   },
@@ -241,21 +24,18 @@
     "present": "حالياً"
   },
   "projects_section": {
-    "title": "مشاريع مختارة",
-    "subtitle": "منتجات صممتها وبنيتها وأواصل تحسينها.",
+    "title": "أنظمة مختارة",
     "archive": "منتجات أخرى",
-    "open_project": "فتح المشروع"
+    "open_project": "عرض المصدر"
   },
   "proof_section": {
-    "title": "كيف أعمل",
-    "subtitle": "منهج عملي تشكّل من إطلاق منتجات حقيقية وصيانتها."
+    "title": "المصدر المفتوح"
   },
   "footer": {
     "command_hint_prefix": "اضغط",
     "command_hint_suffix": "لفتح لوحة الأوامر",
     "quick_links": "روابط سريعة",
-    "verification": "التركيز الحالي",
-    "verification_body": "بناء منتجات Flutter مدروسة وخدمات Go التي تدعمها."
+    "verification": "التركيز الحالي"
   },
   "command_palette": {
     "close": "إغلاق لوحة الأوامر",

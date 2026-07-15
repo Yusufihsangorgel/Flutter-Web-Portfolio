@@ -1,188 +1,151 @@
-<div align="center">
+# Flutter Web Portfolio
 
-# Flutter Render Atlas
+A production Flutter Web document built around one continuous render system: typed external content, measured scroll geometry, a procedural scene, and a dual-runtime Wasm release.
 
-A code-native Flutter Web portfolio built as one procedural render atlas. Scroll geometry moves the same canvas scene through five visual states while the document presents production experience, engineering principles, and selected products.
+[Live site](https://developeryusuf.com) · [Flutter Web first-frame issue](https://github.com/flutter/flutter/issues/189499) · [Draft engine patch](https://github.com/flutter/flutter/pull/189500)
 
-![Flutter](https://img.shields.io/badge/Flutter-3.41-02569B?logo=flutter)
-![Dart](https://img.shields.io/badge/Dart-3.11-0175C2?logo=dart)
-![License](https://img.shields.io/badge/License-MIT-green)
+This repository is the engineering artifact behind the portfolio, not a reusable identity template. The public record below is generated from `assets/content/portfolio.json`; widget and painter code contain no role, biography, experience, project, or contribution records.
 
-[**Live Site**](https://developeryusuf.com)
+<!-- portfolio-record:start -->
+## Public engineering record
 
-</div>
+**Software Engineer.** I build cross-platform products and the systems that keep them reliable.
 
-## Content model
+My work spans Flutter clients, local and real-time data, native integrations, Go services, queues, and production infrastructure. I stay close to the boundary where product behaviour becomes a systems problem.
 
-Edit `assets/i18n/*.json` to change the role, biography, experience, skills, working principles, projects, and interface labels. Keep the same keys in every locale so the translation catalog remains type-safe.
+Source status: `2026.07.15.1`, verified 2026-07-15 against the public GitHub and LinkedIn records declared in the manifest.
 
-The public site intentionally avoids personal contact details. Publish only the identity and links you are comfortable exposing.
+### Accepted upstream changes
 
-Useful keyboard shortcuts:
+| Project | Change | Merged | Evidence |
+|---|---|---:|---|
+| FlutterFire | Make Firebase core loading deterministic on WebKit | 2026-07-15 | [Pull request](https://github.com/firebase/flutterfire/pull/18443) |
+| Flutter Form Builder | Reset unknown dropdown initial values on first build | 2026-07-14 | [Pull request](https://github.com/flutter-form-builder-ecosystem/flutter_form_builder/pull/1512) |
+| Drift | Treat SQLite TRUE and 1 defaults as the same schema | 2026-07-14 | [Pull request](https://github.com/simolus3/drift/pull/3835) |
+| Go Fiber Recipes | Add a Fiber and Asynq background-jobs recipe | 2026-07-12 | [Pull request](https://github.com/gofiber/recipes/pull/4997) |
 
-- `Ctrl/Cmd + K` — open the keyboard-driven command palette.
+### Public systems
 
-## Included
+| System | Engineering focus | Source |
+|---|---|---|
+| Flutter Web Portfolio | Keep the semantic document and high-frequency painter paths separate while one measured scroll model directs both. | [Repository](https://github.com/Yusufihsangorgel/Flutter-Web-Portfolio) |
+| Queue Inspector MCP | Expose queue state, job detail, retries, and dead letters through explicit operations with conservative defaults. | [Repository](https://github.com/Yusufihsangorgel/queue-inspector-mcp) |
+| Multi-tenant Gateway | Keep tenant context explicit from transport through policy rather than hiding it behind global state. | [Repository](https://github.com/Yusufihsangorgel/go-multitenant-gateway) |
+| Redis Task Queue | Make failure states inspectable and scheduling behaviour deterministic without adding a runtime framework. | [Repository](https://github.com/Yusufihsangorgel/redis_task_queue) |
+| Constellation Particles | Use spatial partitioning to avoid comparing every particle pair as the scene grows. | [Repository](https://github.com/Yusufihsangorgel/constellation_particles) |
 
-- Responsive layouts for mobile, tablet, and desktop.
-- English, Turkish, German, French, Spanish, Arabic with RTL, and Hindi.
-- Accessible headings, keyboard navigation, skip links, focus states, and reduced-motion support.
-- Data-driven experience, skills, principles, and project sections.
-- A matching first-frame handoff from the HTML render-atlas shell to Flutter.
-- Scroll-directed procedural planes, perspective geometry, and registration marks rendered with `CustomPainter`.
-- Dart WebAssembly and SkWasm release with a JavaScript and CanvasKit fallback.
-- Playwright coverage for loading, accessibility, localization, routing, and release assets.
+### Work under review
 
----
+- **Flutter:** [Wait for web rendering before the first-frame event](https://github.com/flutter/flutter/pull/189500) — Wait for outstanding scene renders and the next browser frame before dispatching the event; the pull request remains a draft pending Flutter Web review and full engine CI.
+<!-- portfolio-record:end -->
 
-## Quick Start
+## Content contract
+
+`assets/content/portfolio.json` is the canonical professional record. It contains the profile, experience, capabilities, verified contributions, public systems, story transitions, source provenance, and site metadata. `PortfolioDocument` parses it into immutable final classes and rejects unsupported schemas, duplicate evidence IDs, invalid URLs, missing chapters, and public-role drift.
+
+`assets/i18n/*.json` contains interface language only. All seven locale documents share one tested key schema; none may contain biography, experience, project, or contribution records.
+
+Run the synchronization gate after changing the manifest:
 
 ```bash
-git clone <your-fork-url>
-cd Flutter-Web-Portfolio
-flutter pub get
-flutter run -d chrome
+npm run sync:content
+npm run verify:content
 ```
 
-Build the same dual-runtime release used by CI:
+The synchronization tool owns this README record, search/social metadata, structured data, and the web manifest. The social-card renderer reads the same JSON at render time.
 
-```bash
-flutter build web --release --wasm --no-web-resources-cdn
-npm run prepare:bundle
-npm run verify:bundle
+## Rendering architecture
+
+```text
+assets/content/portfolio.json
+        │ strict parse before runApp
+        ▼
+PortfolioDocument ───────────────┐
+                                │
+assets/i18n/{locale}.json        │
+        │ ordered async loading  │
+        ▼                        ▼
+LanguageCubit              semantic sections
+                                │ measured chapter centres
+                                ▼
+AppScrollController ─────► SceneDirector
+                                │ immutable SceneConfig snapshots
+                                ▼
+                     CinematicBackground / CustomPainter
 ```
 
-The output contains both `main.dart.wasm` and `main.dart.js`. Compatible browsers run the Wasm/SkWasm path; Flutter selects the JavaScript/CanvasKit path when needed.
+The document and render loop have deliberately different update paths:
 
-Typography is bundled locally as Inter, Space Grotesk, JetBrains Mono, Instrument Serif, Noto Sans Arabic, and Noto Sans Devanagari. Their SIL Open Font License texts are kept beside the font files under `assets/fonts/`, so every locale renders without a font CDN.
+- The composition root loads and validates professional content before `runApp`.
+- BLoC/Cubit owns language, scroll, and scene state through explicit dependencies and immutable snapshots.
+- High-frequency ambient painting listens to painter-local animation rather than rebuilding the semantic document.
+- Section positions are measured after layout. Scene interpolation follows real chapter centres instead of equal scroll bands.
+- Browser history represents positions inside one document; it is not used as a page router.
+- Reduced-motion sessions stop continuous animation while preserving the complete document and navigation model.
 
-### Upstream Flutter Web work
+## First meaningful frame
 
-Building the first-frame handoff exposed a renderer timing gap rather than a portfolio-only styling problem. In three cold SkWasm runs, `flutter-first-frame` preceded the first visible Flutter frame by 90.3–143.0 ms. The finding is tracked in [flutter/flutter#189499](https://github.com/flutter/flutter/issues/189499), with an engine fix and regression test proposed in [flutter/flutter#189500](https://github.com/flutter/flutter/pull/189500).
+The HTML layer is only a neutral compositor bed. It has no duplicate hero, navigation, or professional copy, and it never forces a service-worker cleanup reload. Flutter owns the first meaningful frame.
 
-The pull request remains a draft while the Flutter Web team validates it in the full engine CI environment. This repository keeps its compositor-safe local handoff until the upstream behavior changes.
+Cold SkWasm measurements showed that `flutter-first-frame` could precede visible compositor output by 90.3–143.0 ms. The reproducible finding is tracked in [flutter/flutter#189499](https://github.com/flutter/flutter/issues/189499); [flutter/flutter#189500](https://github.com/flutter/flutter/pull/189500) proposes waiting for outstanding scene renders and the next browser frame. The pull request is accurately labelled as draft while it is under review.
 
-### Required headers for threaded SkWasm
+The local handoff retains the neutral background for two browser frames after Flutter's event. This avoids a blank flash without presenting a second portfolio screen.
 
-The included Docker image serves:
+## Release model
+
+The release contains Dart WebAssembly/SkWasm plus Flutter's JavaScript/CanvasKit fallback. Renderer binaries and fallback fonts are same-origin. Entry points receive a content hash; renderer files live below Flutter's exact engine revision so immutable caching cannot pair a new bootstrap with stale binaries.
+
+The included Nginx configuration serves the headers required for threaded SkWasm:
 
 ```text
 Cross-Origin-Opener-Policy: same-origin
 Cross-Origin-Embedder-Policy: credentialless
 ```
 
-These headers make the page cross-origin isolated where the browser supports it. The release tests verify the contract against both the local server and the live deployment.
-
-## Make It Yours
-
-| What | File | Details |
-|------|------|---------|
-| Public content | `assets/i18n/*.json` | Project evidence, skills, and localized interface copy |
-| Your meta tags | `web/index.html` | Title, OG tags, analytics, structured data |
-| Social preview | `tool/social_card.html` | Deterministic 1200×630 source; run `npm run render:social-card` after editing |
-| Scene palette | `lib/app/core/constants/scene_configs.dart` | Gradients, accents, atlas morph, vignette |
-
----
-
-## Architecture
-
-```
-main.dart
-└── await AppDependencies.bootstrap()
-    ├── storage + translation repository
-    ├── LanguageCubit
-    └── explicit Cubit + repository graph
-        └── MaterialApp
-            └── HomeView
-                ├── AppScrollController → URL history + measured chapter geometry
-                ├── SceneDirector → geometry-aligned SceneConfig interpolation
-                └── CustomPaint → grid, atlas planes, grain, and registration marks
-```
-
-The state boundary is intentional:
-
-- **BLoC/Cubit** owns application state. Language changes are ordered, testable, and protected against stale requests overwriting newer choices; scene and scroll state use immutable snapshots.
-- **Widget-local state** is reserved for short-lived hover, focus, and presentation details. High-frequency painting never traverses the application state graph.
-- **Browser history is not a page router.** This is one document; `AppScrollController` synchronizes `#/section` URLs directly with visible sections and back/forward navigation.
-- **Bootstrap completes before `runApp`.** Storage and the selected locale cannot race the first widget build.
-
-Key implementation files:
-
-| Concern | File |
-|---|---|
-| Deterministic composition root | `lib/app/app_dependencies.dart` |
-| Locale state and concurrency | `lib/app/features/language/application/language_cubit.dart` |
-| Browser history + section detection | `lib/app/controllers/scroll_controller.dart` |
-| Geometry-aligned scene interpolation | `lib/app/controllers/scene_director.dart` |
-| Procedural render atlas | `lib/app/widgets/background/cinematic_background.dart` |
-| Spatial product archive | `lib/app/modules/home/sections/projects/projects_section.dart` |
-
----
-
-## Tech Stack
-
-| | |
-|---|---|
-| **Framework** | Flutter 3.41 · Dart 3.11 · WebAssembly release target |
-| **Application state** | `flutter_bloc` — explicit dependencies and immutable snapshots |
-| **Render coordination** | Cubit selectors + painter-local `Listenable` updates |
-| **i18n** | Application-owned JSON repository + `LanguageCubit` — 7 languages, ordered runtime switching |
-| **Fonts** | Six local Latin, Arabic, and Devanagari families with adjacent SIL Open Font Licenses |
-| **CI/CD** | GitHub Actions — pinned Flutter toolchain, fatal-info analysis, tests, bundle budget, browser smoke tests |
-| **UI layer** | Flutter widgets and custom painters; no web component library |
-
-## Verification
-
-Run the same quality gates as CI:
+Build the release used by browser tests:
 
 ```bash
+flutter pub get
+npm ci
+npm run verify:content
 flutter analyze --fatal-infos
 flutter test
-npm run verify:source
 flutter build web --release --wasm --no-web-resources-cdn
 npm run prepare:bundle
 npm run verify:bundle
 npm test
-npm run test:e2e:prod
 ```
 
-The local browser suite runs desktop and mobile in parallel against the release
-artifact. The production suite intentionally uses one worker against the live
-Wasm deployment, so limited client bandwidth cannot turn parallel downloads
-into false boot-time failures. Both suites verify that the Open Graph image is
-a real PNG at the declared 1200×630 large-card dimensions.
+The bundle gate checks Wasm headers, dual-runtime configuration, versioned entry points, self-hosted renderer assets, local font coverage, first-frame cleanup, service-worker retirement, and explicit size budgets. Playwright then exercises desktop and mobile semantics, locale/RTL switching, URL history, security headers, and release assets.
 
-For visual QA of the instant shell on a constrained connection, the local
-server can delay only Wasm responses without changing application code:
+## Local development
 
 ```bash
-WASM_DELAY_MS=5000 PORT=4174 node tool/serve_web.mjs
+flutter pub get
+flutter run -d chrome
 ```
 
-Tests cover pure state transitions, uneven chapter geometry, out-of-order locale requests, repositories, responsive widgets, the command palette, and the complete professional narrative. The source-graph gate also rejects Dart files that are no longer reachable from `lib/main.dart`, so retired features cannot survive as dormant production code.
+Useful controls:
 
-The release preparation step removes renderer debug symbol maps, versions app entrypoints with a content hash, and moves renderer binaries below Flutter's exact engine revision. Nginx can therefore cache those large immutable responses for a year without pairing a new bootstrap with stale runtime bytes. The bundle gate rejects unversioned artifacts, caps the complete public release at 36 MiB, `main.dart.wasm` at 3 MiB, and the JavaScript fallback at 4 MiB. It also verifies the Wasm header, dual-runtime build configuration, custom first-frame bootstrap, same-origin fallback fonts, and the fetch-free retirement worker used to remove legacy service-worker registrations.
+- `Ctrl/Cmd + K` opens the keyboard command surface.
+- Native browser back/forward follows section history.
+- `WASM_DELAY_MS=5000 PORT=4174 node tool/serve_web.mjs` exposes the first-frame handoff under a constrained local load.
 
----
+## Key implementation files
 
-## Deploy
-
-**GitHub Pages** — set source to GitHub Actions in repo settings. Auto-deploys on push. Pages does not expose custom response-header configuration, so the renderer can run single-threaded there; use the included Nginx image when cross-origin isolation is required.
-
-**Docker** — build Wasm first, then package the static output:
-
-```bash
-flutter build web --release --wasm --no-web-resources-cdn
-npm run prepare:bundle
-docker build -t flutter-web-portfolio .
-```
-
----
-
-## Contributing
-
-See [CONTRIBUTING.md](CONTRIBUTING.md).
+| Concern | Source |
+|---|---|
+| Canonical professional data | `assets/content/portfolio.json` |
+| Strict content schema | `lib/app/domain/models/portfolio_document.dart` |
+| Deterministic composition root | `lib/app/app_dependencies.dart` |
+| Locale concurrency | `lib/app/features/language/application/language_cubit.dart` |
+| Measured document geometry | `lib/app/controllers/scroll_controller.dart` |
+| Scene interpolation | `lib/app/controllers/scene_director.dart` |
+| Procedural render system | `lib/app/widgets/background/cinematic_background.dart` |
+| Full-width system studies | `lib/app/modules/home/sections/projects/projects_section.dart` |
+| Content synchronization | `tool/sync_public_content.mjs` |
+| Release integrity | `tool/prepare_web_release.mjs`, `tool/verify_web_build.mjs` |
 
 ## License
 
-MIT — see [LICENSE](LICENSE).
+MIT. See [LICENSE](LICENSE).

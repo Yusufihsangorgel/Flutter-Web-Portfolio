@@ -1,224 +1,11 @@
 {
-  "app_name": "Senior Flutter Engineer",
-  "cv_data": {
-    "personal_info": {
-      "name": "Senior Flutter Engineer",
-      "location": "Remote",
-      "bio": "I have been building production Flutter applications since 2021 across mobile, desktop, and web. My work centres on clear product behaviour, resilient offline data, real-time synchronisation, and code that teams can maintain.",
-      "tagline": "Product-minded Flutter engineering",
-      "subtitles": [
-        "Mobile products",
-        "Offline-first applications",
-        "Cross-platform delivery"
-      ]
-    },
-    "experiences": [
-      {
-        "title": "Flutter Developer",
-        "company": "Enterprise retail software",
-        "position": "Mobile and desktop applications",
-        "start_date": "2022",
-        "end_date": "",
-        "period": "March 2022 — Present",
-        "description": "Building production applications for Android and iOS tablets plus Linux, macOS, and Windows desktops. The work includes offline-first SQLite and Drift data, native integrations, and reliable real-time synchronisation.",
-        "technologies": [
-          "Flutter",
-          "Dart",
-          "SQLite",
-          "WebSocket",
-          "i18n"
-        ]
-      },
-      {
-        "title": "Mobile Team Lead",
-        "company": "Logistics platform",
-        "position": "Cross-platform product delivery",
-        "start_date": "2023",
-        "end_date": "2025",
-        "period": "June 2023 — February 2025",
-        "description": "Led mobile delivery for a logistics product, including WebSocket-based vehicle tracking, Google and Apple Maps integrations, and coordination with a React web application.",
-        "technologies": [
-          "Flutter",
-          "WebSocket",
-          "Google Maps",
-          "Apple Maps",
-          "React"
-        ]
-      },
-      {
-        "title": "Flutter Developer",
-        "company": "Digital publishing products",
-        "position": "Android and iOS applications",
-        "start_date": "2022",
-        "end_date": "2024",
-        "period": "October 2022 — June 2024",
-        "description": "Delivered consumer publishing applications for Android and iOS with MVVM, GetX, Dio, localisation, and store-ready release workflows.",
-        "technologies": [
-          "Flutter",
-          "Dart",
-          "MVVM",
-          "GetX",
-          "Dio"
-        ]
-      },
-      {
-        "title": "Software Engineering",
-        "company": "Undergraduate education",
-        "position": "Bachelor’s degree",
-        "start_date": "2021",
-        "end_date": "2025",
-        "period": "2021 — 2025",
-        "description": "Formal software engineering education covering algorithms, data structures, databases, software design, and team-based product development.",
-        "technologies": [
-          "Algorithms",
-          "Data Structures",
-          "Databases",
-          "Software Design",
-          "Team Projects"
-        ]
-      }
-    ],
-    "projects": [
-      {
-        "title": "FakeCallApp",
-        "description": "A playful fake video-call experience with characters, scheduling, and mobile-first interactions.",
-        "category": "Web",
-        "url": "https://fakecallapp.com"
-      },
-      {
-        "title": "CleanMyGallery",
-        "description": "A practical gallery cleaner for finding clutter, compressing photos, and keeping metadata under control.",
-        "category": "Web",
-        "url": "https://cleanmygallery.com"
-      },
-      {
-        "title": "FocusGroves",
-        "description": "A focus workspace that combines timers, tasks, and shared study rooms.",
-        "category": "Web",
-        "url": "https://focusgroves.com"
-      },
-      {
-        "title": "MoodGrade",
-        "description": "A private mood journal with medication tracking, exports, and useful long-term patterns.",
-        "category": "Web",
-        "url": "https://moodgrade.com"
-      },
-      {
-        "title": "GetQrivo",
-        "description": "A QR toolkit for creating codes, managing short links, and understanding scans.",
-        "category": "Web",
-        "url": "https://getqrivo.com"
-      },
-      {
-        "title": "OverlayPhoto",
-        "description": "A photo editor for overlays, frames, filters, and time-capsule memories.",
-        "category": "Web",
-        "url": "https://overlayphoto.com"
-      },
-      {
-        "title": "DistractionKiller",
-        "description": "A digital wellbeing tool for blocking distractions and protecting focus time.",
-        "category": "Web",
-        "url": "https://distractionkiller.com"
-      },
-      {
-        "title": "KPSSHazirlan",
-        "description": "A study planner for KPSS preparation, practice sessions, and progress tracking.",
-        "category": "Web",
-        "url": "https://kpsshazirlan.com"
-      },
-      {
-        "title": "EhliyetCoz",
-        "description": "A driving-exam companion with daily quizzes and clear progress feedback.",
-        "category": "Web",
-        "url": "https://ehliyetcoz.com"
-      },
-      {
-        "title": "Kazanamazi",
-        "description": "A calm personal ledger for missed prayers and fasting days, with reminders and history.",
-        "category": "Web",
-        "url": "https://kazanamazi.net"
-      },
-      {
-        "title": "PDFScanPro",
-        "description": "A focused PDF toolbox for scanning, compressing, merging, splitting, and converting documents.",
-        "category": "Web",
-        "url": "https://pdfscanpro.com"
-      }
-    ],
-    "skills": [
-      {
-        "category": "Mobile",
-        "items": [
-          "Flutter",
-          "Dart",
-          "BLoC",
-          "Platform channels",
-          "Offline-first"
-        ]
-      },
-      {
-        "category": "Backend",
-        "items": [
-          "Go",
-          "Fiber",
-          "PostgreSQL",
-          "Redis",
-          "Asynq"
-        ]
-      },
-      {
-        "category": "Web",
-        "items": [
-          "Flutter Web",
-          "Dart Wasm",
-          "SkWasm",
-          "CanvasKit",
-          "Semantics"
-        ]
-      },
-      {
-        "category": "Operations",
-        "items": [
-          "Docker Swarm",
-          "Nginx",
-          "Prometheus",
-          "Grafana",
-          "PostgreSQL HA"
-        ]
-      }
-    ],
-    "proof": [
-      {
-        "title": "Own the product",
-        "detail": "I stay close to the problem from the first interaction through release, support, and the next iteration.",
-        "verification": "Product before ceremony"
-      },
-      {
-        "title": "Design for real conditions",
-        "detail": "Offline data, unreliable networks, native integrations, and recovery paths are part of the product—not afterthoughts.",
-        "verification": "Resilience by design"
-      },
-      {
-        "title": "Keep it maintainable",
-        "detail": "Clear boundaries, focused state management, and useful tests make features easier to change after launch.",
-        "verification": "Built for the next change"
-      },
-      {
-        "title": "Fix the layer beneath the product",
-        "detail": "A compositor-level SkWasm first-frame gap became a minimal reproduction, measured evidence, and a Flutter engine patch—not a portfolio-only workaround.",
-        "verification": "flutter/flutter issue #189499 · draft PR #189500",
-        "action": "Inspect upstream patch",
-        "url": "https://github.com/flutter/flutter/pull/189500"
-      }
-    ]
-  },
+  "app_name": "Software Engineer",
   "nav": {
     "home": "Home",
     "about": "About",
     "experience": "Experience",
-    "projects": "Projects",
-    "proof": "Approach"
+    "projects": "Systems",
+    "proof": "Open Source"
   },
   "accessibility": {
     "skip_to_content": "Skip to content",
@@ -226,19 +13,14 @@
     "language_menu": "Language menu"
   },
   "about_section": {
-    "title": "About Me",
-    "bio": "I have been building production Flutter applications since 2021 across mobile, desktop, and web. My work centres on clear product behaviour, resilient offline data, real-time synchronisation, and code that teams can maintain.",
-    "bio2": "Alongside client work, I design and operate independent SaaS products end to end—from Flutter interfaces and Go APIs to deployment and monitoring."
+    "title": "About Me"
   },
   "projects_section": {
-    "title": "Selected Work",
-    "subtitle": "Products I designed, built, and continue to improve.",
+    "title": "Selected Systems",
     "archive": "More products",
-    "open_project": "Open Project"
+    "open_project": "View source"
   },
   "home_section": {
-    "title": "SENIOR FLUTTER ENGINEER.",
-    "subtitle": "Building useful products across mobile, desktop, and web.",
     "view_work": "View selected work",
     "inspect_runtime": "About me"
   },
@@ -247,15 +29,13 @@
     "present": "Present"
   },
   "proof_section": {
-    "title": "How I Work",
-    "subtitle": "A practical approach shaped by shipping and maintaining real products."
+    "title": "Open Source"
   },
   "footer": {
     "quick_links": "Quick Links",
     "command_hint_prefix": "Press",
     "command_hint_suffix": "to open command palette",
-    "verification": "Current focus",
-    "verification_body": "Building thoughtful Flutter products and the Go services behind them."
+    "verification": "Current focus"
   },
   "command_palette": {
     "close": "Close command palette",

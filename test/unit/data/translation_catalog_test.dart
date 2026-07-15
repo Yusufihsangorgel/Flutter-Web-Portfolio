@@ -19,31 +19,32 @@ void main() {
       }
     });
 
-    test('retired public integration copy cannot return unnoticed', () {
+    test('locale files contain interface copy, not portfolio records', () {
       const retiredTopLevelKeys = {
         'blog_section',
         'contact_section',
         'sidebar',
         'social_links',
+        'cv_data',
       };
       const retiredNavigationKeys = {'blog', 'contact', 'skills'};
-      const retiredIdentityKeys = {
-        'phone',
-        'email',
-        'github',
-        'linkedin',
-        'medium',
-      };
+      const contentKeys = {'bio', 'bio2', 'subtitle', 'verification_body'};
 
       for (final entry in catalog.entries) {
         final document = entry.value;
         final navigation = document['nav']! as Map<String, dynamic>;
-        final cvData = document['cv_data']! as Map<String, dynamic>;
-        final personalInfo = cvData['personal_info']! as Map<String, dynamic>;
 
         expect(document.keys, isNot(contains(anyOf(retiredTopLevelKeys))));
         expect(navigation.keys, isNot(contains(anyOf(retiredNavigationKeys))));
-        expect(personalInfo.keys, isNot(contains(anyOf(retiredIdentityKeys))));
+        for (final section in [
+          document['about_section'],
+          document['home_section'],
+          document['projects_section'],
+          document['proof_section'],
+          document['footer'],
+        ].whereType<Map<String, dynamic>>()) {
+          expect(section.keys, isNot(contains(anyOf(contentKeys))));
+        }
       }
     });
   });

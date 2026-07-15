@@ -1,120 +1,49 @@
 # Changelog
 
-All notable changes to this project will be documented in this file.
+This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
-
-## [Unreleased]
+## [1.2.0] - 2026-07-15
 
 ### Added
 
-- **Engineering Lab** with live runtime, renderer, isolation, and rolling Flutter `FrameTiming` telemetry
-- **Deterministic application bootstrap** and concurrency-safe `LanguageCubit`
-- **Desktop and mobile Playwright smoke tests** for Wasm, first frame, runtime inspection, and browser history
-- **Bundle integrity gate** with explicit Wasm and JavaScript budgets
-- **Accessible bootstrap recovery** when the Flutter engine cannot start
-- **Deterministic social preview pipeline** with a 1200×630, repository-rendered Open Graph card
-- **Semantic production smoke suite** with serialized live Wasm verification
-- **Instant engineering shell** that renders accessible, indexable content before Flutter's first frame
-- **Release preparation gate** that strips renderer symbol maps and budgets the complete public artifact
-- **Container packaging gate** that validates Nginx syntax during both image creation and CI
-- **Dart source-graph gate** that rejects unreachable production files before release
+- A canonical `assets/content/portfolio.json` record with source provenance, verification date, professional experience, accepted upstream changes, systems, and narrative transitions.
+- Strict, framework-independent Dart models that reject schema drift, duplicate evidence, invalid URLs, missing chapters, and role inflation before `runApp`.
+- A deterministic synchronization gate for README evidence, search/social metadata, JSON-LD, and the web manifest.
+- Four repository-backed merged pull requests plus the accurately labelled Flutter Web engine work under review.
+- Full-width system studies with content-selected procedural diagrams instead of a repeated project-card grid.
+- Large narrative interludes tied to the same measured chapter geometry that directs the background scene.
 
 ### Changed
 
-- Release builds now ship Dart WebAssembly + SkWasm with a JavaScript/CanvasKit fallback
-- Renderer binaries are self-hosted instead of fetched from Flutter's public CDN
-- Inter, Space Grotesk, and JetBrains Mono are bundled as local variable fonts; the font CDN preconnect was removed
-- Dart sources and tests use the Dart 3.11 formatter as a CI-enforced baseline
-- Browser history is synchronized directly by the scroll controller instead of a page router
-- Reduced-motion preferences stop continuous scene animation and bypass the cinematic preloader
-- The verified `build/web` release artifact is committed for the lightweight Nginx packaging path; private CV and portrait assets were removed from both source and output
-- Unverifiable named endorsements were replaced by repository-backed engineering evidence
-- GitHub Actions run on Node 24 releases pinned to immutable commit SHAs
-- Open Graph and Twitter previews now use the engineering showcase card instead of the generic application icon
-- Production verification no longer executes one-off coordinate-driven audit scripts in parallel
-- Package metadata and the footer now agree on version 1.1.0
-- Dormant Medium, GitHub, contact, and social-sidebar integrations were removed from the anonymous systems showcase; navigation and CSP now expose only live features
-- Release jobs now start from a clean Flutter output directory so deleted assets cannot survive from the committed packaging artifact
-- All seven locale catalogs now share a tested runtime schema with retired integration copy removed
-- Localization now has one application-owned loading path; the unused parallel `flutter_i18n` runtime and its transitive network/parser packages were removed
-- Unsupported percentage-based skill scores were removed; the portfolio now presents capabilities without invented precision
-- Primary systems copy and command-palette actions now cover all seven locales; the document root follows both locale and RTL direction
+- The public role is `Software Engineer` across the site, repository metadata, sharing surface, and GitHub profile.
+- Professional records now come only from the canonical manifest; locale JSON contains interface language only.
+- The HTML bootstrap is a neutral compositor bed with no duplicate hero, navigation, or professional copy.
+- The README presents verified engineering artifacts and the actual runtime architecture instead of template setup copy.
+- The social-card renderer reads the canonical manifest at render time.
+- Open-source evidence and public systems replace unverified social proof and generic capability claims.
 
 ### Fixed
 
-- Slow locale requests can no longer overwrite a newer language choice
-- Browser back/forward no longer pushes a duplicate history entry
-- Stable Wasm filenames are revalidated instead of receiving a one-year immutable cache policy
-- Nginx serves Dart's `.mjs` support runtime with a JavaScript MIME type under `nosniff`
-- Unsupported public project metrics were removed from all seven locale documents
-- Legacy Flutter service workers now unregister themselves and return controlled clients to the network
-- Same-origin fallback fonts resolve correctly for both root and repository-subpath deployments
-- Renderer debug symbol maps are no longer published by Docker or GitHub Pages releases
-- Stable Flutter entrypoint names now carry a content hash and renderer URLs include the exact engine revision, enabling cache-safe one-year binary responses
-- The footer's five-click message is deterministic, localized, and free of unverifiable implementation claims
-- Interactive controls now expose one localized accessible name, a concrete button/link role, keyboard focus, and selected state without duplicate screen-reader announcements
-- The hero and section titles now publish an explicit level-one/level-two heading hierarchy, verified from Chromium's accessibility tree on desktop and mobile
-- Reduced-motion sessions reveal scroll content immediately, use deterministic section jumps, and recheck visibility after post-jump layout
+- Removed the service-worker cleanup reload that created a visible double-start sequence.
+- Restored link semantics inside full-width system studies.
+- Made the pinned navigation opaque so interlude headlines cannot ghost through it during anchor navigation.
+- Added a fetch-free service-worker kill switch to release preparation without registering a new worker.
+- Kept accessible error recovery when neither Wasm nor the JavaScript fallback can start.
 
-## [1.1.0] - 2026-03-23
+## [1.1.0] - 2026-07-14
 
 ### Added
 
-- **System theme detection** — auto-detects OS dark/light preference, follows system changes unless manually overridden
-- **Typewriter cycling** — hero subtitle types, erases, and retypes multiple role descriptions in a loop (7 languages)
-- **Cursor trail effect** — 8-point fading particle trail following the custom cursor
-- **Project category filtering** — filter projects by category (All/Mobile/Web/Backend) with animated chip transitions
-- **GitHub contribution heatmap** — 90-day activity grid via Events API with 4 intensity levels
-- **Section progress arc** — circular arc around active scroll dot showing section visibility progress
-- **Case study images** — optional image support in project case studies (problem/solution/result)
-- **Testimonials auto-carousel** — auto-rotating PageView on mobile/tablet with dot indicators
+- Dual-runtime Dart Wasm/SkWasm and JavaScript/CanvasKit releases with same-origin renderer assets and fallback fonts.
+- Measured section geometry, chapter-aligned scene interpolation, browser history, keyboard navigation, RTL support, and reduced-motion behaviour.
+- Release gates for source reachability, binary budgets, immutable asset versioning, security headers, and desktop/mobile Playwright coverage.
+- A reproducible Flutter Web first-frame timing report and draft engine patch.
 
-### Improved
+### Changed
 
-- **Test coverage** expanded from 184 to 185 tests (6 new test files)
-- **i18n completeness** — moved all hardcoded strings to 7-language JSON files (blog, sidebar, experience, 404, project links)
-- **Accessibility** — Semantics on buttons/images/links, ExcludeSemantics on decorative widgets, keyboard navigation
-- **Light mode** — theme-aware colors across 15+ widgets (borders, backgrounds, focus rings)
-- **API resilience** — 10-15s HTTP timeouts on all providers, blog error state with retry, GitHub cached indicator
-- **Mobile UX** — textInputAction on contact form fields, responsive improvements
-- **SEO** — og:image:alt, og:locale meta tags
-- **PWA** — manifest orientation "any", categories field
-- **Smooth theme transition** — 400ms animated color change on theme toggle
-- **Blog error handling** — separate error/empty/loading states with retry button
-- **README** — updated test count, documented all new features, easter egg mention
+- Retired experimental template features, fabricated metrics, testimonials, public contact integrations, and dormant source files.
+- Reduced the application to one semantic document and one procedural render system with explicit dependencies.
 
 ## [1.0.0] - 2026-03-20
 
-### Added
-
-- **Cinematic design system** with 5 movie-inspired scene palettes (Blade Runner 2049, Dune, The Matrix, Spider-Verse, Interstellar)
-- **SceneDirector** scroll-driven state machine with 200px crossfade transition zones
-- **CinematicBackground** animated mesh gradient with Lissajous-curve blob movement, vignette overlay, and procedural film grain
-- **ConstellationParticles** interactive particle field with spatial-grid O(n) neighbor lookups
-- **CustomCursor** with outer ring, inner dot, spotlight glow, and hover expansion
-- **8 portfolio sections**: Hero, About, Experience, Testimonials, Blog, Projects, Contact, Footer
-- **Interactive terminal** in About section with 10+ commands (help, about, skills, experience, education, projects, contact, social, download-cv, clear)
-- **Command palette** (Ctrl+K / Cmd+K) with fuzzy search across navigation, language, and action commands
-- **Konami code easter egg** triggering Matrix digital rain overlay
-- **3D skill orbit** visualization with depth-based scaling and category tooltips
-- **Medium RSS blog integration** via rss2json API
-- **GitHub activity widget** with live API stats (repos, followers, stars)
-- **Contact form** with Formspree integration and validation
-- **Project case study cards** with problem/solution/result breakdowns and multi-link support
-- **Testimonials carousel** with colleague and mentor quotes
-- **7-language internationalization** (English, Turkish, German, French, Spanish, Arabic RTL, Hindi)
-- **Dark/light theme** with localStorage persistence
-- **31 custom widgets** (magnetic buttons, text scramble, shader text reveal, skeleton shimmer, scroll indicators, etc.)
-- **Social sidebars** with fixed icon links and vertical line (desktop)
-- **Scroll progress dots** showing current section position
-- **Back-to-top button** with scroll-triggered visibility
-- **Skip-to-content link** for keyboard accessibility
-- **Deep linking** with hash-based URL routing and section auto-scroll
-- **Responsive layouts** for mobile (<600px), tablet (600-1200px), and desktop (1200px+)
-- **185 automated tests** (unit + widget) covering controllers, constants, models, and interactive components
-- **GitHub Actions CI/CD** pipeline: analyze, test, build (JS + WASM), and auto-deploy to GitHub Pages
-- **PWA manifest** for installable web app experience
-- **Clean Architecture** with domain/data/presentation layers and Dependency Inversion
-- **Modern Dart 3.x** patterns: `abstract interface class`, `final class`, switch expressions, pattern matching
+- Initial Flutter Web portfolio release.

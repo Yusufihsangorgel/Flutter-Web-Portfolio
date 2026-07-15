@@ -71,7 +71,7 @@ final class SceneConfigs {
     vignetteIntensity: 0.3,
   );
 
-  // Chapter 3: Approach
+  // Chapter 3: Open source
   static const proof = SceneConfig(
     gradient1: AppColors.projGradient1,
     gradient2: AppColors.projGradient2,
@@ -81,7 +81,7 @@ final class SceneConfigs {
     vignetteIntensity: 0.25,
   );
 
-  // Chapter 4: Projects
+  // Chapter 4: Systems
   static const projects = SceneConfig(
     gradient1: AppColors.contactGradient1,
     gradient2: AppColors.contactGradient2,

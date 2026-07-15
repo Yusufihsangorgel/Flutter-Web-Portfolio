@@ -74,7 +74,6 @@ void main() {
 
       expect(cubit.currentLanguage, 'tr');
       expect(cubit.appName, 'Portföy');
-      expect(cubit.activeSections, contains('about'));
       expect(repository.savedLanguages, ['tr']);
     });
 

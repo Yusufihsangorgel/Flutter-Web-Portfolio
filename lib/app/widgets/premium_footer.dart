@@ -7,71 +7,74 @@ import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
 import 'package:flutter_web_portfolio/app/core/constants/breakpoints.dart';
 import 'package:flutter_web_portfolio/app/core/constants/durations.dart';
 import 'package:flutter_web_portfolio/app/core/theme/app_fonts.dart';
+import 'package:flutter_web_portfolio/app/domain/models/portfolio_document.dart';
 import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
 import 'package:flutter_web_portfolio/app/widgets/cinematic_focusable.dart';
 import 'package:flutter_web_portfolio/app/widgets/command_palette.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 /// A terminal chapter rather than a conventional three-column site footer.
 class PremiumFooter extends StatelessWidget {
   const PremiumFooter({super.key});
 
   @override
-  Widget build(
-    BuildContext context,
-  ) => BlocBuilder<LanguageCubit, LanguageState>(
-    builder: (context, _) {
-      final language = context.read<LanguageCubit>();
-      final width = MediaQuery.sizeOf(context).width;
-      final desktop = width >= Breakpoints.desktop;
-      final personal =
-          language.cvData['personal_info'] as Map<String, dynamic>? ??
-          const <String, dynamic>{};
-      final name = personal['name'] as String? ?? 'Senior Flutter Engineer';
-      final statement = language.getText(
-        'footer.verification_body',
-        defaultValue:
-            'Building thoughtful Flutter products and the Go services behind them.',
-      );
+  Widget build(BuildContext context) =>
+      BlocBuilder<LanguageCubit, LanguageState>(
+        builder: (context, _) {
+          final language = context.read<LanguageCubit>();
+          final portfolio = context.read<PortfolioDocument>();
+          final width = MediaQuery.sizeOf(context).width;
+          final desktop = width >= Breakpoints.desktop;
+          final name = portfolio.profile.role;
+          final statement = portfolio.profile.headline;
 
-      return Container(
-        width: double.infinity,
-        margin: EdgeInsets.only(top: desktop ? 160 : 96),
-        color: AppColors.textBright,
-        child: DefaultTextStyle.merge(
-          style: const TextStyle(color: AppColors.background),
-          child: Padding(
-            padding: EdgeInsets.fromLTRB(
-              desktop ? 72 : 24,
-              desktop ? 54 : 38,
-              desktop ? 72 : 24,
-              26,
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const _FooterRail(),
-                SizedBox(height: desktop ? 70 : 48),
-                Text(
-                  statement,
-                  style: AppFonts.instrumentSerif(
-                    fontSize: desktop ? 92 : 48,
-                    fontStyle: FontStyle.italic,
-                    color: AppColors.background,
-                    height: 0.93,
-                    letterSpacing: desktop ? -3.2 : -1.4,
-                  ),
+          return Container(
+            width: double.infinity,
+            margin: EdgeInsets.only(top: desktop ? 160 : 96),
+            color: AppColors.textBright,
+            child: DefaultTextStyle.merge(
+              style: const TextStyle(color: AppColors.background),
+              child: Padding(
+                padding: EdgeInsets.fromLTRB(
+                  desktop ? 72 : 24,
+                  desktop ? 54 : 38,
+                  desktop ? 72 : 24,
+                  26,
                 ),
-                SizedBox(height: desktop ? 76 : 54),
-                _FooterNavigation(language: language, desktop: desktop),
-                const SizedBox(height: 44),
-                _FooterBottom(name: name, language: language),
-              ],
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const _FooterRail(),
+                    SizedBox(height: desktop ? 70 : 48),
+                    Text(
+                      statement,
+                      style: AppFonts.instrumentSerif(
+                        fontSize: desktop ? 92 : 48,
+                        fontStyle: FontStyle.italic,
+                        color: AppColors.background,
+                        height: 0.93,
+                        letterSpacing: desktop ? -3.2 : -1.4,
+                      ),
+                    ),
+                    SizedBox(height: desktop ? 76 : 54),
+                    _FooterNavigation(
+                      language: language,
+                      portfolio: portfolio,
+                      desktop: desktop,
+                    ),
+                    const SizedBox(height: 44),
+                    _FooterBottom(
+                      name: name,
+                      language: language,
+                      portfolio: portfolio,
+                    ),
+                  ],
+                ),
+              ),
             ),
-          ),
-        ),
+          );
+        },
       );
-    },
-  );
 }
 
 class _FooterRail extends StatelessWidget {
@@ -107,15 +110,20 @@ class _FooterRail extends StatelessWidget {
 }
 
 class _FooterNavigation extends StatelessWidget {
-  const _FooterNavigation({required this.language, required this.desktop});
+  const _FooterNavigation({
+    required this.language,
+    required this.portfolio,
+    required this.desktop,
+  });
 
   final LanguageCubit language;
+  final PortfolioDocument portfolio;
   final bool desktop;
 
   @override
   Widget build(BuildContext context) {
     final links = [
-      for (final section in language.activeSections)
+      for (final section in portfolio.activeSections)
         if (section != 'home')
           (
             id: section,
@@ -155,15 +163,21 @@ class _FooterNavigation extends StatelessWidget {
         ),
         const SizedBox(height: 10),
         Text(
-          language.getText(
-            'cv_data.personal_info.tagline',
-            defaultValue: 'Product-minded Flutter engineering',
-          ),
+          portfolio.profile.focus.take(3).join(' · '),
           style: AppFonts.spaceGrotesk(
             fontSize: 16,
             fontWeight: FontWeight.w600,
             color: AppColors.background,
           ),
+        ),
+        const SizedBox(height: 24),
+        Wrap(
+          spacing: 18,
+          runSpacing: 12,
+          children: [
+            for (final link in portfolio.profile.links)
+              _ProfileLink(link: link),
+          ],
         ),
       ],
     );
@@ -182,6 +196,43 @@ class _FooterNavigation extends StatelessWidget {
             children: [navigation, const SizedBox(height: 36), focus],
           );
   }
+}
+
+class _ProfileLink extends StatelessWidget {
+  const _ProfileLink({required this.link});
+
+  final PortfolioLink link;
+
+  @override
+  Widget build(BuildContext context) => CinematicFocusable(
+    onTap: () => launchUrl(link.url, webOnlyWindowName: '_blank'),
+    semanticLabel: link.label,
+    semanticRole: CinematicControlRole.link,
+    focusColor: AppColors.background,
+    child: Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            link.label.toUpperCase(),
+            style: AppFonts.jetBrainsMono(
+              fontSize: 9,
+              fontWeight: FontWeight.w700,
+              color: AppColors.background,
+              letterSpacing: 0.8,
+            ),
+          ),
+          const SizedBox(width: 6),
+          const Icon(
+            Icons.north_east_rounded,
+            size: 14,
+            color: AppColors.background,
+          ),
+        ],
+      ),
+    ),
+  );
 }
 
 class _FooterLink extends StatefulWidget {
@@ -232,10 +283,15 @@ class _FooterLinkState extends State<_FooterLink> {
 }
 
 class _FooterBottom extends StatelessWidget {
-  const _FooterBottom({required this.name, required this.language});
+  const _FooterBottom({
+    required this.name,
+    required this.language,
+    required this.portfolio,
+  });
 
   final String name;
   final LanguageCubit language;
+  final PortfolioDocument portfolio;
 
   @override
   Widget build(BuildContext context) {
@@ -256,7 +312,10 @@ class _FooterBottom extends StatelessWidget {
             '\u00A9 ${DateTime.now().year} ${name.toUpperCase()}',
             style: _bottomStyle(),
           ),
-          Text('FLUTTER / DART WASM / SKWASM', style: _bottomStyle()),
+          Text(
+            portfolio.profile.focus.take(3).join(' / ').toUpperCase(),
+            style: _bottomStyle(),
+          ),
           CinematicFocusable(
             onTap: () => CommandPalette.show(context),
             semanticLabel:

@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
 import 'package:flutter_web_portfolio/app/core/constants/breakpoints.dart';
 import 'package:flutter_web_portfolio/app/core/theme/app_fonts.dart';
+import 'package:flutter_web_portfolio/app/domain/models/portfolio_document.dart';
 import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
 import 'package:flutter_web_portfolio/app/widgets/numbered_section_heading.dart';
 import 'package:flutter_web_portfolio/app/widgets/scene_accent_builder.dart';
@@ -15,92 +16,74 @@ class AboutSection extends StatelessWidget {
   const AboutSection({super.key});
 
   @override
-  Widget build(
-    BuildContext context,
-  ) => BlocBuilder<LanguageCubit, LanguageState>(
-    builder: (context, _) {
-      final language = context.read<LanguageCubit>();
-      final personal =
-          language.cvData['personal_info'] as Map<String, dynamic>? ??
-          const <String, dynamic>{};
-      final skills = (language.cvData['skills'] as List? ?? const [])
-          .whereType<Map<String, dynamic>>()
-          .toList();
-      final bio =
-          personal['bio'] as String? ??
-          language.getText(
-            'about_section.bio',
-            defaultValue:
-                'I build production Flutter applications across mobile, desktop, and web.',
-          );
+  Widget build(BuildContext context) =>
+      BlocBuilder<LanguageCubit, LanguageState>(
+        builder: (context, _) {
+          final language = context.read<LanguageCubit>();
+          final portfolio = context.read<PortfolioDocument>();
+          final bio = portfolio.profile.summary;
 
-      return ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 1160),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SceneAccentBuilder(
-              builder: (context, accent) => NumberedSectionHeading(
-                number: '01',
-                title: language.getText(
-                  'about_section.title',
-                  defaultValue: 'About Me',
-                ),
-                accent: accent,
-              ),
-            ),
-            SizedBox(
-              height: MediaQuery.sizeOf(context).width < Breakpoints.tablet
-                  ? 46
-                  : 76,
-            ),
-            Semantics(
-              label: bio,
-              excludeSemantics: true,
-              child: ExcludeSemantics(
-                child: Text(
-                  bio,
-                  style: AppFonts.spaceGrotesk(
-                    fontSize:
-                        MediaQuery.sizeOf(context).width < Breakpoints.tablet
-                        ? 30
-                        : 47,
-                    fontWeight: FontWeight.w500,
-                    color: AppColors.textBright,
-                    height: 1.13,
-                    letterSpacing: -1.5,
+          return ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 1160),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SceneAccentBuilder(
+                  builder: (context, accent) => NumberedSectionHeading(
+                    number: '01',
+                    title: language.getText(
+                      'about_section.title',
+                      defaultValue: 'About Me',
+                    ),
+                    accent: accent,
                   ),
                 ),
-              ),
+                SizedBox(
+                  height: MediaQuery.sizeOf(context).width < Breakpoints.tablet
+                      ? 46
+                      : 76,
+                ),
+                Semantics(
+                  label: bio,
+                  excludeSemantics: true,
+                  child: ExcludeSemantics(
+                    child: Text(
+                      bio,
+                      style: AppFonts.spaceGrotesk(
+                        fontSize:
+                            MediaQuery.sizeOf(context).width <
+                                Breakpoints.tablet
+                            ? 30
+                            : 47,
+                        fontWeight: FontWeight.w500,
+                        color: AppColors.textBright,
+                        height: 1.13,
+                        letterSpacing: -1.5,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 42),
+                _ContextRail(portfolio: portfolio),
+                const SizedBox(height: 72),
+                _CapabilityLedger(capabilities: portfolio.capabilities),
+              ],
             ),
-            const SizedBox(height: 42),
-            _ContextRail(personal: personal, language: language),
-            const SizedBox(height: 72),
-            _CapabilityLedger(skills: skills),
-          ],
-        ),
+          );
+        },
       );
-    },
-  );
 }
 
 class _ContextRail extends StatelessWidget {
-  const _ContextRail({required this.personal, required this.language});
+  const _ContextRail({required this.portfolio});
 
-  final Map<String, dynamic> personal;
-  final LanguageCubit language;
+  final PortfolioDocument portfolio;
 
   @override
   Widget build(BuildContext context) {
     final compact = MediaQuery.sizeOf(context).width < Breakpoints.tablet;
-    final detail = language.getText(
-      'about_section.bio2',
-      defaultValue:
-          'Alongside client work, I design and operate independent SaaS products end to end.',
-    );
-    final location = personal['location'] as String? ?? 'Remote';
-    final tagline = personal['tagline'] as String? ?? '';
-    final metadata = _AtlasMetadata(location: location, tagline: tagline);
+    final detail = portfolio.profile.focus.join('  /  ');
+    final metadata = _AtlasMetadata(profile: portfolio.profile);
 
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 22),
@@ -149,25 +132,24 @@ class _ContextRail extends StatelessWidget {
 }
 
 class _AtlasMetadata extends StatelessWidget {
-  const _AtlasMetadata({required this.location, required this.tagline});
+  const _AtlasMetadata({required this.profile});
 
-  final String location;
-  final String tagline;
+  final PortfolioProfile profile;
 
   @override
   Widget build(BuildContext context) => ExcludeSemantics(
     child: Row(
       children: [
         Expanded(
-          child: _MetadataField(label: 'BASE', value: location),
+          child: _MetadataField(label: 'BASE', value: profile.location),
         ),
         const SizedBox(width: 22),
         Expanded(
-          child: _MetadataField(label: 'MODE', value: tagline),
+          child: _MetadataField(label: 'MODE', value: profile.headline),
         ),
         const SizedBox(width: 22),
-        const Expanded(
-          child: _MetadataField(label: 'SINCE', value: '2021'),
+        Expanded(
+          child: _MetadataField(label: 'SINCE', value: profile.since),
         ),
       ],
     ),
@@ -209,8 +191,8 @@ class _MetadataField extends StatelessWidget {
 }
 
 class _CapabilityLedger extends StatelessWidget {
-  const _CapabilityLedger({required this.skills});
-  final List<Map<String, dynamic>> skills;
+  const _CapabilityLedger({required this.capabilities});
+  final List<PortfolioCapability> capabilities;
 
   @override
   Widget build(BuildContext context) => LayoutBuilder(
@@ -219,19 +201,22 @@ class _CapabilityLedger extends StatelessWidget {
       if (!desktop) {
         return Column(
           children: [
-            for (var index = 0; index < skills.length; index++)
-              _CapabilityField(skill: skills[index], index: index),
+            for (var index = 0; index < capabilities.length; index++)
+              _CapabilityField(capability: capabilities[index], index: index),
           ],
         );
       }
       return Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          for (var index = 0; index < skills.length; index++) ...[
+          for (var index = 0; index < capabilities.length; index++) ...[
             Expanded(
-              child: _CapabilityField(skill: skills[index], index: index),
+              child: _CapabilityField(
+                capability: capabilities[index],
+                index: index,
+              ),
             ),
-            if (index < skills.length - 1) const SizedBox(width: 28),
+            if (index < capabilities.length - 1) const SizedBox(width: 28),
           ],
         ],
       );
@@ -240,15 +225,15 @@ class _CapabilityLedger extends StatelessWidget {
 }
 
 class _CapabilityField extends StatelessWidget {
-  const _CapabilityField({required this.skill, required this.index});
+  const _CapabilityField({required this.capability, required this.index});
 
-  final Map<String, dynamic> skill;
+  final PortfolioCapability capability;
   final int index;
 
   @override
   Widget build(BuildContext context) {
-    final category = skill['category'] as String? ?? '';
-    final items = (skill['items'] as List? ?? const []).whereType<String>();
+    final category = capability.label;
+    final items = capability.items;
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 22),
       decoration: const BoxDecoration(

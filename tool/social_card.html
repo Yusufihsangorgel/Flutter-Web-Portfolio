@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=1200, initial-scale=1">
-    <title>Senior Flutter Engineer social card</title>
+    <title>Portfolio social card</title>
     <style>
       @font-face {
         font-family: "Atlas Sans";
@@ -79,7 +79,8 @@
         line-height: 0.76;
         letter-spacing: -0.06em;
       }
-      .title span {
+      .title-primary { display: block; }
+      .title-accent {
         display: block;
         margin-left: 355px;
         color: #5b6cff;
@@ -130,16 +131,16 @@
   <body>
     <main class="frame">
       <header class="rail">
-        <span>00 / RENDER ATLAS</span><span>FLUTTER / DART / GO</span><i></i>
+        <span>00 / FRAME LIFECYCLE</span><span data-focus></span><i></i>
       </header>
       <div class="atlas" aria-hidden="true">
         <i class="plane"></i><i class="plane"></i><i class="plane"></i>
         <i class="plane"></i><i class="plane"></i>
       </div>
-      <h1 class="title">SENIOR FLUTTER<span>ENGINEER.</span></h1>
+      <h1 class="title"><span class="title-primary" data-role-primary></span><span class="title-accent" data-role-accent></span></h1>
       <footer class="footer">
-        <p class="subtitle">Production applications and selected product work across mobile, desktop, and web.</p>
-        <div class="domain">DEVELOPERYUSUF.COM</div>
+        <p class="subtitle" data-headline></p>
+        <div class="domain" data-domain></div>
       </footer>
     </main>
   </body>

@@ -5,6 +5,7 @@ import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_dimensions.dart';
 import 'package:flutter_web_portfolio/app/core/constants/breakpoints.dart';
 import 'package:flutter_web_portfolio/app/core/theme/app_fonts.dart';
+import 'package:flutter_web_portfolio/app/domain/models/portfolio_document.dart';
 import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
 import 'package:flutter_web_portfolio/app/widgets/cinematic_button.dart';
 import 'package:flutter_web_portfolio/app/widgets/scroll_indicator.dart';
@@ -21,6 +22,7 @@ class HomeSection extends StatelessWidget {
       BlocBuilder<LanguageCubit, LanguageState>(
         builder: (context, _) {
           final language = context.read<LanguageCubit>();
+          final portfolio = context.read<PortfolioDocument>();
           final size = MediaQuery.sizeOf(context);
           final desktop = size.width >= Breakpoints.desktop;
           final tablet = size.width >= Breakpoints.tablet;
@@ -45,7 +47,7 @@ class HomeSection extends StatelessWidget {
                     top: 0,
                     left: 0,
                     right: 0,
-                    child: _HeroDataRail(language: language, desktop: tablet),
+                    child: _HeroDataRail(portfolio: portfolio, desktop: tablet),
                   ),
                   Positioned.fill(
                     top: tablet ? 72 : 58,
@@ -54,7 +56,7 @@ class HomeSection extends StatelessWidget {
                       alignment: desktop
                           ? const Alignment(0, -0.08)
                           : Alignment.center,
-                      child: _EditorialTitle(language: language),
+                      child: _EditorialTitle(portfolio: portfolio),
                     ),
                   ),
                   Positioned(
@@ -62,8 +64,14 @@ class HomeSection extends StatelessWidget {
                     right: 0,
                     bottom: 66,
                     child: desktop
-                        ? _DesktopHeroFooter(language: language)
-                        : _MobileHeroFooter(language: language),
+                        ? _DesktopHeroFooter(
+                            language: language,
+                            portfolio: portfolio,
+                          )
+                        : _MobileHeroFooter(
+                            language: language,
+                            portfolio: portfolio,
+                          ),
                   ),
                   const Positioned(
                     left: 0,
@@ -80,17 +88,16 @@ class HomeSection extends StatelessWidget {
 }
 
 class _HeroDataRail extends StatelessWidget {
-  const _HeroDataRail({required this.language, required this.desktop});
+  const _HeroDataRail({required this.portfolio, required this.desktop});
 
-  final LanguageCubit language;
+  final PortfolioDocument portfolio;
   final bool desktop;
 
   @override
   Widget build(BuildContext context) {
-    final location = language.getText(
-      'cv_data.personal_info.location',
-      defaultValue: 'Remote',
-    );
+    final location = portfolio.profile.location;
+    final focus = portfolio.profile.focus.take(2).join(' / ');
+    final frame = portfolio.story.first.eyebrow;
     return ExcludeSemantics(
       child: Container(
         padding: const EdgeInsets.only(bottom: 14),
@@ -99,10 +106,10 @@ class _HeroDataRail extends StatelessWidget {
         ),
         child: Row(
           children: [
-            const _RailLabel(value: '00 / RENDER ATLAS'),
+            _RailLabel(value: '$frame / FRAME LIFECYCLE'.toUpperCase()),
             const Spacer(),
             if (desktop) ...[
-              const _RailLabel(value: 'FLUTTER / DART / GO'),
+              _RailLabel(value: focus.toUpperCase()),
               const SizedBox(width: 52),
             ],
             _RailLabel(value: location.toUpperCase()),
@@ -139,16 +146,13 @@ class _RailLabel extends StatelessWidget {
 }
 
 class _EditorialTitle extends StatelessWidget {
-  const _EditorialTitle({required this.language});
-  final LanguageCubit language;
+  const _EditorialTitle({required this.portfolio});
+  final PortfolioDocument portfolio;
 
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.sizeOf(context).width;
-    final title = language
-        .getText('home_section.title', defaultValue: 'SENIOR FLUTTER ENGINEER.')
-        .trim()
-        .toUpperCase();
+    final title = '${portfolio.profile.role}.'.trim().toUpperCase();
     final words = title.split(RegExp(r'\s+'));
     final lastWord = words.isEmpty ? title : words.last;
     final prefix = words.length > 1
@@ -209,38 +213,44 @@ class _EditorialTitle extends StatelessWidget {
 }
 
 class _DesktopHeroFooter extends StatelessWidget {
-  const _DesktopHeroFooter({required this.language});
+  const _DesktopHeroFooter({required this.language, required this.portfolio});
   final LanguageCubit language;
+  final PortfolioDocument portfolio;
 
   @override
   Widget build(BuildContext context) => Row(
     crossAxisAlignment: CrossAxisAlignment.end,
     children: [
-      Expanded(flex: 5, child: _HeroStatement(language: language)),
+      Expanded(
+        flex: 5,
+        child: _HeroStatement(language: language, portfolio: portfolio),
+      ),
       const SizedBox(width: 80),
-      Expanded(flex: 4, child: _CapabilityIndex(language: language)),
+      Expanded(flex: 4, child: _CapabilityIndex(portfolio: portfolio)),
     ],
   );
 }
 
 class _MobileHeroFooter extends StatelessWidget {
-  const _MobileHeroFooter({required this.language});
+  const _MobileHeroFooter({required this.language, required this.portfolio});
   final LanguageCubit language;
+  final PortfolioDocument portfolio;
 
   @override
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      _HeroStatement(language: language),
+      _HeroStatement(language: language, portfolio: portfolio),
       const SizedBox(height: 24),
-      _CapabilityIndex(language: language, compact: true),
+      _CapabilityIndex(portfolio: portfolio, compact: true),
     ],
   );
 }
 
 class _HeroStatement extends StatelessWidget {
-  const _HeroStatement({required this.language});
+  const _HeroStatement({required this.language, required this.portfolio});
   final LanguageCubit language;
+  final PortfolioDocument portfolio;
 
   @override
   Widget build(BuildContext context) => Column(
@@ -249,11 +259,7 @@ class _HeroStatement extends StatelessWidget {
       ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 560),
         child: Text(
-          language.getText(
-            'home_section.subtitle',
-            defaultValue:
-                'Building useful products across mobile, desktop, and web.',
-          ),
+          portfolio.profile.headline,
           style: AppFonts.spaceGrotesk(
             fontSize: MediaQuery.sizeOf(context).width < Breakpoints.tablet
                 ? 18
@@ -294,17 +300,13 @@ class _HeroStatement extends StatelessWidget {
 }
 
 class _CapabilityIndex extends StatelessWidget {
-  const _CapabilityIndex({required this.language, this.compact = false});
-  final LanguageCubit language;
+  const _CapabilityIndex({required this.portfolio, this.compact = false});
+  final PortfolioDocument portfolio;
   final bool compact;
 
   @override
   Widget build(BuildContext context) {
-    final personal = language.cvData['personal_info'] as Map<String, dynamic>?;
-    final values = (personal?['subtitles'] as List? ?? const [])
-        .whereType<String>()
-        .take(3)
-        .toList();
+    final values = portfolio.profile.focus.take(3).toList(growable: false);
     return ExcludeSemantics(
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,

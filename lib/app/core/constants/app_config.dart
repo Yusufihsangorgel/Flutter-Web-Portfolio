@@ -1,6 +1,6 @@
 import 'dart:math' show min;
 
-import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
+import 'package:flutter_web_portfolio/app/domain/models/portfolio_document.dart';
 
 /// Central configuration resolved from i18n JSON at runtime.
 ///
@@ -14,14 +14,11 @@ final class AppConfig {
   // ─── Identity ──────────────────────────────────────────────────────
 
   /// Public display label.
-  static String name(LanguageCubit lc) => lc.getText(
-    'cv_data.personal_info.name',
-    defaultValue: 'Senior Flutter Engineer',
-  );
+  static String name(PortfolioDocument portfolio) => portfolio.profile.role;
 
   /// Compact brand mark derived from the current public display label.
-  static String initials(LanguageCubit lc) {
-    final full = name(lc).trim();
+  static String initials(PortfolioDocument portfolio) {
+    final full = name(portfolio).trim();
     if (full.isEmpty) return 'SP';
     if (full.toLowerCase().contains('flutter')) return 'FLUTTER';
     final parts = full.split(RegExp(r'\s+'));
@@ -32,8 +29,6 @@ final class AppConfig {
   }
 
   /// Short brand tagline for the hero and footer.
-  static String tagline(LanguageCubit lc) => lc.getText(
-    'cv_data.personal_info.tagline',
-    defaultValue: 'Building digital experiences',
-  );
+  static String tagline(PortfolioDocument portfolio) =>
+      portfolio.profile.headline;
 }

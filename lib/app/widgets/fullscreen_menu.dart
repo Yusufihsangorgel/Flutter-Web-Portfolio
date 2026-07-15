@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_web_portfolio/app/core/theme/app_fonts.dart';
+import 'package:flutter_web_portfolio/app/domain/models/portfolio_document.dart';
 
 import 'package:flutter_web_portfolio/app/controllers/scroll_controller.dart';
 import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
@@ -57,7 +58,7 @@ class _FullscreenMenuState extends State<FullscreenMenu>
     // Drop 'home' — the logo already scrolls to top, so listing it here
     // produces a confusing duplicate row at the top of the drawer.
     final sections = context
-        .read<LanguageCubit>()
+        .read<PortfolioDocument>()
         .activeSections
         .where((s) => s != 'home')
         .toList();
