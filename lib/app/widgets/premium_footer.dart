@@ -10,7 +10,6 @@ import 'package:flutter_web_portfolio/app/core/constants/breakpoints.dart';
 import 'package:flutter_web_portfolio/app/core/constants/cinematic_curves.dart';
 import 'package:flutter_web_portfolio/app/core/constants/durations.dart';
 import 'package:flutter_web_portfolio/app/widgets/cinematic_focusable.dart';
-import 'package:flutter_web_portfolio/app/widgets/neon_effects.dart';
 
 part 'footer/footer_brand.dart';
 part 'footer/footer_quick_links.dart';
@@ -42,12 +41,17 @@ class PremiumFooter extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // ── Animated gradient neon top border ──────────────────────────
-            const NeonLine(
-              thickness: 2,
-              intensity: 0.8,
-              blurRadius: 16,
-              travelDuration: Duration(milliseconds: 4000),
+            Container(
+              height: 1,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    Colors.transparent,
+                    AppColors.heroAccent.withValues(alpha: 0.55),
+                    Colors.transparent,
+                  ],
+                ),
+              ),
             ),
 
             // ── Main content area ─────────────────────────────────────────

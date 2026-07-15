@@ -3,7 +3,6 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_web_portfolio/app/controllers/scroll_controller.dart';
-import 'package:flutter_web_portfolio/app/controllers/sound_controller.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
 import 'package:flutter_web_portfolio/app/core/constants/breakpoints.dart';
 import 'package:flutter_web_portfolio/app/core/constants/cinematic_curves.dart';
@@ -73,7 +72,6 @@ class _BackToTopButtonState extends State<BackToTopButton>
   }
 
   void _scrollToTop() {
-    context.read<SoundController>().playClick();
     context.read<AppScrollController>().scrollController.animateTo(
       0,
       duration: const Duration(milliseconds: 800),

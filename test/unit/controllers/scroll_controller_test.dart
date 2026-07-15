@@ -46,5 +46,9 @@ void main() {
       expect(controller.stream, isA<Stream<AppScrollState>>());
       expect(controller.state.activeSection, 'home');
     });
+
+    test('has no fabricated section geometry before layout', () {
+      expect(controller.sectionGeometries, isEmpty);
+    });
   });
 }

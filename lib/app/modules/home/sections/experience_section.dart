@@ -1,454 +1,258 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_web_portfolio/app/core/theme/app_fonts.dart';
-import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
-import 'package:flutter_web_portfolio/app/core/constants/cinematic_curves.dart';
-import 'package:flutter_web_portfolio/app/core/constants/durations.dart';
-import 'package:flutter_web_portfolio/app/core/theme/app_typography.dart';
-import 'package:flutter_web_portfolio/app/utils/responsive_utils.dart';
-import 'package:flutter_web_portfolio/app/widgets/cinematic_focusable.dart';
 import 'package:flutter_web_portfolio/app/core/constants/breakpoints.dart';
+import 'package:flutter_web_portfolio/app/core/theme/app_fonts.dart';
+import 'package:flutter_web_portfolio/app/core/theme/app_typography.dart';
+import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
 import 'package:flutter_web_portfolio/app/widgets/numbered_section_heading.dart';
-import 'package:flutter_web_portfolio/app/widgets/scroll_fade_in.dart';
 import 'package:flutter_web_portfolio/app/widgets/scene_accent_builder.dart';
 
-/// Experience Section — "The Journey"
-/// Cinematic upgrade: vertical line + animated dot markers, crossfade tabs.
+/// A chronological, fully visible account of professional work.
+///
+/// Every entry is part of the document flow. There are no hidden tabs or
+/// oversized decorative labels competing with the actual experience.
 class ExperienceSection extends StatelessWidget {
   const ExperienceSection({super.key});
 
   @override
   Widget build(BuildContext context) =>
       BlocBuilder<LanguageCubit, LanguageState>(
-        builder: (context, _) => _buildContent(context),
-      );
+        builder: (context, _) {
+          final language = context.read<LanguageCubit>();
+          final experiences =
+              (language.cvData['experiences'] as List? ?? const [])
+                  .whereType<Map<String, dynamic>>()
+                  .toList();
 
-  Widget _buildContent(BuildContext context) {
-    final languageController = context.read<LanguageCubit>();
-    final screenWidth = MediaQuery.sizeOf(context).width;
-    return Center(
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 900),
-        child: Stack(
-          children: [
-            Positioned(
-              top: -20,
-              right: -10,
-              child: Text(
-                languageController
-                    .getText('nav.experience', defaultValue: 'Experience')
-                    .toUpperCase(),
-                style: AppFonts.spaceGrotesk(
-                  fontSize: ResponsiveUtils.getValueForScreenType<double>(
-                    context: context,
-                    mobile: 48.0,
-                    tablet: screenWidth * 0.14,
-                    desktop: screenWidth * 0.18,
-                  ),
-                  fontWeight: FontWeight.w800,
-                  color: Colors.white.withValues(alpha: 0.03),
-                  letterSpacing: -3,
-                ),
-              ),
-            ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: 40),
-                ScrollFadeIn(
-                  child: SceneAccentBuilder(
+          return Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 1100),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SceneAccentBuilder(
                     builder: (context, accent) => NumberedSectionHeading(
                       number: '02',
-                      title: languageController.getText(
+                      title: language.getText(
                         'experience_section.title',
-                        defaultValue: "Where I've Worked",
+                        defaultValue: 'Experience',
                       ),
                       accent: accent,
                     ),
                   ),
-                ),
-                const SizedBox(height: 32),
-                _buildExperiences(languageController),
-              ],
+                  const SizedBox(height: 52),
+                  for (var index = 0; index < experiences.length; index++)
+                    SceneAccentBuilder(
+                      builder: (context, accent) => _ExperienceEntry(
+                        index: index,
+                        experience: experiences[index],
+                        accent: accent,
+                        isLast: index == experiences.length - 1,
+                      ),
+                    ),
+                ],
+              ),
             ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildExperiences(LanguageCubit languageController) {
-    final raw = languageController.cvData['experiences'] as List? ?? [];
-    final experiences = raw.cast<Map<String, dynamic>>();
-    if (experiences.isEmpty) return const SizedBox.shrink();
-    return _ExperienceTabs(
-      experiences: experiences,
-      languageController: languageController,
-    );
-  }
+          );
+        },
+      );
 }
 
-// Tabbed experience — crossfade + animated markers
-class _ExperienceTabs extends StatefulWidget {
-  const _ExperienceTabs({
-    required this.experiences,
-    required this.languageController,
+class _ExperienceEntry extends StatelessWidget {
+  const _ExperienceEntry({
+    required this.index,
+    required this.experience,
+    required this.accent,
+    required this.isLast,
   });
 
-  final List<Map<String, dynamic>> experiences;
-  final LanguageCubit languageController;
-
-  @override
-  State<_ExperienceTabs> createState() => _ExperienceTabsState();
-}
-
-class _ExperienceTabsState extends State<_ExperienceTabs> {
-  int _selectedIndex = 0;
+  final int index;
+  final Map<String, dynamic> experience;
+  final Color accent;
+  final bool isLast;
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.sizeOf(context).width;
-    final isMobile = screenWidth < Breakpoints.mobile;
+    final width = MediaQuery.sizeOf(context).width;
+    final isCompact = width < Breakpoints.tablet;
+    final period = (experience['period'] as String?)?.trim() ?? '';
+    final title = (experience['title'] as String?)?.trim() ?? '';
+    final position = (experience['position'] as String?)?.trim() ?? '';
+    final company = (experience['company'] as String?)?.trim() ?? '';
+    final description = (experience['description'] as String?)?.trim() ?? '';
+    final technologies = (experience['technologies'] as List? ?? const [])
+        .whereType<String>()
+        .toList();
 
-    if (isMobile) {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+    final content = _ExperienceContent(
+      title: title,
+      position: position,
+      company: company,
+      description: description,
+      technologies: technologies,
+      accent: accent,
+    );
+
+    return IntrinsicHeight(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           SizedBox(
-            height: 40,
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              itemCount: widget.experiences.length,
-              itemBuilder: (context, i) {
-                final exp = widget.experiences[i];
-                final isActive = i == _selectedIndex;
-                return SceneAccentBuilder(
-                  builder: (context, accent) => _TabButton(
-                    label: (exp['company'] as String?) ?? '',
-                    isActive: isActive,
-                    isVertical: false,
-                    accent: accent,
-                    onTap: () => setState(() => _selectedIndex = i),
+            width: isCompact ? 38 : 54,
+            child: Column(
+              children: [
+                Container(
+                  width: 28,
+                  height: 28,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: accent.withValues(alpha: 0.1),
+                    shape: BoxShape.circle,
+                    border: Border.all(color: accent.withValues(alpha: 0.5)),
                   ),
-                );
-              },
+                  child: Text(
+                    (index + 1).toString().padLeft(2, '0'),
+                    style: AppFonts.jetBrainsMono(
+                      fontSize: 9,
+                      fontWeight: FontWeight.w700,
+                      color: accent,
+                    ),
+                  ),
+                ),
+                if (!isLast)
+                  Expanded(
+                    child: Container(
+                      width: 1,
+                      margin: const EdgeInsets.symmetric(vertical: 10),
+                      color: Colors.white.withValues(alpha: 0.1),
+                    ),
+                  ),
+              ],
             ),
           ),
-          const SizedBox(height: 24),
-          AnimatedSwitcher(
-            duration: AppDurations.crossfade,
-            switchInCurve: CinematicCurves.revealDecel,
-            switchOutCurve: Curves.easeIn,
-            child: _ExperienceDetail(
-              key: ValueKey(_selectedIndex),
-              experience: widget.experiences[_selectedIndex],
-              languageController: widget.languageController,
+          SizedBox(width: isCompact ? 14 : 28),
+          Expanded(
+            child: Padding(
+              padding: EdgeInsets.only(bottom: isLast ? 0 : 58),
+              child: isCompact
+                  ? Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _Period(period: period, accent: accent),
+                        const SizedBox(height: 14),
+                        content,
+                      ],
+                    )
+                  : Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(
+                          width: 210,
+                          child: _Period(period: period, accent: accent),
+                        ),
+                        const SizedBox(width: 34),
+                        Expanded(child: content),
+                      ],
+                    ),
             ),
           ),
         ],
-      );
-    }
-
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Vertical timeline with dot markers
-        SizedBox(
-          width: 200,
-          child: SceneAccentBuilder(
-            builder: (context, accent) => _VerticalTimeline(
-              experiences: widget.experiences,
-              selectedIndex: _selectedIndex,
-              accent: accent,
-              onSelect: (i) => setState(() => _selectedIndex = i),
-            ),
-          ),
-        ),
-        const SizedBox(width: 32),
-        // Detail panel with crossfade
-        Expanded(
-          child: AnimatedSwitcher(
-            duration: AppDurations.crossfade,
-            switchInCurve: CinematicCurves.revealDecel,
-            switchOutCurve: Curves.easeIn,
-            child: _ExperienceDetail(
-              key: ValueKey(_selectedIndex),
-              experience: widget.experiences[_selectedIndex],
-              languageController: widget.languageController,
-            ),
-          ),
-        ),
-      ],
+      ),
     );
   }
 }
 
-// Vertical timeline with animated dot markers
-class _VerticalTimeline extends StatelessWidget {
-  const _VerticalTimeline({
-    required this.experiences,
-    required this.selectedIndex,
+class _Period extends StatelessWidget {
+  const _Period({required this.period, required this.accent});
+
+  final String period;
+  final Color accent;
+
+  @override
+  Widget build(BuildContext context) => Text(
+    period,
+    style: AppFonts.jetBrainsMono(
+      fontSize: 11,
+      fontWeight: FontWeight.w600,
+      color: accent,
+      letterSpacing: 0.7,
+      height: 1.5,
+    ),
+  );
+}
+
+class _ExperienceContent extends StatelessWidget {
+  const _ExperienceContent({
+    required this.title,
+    required this.position,
+    required this.company,
+    required this.description,
+    required this.technologies,
     required this.accent,
-    required this.onSelect,
   });
 
-  final List<Map<String, dynamic>> experiences;
-  final int selectedIndex;
+  final String title;
+  final String position;
+  final String company;
+  final String description;
+  final List<String> technologies;
   final Color accent;
-  final ValueChanged<int> onSelect;
 
   @override
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      for (int i = 0; i < experiences.length; i++)
-        _TimelineEntry(
-          label: (experiences[i]['company'] as String?) ?? '',
-          isActive: i == selectedIndex,
-          accent: accent,
-          isLast: i == experiences.length - 1,
-          onTap: () => onSelect(i),
+      Text(
+        title,
+        style: AppFonts.spaceGrotesk(
+          fontSize: 27,
+          fontWeight: FontWeight.w700,
+          color: AppColors.textBright,
+          height: 1.15,
+          letterSpacing: -0.5,
         ),
+      ),
+      const SizedBox(height: 8),
+      Text(
+        '$position · $company',
+        style: AppFonts.spaceGrotesk(
+          fontSize: 16,
+          fontWeight: FontWeight.w500,
+          color: AppColors.textPrimary,
+          height: 1.4,
+        ),
+      ),
+      const SizedBox(height: 18),
+      Text(description, style: AppTypography.body.copyWith(height: 1.7)),
+      if (technologies.isNotEmpty) ...[
+        const SizedBox(height: 22),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: [
+            for (final technology in technologies)
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 11,
+                  vertical: 7,
+                ),
+                decoration: BoxDecoration(
+                  color: accent.withValues(alpha: 0.07),
+                  borderRadius: BorderRadius.circular(999),
+                  border: Border.all(color: accent.withValues(alpha: 0.16)),
+                ),
+                child: Text(
+                  technology,
+                  style: AppFonts.jetBrainsMono(
+                    fontSize: 10,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+              ),
+          ],
+        ),
+      ],
     ],
   );
-}
-
-class _TimelineEntry extends StatefulWidget {
-  const _TimelineEntry({
-    required this.label,
-    required this.isActive,
-    required this.accent,
-    required this.isLast,
-    required this.onTap,
-  });
-
-  final String label;
-  final bool isActive;
-  final Color accent;
-  final bool isLast;
-  final VoidCallback onTap;
-
-  @override
-  State<_TimelineEntry> createState() => _TimelineEntryState();
-}
-
-class _TimelineEntryState extends State<_TimelineEntry> {
-  bool _hovered = false;
-
-  @override
-  Widget build(BuildContext context) => CinematicFocusable(
-    onTap: widget.onTap,
-    semanticLabel: widget.label,
-    selected: widget.isActive,
-    onHoverChanged: (hovered) => setState(() => _hovered = hovered),
-    child: IntrinsicHeight(
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Dot + line
-          SizedBox(
-            width: 24,
-            child: Column(
-              children: [
-                const SizedBox(height: 6),
-                AnimatedContainer(
-                  duration: AppDurations.medium,
-                  curve: CinematicCurves.hoverLift,
-                  width: widget.isActive ? 10 : 6,
-                  height: widget.isActive ? 10 : 6,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: widget.isActive
-                        ? widget.accent
-                        : AppColors.textSecondary.withValues(alpha: 0.3),
-                    boxShadow: widget.isActive
-                        ? [
-                            BoxShadow(
-                              color: widget.accent.withValues(alpha: 0.4),
-                              blurRadius: 8,
-                            ),
-                          ]
-                        : [],
-                  ),
-                ),
-                if (!widget.isLast)
-                  Expanded(
-                    child: Container(
-                      width: 1,
-                      margin: const EdgeInsets.only(top: 4),
-                      color: AppColors.textSecondary.withValues(alpha: 0.15),
-                    ),
-                  ),
-              ],
-            ),
-          ),
-          const SizedBox(width: 12),
-          // Label
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.only(bottom: 24),
-              child: AnimatedDefaultTextStyle(
-                duration: AppDurations.fast,
-                style: AppFonts.jetBrainsMono(
-                  fontSize: 13,
-                  color: widget.isActive
-                      ? widget.accent
-                      : (_hovered
-                            ? AppColors.textBright
-                            : AppColors.textPrimary),
-                ),
-                child: Text(widget.label),
-              ),
-            ),
-          ),
-        ],
-      ),
-    ),
-  );
-}
-
-class _TabButton extends StatefulWidget {
-  const _TabButton({
-    required this.label,
-    required this.isActive,
-    required this.isVertical,
-    required this.accent,
-    required this.onTap,
-  });
-
-  final String label;
-  final bool isActive;
-  final bool isVertical;
-  final Color accent;
-  final VoidCallback onTap;
-
-  @override
-  State<_TabButton> createState() => _TabButtonState();
-}
-
-class _TabButtonState extends State<_TabButton> {
-  bool _hovered = false;
-
-  @override
-  Widget build(BuildContext context) => CinematicFocusable(
-    onTap: widget.onTap,
-    semanticLabel: widget.label,
-    selected: widget.isActive,
-    onHoverChanged: (hovered) => setState(() => _hovered = hovered),
-    child: AnimatedContainer(
-      duration: AppDurations.fast,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      decoration: BoxDecoration(
-        color: widget.isActive || _hovered
-            ? widget.accent.withValues(alpha: 0.08)
-            : Colors.transparent,
-        border: Border(
-          bottom: BorderSide(
-            color: widget.isActive
-                ? widget.accent
-                : AppColors.textSecondary.withValues(alpha: 0.2),
-            width: widget.isActive ? 2 : 1,
-          ),
-        ),
-      ),
-      child: Text(
-        widget.label,
-        style: AppFonts.jetBrainsMono(
-          fontSize: 13,
-          color: widget.isActive ? widget.accent : AppColors.textPrimary,
-        ),
-      ),
-    ),
-  );
-}
-
-// Experience detail panel
-class _ExperienceDetail extends StatelessWidget {
-  const _ExperienceDetail({
-    super.key,
-    required this.experience,
-    required this.languageController,
-  });
-
-  final Map<String, dynamic> experience;
-  final LanguageCubit languageController;
-
-  @override
-  Widget build(BuildContext context) {
-    final exp = experience;
-    final position = (exp['position'] as String?) ?? '';
-    final company = (exp['company'] as String?) ?? '';
-    final startDate = (exp['start_date'] as String?) ?? '';
-    final endDate =
-        (exp['end_date'] as String?) ??
-        languageController.getText(
-          'experience_section.present',
-          defaultValue: 'Present',
-        );
-    final description = (exp['description'] as String?) ?? '';
-    final configuredPeriod = (exp['period'] as String?) ?? '';
-    final period = configuredPeriod.isNotEmpty
-        ? configuredPeriod
-        : '$startDate — $endDate';
-
-    final bullets = description
-        .toString()
-        .split(RegExp(r'[\n•·]+'))
-        .map((s) => s.replaceFirst(RegExp(r'^[\s\-–—▸►]\s*'), '').trim())
-        .where((s) => s.isNotEmpty)
-        .toList();
-    if (bullets.isEmpty && description.toString().trim().isNotEmpty) {
-      bullets.add(description.toString().trim());
-    }
-
-    return SceneAccentBuilder(
-      builder: (context, accent) => Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            position,
-            style: AppFonts.spaceGrotesk(
-              fontSize: 24,
-              fontWeight: FontWeight.w700,
-              color: AppColors.textBright,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            '@ $company',
-            style: AppFonts.spaceGrotesk(
-              fontSize: 20,
-              fontWeight: FontWeight.w600,
-              color: accent,
-            ),
-          ),
-          const SizedBox(height: 8),
-          if (period.trim().isNotEmpty)
-            Text(period, style: AppTypography.mono.copyWith(letterSpacing: 1)),
-          const SizedBox(height: 24),
-          for (final bullet in bullets)
-            Padding(
-              padding: const EdgeInsets.only(bottom: 12),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    '▸ ',
-                    style: AppFonts.jetBrainsMono(
-                      fontSize: 14,
-                      color: accent,
-                      height: 1.6,
-                    ),
-                  ),
-                  Expanded(
-                    child: Text(bullet.trim(), style: AppTypography.bodySmall),
-                  ),
-                ],
-              ),
-            ),
-        ],
-      ),
-    );
-  }
 }

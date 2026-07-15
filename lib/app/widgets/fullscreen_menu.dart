@@ -6,17 +6,12 @@ import 'package:flutter_web_portfolio/app/core/theme/app_fonts.dart';
 
 import 'package:flutter_web_portfolio/app/controllers/scroll_controller.dart';
 import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
-import 'package:flutter_web_portfolio/app/controllers/sound_controller.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
 import 'package:flutter_web_portfolio/app/core/constants/breakpoints.dart';
 import 'package:flutter_web_portfolio/app/core/constants/cinematic_curves.dart';
 import 'package:flutter_web_portfolio/app/widgets/cinematic_focusable.dart';
 
-/// Full-screen overlay menu with staggered panel animations.
-///
-/// Inspired by award-winning portfolio navigation — panels drop in like a
-/// curtain, each item enters with a staggered delay, and the background
-/// blurs behind a glassmorphic overlay.
+/// Full-screen navigation for compact viewports.
 ///
 /// Usage:
 /// ```dart
@@ -100,7 +95,6 @@ class _FullscreenMenuState extends State<FullscreenMenu>
     );
 
     _masterController.forward();
-    context.read<SoundController>().playTransition();
   }
 
   @override

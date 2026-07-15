@@ -33,7 +33,7 @@ addEventListener("message", eventListener);
 if (!window._flutter) {
   window._flutter = {};
 }
-_flutter.buildConfig = {"engineRevision":"6c0baaebf70e0148f485f27d5616b3d3382da7bf","builds":[{"compileTarget":"dart2wasm","renderer":"skwasm","mainWasmPath":"main.dart.wasm?v=9ece2020e3522f89","jsSupportRuntimePath":"main.dart.mjs?v=9ece2020e3522f89"},{"compileTarget":"dart2js","renderer":"canvaskit","mainJsPath":"main.dart.js?v=9ece2020e3522f89"}],"useLocalCanvasKit":true};
+_flutter.buildConfig = {"engineRevision":"6c0baaebf70e0148f485f27d5616b3d3382da7bf","builds":[{"compileTarget":"dart2wasm","renderer":"skwasm","mainWasmPath":"main.dart.wasm?v=30b8883394867a1e","jsSupportRuntimePath":"main.dart.mjs?v=30b8883394867a1e"},{"compileTarget":"dart2js","renderer":"canvaskit","mainJsPath":"main.dart.js?v=30b8883394867a1e"}],"useLocalCanvasKit":true};
 
 
 const removeBootstrapSurface = () => {
@@ -52,20 +52,17 @@ const showBootstrapFailure = (error) => {
   splash.classList.add('bootstrap-surface--failed');
   splash.setAttribute('aria-busy', 'false');
   splash.setAttribute('aria-label', 'The portfolio could not start');
-  const label = splash.querySelector('.bootstrap-label');
-  if (label) label.textContent = 'PORTFOLIO / LOAD FAILED';
-  const status = splash.querySelector('.bootstrap-status-copy');
+  const label = splash.querySelector('.bootstrap-kicker');
+  if (label) label.textContent = 'The portfolio could not start';
+  const status = splash.querySelector('.bootstrap-status');
   if (status) {
     status.textContent = 'The portfolio could not load. Please try again.';
-  }
-  const track = splash.querySelector('.bootstrap-track');
-  if (track) {
     const retry = document.createElement('button');
     retry.type = 'button';
     retry.className = 'bootstrap-retry';
-    retry.textContent = 'RETRY';
+    retry.textContent = 'Retry';
     retry.addEventListener('click', () => window.location.reload());
-    track.replaceWith(retry);
+    status.appendChild(retry);
   }
 };
 

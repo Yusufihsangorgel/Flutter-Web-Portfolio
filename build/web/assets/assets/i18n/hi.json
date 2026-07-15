@@ -216,9 +216,7 @@
   "accessibility": {
     "skip_to_content": "सामग्री पर जाएँ",
     "back_to_top": "ऊपर जाएँ",
-    "language_menu": "भाषा मेनू",
-    "mute_sound_effects": "ध्वनि प्रभाव म्यूट करें",
-    "enable_sound_effects": "ध्वनि प्रभाव चालू करें"
+    "language_menu": "भाषा मेनू"
   },
   "about_section": {
     "title": "मेरे बारे में",
@@ -238,20 +236,8 @@
   "projects_section": {
     "title": "चुने गए प्रोजेक्ट",
     "subtitle": "वे उत्पाद जिन्हें मैंने डिज़ाइन किया, बनाया और लगातार बेहतर कर रहा हूँ।",
-    "filter_all": "सभी",
-    "case_study_problem": "चुनौती",
-    "case_study_solution": "दृष्टिकोण",
-    "case_study_result": "परिणाम",
-    "links": "लिंक",
-    "technologies": "प्रौद्योगिकियाँ",
-    "open_project": "प्रोजेक्ट खोलें",
-    "link_labels": {
-      "google_play": "Google Play",
-      "app_store": "App Store",
-      "website": "वेबसाइट"
-    },
-    "case_study_label": "केस स्टडी",
-    "flip_hint": "केस स्टडी देखने के लिए क्लिक करें"
+    "archive": "और उत्पाद",
+    "open_project": "प्रोजेक्ट खोलें"
   },
   "proof_section": {
     "title": "मैं कैसे काम करता हूँ",
@@ -262,8 +248,7 @@
     "command_hint_suffix": "कमांड पैलेट खोलने के लिए",
     "quick_links": "त्वरित लिंक",
     "verification": "वर्तमान फ़ोकस",
-    "verification_body": "सोच-समझकर Flutter उत्पाद और उनके पीछे की Go सेवाएँ बनाना।",
-    "easter_egg": "आपने शांत कोना खोज लिया। ध्यान से देखने के लिए धन्यवाद।"
+    "verification_body": "सोच-समझकर Flutter उत्पाद और उनके पीछे की Go सेवाएँ बनाना।"
   },
   "command_palette": {
     "close": "कमांड पैलेट बंद करें",
@@ -272,7 +257,6 @@
     "action": "कार्रवाई",
     "go_to": "{section} पर जाएँ",
     "switch_to": "{language} में बदलें",
-    "open_lab": "Engineering Lab खोलें",
     "search_hint": "कमांड लिखें...",
     "no_matches": "कोई मिलता-जुलता कमांड नहीं"
   }

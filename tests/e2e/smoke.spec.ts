@@ -83,7 +83,11 @@ test('publishes a clean heading and control hierarchy', async ({
       .getByRole('button', { name: 'Open navigation menu', exact: true })
       .click();
   }
-  await page.getByRole('button', { name: 'About', exact: true }).click();
+  const aboutControl = page.getByRole('button', {
+    name: 'About',
+    exact: true,
+  });
+  await (isMobile ? aboutControl.last() : aboutControl.first()).click();
   await expect(page).toHaveURL(/#\/about$/);
   await expect(page.getByRole('heading', { name: 'About Me' })).toBeAttached();
 
@@ -101,13 +105,6 @@ test('publishes a clean heading and control hierarchy', async ({
       ?.value?.value,
   ).toBe(2);
 
-  if (isMobile) {
-    await page
-      .getByRole('button', { name: 'Open navigation menu', exact: true })
-      .click();
-  }
-  await page.getByRole('button', { name: 'Projects', exact: true }).click();
-  await expect(page).toHaveURL(/#\/projects$/);
   await expect(
     page.getByRole('heading', { name: 'Selected Work' }),
   ).toBeAttached();
@@ -139,10 +136,11 @@ test('paints an accessible portfolio shell before the Wasm canvas', async ({
   const shell = page.locator('#bootstrap-surface');
   await expect(shell).toBeVisible();
   await expect(shell).toHaveAttribute('aria-busy', 'true');
-  await expect(shell.getByRole('heading', { name: /PRODUCTS FOR/ })).toBeVisible();
-  await expect(shell.getByText('Selected focus')).toBeVisible();
-  await expect(shell.getByText('Android · iOS')).toBeVisible();
-  await expect(shell.getByText('Loading selected work')).toBeVisible();
+  await expect(
+    shell.getByRole('heading', { name: 'SENIOR FLUTTER ENGINEER.' }),
+  ).toBeVisible();
+  await expect(shell.getByText('Product-minded Flutter engineering')).toBeVisible();
+  await expect(shell.getByText('Preparing the portfolio')).toBeVisible();
 
   releaseWasm?.();
   await expect(shell).toHaveCount(0, { timeout: 20000 });
@@ -154,10 +152,10 @@ test('offers an accessible retry when the Wasm artifact cannot load', async ({
   await page.route('**/main.dart.wasm*', (route) => route.abort('failed'));
   await page.goto('/', { waitUntil: 'domcontentloaded' });
 
-  await expect(page.getByText('PORTFOLIO / LOAD FAILED')).toBeVisible({
+  await expect(page.getByText('The portfolio could not start')).toBeVisible({
     timeout: 20000,
   });
-  await expect(page.getByRole('button', { name: 'RETRY' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Retry' })).toBeVisible();
   await expect(page.locator('#bootstrap-surface')).toHaveAttribute(
     'aria-label',
     'The portfolio could not start',
@@ -268,16 +266,17 @@ test('does not publish renderer debug symbols', async ({ request }) => {
   expect(await version.json()).toMatchObject({ version: '1.1.0' });
 });
 
-test('exposes the live Engineering Lab through the keyboard', async ({ page }) => {
+test('keeps every professional chapter in one accessible document', async ({
+  page,
+}) => {
   await openPortfolio(page);
-  await page.keyboard.press('Control+Shift+KeyL');
-
-  await expect(page.getByText('ENGINEERING LAB / LIVE')).toBeAttached();
-  await expect(page.getByText('Dart WebAssembly')).toBeAttached();
-  await expect(page.getByText('SkWasm', { exact: true })).toBeAttached();
-  await expect(page.getByText('main.dart.wasm')).toBeAttached();
-  await expect(page.getByText('Active', { exact: true })).toBeAttached();
-  await expect(page.getByText('Flutter scheduler telemetry')).toBeAttached();
+  await expect(page.getByRole('heading', { name: 'About Me' })).toBeAttached();
+  await expect(page.getByRole('heading', { name: 'Experience' })).toBeAttached();
+  await expect(page.getByRole('heading', { name: 'How I Work' })).toBeAttached();
+  await expect(
+    page.getByRole('heading', { name: 'Selected Work' }),
+  ).toBeAttached();
+  await expect(page.getByText('Mobile Team Lead')).toBeAttached();
 });
 
 test('switches to the application-owned Arabic catalog', async ({ page }) => {

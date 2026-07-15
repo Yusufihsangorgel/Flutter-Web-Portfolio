@@ -17,20 +17,17 @@ const showBootstrapFailure = (error) => {
   splash.classList.add('bootstrap-surface--failed');
   splash.setAttribute('aria-busy', 'false');
   splash.setAttribute('aria-label', 'The portfolio could not start');
-  const label = splash.querySelector('.bootstrap-label');
-  if (label) label.textContent = 'PORTFOLIO / LOAD FAILED';
-  const status = splash.querySelector('.bootstrap-status-copy');
+  const label = splash.querySelector('.bootstrap-kicker');
+  if (label) label.textContent = 'The portfolio could not start';
+  const status = splash.querySelector('.bootstrap-status');
   if (status) {
     status.textContent = 'The portfolio could not load. Please try again.';
-  }
-  const track = splash.querySelector('.bootstrap-track');
-  if (track) {
     const retry = document.createElement('button');
     retry.type = 'button';
     retry.className = 'bootstrap-retry';
-    retry.textContent = 'RETRY';
+    retry.textContent = 'Retry';
     retry.addEventListener('click', () => window.location.reload());
-    track.replaceWith(retry);
+    status.appendChild(retry);
   }
 };
 

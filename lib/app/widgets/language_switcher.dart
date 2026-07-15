@@ -4,7 +4,6 @@ import 'package:flutter_web_portfolio/app/core/theme/app_fonts.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
 import 'package:flutter_web_portfolio/app/controllers/scene_director.dart';
 import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
-import 'package:flutter_web_portfolio/app/controllers/sound_controller.dart';
 
 /// Flag-emoji popup menu for switching the active language.
 class LanguageSwitcher extends StatelessWidget {
@@ -57,10 +56,7 @@ class LanguageSwitcher extends StatelessWidget {
                             .withValues(alpha: 0.05),
                   ),
                 ),
-                onSelected: (code) {
-                  context.read<SoundController>().playToggle(on: true);
-                  languageController.changeLanguage(code);
-                },
+                onSelected: languageController.changeLanguage,
                 itemBuilder: (BuildContext context) => languageController
                     .supportedLanguages
                     .keys

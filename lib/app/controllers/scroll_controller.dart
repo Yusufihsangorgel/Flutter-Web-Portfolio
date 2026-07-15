@@ -3,6 +3,7 @@ import 'dart:developer' as dev;
 
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:flutter_web_portfolio/app/core/constants/app_dimensions.dart';
@@ -26,10 +27,30 @@ final class AppScrollState {
   int get hashCode => activeSection.hashCode;
 }
 
+/// Measured document geometry for one portfolio chapter.
+///
+/// Navigation and the scene engine share this coordinate system. This keeps
+/// visual transitions aligned even when chapters have different heights.
+@immutable
+final class SectionGeometry {
+  const SectionGeometry({
+    required this.id,
+    required this.top,
+    required this.height,
+  });
+
+  final String id;
+  final double top;
+  final double height;
+
+  double get bottom => top + height;
+  double get center => top + height / 2;
+}
+
 /// Owns the primary scroll position, section geometry and URL synchronization.
 ///
 /// Section changes are exposed as immutable Cubit state. Pixel-level scroll
-/// movement stays on Flutter's [ScrollController], so cinematic painters can
+/// movement stays on Flutter's [ScrollController], so background painters can
 /// subscribe without rebuilding navigation widgets every frame.
 final class AppScrollController extends Cubit<AppScrollState>
     with WidgetsBindingObserver {
@@ -37,7 +58,7 @@ final class AppScrollController extends Cubit<AppScrollState>
     _readInitialRoute();
     WidgetsBinding.instance
       ..addObserver(this)
-      ..addPostFrameCallback((_) => _updateSectionInfo());
+      ..addPostFrameCallback((_) => refreshSectionGeometry());
     scrollController.addListener(_handleScroll);
 
     if (kIsWeb) {
@@ -55,11 +76,18 @@ final class AppScrollController extends Cubit<AppScrollState>
 
   String get activeSection => state.activeSection;
 
+  List<SectionGeometry> get sectionGeometries => [
+    for (final id in Routes.sectionIds)
+      if (_sectionOffsets[id] case final top?)
+        if (_sectionHeights[id] case final height?)
+          SectionGeometry(id: id, top: top, height: height),
+  ];
+
   final Map<String, double> _sectionOffsets = {};
   final Map<String, double> _sectionHeights = {};
   bool _isManualScrolling = false;
   bool _reduceMotion = false;
-  bool _suppressNextHistoryUpdate = false;
+  int _scrollRequestId = 0;
   Timer? _debounceTimer;
   String? _pendingSection;
   void Function()? _disposePopState;
@@ -84,7 +112,7 @@ final class AppScrollController extends Cubit<AppScrollState>
     _pendingSection = null;
     if (target == null || target == 'home') return;
 
-    _updateSectionInfo();
+    refreshSectionGeometry();
     Future<void>.delayed(const Duration(milliseconds: 100), () {
       if (!isClosed) scrollToSection(target);
     });
@@ -98,10 +126,6 @@ final class AppScrollController extends Cubit<AppScrollState>
 
   void _onActiveSectionChanged(String section) {
     if (!kIsWeb) return;
-    if (_suppressNextHistoryUpdate) {
-      _suppressNextHistoryUpdate = false;
-      return;
-    }
     url_strategy.setUrlHash(section);
   }
 
@@ -109,14 +133,13 @@ final class AppScrollController extends Cubit<AppScrollState>
     final section = hash.isNotEmpty && Routes.sectionIds.contains(hash)
         ? hash
         : 'home';
-    _suppressNextHistoryUpdate = state.activeSection != section;
-    scrollToSection(section);
+    scrollToSection(section, syncUrl: false);
   }
 
   @override
-  void didChangeMetrics() => _updateSectionInfo();
+  void didChangeMetrics() => refreshSectionGeometry();
 
-  void _updateSectionInfo() {
+  void refreshSectionGeometry() {
     _updateKeyInfo('home', homeKey);
     _updateKeyInfo('about', aboutKey);
     _updateKeyInfo('experience', experienceKey);
@@ -128,12 +151,12 @@ final class AppScrollController extends Cubit<AppScrollState>
     final context = key.currentContext;
     final renderObject = context?.findRenderObject();
     if (renderObject is! RenderBox || !renderObject.hasSize) return;
+    final viewport = RenderAbstractViewport.maybeOf(renderObject);
+    if (viewport == null) return;
 
-    final position = renderObject.localToGlobal(Offset.zero);
-    final currentOffset = scrollController.hasClients
-        ? scrollController.offset
-        : 0.0;
-    _sectionOffsets[sectionId] = position.dy + currentOffset;
+    _sectionOffsets[sectionId] = viewport
+        .getOffsetToReveal(renderObject, 0)
+        .offset;
     _sectionHeights[sectionId] = renderObject.size.height;
   }
 
@@ -149,7 +172,7 @@ final class AppScrollController extends Cubit<AppScrollState>
     }
 
     try {
-      _updateSectionInfo();
+      refreshSectionGeometry();
       if (_sectionOffsets.isEmpty) return;
 
       const appBarHeight = AppDimensions.appBarHeight;
@@ -158,18 +181,14 @@ final class AppScrollController extends Cubit<AppScrollState>
       final viewportHeight = rawViewportHeight > appBarHeight
           ? rawViewportHeight - appBarHeight
           : 0.0;
-      final viewportCenter = scrollOffset + appBarHeight + viewportHeight / 2;
+      final focalPoint = scrollOffset + appBarHeight + viewportHeight * 0.28;
 
       var bestSection = 'home';
-      var bestDistance = double.infinity;
-      _sectionOffsets.forEach((sectionId, top) {
-        final height = _sectionHeights[sectionId] ?? 0;
-        final distance = (top + height / 2 - viewportCenter).abs();
-        if (distance < bestDistance) {
-          bestDistance = distance;
-          bestSection = sectionId;
-        }
-      });
+      for (final sectionId in Routes.sectionIds) {
+        final top = _sectionOffsets[sectionId];
+        if (top == null || top > focalPoint + 1) break;
+        bestSection = sectionId;
+      }
 
       _setActiveSection(bestSection);
     } catch (error, stackTrace) {
@@ -182,31 +201,39 @@ final class AppScrollController extends Cubit<AppScrollState>
     }
   }
 
-  void scrollToSection(String sectionId) {
+  void scrollToSection(String sectionId, {bool syncUrl = true}) {
     try {
       if (!scrollController.hasClients) return;
+      refreshSectionGeometry();
+      final sectionTop = _sectionOffsets[sectionId];
+      if (sectionTop == null) return;
 
-      final sectionKey = switch (sectionId) {
-        'home' => homeKey,
-        'about' => aboutKey,
-        'experience' => experienceKey,
-        'proof' => proofKey,
-        'projects' => projectsKey,
-        _ => null,
-      };
-      final sectionContext = sectionKey?.currentContext;
-      if (sectionContext == null) return;
-
+      final requestId = ++_scrollRequestId;
+      _debounceTimer?.cancel();
       _isManualScrolling = true;
-      _setActiveSection(sectionId);
+      _setActiveSection(sectionId, syncUrl: syncUrl);
 
-      final scrollFuture = Scrollable.ensureVisible(
-        sectionContext,
-        alignment: 0,
-        duration: _reduceMotion ? Duration.zero : AppDurations.sectionScroll,
-        curve: Curves.easeInOut,
+      final targetOffset =
+          (sectionId == 'home'
+                  ? 0.0
+                  : sectionTop - AppDimensions.appBarHeightMobile)
+              .clamp(0.0, scrollController.position.maxScrollExtent);
+      final Future<void> scrollFuture;
+      if (_reduceMotion) {
+        scrollController.jumpTo(targetOffset);
+        scrollFuture = Future<void>.value();
+      } else {
+        scrollFuture = scrollController.animateTo(
+          targetOffset,
+          duration: AppDurations.sectionScroll,
+          curve: Curves.easeInOut,
+        );
+      }
+      unawaited(
+        scrollFuture.then((_) {
+          if (requestId == _scrollRequestId) _finishScrolling(requestId);
+        }),
       );
-      unawaited(scrollFuture.then((_) => _finishScrolling()));
     } catch (error, stackTrace) {
       dev.log(
         'Scroll to section failed',
@@ -218,11 +245,11 @@ final class AppScrollController extends Cubit<AppScrollState>
     }
   }
 
-  void _finishScrolling() {
+  void _finishScrolling(int requestId) {
     Future<void>.delayed(AppDurations.heroDebounce, () {
-      if (isClosed) return;
+      if (isClosed || requestId != _scrollRequestId) return;
       _isManualScrolling = false;
-      _updateSectionInfo();
+      refreshSectionGeometry();
       _detectActiveSection();
     });
   }

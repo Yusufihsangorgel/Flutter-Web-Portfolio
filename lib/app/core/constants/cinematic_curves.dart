@@ -1,10 +1,10 @@
 import 'package:flutter/animation.dart';
 
-/// Easing curves tuned for cinematic micro-interactions.
+/// Shared easing curves for restrained interface motion.
 final class CinematicCurves {
   const CinematicCurves._();
 
-  /// Smooth cinematic ease — replaces springy Flutter defaults
+  /// Smooth ease for large transitions.
   static const easeInOutCinematic = Cubic(0.65, 0.0, 0.35, 1.0);
 
   /// Dramatic entrance — slow start, powerful finish

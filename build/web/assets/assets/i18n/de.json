@@ -216,9 +216,7 @@
   "accessibility": {
     "skip_to_content": "Zum Inhalt springen",
     "back_to_top": "Nach oben",
-    "language_menu": "Sprachmenü",
-    "mute_sound_effects": "Soundeffekte stummschalten",
-    "enable_sound_effects": "Soundeffekte aktivieren"
+    "language_menu": "Sprachmenü"
   },
   "about_section": {
     "title": "Über mich",
@@ -238,20 +236,8 @@
   "projects_section": {
     "title": "Ausgewählte Projekte",
     "subtitle": "Produkte, die ich konzipiert, entwickelt und fortlaufend verbessert habe.",
-    "filter_all": "Alle",
-    "case_study_problem": "Die Herausforderung",
-    "case_study_solution": "Der Ansatz",
-    "case_study_result": "Das Ergebnis",
-    "links": "Links",
-    "technologies": "Technologien",
-    "open_project": "Projekt öffnen",
-    "link_labels": {
-      "google_play": "Google Play",
-      "app_store": "App Store",
-      "website": "Webseite"
-    },
-    "case_study_label": "Fallstudie",
-    "flip_hint": "Klicken, um die Fallstudie anzuzeigen"
+    "archive": "Weitere Produkte",
+    "open_project": "Projekt öffnen"
   },
   "proof_section": {
     "title": "Meine Arbeitsweise",
@@ -262,8 +248,7 @@
     "command_hint_suffix": "um die Befehlspalette zu öffnen",
     "verification": "Aktueller Fokus",
     "verification_body": "Durchdachte Flutter-Produkte und die Go-Dienste dahinter entwickeln.",
-    "quick_links": "Schnellzugriff",
-    "easter_egg": "Du hast die ruhige Ecke gefunden. Danke fürs genaue Hinsehen."
+    "quick_links": "Schnellzugriff"
   },
   "command_palette": {
     "close": "Befehlspalette schließen",
@@ -272,7 +257,6 @@
     "action": "Aktion",
     "go_to": "Zu {section}",
     "switch_to": "Zu {language} wechseln",
-    "open_lab": "Engineering Lab öffnen",
     "search_hint": "Befehl eingeben...",
     "no_matches": "Keine passenden Befehle"
   }

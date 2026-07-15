@@ -1,14 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter_web_portfolio/app/controllers/sound_controller.dart';
 import 'package:flutter_web_portfolio/app/widgets/cinematic_focusable.dart';
 
-Widget _buildSubject(Widget child) => BlocProvider(
-  create: (_) => SoundController(),
-  child: MaterialApp(home: Scaffold(body: child)),
-);
+Widget _buildSubject(Widget child) => MaterialApp(home: Scaffold(body: child));
 
 void main() {
   group('CinematicFocusable', () {

@@ -216,9 +216,7 @@
   "accessibility": {
     "skip_to_content": "Skip to content",
     "back_to_top": "Back to top",
-    "language_menu": "Language menu",
-    "mute_sound_effects": "Mute sound effects",
-    "enable_sound_effects": "Enable sound effects"
+    "language_menu": "Language menu"
   },
   "about_section": {
     "title": "About Me",
@@ -228,20 +226,8 @@
   "projects_section": {
     "title": "Selected Work",
     "subtitle": "Products I designed, built, and continue to improve.",
-    "filter_all": "All",
-    "technologies": "Technologies",
-    "open_project": "Open Project",
-    "case_study_problem": "The Challenge",
-    "case_study_solution": "The Approach",
-    "case_study_result": "The Result",
-    "links": "Links",
-    "link_labels": {
-      "google_play": "Google Play",
-      "app_store": "App Store",
-      "website": "Website"
-    },
-    "case_study_label": "Case Study",
-    "flip_hint": "Click to view case study"
+    "archive": "More products",
+    "open_project": "Open Project"
   },
   "home_section": {
     "title": "SENIOR FLUTTER ENGINEER.",
@@ -262,8 +248,7 @@
     "command_hint_prefix": "Press",
     "command_hint_suffix": "to open command palette",
     "verification": "Current focus",
-    "verification_body": "Building thoughtful Flutter products and the Go services behind them.",
-    "easter_egg": "You found the quiet corner. Thanks for looking closely."
+    "verification_body": "Building thoughtful Flutter products and the Go services behind them."
   },
   "command_palette": {
     "close": "Close command palette",
@@ -272,7 +257,6 @@
     "action": "Action",
     "go_to": "Go to {section}",
     "switch_to": "Switch to {language}",
-    "open_lab": "Open Engineering Lab",
     "search_hint": "Type a command...",
     "no_matches": "No matching commands"
   }

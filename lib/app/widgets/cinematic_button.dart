@@ -5,7 +5,7 @@ import 'package:flutter_web_portfolio/app/core/constants/cinematic_curves.dart';
 import 'package:flutter_web_portfolio/app/core/constants/durations.dart';
 import 'package:flutter_web_portfolio/app/widgets/cinematic_focusable.dart';
 
-/// Cinematic CTA button — custom border draw, no Material.
+/// Pointer- and keyboard-accessible outlined call-to-action.
 ///
 /// [isPrimary] toggles between filled accent (primary) and outline (secondary).
 class CinematicButton extends StatefulWidget {

@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_web_portfolio/app/controllers/sound_controller.dart';
 
 /// Accessibility role exposed by [CinematicFocusable].
 enum CinematicControlRole { button, link }
@@ -47,12 +45,7 @@ class _CinematicFocusableState extends State<CinematicFocusable> {
 
     final control = FocusableActionDetector(
       mouseCursor: widget.cursor,
-      onShowHoverHighlight: (hovered) {
-        if (hovered) {
-          context.read<SoundController>().playHover();
-        }
-        widget.onHoverChanged?.call(hovered);
-      },
+      onShowHoverHighlight: widget.onHoverChanged,
       onShowFocusHighlight: (focused) => setState(() => _focused = focused),
       actions: {
         ActivateIntent: CallbackAction<ActivateIntent>(
@@ -67,10 +60,7 @@ class _CinematicFocusableState extends State<CinematicFocusable> {
         SingleActivator(LogicalKeyboardKey.space): ActivateIntent(),
       },
       child: GestureDetector(
-        onTap: () {
-          context.read<SoundController>().playClick();
-          widget.onTap();
-        },
+        onTap: widget.onTap,
         child: DecoratedBox(
           decoration: BoxDecoration(
             borderRadius: widget.borderRadius,

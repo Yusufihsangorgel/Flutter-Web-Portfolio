@@ -20,7 +20,6 @@ The public demo intentionally avoids personal contact details. Add only the iden
 
 Useful keyboard shortcuts:
 
-- `Ctrl/Cmd + Shift + L` — open the optional Flutter runtime diagnostic.
 - `Ctrl/Cmd + K` — open the keyboard-driven command palette.
 
 ## Included
@@ -29,6 +28,7 @@ Useful keyboard shortcuts:
 - English, Turkish, German, French, Spanish, Arabic with RTL, and Hindi.
 - Accessible headings, keyboard navigation, skip links, focus states, and reduced-motion support.
 - Data-driven experience, skills, principles, and project sections.
+- A single first-frame handoff from the HTML loading shell to the Flutter hero.
 - Dart WebAssembly and SkWasm release with a JavaScript and CanvasKit fallback.
 - Playwright coverage for loading, accessibility, localization, routing, and release assets.
 
@@ -64,7 +64,7 @@ Cross-Origin-Opener-Policy: same-origin
 Cross-Origin-Embedder-Policy: credentialless
 ```
 
-These headers make the page cross-origin isolated where the browser supports it. The Engineering Lab shows the result at runtime instead of assuming the deployment is configured correctly.
+These headers make the page cross-origin isolated where the browser supports it. The release tests verify the contract against both the local server and the live deployment.
 
 ## Make It Yours
 
@@ -87,15 +87,15 @@ main.dart
     └── explicit Cubit + repository graph
         └── MaterialApp
             └── HomeView
-                ├── AppScrollController → URL history + section offsets
-                ├── SceneDirector → interpolated SceneConfig
-                └── CustomPaint layers → mesh, grain, particles, cursor
+                ├── AppScrollController → URL history + measured chapter geometry
+                ├── SceneDirector → geometry-aligned SceneConfig interpolation
+                └── CustomPaint layers → mesh, grain, and particles
 ```
 
 The state boundary is intentional:
 
-- **BLoC/Cubit** owns application state. Language changes are ordered, testable, and protected against stale requests overwriting newer choices; scene, scroll, cursor, and sound state use immutable snapshots.
-- **Widget-local `Listenable` state** owns pointer coordinates and spring physics that can change every rendered frame. High-frequency motion never traverses the application state graph.
+- **BLoC/Cubit** owns application state. Language changes are ordered, testable, and protected against stale requests overwriting newer choices; scene and scroll state use immutable snapshots.
+- **Widget-local state** is reserved for short-lived hover, focus, and presentation details. High-frequency painting never traverses the application state graph.
 - **Browser history is not a page router.** This is one document; `AppScrollController` synchronizes `#/section` URLs directly with visible sections and back/forward navigation.
 - **Bootstrap completes before `runApp`.** Storage and the selected locale cannot race the first widget build.
 
@@ -105,9 +105,8 @@ Key implementation files:
 |---|---|
 | Deterministic composition root | `lib/app/app_dependencies.dart` |
 | Locale state and concurrency | `lib/app/features/language/application/language_cubit.dart` |
-| Runtime/frame telemetry | `lib/app/features/engineering_lab/` |
 | Browser history + section detection | `lib/app/controllers/scroll_controller.dart` |
-| Scene interpolation | `lib/app/controllers/scene_director.dart` |
+| Geometry-aligned scene interpolation | `lib/app/controllers/scene_director.dart` |
 | Particle spatial grid | `lib/app/widgets/constellation_particles.dart` |
 | Custom mesh and grain painter | `lib/app/widgets/background/cinematic_background.dart` |
 
@@ -119,7 +118,7 @@ Key implementation files:
 |---|---|
 | **Framework** | Flutter 3.41 · Dart 3.11 · WebAssembly release target |
 | **Application state** | `flutter_bloc` — explicit dependencies and immutable snapshots |
-| **Render coordination** | Cubit selectors + widget-local `ValueNotifier`/`Listenable` physics |
+| **Render coordination** | Cubit selectors + painter-local `Listenable` updates |
 | **i18n** | Application-owned JSON repository + `LanguageCubit` — 7 languages, ordered runtime switching |
 | **Fonts** | Local variable Inter, JetBrains Mono, and Space Grotesk assets with adjacent SIL Open Font Licenses |
 | **CI/CD** | GitHub Actions — pinned Flutter toolchain, fatal-info analysis, tests, bundle budget, browser smoke tests |
@@ -153,7 +152,7 @@ server can delay only Wasm responses without changing application code:
 WASM_DELAY_MS=5000 PORT=4174 node tool/serve_web.mjs
 ```
 
-Tests cover pure state transitions, out-of-order locale requests, repositories, scene configuration, responsive widgets, the command palette, and narrow-screen Engineering Lab layout. The source-graph gate also rejects Dart files that are no longer reachable from `lib/main.dart`, so retired features cannot survive as dormant production code.
+Tests cover pure state transitions, uneven chapter geometry, out-of-order locale requests, repositories, responsive widgets, the command palette, and the complete professional narrative. The source-graph gate also rejects Dart files that are no longer reachable from `lib/main.dart`, so retired features cannot survive as dormant production code.
 
 The release preparation step removes renderer debug symbol maps, versions app entrypoints with a content hash, and moves renderer binaries below Flutter's exact engine revision. Nginx can therefore cache those large immutable responses for a year without pairing a new bootstrap with stale runtime bytes. The bundle gate rejects unversioned artifacts, caps the complete public release at 36 MiB, `main.dart.wasm` at 3 MiB, and the JavaScript fallback at 4 MiB. It also verifies the Wasm header, dual-runtime build configuration, custom first-frame bootstrap, same-origin fallback fonts, and the fetch-free retirement worker used to remove legacy service-worker registrations.
 

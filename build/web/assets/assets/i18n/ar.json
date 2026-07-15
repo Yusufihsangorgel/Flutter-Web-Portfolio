@@ -216,9 +216,7 @@
   "accessibility": {
     "skip_to_content": "تخطي إلى المحتوى",
     "back_to_top": "العودة إلى الأعلى",
-    "language_menu": "قائمة اللغات",
-    "mute_sound_effects": "كتم المؤثرات الصوتية",
-    "enable_sound_effects": "تفعيل المؤثرات الصوتية"
+    "language_menu": "قائمة اللغات"
   },
   "about_section": {
     "title": "عني",
@@ -238,20 +236,8 @@
   "projects_section": {
     "title": "مشاريع مختارة",
     "subtitle": "منتجات صممتها وبنيتها وأواصل تحسينها.",
-    "filter_all": "الكل",
-    "case_study_problem": "التحدي",
-    "case_study_solution": "النهج",
-    "case_study_result": "النتيجة",
-    "links": "الروابط",
-    "technologies": "التقنيات",
-    "open_project": "فتح المشروع",
-    "link_labels": {
-      "google_play": "Google Play",
-      "app_store": "App Store",
-      "website": "الموقع"
-    },
-    "case_study_label": "دراسة حالة",
-    "flip_hint": "انقر لعرض دراسة الحالة"
+    "archive": "منتجات أخرى",
+    "open_project": "فتح المشروع"
   },
   "proof_section": {
     "title": "كيف أعمل",
@@ -262,8 +248,7 @@
     "command_hint_suffix": "لفتح لوحة الأوامر",
     "quick_links": "روابط سريعة",
     "verification": "التركيز الحالي",
-    "verification_body": "بناء منتجات Flutter مدروسة وخدمات Go التي تدعمها.",
-    "easter_egg": "لقد وجدت الزاوية الهادئة. شكراً للنظر بعناية."
+    "verification_body": "بناء منتجات Flutter مدروسة وخدمات Go التي تدعمها."
   },
   "command_palette": {
     "close": "إغلاق لوحة الأوامر",
@@ -272,7 +257,6 @@
     "action": "إجراء",
     "go_to": "الانتقال إلى {section}",
     "switch_to": "التبديل إلى {language}",
-    "open_lab": "فتح مختبر الهندسة",
     "search_hint": "اكتب أمراً...",
     "no_matches": "لا توجد أوامر مطابقة"
   }

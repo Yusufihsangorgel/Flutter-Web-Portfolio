@@ -8,7 +8,7 @@ import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
 final class AppTypography {
   const AppTypography._();
 
-  // ─── Display tier (Space Grotesk — cinematic) ─────────────────────────
+  // ─── Display tier (Space Grotesk) ──────────────────────────────────────
   static final display = AppFonts.spaceGrotesk(
     fontSize: 120,
     fontWeight: FontWeight.w800,

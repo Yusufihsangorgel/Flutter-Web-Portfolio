@@ -45,7 +45,7 @@ final class SceneConfigs {
 
   static const scenes = [hero, about, experience, proof, projects];
 
-  // Scene 0: Hero — Blade Runner 2049
+  // Chapter 0: Hero
   static const hero = SceneConfig(
     gradient1: AppColors.heroGradient1,
     gradient2: AppColors.heroGradient2,
@@ -56,7 +56,7 @@ final class SceneConfigs {
     vignetteIntensity: 0.3,
   );
 
-  // Scene 1: About — Dune
+  // Chapter 1: About
   static const about = SceneConfig(
     gradient1: AppColors.aboutGradient1,
     gradient2: AppColors.aboutGradient2,
@@ -67,7 +67,7 @@ final class SceneConfigs {
     vignetteIntensity: 0.3,
   );
 
-  // Scene 2: Experience — Matrix
+  // Chapter 2: Experience
   static const experience = SceneConfig(
     gradient1: AppColors.expGradient1,
     gradient2: AppColors.expGradient2,
@@ -78,7 +78,7 @@ final class SceneConfigs {
     vignetteIntensity: 0.3,
   );
 
-  // Scene 3: Proof — Spider-Verse
+  // Chapter 3: Approach
   static const proof = SceneConfig(
     gradient1: AppColors.projGradient1,
     gradient2: AppColors.projGradient2,
@@ -89,7 +89,7 @@ final class SceneConfigs {
     vignetteIntensity: 0.25,
   );
 
-  // Scene 4: Projects — Interstellar
+  // Chapter 4: Projects
   static const projects = SceneConfig(
     gradient1: AppColors.contactGradient1,
     gradient2: AppColors.contactGradient2,

@@ -216,9 +216,7 @@
   "accessibility": {
     "skip_to_content": "İçeriğe geç",
     "back_to_top": "Başa dön",
-    "language_menu": "Dil menüsü",
-    "mute_sound_effects": "Ses efektlerini kapat",
-    "enable_sound_effects": "Ses efektlerini aç"
+    "language_menu": "Dil menüsü"
   },
   "about_section": {
     "title": "Hakkımda",
@@ -228,20 +226,8 @@
   "projects_section": {
     "title": "Seçili Projeler",
     "subtitle": "Tasarladığım, geliştirdiğim ve iyileştirmeye devam ettiğim ürünler.",
-    "filter_all": "Tümü",
-    "technologies": "Teknolojiler",
-    "open_project": "Projeyi Aç",
-    "case_study_problem": "Zorluk",
-    "case_study_solution": "Yaklaşım",
-    "case_study_result": "Sonuç",
-    "links": "Bağlantılar",
-    "link_labels": {
-      "google_play": "Google Play",
-      "app_store": "App Store",
-      "website": "Web Sitesi"
-    },
-    "case_study_label": "Vaka Çalışması",
-    "flip_hint": "Vaka çalışmasını görmek için tıklayın"
+    "archive": "Diğer ürünler",
+    "open_project": "Projeyi Aç"
   },
   "home_section": {
     "title": "KIDEMLİ FLUTTER MÜHENDİSİ.",
@@ -262,8 +248,7 @@
     "command_hint_suffix": "komut paletini açmak için",
     "quick_links": "Hızlı Bağlantılar",
     "verification": "Şu anki odağım",
-    "verification_body": "Özenli Flutter ürünleri ve onların arkasındaki Go servislerini geliştirmek.",
-    "easter_egg": "Sessiz köşeyi buldun. Dikkatle baktığın için teşekkürler."
+    "verification_body": "Özenli Flutter ürünleri ve onların arkasındaki Go servislerini geliştirmek."
   },
   "command_palette": {
     "close": "Komut paletini kapat",
@@ -272,7 +257,6 @@
     "action": "Eylem",
     "go_to": "{section} bölümüne git",
     "switch_to": "{language} diline geç",
-    "open_lab": "Engineering Lab'i aç",
     "search_hint": "Bir komut yazın...",
     "no_matches": "Eşleşen komut yok"
   }

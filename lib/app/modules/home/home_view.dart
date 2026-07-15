@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -8,30 +7,24 @@ import 'package:flutter_web_portfolio/app/controllers/scroll_controller.dart';
 import 'package:flutter_web_portfolio/app/controllers/scene_director.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_dimensions.dart';
-import 'package:flutter_web_portfolio/app/core/constants/breakpoints.dart';
 import 'package:flutter_web_portfolio/app/core/constants/durations.dart';
+import 'package:flutter_web_portfolio/app/core/constants/breakpoints.dart';
+import 'package:flutter_web_portfolio/app/core/constants/scene_configs.dart';
+import 'package:flutter_web_portfolio/app/core/theme/app_fonts.dart';
 import 'package:flutter_web_portfolio/app/modules/home/sections/home_section.dart';
 import 'package:flutter_web_portfolio/app/modules/home/sections/about_section.dart';
 import 'package:flutter_web_portfolio/app/modules/home/sections/experience_section.dart';
 import 'package:flutter_web_portfolio/app/modules/home/sections/projects/projects_section.dart';
 import 'package:flutter_web_portfolio/app/modules/home/sections/proof_section.dart';
-import 'package:flutter_web_portfolio/app/core/constants/app_config.dart';
-import 'package:flutter_web_portfolio/app/features/engineering_lab/presentation/engineering_lab.dart';
-import 'package:flutter_web_portfolio/app/widgets/advanced_cursor.dart';
 import 'package:flutter_web_portfolio/app/widgets/back_to_top_button.dart';
-import 'package:flutter_web_portfolio/app/widgets/cinematic_preloader.dart';
 import 'package:flutter_web_portfolio/app/widgets/command_palette.dart';
 import 'package:flutter_web_portfolio/app/widgets/custom_sliver_app_bar.dart';
 import 'package:flutter_web_portfolio/app/widgets/premium_footer.dart';
-import 'package:flutter_web_portfolio/app/widgets/sound_toggle.dart';
-import 'package:flutter_web_portfolio/app/widgets/matrix_rain.dart';
-import 'package:flutter_web_portfolio/app/widgets/scroll_fade_in.dart';
-import 'package:flutter_web_portfolio/app/widgets/scroll_progress_dots.dart';
 import 'package:flutter_web_portfolio/app/widgets/background/cinematic_background.dart';
 import 'package:flutter_web_portfolio/app/widgets/constellation_particles.dart';
 
-/// Aurora Cinema home view — cinematic scene-driven portfolio.
-/// Layer stack: dark base -> mesh gradient -> constellation particles -> content.
+/// Single-document portfolio with chapter-aware background transitions.
+/// Layer stack: dark base, mesh gradient, particles, and content.
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
 
@@ -40,22 +33,6 @@ class HomeView extends StatefulWidget {
 }
 
 class _HomeViewState extends State<HomeView> {
-  /// Konami code sequence: Up Up Down Down Left Right Left Right B A
-  static const _konamiSequence = <LogicalKeyboardKey>[
-    LogicalKeyboardKey.arrowUp,
-    LogicalKeyboardKey.arrowUp,
-    LogicalKeyboardKey.arrowDown,
-    LogicalKeyboardKey.arrowDown,
-    LogicalKeyboardKey.arrowLeft,
-    LogicalKeyboardKey.arrowRight,
-    LogicalKeyboardKey.arrowLeft,
-    LogicalKeyboardKey.arrowRight,
-    LogicalKeyboardKey.keyB,
-    LogicalKeyboardKey.keyA,
-  ];
-
-  final List<LogicalKeyboardKey> _konamiBuffer = [];
-  bool _showMatrixRain = false;
   final FocusNode _focusNode = FocusNode();
   final FocusNode _skipLinkFocusNode = FocusNode();
   bool _skipLinkVisible = false;
@@ -78,38 +55,7 @@ class _HomeViewState extends State<HomeView> {
       return KeyEventResult.handled;
     }
 
-    // Ctrl/Cmd+Shift+L -> inspect the live Flutter Web runtime.
-    if (event.logicalKey == LogicalKeyboardKey.keyL &&
-        HardwareKeyboard.instance.isShiftPressed &&
-        (HardwareKeyboard.instance.isControlPressed ||
-            HardwareKeyboard.instance.isMetaPressed)) {
-      final scrollController = context.read<AppScrollController>();
-      EngineeringLab.show(
-        context,
-        activeSection: scrollController.activeSection,
-      );
-      return KeyEventResult.handled;
-    }
-
-    // Konami code detection
-    _konamiBuffer.add(event.logicalKey);
-    if (_konamiBuffer.length > _konamiSequence.length) {
-      _konamiBuffer.removeAt(0);
-    }
-    if (_konamiBuffer.length == _konamiSequence.length && _isKonamiMatch()) {
-      _konamiBuffer.clear();
-      setState(() => _showMatrixRain = true);
-      return KeyEventResult.handled;
-    }
-
     return KeyEventResult.ignored;
-  }
-
-  bool _isKonamiMatch() {
-    for (var i = 0; i < _konamiSequence.length; i++) {
-      if (_konamiBuffer[i] != _konamiSequence[i]) return false;
-    }
-    return true;
   }
 
   @override
@@ -120,6 +66,7 @@ class _HomeViewState extends State<HomeView> {
 
     // After first frame: recalculate scene + handle deep-link scroll
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      scrollController.refreshSectionGeometry();
       context.read<SceneDirector>().recalculate();
       scrollController.handleInitialDeepLink();
     });
@@ -131,34 +78,15 @@ class _HomeViewState extends State<HomeView> {
       child: BlocBuilder<LanguageCubit, LanguageState>(
         builder: (context, state) {
           final active = languageController.activeSections;
-
-          final isDesktop =
-              MediaQuery.sizeOf(context).width > Breakpoints.tablet;
-
-          Widget scaffold = Scaffold(
+          return Scaffold(
             backgroundColor: AppColors.background,
             body: _buildBody(
               context,
-              isDesktop,
               scrollController,
               languageController,
               active,
             ),
           );
-
-          // Wrap with cinematic preloader (plays once per session)
-          scaffold = CinematicPreloader(
-            displayName: AppConfig.name(languageController).toUpperCase(),
-            tagline: AppConfig.tagline(languageController),
-            child: scaffold,
-          );
-
-          // Wrap with advanced cursor on desktop web
-          if (kIsWeb && isDesktop) {
-            scaffold = AdvancedCursor(child: scaffold);
-          }
-
-          return scaffold;
         },
       ),
     );
@@ -166,7 +94,6 @@ class _HomeViewState extends State<HomeView> {
 
   Widget _buildBody(
     BuildContext context,
-    bool isDesktop,
     AppScrollController scrollController,
     LanguageCubit languageController,
     List<String> active,
@@ -231,102 +158,71 @@ class _HomeViewState extends State<HomeView> {
           },
         ),
       ),
-      // Layer 3: Scrollable content
-      ValueListenableBuilder<bool>(
-        valueListenable: HomeSection.entranceComplete,
-        builder: (context, entranceDone, child) => ScrollConfiguration(
-          behavior: ScrollConfiguration.of(context).copyWith(
-            dragDevices: {
-              PointerDeviceKind.touch,
-              PointerDeviceKind.mouse,
-              PointerDeviceKind.trackpad,
-            },
-          ),
-          child: CustomScrollView(
-            controller: scrollController.scrollController,
-            physics: entranceDone
-                ? const BouncingScrollPhysics(
-                    decelerationRate: ScrollDecelerationRate.fast,
-                  )
-                : const NeverScrollableScrollPhysics(),
-            slivers: [
-              CustomSliverAppBar(
-                scrollController: scrollController,
-                languageController: languageController,
-              ),
-              _buildSection(
-                scrollController.homeKey,
-                const HomeSection(),
-                context,
-                animated: false,
-              ),
-              if (active.contains('about'))
-                _buildSection(
-                  scrollController.aboutKey,
-                  const AboutSection(),
-                  context,
-                  enableScale: true,
-                ),
-              if (active.contains('experience'))
-                _buildSection(
-                  scrollController.experienceKey,
-                  const ExperienceSection(),
-                  context,
-                  delay: AppDurations.staggerShort,
-                ),
-              if (active.contains('proof'))
-                _buildSection(
-                  scrollController.proofKey,
-                  const ProofSection(),
-                  context,
-                  delay: AppDurations.staggerShort,
-                ),
-              if (active.contains('projects'))
-                _buildSection(
-                  scrollController.projectsKey,
-                  const ProjectsSection(),
-                  context,
-                  delay: AppDurations.staggerShort,
-                  enableScale: true,
-                ),
-              const SliverToBoxAdapter(child: PremiumFooter()),
-            ],
-          ),
+      // Layer 3: one continuous, immediately interactive document.
+      ScrollConfiguration(
+        behavior: ScrollConfiguration.of(context).copyWith(
+          dragDevices: {
+            PointerDeviceKind.touch,
+            PointerDeviceKind.mouse,
+            PointerDeviceKind.trackpad,
+          },
         ),
-      ),
-      // Layer 4: Scroll progress dots (desktop only)
-      ValueListenableBuilder<bool>(
-        valueListenable: HomeSection.entranceComplete,
-        builder: (context, entranceDone, _) => Positioned(
-          right: AppDimensions.scrollDotsInset,
-          top: 0,
-          bottom: 0,
-          child: Center(child: ScrollProgressDots(visible: entranceDone)),
-        ),
-      ),
-      // Layer 5: Back-to-top button with scroll progress
-      const BackToTopButton(),
-      // Layer 6: Sound toggle (bottom-left, desktop only)
-      if (isDesktop)
-        ValueListenableBuilder<bool>(
-          valueListenable: HomeSection.entranceComplete,
-          builder: (context, entranceDone, _) => Positioned(
-            bottom: 24,
-            left: 24,
-            child: AnimatedOpacity(
-              opacity: entranceDone ? 1.0 : 0.0,
-              duration: AppDurations.medium,
-              child: const SoundToggle(),
+        child: CustomScrollView(
+          controller: scrollController.scrollController,
+          physics: const ClampingScrollPhysics(),
+          // This is a short, single-document portfolio. Keeping every chapter
+          // mounted makes global navigation, measured scene transitions, and
+          // the accessibility tree deterministic from the first frame.
+          cacheExtent: 16000,
+          slivers: [
+            CustomSliverAppBar(
+              scrollController: scrollController,
+              languageController: languageController,
             ),
-          ),
+            _buildSection(
+              scrollController.homeKey,
+              const HomeSection(),
+              context,
+              isHero: true,
+            ),
+            if (active.contains('about')) ...[
+              const _NarrativeBridge(from: 0, to: 1),
+              _buildSection(
+                scrollController.aboutKey,
+                const AboutSection(),
+                context,
+              ),
+            ],
+            if (active.contains('experience')) ...[
+              const _NarrativeBridge(from: 1, to: 2),
+              _buildSection(
+                scrollController.experienceKey,
+                const ExperienceSection(),
+                context,
+              ),
+            ],
+            if (active.contains('proof')) ...[
+              const _NarrativeBridge(from: 2, to: 3),
+              _buildSection(
+                scrollController.proofKey,
+                const ProofSection(),
+                context,
+              ),
+            ],
+            if (active.contains('projects')) ...[
+              const _NarrativeBridge(from: 3, to: 4),
+              _buildSection(
+                scrollController.projectsKey,
+                const ProjectsSection(),
+                context,
+              ),
+            ],
+            const SliverToBoxAdapter(child: PremiumFooter()),
+          ],
         ),
-      // Layer 7: Matrix rain easter egg overlay
-      if (_showMatrixRain)
-        Positioned.fill(
-          child: MatrixRain(
-            onDismiss: () => setState(() => _showMatrixRain = false),
-          ),
-        ),
+      ),
+      // Layer 4: Back-to-top button with scroll progress
+      const BackToTopButton(),
     ],
   );
 
@@ -337,23 +233,91 @@ class _HomeViewState extends State<HomeView> {
         : (width > Breakpoints.tablet
               ? AppDimensions.sectionPaddingTablet
               : AppDimensions.sectionPaddingMobile);
-    return EdgeInsets.symmetric(vertical: 80, horizontal: horizontal);
+    final vertical = width > Breakpoints.tablet ? 40.0 : 28.0;
+    return EdgeInsets.symmetric(vertical: vertical, horizontal: horizontal);
   }
 
   SliverToBoxAdapter _buildSection(
     GlobalKey key,
     Widget child,
     BuildContext context, {
-    bool animated = true,
-    Duration delay = Duration.zero,
-    bool enableScale = false,
+    bool isHero = false,
   }) => SliverToBoxAdapter(
     child: Container(
       key: key,
-      padding: _sectionPadding(context),
-      child: animated
-          ? ScrollFadeIn(delay: delay, enableScale: enableScale, child: child)
-          : child,
+      padding: isHero ? EdgeInsets.zero : _sectionPadding(context),
+      child: child,
+    ),
+  );
+}
+
+class _NarrativeBridge extends StatelessWidget {
+  const _NarrativeBridge({required this.from, required this.to});
+
+  final int from;
+  final int to;
+
+  @override
+  Widget build(BuildContext context) {
+    final width = MediaQuery.sizeOf(context).width;
+    final horizontal = width > AppDimensions.maxContentWidth
+        ? AppDimensions.sectionPaddingDesktop
+        : (width > Breakpoints.tablet
+              ? AppDimensions.sectionPaddingTablet
+              : AppDimensions.sectionPaddingMobile);
+    final fromColor = SceneConfigs.scenes[from].accent;
+    final toColor = SceneConfigs.scenes[to].accent;
+
+    return SliverToBoxAdapter(
+      child: ExcludeSemantics(
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: horizontal),
+          child: SizedBox(
+            height: width > Breakpoints.tablet ? 64 : 48,
+            child: Row(
+              children: [
+                _ChapterIndex(value: from, color: fromColor),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Container(
+                    height: 1,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          fromColor.withValues(alpha: 0.18),
+                          fromColor.withValues(alpha: 0.8),
+                          toColor.withValues(alpha: 0.8),
+                          toColor.withValues(alpha: 0.18),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 16),
+                _ChapterIndex(value: to, color: toColor),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ChapterIndex extends StatelessWidget {
+  const _ChapterIndex({required this.value, required this.color});
+
+  final int value;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) => Text(
+    value.toString().padLeft(2, '0'),
+    style: AppFonts.jetBrainsMono(
+      fontSize: 10,
+      fontWeight: FontWeight.w600,
+      color: color,
+      letterSpacing: 1.4,
     ),
   );
 }

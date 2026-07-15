@@ -216,9 +216,7 @@
   "accessibility": {
     "skip_to_content": "Saltar al contenido",
     "back_to_top": "Volver arriba",
-    "language_menu": "Menú de idiomas",
-    "mute_sound_effects": "Silenciar efectos de sonido",
-    "enable_sound_effects": "Activar efectos de sonido"
+    "language_menu": "Menú de idiomas"
   },
   "about_section": {
     "title": "Sobre mí",
@@ -238,20 +236,8 @@
   "projects_section": {
     "title": "Proyectos seleccionados",
     "subtitle": "Productos que diseñé, construí y sigo mejorando.",
-    "filter_all": "Todos",
-    "case_study_problem": "El desafío",
-    "case_study_solution": "El enfoque",
-    "case_study_result": "El resultado",
-    "links": "Enlaces",
-    "technologies": "Tecnologías",
-    "open_project": "Abrir proyecto",
-    "link_labels": {
-      "google_play": "Google Play",
-      "app_store": "App Store",
-      "website": "Sitio web"
-    },
-    "case_study_label": "Caso de estudio",
-    "flip_hint": "Haz clic para ver el caso de estudio"
+    "archive": "Más productos",
+    "open_project": "Abrir proyecto"
   },
   "proof_section": {
     "title": "Cómo trabajo",
@@ -262,8 +248,7 @@
     "command_hint_suffix": "para abrir la paleta de comandos",
     "quick_links": "Enlaces rápidos",
     "verification": "Enfoque actual",
-    "verification_body": "Crear productos Flutter cuidados y los servicios Go que los respaldan.",
-    "easter_egg": "Encontraste el rincón tranquilo. Gracias por mirar con atención."
+    "verification_body": "Crear productos Flutter cuidados y los servicios Go que los respaldan."
   },
   "command_palette": {
     "close": "Cerrar la paleta de comandos",
@@ -272,7 +257,6 @@
     "action": "Acción",
     "go_to": "Ir a {section}",
     "switch_to": "Cambiar a {language}",
-    "open_lab": "Abrir Engineering Lab",
     "search_hint": "Escribe un comando...",
     "no_matches": "No hay comandos coincidentes"
   }

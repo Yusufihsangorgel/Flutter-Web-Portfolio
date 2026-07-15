@@ -76,9 +76,7 @@ void main() {
     ),
   );
 
-  testWidgets('renders practical working principles', (
-    tester,
-  ) async {
+  testWidgets('renders practical working principles', (tester) async {
     await tester.pumpWidget(buildSubject());
     await tester.pump(const Duration(seconds: 1));
 

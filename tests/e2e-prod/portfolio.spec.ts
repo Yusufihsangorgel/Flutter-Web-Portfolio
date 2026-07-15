@@ -77,15 +77,15 @@ test('boots the production Wasm release with its security contract', async ({
   expect(errors).toEqual([]);
 });
 
-test('exposes interactive engineering evidence in production', async ({ page }) => {
+test('serves the complete professional narrative in production', async ({
+  page,
+}) => {
   await openPortfolio(page);
-  await page.keyboard.press('Control+Shift+KeyL');
-
-  await expect(page.getByText('ENGINEERING LAB / LIVE')).toBeAttached();
-  await expect(page.getByText('Dart WebAssembly')).toBeAttached();
-  await expect(page.getByText('SkWasm', { exact: true })).toBeAttached();
-  await expect(page.getByText('main.dart.wasm')).toBeAttached();
-  await expect(page.getByText('Flutter scheduler telemetry')).toBeAttached();
+  await expect(page.getByRole('heading', { name: 'About Me' })).toBeAttached();
+  await expect(page.getByRole('heading', { name: 'Experience' })).toBeAttached();
+  await expect(page.getByRole('heading', { name: 'How I Work' })).toBeAttached();
+  await expect(page.getByRole('heading', { name: 'Selected Work' })).toBeAttached();
+  await expect(page.getByText('Mobile Team Lead')).toBeAttached();
 });
 
 test('serves the production accessibility hierarchy', async ({
@@ -174,7 +174,7 @@ test('serves the declared production sharing and font assets', async ({
   const html = await document.text();
   expect(html).toContain('class="bootstrap-title"');
   expect(html).toContain('aria-busy="true"');
-  expect(html).toContain('Loading selected work');
+  expect(html).toContain('Preparing the portfolio');
   expect(html).toContain(
     'content="https://developeryusuf.com/assets/og/engineering-showcase.png"',
   );

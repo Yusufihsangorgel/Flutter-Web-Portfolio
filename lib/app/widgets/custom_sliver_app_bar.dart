@@ -15,7 +15,7 @@ import 'package:flutter_web_portfolio/app/widgets/fullscreen_menu.dart';
 import 'package:flutter_web_portfolio/app/widgets/language_switcher.dart';
 import 'package:flutter_web_portfolio/app/widgets/scene_accent_builder.dart';
 
-/// Minimal floating navigation — cinematic, no numbered sections.
+/// Minimal floating navigation for the single-page document.
 /// Shrinks from 80px to 60px as the user scrolls down (200px threshold).
 class CustomSliverAppBar extends StatefulWidget {
   const CustomSliverAppBar({

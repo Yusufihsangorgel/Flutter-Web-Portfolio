@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-/// Centralized color palette for the cinematic portfolio theme.
+/// Centralized color palette for the portfolio.
 final class AppColors {
   const AppColors._();
 
@@ -16,31 +16,31 @@ final class AppColors {
   static const textSecondary = Color(0xFF64748B);
   static const white = Color(0xFFF8FAFC);
 
-  // ─── Scene: Hero — Blade Runner 2049 ──────────────────────────────
+  // ─── Hero palette ──────────────────────────────────────────────────
   static const heroGradient1 = Color(0xFF1E0B3E);
   static const heroGradient2 = Color(0xFF2D1055);
   static const heroGradient3 = Color(0xFF0891B2);
   static const heroAccent = Color(0xFF06B6D4);
 
-  // ─── Scene: About — Dune ──────────────────────────────────────────
+  // ─── About palette ─────────────────────────────────────────────────
   static const aboutGradient1 = Color(0xFF451A03);
   static const aboutGradient2 = Color(0xFF78350F);
   static const aboutGradient3 = Color(0xFF1E1B4B);
   static const aboutAccent = Color(0xFFF59E0B);
 
-  // ─── Scene: Experience — Matrix ────────────────────────────────────
+  // ─── Experience palette ────────────────────────────────────────────
   static const expGradient1 = Color(0xFF0F4C4C);
   static const expGradient2 = Color(0xFF064E3B);
   static const expGradient3 = Color(0xFF78350F);
   static const expAccent = Color(0xFF10B981);
 
-  // ─── Scene: Projects — Spider-Verse ────────────────────────────────
+  // ─── Approach palette ──────────────────────────────────────────────
   static const projGradient1 = Color(0xFF831843);
   static const projGradient2 = Color(0xFF9F1239);
   static const projGradient3 = Color(0xFF0C1445);
   static const projAccent = Color(0xFFF43F5E);
 
-  // ─── Scene: Contact — Interstellar ─────────────────────────────────
+  // ─── Projects palette ──────────────────────────────────────────────
   static const contactGradient1 = Color(0xFF0A0A0A);
   static const contactGradient2 = Color(0xFF171717);
   static const contactGradient3 = Color(0xFF1C1C1C);

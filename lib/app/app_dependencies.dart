@@ -3,10 +3,8 @@ import 'dart:async';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'package:flutter_web_portfolio/app/controllers/cursor_controller.dart';
 import 'package:flutter_web_portfolio/app/controllers/scene_director.dart';
 import 'package:flutter_web_portfolio/app/controllers/scroll_controller.dart';
-import 'package:flutter_web_portfolio/app/controllers/sound_controller.dart';
 import 'package:flutter_web_portfolio/app/data/providers/assets_provider.dart';
 import 'package:flutter_web_portfolio/app/data/providers/local_storage_provider.dart';
 import 'package:flutter_web_portfolio/app/data/repositories/language_repository_impl.dart';
@@ -21,15 +19,11 @@ final class AppDependencies {
     required this.languageCubit,
     required this.scrollController,
     required this.sceneDirector,
-    required this.cursorController,
-    required this.soundController,
   });
 
   final LanguageCubit languageCubit;
   final AppScrollController scrollController;
   final SceneDirector sceneDirector;
-  final CursorController cursorController;
-  final SoundController soundController;
 
   static Future<AppDependencies> bootstrap() async {
     final assetsProvider = AssetsProvider();
@@ -43,23 +37,17 @@ final class AppDependencies {
 
     final scrollController = AppScrollController();
     final sceneDirector = SceneDirector(scrollController: scrollController);
-    final cursorController = CursorController();
-    final soundController = SoundController();
 
     return AppDependencies._(
       languageCubit: languageCubit,
       scrollController: scrollController,
       sceneDirector: sceneDirector,
-      cursorController: cursorController,
-      soundController: soundController,
     );
   }
 
   Future<void> dispose() async {
     await sceneDirector.close();
     await scrollController.close();
-    await cursorController.close();
-    await soundController.close();
     await languageCubit.close();
   }
 }
@@ -97,12 +85,6 @@ final class _AppRuntimeState extends State<AppRuntime> {
       ),
       BlocProvider<SceneDirector>.value(
         value: widget.dependencies.sceneDirector,
-      ),
-      BlocProvider<CursorController>.value(
-        value: widget.dependencies.cursorController,
-      ),
-      BlocProvider<SoundController>.value(
-        value: widget.dependencies.soundController,
       ),
     ],
     child: widget.child,

@@ -27,7 +27,7 @@ class _PaletteCommand {
   final VoidCallback onExecute;
 }
 
-/// Cinematic command palette overlay — opened with Ctrl+K / Cmd+K.
+/// Keyboard command palette opened with Ctrl+K or Cmd+K.
 ///
 /// Provides fuzzy search across navigation, language, and action commands.
 /// Keyboard navigable with arrow keys, Enter to select, Escape to close.

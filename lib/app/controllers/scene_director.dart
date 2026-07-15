@@ -53,7 +53,7 @@ final class SceneState {
 ///
 /// A single immutable snapshot is emitted per scroll tick. Consumers select
 /// only the accent or progress field they paint, preventing unrelated widgets
-/// from rebuilding as the cinematic background moves.
+/// from rebuilding while the background changes.
 final class SceneDirector extends Cubit<SceneState> {
   SceneDirector({required AppScrollController scrollController})
     : _scrollController = scrollController,
@@ -63,50 +63,105 @@ final class SceneDirector extends Cubit<SceneState> {
 
   final AppScrollController _scrollController;
 
-  int get _sceneCount => SceneConfigs.scenes.length;
-  static const _transitionZone = 200.0;
-
   void _onScroll() {
     final scroll = _scrollController.scrollController;
     if (!scroll.hasClients) return;
 
-    final offset = scroll.offset;
-    final maxExtent = scroll.position.maxScrollExtent;
-    if (maxExtent <= 0) return;
-
-    final globalProgress = (offset / maxExtent).clamp(0.0, 1.0);
-    final sceneSize = maxExtent / _sceneCount;
-    final rawScene = offset / sceneSize;
-    final sceneIndex = rawScene.floor().clamp(0, _sceneCount - 1);
-    final sceneProgress = (rawScene - sceneIndex).clamp(0.0, 1.0);
-
-    final sceneEndPixel = (sceneIndex + 1) * sceneSize;
-    final distanceToEnd = sceneEndPixel - offset;
-    var blendFactor = 0.0;
-    if (distanceToEnd < _transitionZone && sceneIndex < _sceneCount - 1) {
-      blendFactor = 1 - (distanceToEnd / _transitionZone);
-    }
-    blendFactor = blendFactor.clamp(0.0, 1.0);
-
-    final current = SceneConfigs.scenes[sceneIndex];
-    final blendedConfig = blendFactor > 0.001 && sceneIndex < _sceneCount - 1
-        ? SceneConfig.lerp(
-            current,
-            SceneConfigs.scenes[sceneIndex + 1],
-            blendFactor,
-          )
-        : current;
-
     emit(
-      SceneState(
-        currentSceneIndex: sceneIndex,
-        sceneProgress: sceneProgress,
-        globalProgress: globalProgress,
-        blendFactor: blendFactor,
-        blendedConfig: blendedConfig,
+      calculateState(
+        offset: scroll.offset,
+        viewportDimension: scroll.position.viewportDimension,
+        maxExtent: scroll.position.maxScrollExtent,
+        sections: _scrollController.sectionGeometries,
       ),
     );
   }
+
+  /// Calculates scene state from measured chapter centres.
+  ///
+  /// The viewport focal point travels between adjacent chapter centres, and
+  /// the palette follows that real journey. Uneven content no longer makes a
+  /// scene change early or linger after its chapter has left the viewport.
+  @visibleForTesting
+  static SceneState calculateState({
+    required double offset,
+    required double viewportDimension,
+    required double maxExtent,
+    required List<SectionGeometry> sections,
+  }) {
+    if (sections.isEmpty) return const SceneState.initial();
+
+    final safeMaxExtent = maxExtent <= 0 ? 1.0 : maxExtent;
+    final globalProgress = (offset / safeMaxExtent).clamp(0.0, 1.0);
+    final focalPoint = offset + viewportDimension * 0.44;
+
+    if (sections.length == 1 || focalPoint <= sections.first.center) {
+      final sceneIndex = _sceneIndexFor(sections.first.id);
+      return SceneState(
+        currentSceneIndex: sceneIndex,
+        sceneProgress: 0,
+        globalProgress: globalProgress,
+        blendFactor: 0,
+        blendedConfig: SceneConfigs.scenes[sceneIndex],
+      );
+    }
+
+    for (var index = 0; index < sections.length - 1; index++) {
+      final currentSection = sections[index];
+      final nextSection = sections[index + 1];
+      if (focalPoint >= nextSection.center) continue;
+
+      final distance = nextSection.center - currentSection.center;
+      final progress = distance <= 0
+          ? 1.0
+          : ((focalPoint - currentSection.center) / distance).clamp(0.0, 1.0);
+      final easedProgress = _smoothStep(progress);
+      final sceneIndex = _sceneIndexFor(currentSection.id);
+      final nextSceneIndex = _sceneIndexFor(nextSection.id);
+
+      return SceneState(
+        currentSceneIndex: sceneIndex,
+        sceneProgress: progress,
+        globalProgress: globalProgress,
+        blendFactor: easedProgress,
+        blendedConfig: easedProgress == 0
+            ? SceneConfigs.scenes[sceneIndex]
+            : SceneConfig.lerp(
+                SceneConfigs.scenes[sceneIndex],
+                SceneConfigs.scenes[nextSceneIndex],
+                easedProgress,
+              ),
+      );
+    }
+
+    final lastSection = sections.last;
+    final lastSceneIndex = _sceneIndexFor(lastSection.id);
+    final documentEnd = maxExtent + viewportDimension;
+    final remainingDistance = documentEnd - lastSection.center;
+    final tailProgress = remainingDistance <= 0
+        ? 1.0
+        : ((focalPoint - lastSection.center) / remainingDistance).clamp(
+            0.0,
+            1.0,
+          );
+    return SceneState(
+      currentSceneIndex: lastSceneIndex,
+      sceneProgress: tailProgress,
+      globalProgress: globalProgress,
+      blendFactor: 0,
+      blendedConfig: SceneConfigs.scenes[lastSceneIndex],
+    );
+  }
+
+  static int _sceneIndexFor(String sectionId) => switch (sectionId) {
+    'about' => 1,
+    'experience' => 2,
+    'proof' => 3,
+    'projects' => 4,
+    _ => 0,
+  };
+
+  static double _smoothStep(double value) => value * value * (3 - 2 * value);
 
   void recalculate() => _onScroll();
 

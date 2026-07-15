@@ -14,7 +14,6 @@ import 'package:flutter_web_portfolio/app/core/theme/app_theme.dart';
 import 'package:flutter_web_portfolio/app/modules/home/home_view.dart';
 import 'package:flutter_web_portfolio/app/utils/web_url_strategy.dart'
     as url_strategy;
-import 'package:flutter_web_portfolio/app/widgets/mouse_interaction_wrapper.dart';
 
 void main() {
   runZonedGuarded(
@@ -28,8 +27,6 @@ void main() {
         FlutterError.presentError(details);
         dev.log('Flutter error', name: 'Main', error: details.exception);
       };
-
-      _printConsoleAsciiArt();
 
       SystemChrome.setSystemUIOverlayStyle(
         const SystemUiOverlayStyle(
@@ -109,23 +106,6 @@ class _BootstrapFailureApp extends StatelessWidget {
   );
 }
 
-void _printConsoleAsciiArt() {
-  if (kIsWeb) {
-    // Intentional console art for visitors inspecting DevTools.
-    // ignore: avoid_print
-    print('''
-
- ╔═══════════════════════════════╗
- ║   Flutter Developer Portfolio ║
- ║   Dart + Flutter WebAssembly   ║
- ║   ─────────────────────────── ║
- ║   Ctrl+K · Ctrl+Shift+L       ║
- ╚═══════════════════════════════╝
-
-''');
-  }
-}
-
 /// Root application widget.
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -159,11 +139,6 @@ class MyApp extends StatelessWidget {
               Locale('hi'),
             ],
             home: const HomeView(),
-            builder: (context, child) {
-              final content = child ?? const SizedBox.shrink();
-              if (!kIsWeb) return content;
-              return MouseInteractionWrapper(child: content);
-            },
           );
         },
       );

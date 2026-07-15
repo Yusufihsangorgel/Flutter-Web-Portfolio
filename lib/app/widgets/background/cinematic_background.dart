@@ -8,7 +8,7 @@ import 'package:flutter_web_portfolio/app/controllers/scene_director.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
 import 'package:flutter_web_portfolio/app/core/constants/scene_configs.dart';
 
-/// Cinematic background: animated gradient mesh + vignette + film grain.
+/// Animated gradient mesh with vignette and subtle grain.
 /// Colors shift based on SceneDirector's blendedConfig.
 class CinematicBackground extends StatefulWidget {
   const CinematicBackground({super.key});

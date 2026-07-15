@@ -51,5 +51,53 @@ void main() {
     test('exposes typed scene snapshots through the Cubit stream', () {
       expect(director.stream, isA<Stream<SceneState>>());
     });
+
+    test('uses measured chapter centres instead of equal document bands', () {
+      const sections = [
+        SectionGeometry(id: 'home', top: 0, height: 800),
+        SectionGeometry(id: 'about', top: 900, height: 400),
+        SectionGeometry(id: 'experience', top: 1500, height: 1400),
+        SectionGeometry(id: 'proof', top: 3000, height: 500),
+        SectionGeometry(id: 'projects', top: 3600, height: 2400),
+      ];
+
+      final state = SceneDirector.calculateState(
+        offset: 660,
+        viewportDimension: 1000,
+        maxExtent: 5200,
+        sections: sections,
+      );
+
+      expect(state.currentSceneIndex, 1);
+      expect(state.sceneProgress, 0);
+      expect(state.blendedConfig, SceneConfigs.about);
+    });
+
+    test('smoothly blends between adjacent measured chapters', () {
+      const sections = [
+        SectionGeometry(id: 'home', top: 0, height: 800),
+        SectionGeometry(id: 'about', top: 900, height: 400),
+        SectionGeometry(id: 'experience', top: 1500, height: 1400),
+      ];
+
+      final state = SceneDirector.calculateState(
+        offset: 1210,
+        viewportDimension: 1000,
+        maxExtent: 2400,
+        sections: sections,
+      );
+
+      expect(state.currentSceneIndex, 1);
+      expect(state.sceneProgress, closeTo(0.5, 0.001));
+      expect(state.blendFactor, closeTo(0.5, 0.001));
+      expect(
+        state.blendedConfig.accent,
+        SceneConfig.lerp(
+          SceneConfigs.about,
+          SceneConfigs.experience,
+          0.5,
+        ).accent,
+      );
+    });
   });
 }

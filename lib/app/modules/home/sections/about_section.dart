@@ -2,12 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
 import 'package:flutter_web_portfolio/app/core/constants/breakpoints.dart';
-import 'package:flutter_web_portfolio/app/core/constants/durations.dart';
 import 'package:flutter_web_portfolio/app/core/theme/app_fonts.dart';
 import 'package:flutter_web_portfolio/app/core/theme/app_typography.dart';
 import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
 import 'package:flutter_web_portfolio/app/widgets/numbered_section_heading.dart';
-import 'package:flutter_web_portfolio/app/widgets/scroll_fade_in.dart';
 import 'package:flutter_web_portfolio/app/widgets/scene_accent_builder.dart';
 
 /// Personal, professional context without publishing private identity details.
@@ -40,16 +38,14 @@ class AboutSection extends StatelessWidget {
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    ScrollFadeIn(
-                      child: SceneAccentBuilder(
-                        builder: (context, accent) => NumberedSectionHeading(
-                          number: '01',
-                          title: language.getText(
-                            'about_section.title',
-                            defaultValue: 'About Me',
-                          ),
-                          accent: accent,
+                    SceneAccentBuilder(
+                      builder: (context, accent) => NumberedSectionHeading(
+                        number: '01',
+                        title: language.getText(
+                          'about_section.title',
+                          defaultValue: 'About Me',
                         ),
+                        accent: accent,
                       ),
                     ),
                     const SizedBox(height: 36),
@@ -87,36 +83,34 @@ class _Biography extends StatelessWidget {
   final LanguageCubit language;
 
   @override
-  Widget build(BuildContext context) => ScrollFadeIn(
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          personal['bio'] as String? ??
-              language.getText(
-                'about_section.bio',
-                defaultValue:
-                    'I build production Flutter applications across mobile, desktop, and web.',
-              ),
-          style: AppFonts.spaceGrotesk(
-            fontSize: 27,
-            fontWeight: FontWeight.w500,
-            color: AppColors.textBright,
-            height: 1.45,
-            letterSpacing: -0.5,
-          ),
+  Widget build(BuildContext context) => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text(
+        personal['bio'] as String? ??
+            language.getText(
+              'about_section.bio',
+              defaultValue:
+                  'I build production Flutter applications across mobile, desktop, and web.',
+            ),
+        style: AppFonts.spaceGrotesk(
+          fontSize: 27,
+          fontWeight: FontWeight.w500,
+          color: AppColors.textBright,
+          height: 1.45,
+          letterSpacing: -0.5,
         ),
-        const SizedBox(height: 24),
-        Text(
-          language.getText(
-            'about_section.bio2',
-            defaultValue:
-                'Alongside client work, I design and operate independent SaaS products end to end.',
-          ),
-          style: AppTypography.body.copyWith(height: 1.75),
+      ),
+      const SizedBox(height: 24),
+      Text(
+        language.getText(
+          'about_section.bio2',
+          defaultValue:
+              'Alongside client work, I design and operate independent SaaS products end to end.',
         ),
-      ],
-    ),
+        style: AppTypography.body.copyWith(height: 1.75),
+      ),
+    ],
   );
 }
 
@@ -126,31 +120,28 @@ class _SkillSummary extends StatelessWidget {
   final List<Map<String, dynamic>> skills;
 
   @override
-  Widget build(BuildContext context) => ScrollFadeIn(
-    delay: AppDurations.staggerMedium,
-    child: SceneAccentBuilder(
-      builder: (context, accent) => Container(
-        padding: const EdgeInsets.all(26),
-        decoration: BoxDecoration(
-          color: AppColors.backgroundLight.withValues(alpha: 0.68),
-          borderRadius: BorderRadius.circular(22),
-          border: Border.all(color: Colors.white.withValues(alpha: 0.09)),
-        ),
-        child: Column(
-          children: [
-            for (var index = 0; index < skills.length; index++) ...[
-              _SkillRow(skill: skills[index], accent: accent),
-              if (index < skills.length - 1)
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 18),
-                  child: Divider(
-                    height: 1,
-                    color: Colors.white.withValues(alpha: 0.07),
-                  ),
+  Widget build(BuildContext context) => SceneAccentBuilder(
+    builder: (context, accent) => Container(
+      padding: const EdgeInsets.all(26),
+      decoration: BoxDecoration(
+        color: AppColors.backgroundLight.withValues(alpha: 0.68),
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.09)),
+      ),
+      child: Column(
+        children: [
+          for (var index = 0; index < skills.length; index++) ...[
+            _SkillRow(skill: skills[index], accent: accent),
+            if (index < skills.length - 1)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 18),
+                child: Divider(
+                  height: 1,
+                  color: Colors.white.withValues(alpha: 0.07),
                 ),
-            ],
+              ),
           ],
-        ),
+        ],
       ),
     ),
   );

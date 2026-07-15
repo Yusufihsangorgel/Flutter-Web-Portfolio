@@ -20,10 +20,11 @@ final class AppConfig {
     defaultValue: 'Senior Flutter Engineer',
   );
 
-  /// Two-letter initials derived from the current public display label.
+  /// Compact brand mark derived from the current public display label.
   static String initials(LanguageCubit lc) {
     final full = name(lc).trim();
     if (full.isEmpty) return 'SP';
+    if (full.toLowerCase().contains('flutter')) return 'FLUTTER';
     final parts = full.split(RegExp(r'\s+'));
     if (parts.length >= 2) {
       return '${parts.first[0]}${parts.last[0]}'.toUpperCase();
@@ -31,7 +32,7 @@ final class AppConfig {
     return full.substring(0, min(2, full.length)).toUpperCase();
   }
 
-  /// Short brand tagline for the preloader and footer.
+  /// Short brand tagline for the hero and footer.
   static String tagline(LanguageCubit lc) => lc.getText(
     'cv_data.personal_info.tagline',
     defaultValue: 'Building digital experiences',

@@ -117,7 +117,7 @@ try {
   if (!index.includes('aria-busy="true"')) {
     failures.push('the instant portfolio shell does not expose loading state');
   }
-  if (!index.includes('Loading selected work')) {
+  if (!index.includes('Preparing the portfolio')) {
     failures.push('the instant portfolio shell status is missing');
   }
 } catch {
