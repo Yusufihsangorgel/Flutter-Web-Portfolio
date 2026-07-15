@@ -116,6 +116,10 @@ test('publishes a clean heading and control hierarchy', async ({
     .filter((node) => !node.ignored && node.role?.value === 'link')
     .map((node) => node.name?.value ?? '');
   expect(projectLinks).toContain('Open Project: FakeCallApp');
+  expect(projectLinks).toContain(
+    'Inspect upstream patch. Fix the layer beneath the product. '
+      + 'flutter/flutter issue #189499 · draft PR #189500',
+  );
   expect(projectLinks).not.toContain('Open Project');
   expect(projectLinks).not.toContain('Website');
 });

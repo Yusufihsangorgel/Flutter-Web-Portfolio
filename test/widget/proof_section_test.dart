@@ -7,6 +7,7 @@ import 'package:flutter_web_portfolio/app/controllers/scroll_controller.dart';
 import 'package:flutter_web_portfolio/app/domain/repositories/i_language_repository.dart';
 import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
 import 'package:flutter_web_portfolio/app/modules/home/sections/proof_section.dart';
+import 'package:flutter_web_portfolio/app/widgets/cinematic_focusable.dart';
 
 final class _ProofLanguageRepository implements ILanguageRepository {
   @override
@@ -38,6 +39,13 @@ final class _ProofLanguageRepository implements ILanguageRepository {
           'title': 'Keep it maintainable',
           'detail': 'Make the next change easier.',
           'verification': 'Built for the next change',
+        },
+        {
+          'title': 'Fix the layer beneath the product',
+          'detail': 'Turn a renderer gap into an upstream fix.',
+          'verification': 'flutter/flutter issue #189499 · draft PR #189500',
+          'action': 'Inspect upstream patch',
+          'url': 'https://github.com/flutter/flutter/pull/189500',
         },
       ],
     },
@@ -84,11 +92,31 @@ void main() {
     expect(find.text('Own the product'), findsOneWidget);
     expect(find.text('Design for real conditions'), findsOneWidget);
     expect(find.text('Keep it maintainable'), findsOneWidget);
+    expect(find.text('Fix the layer beneath the product'), findsOneWidget);
+    expect(find.text('INSPECT UPSTREAM PATCH'), findsOneWidget);
     expect(find.textContaining('testimonial'), findsNothing);
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('keeps every evidence card visible on a narrow viewport', (
+  testWidgets('configures the Flutter engine patch as an accessible link', (
+    tester,
+  ) async {
+    await tester.pumpWidget(buildSubject());
+    await tester.pump(const Duration(seconds: 1));
+
+    expect(
+      find.byWidgetPredicate(
+        (widget) =>
+            widget is CinematicFocusable &&
+            widget.semanticRole == CinematicControlRole.link &&
+            widget.semanticLabel?.contains('Inspect upstream patch') == true &&
+            widget.semanticLabel?.contains('draft PR #189500') == true,
+      ),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets('keeps every evidence plate visible on a narrow viewport', (
     tester,
   ) async {
     tester.view.physicalSize = const Size(390, 844);
@@ -102,6 +130,7 @@ void main() {
     expect(find.text('Own the product'), findsOneWidget);
     expect(find.text('Design for real conditions'), findsOneWidget);
     expect(find.text('Keep it maintainable'), findsOneWidget);
+    expect(find.text('Fix the layer beneath the product'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 }

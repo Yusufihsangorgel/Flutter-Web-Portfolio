@@ -203,6 +203,13 @@
         "title": "Wartbar bleiben",
         "detail": "Klare Grenzen, fokussiertes State-Management und sinnvolle Tests erleichtern Änderungen nach der Veröffentlichung.",
         "verification": "Bereit für die nächste Änderung"
+      },
+      {
+        "title": "Die Schicht unter dem Produkt reparieren",
+        "detail": "Aus einer SkWasm-Lücke beim ersten Frame auf Compositor-Ebene wurden ein minimales Reproduktionsbeispiel, gemessene Belege und ein Patch für die Flutter Engine—statt eines Portfolio-Workarounds.",
+        "verification": "flutter/flutter issue #189499 · draft PR #189500",
+        "action": "Upstream-Patch ansehen",
+        "url": "https://github.com/flutter/flutter/pull/189500"
       }
     ]
   },

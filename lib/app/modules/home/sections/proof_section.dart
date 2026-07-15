@@ -4,10 +4,12 @@ import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
 import 'package:flutter_web_portfolio/app/core/constants/breakpoints.dart';
 import 'package:flutter_web_portfolio/app/core/theme/app_fonts.dart';
 import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
+import 'package:flutter_web_portfolio/app/widgets/cinematic_focusable.dart';
 import 'package:flutter_web_portfolio/app/widgets/numbered_section_heading.dart';
 import 'package:flutter_web_portfolio/app/widgets/scene_accent_builder.dart';
+import 'package:url_launcher/url_launcher.dart';
 
-/// Three operating principles expressed as large editorial plates.
+/// Operating principles and verifiable engineering evidence.
 class ProofSection extends StatelessWidget {
   const ProofSection({super.key});
 
@@ -94,15 +96,19 @@ class _PrinciplePlate extends StatelessWidget {
     final title = principle['title'] as String? ?? '';
     final detail = principle['detail'] as String? ?? '';
     final verification = principle['verification'] as String? ?? '';
+    final action = principle['action'] as String? ?? '';
+    final url = principle['url'] as String? ?? '';
 
-    final number = Text(
-      '${index + 1}'.padLeft(2, '0'),
-      style: AppFonts.instrumentSerif(
-        fontSize: compact ? 68 : 96,
-        fontStyle: FontStyle.italic,
-        color: accent.withValues(alpha: 0.9),
-        height: 0.72,
-        letterSpacing: -3,
+    final number = ExcludeSemantics(
+      child: Text(
+        '${index + 1}'.padLeft(2, '0'),
+        style: AppFonts.instrumentSerif(
+          fontSize: compact ? 68 : 96,
+          fontStyle: FontStyle.italic,
+          color: accent.withValues(alpha: 0.9),
+          height: 0.72,
+          letterSpacing: -3,
+        ),
       ),
     );
     final copy = Column(
@@ -130,49 +136,119 @@ class _PrinciplePlate extends StatelessWidget {
       ],
     );
 
-    return Semantics(
-      container: true,
-      label: '$title. $detail',
-      child: ExcludeSemantics(
-        child: Container(
-          padding: EdgeInsets.symmetric(vertical: compact ? 38 : 54),
-          decoration: BoxDecoration(
-            border: Border(
-              top: BorderSide(color: accent.withValues(alpha: 0.32)),
-              bottom: isLast
-                  ? BorderSide(color: accent.withValues(alpha: 0.32))
-                  : BorderSide.none,
-            ),
-          ),
-          child: compact
-              ? Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    number,
-                    const SizedBox(height: 32),
-                    copy,
-                    if (verification.isNotEmpty) ...[
-                      const SizedBox(height: 24),
-                      _Verification(value: verification, accent: accent),
-                    ],
-                  ],
-                )
-              : Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(width: 170, child: number),
-                    Expanded(flex: 6, child: copy),
-                    const SizedBox(width: 70),
-                    SizedBox(
-                      width: 190,
-                      child: _Verification(value: verification, accent: accent),
-                    ),
-                  ],
-                ),
+    final verificationWidget = url.isEmpty
+        ? _Verification(value: verification, accent: accent)
+        : _EvidenceLink(
+            title: title,
+            verification: verification,
+            action: action,
+            url: url,
+            accent: accent,
+          );
+    final plate = Container(
+      padding: EdgeInsets.symmetric(vertical: compact ? 38 : 54),
+      decoration: BoxDecoration(
+        border: Border(
+          top: BorderSide(color: accent.withValues(alpha: 0.32)),
+          bottom: isLast
+              ? BorderSide(color: accent.withValues(alpha: 0.32))
+              : BorderSide.none,
         ),
       ),
+      child: compact
+          ? Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                number,
+                const SizedBox(height: 32),
+                copy,
+                if (verification.isNotEmpty) ...[
+                  const SizedBox(height: 24),
+                  verificationWidget,
+                ],
+              ],
+            )
+          : Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(width: 170, child: number),
+                Expanded(flex: 6, child: copy),
+                const SizedBox(width: 70),
+                SizedBox(width: 190, child: verificationWidget),
+              ],
+            ),
+    );
+
+    if (url.isNotEmpty) {
+      return plate;
+    }
+    return Semantics(
+      container: true,
+      label: '$title. $detail. $verification',
+      child: ExcludeSemantics(child: plate),
     );
   }
+}
+
+class _EvidenceLink extends StatelessWidget {
+  const _EvidenceLink({
+    required this.title,
+    required this.verification,
+    required this.action,
+    required this.url,
+    required this.accent,
+  });
+
+  final String title;
+  final String verification;
+  final String action;
+  final String url;
+  final Color accent;
+
+  @override
+  Widget build(BuildContext context) => CinematicFocusable(
+    onTap: () => _openEvidence(url),
+    semanticLabel: '$action. $title. $verification',
+    semanticRole: CinematicControlRole.link,
+    focusColor: accent,
+    child: Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _Verification(value: verification, accent: accent),
+          if (action.isNotEmpty) ...[
+            const SizedBox(height: 18),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Flexible(
+                  child: Text(
+                    action.toUpperCase(),
+                    style: AppFonts.jetBrainsMono(
+                      fontSize: 9,
+                      fontWeight: FontWeight.w700,
+                      color: accent,
+                      height: 1.4,
+                      letterSpacing: 0.9,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Icon(Icons.north_east_rounded, size: 15, color: accent),
+              ],
+            ),
+          ],
+        ],
+      ),
+    ),
+  );
+}
+
+Future<void> _openEvidence(String rawUrl) async {
+  final uri = Uri.tryParse(rawUrl);
+  if (uri == null || !(uri.isScheme('https') || uri.isScheme('http'))) return;
+  await launchUrl(uri, webOnlyWindowName: '_blank');
 }
 
 class _Verification extends StatelessWidget {

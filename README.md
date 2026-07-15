@@ -56,6 +56,12 @@ The output contains both `main.dart.wasm` and `main.dart.js`. Compatible browser
 
 Typography is bundled locally as Inter, Space Grotesk, JetBrains Mono, Instrument Serif, Noto Sans Arabic, and Noto Sans Devanagari. Their SIL Open Font License texts are kept beside the font files under `assets/fonts/`, so every locale renders without a font CDN.
 
+### Upstream Flutter Web work
+
+Building the first-frame handoff exposed a renderer timing gap rather than a portfolio-only styling problem. In three cold SkWasm runs, `flutter-first-frame` preceded the first visible Flutter frame by 90.3–143.0 ms. The finding is tracked in [flutter/flutter#189499](https://github.com/flutter/flutter/issues/189499), with an engine fix and regression test proposed in [flutter/flutter#189500](https://github.com/flutter/flutter/pull/189500).
+
+The pull request remains a draft while the Flutter Web team validates it in the full engine CI environment. This repository keeps its compositor-safe local handoff until the upstream behavior changes.
+
 ### Required headers for threaded SkWasm
 
 The included Docker image serves:

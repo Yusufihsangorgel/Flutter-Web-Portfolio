@@ -33,7 +33,7 @@ addEventListener("message", eventListener);
 if (!window._flutter) {
   window._flutter = {};
 }
-_flutter.buildConfig = {"engineRevision":"6c0baaebf70e0148f485f27d5616b3d3382da7bf","builds":[{"compileTarget":"dart2wasm","renderer":"skwasm","mainWasmPath":"main.dart.wasm?v=3455685cf0335628","jsSupportRuntimePath":"main.dart.mjs?v=3455685cf0335628"},{"compileTarget":"dart2js","renderer":"canvaskit","mainJsPath":"main.dart.js?v=3455685cf0335628"}],"useLocalCanvasKit":true};
+_flutter.buildConfig = {"engineRevision":"6c0baaebf70e0148f485f27d5616b3d3382da7bf","builds":[{"compileTarget":"dart2wasm","renderer":"skwasm","mainWasmPath":"main.dart.wasm?v=40b04c27b888041f","jsSupportRuntimePath":"main.dart.mjs?v=40b04c27b888041f"},{"compileTarget":"dart2js","renderer":"canvaskit","mainJsPath":"main.dart.js?v=40b04c27b888041f"}],"useLocalCanvasKit":true};
 
 
 const removeBootstrapSurface = () => {

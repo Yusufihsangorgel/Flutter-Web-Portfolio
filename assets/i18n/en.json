@@ -203,6 +203,13 @@
         "title": "Keep it maintainable",
         "detail": "Clear boundaries, focused state management, and useful tests make features easier to change after launch.",
         "verification": "Built for the next change"
+      },
+      {
+        "title": "Fix the layer beneath the product",
+        "detail": "A compositor-level SkWasm first-frame gap became a minimal reproduction, measured evidence, and a Flutter engine patch—not a portfolio-only workaround.",
+        "verification": "flutter/flutter issue #189499 · draft PR #189500",
+        "action": "Inspect upstream patch",
+        "url": "https://github.com/flutter/flutter/pull/189500"
       }
     ]
   },

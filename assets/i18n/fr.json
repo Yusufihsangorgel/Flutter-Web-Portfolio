@@ -203,6 +203,13 @@
         "title": "Rester maintenable",
         "detail": "Des limites claires, une gestion d’état ciblée et des tests utiles facilitent les changements après la mise en ligne.",
         "verification": "Prêt pour le prochain changement"
+      },
+      {
+        "title": "Corriger la couche sous le produit",
+        "detail": "Un vide au premier frame de SkWasm au niveau du compositeur est devenu une reproduction minimale, des mesures vérifiables et un correctif du moteur Flutter—pas un contournement propre au portfolio.",
+        "verification": "flutter/flutter issue #189499 · draft PR #189500",
+        "action": "Voir le correctif upstream",
+        "url": "https://github.com/flutter/flutter/pull/189500"
       }
     ]
   },

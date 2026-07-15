@@ -210,6 +210,13 @@
         "title": "Sürdürülebilir tut",
         "detail": "Net sınırlar, odaklı durum yönetimi ve yararlı testler yayından sonra değişikliği kolaylaştırır.",
         "verification": "Bir sonraki değişime hazır"
+      },
+      {
+        "title": "Ürünün altındaki katmanı düzelt",
+        "detail": "Compositor seviyesindeki SkWasm ilk-kare boşluğunu küçük bir reproya, ölçülmüş kanıta ve Flutter engine düzeltmesine dönüştürdüm; siteye özel geçici çözümde bırakmadım.",
+        "verification": "flutter/flutter issue #189499 · draft PR #189500",
+        "action": "Upstream düzeltmeyi incele",
+        "url": "https://github.com/flutter/flutter/pull/189500"
       }
     ]
   },
