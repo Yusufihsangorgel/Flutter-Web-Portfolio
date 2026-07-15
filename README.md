@@ -2,7 +2,7 @@
 
 A production Flutter Web document built around one continuous render system: typed external content, measured scroll geometry, a procedural scene, and a dual-runtime Wasm release.
 
-[Live site](https://developeryusuf.com) · [Flutter Web first-frame issue](https://github.com/flutter/flutter/issues/189499) · [Draft engine patch](https://github.com/flutter/flutter/pull/189500)
+[Live site](https://developeryusuf.com) · [Flutter Web first-frame issue](https://github.com/flutter/flutter/issues/189499) · [Engine patch](https://github.com/flutter/flutter/pull/189500)
 
 This repository is the engineering artifact behind the portfolio, not a reusable identity template. The public record below is generated from `assets/content/portfolio.json`; widget and painter code contain no role, biography, experience, project, or contribution records.
 
@@ -13,7 +13,7 @@ This repository is the engineering artifact behind the portfolio, not a reusable
 
 My work spans Flutter clients, local and real-time data, native integrations, Go services, queues, and production infrastructure. I stay close to the boundary where product behaviour becomes a systems problem.
 
-Source status: `2026.07.15.1`, verified 2026-07-15 against the public GitHub and LinkedIn records declared in the manifest.
+Source status: `2026.07.15.2`, verified 2026-07-15 against the public GitHub and LinkedIn records declared in the manifest.
 
 ### Accepted upstream changes
 
@@ -36,7 +36,7 @@ Source status: `2026.07.15.1`, verified 2026-07-15 against the public GitHub and
 
 ### Work under review
 
-- **Flutter:** [Wait for web rendering before the first-frame event](https://github.com/flutter/flutter/pull/189500) — Wait for outstanding scene renders and the next browser frame before dispatching the event; the pull request remains a draft pending Flutter Web review and full engine CI.
+- **Flutter:** [Wait for web rendering before the first-frame event](https://github.com/flutter/flutter/pull/189500) — Wait for outstanding scene renders and the next browser frame before dispatching the event; the pull request is ready for review with seven Chrome renderer and compiler suites passing.
 <!-- portfolio-record:end -->
 
 ## Content contract
@@ -87,9 +87,23 @@ The document and render loop have deliberately different update paths:
 
 The HTML layer is only a neutral compositor bed. It has no duplicate hero, navigation, or professional copy, and it never forces a service-worker cleanup reload. Flutter owns the first meaningful frame.
 
-Cold SkWasm measurements showed that `flutter-first-frame` could precede visible compositor output by 90.3–143.0 ms. The reproducible finding is tracked in [flutter/flutter#189499](https://github.com/flutter/flutter/issues/189499); [flutter/flutter#189500](https://github.com/flutter/flutter/pull/189500) proposes waiting for outstanding scene renders and the next browser frame. The pull request is accurately labelled as draft while it is under review.
+Cold SkWasm measurements showed that `flutter-first-frame` could precede visible compositor output by 90.3–143.0 ms. The reproducible finding is tracked in [flutter/flutter#189499](https://github.com/flutter/flutter/issues/189499); [flutter/flutter#189500](https://github.com/flutter/flutter/pull/189500) proposes waiting for outstanding scene renders and the next browser frame. The patch is under review with its engine tests passing across seven Chrome renderer/compiler suites.
 
 The local handoff retains the neutral background for two browser frames after Flutter's event. This avoids a blank flash without presenting a second portfolio screen.
+
+### Runtime measurement
+
+The bootstrap publishes ordered User Timing marks for entrypoint loading, engine initialization, Flutter's first-frame event, compositor-safe reveal, and final bootstrap removal. A separate cold-context runner samples three launches plus a frame-by-frame full-document scroll, then reports median startup, p95 frame interval, long-task time, layout shift, and renderer transfer data.
+
+```bash
+# Serve build/web separately, then collect a three-run JSON report.
+npm run measure:runtime
+
+# Apply the checked-in median budget as a local release gate.
+npm run verify:runtime
+```
+
+The budget is deliberately separate from content and presentation. It can evolve from measured hardware baselines without introducing device-specific branches into the Flutter document.
 
 ## Release model
 
@@ -144,6 +158,7 @@ Useful controls:
 | Procedural render system | `lib/app/widgets/background/cinematic_background.dart` |
 | Full-width system studies | `lib/app/modules/home/sections/projects/projects_section.dart` |
 | Content synchronization | `tool/sync_public_content.mjs` |
+| Runtime measurement | `tool/measure_web_runtime.mjs`, `tool/performance_budget.json` |
 | Release integrity | `tool/prepare_web_release.mjs`, `tool/verify_web_build.mjs` |
 
 ## License

@@ -11,6 +11,22 @@ async function openPortfolio(page: Page) {
   await expect(page.getByRole('heading').first()).toBeAttached();
 }
 
+async function readRuntimeTimeline(page: Page) {
+  return page.evaluate(() => {
+    const names = [
+      'flutter-bootstrap-start',
+      'flutter-entrypoint-loaded',
+      'flutter-engine-initialized',
+      'flutter-first-frame-event',
+      'flutter-surface-reveal-start',
+      'flutter-bootstrap-surface-removed',
+    ];
+    return names.map(
+      (name) => performance.getEntriesByName(name, 'mark').at(-1)?.startTime,
+    );
+  });
+}
+
 test('boots the production Wasm release with its security contract', async ({
   page,
 }) => {
@@ -106,6 +122,9 @@ test('boots the production Wasm release with its security contract', async ({
   });
   await expect(page.locator('#bootstrap-surface')).toHaveCount(0);
   await expect(page.getByRole('heading').first()).toBeAttached();
+  const timeline = await readRuntimeTimeline(page);
+  expect(timeline.every((value) => Number.isFinite(value))).toBe(true);
+  expect(timeline).toEqual([...timeline].sort((a, b) => a! - b!));
   expect(await page.evaluate(() => window.crossOriginIsolated)).toBe(true);
   expect(badResponses).toEqual([]);
   expect(errors).toEqual([]);
@@ -257,5 +276,5 @@ test('serves the declared production sharing and font assets', async ({
 
   const version = await request.get('/version.json');
   expect(version.status()).toBe(200);
-  expect(await version.json()).toMatchObject({ version: '1.2.0' });
+  expect(await version.json()).toMatchObject({ version: '1.3.0' });
 });

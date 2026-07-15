@@ -221,6 +221,20 @@ try {
   ) {
     failures.push('the first-frame reveal is not compositor-safe');
   }
+  for (const timelineEntry of [
+    'flutter-bootstrap-start',
+    'flutter-entrypoint-loaded',
+    'flutter-engine-initialized',
+    'flutter-first-frame-event',
+    'flutter-surface-reveal-start',
+    'flutter-bootstrap-surface-removed',
+    'flutter-bootstrap-to-first-frame',
+    'flutter-first-frame-to-reveal',
+  ]) {
+    if (!bootstrap.includes(`'${timelineEntry}'`)) {
+      failures.push(`the runtime timeline is missing ${timelineEntry}`);
+    }
+  }
   if (
     !bootstrap.includes('fontFallbackBaseUrl: new URL(') ||
     !bootstrap.includes("'assets/fallback_fonts/'") ||

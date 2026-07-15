@@ -10,7 +10,7 @@ void main() {
       final document = PortfolioDocument.fromJson(_manifest());
 
       expect(document.schemaVersion, 1);
-      expect(document.contentVersion, '2026.07.15.1');
+      expect(document.contentVersion, '2026.07.15.2');
       expect(document.profile.role, 'Software Engineer');
       expect(document.site.url.toString(), 'https://developeryusuf.com');
       expect(document.site.title, contains(document.profile.role));

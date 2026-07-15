@@ -2,6 +2,20 @@
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.0] - 2026-07-15
+
+### Added
+
+- Ordered User Timing marks for entrypoint loading, engine initialization, first-frame dispatch, compositor-safe reveal, and bootstrap removal.
+- A three-run runtime laboratory that records cold startup, renderer transfer, long tasks, layout shift, and p95 frame intervals during a full-document scroll.
+- A checked-in median performance budget with an explicit local release gate.
+- Flutter Web engine coverage for the first-frame race across seven Chrome renderer/compiler suites, including threaded and single-threaded SkWasm.
+
+### Changed
+
+- Promoted the Flutter engine patch from draft to ready for review after its real browser matrix passed.
+- Split the engine tests between the platform-message contract and a renderer-level gated-rasterization regression test.
+
 ## [1.2.0] - 2026-07-15
 
 ### Added

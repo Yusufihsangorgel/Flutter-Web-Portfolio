@@ -1,24 +1,59 @@
 {{flutter_js}}
 {{flutter_build_config}}
 
+const markRuntime = (name) => window.performance?.mark(name);
+const measureRuntime = (name, start, end) => {
+  if (
+    !window.performance?.getEntriesByName(start, 'mark').length ||
+    !window.performance?.getEntriesByName(end, 'mark').length
+  ) {
+    return;
+  }
+  window.performance.measure(name, start, end);
+};
+
+markRuntime('flutter-bootstrap-start');
+
 const removeBootstrapSurface = () => {
+  markRuntime('flutter-surface-reveal-start');
+  measureRuntime(
+    'flutter-first-frame-to-reveal',
+    'flutter-first-frame-event',
+    'flutter-surface-reveal-start',
+  );
   const splash = document.getElementById('bootstrap-surface');
   if (!splash) return;
   splash.setAttribute('aria-busy', 'false');
   splash.classList.add('bootstrap-surface--done');
-  window.setTimeout(() => splash.remove(), 220);
+  window.setTimeout(() => {
+    splash.remove();
+    markRuntime('flutter-bootstrap-surface-removed');
+    measureRuntime(
+      'flutter-bootstrap-to-surface-removed',
+      'flutter-bootstrap-start',
+      'flutter-bootstrap-surface-removed',
+    );
+  }, 220);
 };
 
 // Flutter dispatches its first-frame event while the browser is still
 // compositing that frame. Keeping the matching HTML surface for two browser
 // frames prevents a one-frame dark flash on cold GPU/Wasm starts.
 const revealFlutterSurface = () => {
+  markRuntime('flutter-first-frame-event');
+  measureRuntime(
+    'flutter-bootstrap-to-first-frame',
+    'flutter-bootstrap-start',
+    'flutter-first-frame-event',
+  );
   window.requestAnimationFrame(() => {
+    markRuntime('flutter-reveal-frame-1');
     window.requestAnimationFrame(removeBootstrapSurface);
   });
 };
 
 const showBootstrapFailure = (error) => {
+  markRuntime('flutter-bootstrap-failed');
   console.error('Flutter bootstrap failed', error);
   const splash = document.getElementById('bootstrap-surface');
   if (!splash) return;
@@ -62,10 +97,13 @@ const engineConfig = {
 _flutter.loader.load({
   config: engineConfig,
   onEntrypointLoaded: async function onEntrypointLoaded(engineInitializer) {
+    markRuntime('flutter-entrypoint-loaded');
     window.addEventListener('flutter-first-frame', revealFlutterSurface, {
       once: true,
     });
     const appRunner = await engineInitializer.initializeEngine(engineConfig);
+    markRuntime('flutter-engine-initialized');
     await appRunner.runApp();
+    markRuntime('flutter-run-app-complete');
   },
 }).catch(showBootstrapFailure);

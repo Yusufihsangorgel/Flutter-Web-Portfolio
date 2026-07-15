@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "content_version": "2026.07.15.1",
+  "content_version": "2026.07.15.2",
   "verified_at": "2026-07-15",
   "site": {
     "url": "https://developeryusuf.com",
@@ -182,7 +182,7 @@
       "date": "2026-07-15",
       "title": "Wait for web rendering before the first-frame event",
       "problem": "On SkWasm, flutter-first-frame can fire before the compositor presents visible Flutter content, leaving a measurable blank handoff window.",
-      "change": "Wait for outstanding scene renders and the next browser frame before dispatching the event; the pull request remains a draft pending Flutter Web review and full engine CI.",
+      "change": "Wait for outstanding scene renders and the next browser frame before dispatching the event; the pull request is ready for review with seven Chrome renderer and compiler suites passing.",
       "url": "https://github.com/flutter/flutter/pull/189500",
       "issue_url": "https://github.com/flutter/flutter/issues/189499"
     }
