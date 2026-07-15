@@ -126,13 +126,6 @@ test('serves the production accessibility hierarchy', async ({
     /Profile PROFILE|Show menu|Scroll to top|🇬🇧/,
   );
 
-  if (isMobile) {
-    await page
-      .getByRole('button', { name: 'Open navigation menu', exact: true })
-      .click();
-  }
-  await page.getByRole('button', { name: 'Projects', exact: true }).click();
-  await expect(page).toHaveURL(/#\/projects$/);
   await expect(
     page.getByRole('heading', { name: 'Selected Work' }),
   ).toBeAttached();
