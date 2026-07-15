@@ -14,6 +14,10 @@ async function openPortfolio(page: Page) {
   });
   await expect(page.locator('#bootstrap-surface')).toHaveCount(0);
   await expect(page.getByRole('heading').first()).toBeAttached();
+  await expect(page.locator('html')).toHaveAttribute(
+    'data-render-quality',
+    /^(essential|balanced|cinematic)$/,
+  );
 }
 
 async function readRuntimeTimeline(page: Page) {
@@ -171,6 +175,14 @@ test('serves the production accessibility hierarchy', async ({
   const accessibility = await page.context().newCDPSession(page);
   await accessibility.send('Accessibility.enable');
   await openPortfolio(page);
+  await expect(page.locator('html')).toHaveAttribute(
+    'data-render-quality',
+    'essential',
+  );
+  await expect(page.locator('html')).toHaveAttribute(
+    'data-render-quality-reason',
+    'reducedMotion',
+  );
 
   const tree = await accessibility.send('Accessibility.getFullAXTree');
   const nodes = tree.nodes.filter((node) => !node.ignored);
@@ -304,5 +316,5 @@ test('serves the declared production sharing and font assets', async ({
 
   const version = await request.get('/version.json');
   expect(version.status()).toBe(200);
-  expect(await version.json()).toMatchObject({ version: '1.4.1' });
+  expect(await version.json()).toMatchObject({ version: '1.5.0' });
 });

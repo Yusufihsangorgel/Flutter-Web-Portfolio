@@ -8,6 +8,7 @@ import 'package:flutter_web_portfolio/app/core/constants/breakpoints.dart';
 import 'package:flutter_web_portfolio/app/core/constants/cinematic_curves.dart';
 import 'package:flutter_web_portfolio/app/core/constants/durations.dart';
 import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
+import 'package:flutter_web_portfolio/app/utils/motion_preference.dart';
 
 /// Floating back-to-top control with a live document-scroll progress arc.
 class BackToTopButton extends StatefulWidget {
@@ -21,6 +22,7 @@ class _BackToTopButtonState extends State<BackToTopButton>
     with SingleTickerProviderStateMixin {
   bool _visible = false;
   bool _hovered = false;
+  bool _reduceMotion = false;
   double _scrollProgress = 0;
   late final AnimationController _entranceController;
   late final Animation<double> _entranceAnimation;
@@ -39,6 +41,17 @@ class _BackToTopButtonState extends State<BackToTopButton>
     context.read<AppScrollController>().scrollController.addListener(_onScroll);
   }
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final reduceMotion = prefersReducedMotion(context);
+    if (_reduceMotion == reduceMotion) return;
+    _reduceMotion = reduceMotion;
+    if (reduceMotion) {
+      _entranceController.value = _visible ? 1 : 0;
+    }
+  }
+
   void _onScroll() {
     final controller = context.read<AppScrollController>().scrollController;
     if (!controller.hasClients) return;
@@ -46,7 +59,9 @@ class _BackToTopButtonState extends State<BackToTopButton>
     final shouldShow = controller.offset > 500;
     if (shouldShow != _visible) {
       setState(() => _visible = shouldShow);
-      if (shouldShow) {
+      if (_reduceMotion) {
+        _entranceController.value = shouldShow ? 1 : 0;
+      } else if (shouldShow) {
         _entranceController.forward();
       } else {
         _entranceController.reverse();
@@ -72,11 +87,7 @@ class _BackToTopButtonState extends State<BackToTopButton>
   }
 
   void _scrollToTop() {
-    context.read<AppScrollController>().scrollController.animateTo(
-      0,
-      duration: const Duration(milliseconds: 800),
-      curve: Curves.easeInOutCubic,
-    );
+    context.read<AppScrollController>().scrollToSection('home');
   }
 
   @override
@@ -125,7 +136,9 @@ class _BackToTopButtonState extends State<BackToTopButton>
                               child: Center(
                                 child: AnimatedScale(
                                   scale: _hovered ? 1.15 : 1,
-                                  duration: AppDurations.fast,
+                                  duration: _reduceMotion
+                                      ? Duration.zero
+                                      : AppDurations.fast,
                                   child: Icon(
                                     Icons.arrow_upward_rounded,
                                     size: isMobile ? 18 : 22,

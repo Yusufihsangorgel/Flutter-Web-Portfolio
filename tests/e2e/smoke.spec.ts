@@ -13,6 +13,10 @@ async function openPortfolio(page: Page) {
   });
   await expect(page.locator('#bootstrap-surface')).toHaveCount(0);
   await expect(page.getByRole('heading').first()).toBeAttached();
+  await expect(page.locator('html')).toHaveAttribute(
+    'data-render-quality',
+    /^(essential|balanced|cinematic)$/,
+  );
 }
 
 async function readAccessibilityTree(page: Page) {
@@ -94,6 +98,14 @@ test('publishes a clean heading and control hierarchy', async ({
   await page.emulateMedia({ reducedMotion: 'reduce' });
   const accessibility = await readAccessibilityTree(page);
   await openPortfolio(page);
+  await expect(page.locator('html')).toHaveAttribute(
+    'data-render-quality',
+    'essential',
+  );
+  await expect(page.locator('html')).toHaveAttribute(
+    'data-render-quality-reason',
+    'reducedMotion',
+  );
 
   const initialTree = await accessibility.send(
     'Accessibility.getFullAXTree',
@@ -426,7 +438,7 @@ test('does not publish renderer debug symbols', async ({ request }) => {
 
   const version = await request.get('/version.json');
   expect(version.status()).toBe(200);
-  expect(await version.json()).toMatchObject({ version: '1.4.1' });
+  expect(await version.json()).toMatchObject({ version: '1.5.0' });
 });
 
 test('keeps every professional chapter in one accessible document', async ({

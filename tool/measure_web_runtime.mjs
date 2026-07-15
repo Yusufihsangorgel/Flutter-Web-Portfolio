@@ -1,3 +1,4 @@
+import { spawn } from 'node:child_process';
 import { readFile } from 'node:fs/promises';
 import process from 'node:process';
 
@@ -6,7 +7,8 @@ import { chromium } from '@playwright/test';
 const budget = JSON.parse(
   await readFile(new URL('./performance_budget.json', import.meta.url), 'utf8'),
 );
-const target = process.env.PERF_URL ?? 'http://127.0.0.1:4173';
+const localTarget = 'http://127.0.0.1:4173';
+const target = process.env.PERF_URL ?? localTarget;
 const enforce = process.argv.includes('--enforce');
 const runCount = Number(process.env.PERF_RUNS ?? budget.runs);
 
@@ -14,15 +16,18 @@ if (!Number.isInteger(runCount) || runCount < 1 || runCount > 10) {
   throw new Error('PERF_RUNS must be an integer between 1 and 10.');
 }
 
-const browser = await chromium.launch({ headless: true });
+const server = process.env.PERF_URL ? null : await startLocalServer(localTarget);
+let browser;
 const runs = [];
 
 try {
+  browser = await chromium.launch({ headless: true });
   for (let index = 0; index < runCount; index += 1) {
     runs.push(await measureRun(browser, index + 1));
   }
 } finally {
-  await browser.close();
+  await browser?.close();
+  server?.kill('SIGTERM');
 }
 
 const summary = {
@@ -100,33 +105,57 @@ async function measureRun(browserInstance, run) {
       { timeout: budget.startup_timeout_ms },
     );
 
-    const frameIntervals = await page.evaluate(async (sampleMs) => {
-      const intervals = [];
-      const maxScroll = Math.max(
-        0,
-        document.documentElement.scrollHeight - window.innerHeight,
-      );
+    await page.evaluate((sampleMs) => {
+      const sample = {
+        done: false,
+        intervals: [],
+        routeHashes: [window.location.hash],
+      };
+      window.__flutterScrollSample = sample;
       const startedAt = performance.now();
       let previousFrame;
-
-      await new Promise((resolve) => {
-        const sampleFrame = (now) => {
-          if (previousFrame !== undefined) intervals.push(now - previousFrame);
-          previousFrame = now;
-          const progress = Math.min(1, (now - startedAt) / sampleMs);
-          const eased = 0.5 - Math.cos(Math.PI * progress) / 2;
-          window.scrollTo(0, maxScroll * eased);
-          if (progress < 1) {
-            window.requestAnimationFrame(sampleFrame);
-          } else {
-            resolve();
-          }
-        };
-        window.requestAnimationFrame(sampleFrame);
-      });
-      window.scrollTo(0, 0);
-      return intervals;
+      const sampleFrame = (now) => {
+        if (previousFrame !== undefined) {
+          sample.intervals.push(now - previousFrame);
+        }
+        previousFrame = now;
+        const currentHash = window.location.hash;
+        if (sample.routeHashes.at(-1) !== currentHash) {
+          sample.routeHashes.push(currentHash);
+        }
+        if (now - startedAt < sampleMs) {
+          window.requestAnimationFrame(sampleFrame);
+        } else {
+          sample.done = true;
+        }
+      };
+      window.requestAnimationFrame(sampleFrame);
     }, budget.scroll_sample_ms);
+
+    const scrollTargets = ['Systems', 'About'];
+    const segmentDuration = Math.floor(
+      budget.scroll_sample_ms / scrollTargets.length,
+    );
+    for (const label of scrollTargets) {
+      const controls = page.getByRole('button', { name: label, exact: true });
+      const controlCount = await controls.count();
+      if (controlCount < 1) {
+        throw new Error(`Flutter scroll control is missing: ${label}`);
+      }
+      await controls.first().click();
+      await page.waitForTimeout(segmentDuration);
+    }
+    await page.waitForFunction(() => window.__flutterScrollSample?.done === true);
+    const scrollSample = await page.evaluate(() => window.__flutterScrollSample);
+    const frameIntervals = scrollSample.intervals;
+    const visitedSections = [...new Set(scrollSample.routeHashes)].filter(
+      (hash) => hash && hash !== '#/',
+    );
+    if (visitedSections.length === 0) {
+      throw new Error(
+        'Runtime performance sample did not move the Flutter scroll view.',
+      );
+    }
 
     const pageMetrics = await page.evaluate(() => {
       const mark = (name) =>
@@ -159,6 +188,12 @@ async function measureRun(browserInstance, run) {
         wasmDuration: wasm?.duration ?? null,
         wasmTransferBytes: wasm?.transferSize ?? null,
         vitals: window.__runtimeVitals,
+        renderQuality: document.documentElement.getAttribute(
+          'data-render-quality',
+        ),
+        renderQualityReason: document.documentElement.getAttribute(
+          'data-render-quality-reason',
+        ),
       };
     });
 
@@ -198,6 +233,9 @@ async function measureRun(browserInstance, run) {
         : pageMetrics.marks.runAppFallback !== null
         ? 'run-app-fallback'
         : 'glass-pane-fallback',
+      render_quality: pageMetrics.renderQuality,
+      render_quality_reason: pageMetrics.renderQualityReason,
+      scroll_sections_visited: visitedSections,
       dom_content_loaded_ms: round(pageMetrics.domContentLoaded),
       wasm_duration_ms: round(pageMetrics.wasmDuration),
       wasm_transfer_bytes: pageMetrics.wasmTransferBytes,
@@ -217,6 +255,29 @@ async function measureRun(browserInstance, run) {
   } finally {
     await context.close();
   }
+}
+
+async function startLocalServer(url) {
+  const child = spawn(process.execPath, ['tool/serve_web.mjs'], {
+    cwd: process.cwd(),
+    stdio: 'ignore',
+  });
+  child.unref();
+  const deadline = Date.now() + 15000;
+  while (Date.now() < deadline) {
+    if (child.exitCode !== null) {
+      throw new Error(`Local performance server exited with ${child.exitCode}.`);
+    }
+    try {
+      const response = await fetch(url);
+      if (response.ok) return child;
+    } catch {
+      // The server is still starting.
+    }
+    await new Promise((resolve) => setTimeout(resolve, 100));
+  }
+  child.kill('SIGTERM');
+  throw new Error(`Local performance server did not start at ${url}.`);
 }
 
 function assertTimeline(marks) {

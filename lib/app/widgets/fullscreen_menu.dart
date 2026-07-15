@@ -11,6 +11,7 @@ import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
 import 'package:flutter_web_portfolio/app/core/constants/breakpoints.dart';
 import 'package:flutter_web_portfolio/app/core/constants/cinematic_curves.dart';
 import 'package:flutter_web_portfolio/app/widgets/cinematic_focusable.dart';
+import 'package:flutter_web_portfolio/app/utils/motion_preference.dart';
 
 /// Full-screen navigation for compact viewports.
 ///
@@ -22,13 +23,18 @@ class FullscreenMenu extends StatefulWidget {
   const FullscreenMenu({super.key});
 
   static void show(BuildContext context) {
+    final reduceMotion = prefersReducedMotion(context);
     Navigator.of(context).push(
       PageRouteBuilder(
         opaque: false,
         barrierDismissible: true,
         barrierColor: Colors.transparent,
-        transitionDuration: const Duration(milliseconds: 600),
-        reverseTransitionDuration: const Duration(milliseconds: 400),
+        transitionDuration: reduceMotion
+            ? Duration.zero
+            : const Duration(milliseconds: 600),
+        reverseTransitionDuration: reduceMotion
+            ? Duration.zero
+            : const Duration(milliseconds: 400),
         pageBuilder: (_, _, _) => const FullscreenMenu(),
       ),
     );
@@ -45,6 +51,7 @@ class _FullscreenMenuState extends State<FullscreenMenu>
   late Animation<double> _overlayOpacity;
 
   int _hoveredIndex = -1;
+  bool _reduceMotion = false;
 
   static const _iconMap = <String, IconData>{
     'home': Icons.home_outlined,
@@ -99,12 +106,27 @@ class _FullscreenMenuState extends State<FullscreenMenu>
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final reduceMotion = prefersReducedMotion(context);
+    if (_reduceMotion == reduceMotion) return;
+    _reduceMotion = reduceMotion;
+    if (reduceMotion) {
+      _masterController.value = 1;
+    }
+  }
+
+  @override
   void dispose() {
     _masterController.dispose();
     super.dispose();
   }
 
   void _close() {
+    if (_reduceMotion) {
+      Navigator.of(context).pop();
+      return;
+    }
     _masterController.reverse().then((_) {
       if (mounted) Navigator.of(context).pop();
     });
@@ -113,9 +135,12 @@ class _FullscreenMenuState extends State<FullscreenMenu>
   void _navigateToSection(String key) {
     final scrollController = context.read<AppScrollController>();
     _close();
-    Future.delayed(const Duration(milliseconds: 300), () {
-      scrollController.scrollToSection(key);
-    });
+    Future.delayed(
+      _reduceMotion ? Duration.zero : const Duration(milliseconds: 300),
+      () {
+        scrollController.scrollToSection(key);
+      },
+    );
   }
 
   @override
@@ -135,8 +160,8 @@ class _FullscreenMenuState extends State<FullscreenMenu>
               onTap: _close,
               child: BackdropFilter(
                 filter: ImageFilter.blur(
-                  sigmaX: _backdropBlur.value,
-                  sigmaY: _backdropBlur.value,
+                  sigmaX: _reduceMotion ? 0 : _backdropBlur.value,
+                  sigmaY: _reduceMotion ? 0 : _backdropBlur.value,
                 ),
                 child: Container(
                   color: Colors.black.withValues(
@@ -256,6 +281,9 @@ class _MenuItemWidget extends StatelessWidget {
     const textColor = Colors.white;
     const accentColor = AppColors.accent;
     final fontSize = isMobile ? 28.0 : 48.0;
+    final motionDuration = prefersReducedMotion(context)
+        ? Duration.zero
+        : const Duration(milliseconds: 200);
 
     return CinematicFocusable(
       onTap: onTap,
@@ -263,7 +291,7 @@ class _MenuItemWidget extends StatelessWidget {
       semanticLabel: label,
       selected: isSelected,
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
+        duration: motionDuration,
         curve: Curves.easeOut,
         padding: EdgeInsets.symmetric(
           vertical: isMobile ? 12 : 16,
@@ -281,7 +309,7 @@ class _MenuItemWidget extends StatelessWidget {
           children: [
             // Number
             AnimatedDefaultTextStyle(
-              duration: const Duration(milliseconds: 200),
+              duration: motionDuration,
               style: AppFonts.jetBrainsMono(
                 fontSize: isMobile ? 12 : 14,
                 fontWeight: FontWeight.w400,
@@ -296,7 +324,7 @@ class _MenuItemWidget extends StatelessWidget {
 
             // Icon
             AnimatedContainer(
-              duration: const Duration(milliseconds: 200),
+              duration: motionDuration,
               child: Icon(
                 item.icon,
                 size: isMobile ? 20 : 24,
@@ -310,7 +338,7 @@ class _MenuItemWidget extends StatelessWidget {
             // Label
             Expanded(
               child: AnimatedDefaultTextStyle(
-                duration: const Duration(milliseconds: 200),
+                duration: motionDuration,
                 style: AppFonts.spaceGrotesk(
                   fontSize: fontSize,
                   fontWeight: isHovered ? FontWeight.w700 : FontWeight.w300,
@@ -323,10 +351,10 @@ class _MenuItemWidget extends StatelessWidget {
 
             // Arrow on hover
             AnimatedOpacity(
-              duration: const Duration(milliseconds: 200),
+              duration: motionDuration,
               opacity: isHovered ? 1.0 : 0.0,
               child: AnimatedSlide(
-                duration: const Duration(milliseconds: 200),
+                duration: motionDuration,
                 offset: Offset(isHovered ? 0 : -0.5, 0),
                 child: Icon(
                   Icons.arrow_forward,

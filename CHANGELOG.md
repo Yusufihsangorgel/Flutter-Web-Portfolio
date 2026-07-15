@@ -2,6 +2,20 @@
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.0] - 2026-07-15
+
+### Added
+
+- A frame-timing governor that adapts only decorative render work between essential, balanced, and cinematic profiles while preserving identical content and semantics.
+- Runtime quality attributes and deterministic policy tests for warm-up, sustained pressure, recovery hysteresis, and reduced-motion override.
+- A CI-enforced performance pass that drives the real Flutter scroll view instead of the fixed browser document.
+
+### Changed
+
+- Moved the procedural atlas to one coalesced painter notification per scheduler frame and made its ambient clock honor the active quality profile.
+- Limited content accent rebuilds to chapter changes while retaining continuous palette interpolation inside the painter.
+- Made back-to-top, compact navigation, the scroll indicator, pointer parallax, and scene morphing respect reduced-motion consistently.
+
 ## [1.4.1] - 2026-07-15
 
 ### Fixed

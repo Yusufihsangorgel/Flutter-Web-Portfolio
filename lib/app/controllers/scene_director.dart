@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:flutter_web_portfolio/app/controllers/scroll_controller.dart';
@@ -27,7 +28,12 @@ final class SceneState {
   final double blendFactor;
   final SceneConfig blendedConfig;
 
-  Color get currentAccent => blendedConfig.accent;
+  /// Stable chapter accent for content widgets.
+  ///
+  /// The painter consumes [blendedConfig] continuously, while headings and
+  /// cards change accent only when the active chapter changes. This prevents
+  /// scroll-frequency content rebuilds during palette crossfades.
+  Color get currentAccent => SceneConfigs.scenes[currentSceneIndex].accent;
 
   @override
   bool operator ==(Object other) =>
@@ -62,8 +68,19 @@ final class SceneDirector extends Cubit<SceneState> {
   }
 
   final AppScrollController _scrollController;
+  bool _frameScheduled = false;
 
   void _onScroll() {
+    if (_frameScheduled) return;
+    _frameScheduled = true;
+    SchedulerBinding.instance.scheduleFrameCallback((_) {
+      _frameScheduled = false;
+      if (isClosed) return;
+      _emitCurrentState();
+    });
+  }
+
+  void _emitCurrentState() {
     final scroll = _scrollController.scrollController;
     if (!scroll.hasClients) return;
 

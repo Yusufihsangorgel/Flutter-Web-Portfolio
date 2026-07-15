@@ -300,59 +300,54 @@ class _NavItemState extends State<_NavItem> {
 // ---------------------------------------------------------------------------
 // Scene-aware scroll progress bar (1px, gradient with scene accent)
 // ---------------------------------------------------------------------------
-class _SceneProgressBar extends StatefulWidget {
+class _SceneProgressBar extends StatelessWidget {
   const _SceneProgressBar({required this.scrollController});
   final AppScrollController scrollController;
 
   @override
-  State<_SceneProgressBar> createState() => _SceneProgressBarState();
-}
-
-class _SceneProgressBarState extends State<_SceneProgressBar> {
-  double _progress = 0;
-
-  @override
-  void initState() {
-    super.initState();
-    widget.scrollController.scrollController.addListener(_onScroll);
-  }
-
-  @override
-  void dispose() {
-    widget.scrollController.scrollController.removeListener(_onScroll);
-    super.dispose();
-  }
-
-  void _onScroll() {
-    final controller = widget.scrollController.scrollController;
-    if (!controller.hasClients) return;
-    final maxExtent = controller.position.maxScrollExtent;
-    if (maxExtent <= 0) return;
-    setState(() {
-      _progress = (controller.offset / maxExtent).clamp(0.0, 1.0);
-    });
-  }
-
-  @override
   Widget build(BuildContext context) => SizedBox(
     height: 1,
-    child: LayoutBuilder(
-      builder: (context, constraints) => SceneAccentBuilder(
-        builder: (context, accent) => Stack(
-          children: [
-            AnimatedContainer(
-              duration: AppDurations.microFast,
-              width: constraints.maxWidth * _progress,
-              height: 1,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [accent.withValues(alpha: 0.2), accent],
-                ),
-              ),
-            ),
-          ],
+    child: SceneAccentBuilder(
+      builder: (context, accent) => RepaintBoundary(
+        child: CustomPaint(
+          painter: _SceneProgressPainter(
+            scrollController: scrollController.scrollController,
+            accent: accent,
+          ),
+          size: Size.infinite,
         ),
       ),
     ),
   );
+}
+
+final class _SceneProgressPainter extends CustomPainter {
+  _SceneProgressPainter({required this.scrollController, required this.accent})
+    : super(repaint: scrollController);
+
+  final ScrollController scrollController;
+  final Color accent;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    if (!scrollController.hasClients || size.isEmpty) return;
+    final maxExtent = scrollController.position.maxScrollExtent;
+    if (maxExtent <= 0) return;
+    final progress = (scrollController.offset / maxExtent).clamp(0.0, 1.0);
+    final width = size.width * progress;
+    if (width <= 0) return;
+    final bounds = Rect.fromLTWH(0, 0, width, size.height);
+    canvas.drawRect(
+      bounds,
+      Paint()
+        ..shader = LinearGradient(
+          colors: [accent.withValues(alpha: 0.2), accent],
+        ).createShader(bounds),
+    );
+  }
+
+  @override
+  bool shouldRepaint(_SceneProgressPainter oldDelegate) =>
+      !identical(scrollController, oldDelegate.scrollController) ||
+      accent != oldDelegate.accent;
 }

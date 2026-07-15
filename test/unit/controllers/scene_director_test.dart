@@ -97,6 +97,7 @@ void main() {
           0.5,
         ).accent,
       );
+      expect(state.currentAccent, SceneConfigs.about.accent);
     });
   });
 }

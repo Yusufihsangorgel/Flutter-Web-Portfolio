@@ -4,9 +4,13 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_web_portfolio/app/controllers/scene_director.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
 import 'package:flutter_web_portfolio/app/core/constants/scene_configs.dart';
+import 'package:flutter_web_portfolio/app/features/render_quality/application/render_quality_controller.dart';
+import 'package:flutter_web_portfolio/app/features/render_quality/domain/render_quality.dart';
+import 'package:flutter_web_portfolio/app/utils/motion_preference.dart';
 
 /// A single procedural stage shared by every portfolio chapter.
 ///
@@ -22,81 +26,134 @@ class CinematicBackground extends StatefulWidget {
 }
 
 class _CinematicBackgroundState extends State<CinematicBackground>
-    with SingleTickerProviderStateMixin, WidgetsBindingObserver {
-  static const _ambientFrameCount = 30 * 36;
+    with WidgetsBindingObserver {
+  static const _ambientCycle = Duration(seconds: 36);
 
-  late final AnimationController _animation;
-  late SceneConfig _config;
+  late final _RenderAtlasFrame _frame;
+  final Stopwatch _ambientClock = Stopwatch();
+  Timer? _ambientTimer;
   StreamSubscription<SceneState>? _sceneSubscription;
+  StreamSubscription<RenderQualityState>? _qualitySubscription;
   SceneDirector? _sceneDirector;
+  RenderQualityController? _qualityController;
   ui.Image? _grainTexture;
-  Offset _pointer = Offset.zero;
   bool _reduceMotion = false;
+  bool _appActive = true;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    _animation = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 36),
-    )..repeat();
-    _config = SceneConfigs.hero;
-    _grainTexture = _createGrainTexture();
+    _frame = _RenderAtlasFrame(
+      config: SceneConfigs.hero,
+      quality: RenderQuality.balanced,
+    );
+    _syncAmbientClock();
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    final reduceMotion = prefersReducedMotion(context);
+    final qualityController = context.read<RenderQualityController>();
+    if (!identical(qualityController, _qualityController)) {
+      _qualitySubscription?.cancel();
+      _qualityController = qualityController;
+      qualityController.setReducedMotion(reduceMotion);
+      _applyQuality(qualityController.state);
+      _qualitySubscription = qualityController.stream.listen(_applyQuality);
+    } else if (_reduceMotion != reduceMotion) {
+      qualityController.setReducedMotion(reduceMotion);
+    }
+
+    _reduceMotion = reduceMotion;
     final director = context.read<SceneDirector>();
     if (!identical(director, _sceneDirector)) {
       _sceneSubscription?.cancel();
       _sceneDirector = director;
-      _config = director.state.blendedConfig;
+      _frame.queueConfig(_sceneConfigFor(director.state));
       _sceneSubscription = director.stream.listen((state) {
-        _config = state.blendedConfig;
-        if (_reduceMotion && mounted) setState(() {});
+        _frame.queueConfig(_sceneConfigFor(state));
       });
+    } else {
+      _frame.queueConfig(_sceneConfigFor(director.state));
     }
-
-    final reduceMotion = MediaQuery.disableAnimationsOf(context);
-    if (_reduceMotion == reduceMotion) return;
-    _reduceMotion = reduceMotion;
-    if (reduceMotion) {
-      _animation.stop();
-      _pointer = Offset.zero;
-    } else if (!_animation.isAnimating) {
-      _animation.repeat();
-    }
+    _syncAmbientClock();
   }
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.hidden ||
-        state == AppLifecycleState.paused) {
-      _animation.stop();
-    } else if (state == AppLifecycleState.resumed && !_reduceMotion) {
-      _animation.repeat();
-    }
+    _appActive = state == AppLifecycleState.resumed;
+    _syncAmbientClock();
   }
 
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     _sceneSubscription?.cancel();
-    _animation.dispose();
+    _qualitySubscription?.cancel();
+    _ambientTimer?.cancel();
+    _ambientClock.stop();
+    _frame.dispose();
     _grainTexture?.dispose();
     super.dispose();
   }
 
   void _trackPointer(PointerEvent event) {
-    if (_reduceMotion) return;
+    if (_reduceMotion || !_frame.quality.profile.trackPointer) return;
     final size = context.size;
     if (size == null || size.isEmpty) return;
-    _pointer = Offset(
-      (event.localPosition.dx / size.width - 0.5) * 2,
-      (event.localPosition.dy / size.height - 0.5) * 2,
+    _frame.queuePointer(
+      Offset(
+        (event.localPosition.dx / size.width - 0.5) * 2,
+        (event.localPosition.dy / size.height - 0.5) * 2,
+      ),
     );
+  }
+
+  SceneConfig _sceneConfigFor(SceneState state) => _reduceMotion
+      ? SceneConfigs.scenes[state.currentSceneIndex]
+      : state.blendedConfig;
+
+  void _applyQuality(RenderQualityState state) {
+    final qualityChanged = _frame.quality != state.quality;
+    _frame.setQuality(state.quality);
+    if (!state.quality.profile.trackPointer) {
+      _frame.queuePointer(Offset.zero);
+    }
+    if (state.quality.profile.drawGrain && _grainTexture == null) {
+      _grainTexture = _createGrainTexture();
+      _frame.setGrainTexture(_grainTexture);
+    }
+    if (qualityChanged) _syncAmbientClock();
+  }
+
+  void _syncAmbientClock() {
+    _ambientTimer?.cancel();
+    _ambientTimer = null;
+    if (!_appActive || _reduceMotion) {
+      _ambientClock.stop();
+      _frame
+        ..queuePointer(Offset.zero)
+        ..queueTime(0);
+      return;
+    }
+    if (!_ambientClock.isRunning) _ambientClock.start();
+    final framesPerSecond = _frame.quality.profile.targetFramesPerSecond;
+    if (framesPerSecond <= 0) return;
+    _ambientTimer = Timer.periodic(
+      Duration(microseconds: Duration.microsecondsPerSecond ~/ framesPerSecond),
+      _publishAmbientFrame,
+    );
+    _publishAmbientFrame();
+  }
+
+  void _publishAmbientFrame([Timer? _]) {
+    if (_reduceMotion || !_appActive) return;
+    final cycleMicroseconds = _ambientCycle.inMicroseconds;
+    final elapsedInCycle =
+        _ambientClock.elapsedMicroseconds % cycleMicroseconds;
+    _frame.queueTime(elapsedInCycle / cycleMicroseconds);
   }
 
   ui.Image _createGrainTexture() {
@@ -127,38 +184,24 @@ class _CinematicBackgroundState extends State<CinematicBackground>
       behavior: HitTestBehavior.translucent,
       onPointerHover: _trackPointer,
       onPointerMove: _trackPointer,
-      child: AnimatedBuilder(
-        animation: _animation,
-        builder: (context, _) {
-          final frame = (_animation.value * _ambientFrameCount).floor();
-          final time = frame / _ambientFrameCount;
-          return CustomPaint(
-            painter: _RenderAtlasPainter(
-              time: time,
-              config: _config,
-              pointer: _pointer,
-              grainImage: _grainTexture,
-            ),
-            size: Size.infinite,
-          );
-        },
+      child: CustomPaint(
+        painter: _RenderAtlasPainter(frame: _frame),
+        size: Size.infinite,
       ),
     ),
   );
 }
 
 class _RenderAtlasPainter extends CustomPainter {
-  _RenderAtlasPainter({
-    required this.time,
-    required this.config,
-    required this.pointer,
-    required this.grainImage,
-  });
+  _RenderAtlasPainter({required this.frame}) : super(repaint: frame);
 
-  final double time;
-  final SceneConfig config;
-  final Offset pointer;
-  final ui.Image? grainImage;
+  final _RenderAtlasFrame frame;
+
+  double get time => frame.time;
+  SceneConfig get config => frame.config;
+  Offset get pointer => frame.pointer;
+  ui.Image? get grainImage => frame.grainTexture;
+  RenderQualityProfile get profile => frame.quality.profile;
 
   static final _paint = Paint()..isAntiAlias = true;
   static final _linePaint = Paint()
@@ -179,9 +222,11 @@ class _RenderAtlasPainter extends CustomPainter {
     _drawAmbientField(canvas, size, bounds);
     _drawPerspectiveGrid(canvas, size);
     _drawAtlas(canvas, size);
-    _drawRegistrationMarks(canvas, size);
+    if (profile.drawRegistrationMarks) {
+      _drawRegistrationMarks(canvas, size);
+    }
     _drawVignette(canvas, size, bounds);
-    _drawGrain(canvas, size);
+    if (profile.drawGrain) _drawGrain(canvas, size);
   }
 
   void _drawAmbientField(Canvas canvas, Size size, Rect bounds) {
@@ -219,8 +264,10 @@ class _RenderAtlasPainter extends CustomPainter {
       ..strokeWidth = 0.75
       ..color = config.accent.withValues(alpha: 0.085);
 
-    for (var index = -10; index <= 10; index++) {
-      final bottomX = vanishingPoint.dx + index * size.width * 0.115;
+    final verticalDivisor = math.max(profile.verticalGridLines - 1, 1);
+    for (var index = 0; index < profile.verticalGridLines; index++) {
+      final normalized = index / verticalDivisor * 2 - 1;
+      final bottomX = vanishingPoint.dx + normalized * 10 * size.width * 0.115;
       canvas.drawLine(
         vanishingPoint,
         Offset(bottomX, size.height + 2),
@@ -228,8 +275,8 @@ class _RenderAtlasPainter extends CustomPainter {
       );
     }
 
-    for (var index = 1; index <= 13; index++) {
-      final depth = index / 13;
+    for (var index = 1; index <= profile.horizontalGridLines; index++) {
+      final depth = index / profile.horizontalGridLines;
       final y = horizon + math.pow(depth, 1.85) * (size.height - horizon);
       final alpha = 0.035 + depth * 0.07;
       _linePaint.color = config.accent.withValues(alpha: alpha);
@@ -253,7 +300,13 @@ class _RenderAtlasPainter extends CustomPainter {
     final stageT = _smoothStep(morph - stage);
     final planes = <_DrawablePlane>[];
 
-    for (var index = 0; index < 8; index++) {
+    final planeIndices = List<int>.generate(
+      profile.planeCount,
+      (index) => profile.planeCount == 1
+          ? 0
+          : (index * 7 / (profile.planeCount - 1)).round(),
+    );
+    for (final index in planeIndices) {
       final from = _poseFor(stage, index);
       final to = _poseFor(nextStage, index);
       final pose = _PlanePose.lerp(from, to, stageT);
@@ -264,7 +317,9 @@ class _RenderAtlasPainter extends CustomPainter {
     Offset? previousCenter;
     for (final plane in planes) {
       final center = _planeCenter(size, plane.pose, plane.index);
-      if (previousCenter != null && (morph < 1.25 || morph > 3.5)) {
+      if (profile.drawConnections &&
+          previousCenter != null &&
+          (morph < 1.25 || morph > 3.5)) {
         _linePaint
           ..strokeWidth = 0.65
           ..color = config.accent.withValues(alpha: 0.09);
@@ -462,10 +517,109 @@ class _RenderAtlasPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(_RenderAtlasPainter oldDelegate) =>
-      time != oldDelegate.time ||
-      config != oldDelegate.config ||
-      pointer != oldDelegate.pointer ||
-      grainImage != oldDelegate.grainImage;
+      !identical(frame, oldDelegate.frame);
+}
+
+/// Coalesces ambient, scroll, and pointer inputs into at most one painter
+/// notification per scheduler frame.
+final class _RenderAtlasFrame extends ChangeNotifier {
+  _RenderAtlasFrame({
+    required SceneConfig config,
+    required RenderQuality quality,
+  }) : _config = config,
+       _quality = quality;
+
+  SceneConfig _config;
+  RenderQuality _quality;
+  double _time = 0;
+  Offset _pointer = Offset.zero;
+  ui.Image? _grainTexture;
+
+  SceneConfig? _pendingConfig;
+  double? _pendingTime;
+  Offset? _pendingPointer;
+  bool _notificationPending = false;
+  bool _forceNotification = false;
+  bool _disposed = false;
+
+  SceneConfig get config => _config;
+  RenderQuality get quality => _quality;
+  double get time => _time;
+  Offset get pointer => _pointer;
+  ui.Image? get grainTexture => _grainTexture;
+
+  void queueConfig(SceneConfig value) {
+    _pendingConfig = value;
+    _scheduleNotification();
+  }
+
+  void queueTime(double value) {
+    if (_pendingTime == value || (_pendingTime == null && _time == value)) {
+      return;
+    }
+    _pendingTime = value;
+    _scheduleNotification();
+  }
+
+  void queuePointer(Offset value) {
+    if (_pendingPointer == value ||
+        (_pendingPointer == null && _pointer == value)) {
+      return;
+    }
+    _pendingPointer = value;
+    _scheduleNotification();
+  }
+
+  void setQuality(RenderQuality value) {
+    if (_quality == value) return;
+    _quality = value;
+    _forceNotification = true;
+    _scheduleNotification();
+  }
+
+  void setGrainTexture(ui.Image? value) {
+    if (identical(_grainTexture, value)) return;
+    _grainTexture = value;
+    _forceNotification = true;
+    _scheduleNotification();
+  }
+
+  void _scheduleNotification() {
+    if (_disposed || _notificationPending) return;
+    _notificationPending = true;
+    SchedulerBinding.instance.scheduleFrameCallback((_) {
+      if (_disposed) return;
+      _notificationPending = false;
+      var changed = _forceNotification;
+      _forceNotification = false;
+      final config = _pendingConfig;
+      final time = _pendingTime;
+      final pointer = _pendingPointer;
+      _pendingConfig = null;
+      _pendingTime = null;
+      _pendingPointer = null;
+
+      if (config != null && !identical(config, _config)) {
+        _config = config;
+        changed = true;
+      }
+      if (time != null && time != _time) {
+        _time = time;
+        changed = true;
+      }
+      if (pointer != null && pointer != _pointer) {
+        _pointer = pointer;
+        changed = true;
+      }
+      if (changed) notifyListeners();
+    });
+  }
+
+  @override
+  void dispose() {
+    _disposed = true;
+    super.dispose();
+  }
 }
 
 class _DrawablePlane {

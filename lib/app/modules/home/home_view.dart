@@ -21,6 +21,7 @@ import 'package:flutter_web_portfolio/app/widgets/back_to_top_button.dart';
 import 'package:flutter_web_portfolio/app/widgets/command_palette.dart';
 import 'package:flutter_web_portfolio/app/widgets/custom_sliver_app_bar.dart';
 import 'package:flutter_web_portfolio/app/widgets/premium_footer.dart';
+import 'package:flutter_web_portfolio/app/utils/motion_preference.dart';
 import 'package:flutter_web_portfolio/app/widgets/background/cinematic_background.dart';
 
 /// Single-document portfolio with chapter-aware background transitions.
@@ -62,7 +63,7 @@ class _HomeViewState extends State<HomeView> {
   Widget build(BuildContext context) {
     final scrollController = context.read<AppScrollController>();
     final languageController = BlocProvider.of<LanguageCubit>(context);
-    scrollController.setReduceMotion(MediaQuery.disableAnimationsOf(context));
+    scrollController.setReduceMotion(prefersReducedMotion(context));
 
     // After first frame: recalculate scene + handle deep-link scroll
     WidgetsBinding.instance.addPostFrameCallback((_) {

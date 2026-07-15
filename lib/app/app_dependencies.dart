@@ -11,6 +11,8 @@ import 'package:flutter_web_portfolio/app/data/repositories/language_repository_
 import 'package:flutter_web_portfolio/app/data/repositories/portfolio_repository_impl.dart';
 import 'package:flutter_web_portfolio/app/domain/models/portfolio_document.dart';
 import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
+import 'package:flutter_web_portfolio/app/features/render_quality/application/render_quality_controller.dart';
+import 'package:flutter_web_portfolio/app/utils/render_quality_sync.dart';
 
 /// Explicit, application-owned dependency graph.
 ///
@@ -22,12 +24,14 @@ final class AppDependencies {
     required this.portfolio,
     required this.scrollController,
     required this.sceneDirector,
+    required this.renderQualityController,
   });
 
   final LanguageCubit languageCubit;
   final PortfolioDocument portfolio;
   final AppScrollController scrollController;
   final SceneDirector sceneDirector;
+  final RenderQualityController renderQualityController;
 
   static Future<AppDependencies> bootstrap() async {
     final assetsProvider = AssetsProvider();
@@ -44,16 +48,24 @@ final class AppDependencies {
 
     final scrollController = AppScrollController();
     final sceneDirector = SceneDirector(scrollController: scrollController);
+    final renderQualityController = RenderQualityController()
+      ..startMonitoring();
+    syncRenderQualityAttributes(
+      quality: renderQualityController.state.quality.name,
+      reason: renderQualityController.state.reason.name,
+    );
 
     return AppDependencies._(
       languageCubit: languageCubit,
       portfolio: portfolio,
       scrollController: scrollController,
       sceneDirector: sceneDirector,
+      renderQualityController: renderQualityController,
     );
   }
 
   Future<void> dispose() async {
+    await renderQualityController.close();
     await sceneDirector.close();
     await scrollController.close();
     await languageCubit.close();
@@ -97,8 +109,21 @@ final class _AppRuntimeState extends State<AppRuntime> {
             BlocProvider<SceneDirector>.value(
               value: widget.dependencies.sceneDirector,
             ),
+            BlocProvider<RenderQualityController>.value(
+              value: widget.dependencies.renderQualityController,
+            ),
           ],
-          child: widget.child,
+          child: BlocListener<RenderQualityController, RenderQualityState>(
+            listenWhen: (previous, current) =>
+                previous.quality != current.quality ||
+                previous.reason != current.reason ||
+                previous.reducedMotion != current.reducedMotion,
+            listener: (context, state) => syncRenderQualityAttributes(
+              quality: state.quality.name,
+              reason: state.reason.name,
+            ),
+            child: widget.child,
+          ),
         ),
       );
 }

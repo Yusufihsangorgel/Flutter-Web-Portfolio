@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_web_portfolio/app/core/constants/cinematic_curves.dart';
 import 'package:flutter_web_portfolio/app/core/constants/durations.dart';
+import 'package:flutter_web_portfolio/app/utils/motion_preference.dart';
 
 /// Scroll indicator — vertical line + floating dot
 class ScrollIndicator extends StatefulWidget {
@@ -16,6 +17,7 @@ class _ScrollIndicatorState extends State<ScrollIndicator>
   late AnimationController _fadeCtrl;
   late AnimationController _dotCtrl;
   late Animation<double> _dotY;
+  bool _reduceMotion = false;
 
   @override
   void initState() {
@@ -33,8 +35,29 @@ class _ScrollIndicatorState extends State<ScrollIndicator>
     );
 
     Future.delayed(widget.delay, () {
-      if (mounted) _fadeCtrl.forward();
+      if (!mounted) return;
+      if (_reduceMotion) {
+        _fadeCtrl.value = 1;
+      } else {
+        _fadeCtrl.forward();
+      }
     });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final reduceMotion = prefersReducedMotion(context);
+    if (_reduceMotion == reduceMotion) return;
+    _reduceMotion = reduceMotion;
+    if (reduceMotion) {
+      _dotCtrl
+        ..stop()
+        ..value = 0.5;
+      if (_fadeCtrl.value > 0) _fadeCtrl.value = 1;
+    } else if (!_dotCtrl.isAnimating) {
+      _dotCtrl.repeat();
+    }
   }
 
   @override
