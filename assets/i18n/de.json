@@ -1,124 +1,26 @@
 {
   "app_name": "Systemportfolio",
-  "theme": {
-    "primary_color": "#3F51B5",
-    "secondary_color": "#FF4081",
-    "background_color": {
-      "light": "#FFFFFF",
-      "dark": "#121212"
-    },
-    "surface_color": {
-      "light": "#F5F5F5",
-      "dark": "#1E1E1E"
-    },
-    "text_color": {
-      "light": "#212121",
-      "dark": "#FFFFFF"
-    }
-  },
-  "navigation": {
-    "items": [
-      {
-        "id": "home",
-        "title": "Startseite"
-      },
-      {
-        "id": "about",
-        "title": "Über mich"
-      },
-      {
-        "id": "experience",
-        "title": "Erfahrung"
-      },
-      {
-        "id": "projects",
-        "title": "Projekte"
-      },
-      {
-        "id": "skills",
-        "title": "Fähigkeiten"
-      },
-      {
-        "id": "references",
-        "title": "Referenzen"
-      },
-      {
-        "id": "contact",
-        "title": "Kontakt"
-      }
-    ]
-  },
-  "translations": {
-    "app_name": "Systemportfolio",
-    "home": "Startseite",
-    "about": "Über mich",
-    "experience": "Erfahrung",
-    "projects": "Projekte",
-    "skills": "Fähigkeiten",
-    "references": "Referenzen",
-    "contact": "Kontakt",
-    "explore_more": "Mehr entdecken",
-    "dark_mode": "Dunkelmodus",
-    "light_mode": "Hellmodus",
-    "personal_info": "Persönliche Informationen",
-    "education": "Bildung",
-    "languages": "Sprachen",
-    "name": "Name",
-    "email": "E-Mail",
-    "phone": "Telefon",
-    "location": "Standort",
-    "github": "GitHub",
-    "linkedin": "LinkedIn",
-    "send_message": "Nachricht senden",
-    "contact_me": "Kontaktieren Sie mich",
-    "your_name": "Ihr Name",
-    "your_email": "Ihre E-Mail",
-    "your_message": "Ihre Nachricht",
-    "send": "Senden",
-    "subject": "Betreff",
-    "portfolio_loading": "Portfolio wird geladen...",
-    "error_name": "Bitte geben Sie Ihren Namen ein",
-    "error_email": "Bitte geben Sie eine gültige E-Mail-Adresse ein",
-    "error_subject": "Bitte geben Sie einen Betreff ein",
-    "error_message": "Bitte geben Sie Ihre Nachricht ein"
-  },
-  "animations": {
-    "loading_animation": "assets/animations/loading.json",
-    "scroll_animation_duration": 500,
-    "page_transition_duration": 300
-  },
-  "social_links": {
-    "github": "",
-    "linkedin": "",
-    "medium": ""
-  },
   "cv_data": {
     "personal_info": {
       "name": "Systemportfolio",
-      "title": "Unabhängige Softwareentwicklung",
-      "phone": "",
-      "email": "",
-      "location": "Remote",
-      "github": "",
-      "linkedin": "",
+      "location": "Ortsunabhängig",
       "bio": "Ein anonymes Engineering-Portfolio mit Fokus auf Flutter, Go, Datensysteme und messbare Produktionszuverlässigkeit.",
       "tagline": "Prüfbare Softwaresysteme, in Produktion gemessen",
-      "medium": "",
       "subtitles": [
-        "Flutter systems",
-        "Go services",
-        "Production reliability"
+        "Flutter-Systeme",
+        "Go-Dienste",
+        "Produktionszuverlässigkeit"
       ]
     },
     "experiences": [
       {
-        "title": "Client engineering",
-        "company": "Cross-platform applications",
-        "position": "Flutter systems",
+        "title": "Client-Engineering",
+        "company": "Plattformübergreifende Anwendungen",
+        "position": "Flutter-Systeme",
         "start_date": "",
         "end_date": "",
-        "period": "Selected production work",
-        "description": "Flutter · offline-first data · native integrations · realtime synchronization",
+        "period": "Ausgewählte Produktionsarbeit",
+        "description": "Flutter · Offline-First-Daten · native Integrationen · Echtzeitsynchronisierung",
         "technologies": [
           "Flutter",
           "Dart",
@@ -128,13 +30,13 @@
         ]
       },
       {
-        "title": "Backend engineering",
-        "company": "API and data systems",
-        "position": "Go services",
+        "title": "Backend-Engineering",
+        "company": "API- und Datensysteme",
+        "position": "Go-Dienste",
         "start_date": "",
         "end_date": "",
-        "period": "Selected production work",
-        "description": "Go Fiber · PostgreSQL · Redis · object storage · background jobs",
+        "period": "Ausgewählte Produktionsarbeit",
+        "description": "Go Fiber · PostgreSQL · Redis · Objektspeicher · Hintergrundaufgaben",
         "technologies": [
           "Go",
           "PostgreSQL",
@@ -144,13 +46,13 @@
         ]
       },
       {
-        "title": "Reliability engineering",
-        "company": "Self-hosted runtime",
-        "position": "Production operations",
+        "title": "Zuverlässigkeitsengineering",
+        "company": "Selbst gehostete Laufzeit",
+        "position": "Produktionsbetrieb",
         "start_date": "",
         "end_date": "",
-        "period": "Selected production work",
-        "description": "Docker Swarm · immutable images · backup drills · observability · incident recovery",
+        "period": "Ausgewählte Produktionsarbeit",
+        "description": "Docker Swarm · unveränderliche Images · Wiederherstellungstests · Beobachtbarkeit · Störungsbehebung",
         "technologies": [
           "Docker",
           "Nginx",
@@ -169,231 +71,185 @@
       },
       {
         "title": "CleanMyGallery",
-        "description": "Flutter · image pipeline · EXIF",
+        "description": "Flutter · Bildverarbeitung · EXIF",
         "category": "Web",
         "url": "https://cleanmygallery.com"
       },
       {
         "title": "FocusGroves",
-        "description": "Flutter · focus systems · realtime rooms",
+        "description": "Flutter · Fokussysteme · Echtzeiträume",
         "category": "Web",
         "url": "https://focusgroves.com"
       },
       {
         "title": "MoodGrade",
-        "description": "Flutter · health journal · export",
+        "description": "Flutter · Gesundheitstagebuch · Export",
         "category": "Web",
         "url": "https://moodgrade.com"
       },
       {
         "title": "GetQrivo",
-        "description": "QR · short links · analytics",
+        "description": "QR · Kurzlinks · Analysen",
         "category": "Web",
         "url": "https://getqrivo.com"
       },
       {
         "title": "OverlayPhoto",
-        "description": "Flutter · compositing · time capsules",
+        "description": "Flutter · Compositing · Zeitkapseln",
         "category": "Web",
         "url": "https://overlayphoto.com"
       },
       {
         "title": "DistractionKiller",
-        "description": "Flutter · digital wellbeing · schedules",
+        "description": "Flutter · digitales Wohlbefinden · Zeitpläne",
         "category": "Web",
         "url": "https://distractionkiller.com"
       },
       {
         "title": "KPSSHazirlan",
-        "description": "Learning plans · practice engine · analytics",
+        "description": "Lernpläne · Übungsengine · Analysen",
         "category": "Web",
         "url": "https://kpsshazirlan.com"
       },
       {
         "title": "EhliyetCoz",
-        "description": "Daily quizzes · progress model · content QA",
+        "description": "Tägliche Quizze · Fortschrittsmodell · Inhaltsprüfung",
         "category": "Web",
         "url": "https://ehliyetcoz.com"
       },
       {
         "title": "Kazanamazi",
-        "description": "Habit ledger · heatmaps · reminders",
+        "description": "Gewohnheitsprotokoll · Heatmaps · Erinnerungen",
         "category": "Web",
         "url": "https://kazanamazi.net"
       },
       {
         "title": "PDFScanPro",
-        "description": "PDF pipeline · conversion · compression",
+        "description": "PDF-Pipeline · Konvertierung · Komprimierung",
         "category": "Web",
         "url": "https://pdfscanpro.com"
       }
     ],
-    "education": [],
     "skills": [
       {
-        "category": "Mobile",
+        "category": "Mobil",
         "items": [
           "Flutter",
-          "Swift"
+          "Dart",
+          "BLoC",
+          "Plattformkanäle",
+          "Offline-First"
         ]
       },
       {
         "category": "Backend",
         "items": [
-          "Node.js",
-          "Express.js",
-          "MongoDB",
-          "SQLite",
-          "MSSQL"
+          "Go",
+          "Fiber",
+          "PostgreSQL",
+          "Redis",
+          "Asynq"
         ]
       },
       {
-        "category": "Frontend",
+        "category": "Web",
         "items": [
-          "HTML",
-          "CSS",
-          "JavaScript",
-          "React"
+          "Flutter Web",
+          "Dart Wasm",
+          "SkWasm",
+          "CanvasKit",
+          "Semantics"
         ]
       },
       {
-        "category": "DevOps",
+        "category": "Betrieb",
         "items": [
-          "AWS"
+          "Docker Swarm",
+          "Nginx",
+          "Prometheus",
+          "Grafana",
+          "PostgreSQL HA"
         ]
-      }
-    ],
-    "references": [],
-    "languages": [
-      {
-        "name": "Türkisch",
-        "level": "Muttersprache"
-      },
-      {
-        "name": "Englisch",
-        "level": "B2"
       }
     ],
     "proof": [
       {
         "title": "Dual-Runtime-Auslieferung",
-        "detail": "WebAssembly mit SkWasm ist das primaere Artefakt; fuer Browser ohne Unterstuetzung steht ein JavaScript- und CanvasKit-Fallback bereit.",
-        "verification": "Build-Manifest pruefen"
+        "detail": "WebAssembly mit SkWasm ist das primäre Artefakt; für Browser ohne Unterstützung steht ein JavaScript- und CanvasKit-Fallback bereit.",
+        "verification": "Build-Manifest prüfen"
       },
       {
         "title": "Im Browser gemessen",
-        "detail": "Das Engineering Lab zeigt Runtime, Renderer, Isolationsstatus und gleitende Frame-Timing-Perzentile der laufenden App.",
-        "verification": "Engineering Lab oeffnen"
+        "detail": "Das Engineering Lab zeigt Laufzeit, Renderer, Isolationsstatus und gleitende Frame-Timing-Perzentile der laufenden Anwendung.",
+        "verification": "Engineering Lab öffnen"
       },
       {
-        "title": "Fuer Produktion gehaertet",
-        "detail": "Automatisierte Tests decken State, Barrierefreiheit, Deep Links, Fehlerbehebung und mobile Layouts ab; der Server erzwingt CSP, COOP, COEP und korrekte Wasm-MIME-Typen.",
-        "verification": "Tests und Nginx-Konfiguration pruefen"
+        "title": "Für Produktion gehärtet",
+        "detail": "Automatisierte Tests decken Zustand, Barrierefreiheit, Deep Links, Fehlerwiederherstellung und mobile Layouts ab; der Server erzwingt CSP, COOP, COEP und korrekte Wasm-MIME-Typen.",
+        "verification": "Tests und Nginx-Konfiguration prüfen"
       }
     ]
   },
-  "language_info": {
-    "code": "de",
-    "name": "Deutsch",
-    "flag": "🇩🇪",
-    "direction": "ltr"
-  },
   "nav": {
     "home": "Startseite",
-    "about": "Über Mich",
-    "skills": "Fähigkeiten",
-    "experience": "Erfahrung",
-    "projects": "Projekte",
-    "contact": "Kontakt",
-    "proof": "Nachweis",
-    "blog": "Blog"
+    "about": "Profil",
+    "experience": "Arbeit",
+    "projects": "Systeme",
+    "proof": "Nachweise"
   },
   "about_section": {
-    "title": "Über Mich",
+    "title": "Systemprofil",
     "bio": "Dieses Portfolio dokumentiert Design, Messung, Tests und Betrieb von Software, ohne persönliche Identität offenzulegen.",
-    "bio2": "Hier sind einige Technologien, mit denen ich kürzlich gearbeitet habe:",
-    "github_title": "GitHub Aktivität",
-    "github_repos": "Repos",
-    "github_followers": "Follower",
-    "github_stars": "Sterne",
-    "github_cached": "(zwischengespeichert)"
+    "bio2": "In den ausgewählten Systemen eingesetzte Technologien:"
   },
   "home_section": {
-    "greeting": "BUILD / MEASURE / OPERATE",
     "title": "SYSTEMPORTFOLIO.",
     "subtitle": "Unabhängige Softwareentwicklung",
-    "bio": "Ein produktionsorientiertes Portfolio für plattformübergreifende Clients, Service-APIs und selbst gehostete Infrastruktur.",
-    "view_work": "Meine Arbeiten",
-    "inspect_runtime": "Inspect runtime",
-    "contact": "Kontakt"
+    "view_work": "Systeme erkunden",
+    "inspect_runtime": "Laufzeit prüfen"
   },
   "experience_section": {
-    "title": "Wo ich gearbeitet habe",
+    "title": "Ausgewählte Engineering-Arbeit",
     "present": "Aktuell"
   },
   "projects_section": {
-    "title": "Meine Projekte",
-    "description": "Wichtige Projekte und abgeschlossene Arbeiten",
+    "title": "Ausgewählte Systeme",
     "filter_all": "Alle",
     "case_study_problem": "Die Herausforderung",
     "case_study_solution": "Der Ansatz",
     "case_study_result": "Das Ergebnis",
     "links": "Links",
-    "untitled_project": "Unbenanntes Projekt",
     "technologies": "Technologien",
     "open_project": "Projekt öffnen",
     "link_labels": {
       "google_play": "Google Play",
       "app_store": "App Store",
       "website": "Webseite"
-    }
-  },
-  "contact_section": {
-    "title": "Kontakt aufnehmen",
-    "whats_next": "Was kommt als Nächstes?",
-    "description": "Ich bin immer offen für neue Herausforderungen und Zusammenarbeit. Ob Sie eine Projektidee, eine Frage haben oder sich einfach vernetzen möchten — schreiben Sie mir gerne!",
-    "form": {
-      "name_label": "Name",
-      "email_label": "E-Mail",
-      "message_label": "Nachricht",
-      "submit_button": "Nachricht senden",
-      "name_error": "Bitte geben Sie Ihren Namen ein",
-      "email_error": "Bitte geben Sie eine gültige E-Mail-Adresse ein",
-      "message_error": "Bitte geben Sie Ihre Nachricht ein",
-      "success": "Ihre E-Mail-App ist geöffnet. Prüfen und senden Sie Ihre Nachricht.",
-      "error": "Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.",
-      "or_divider": "oder senden Sie eine Nachricht direkt"
-    }
-  },
-  "blog_section": {
-    "title": "Blog",
-    "subtitle": "Technische Tiefenanalysen, Architekturentscheidungen und Erfahrungen aus dem Versand von Flutter-Produktions-Apps",
-    "empty": "Noch keine Blogbeiträge",
-    "read_on_medium": "Auf Medium lesen",
-    "follow_on_medium": "Auf Medium folgen",
-    "error": "Blogbeiträge konnten nicht geladen werden",
-    "retry": "Erneut versuchen"
+    },
+    "case_study_label": "Fallstudie",
+    "flip_hint": "Klicken, um die Fallstudie anzuzeigen"
   },
   "proof_section": {
     "title": "Technischer Nachweis",
-    "subtitle": "Aussagen, die im Repository und in der laufenden App pruefbar sind"
-  },
-  "skills_section": {
-    "title": "Fähigkeiten",
-    "description": "Meine technischen Fähigkeiten und Fachgebiete"
+    "subtitle": "Aussagen, die im Repository und in der laufenden Anwendung überprüfbar sind"
   },
   "footer": {
-    "view_source": "Quellcode anzeigen",
     "command_hint_prefix": "Drücken Sie",
-    "command_hint_suffix": "um die Befehlspalette zu öffnen"
+    "command_hint_suffix": "um die Befehlspalette zu öffnen",
+    "verification": "Verifizierung",
+    "verification_body": "Nachweise zu Laufzeit, Renderer, Isolation und Frame-Zeiten lassen sich direkt auf dieser Seite prüfen.",
+    "quick_links": "Schnellzugriff",
+    "easter_egg": "Du hast den Fünf-Klick-Pfad gefunden. Neugier gehört zur Testoberfläche."
   },
-  "sidebar": {
-    "github": "GitHub",
-    "linkedin": "LinkedIn",
-    "email": "E-Mail"
-  },
-  "not_found": {
-    "subtitle": "Seite nicht gefunden",
-    "go_home": "Startseite"
+  "command_palette": {
+    "close": "Befehlspalette schließen",
+    "navigate": "Navigation",
+    "language": "Sprache",
+    "action": "Aktion",
+    "go_to": "Zu {section}",
+    "switch_to": "Zu {language} wechseln",
+    "open_lab": "Engineering Lab öffnen",
+    "search_hint": "Befehl eingeben...",
+    "no_matches": "Keine passenden Befehle"
   }
 }

@@ -1,111 +1,33 @@
 {
   "app_name": "Sistemler Portföyü",
-  "navigation": {
-    "items": [
-      {
-        "id": "home",
-        "title": "Ana Sayfa"
-      },
-      {
-        "id": "about",
-        "title": "Hakkımda"
-      },
-      {
-        "id": "experience",
-        "title": "Deneyim"
-      },
-      {
-        "id": "projects",
-        "title": "Projeler"
-      },
-      {
-        "id": "skills",
-        "title": "Yetenekler"
-      },
-      {
-        "id": "contact",
-        "title": "İletişim"
-      }
-    ]
-  },
   "nav": {
     "home": "Ana Sayfa",
-    "about": "Hakkımda",
-    "skills": "Yetenekler",
-    "experience": "Deneyim",
-    "projects": "Projeler",
-    "contact": "İletişim",
-    "proof": "Kanıt",
-    "blog": "Blog"
-  },
-  "translations": {
-    "app_name": "Sistemler Portföyü",
-    "home": "Ana Sayfa",
-    "about": "Hakkımda",
-    "experience": "Deneyim",
-    "projects": "Projeler",
-    "skills": "Yetenekler",
-    "contact": "İletişim",
-    "explore_more": "Daha Fazla Keşfet",
-    "personal_info": "Kişisel Bilgiler",
-    "education": "Eğitim",
-    "languages": "Diller",
-    "name": "İsim",
-    "email": "E-posta",
-    "phone": "Telefon",
-    "location": "Konum",
-    "github": "GitHub",
-    "linkedin": "LinkedIn",
-    "send_message": "Mesaj Gönder",
-    "contact_me": "Benimle İletişime Geç",
-    "your_name": "Adınız",
-    "your_email": "E-posta Adresiniz",
-    "your_message": "Mesajınız",
-    "send": "Gönder",
-    "subject": "Konu",
-    "portfolio_loading": "Portföy Yükleniyor...",
-    "error_name": "Lütfen adınızı girin",
-    "error_email": "Lütfen geçerli bir e-posta adresi girin",
-    "error_subject": "Lütfen bir konu girin",
-    "error_message": "Lütfen mesajınızı girin"
-  },
-  "animations": {
-    "loading_animation": "assets/animations/loading.json",
-    "scroll_animation_duration": 500,
-    "page_transition_duration": 300
-  },
-  "social_links": {
-    "github": "",
-    "linkedin": "",
-    "medium": ""
+    "about": "Profil",
+    "experience": "Çalışmalar",
+    "projects": "Sistemler",
+    "proof": "Kanıtlar"
   },
   "cv_data": {
     "personal_info": {
       "name": "Sistemler Portföyü",
-      "title": "Bağımsız Yazılım Mühendisliği",
-      "phone": "",
-      "email": "",
-      "location": "Remote",
-      "github": "",
-      "linkedin": "",
+      "location": "Uzaktan",
       "bio": "Flutter, Go, veri sistemleri ve ölçülebilir üretim güvenilirliğine odaklanan anonim bir mühendislik portföyü.",
       "tagline": "İncelenebilir yazılım sistemleri, üretimde ölçülmüş",
-      "medium": "",
       "subtitles": [
-        "Flutter systems",
-        "Go services",
-        "Production reliability"
+        "Flutter sistemleri",
+        "Go servisleri",
+        "Üretim güvenilirliği"
       ]
     },
     "experiences": [
       {
-        "title": "Client engineering",
-        "company": "Cross-platform applications",
-        "position": "Flutter systems",
+        "title": "İstemci mühendisliği",
+        "company": "Çapraz platform uygulamaları",
+        "position": "Flutter sistemleri",
         "start_date": "",
         "end_date": "",
-        "period": "Selected production work",
-        "description": "Flutter · offline-first data · native integrations · realtime synchronization",
+        "period": "Seçili üretim çalışmaları",
+        "description": "Flutter · çevrimdışı öncelikli veri · yerel entegrasyonlar · gerçek zamanlı senkronizasyon",
         "technologies": [
           "Flutter",
           "Dart",
@@ -115,13 +37,13 @@
         ]
       },
       {
-        "title": "Backend engineering",
-        "company": "API and data systems",
-        "position": "Go services",
+        "title": "Backend mühendisliği",
+        "company": "API ve veri sistemleri",
+        "position": "Go servisleri",
         "start_date": "",
         "end_date": "",
-        "period": "Selected production work",
-        "description": "Go Fiber · PostgreSQL · Redis · object storage · background jobs",
+        "period": "Seçili üretim çalışmaları",
+        "description": "Go Fiber · PostgreSQL · Redis · nesne depolama · arka plan işleri",
         "technologies": [
           "Go",
           "PostgreSQL",
@@ -131,13 +53,13 @@
         ]
       },
       {
-        "title": "Reliability engineering",
-        "company": "Self-hosted runtime",
-        "position": "Production operations",
+        "title": "Güvenilirlik mühendisliği",
+        "company": "Kendi sunucusunda çalışan altyapı",
+        "position": "Üretim operasyonları",
         "start_date": "",
         "end_date": "",
-        "period": "Selected production work",
-        "description": "Docker Swarm · immutable images · backup drills · observability · incident recovery",
+        "period": "Seçili üretim çalışmaları",
+        "description": "Docker Swarm · değişmez imajlar · geri yükleme provaları · gözlemlenebilirlik · olay kurtarma",
         "technologies": [
           "Docker",
           "Nginx",
@@ -156,120 +78,105 @@
       },
       {
         "title": "CleanMyGallery",
-        "description": "Flutter · image pipeline · EXIF",
+        "description": "Flutter · görsel işleme hattı · EXIF",
         "category": "Web",
         "url": "https://cleanmygallery.com"
       },
       {
         "title": "FocusGroves",
-        "description": "Flutter · focus systems · realtime rooms",
+        "description": "Flutter · odak sistemleri · gerçek zamanlı odalar",
         "category": "Web",
         "url": "https://focusgroves.com"
       },
       {
         "title": "MoodGrade",
-        "description": "Flutter · health journal · export",
+        "description": "Flutter · sağlık günlüğü · dışa aktarma",
         "category": "Web",
         "url": "https://moodgrade.com"
       },
       {
         "title": "GetQrivo",
-        "description": "QR · short links · analytics",
+        "description": "QR · kısa bağlantılar · analiz",
         "category": "Web",
         "url": "https://getqrivo.com"
       },
       {
         "title": "OverlayPhoto",
-        "description": "Flutter · compositing · time capsules",
+        "description": "Flutter · kompozitleme · zaman kapsülleri",
         "category": "Web",
         "url": "https://overlayphoto.com"
       },
       {
         "title": "DistractionKiller",
-        "description": "Flutter · digital wellbeing · schedules",
+        "description": "Flutter · dijital esenlik · zamanlamalar",
         "category": "Web",
         "url": "https://distractionkiller.com"
       },
       {
         "title": "KPSSHazirlan",
-        "description": "Learning plans · practice engine · analytics",
+        "description": "Öğrenme planları · pratik motoru · analiz",
         "category": "Web",
         "url": "https://kpsshazirlan.com"
       },
       {
         "title": "EhliyetCoz",
-        "description": "Daily quizzes · progress model · content QA",
+        "description": "Günlük testler · ilerleme modeli · içerik kalite kontrolü",
         "category": "Web",
         "url": "https://ehliyetcoz.com"
       },
       {
         "title": "Kazanamazi",
-        "description": "Habit ledger · heatmaps · reminders",
+        "description": "Alışkanlık kaydı · ısı haritaları · hatırlatıcılar",
         "category": "Web",
         "url": "https://kazanamazi.net"
       },
       {
         "title": "PDFScanPro",
-        "description": "PDF pipeline · conversion · compression",
+        "description": "PDF işleme hattı · dönüştürme · sıkıştırma",
         "category": "Web",
         "url": "https://pdfscanpro.com"
       }
     ],
-    "education": [],
     "skills": [
       {
         "category": "Mobil",
         "items": [
           "Flutter",
           "Dart",
-          "Swift",
-          "SwiftUI",
-          "GetX",
           "BLoC",
-          "Provider"
+          "Platform kanalları",
+          "Çevrimdışı öncelikli"
         ]
       },
       {
-        "category": "Arka Uç",
+        "category": "Backend",
         "items": [
-          "Node.js",
-          "Express.js",
           "Go",
-          "Spring Boot",
-          "MongoDB",
-          "MSSQL",
-          "SQLite"
+          "Fiber",
+          "PostgreSQL",
+          "Redis",
+          "Asynq"
         ]
       },
       {
-        "category": "Ön Yüz",
+        "category": "Web",
         "items": [
-          "React",
-          "JavaScript",
-          "TypeScript",
-          "HTML",
-          "CSS"
+          "Flutter Web",
+          "Dart Wasm",
+          "SkWasm",
+          "CanvasKit",
+          "Semantics"
         ]
       },
       {
-        "category": "DevOps",
+        "category": "Operasyon",
         "items": [
-          "AWS",
-          "Docker",
-          "Git",
-          "CI/CD",
-          "Firebase"
+          "Docker Swarm",
+          "Nginx",
+          "Prometheus",
+          "Grafana",
+          "PostgreSQL HA"
         ]
-      }
-    ],
-    "languages": [
-      {
-        "name": "Türkçe",
-        "level": "Anadil"
-      },
-      {
-        "name": "İngilizce",
-        "level": "B2"
       }
     ],
     "proof": [
@@ -290,27 +197,14 @@
       }
     ]
   },
-  "language_info": {
-    "code": "tr",
-    "name": "Türkçe",
-    "flag": "🇹🇷",
-    "direction": "ltr"
-  },
   "about_section": {
-    "title": "Hakkımda",
+    "title": "Sistem Profili",
     "bio": "Bu portföy, kişisel kimliği açığa çıkarmadan yazılımın nasıl tasarlandığını, ölçüldüğünü, test edildiğini ve işletildiğini belgeler.",
-    "bio2": "Son zamanlarda çalıştığım teknolojilerden bazıları:",
-    "github_title": "GitHub Aktivitesi",
-    "github_repos": "Repo",
-    "github_followers": "Takipçi",
-    "github_stars": "Yıldız",
-    "github_cached": "(önbellek)"
+    "bio2": "Seçili sistemlerde kullanılan teknolojiler:"
   },
   "projects_section": {
-    "title": "Projelerim",
-    "description": "Tamamladığım başlıca projeler ve çalışmalarım",
+    "title": "Seçili Sistemler",
     "filter_all": "Tümü",
-    "untitled_project": "İsimsiz Proje",
     "technologies": "Teknolojiler",
     "open_project": "Projeyi Aç",
     "case_study_problem": "Zorluk",
@@ -326,68 +220,36 @@
     "flip_hint": "Vaka çalışmasını görmek için tıklayın"
   },
   "home_section": {
-    "greeting": "BUILD / MEASURE / OPERATE",
     "title": "SİSTEMLER PORTFÖYÜ.",
     "subtitle": "Bağımsız Yazılım Mühendisliği",
-    "bio": "Cross-platform istemciler, servis API’leri ve self-hosted altyapı için üretim odaklı bir yazılım portföyü.",
-    "view_work": "Çalışmalarımı Gör",
-    "inspect_runtime": "Inspect runtime",
-    "contact": "İletişim"
+    "view_work": "Sistemleri keşfet",
+    "inspect_runtime": "Çalışma zamanını incele"
   },
   "experience_section": {
-    "title": "Çalıştığım Yerler",
+    "title": "Seçili Mühendislik Çalışmaları",
     "present": "Devam Ediyor"
-  },
-  "contact_section": {
-    "title": "İletişime Geç",
-    "whats_next": "Sırada Ne Var?",
-    "description": "Yeni zorluklara ve iş birliklerine her zaman açığım. Bir proje fikriniz, sorunuz varsa veya sadece bağlantı kurmak istiyorsanız — çekinmeden ulaşın!",
-    "form": {
-      "name_label": "İsim",
-      "email_label": "E-posta",
-      "message_label": "Mesaj",
-      "submit_button": "Mesaj Gönder",
-      "name_error": "Lütfen adınızı girin",
-      "email_error": "Lütfen geçerli bir e-posta adresi girin",
-      "message_error": "Lütfen mesajınızı girin",
-      "success": "E-posta uygulamanız açıldı. Mesajınızı kontrol edip gönderin.",
-      "error": "Bir hata oluştu. Lütfen tekrar deneyin.",
-      "or_divider": "veya doğrudan mesaj gönderin"
-    }
-  },
-  "blog_section": {
-    "title": "Blog",
-    "subtitle": "Teknik derinlemesine incelemeler, mimari kararlar ve production Flutter uygulamaları gönderme deneyimleri",
-    "empty": "Henüz blog yazısı yok",
-    "read_on_medium": "Medium'da Oku",
-    "follow_on_medium": "Medium'da Takip Et",
-    "error": "Blog yazıları yüklenemedi",
-    "retry": "Tekrar Dene"
   },
   "proof_section": {
     "title": "Mühendislik Kanıtı",
     "subtitle": "Repoda ve canlı çalışma zamanında doğrudan inceleyebileceğiniz özellikler"
   },
-  "skills_section": {
-    "title": "Beceriler",
-    "description": "Teknik yeteneklerim ve uzmanlık alanlarım"
-  },
   "footer": {
-    "view_source": "Kaynak Kodu",
     "command_hint_prefix": "Basın",
     "command_hint_suffix": "komut paletini açmak için",
     "quick_links": "Hızlı Bağlantılar",
-    "connect": "Bağlan",
-    "stay_updated": "Güncel Kal",
-    "subscribed": "Abone olundu!"
+    "verification": "Doğrulama",
+    "verification_body": "Çalışma zamanı, renderer, izolasyon ve kare zamanlama kanıtları doğrudan bu sayfadan incelenebilir.",
+    "easter_egg": "Beş tıklamalı yolu buldun. Merak da test yüzeyinin bir parçası."
   },
-  "sidebar": {
-    "github": "GitHub",
-    "linkedin": "LinkedIn",
-    "email": "E-posta"
-  },
-  "not_found": {
-    "subtitle": "Sayfa bulunamadı",
-    "go_home": "Ana Sayfa"
+  "command_palette": {
+    "close": "Komut paletini kapat",
+    "navigate": "Gezinme",
+    "language": "Dil",
+    "action": "Eylem",
+    "go_to": "{section} bölümüne git",
+    "switch_to": "{language} diline geç",
+    "open_lab": "Engineering Lab'i aç",
+    "search_hint": "Bir komut yazın...",
+    "no_matches": "Eşleşen komut yok"
   }
 }

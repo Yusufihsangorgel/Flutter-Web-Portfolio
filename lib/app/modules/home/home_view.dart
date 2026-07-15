@@ -14,24 +14,21 @@ import 'package:flutter_web_portfolio/app/modules/home/sections/home_section.dar
 import 'package:flutter_web_portfolio/app/modules/home/sections/about_section.dart';
 import 'package:flutter_web_portfolio/app/modules/home/sections/experience_section.dart';
 import 'package:flutter_web_portfolio/app/modules/home/sections/projects/projects_section.dart';
-import 'package:flutter_web_portfolio/app/modules/home/sections/blog_section.dart';
-import 'package:flutter_web_portfolio/app/modules/home/sections/contact/contact_section.dart';
 import 'package:flutter_web_portfolio/app/modules/home/sections/proof_section.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_config.dart';
 import 'package:flutter_web_portfolio/app/features/engineering_lab/presentation/engineering_lab.dart';
 import 'package:flutter_web_portfolio/app/widgets/advanced_cursor.dart';
+import 'package:flutter_web_portfolio/app/widgets/back_to_top_button.dart';
 import 'package:flutter_web_portfolio/app/widgets/cinematic_preloader.dart';
 import 'package:flutter_web_portfolio/app/widgets/command_palette.dart';
 import 'package:flutter_web_portfolio/app/widgets/custom_sliver_app_bar.dart';
 import 'package:flutter_web_portfolio/app/widgets/premium_footer.dart';
-import 'package:flutter_web_portfolio/app/widgets/social_links_row.dart';
 import 'package:flutter_web_portfolio/app/widgets/sound_toggle.dart';
 import 'package:flutter_web_portfolio/app/widgets/matrix_rain.dart';
 import 'package:flutter_web_portfolio/app/widgets/scroll_fade_in.dart';
 import 'package:flutter_web_portfolio/app/widgets/scroll_progress_dots.dart';
 import 'package:flutter_web_portfolio/app/widgets/background/cinematic_background.dart';
 import 'package:flutter_web_portfolio/app/widgets/constellation_particles.dart';
-import 'package:flutter_web_portfolio/app/widgets/social_sidebar.dart';
 
 /// Aurora Cinema home view — cinematic scene-driven portfolio.
 /// Layer stack: dark base -> mesh gradient -> constellation particles -> content.
@@ -279,13 +276,6 @@ class _HomeViewState extends State<HomeView> {
                   context,
                   delay: AppDurations.staggerShort,
                 ),
-              if (active.contains('blog'))
-                _buildSection(
-                  scrollController.blogKey,
-                  const BlogSection(),
-                  context,
-                  delay: AppDurations.staggerShort,
-                ),
               if (active.contains('projects'))
                 _buildSection(
                   scrollController.projectsKey,
@@ -294,36 +284,12 @@ class _HomeViewState extends State<HomeView> {
                   delay: AppDurations.staggerShort,
                   enableScale: true,
                 ),
-              if (active.contains('contact'))
-                _buildSection(
-                  scrollController.contactKey,
-                  const ContactSection(),
-                  context,
-                  delay: AppDurations.staggerShort,
-                ),
               const SliverToBoxAdapter(child: PremiumFooter()),
             ],
           ),
         ),
       ),
-      // Layer 4: Fixed social sidebars (desktop only)
-      ValueListenableBuilder<bool>(
-        valueListenable: HomeSection.entranceComplete,
-        builder: (context, entranceDone, _) => Positioned(
-          left: AppDimensions.sidebarInset,
-          bottom: 0,
-          child: SocialSidebarLeft(visible: entranceDone),
-        ),
-      ),
-      ValueListenableBuilder<bool>(
-        valueListenable: HomeSection.entranceComplete,
-        builder: (context, entranceDone, _) => Positioned(
-          right: AppDimensions.sidebarInset,
-          bottom: 0,
-          child: SocialSidebarRight(visible: entranceDone),
-        ),
-      ),
-      // Layer 5: Scroll progress dots (desktop only)
+      // Layer 4: Scroll progress dots (desktop only)
       ValueListenableBuilder<bool>(
         valueListenable: HomeSection.entranceComplete,
         builder: (context, entranceDone, _) => Positioned(
@@ -333,9 +299,9 @@ class _HomeViewState extends State<HomeView> {
           child: Center(child: ScrollProgressDots(visible: entranceDone)),
         ),
       ),
-      // Layer 6: Back-to-top button with scroll progress
-      const PremiumBackToTopButton(),
-      // Layer 7: Sound toggle (bottom-left, desktop only)
+      // Layer 5: Back-to-top button with scroll progress
+      const BackToTopButton(),
+      // Layer 6: Sound toggle (bottom-left, desktop only)
       if (isDesktop)
         ValueListenableBuilder<bool>(
           valueListenable: HomeSection.entranceComplete,
@@ -349,7 +315,7 @@ class _HomeViewState extends State<HomeView> {
             ),
           ),
         ),
-      // Layer 8: Matrix rain easter egg overlay
+      // Layer 7: Matrix rain easter egg overlay
       if (_showMatrixRain)
         Positioned.fill(
           child: MatrixRain(

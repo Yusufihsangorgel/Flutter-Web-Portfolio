@@ -190,10 +190,27 @@ test('exposes the live Engineering Lab through the keyboard', async ({ page }) =
   await expect(page.getByText('Flutter scheduler telemetry')).toBeAttached();
 });
 
+test('switches to the application-owned Arabic catalog', async ({ page }) => {
+  await openPortfolio(page);
+  await page.keyboard.press('Control+KeyK');
+  await page.getByText('Switch to العربية', { exact: true }).click();
+
+  await expect
+    .poll(() => page.locator('html').getAttribute('lang'))
+    .toBe('ar');
+  await expect(page.locator('html')).toHaveAttribute('dir', 'rtl');
+  await expect(page.getByText('استكشاف الأنظمة', { exact: true })).toBeAttached();
+
+  await page.keyboard.press('Control+KeyK');
+  await expect(
+    page.getByText('الانتقال إلى الأنظمة', { exact: true }),
+  ).toBeVisible();
+});
+
 test('keeps section hashes synchronized with browser history', async ({ page }) => {
   await openPortfolio(page);
   await page.keyboard.press('Control+KeyK');
-  const projectsCommand = page.getByText('Go to Projects', { exact: true });
+  const projectsCommand = page.getByText('Go to Systems', { exact: true });
   await expect(projectsCommand).toBeVisible();
   await projectsCommand.click();
   await expect(page).toHaveURL(/#\/projects$/);

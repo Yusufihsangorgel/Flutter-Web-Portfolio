@@ -113,7 +113,7 @@ class _ProjectsSectionState extends State<ProjectsSection> {
               ),
               const SizedBox(height: 24),
               // Category filter chips
-              if (categories.isNotEmpty)
+              if (categories.length > 1)
                 ScrollFadeIn(
                   child: SceneAccentBuilder(
                     builder: (context, accent) {

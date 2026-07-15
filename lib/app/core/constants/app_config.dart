@@ -20,31 +20,20 @@ final class AppConfig {
     defaultValue: 'Systems Portfolio',
   );
 
-  /// Two-letter initials derived from [name] (e.g. "JD").
+  /// Two-letter initials derived from the current public display label.
   static String initials(LanguageCubit lc) {
-    final full = name(lc);
-    final parts = full.trim().split(RegExp(r'\s+'));
+    final full = name(lc).trim();
+    if (full.isEmpty) return 'SP';
+    final parts = full.split(RegExp(r'\s+'));
     if (parts.length >= 2) {
       return '${parts.first[0]}${parts.last[0]}'.toUpperCase();
     }
     return full.substring(0, min(2, full.length)).toUpperCase();
   }
 
-  /// Primary job title / tagline shown in the hero section.
-  static String title(LanguageCubit lc) =>
-      lc.getText('home_section.subtitle', defaultValue: 'Software Engineer');
-
   /// Short brand tagline for the preloader and footer.
   static String tagline(LanguageCubit lc) => lc.getText(
     'cv_data.personal_info.tagline',
     defaultValue: 'Building digital experiences',
   );
-
-  /// Contact e-mail address.
-  static String email(LanguageCubit lc) =>
-      (lc.cvData['personal_info']?['email'] as String?) ?? '';
-
-  /// Physical location string.
-  static String location(LanguageCubit lc) =>
-      lc.getText('cv_data.personal_info.location', defaultValue: '');
 }

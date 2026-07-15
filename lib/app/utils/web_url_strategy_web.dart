@@ -27,11 +27,13 @@ void setUrlHash(String hash) {
   web.window.history.pushState(null, '', url);
 }
 
-/// Updates the `<html lang="...">` attribute so the document language tracks
-/// the app locale. Keeps screen readers and SEO happy.
+/// Keeps the root document language and writing direction aligned with the
+/// active application locale for assistive technology and browser tooling.
 void setHtmlLang(String languageCode) {
   if (languageCode.isEmpty) return;
-  web.document.documentElement?.setAttribute('lang', languageCode);
+  web.document.documentElement
+    ?..setAttribute('lang', languageCode)
+    ..setAttribute('dir', languageCode == 'ar' ? 'rtl' : 'ltr');
 }
 
 /// Reloads the current document after an unrecoverable bootstrap failure.

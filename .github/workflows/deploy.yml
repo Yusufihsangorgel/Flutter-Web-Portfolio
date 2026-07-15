@@ -22,6 +22,7 @@ jobs:
         with:
           flutter-version: 3.41.2
           cache: true
+      - run: flutter clean
       - run: flutter pub get
       - run: flutter build web --release --wasm --no-web-resources-cdn --base-href "/${{ github.event.repository.name }}/"
       - run: npm ci

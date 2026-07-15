@@ -4,7 +4,6 @@ import 'package:flutter/foundation.dart'
     show defaultTargetPlatform, TargetPlatform;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
 import 'package:flutter_web_portfolio/app/controllers/scroll_controller.dart';
 import 'package:flutter_web_portfolio/app/controllers/sound_controller.dart';
@@ -15,7 +14,6 @@ import 'package:flutter_web_portfolio/app/core/constants/cinematic_curves.dart';
 import 'package:flutter_web_portfolio/app/core/constants/durations.dart';
 import 'package:flutter_web_portfolio/app/features/engineering_lab/presentation/engineering_lab.dart';
 import 'package:flutter_web_portfolio/app/widgets/neon_effects.dart';
-import 'package:flutter_web_portfolio/app/widgets/social_links_row.dart';
 
 part 'footer/footer_brand.dart';
 part 'footer/footer_quick_links.dart';
@@ -30,8 +28,8 @@ const String _appVersion = '1.1.0';
 // =============================================================================
 
 /// A full-width dark footer with an animated gradient neon top border,
-/// three-column responsive layout, newsletter subscription, animated
-/// "Built with Flutter" heart badge, and a 5-click easter egg.
+/// responsive navigation, inspectable runtime evidence, build metadata, and
+/// a deliberately small five-click easter egg.
 class PremiumFooter extends StatelessWidget {
   const PremiumFooter({super.key});
 
@@ -100,7 +98,7 @@ class _DesktopLayout extends StatelessWidget {
       // Center — quick navigation links
       Expanded(flex: 2, child: _QuickLinksColumn()),
       SizedBox(width: 48),
-      // Right — social icons + newsletter
+      // Right — inspectable verification note
       Expanded(flex: 3, child: _ConnectColumn()),
     ],
   );

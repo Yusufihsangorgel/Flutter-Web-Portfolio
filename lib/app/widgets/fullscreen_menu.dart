@@ -54,9 +54,7 @@ class _FullscreenMenuState extends State<FullscreenMenu>
     'about': Icons.person_outline,
     'experience': Icons.work_outline,
     'projects': Icons.code_outlined,
-    'blog': Icons.article_outlined,
     'proof': Icons.verified_outlined,
-    'contact': Icons.mail_outline,
   };
 
   List<_MenuItem> _buildMenuItems() {

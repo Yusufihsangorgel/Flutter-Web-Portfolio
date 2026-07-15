@@ -6,8 +6,6 @@ import 'package:flutter/semantics.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:flutter_i18n/flutter_i18n.dart';
-import 'package:flutter_i18n/loaders/decoders/json_decode_strategy.dart';
 import 'package:flutter_bloc/flutter_bloc.dart' show BlocBuilder, BlocProvider;
 
 import 'package:flutter_web_portfolio/app/app_dependencies.dart';
@@ -139,9 +137,6 @@ class MyApp extends StatelessWidget {
           final languageCubit = BlocProvider.of<LanguageCubit>(context);
           final currentLocale = state.locale;
           final appTitle = languageCubit.appName;
-          final textDirection = state.languageCode == 'ar'
-              ? TextDirection.rtl
-              : TextDirection.ltr;
 
           return MaterialApp(
             title: appTitle,
@@ -151,17 +146,8 @@ class MyApp extends StatelessWidget {
             themeMode: ThemeMode.dark,
             locale: currentLocale,
             localizationsDelegates: [
-              FlutterI18nDelegate(
-                translationLoader: FileTranslationLoader(
-                  fallbackFile: 'en',
-                  basePath: 'assets/i18n',
-                  forcedLocale: currentLocale,
-                  decodeStrategies: [JsonDecodeStrategy()],
-                ),
-              ),
               GlobalMaterialLocalizations.delegate,
               GlobalWidgetsLocalizations.delegate,
-              GlobalCupertinoLocalizations.delegate,
             ],
             supportedLocales: const [
               Locale('en'),
@@ -174,13 +160,7 @@ class MyApp extends StatelessWidget {
             ],
             home: const HomeView(),
             builder: (context, child) {
-              final wrappedApp = FlutterI18n.rootAppBuilder()(context, child);
-
-              final content = Directionality(
-                textDirection: textDirection,
-                child: wrappedApp,
-              );
-
+              final content = child ?? const SizedBox.shrink();
               if (!kIsWeb) return content;
               return MouseInteractionWrapper(child: content);
             },

@@ -7,9 +7,7 @@ abstract final class Routes {
   static const about = '/about';
   static const experience = '/experience';
   static const proof = '/proof';
-  static const blog = '/blog';
   static const projects = '/projects';
-  static const contact = '/contact';
 
   /// All valid section IDs in display order.
   static const sectionIds = [
@@ -17,9 +15,7 @@ abstract final class Routes {
     'about',
     'experience',
     'proof',
-    'blog',
     'projects',
-    'contact',
   ];
 
   /// Maps a URL path to its section ID.
@@ -27,9 +23,7 @@ abstract final class Routes {
     about => 'about',
     experience => 'experience',
     proof => 'proof',
-    blog => 'blog',
     projects => 'projects',
-    contact => 'contact',
     _ => 'home',
   };
 
@@ -38,9 +32,7 @@ abstract final class Routes {
     'about' => about,
     'experience' => experience,
     'proof' => proof,
-    'blog' => blog,
     'projects' => projects,
-    'contact' => contact,
     _ => home,
   };
 }

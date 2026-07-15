@@ -101,26 +101,8 @@ final class LanguageCubit extends Cubit<LanguageState> {
       if (data['personal_info'] is Map) 'about',
       if (data['experiences'] case final List l when l.isNotEmpty) 'experience',
       if (data['proof'] case final List l when l.isNotEmpty) 'proof',
-      if (_hasMediumUsername(data)) 'blog',
       if (data['projects'] case final List l when l.isNotEmpty) 'projects',
-      if (_hasPublicContact(data)) 'contact',
     ];
-  }
-
-  static bool _hasMediumUsername(Map<String, dynamic> data) {
-    final info = data['personal_info'];
-    if (info is! Map<String, dynamic>) return false;
-    final medium = info['medium'];
-    return medium is String && medium.isNotEmpty;
-  }
-
-  static bool _hasPublicContact(Map<String, dynamic> data) {
-    final info = data['personal_info'];
-    if (info is! Map<String, dynamic>) return false;
-    return ['email', 'github', 'linkedin', 'twitter'].any((key) {
-      final value = info[key];
-      return value is String && value.trim().isNotEmpty;
-    });
   }
 
   String getText(String key, {String defaultValue = ''}) {

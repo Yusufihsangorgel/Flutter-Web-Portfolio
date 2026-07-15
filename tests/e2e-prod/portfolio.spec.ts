@@ -88,6 +88,21 @@ test('exposes interactive engineering evidence in production', async ({ page }) 
   await expect(page.getByText('Flutter scheduler telemetry')).toBeAttached();
 });
 
+test('serves the localized Arabic command surface in production', async ({
+  page,
+  isMobile,
+}) => {
+  test.skip(isMobile, 'locale contract only needs one browser project');
+
+  await openPortfolio(page);
+  await page.keyboard.press('Control+KeyK');
+  await page.getByText('Switch to العربية', { exact: true }).click();
+
+  await expect(page.locator('html')).toHaveAttribute('lang', 'ar');
+  await expect(page.locator('html')).toHaveAttribute('dir', 'rtl');
+  await expect(page.getByText('استكشاف الأنظمة', { exact: true })).toBeAttached();
+});
+
 test('serves the declared production sharing and font assets', async ({
   request,
   isMobile,

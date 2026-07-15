@@ -12,7 +12,6 @@ final class AppDimensions {
 
   static const double maxContentWidth = 1400.0;
 
-  static const double sidebarInset = 40.0;
   static const double scrollDotsInset = 20.0;
 
   // ─── 8px spacing scale ─────────────────────────────────────────────

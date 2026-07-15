@@ -19,31 +19,16 @@ class _QuickLinksColumn extends StatelessWidget {
           !identical(previous.translations, current.translations),
       builder: (context, state) {
         final lang = context.read<LanguageCubit>();
-        final sections = <_QuickLinkItem>[
-          _QuickLinkItem(
-            'home',
-            lang.getText('nav.home', defaultValue: 'Home'),
-          ),
-          _QuickLinkItem(
-            'about',
-            lang.getText('nav.about', defaultValue: 'About'),
-          ),
-          _QuickLinkItem(
-            'experience',
-            lang.getText('nav.experience', defaultValue: 'Experience'),
-          ),
-          _QuickLinkItem(
-            'projects',
-            lang.getText('nav.projects', defaultValue: 'Projects'),
-          ),
-          _QuickLinkItem(
-            'blog',
-            lang.getText('nav.blog', defaultValue: 'Blog'),
-          ),
-          _QuickLinkItem(
-            'contact',
-            lang.getText('nav.contact', defaultValue: 'Contact'),
-          ),
+        final sections = [
+          for (final section in lang.activeSections)
+            _QuickLinkItem(
+              section,
+              lang.getText(
+                'nav.$section',
+                defaultValue:
+                    '${section[0].toUpperCase()}${section.substring(1)}',
+              ),
+            ),
         ];
 
         return Column(

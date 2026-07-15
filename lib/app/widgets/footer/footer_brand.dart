@@ -91,14 +91,6 @@ class _CopyrightEasterEggState extends State<_CopyrightEasterEgg>
   late final AnimationController _eggCtrl;
   late final Animation<double> _eggAnimation;
 
-  static const _easterEggMessages = <String>[
-    'You found a secret! You must be a curious developer.',
-    'This portfolio was built with passion and lots of coffee.',
-    'Fun fact: the first version of this was 47 lines of code.',
-    'Thanks for exploring every corner of this portfolio!',
-    'You are awesome. Have an amazing day!',
-  ];
-
   @override
   void initState() {
     super.initState();
@@ -138,6 +130,7 @@ class _CopyrightEasterEggState extends State<_CopyrightEasterEgg>
   @override
   Widget build(BuildContext context) {
     final year = DateTime.now().year;
+    final language = context.read<LanguageCubit>();
     const secondaryColor = AppColors.textSecondary;
 
     return Column(
@@ -158,10 +151,6 @@ class _CopyrightEasterEggState extends State<_CopyrightEasterEgg>
             animation: _eggAnimation,
             builder: (_, _) {
               final v = _eggAnimation.value;
-              final message =
-                  _easterEggMessages[math.Random().nextInt(
-                    _easterEggMessages.length,
-                  )];
               return Opacity(
                 opacity: v,
                 child: Transform.translate(
@@ -181,7 +170,12 @@ class _CopyrightEasterEggState extends State<_CopyrightEasterEgg>
                         ),
                       ),
                       child: Text(
-                        message,
+                        language.getText(
+                          'footer.easter_egg',
+                          defaultValue:
+                              'You found the five-click path. Curiosity is '
+                              'part of the test surface.',
+                        ),
                         style: AppFonts.jetBrainsMono(
                           fontSize: 11,
                           color: AppColors.accent,

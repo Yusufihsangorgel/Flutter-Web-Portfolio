@@ -1,119 +1,26 @@
 {
   "app_name": "ملف الأنظمة",
-  "theme": {
-    "primary_color": "#3F51B5",
-    "secondary_color": "#FF4081",
-    "background_color": {
-      "light": "#FFFFFF",
-      "dark": "#121212"
-    },
-    "surface_color": {
-      "light": "#F5F5F5",
-      "dark": "#1E1E1E"
-    },
-    "text_color": {
-      "light": "#212121",
-      "dark": "#FFFFFF"
-    }
-  },
-  "navigation": {
-    "items": [
-      {
-        "id": "home",
-        "title": "الرئيسية"
-      },
-      {
-        "id": "about",
-        "title": "نبذة عني"
-      },
-      {
-        "id": "experience",
-        "title": "الخبرة"
-      },
-      {
-        "id": "projects",
-        "title": "المشاريع"
-      },
-      {
-        "id": "skills",
-        "title": "المهارات"
-      },
-      {
-        "id": "contact",
-        "title": "اتصل بي"
-      }
-    ]
-  },
-  "translations": {
-    "app_name": "ملف الأنظمة",
-    "home": "الرئيسية",
-    "about": "نبذة عني",
-    "experience": "الخبرة",
-    "projects": "المشاريع",
-    "skills": "المهارات",
-    "contact": "اتصل بي",
-    "explore_more": "استكشف المزيد",
-    "dark_mode": "الوضع الداكن",
-    "light_mode": "الوضع الفاتح",
-    "personal_info": "المعلومات الشخصية",
-    "education": "التعليم",
-    "languages": "اللغات",
-    "name": "الاسم",
-    "email": "البريد الإلكتروني",
-    "phone": "الهاتف",
-    "location": "الموقع",
-    "github": "GitHub",
-    "linkedin": "LinkedIn",
-    "send_message": "إرسال رسالة",
-    "contact_me": "اتصل بي",
-    "your_name": "اسمك",
-    "your_email": "بريدك الإلكتروني",
-    "your_message": "رسالتك",
-    "send": "إرسال",
-    "subject": "الموضوع",
-    "portfolio_loading": "جاري تحميل معرض الأعمال...",
-    "error_name": "الرجاء إدخال اسمك",
-    "error_email": "الرجاء إدخال عنوان بريد إلكتروني صالح",
-    "error_subject": "الرجاء إدخال موضوع",
-    "error_message": "الرجاء إدخال رسالتك"
-  },
-  "animations": {
-    "loading_animation": "assets/animations/loading.json",
-    "scroll_animation_duration": 500,
-    "page_transition_duration": 300
-  },
-  "social_links": {
-    "github": "",
-    "linkedin": "",
-    "medium": ""
-  },
   "cv_data": {
     "personal_info": {
       "name": "ملف الأنظمة",
-      "title": "هندسة برمجيات مستقلة",
-      "phone": "",
-      "email": "",
-      "location": "Remote",
-      "github": "",
-      "linkedin": "",
+      "location": "عن بُعد",
       "bio": "ملف هندسي مجهول الهوية يركز على Flutter وGo وأنظمة البيانات والموثوقية القابلة للقياس في الإنتاج.",
       "tagline": "أنظمة برمجية قابلة للفحص ومقاسة في الإنتاج",
-      "medium": "",
       "subtitles": [
-        "Flutter systems",
-        "Go services",
-        "Production reliability"
+        "أنظمة Flutter",
+        "خدمات Go",
+        "موثوقية الإنتاج"
       ]
     },
     "experiences": [
       {
-        "title": "Client engineering",
-        "company": "Cross-platform applications",
-        "position": "Flutter systems",
+        "title": "هندسة تطبيقات العميل",
+        "company": "تطبيقات متعددة المنصات",
+        "position": "أنظمة Flutter",
         "start_date": "",
         "end_date": "",
-        "period": "Selected production work",
-        "description": "Flutter · offline-first data · native integrations · realtime synchronization",
+        "period": "أعمال إنتاج مختارة",
+        "description": "Flutter · بيانات تعمل دون اتصال أولاً · تكاملات أصلية · مزامنة فورية",
         "technologies": [
           "Flutter",
           "Dart",
@@ -123,13 +30,13 @@
         ]
       },
       {
-        "title": "Backend engineering",
-        "company": "API and data systems",
-        "position": "Go services",
+        "title": "هندسة الواجهة الخلفية",
+        "company": "أنظمة API والبيانات",
+        "position": "خدمات Go",
         "start_date": "",
         "end_date": "",
-        "period": "Selected production work",
-        "description": "Go Fiber · PostgreSQL · Redis · object storage · background jobs",
+        "period": "أعمال إنتاج مختارة",
+        "description": "Go Fiber · PostgreSQL · Redis · تخزين الكائنات · مهام الخلفية",
         "technologies": [
           "Go",
           "PostgreSQL",
@@ -139,13 +46,13 @@
         ]
       },
       {
-        "title": "Reliability engineering",
-        "company": "Self-hosted runtime",
-        "position": "Production operations",
+        "title": "هندسة الموثوقية",
+        "company": "بيئة تشغيل ذاتية الاستضافة",
+        "position": "عمليات الإنتاج",
         "start_date": "",
         "end_date": "",
-        "period": "Selected production work",
-        "description": "Docker Swarm · immutable images · backup drills · observability · incident recovery",
+        "period": "أعمال إنتاج مختارة",
+        "description": "Docker Swarm · صور غير قابلة للتغيير · اختبارات الاستعادة · قابلية المراقبة · التعافي من الحوادث",
         "technologies": [
           "Docker",
           "Nginx",
@@ -159,125 +66,110 @@
       {
         "title": "FakeCallApp",
         "description": "Flutter · Next.js · Go",
-        "category": "Web",
+        "category": "ويب",
         "url": "https://fakecallapp.com"
       },
       {
         "title": "CleanMyGallery",
-        "description": "Flutter · image pipeline · EXIF",
-        "category": "Web",
+        "description": "Flutter · معالجة الصور · EXIF",
+        "category": "ويب",
         "url": "https://cleanmygallery.com"
       },
       {
         "title": "FocusGroves",
-        "description": "Flutter · focus systems · realtime rooms",
-        "category": "Web",
+        "description": "Flutter · أنظمة التركيز · غرف فورية",
+        "category": "ويب",
         "url": "https://focusgroves.com"
       },
       {
         "title": "MoodGrade",
-        "description": "Flutter · health journal · export",
-        "category": "Web",
+        "description": "Flutter · سجل صحي · تصدير",
+        "category": "ويب",
         "url": "https://moodgrade.com"
       },
       {
         "title": "GetQrivo",
-        "description": "QR · short links · analytics",
-        "category": "Web",
+        "description": "QR · روابط قصيرة · تحليلات",
+        "category": "ويب",
         "url": "https://getqrivo.com"
       },
       {
         "title": "OverlayPhoto",
-        "description": "Flutter · compositing · time capsules",
-        "category": "Web",
+        "description": "Flutter · تركيب الصور · كبسولات زمنية",
+        "category": "ويب",
         "url": "https://overlayphoto.com"
       },
       {
         "title": "DistractionKiller",
-        "description": "Flutter · digital wellbeing · schedules",
-        "category": "Web",
+        "description": "Flutter · الرفاهية الرقمية · جداول زمنية",
+        "category": "ويب",
         "url": "https://distractionkiller.com"
       },
       {
         "title": "KPSSHazirlan",
-        "description": "Learning plans · practice engine · analytics",
-        "category": "Web",
+        "description": "خطط تعلم · محرك تدريب · تحليلات",
+        "category": "ويب",
         "url": "https://kpsshazirlan.com"
       },
       {
         "title": "EhliyetCoz",
-        "description": "Daily quizzes · progress model · content QA",
-        "category": "Web",
+        "description": "اختبارات يومية · نموذج تقدم · ضبط جودة المحتوى",
+        "category": "ويب",
         "url": "https://ehliyetcoz.com"
       },
       {
         "title": "Kazanamazi",
-        "description": "Habit ledger · heatmaps · reminders",
-        "category": "Web",
+        "description": "سجل عادات · خرائط حرارية · تذكيرات",
+        "category": "ويب",
         "url": "https://kazanamazi.net"
       },
       {
         "title": "PDFScanPro",
-        "description": "PDF pipeline · conversion · compression",
-        "category": "Web",
+        "description": "مسار PDF · تحويل · ضغط",
+        "category": "ويب",
         "url": "https://pdfscanpro.com"
       }
     ],
-    "education": [],
     "skills": [
       {
-        "category": "الجوال",
+        "category": "تطبيقات الجوال",
         "items": [
           "Flutter",
           "Dart",
-          "Swift",
-          "SwiftUI",
-          "GetX",
           "BLoC",
-          "Provider"
+          "قنوات المنصة",
+          "العمل دون اتصال أولاً"
         ]
       },
       {
         "category": "الواجهة الخلفية",
         "items": [
-          "Node.js",
-          "Express.js",
           "Go",
-          "Spring Boot",
-          "MongoDB",
-          "MSSQL",
-          "SQLite"
+          "Fiber",
+          "PostgreSQL",
+          "Redis",
+          "Asynq"
         ]
       },
       {
-        "category": "الواجهة الأمامية",
+        "category": "الويب",
         "items": [
-          "React",
-          "JavaScript",
-          "TypeScript",
-          "HTML",
-          "CSS"
+          "Flutter Web",
+          "Dart Wasm",
+          "SkWasm",
+          "CanvasKit",
+          "Semantics"
         ]
       },
       {
-        "category": "DevOps",
+        "category": "العمليات",
         "items": [
-          "AWS",
-          "Docker",
-          "Git",
-          "CI/CD",
-          "Firebase"
+          "Docker Swarm",
+          "Nginx",
+          "Prometheus",
+          "Grafana",
+          "PostgreSQL HA"
         ]
-      }
-    ],
-    "languages": [
-      {
-        "name": "التركية",
-        "level": "اللغة الأم"
-      },
-      {
-        "name": "الإنجليزية",
-        "level": "B2"
       }
     ],
     "proof": [
@@ -298,54 +190,35 @@
       }
     ]
   },
-  "language_info": {
-    "code": "ar",
-    "name": "العربية",
-    "flag": "🇦🇪",
-    "direction": "rtl"
-  },
   "nav": {
     "home": "الرئيسية",
-    "about": "نبذة عني",
-    "skills": "المهارات",
-    "experience": "الخبرة",
-    "projects": "المشاريع",
-    "contact": "تواصل",
-    "proof": "الأدلة",
-    "blog": "المدونة"
+    "about": "الملف",
+    "experience": "الأعمال",
+    "projects": "الأنظمة",
+    "proof": "الأدلة"
   },
   "about_section": {
-    "title": "نبذة عني",
+    "title": "ملف الأنظمة",
     "bio": "يوثق هذا الملف تصميم البرمجيات وقياسها واختبارها وتشغيلها دون كشف الهوية الشخصية.",
-    "bio2": "إليك بعض التقنيات التي عملت بها مؤخراً:",
-    "github_title": "نشاط GitHub",
-    "github_repos": "المستودعات",
-    "github_followers": "المتابعون",
-    "github_stars": "النجوم",
-    "github_cached": "(مخزن مؤقتاً)"
+    "bio2": "التقنيات المستخدمة في الأنظمة المختارة:"
   },
   "home_section": {
-    "greeting": "BUILD / MEASURE / OPERATE",
     "title": "ملف الأنظمة.",
     "subtitle": "هندسة برمجيات مستقلة",
-    "bio": "ملف برمجي يركز على الإنتاج للعملاء متعددي المنصات وواجهات الخدمات والبنية التحتية ذاتية الاستضافة.",
-    "view_work": "عرض أعمالي",
-    "inspect_runtime": "Inspect runtime",
-    "contact": "تواصل"
+    "view_work": "استكشاف الأنظمة",
+    "inspect_runtime": "فحص وقت التشغيل"
   },
   "experience_section": {
-    "title": "أين عملت",
+    "title": "أعمال هندسية مختارة",
     "present": "حالياً"
   },
   "projects_section": {
-    "title": "مشاريعي",
-    "description": "المشاريع الرئيسية والأعمال المنجزة",
+    "title": "أنظمة مختارة",
     "filter_all": "الكل",
     "case_study_problem": "التحدي",
     "case_study_solution": "النهج",
     "case_study_result": "النتيجة",
     "links": "الروابط",
-    "untitled_project": "مشروع بدون عنوان",
     "technologies": "التقنيات",
     "open_project": "فتح المشروع",
     "link_labels": {
@@ -356,56 +229,27 @@
     "case_study_label": "دراسة حالة",
     "flip_hint": "انقر لعرض دراسة الحالة"
   },
-  "contact_section": {
-    "title": "تواصل معي",
-    "whats_next": "ما التالي؟",
-    "description": "أنا دائماً منفتح على التحديات والتعاون الجديد. سواء كانت لديك فكرة مشروع، أو سؤال، أو تريد فقط التواصل — لا تتردد في التواصل معي!",
-    "form": {
-      "name_label": "الاسم",
-      "email_label": "البريد الإلكتروني",
-      "message_label": "الرسالة",
-      "submit_button": "إرسال الرسالة",
-      "name_error": "الرجاء إدخال اسمك",
-      "email_error": "الرجاء إدخال عنوان بريد إلكتروني صالح",
-      "message_error": "الرجاء إدخال رسالتك",
-      "success": "تم فتح تطبيق البريد الإلكتروني. راجع رسالتك ثم أرسلها.",
-      "error": "حدث خطأ. يرجى المحاولة مرة أخرى.",
-      "or_divider": "أو أرسل رسالة مباشرة"
-    }
-  },
-  "blog_section": {
-    "title": "المدونة",
-    "subtitle": "تحليلات تقنية معمّقة، قرارات معمارية، ودروس مستفادة من نشر تطبيقات Flutter في بيئة الإنتاج",
-    "empty": "لا توجد مقالات بعد",
-    "read_on_medium": "اقرأ على Medium",
-    "follow_on_medium": "تابع على Medium",
-    "error": "تعذر تحميل المقالات",
-    "retry": "إعادة المحاولة"
-  },
   "proof_section": {
     "title": "أدلة هندسية",
     "subtitle": "ادعاءات يمكنك التحقق منها في المستودع وبيئة التشغيل الحية"
   },
-  "skills_section": {
-    "title": "المهارات",
-    "description": "مهاراتي التقنية ومجالات خبرتي"
-  },
   "footer": {
-    "view_source": "عرض الكود المصدري",
     "command_hint_prefix": "اضغط",
     "command_hint_suffix": "لفتح لوحة الأوامر",
     "quick_links": "روابط سريعة",
-    "connect": "تواصل",
-    "stay_updated": "ابقَ على اطلاع",
-    "subscribed": "تم الاشتراك!"
+    "verification": "التحقق",
+    "verification_body": "يمكن فحص أدلة وقت التشغيل ومحرك العرض والعزل وتوقيت الإطارات مباشرةً من هذه الصفحة.",
+    "easter_egg": "لقد وجدت مسار النقرات الخمس. الفضول جزء من سطح الاختبار."
   },
-  "sidebar": {
-    "github": "GitHub",
-    "linkedin": "LinkedIn",
-    "email": "البريد الإلكتروني"
-  },
-  "not_found": {
-    "subtitle": "الصفحة غير موجودة",
-    "go_home": "الرئيسية"
+  "command_palette": {
+    "close": "إغلاق لوحة الأوامر",
+    "navigate": "التنقل",
+    "language": "اللغة",
+    "action": "إجراء",
+    "go_to": "الانتقال إلى {section}",
+    "switch_to": "التبديل إلى {language}",
+    "open_lab": "فتح مختبر الهندسة",
+    "search_hint": "اكتب أمراً...",
+    "no_matches": "لا توجد أوامر مطابقة"
   }
 }

@@ -1,119 +1,26 @@
 {
   "app_name": "सिस्टम पोर्टफोलियो",
-  "theme": {
-    "primary_color": "#3F51B5",
-    "secondary_color": "#FF4081",
-    "background_color": {
-      "light": "#FFFFFF",
-      "dark": "#121212"
-    },
-    "surface_color": {
-      "light": "#F5F5F5",
-      "dark": "#1E1E1E"
-    },
-    "text_color": {
-      "light": "#212121",
-      "dark": "#FFFFFF"
-    }
-  },
-  "navigation": {
-    "items": [
-      {
-        "id": "home",
-        "title": "होम"
-      },
-      {
-        "id": "about",
-        "title": "परिचय"
-      },
-      {
-        "id": "experience",
-        "title": "अनुभव"
-      },
-      {
-        "id": "projects",
-        "title": "प्रोजेक्ट्स"
-      },
-      {
-        "id": "skills",
-        "title": "कौशल"
-      },
-      {
-        "id": "contact",
-        "title": "संपर्क"
-      }
-    ]
-  },
-  "translations": {
-    "app_name": "सिस्टम पोर्टफोलियो",
-    "home": "होम",
-    "about": "परिचय",
-    "experience": "अनुभव",
-    "projects": "प्रोजेक्ट्स",
-    "skills": "कौशल",
-    "contact": "संपर्क",
-    "explore_more": "और अन्वेषण करें",
-    "dark_mode": "डार्क मोड",
-    "light_mode": "लाइट मोड",
-    "personal_info": "व्यक्तिगत जानकारी",
-    "education": "शिक्षा",
-    "languages": "भाषाएँ",
-    "name": "नाम",
-    "email": "ईमेल",
-    "phone": "फोन",
-    "location": "स्थान",
-    "github": "GitHub",
-    "linkedin": "LinkedIn",
-    "send_message": "संदेश भेजें",
-    "contact_me": "मुझसे संपर्क करें",
-    "your_name": "आपका नाम",
-    "your_email": "आपका ईमेल",
-    "your_message": "आपका संदेश",
-    "send": "भेजें",
-    "subject": "विषय",
-    "portfolio_loading": "पोर्टफोलियो लोड हो रहा है...",
-    "error_name": "कृपया अपना नाम दर्ज करें",
-    "error_email": "कृपया एक वैध ईमेल पता दर्ज करें",
-    "error_subject": "कृपया एक विषय दर्ज करें",
-    "error_message": "कृपया अपना संदेश दर्ज करें"
-  },
-  "animations": {
-    "loading_animation": "assets/animations/loading.json",
-    "scroll_animation_duration": 500,
-    "page_transition_duration": 300
-  },
-  "social_links": {
-    "github": "",
-    "linkedin": "",
-    "medium": ""
-  },
   "cv_data": {
     "personal_info": {
       "name": "सिस्टम पोर्टफोलियो",
-      "title": "स्वतंत्र सॉफ्टवेयर इंजीनियरिंग",
-      "phone": "",
-      "email": "",
-      "location": "Remote",
-      "github": "",
-      "linkedin": "",
+      "location": "दूरस्थ",
       "bio": "Flutter, Go, डेटा सिस्टम और मापने योग्य प्रोडक्शन विश्वसनीयता पर केंद्रित एक गुमनाम इंजीनियरिंग पोर्टफोलियो।",
       "tagline": "निरीक्षण योग्य सॉफ्टवेयर सिस्टम, प्रोडक्शन में मापे गए",
-      "medium": "",
       "subtitles": [
-        "Flutter systems",
-        "Go services",
-        "Production reliability"
+        "Flutter सिस्टम",
+        "Go सेवाएँ",
+        "प्रोडक्शन विश्वसनीयता"
       ]
     },
     "experiences": [
       {
-        "title": "Client engineering",
-        "company": "Cross-platform applications",
-        "position": "Flutter systems",
+        "title": "क्लाइंट इंजीनियरिंग",
+        "company": "क्रॉस-प्लेटफ़ॉर्म एप्लिकेशन",
+        "position": "Flutter सिस्टम",
         "start_date": "",
         "end_date": "",
-        "period": "Selected production work",
-        "description": "Flutter · offline-first data · native integrations · realtime synchronization",
+        "period": "चुना हुआ प्रोडक्शन कार्य",
+        "description": "Flutter · ऑफ़लाइन-फर्स्ट डेटा · नेटिव इंटीग्रेशन · रीयल-टाइम सिंक्रोनाइज़ेशन",
         "technologies": [
           "Flutter",
           "Dart",
@@ -123,13 +30,13 @@
         ]
       },
       {
-        "title": "Backend engineering",
-        "company": "API and data systems",
-        "position": "Go services",
+        "title": "बैकएंड इंजीनियरिंग",
+        "company": "API और डेटा सिस्टम",
+        "position": "Go सेवाएँ",
         "start_date": "",
         "end_date": "",
-        "period": "Selected production work",
-        "description": "Go Fiber · PostgreSQL · Redis · object storage · background jobs",
+        "period": "चुना हुआ प्रोडक्शन कार्य",
+        "description": "Go Fiber · PostgreSQL · Redis · ऑब्जेक्ट स्टोरेज · बैकग्राउंड कार्य",
         "technologies": [
           "Go",
           "PostgreSQL",
@@ -139,13 +46,13 @@
         ]
       },
       {
-        "title": "Reliability engineering",
-        "company": "Self-hosted runtime",
-        "position": "Production operations",
+        "title": "विश्वसनीयता इंजीनियरिंग",
+        "company": "स्व-होस्टेड रनटाइम",
+        "position": "प्रोडक्शन संचालन",
         "start_date": "",
         "end_date": "",
-        "period": "Selected production work",
-        "description": "Docker Swarm · immutable images · backup drills · observability · incident recovery",
+        "period": "चुना हुआ प्रोडक्शन कार्य",
+        "description": "Docker Swarm · अपरिवर्तनीय इमेज · रीस्टोर ड्रिल · ऑब्ज़र्वेबिलिटी · घटना से पुनर्प्राप्ति",
         "technologies": [
           "Docker",
           "Nginx",
@@ -159,125 +66,110 @@
       {
         "title": "FakeCallApp",
         "description": "Flutter · Next.js · Go",
-        "category": "Web",
+        "category": "वेब",
         "url": "https://fakecallapp.com"
       },
       {
         "title": "CleanMyGallery",
-        "description": "Flutter · image pipeline · EXIF",
-        "category": "Web",
+        "description": "Flutter · इमेज पाइपलाइन · EXIF",
+        "category": "वेब",
         "url": "https://cleanmygallery.com"
       },
       {
         "title": "FocusGroves",
-        "description": "Flutter · focus systems · realtime rooms",
-        "category": "Web",
+        "description": "Flutter · फ़ोकस सिस्टम · रीयल-टाइम रूम",
+        "category": "वेब",
         "url": "https://focusgroves.com"
       },
       {
         "title": "MoodGrade",
-        "description": "Flutter · health journal · export",
-        "category": "Web",
+        "description": "Flutter · स्वास्थ्य जर्नल · निर्यात",
+        "category": "वेब",
         "url": "https://moodgrade.com"
       },
       {
         "title": "GetQrivo",
-        "description": "QR · short links · analytics",
-        "category": "Web",
+        "description": "QR · शॉर्ट लिंक · एनालिटिक्स",
+        "category": "वेब",
         "url": "https://getqrivo.com"
       },
       {
         "title": "OverlayPhoto",
-        "description": "Flutter · compositing · time capsules",
-        "category": "Web",
+        "description": "Flutter · कम्पोज़िटिंग · टाइम कैप्सूल",
+        "category": "वेब",
         "url": "https://overlayphoto.com"
       },
       {
         "title": "DistractionKiller",
-        "description": "Flutter · digital wellbeing · schedules",
-        "category": "Web",
+        "description": "Flutter · डिजिटल वेलबीइंग · शेड्यूल",
+        "category": "वेब",
         "url": "https://distractionkiller.com"
       },
       {
         "title": "KPSSHazirlan",
-        "description": "Learning plans · practice engine · analytics",
-        "category": "Web",
+        "description": "लर्निंग प्लान · अभ्यास इंजन · एनालिटिक्स",
+        "category": "वेब",
         "url": "https://kpsshazirlan.com"
       },
       {
         "title": "EhliyetCoz",
-        "description": "Daily quizzes · progress model · content QA",
-        "category": "Web",
+        "description": "दैनिक क्विज़ · प्रगति मॉडल · कंटेंट QA",
+        "category": "वेब",
         "url": "https://ehliyetcoz.com"
       },
       {
         "title": "Kazanamazi",
-        "description": "Habit ledger · heatmaps · reminders",
-        "category": "Web",
+        "description": "आदत लेखा · हीटमैप · रिमाइंडर",
+        "category": "वेब",
         "url": "https://kazanamazi.net"
       },
       {
         "title": "PDFScanPro",
-        "description": "PDF pipeline · conversion · compression",
-        "category": "Web",
+        "description": "PDF पाइपलाइन · रूपांतरण · संपीड़न",
+        "category": "वेब",
         "url": "https://pdfscanpro.com"
       }
     ],
-    "education": [],
     "skills": [
       {
         "category": "मोबाइल",
         "items": [
           "Flutter",
           "Dart",
-          "Swift",
-          "SwiftUI",
-          "GetX",
           "BLoC",
-          "Provider"
+          "प्लेटफ़ॉर्म चैनल",
+          "ऑफ़लाइन-फर्स्ट"
         ]
       },
       {
         "category": "बैकएंड",
         "items": [
-          "Node.js",
-          "Express.js",
           "Go",
-          "Spring Boot",
-          "MongoDB",
-          "MSSQL",
-          "SQLite"
+          "Fiber",
+          "PostgreSQL",
+          "Redis",
+          "Asynq"
         ]
       },
       {
-        "category": "फ्रंटएंड",
+        "category": "वेब",
         "items": [
-          "React",
-          "JavaScript",
-          "TypeScript",
-          "HTML",
-          "CSS"
+          "Flutter Web",
+          "Dart Wasm",
+          "SkWasm",
+          "CanvasKit",
+          "Semantics"
         ]
       },
       {
-        "category": "DevOps",
+        "category": "संचालन",
         "items": [
-          "AWS",
-          "Docker",
-          "Git",
-          "CI/CD",
-          "Firebase"
+          "Docker Swarm",
+          "Nginx",
+          "Prometheus",
+          "Grafana",
+          "PostgreSQL HA"
         ]
-      }
-    ],
-    "languages": [
-      {
-        "name": "तुर्की",
-        "level": "मातृभाषा"
-      },
-      {
-        "name": "अंग्रेज़ी",
-        "level": "B2"
       }
     ],
     "proof": [
@@ -298,54 +190,35 @@
       }
     ]
   },
-  "language_info": {
-    "code": "hi",
-    "name": "हिन्दी",
-    "flag": "🇮🇳",
-    "direction": "ltr"
-  },
   "nav": {
     "home": "होम",
-    "about": "परिचय",
-    "skills": "कौशल",
-    "experience": "अनुभव",
-    "projects": "परियोजनाएँ",
-    "contact": "संपर्क",
-    "proof": "प्रमाण",
-    "blog": "ब्लॉग"
+    "about": "प्रोफ़ाइल",
+    "experience": "कार्य",
+    "projects": "सिस्टम",
+    "proof": "प्रमाण"
   },
   "about_section": {
-    "title": "मेरे बारे में",
-    "bio": "यह पोर्टफोलियो व्यक्तिगत पहचान उजागर किए बिना सॉफ्टवेयर के डिजाइन, मापन, परीक्षण और संचालन को दर्ज करता है।",
-    "bio2": "यहाँ कुछ तकनीकें हैं जिनके साथ मैंने हाल ही में काम किया है:",
-    "github_title": "GitHub गतिविधि",
-    "github_repos": "रेपो",
-    "github_followers": "फॉलोअर्स",
-    "github_stars": "स्टार्स",
-    "github_cached": "(कैश्ड)"
+    "title": "सिस्टम प्रोफ़ाइल",
+    "bio": "यह पोर्टफोलियो व्यक्तिगत पहचान उजागर किए बिना सॉफ्टवेयर के डिज़ाइन, मापन, परीक्षण और संचालन को दर्ज करता है।",
+    "bio2": "चुने गए सिस्टम में उपयोग की गई तकनीकें:"
   },
   "home_section": {
-    "greeting": "BUILD / MEASURE / OPERATE",
     "title": "सिस्टम पोर्टफोलियो।",
     "subtitle": "स्वतंत्र सॉफ्टवेयर इंजीनियरिंग",
-    "bio": "क्रॉस-प्लेटफ़ॉर्म क्लाइंट, सर्विस API और सेल्फ-होस्टेड इंफ्रास्ट्रक्चर के लिए प्रोडक्शन-केंद्रित पोर्टफोलियो।",
-    "view_work": "मेरा काम देखें",
-    "inspect_runtime": "Inspect runtime",
-    "contact": "संपर्क"
+    "view_work": "सिस्टम देखें",
+    "inspect_runtime": "रनटाइम जाँचें"
   },
   "experience_section": {
-    "title": "मैंने कहाँ काम किया",
+    "title": "चुना हुआ इंजीनियरिंग कार्य",
     "present": "वर्तमान"
   },
   "projects_section": {
-    "title": "मेरी परियोजनाएँ",
-    "description": "प्रमुख परियोजनाएँ और पूर्ण किए गए कार्य",
+    "title": "चुने गए सिस्टम",
     "filter_all": "सभी",
     "case_study_problem": "चुनौती",
     "case_study_solution": "दृष्टिकोण",
     "case_study_result": "परिणाम",
     "links": "लिंक",
-    "untitled_project": "शीर्षकहीन प्रोजेक्ट",
     "technologies": "प्रौद्योगिकियाँ",
     "open_project": "प्रोजेक्ट खोलें",
     "link_labels": {
@@ -356,56 +229,27 @@
     "case_study_label": "केस स्टडी",
     "flip_hint": "केस स्टडी देखने के लिए क्लिक करें"
   },
-  "contact_section": {
-    "title": "संपर्क करें",
-    "whats_next": "आगे क्या?",
-    "description": "मैं हमेशा नई चुनौतियों और सहयोग के लिए तैयार हूँ। चाहे आपके पास कोई प्रोजेक्ट आइडिया हो, कोई सवाल हो, या बस जुड़ना चाहते हों — बेझिझक संपर्क करें!",
-    "form": {
-      "name_label": "नाम",
-      "email_label": "ईमेल",
-      "message_label": "संदेश",
-      "submit_button": "संदेश भेजें",
-      "name_error": "कृपया अपना नाम दर्ज करें",
-      "email_error": "कृपया एक वैध ईमेल पता दर्ज करें",
-      "message_error": "कृपया अपना संदेश दर्ज करें",
-      "success": "आपका ईमेल ऐप खुल गया है। संदेश जाँचें और भेजें।",
-      "error": "एक त्रुटि हुई। कृपया पुनः प्रयास करें।",
-      "or_divider": "या सीधे संदेश भेजें"
-    }
-  },
-  "blog_section": {
-    "title": "ब्लॉग",
-    "subtitle": "गहन तकनीकी विश्लेषण, आर्किटेक्चर निर्णय, और प्रोडक्शन Flutter ऐप्स डिप्लॉय करने से सीखे गए अनुभव",
-    "empty": "अभी कोई ब्लॉग पोस्ट नहीं",
-    "read_on_medium": "Medium पर पढ़ें",
-    "follow_on_medium": "Medium पर फ़ॉलो करें",
-    "error": "ब्लॉग पोस्ट लोड नहीं हो सके",
-    "retry": "पुनः प्रयास करें"
-  },
   "proof_section": {
     "title": "इंजीनियरिंग प्रमाण",
     "subtitle": "ऐसे दावे जिन्हें repository और live runtime में जांचा जा सकता है"
   },
-  "skills_section": {
-    "title": "कौशल",
-    "description": "मेरे तकनीकी कौशल और विशेषज्ञता के क्षेत्र"
-  },
   "footer": {
-    "view_source": "स्रोत कोड देखें",
     "command_hint_prefix": "दबाएं",
     "command_hint_suffix": "कमांड पैलेट खोलने के लिए",
     "quick_links": "त्वरित लिंक",
-    "connect": "जुड़ें",
-    "stay_updated": "अपडेट रहें",
-    "subscribed": "सदस्यता ली!"
+    "verification": "सत्यापन",
+    "verification_body": "रनटाइम, रेंडरर, आइसोलेशन और फ़्रेम टाइमिंग के प्रमाण इस पृष्ठ पर सीधे देखे जा सकते हैं।",
+    "easter_egg": "आपने पाँच-क्लिक वाला रास्ता खोज लिया। जिज्ञासा परीक्षण सतह का हिस्सा है।"
   },
-  "sidebar": {
-    "github": "GitHub",
-    "linkedin": "LinkedIn",
-    "email": "ईमेल"
-  },
-  "not_found": {
-    "subtitle": "पृष्ठ नहीं मिला",
-    "go_home": "होम पेज"
+  "command_palette": {
+    "close": "कमांड पैलेट बंद करें",
+    "navigate": "नेविगेशन",
+    "language": "भाषा",
+    "action": "कार्रवाई",
+    "go_to": "{section} पर जाएँ",
+    "switch_to": "{language} में बदलें",
+    "open_lab": "Engineering Lab खोलें",
+    "search_hint": "कमांड लिखें...",
+    "no_matches": "कोई मिलता-जुलता कमांड नहीं"
   }
 }

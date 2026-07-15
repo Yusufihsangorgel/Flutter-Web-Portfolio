@@ -30,12 +30,10 @@ void main() {
         controller.aboutKey,
         controller.experienceKey,
         controller.proofKey,
-        controller.blogKey,
         controller.projectsKey,
-        controller.contactKey,
       };
 
-      expect(keys, hasLength(7));
+      expect(keys, hasLength(5));
     });
 
     test('ignores unknown or detached sections safely', () {

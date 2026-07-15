@@ -13,7 +13,6 @@ import 'package:flutter_web_portfolio/app/utils/responsive_utils.dart';
 import 'package:flutter_web_portfolio/app/widgets/numbered_section_heading.dart';
 import 'package:flutter_web_portfolio/app/widgets/scroll_fade_in.dart';
 import 'package:flutter_web_portfolio/app/widgets/scene_accent_builder.dart';
-import 'package:flutter_web_portfolio/app/widgets/skill_bar_chart.dart';
 import 'package:flutter_web_portfolio/app/widgets/skill_orbit.dart';
 
 /// About Section — "The Introduction"
@@ -118,53 +117,11 @@ class AboutSection extends StatelessWidget {
 }
 
 // Bio content with staggered word reveal
-class _BioContent extends StatefulWidget {
+class _BioContent extends StatelessWidget {
   const _BioContent({required this.data, required this.languageController});
 
   final Map<String, dynamic> data;
   final LanguageCubit languageController;
-
-  @override
-  State<_BioContent> createState() => _BioContentState();
-}
-
-class _BioContentState extends State<_BioContent>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _barController;
-
-  // Hardcoded relative proficiency per category.
-  static const _proficiencyMap = <String, double>{
-    'Mobile': 0.95,
-    'Backend': 0.80,
-    'Frontend': 0.70,
-    'DevOps': 0.65,
-  };
-
-  @override
-  void initState() {
-    super.initState();
-    // Total animation budget: 800ms per bar + 100ms stagger * 3 gaps = 1100ms.
-    _barController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1100),
-    );
-  }
-
-  @override
-  void dispose() {
-    _barController.dispose();
-    super.dispose();
-  }
-
-  List<String> _categoryLabels() {
-    final skills = widget.languageController.cvData['skills'] as List? ?? [];
-    return skills
-        .map<String>((s) => (s as Map<String, dynamic>)['category'] as String)
-        .toList();
-  }
-
-  List<double> _categoryProficiencies(List<String> labels) =>
-      labels.map((l) => _proficiencyMap[l] ?? 0.60).toList();
 
   @override
   Widget build(BuildContext context) {
@@ -178,7 +135,7 @@ class _BioContentState extends State<_BioContent>
         SceneAccentBuilder(
           builder: (context, accent) => NumberedSectionHeading(
             number: '01',
-            title: widget.languageController.getText(
+            title: languageController.getText(
               'about_section.title',
               defaultValue: 'About Me',
             ),
@@ -187,8 +144,8 @@ class _BioContentState extends State<_BioContent>
         ),
         const SizedBox(height: 24),
         Text(
-          (widget.data['bio'] as String?) ??
-              widget.languageController.getText(
+          (data['bio'] as String?) ??
+              languageController.getText(
                 'about_section.bio',
                 defaultValue:
                     'I enjoy creating things that live on the internet, '
@@ -200,7 +157,7 @@ class _BioContentState extends State<_BioContent>
         ),
         const SizedBox(height: 16),
         Text(
-          widget.languageController.getText(
+          languageController.getText(
             'about_section.bio2',
             defaultValue:
                 'Here are a few technologies I\'ve been working with recently:',
@@ -211,7 +168,7 @@ class _BioContentState extends State<_BioContent>
         // Floating tech pills — derived from cvData skills
         _FloatingTechPills(
           sceneDirector: sceneDirector,
-          languageController: widget.languageController,
+          languageController: languageController,
         ),
         const SizedBox(height: 32),
         // Skill orbit — desktop only (too dense for mobile).
@@ -221,7 +178,7 @@ class _BioContentState extends State<_BioContent>
             child: SceneAccentBuilder(
               builder: (context, accent) {
                 final rawSkills =
-                    widget.languageController.cvData['skills'] as List? ?? [];
+                    languageController.cvData['skills'] as List? ?? [];
                 if (rawSkills.isEmpty) return const SizedBox.shrink();
                 final skills = rawSkills.cast<Map<String, dynamic>>();
                 return ClipRect(
@@ -232,68 +189,9 @@ class _BioContentState extends State<_BioContent>
           ),
           const SizedBox(height: 32),
         ],
-        // Skill proficiency chart
-        ScrollFadeIn(
-          delay: AppDurations.staggerMedium,
-          child: SceneAccentBuilder(
-            builder: (context, accent) {
-              final labels = _categoryLabels();
-              if (labels.isEmpty) return const SizedBox.shrink();
-              return _SkillChartAnimator(
-                controller: _barController,
-                accent: accent,
-                categories: labels,
-                proficiencies: _categoryProficiencies(labels),
-                barHeight: isMobile ? 20.0 : 28.0,
-              );
-            },
-          ),
-        ),
       ],
     );
   }
-}
-
-/// Wrapper that triggers the bar animation when the [ScrollFadeIn] ancestor
-/// first becomes visible. It starts the supplied [controller] on init so the
-/// bars animate in sync with the scroll-triggered fade.
-class _SkillChartAnimator extends StatefulWidget {
-  const _SkillChartAnimator({
-    required this.controller,
-    required this.accent,
-    required this.categories,
-    required this.proficiencies,
-    required this.barHeight,
-  });
-
-  final AnimationController controller;
-  final Color accent;
-  final List<String> categories;
-  final List<double> proficiencies;
-  final double barHeight;
-
-  @override
-  State<_SkillChartAnimator> createState() => _SkillChartAnimatorState();
-}
-
-class _SkillChartAnimatorState extends State<_SkillChartAnimator> {
-  @override
-  void initState() {
-    super.initState();
-    // Begin fill animation (the ScrollFadeIn handles visibility gating).
-    if (!widget.controller.isAnimating && !widget.controller.isCompleted) {
-      widget.controller.forward();
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) => SkillBarChart(
-    categories: widget.categories,
-    proficiencies: widget.proficiencies,
-    accent: widget.accent,
-    animation: widget.controller,
-    barHeight: widget.barHeight,
-  );
 }
 
 // Floating tech pills — data-driven from cvData skills

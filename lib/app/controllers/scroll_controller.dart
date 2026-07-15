@@ -49,9 +49,7 @@ final class AppScrollController extends Cubit<AppScrollState>
   final aboutKey = GlobalKey();
   final experienceKey = GlobalKey();
   final proofKey = GlobalKey();
-  final blogKey = GlobalKey();
   final projectsKey = GlobalKey();
-  final contactKey = GlobalKey();
 
   final ScrollController scrollController = ScrollController();
 
@@ -117,9 +115,7 @@ final class AppScrollController extends Cubit<AppScrollState>
     _updateKeyInfo('about', aboutKey);
     _updateKeyInfo('experience', experienceKey);
     _updateKeyInfo('proof', proofKey);
-    _updateKeyInfo('blog', blogKey);
     _updateKeyInfo('projects', projectsKey);
-    _updateKeyInfo('contact', contactKey);
   }
 
   void _updateKeyInfo(String sectionId, GlobalKey key) {
@@ -189,9 +185,7 @@ final class AppScrollController extends Cubit<AppScrollState>
         'about' => aboutKey,
         'experience' => experienceKey,
         'proof' => proofKey,
-        'blog' => blogKey,
         'projects' => projectsKey,
-        'contact' => contactKey,
         _ => null,
       };
       final sectionContext = sectionKey?.currentContext;

@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_web_portfolio/app/core/theme/app_fonts.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
 import 'package:flutter_web_portfolio/app/controllers/scroll_controller.dart';
@@ -37,10 +36,14 @@ class CommandPalette extends StatefulWidget {
 
   /// Shows the command palette as a modal overlay.
   static void show(BuildContext context) {
+    final language = context.read<LanguageCubit>();
     showGeneralDialog(
       context: context,
       barrierDismissible: true,
-      barrierLabel: 'Close command palette',
+      barrierLabel: language.getText(
+        'command_palette.close',
+        defaultValue: 'Close command palette',
+      ),
       barrierColor: Colors.black.withValues(alpha: 0.6),
       transitionDuration: AppDurations.medium,
       transitionBuilder: (context, animation, _, child) {
@@ -95,30 +98,43 @@ class _CommandPaletteState extends State<CommandPalette> {
   List<_PaletteCommand> _buildCommands() {
     final scrollController = context.read<AppScrollController>();
     final languageController = context.read<LanguageCubit>();
-    final cvData = languageController.cvData;
-    final personalInfo = cvData['personal_info'] as Map<String, dynamic>? ?? {};
-
-    final github = personalInfo['github'] as String? ?? '';
-    final linkedin = personalInfo['linkedin'] as String? ?? '';
-
     final active = languageController.activeSections;
+    final navigateCategory = languageController.getText(
+      'command_palette.navigate',
+      defaultValue: 'Navigate',
+    );
+    final languageCategory = languageController.getText(
+      'command_palette.language',
+      defaultValue: 'Language',
+    );
+    final actionCategory = languageController.getText(
+      'command_palette.action',
+      defaultValue: 'Action',
+    );
 
     const sectionIcons = <String, IconData>{
       'home': Icons.home_rounded,
       'about': Icons.person_rounded,
       'experience': Icons.work_rounded,
       'proof': Icons.verified_rounded,
-      'blog': Icons.article_rounded,
       'projects': Icons.code_rounded,
-      'contact': Icons.mail_rounded,
     };
 
     return [
       // ── Navigation ──────────────────────────────────────────────────────
       for (final section in active)
         _PaletteCommand(
-          label: 'Go to ${section[0].toUpperCase()}${section.substring(1)}',
-          category: 'Navigate',
+          label: languageController
+              .getText('command_palette.go_to', defaultValue: 'Go to {section}')
+              .replaceAll(
+                '{section}',
+                languageController.getText(
+                  'nav.$section',
+                  defaultValue:
+                      '${section[0].toUpperCase()}${section.substring(1)}',
+                ),
+              ),
+          category: navigateCategory,
           icon: sectionIcons[section] ?? Icons.arrow_forward_rounded,
           onExecute: () =>
               _executeAndClose(() => scrollController.scrollToSection(section)),
@@ -127,8 +143,16 @@ class _CommandPaletteState extends State<CommandPalette> {
       // ── Language ────────────────────────────────────────────────────────
       for (final entry in languageController.supportedLanguages.entries)
         _PaletteCommand(
-          label: 'Switch to ${entry.value}',
-          category: 'Language',
+          label: languageController
+              .getText(
+                'command_palette.switch_to',
+                defaultValue: 'Switch to {language}',
+              )
+              .replaceAll(
+                '{language}',
+                LanguageCubit.getLanguageName(entry.key),
+              ),
+          category: languageCategory,
           icon: Icons.translate_rounded,
           onExecute: () => _executeAndClose(
             () => languageController.changeLanguage(entry.key),
@@ -137,8 +161,11 @@ class _CommandPaletteState extends State<CommandPalette> {
 
       // ── Actions ─────────────────────────────────────────────────────────
       _PaletteCommand(
-        label: 'Open Engineering Lab',
-        category: 'Action',
+        label: languageController.getText(
+          'command_palette.open_lab',
+          defaultValue: 'Open Engineering Lab',
+        ),
+        category: actionCategory,
         icon: Icons.science_rounded,
         onExecute: () {
           final navigator = Navigator.of(context, rootNavigator: true)..pop();
@@ -150,30 +177,6 @@ class _CommandPaletteState extends State<CommandPalette> {
           });
         },
       ),
-      if (github.isNotEmpty)
-        _PaletteCommand(
-          label: 'Open GitHub',
-          category: 'Action',
-          icon: Icons.open_in_new_rounded,
-          onExecute: () => _executeAndClose(() async {
-            final uri = Uri.parse(github);
-            if (await canLaunchUrl(uri)) {
-              await launchUrl(uri, mode: LaunchMode.externalApplication);
-            }
-          }),
-        ),
-      if (linkedin.isNotEmpty)
-        _PaletteCommand(
-          label: 'Open LinkedIn',
-          category: 'Action',
-          icon: Icons.open_in_new_rounded,
-          onExecute: () => _executeAndClose(() async {
-            final uri = Uri.parse(linkedin);
-            if (await canLaunchUrl(uri)) {
-              await launchUrl(uri, mode: LaunchMode.externalApplication);
-            }
-          }),
-        ),
     ];
   }
 
@@ -320,7 +323,10 @@ class _CommandPaletteState extends State<CommandPalette> {
             focusNode: _focusNode,
             style: AppFonts.inter(fontSize: 15, color: AppColors.textBright),
             decoration: InputDecoration(
-              hintText: 'Type a command...',
+              hintText: context.read<LanguageCubit>().getText(
+                'command_palette.search_hint',
+                defaultValue: 'Type a command...',
+              ),
               hintStyle: AppFonts.inter(
                 fontSize: 15,
                 color: AppColors.textSecondary,
@@ -354,7 +360,10 @@ class _CommandPaletteState extends State<CommandPalette> {
       return Padding(
         padding: const EdgeInsets.all(24),
         child: Text(
-          'No matching commands',
+          context.read<LanguageCubit>().getText(
+            'command_palette.no_matches',
+            defaultValue: 'No matching commands',
+          ),
           style: AppFonts.inter(fontSize: 14, color: AppColors.textSecondary),
         ),
       );

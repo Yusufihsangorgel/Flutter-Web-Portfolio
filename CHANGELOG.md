@@ -26,7 +26,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Renderer binaries are self-hosted instead of fetched from Flutter's public CDN
 - Inter, Space Grotesk, and JetBrains Mono are bundled as local variable fonts; the font CDN preconnect was removed
 - Dart sources and tests use the Dart 3.11 formatter as a CI-enforced baseline
-- Contact drafts open the visitor's mail client; the UI no longer claims delivery before the visitor sends
 - Browser history is synchronized directly by the scroll controller instead of a page router
 - Reduced-motion preferences stop continuous scene animation and bypass the cinematic preloader
 - The verified `build/web` release artifact is committed for the lightweight Nginx packaging path; private CV and portrait assets were removed from both source and output
@@ -35,6 +34,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Open Graph and Twitter previews now use the engineering showcase card instead of the generic application icon
 - Production verification no longer executes one-off coordinate-driven audit scripts in parallel
 - Package metadata and the footer now agree on version 1.1.0
+- Dormant Medium, GitHub, contact, and social-sidebar integrations were removed from the anonymous systems showcase; navigation and CSP now expose only live features
+- Release jobs now start from a clean Flutter output directory so deleted assets cannot survive from the committed packaging artifact
+- All seven locale catalogs now share a tested runtime schema with retired integration copy removed
+- Localization now has one application-owned loading path; the unused parallel `flutter_i18n` runtime and its transitive network/parser packages were removed
+- Unsupported percentage-based skill scores were removed; the portfolio now presents capabilities without invented precision
+- Primary systems copy and command-palette actions now cover all seven locales; the document root follows both locale and RTL direction
 
 ### Fixed
 
@@ -47,6 +52,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Same-origin fallback fonts resolve correctly for both root and repository-subpath deployments
 - Renderer debug symbol maps are no longer published by Docker or GitHub Pages releases
 - Stable Flutter entrypoint names now carry a content hash and renderer URLs include the exact engine revision, enabling cache-safe one-year binary responses
+- The footer's five-click message is deterministic, localized, and free of unverifiable implementation claims
 
 ## [1.1.0] - 2026-03-23
 

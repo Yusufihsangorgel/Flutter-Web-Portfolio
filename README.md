@@ -42,7 +42,7 @@ The Engineering Lab reports values from the current browser session. It delibera
 
 🌍 **7 Languages** — English, Turkish, German, French, Spanish, Arabic (RTL), Hindi
 
-🎯 **Scroll Animations** — fade-in reveals, magnetic buttons, text scramble, shader wipes
+🎯 **Scroll Animations** — fade-in reveals, scene-aware accents, text scramble, shader wipes
 
 🔊 **Sound Design** — Web Audio API synthesized hover, click, and ambient sounds
 
@@ -68,6 +68,7 @@ Build the same dual-runtime release used by CI:
 ```bash
 flutter build web --release --wasm --no-web-resources-cdn
 npm run prepare:bundle
+npm run verify:bundle
 ```
 
 The output contains both `main.dart.wasm` and `main.dart.js`. Compatible browsers run the Wasm/SkWasm path; Flutter selects the JavaScript/CanvasKit path when needed.
@@ -113,7 +114,7 @@ main.dart
 
 The state boundary is intentional:
 
-- **BLoC/Cubit** owns application state. Language changes are ordered, testable, and protected against stale requests overwriting newer choices; scene, scroll, cursor, sound, and personalization state use immutable snapshots.
+- **BLoC/Cubit** owns application state. Language changes are ordered, testable, and protected against stale requests overwriting newer choices; scene, scroll, cursor, and sound state use immutable snapshots.
 - **Widget-local `Listenable` state** owns pointer coordinates and spring physics that can change every rendered frame. High-frequency motion never traverses the application state graph.
 - **Browser history is not a page router.** This is one document; `AppScrollController` synchronizes `#/section` URLs directly with visible sections and back/forward navigation.
 - **Bootstrap completes before `runApp`.** Storage and the selected locale cannot race the first widget build.
@@ -139,7 +140,7 @@ Key implementation files:
 | **Framework** | Flutter 3.41 · Dart 3.11 · WebAssembly release target |
 | **Application state** | `flutter_bloc` — explicit dependencies and immutable snapshots |
 | **Render coordination** | Cubit selectors + widget-local `ValueNotifier`/`Listenable` physics |
-| **i18n** | [flutter_i18n](https://pub.dev/packages/flutter_i18n) — 7 languages, runtime switching |
+| **i18n** | Application-owned JSON repository + `LanguageCubit` — 7 languages, ordered runtime switching |
 | **Fonts** | Local variable Inter, JetBrains Mono, and Space Grotesk assets with adjacent SIL Open Font Licenses |
 | **CI/CD** | GitHub Actions — pinned Flutter toolchain, fatal-info analysis, tests, bundle budget, browser smoke tests |
 | **UI layer** | Flutter widgets and custom painters; no web component library |
