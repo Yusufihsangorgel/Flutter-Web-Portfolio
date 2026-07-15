@@ -11,9 +11,15 @@ const localTarget = 'http://127.0.0.1:4173';
 const target = process.env.PERF_URL ?? localTarget;
 const enforce = process.argv.includes('--enforce');
 const runCount = Number(process.env.PERF_RUNS ?? budget.runs);
+const startupTimeoutMs = Number(
+  process.env.PERF_STARTUP_TIMEOUT_MS ?? budget.startup_timeout_ms,
+);
 
 if (!Number.isInteger(runCount) || runCount < 1 || runCount > 10) {
   throw new Error('PERF_RUNS must be an integer between 1 and 10.');
+}
+if (!Number.isFinite(startupTimeoutMs) || startupTimeoutMs < 1000) {
+  throw new Error('PERF_STARTUP_TIMEOUT_MS must be at least 1000.');
 }
 
 const server = process.env.PERF_URL ? null : await startLocalServer(localTarget);
@@ -95,15 +101,19 @@ async function measureRun(browserInstance, run) {
     await page.goto(target, { waitUntil: 'domcontentloaded' });
     await page.waitForSelector('flt-semantics-host', {
       state: 'attached',
-      timeout: budget.startup_timeout_ms,
+      timeout: startupTimeoutMs,
     });
     await page.waitForFunction(
       () =>
         performance.getEntriesByName('flutter-surface-reveal-start', 'mark')
           .length === 1 && !document.querySelector('#bootstrap-surface'),
       undefined,
-      { timeout: budget.startup_timeout_ms },
+      { timeout: startupTimeoutMs },
     );
+    await page
+      .getByRole('button', { name: 'Systems', exact: true })
+      .first()
+      .waitFor({ state: 'attached', timeout: startupTimeoutMs });
 
     await page.evaluate((sampleMs) => {
       const sample = {
