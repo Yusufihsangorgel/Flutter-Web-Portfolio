@@ -211,6 +211,7 @@ async function measureRun(browserInstance, run) {
     const sortedIntervals = [...frameIntervals].sort((a, b) => a - b);
     const medianFrameInterval = percentile(sortedIntervals, 0.5);
     const p95FrameInterval = percentile(sortedIntervals, 0.95);
+    const firstFrameToReveal = pageMetrics.firstFrameToReveal;
     const longTaskTotal = pageMetrics.vitals.longTasks.reduce(
       (total, duration) => total + duration,
       0,
@@ -224,7 +225,13 @@ async function measureRun(browserInstance, run) {
         pageMetrics.bootstrapToFirstFrame ??
           pageMetrics.bootstrapToRevealSignal,
       ),
-      first_frame_to_reveal_ms: round(pageMetrics.firstFrameToReveal),
+      first_frame_to_reveal_ms: round(firstFrameToReveal),
+      first_frame_to_reveal_frame_intervals: round(
+        medianFrameInterval > 0
+          ? firstFrameToReveal / medianFrameInterval
+          : 0,
+        3,
+      ),
       bootstrap_start_ms: round(pageMetrics.marks.bootstrapStart),
       bootstrap_to_entrypoint_ms: round(
         pageMetrics.marks.entrypointLoaded -
@@ -328,6 +335,7 @@ function summarize(samples) {
   const metrics = [
     ...new Set([
       ...Object.keys(budget.maximum_median),
+      'first_frame_to_reveal_ms',
       'scroll_frame_median_ms',
       'scroll_frame_p95_ms',
     ]),
