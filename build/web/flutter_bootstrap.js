@@ -79,6 +79,7 @@ const removeBootstrapSurface = () => {
 const revealFlutterSurface = () => {
   if (revealStarted) return;
   revealStarted = true;
+  window.removeEventListener('flutter-first-frame', onFlutterFirstFrame);
   markRuntime('flutter-first-frame-signal');
   measureRuntime(
     'flutter-bootstrap-to-reveal-signal',

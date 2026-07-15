@@ -2,6 +2,12 @@
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.1] - 2026-07-15
+
+### Fixed
+
+- Retired the pending first-frame listener when a faster `runApp` fallback owns the reveal, keeping the production timeline single-source and ordered on slow cold networks.
+
 ## [1.4.0] - 2026-07-15
 
 ### Added
