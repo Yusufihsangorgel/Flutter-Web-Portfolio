@@ -20,6 +20,37 @@ async function openPortfolio(page: Page) {
   );
 }
 
+async function openChapterFromPalette(
+  page: Page,
+  command: string,
+  hash: RegExp,
+  heading: string,
+) {
+  await page.keyboard.press('Control+KeyK');
+  const commandItem = page.getByText(command, { exact: true });
+  await expect(commandItem).toBeVisible();
+  await commandItem.click();
+  await expect(page).toHaveURL(hash);
+  await expect(
+    page.getByRole('heading', { name: heading, exact: true }),
+  ).toBeAttached();
+}
+
+async function scrollToHeading(page: Page, name: string) {
+  const heading = page.getByRole('heading', { name, exact: true });
+  for (let attempt = 0; attempt < 80; attempt += 1) {
+    if ((await heading.count()) > 0) {
+      const [box, viewportHeight] = await Promise.all([
+        heading.boundingBox(),
+        page.evaluate(() => window.innerHeight),
+      ]);
+      if (box && box.y < viewportHeight && box.y + box.height > 0) return;
+    }
+    await page.mouse.wheel(0, 500);
+  }
+  await expect(heading).toBeVisible();
+}
+
 async function readRuntimeTimeline(page: Page) {
   return page.evaluate(() => {
     const names = [
@@ -157,14 +188,36 @@ test('boots the production Wasm release with its security contract', async ({
 test('serves the complete professional narrative in production', async ({
   page,
 }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
   await openPortfolio(page);
   await expect(page.getByRole('heading', { name: 'About' })).toBeAttached();
-  await expect(page.getByRole('heading', { name: 'Experience' })).toBeAttached();
-  await expect(page.getByRole('heading', { name: 'Open Source' })).toBeAttached();
-  await expect(page.getByRole('heading', { name: 'Selected Work' })).toBeAttached();
+
+  await openChapterFromPalette(
+    page,
+    'Go to Experience',
+    /#\/experience$/,
+    'Experience',
+  );
   await expect(
     page.getByText(portfolio.experience[0].company).first(),
   ).toBeAttached();
+
+  await openChapterFromPalette(
+    page,
+    'Go to Open Source',
+    /#\/proof$/,
+    'Open Source',
+  );
+  await openChapterFromPalette(
+    page,
+    'Go to Work',
+    /#\/projects$/,
+    'Selected Work',
+  );
+  await scrollToHeading(page, 'More work');
+  const supportingSystem = portfolio.systems.find((system) => !system.featured);
+  expect(supportingSystem).toBeTruthy();
+  await expect(page.getByText(supportingSystem.name).first()).toBeAttached();
 });
 
 test('serves the production accessibility hierarchy', async ({
@@ -216,40 +269,53 @@ test('serves the production accessibility hierarchy', async ({
     /Profile PROFILE|Show menu|Scroll to top|🇬🇧/,
   );
 
-  await expect(
-    page.getByRole('heading', { name: 'Selected Work' }),
-  ).toBeAttached();
-
-  const projectsTree = await accessibility.send(
-    'Accessibility.getFullAXTree',
+  await openChapterFromPalette(
+    page,
+    'Go to Open Source',
+    /#\/proof$/,
+    'Open Source',
   );
+  const proofTree = await accessibility.send('Accessibility.getFullAXTree');
+  const proofLinks = proofTree.nodes
+    .filter((node) => !node.ignored && node.role?.value === 'link')
+    .map((node) => node.name?.value ?? '');
+  const visibleContribution = portfolio.contributions[0];
+  expect(visibleContribution).toBeTruthy();
+  expect(proofLinks).toEqual(
+    expect.arrayContaining([
+      `View pull request. ${visibleContribution.title}. ` +
+        `${visibleContribution.project} · Merged · ${visibleContribution.date}`,
+    ]),
+  );
+
+  await openChapterFromPalette(
+    page,
+    'Go to Work',
+    /#\/projects$/,
+    'Selected Work',
+  );
+  const projectsTree = await accessibility.send('Accessibility.getFullAXTree');
   const projectLinks = projectsTree.nodes
     .filter((node) => !node.ignored && node.role?.value === 'link')
     .map((node) => node.name?.value ?? '');
   const featuredSystem = portfolio.systems.find((system) => system.featured);
   const supportingSystem = portfolio.systems.find((system) => !system.featured);
-  const reviewedContribution =
-    portfolio.contributions.find(
-      (contribution) => contribution.status === 'under_review',
-    ) ?? portfolio.contributions[0];
   expect(featuredSystem).toBeTruthy();
   expect(supportingSystem).toBeTruthy();
-  expect(reviewedContribution).toBeTruthy();
   expect(projectLinks).toEqual(
-    expect.arrayContaining([
-      expect.stringContaining(supportingSystem.name),
-      `Open project: ${featuredSystem.name}`,
-      `View pull request. ${reviewedContribution.title}. `
-        + `${reviewedContribution.project} · Under review · ${reviewedContribution.date}`,
-    ]),
-  );
-  expect(projectLinks).toEqual(
-    expect.arrayContaining(
-      portfolio.profile.links.map((link) => link.label),
-    ),
+    expect.arrayContaining([`Open project: ${featuredSystem.name}`]),
   );
   expect(projectLinks).not.toContain('View source');
   expect(projectLinks).not.toContain('Website');
+
+  await scrollToHeading(page, 'More work');
+  const archiveTree = await accessibility.send('Accessibility.getFullAXTree');
+  const archiveLinks = archiveTree.nodes
+    .filter((node) => !node.ignored && node.role?.value === 'link')
+    .map((node) => node.name?.value ?? '');
+  expect(archiveLinks).toEqual(
+    expect.arrayContaining([expect.stringContaining(supportingSystem.name)]),
+  );
 });
 
 test('serves the localized Arabic command surface in production', async ({
@@ -260,13 +326,26 @@ test('serves the localized Arabic command surface in production', async ({
 
   const runtimeErrors: string[] = [];
   page.on('pageerror', (error) => runtimeErrors.push(error.message));
+  await page.emulateMedia({ reducedMotion: 'reduce' });
   await openPortfolio(page);
+  await openChapterFromPalette(
+    page,
+    'Go to Work',
+    /#\/projects$/,
+    'Selected Work',
+  );
   await page.keyboard.press('Control+KeyK');
   await page.getByText('Switch to العربية', { exact: true }).click();
 
   await expect(page.locator('html')).toHaveAttribute('lang', 'ar');
   await expect(page.locator('html')).toHaveAttribute('dir', 'rtl');
-  await expect(page.getByText('عرض المشاريع', { exact: true })).toBeAttached();
+  await expect(
+    page.getByRole('heading', { name: 'أعمال مختارة' }),
+  ).toBeAttached();
+  await page.keyboard.press('Control+KeyK');
+  await expect(
+    page.getByText('الانتقال إلى الأعمال', { exact: true }),
+  ).toBeVisible();
   expect(runtimeErrors).toEqual([]);
 });
 
