@@ -221,15 +221,11 @@ class _Header extends StatelessWidget {
           ],
         ),
       ),
-      Semantics(
-        button: true,
-        label: 'Close Engineering Lab',
-        child: IconButton(
-          tooltip: 'Close Engineering Lab',
-          onPressed: onClose,
-          icon: const Icon(Icons.close_rounded),
-          color: AppColors.textSecondary,
-        ),
+      IconButton(
+        tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
+        onPressed: onClose,
+        icon: const Icon(Icons.close_rounded),
+        color: AppColors.textSecondary,
       ),
     ],
   );

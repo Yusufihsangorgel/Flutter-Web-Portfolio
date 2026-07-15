@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Instant engineering shell** that renders accessible, indexable content before Flutter's first frame
 - **Release preparation gate** that strips renderer symbol maps and budgets the complete public artifact
 - **Container packaging gate** that validates Nginx syntax during both image creation and CI
+- **Dart source-graph gate** that rejects unreachable production files before release
 
 ### Changed
 
@@ -53,6 +54,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Renderer debug symbol maps are no longer published by Docker or GitHub Pages releases
 - Stable Flutter entrypoint names now carry a content hash and renderer URLs include the exact engine revision, enabling cache-safe one-year binary responses
 - The footer's five-click message is deterministic, localized, and free of unverifiable implementation claims
+- Interactive controls now expose one localized accessible name, a concrete button/link role, keyboard focus, and selected state without duplicate screen-reader announcements
+- The hero and section titles now publish an explicit level-one/level-two heading hierarchy, verified from Chromium's accessibility tree on desktop and mobile
+- Reduced-motion sessions reveal scroll content immediately, use deterministic section jumps, and recheck visibility after post-jump layout
 
 ## [1.1.0] - 2026-03-23
 

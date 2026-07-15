@@ -10,6 +10,7 @@ import 'package:flutter_web_portfolio/app/controllers/sound_controller.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
 import 'package:flutter_web_portfolio/app/core/constants/breakpoints.dart';
 import 'package:flutter_web_portfolio/app/core/constants/cinematic_curves.dart';
+import 'package:flutter_web_portfolio/app/widgets/cinematic_focusable.dart';
 
 /// Full-screen overlay menu with staggered panel animations.
 ///
@@ -135,6 +136,7 @@ class _FullscreenMenuState extends State<FullscreenMenu>
         children: [
           Positioned.fill(
             child: GestureDetector(
+              excludeFromSemantics: true,
               onTap: _close,
               child: BackdropFilter(
                 filter: ImageFilter.blur(
@@ -157,6 +159,7 @@ class _FullscreenMenuState extends State<FullscreenMenu>
               opacity: _overlayOpacity.value,
               child: IconButton(
                 onPressed: _close,
+                tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
                 icon: const Icon(Icons.close, color: Colors.white, size: 32),
               ),
             ),
@@ -201,6 +204,9 @@ class _FullscreenMenuState extends State<FullscreenMenu>
                       child: _MenuItemWidget(
                         item: item,
                         label: label,
+                        isSelected:
+                            context.read<AppScrollController>().activeSection ==
+                            item.sectionId,
                         isHovered: _hoveredIndex == index,
                         isMobile: isMobile,
                         onTap: () => _navigateToSection(item.sectionId),
@@ -235,6 +241,7 @@ class _MenuItemWidget extends StatelessWidget {
   const _MenuItemWidget({
     required this.item,
     required this.label,
+    required this.isSelected,
     required this.isHovered,
     required this.isMobile,
     required this.onTap,
@@ -243,6 +250,7 @@ class _MenuItemWidget extends StatelessWidget {
 
   final _MenuItem item;
   final String label;
+  final bool isSelected;
   final bool isHovered;
   final bool isMobile;
   final VoidCallback onTap;
@@ -254,87 +262,85 @@ class _MenuItemWidget extends StatelessWidget {
     const accentColor = AppColors.accent;
     final fontSize = isMobile ? 28.0 : 48.0;
 
-    return MouseRegion(
-      onEnter: (_) => onHover(true),
-      onExit: (_) => onHover(false),
-      cursor: SystemMouseCursors.click,
-      child: GestureDetector(
-        onTap: onTap,
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          curve: Curves.easeOut,
-          padding: EdgeInsets.symmetric(
-            vertical: isMobile ? 12 : 16,
-            horizontal: isHovered ? 16 : 0,
-          ),
-          decoration: BoxDecoration(
-            border: Border(
-              bottom: BorderSide(
-                color: Colors.white.withValues(alpha: 0.08),
-                width: 1,
-              ),
+    return CinematicFocusable(
+      onTap: onTap,
+      onHoverChanged: onHover,
+      semanticLabel: label,
+      selected: isSelected,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        curve: Curves.easeOut,
+        padding: EdgeInsets.symmetric(
+          vertical: isMobile ? 12 : 16,
+          horizontal: isHovered ? 16 : 0,
+        ),
+        decoration: BoxDecoration(
+          border: Border(
+            bottom: BorderSide(
+              color: Colors.white.withValues(alpha: 0.08),
+              width: 1,
             ),
           ),
-          child: Row(
-            children: [
-              // Number
-              AnimatedDefaultTextStyle(
-                duration: const Duration(milliseconds: 200),
-                style: AppFonts.jetBrainsMono(
-                  fontSize: isMobile ? 12 : 14,
-                  fontWeight: FontWeight.w400,
-                  color: isHovered
-                      ? accentColor
-                      : textColor.withValues(alpha: 0.4),
-                  letterSpacing: 2,
-                ),
-                child: Text(item.number),
+        ),
+        child: Row(
+          children: [
+            // Number
+            AnimatedDefaultTextStyle(
+              duration: const Duration(milliseconds: 200),
+              style: AppFonts.jetBrainsMono(
+                fontSize: isMobile ? 12 : 14,
+                fontWeight: FontWeight.w400,
+                color: isHovered
+                    ? accentColor
+                    : textColor.withValues(alpha: 0.4),
+                letterSpacing: 2,
               ),
-              SizedBox(width: isMobile ? 16 : 32),
+              child: Text(item.number),
+            ),
+            SizedBox(width: isMobile ? 16 : 32),
 
-              // Icon
-              AnimatedContainer(
+            // Icon
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              child: Icon(
+                item.icon,
+                size: isMobile ? 20 : 24,
+                color: isHovered
+                    ? accentColor
+                    : textColor.withValues(alpha: 0.5),
+              ),
+            ),
+            SizedBox(width: isMobile ? 12 : 24),
+
+            // Label
+            Expanded(
+              child: AnimatedDefaultTextStyle(
                 duration: const Duration(milliseconds: 200),
+                style: AppFonts.spaceGrotesk(
+                  fontSize: fontSize,
+                  fontWeight: isHovered ? FontWeight.w700 : FontWeight.w300,
+                  color: isHovered ? accentColor : textColor,
+                  letterSpacing: isHovered ? 2 : 0,
+                ),
+                child: Text(label),
+              ),
+            ),
+
+            // Arrow on hover
+            AnimatedOpacity(
+              duration: const Duration(milliseconds: 200),
+              opacity: isHovered ? 1.0 : 0.0,
+              child: AnimatedSlide(
+                duration: const Duration(milliseconds: 200),
+                offset: Offset(isHovered ? 0 : -0.5, 0),
                 child: Icon(
-                  item.icon,
-                  size: isMobile ? 20 : 24,
-                  color: isHovered
-                      ? accentColor
-                      : textColor.withValues(alpha: 0.5),
+                  Icons.arrow_forward,
+                  color: accentColor,
+                  size: isMobile ? 20 : 28,
                 ),
               ),
-              SizedBox(width: isMobile ? 12 : 24),
-
-              // Label
-              Expanded(
-                child: AnimatedDefaultTextStyle(
-                  duration: const Duration(milliseconds: 200),
-                  style: AppFonts.spaceGrotesk(
-                    fontSize: fontSize,
-                    fontWeight: isHovered ? FontWeight.w700 : FontWeight.w300,
-                    color: isHovered ? accentColor : textColor,
-                    letterSpacing: isHovered ? 2 : 0,
-                  ),
-                  child: Text(label),
-                ),
-              ),
-
-              // Arrow on hover
-              AnimatedOpacity(
-                duration: const Duration(milliseconds: 200),
-                opacity: isHovered ? 1.0 : 0.0,
-                child: AnimatedSlide(
-                  duration: const Duration(milliseconds: 200),
-                  offset: Offset(isHovered ? 0 : -0.5, 0),
-                  child: Icon(
-                    Icons.arrow_forward,
-                    color: accentColor,
-                    size: isMobile ? 20 : 28,
-                  ),
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

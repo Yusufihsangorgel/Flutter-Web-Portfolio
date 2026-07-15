@@ -62,5 +62,31 @@ void main() {
 
       expect(hasDivider, isTrue);
     });
+
+    testWidgets('exposes one level-two heading', (tester) async {
+      final semantics = tester.ensureSemantics();
+      try {
+        await tester.pumpWidget(
+          const MaterialApp(
+            home: Scaffold(
+              body: NumberedSectionHeading(
+                number: '04',
+                title: 'Evidence',
+                accent: Colors.cyan,
+              ),
+            ),
+          ),
+        );
+
+        final data = tester
+            .getSemantics(find.bySemanticsLabel('Evidence'))
+            .getSemanticsData();
+        expect(data.flagsCollection.isHeader, isTrue);
+        expect(data.headingLevel, 2);
+        expect(find.bySemanticsLabel('04.'), findsNothing);
+      } finally {
+        semantics.dispose();
+      }
+    });
   });
 }

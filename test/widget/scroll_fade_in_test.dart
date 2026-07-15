@@ -40,5 +40,43 @@ void main() {
 
       expect(find.text('Custom'), findsOneWidget);
     });
+
+    testWidgets('reveals after a programmatic jump settles layout', (
+      tester,
+    ) async {
+      final controller = ScrollController();
+      addTearDown(controller.dispose);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: SingleChildScrollView(
+              controller: controller,
+              child: const Column(
+                children: [
+                  SizedBox(height: 900),
+                  ScrollFadeIn(
+                    child: SizedBox(height: 200, child: Text('Target')),
+                  ),
+                  SizedBox(height: 900),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+
+      final targetOpacity = find.ancestor(
+        of: find.text('Target'),
+        matching: find.byType(Opacity),
+      );
+      expect(tester.widget<Opacity>(targetOpacity).opacity, 0);
+
+      controller.jumpTo(850);
+      await tester.pump();
+      await tester.pumpAndSettle();
+
+      expect(tester.widget<Opacity>(targetOpacity).opacity, 1);
+    });
   });
 }

@@ -92,45 +92,39 @@ class _QuickLinkButtonState extends State<_QuickLinkButton> {
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
-      child: MouseRegion(
-        onEnter: (_) => setState(() => _hovered = true),
-        onExit: (_) => setState(() => _hovered = false),
-        cursor: SystemMouseCursors.click,
-        child: GestureDetector(
-          onTap: () {
-            context.read<SoundController>().playClick();
-            context.read<AppScrollController>().scrollToSection(
-              widget.sectionId,
-            );
-          },
-          child: AnimatedContainer(
-            duration: AppDurations.fast,
-            curve: CinematicCurves.hoverLift,
-            transform: Matrix4.translationValues(
-              _hovered && !widget.centered ? 6 : 0,
-              0,
-              0,
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // Expanding accent dash indicator
-                AnimatedContainer(
-                  duration: AppDurations.fast,
-                  width: _hovered ? 20 : 0,
-                  height: 1,
-                  color: AppColors.accent.withValues(alpha: 0.6),
+      child: CinematicFocusable(
+        semanticLabel: widget.label,
+        onHoverChanged: (hovered) => setState(() => _hovered = hovered),
+        onTap: () => context.read<AppScrollController>().scrollToSection(
+          widget.sectionId,
+        ),
+        child: AnimatedContainer(
+          duration: AppDurations.fast,
+          curve: CinematicCurves.hoverLift,
+          transform: Matrix4.translationValues(
+            _hovered && !widget.centered ? 6 : 0,
+            0,
+            0,
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Expanding accent dash indicator
+              AnimatedContainer(
+                duration: AppDurations.fast,
+                width: _hovered ? 20 : 0,
+                height: 1,
+                color: AppColors.accent.withValues(alpha: 0.6),
+              ),
+              if (_hovered) const SizedBox(width: 8),
+              Text(
+                widget.label,
+                style: AppFonts.jetBrainsMono(
+                  fontSize: 13,
+                  color: _hovered ? AppColors.accent : baseColor,
                 ),
-                if (_hovered) const SizedBox(width: 8),
-                Text(
-                  widget.label,
-                  style: AppFonts.jetBrainsMono(
-                    fontSize: 13,
-                    color: _hovered ? AppColors.accent : baseColor,
-                  ),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),

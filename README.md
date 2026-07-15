@@ -50,7 +50,7 @@ The Engineering Lab reports values from the current browser session. It delibera
 
 📱 **Responsive** — mobile, tablet, and desktop breakpoints
 
-♿ **Accessible Controls** — semantics, keyboard navigation, skip link, focus states, and reduced-motion-aware dialogs
+♿ **Accessible Controls** — one-name controls, H1/H2 semantics, keyboard navigation, skip link, focus states, and reduced-motion-aware navigation
 
 ---
 
@@ -152,6 +152,7 @@ Run the same quality gates as CI:
 ```bash
 flutter analyze --fatal-infos
 flutter test
+npm run verify:source
 flutter build web --release --wasm --no-web-resources-cdn
 npm run prepare:bundle
 npm run verify:bundle
@@ -172,7 +173,7 @@ server can delay only Wasm responses without changing application code:
 WASM_DELAY_MS=5000 PORT=4174 node tool/serve_web.mjs
 ```
 
-Tests cover pure state transitions, out-of-order locale requests, repositories, scene configuration, responsive widgets, the command palette, and narrow-screen Engineering Lab layout.
+Tests cover pure state transitions, out-of-order locale requests, repositories, scene configuration, responsive widgets, the command palette, and narrow-screen Engineering Lab layout. The source-graph gate also rejects Dart files that are no longer reachable from `lib/main.dart`, so retired features cannot survive as dormant production code.
 
 The release preparation step removes renderer debug symbol maps, versions app entrypoints with a content hash, and moves renderer binaries below Flutter's exact engine revision. Nginx can therefore cache those large immutable responses for a year without pairing a new bootstrap with stale runtime bytes. The bundle gate rejects unversioned artifacts, caps the complete public release at 36 MiB, `main.dart.wasm` at 3 MiB, and the JavaScript fallback at 4 MiB. It also verifies the Wasm header, dual-runtime build configuration, custom first-frame bootstrap, same-origin fallback fonts, and the fetch-free retirement worker used to remove legacy service-worker registrations.
 

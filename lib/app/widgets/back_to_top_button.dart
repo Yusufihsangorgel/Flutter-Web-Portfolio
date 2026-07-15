@@ -8,6 +8,7 @@ import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
 import 'package:flutter_web_portfolio/app/core/constants/breakpoints.dart';
 import 'package:flutter_web_portfolio/app/core/constants/cinematic_curves.dart';
 import 'package:flutter_web_portfolio/app/core/constants/durations.dart';
+import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
 
 /// Floating back-to-top control with a live document-scroll progress arc.
 class BackToTopButton extends StatefulWidget {
@@ -106,26 +107,34 @@ class _BackToTopButtonState extends State<BackToTopButton>
                     cursor: SystemMouseCursors.click,
                     child: Semantics(
                       button: true,
-                      label: 'Back to top',
-                      child: GestureDetector(
-                        onTap: _scrollToTop,
-                        child: SizedBox.square(
-                          dimension: buttonSize,
-                          child: CustomPaint(
-                            painter: _ScrollProgressPainter(
-                              progress: _scrollProgress,
-                              hovered: _hovered,
-                            ),
-                            child: Center(
-                              child: AnimatedScale(
-                                scale: _hovered ? 1.15 : 1,
-                                duration: AppDurations.fast,
-                                child: Icon(
-                                  Icons.arrow_upward_rounded,
-                                  size: isMobile ? 18 : 22,
-                                  color: _hovered
-                                      ? AppColors.accent
-                                      : AppColors.textPrimary,
+                      focusable: true,
+                      label: context.read<LanguageCubit>().getText(
+                        'accessibility.back_to_top',
+                        defaultValue: 'Back to top',
+                      ),
+                      onTap: _scrollToTop,
+                      excludeSemantics: true,
+                      child: ExcludeSemantics(
+                        child: GestureDetector(
+                          onTap: _scrollToTop,
+                          child: SizedBox.square(
+                            dimension: buttonSize,
+                            child: CustomPaint(
+                              painter: _ScrollProgressPainter(
+                                progress: _scrollProgress,
+                                hovered: _hovered,
+                              ),
+                              child: Center(
+                                child: AnimatedScale(
+                                  scale: _hovered ? 1.15 : 1,
+                                  duration: AppDurations.fast,
+                                  child: Icon(
+                                    Icons.arrow_upward_rounded,
+                                    size: isMobile ? 18 : 22,
+                                    color: _hovered
+                                        ? AppColors.accent
+                                        : AppColors.textPrimary,
+                                  ),
                                 ),
                               ),
                             ),

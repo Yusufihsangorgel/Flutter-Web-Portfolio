@@ -22,6 +22,7 @@ jobs:
       - run: flutter pub get
       - run: dart format --output=none --set-exit-if-changed lib test
       - run: flutter analyze --fatal-infos
+      - run: npm run verify:source
 
   test:
     runs-on: ubuntu-latest

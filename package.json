@@ -8,6 +8,7 @@
     "test:e2e": "playwright test",
     "test:e2e:prod": "playwright test --config playwright.prod.config.ts",
     "render:social-card": "node tool/render_social_card.mjs",
+    "verify:source": "node tool/verify_dart_reachability.mjs",
     "prepare:bundle": "node tool/prepare_web_release.mjs",
     "verify:bundle": "node tool/verify_web_build.mjs"
   },

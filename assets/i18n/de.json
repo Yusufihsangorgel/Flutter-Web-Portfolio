@@ -197,6 +197,13 @@
     "projects": "Systeme",
     "proof": "Nachweise"
   },
+  "accessibility": {
+    "skip_to_content": "Zum Inhalt springen",
+    "back_to_top": "Nach oben",
+    "language_menu": "Sprachmenü",
+    "mute_sound_effects": "Soundeffekte stummschalten",
+    "enable_sound_effects": "Soundeffekte aktivieren"
+  },
   "about_section": {
     "title": "Systemprofil",
     "bio": "Dieses Portfolio dokumentiert Design, Messung, Tests und Betrieb von Software, ohne persönliche Identität offenzulegen.",

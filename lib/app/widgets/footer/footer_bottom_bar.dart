@@ -54,10 +54,15 @@ class _EngineeringLabButton extends StatelessWidget {
   const _EngineeringLabButton();
 
   @override
-  Widget build(BuildContext context) => Semantics(
-    button: true,
-    label: 'Open Engineering Lab',
-    child: InkWell(
+  Widget build(BuildContext context) {
+    final languageController = context.read<LanguageCubit>();
+    final label = languageController.getText(
+      'command_palette.open_lab',
+      defaultValue: 'Open Engineering Lab',
+    );
+
+    return CinematicFocusable(
+      semanticLabel: label,
       borderRadius: BorderRadius.circular(6),
       onTap: () {
         final scrollController = context.read<AppScrollController>();
@@ -83,7 +88,10 @@ class _EngineeringLabButton extends StatelessWidget {
             ),
             const SizedBox(width: 5),
             Text(
-              'Inspect runtime',
+              languageController.getText(
+                'home_section.inspect_runtime',
+                defaultValue: 'Inspect runtime',
+              ),
               style: AppFonts.jetBrainsMono(
                 fontSize: 10,
                 color: AppColors.accent,
@@ -93,8 +101,8 @@ class _EngineeringLabButton extends StatelessWidget {
           ],
         ),
       ),
-    ),
-  );
+    );
+  }
 }
 
 // =============================================================================

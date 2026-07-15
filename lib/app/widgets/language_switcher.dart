@@ -18,23 +18,33 @@ class LanguageSwitcher extends StatelessWidget {
       builder: (context, languageState) =>
           BlocSelector<SceneDirector, SceneState, Color>(
             selector: (state) => state.currentAccent,
-            builder: (context, accent) => Semantics(
-              label: 'Language',
-              child: PopupMenuButton<String>(
+            builder: (context, accent) {
+              final menuLabel = languageController.getText(
+                'accessibility.language_menu',
+                defaultValue: 'Language menu',
+              );
+              final currentLanguage = LanguageCubit.getLanguageName(
+                languageState.languageCode,
+              );
+
+              return PopupMenuButton<String>(
+                tooltip: '$menuLabel: $currentLanguage',
                 offset: const Offset(0, 40),
-                icon: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      languageController.languageInfo['flag'] ?? '',
-                      style: const TextStyle(fontSize: 24),
-                    ),
-                    Icon(
-                      Icons.arrow_drop_down,
-                      color: Colors.white.withValues(alpha: 0.3),
-                      size: 18,
-                    ),
-                  ],
+                icon: ExcludeSemantics(
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        languageController.languageInfo['flag'] ?? '',
+                        style: const TextStyle(fontSize: 24),
+                      ),
+                      Icon(
+                        Icons.arrow_drop_down,
+                        color: Colors.white.withValues(alpha: 0.3),
+                        size: 18,
+                      ),
+                    ],
+                  ),
                 ),
                 color: AppColors.backgroundLight,
                 shape: RoundedRectangleBorder(
@@ -77,7 +87,12 @@ class LanguageSwitcher extends StatelessWidget {
                           ),
                           child: Row(
                             children: [
-                              Text(flag, style: const TextStyle(fontSize: 24)),
+                              ExcludeSemantics(
+                                child: Text(
+                                  flag,
+                                  style: const TextStyle(fontSize: 24),
+                                ),
+                              ),
                               const SizedBox(width: 12),
                               Text(
                                 languageName,
@@ -96,8 +111,8 @@ class LanguageSwitcher extends StatelessWidget {
                       );
                     })
                     .toList(),
-              ),
-            ),
+              );
+            },
           ),
     );
   }

@@ -97,6 +97,7 @@ class _CustomSliverAppBarState extends State<CustomSliverAppBar> {
       backgroundColor: Colors.transparent,
       elevation: 0,
       automaticallyImplyLeading: false,
+      excludeHeaderSemantics: true,
       flexibleSpace: Column(
         children: [
           Expanded(
@@ -121,6 +122,10 @@ class _CustomSliverAppBarState extends State<CustomSliverAppBar> {
         onTap: () => widget.scrollController.scrollToSection('home'),
         scaleFactor: _scaleFactor,
         languageController: widget.languageController,
+        semanticLabel: widget.languageController.getText(
+          'accessibility.back_to_top',
+          defaultValue: 'Back to top',
+        ),
       ),
       leading: isMobile
           ? IconButton(
@@ -183,10 +188,12 @@ class _LogoText extends StatefulWidget {
     required this.onTap,
     this.scaleFactor = 1.0,
     required this.languageController,
+    required this.semanticLabel,
   });
   final VoidCallback onTap;
   final double scaleFactor;
   final LanguageCubit languageController;
+  final String semanticLabel;
 
   @override
   State<_LogoText> createState() => _LogoTextState();
@@ -200,30 +207,27 @@ class _LogoTextState extends State<_LogoText> {
     const baseColor = AppColors.textBright;
     const hoverColor = Colors.white;
 
-    return Semantics(
-      button: true,
-      label: 'Scroll to top',
-      child: CinematicFocusable(
-        onTap: widget.onTap,
-        onHoverChanged: (h) => setState(() => _hovered = h),
-        child: AnimatedContainer(
-          duration: AppDurations.buttonHover,
-          child: Text(
-            AppConfig.initials(widget.languageController),
-            style: AppFonts.spaceGrotesk(
-              fontSize: 20 * widget.scaleFactor,
-              fontWeight: FontWeight.w700,
-              color: _hovered ? hoverColor : baseColor,
-              letterSpacing: 1,
-              shadows: _hovered
-                  ? [
-                      Shadow(
-                        color: hoverColor.withValues(alpha: 0.3),
-                        blurRadius: 12,
-                      ),
-                    ]
-                  : [],
-            ),
+    return CinematicFocusable(
+      onTap: widget.onTap,
+      onHoverChanged: (h) => setState(() => _hovered = h),
+      semanticLabel: widget.semanticLabel,
+      child: AnimatedContainer(
+        duration: AppDurations.buttonHover,
+        child: Text(
+          AppConfig.initials(widget.languageController),
+          style: AppFonts.spaceGrotesk(
+            fontSize: 20 * widget.scaleFactor,
+            fontWeight: FontWeight.w700,
+            color: _hovered ? hoverColor : baseColor,
+            letterSpacing: 1,
+            shadows: _hovered
+                ? [
+                    Shadow(
+                      color: hoverColor.withValues(alpha: 0.3),
+                      blurRadius: 12,
+                    ),
+                  ]
+                : [],
           ),
         ),
       ),
@@ -260,46 +264,42 @@ class _NavItemState extends State<_NavItem> {
     const inactiveColor = AppColors.textPrimary;
     const underlineColor = Colors.white;
 
-    return Semantics(
-      button: true,
-      label: widget.label,
-      child: CinematicFocusable(
-        onTap: widget.onTap,
-        onHoverChanged: (h) => setState(() => _hovered = h),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                widget.label.toUpperCase(),
-                style: AppFonts.spaceGrotesk(
-                  fontSize: 12 * widget.scaleFactor,
-                  fontWeight: widget.isActive
-                      ? FontWeight.w600
-                      : FontWeight.w400,
-                  color: widget.isActive
-                      ? activeColor
-                      : (_hovered ? activeColor : inactiveColor),
-                  letterSpacing: 2,
+    return CinematicFocusable(
+      onTap: widget.onTap,
+      onHoverChanged: (h) => setState(() => _hovered = h),
+      semanticLabel: widget.label,
+      selected: widget.isActive,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              widget.label.toUpperCase(),
+              style: AppFonts.spaceGrotesk(
+                fontSize: 12 * widget.scaleFactor,
+                fontWeight: widget.isActive ? FontWeight.w600 : FontWeight.w400,
+                color: widget.isActive
+                    ? activeColor
+                    : (_hovered ? activeColor : inactiveColor),
+                letterSpacing: 2,
+              ),
+            ),
+            const SizedBox(height: 4),
+            // Underline — animates from left
+            Align(
+              alignment: Alignment.centerLeft,
+              child: AnimatedContainer(
+                duration: AppDurations.buttonHover,
+                curve: CinematicCurves.hoverLift,
+                width: widget.isActive || _hovered ? 20 : 0,
+                height: 1,
+                color: underlineColor.withValues(
+                  alpha: widget.isActive ? 0.6 : 0.3,
                 ),
               ),
-              const SizedBox(height: 4),
-              // Underline — animates from left
-              Align(
-                alignment: Alignment.centerLeft,
-                child: AnimatedContainer(
-                  duration: AppDurations.buttonHover,
-                  curve: CinematicCurves.hoverLift,
-                  width: widget.isActive || _hovered ? 20 : 0,
-                  height: 1,
-                  color: underlineColor.withValues(
-                    alpha: widget.isActive ? 0.6 : 0.3,
-                  ),
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

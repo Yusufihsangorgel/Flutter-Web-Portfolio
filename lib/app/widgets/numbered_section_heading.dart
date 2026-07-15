@@ -23,32 +23,47 @@ class NumberedSectionHeading extends StatelessWidget {
   final Color accent;
 
   @override
-  Widget build(BuildContext context) => Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    mainAxisSize: MainAxisSize.min,
-    children: [
-      Row(
+  Widget build(BuildContext context) => Semantics(
+    header: true,
+    headingLevel: 2,
+    label: title,
+    excludeSemantics: true,
+    child: ExcludeSemantics(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.baseline,
-        textBaseline: TextBaseline.alphabetic,
         children: [
-          Text(
-            '$number.',
-            style: AppFonts.jetBrainsMono(
-              fontSize: AppTypography.h1.fontSize,
-              fontWeight: FontWeight.w400,
-              height: AppTypography.h1.height,
-              color: accent,
-            ),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.baseline,
+            textBaseline: TextBaseline.alphabetic,
+            children: [
+              Text(
+                '$number.',
+                style: AppFonts.jetBrainsMono(
+                  fontSize: AppTypography.h1.fontSize,
+                  fontWeight: FontWeight.w400,
+                  height: AppTypography.h1.height,
+                  color: accent,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Flexible(
+                child: Text(
+                  title,
+                  style: AppTypography.h1.copyWith(color: accent),
+                ),
+              ),
+            ],
           ),
-          const SizedBox(width: 8),
-          Flexible(
-            child: Text(title, style: AppTypography.h1.copyWith(color: accent)),
+          const SizedBox(height: 8),
+          Container(
+            width: 100,
+            height: 1,
+            color: accent.withValues(alpha: 0.15),
           ),
         ],
       ),
-      const SizedBox(height: 8),
-      Container(width: 100, height: 1, color: accent.withValues(alpha: 0.15)),
-    ],
+    ),
   );
 }

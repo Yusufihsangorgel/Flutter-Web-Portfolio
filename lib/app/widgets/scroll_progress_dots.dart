@@ -8,6 +8,7 @@ import 'package:flutter_web_portfolio/app/controllers/scroll_controller.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
 import 'package:flutter_web_portfolio/app/core/constants/durations.dart';
 import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
+import 'package:flutter_web_portfolio/app/widgets/cinematic_focusable.dart';
 
 /// Vertical column of dots fixed on the right side of the viewport.
 ///
@@ -74,51 +75,57 @@ class _DotState extends State<_Dot> {
         final isActive = scrollState.activeSection == widget.sectionId;
         final dotSize = isActive ? 8.0 : 4.0;
         final color = isActive ? AppColors.accent : AppColors.textSecondary;
+        final languageController = context.read<LanguageCubit>();
+        final sectionLabel = languageController.getText(
+          'nav.${widget.sectionId}',
+          defaultValue: widget.sectionId,
+        );
+        final semanticLabel = languageController
+            .getText('command_palette.go_to', defaultValue: 'Go to {section}')
+            .replaceAll('{section}', sectionLabel);
 
         return BlocSelector<SceneDirector, SceneState, double>(
           selector: (state) => state.sceneProgress,
           builder: (context, sceneProgress) => Padding(
             padding: const EdgeInsets.symmetric(vertical: 6),
-            child: MouseRegion(
-              onEnter: (_) => setState(() => _hovered = true),
-              onExit: (_) => setState(() => _hovered = false),
-              cursor: SystemMouseCursors.click,
-              child: GestureDetector(
-                onTap: () => scrollController.scrollToSection(widget.sectionId),
-                behavior: HitTestBehavior.opaque,
-                child: SizedBox(
-                  width: 20,
-                  height: 20,
-                  child: CustomPaint(
-                    painter: isActive
-                        ? _ProgressArcPainter(
-                            progress: sceneProgress,
-                            color: AppColors.accent.withValues(alpha: 0.6),
-                          )
-                        : null,
-                    child: Center(
-                      child: AnimatedContainer(
-                        duration: _hovered
-                            ? AppDurations.microFast
-                            : AppDurations.medium,
-                        curve: Curves.easeOutCubic,
-                        width: _hovered && !isActive ? 6.0 : dotSize,
-                        height: _hovered && !isActive ? 6.0 : dotSize,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: color,
-                          boxShadow: isActive
-                              ? [
-                                  BoxShadow(
-                                    color: AppColors.accent.withValues(
-                                      alpha: 0.5,
-                                    ),
-                                    blurRadius: 8,
-                                    spreadRadius: 1,
+            child: CinematicFocusable(
+              onTap: () => scrollController.scrollToSection(widget.sectionId),
+              onHoverChanged: (hovered) => setState(() => _hovered = hovered),
+              semanticLabel: semanticLabel,
+              selected: isActive,
+              borderRadius: BorderRadius.circular(10),
+              child: SizedBox(
+                width: 20,
+                height: 20,
+                child: CustomPaint(
+                  painter: isActive
+                      ? _ProgressArcPainter(
+                          progress: sceneProgress,
+                          color: AppColors.accent.withValues(alpha: 0.6),
+                        )
+                      : null,
+                  child: Center(
+                    child: AnimatedContainer(
+                      duration: _hovered
+                          ? AppDurations.microFast
+                          : AppDurations.medium,
+                      curve: Curves.easeOutCubic,
+                      width: _hovered && !isActive ? 6.0 : dotSize,
+                      height: _hovered && !isActive ? 6.0 : dotSize,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: color,
+                        boxShadow: isActive
+                            ? [
+                                BoxShadow(
+                                  color: AppColors.accent.withValues(
+                                    alpha: 0.5,
                                   ),
-                                ]
-                              : null,
-                        ),
+                                  blurRadius: 8,
+                                  spreadRadius: 1,
+                                ),
+                              ]
+                            : null,
                       ),
                     ),
                   ),

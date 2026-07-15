@@ -197,6 +197,13 @@
       }
     ]
   },
+  "accessibility": {
+    "skip_to_content": "İçeriğe geç",
+    "back_to_top": "Başa dön",
+    "language_menu": "Dil menüsü",
+    "mute_sound_effects": "Ses efektlerini kapat",
+    "enable_sound_effects": "Ses efektlerini aç"
+  },
   "about_section": {
     "title": "Sistem Profili",
     "bio": "Bu portföy, kişisel kimliği açığa çıkarmadan yazılımın nasıl tasarlandığını, ölçüldüğünü, test edildiğini ve işletildiğini belgeler.",

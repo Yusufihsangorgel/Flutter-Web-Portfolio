@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_web_portfolio/app/controllers/sound_controller.dart';
 import 'package:flutter_web_portfolio/app/controllers/sound_state.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
+import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
 
 /// Animated speaker icon that toggles the [SoundController] on/off.
 ///
@@ -66,52 +67,54 @@ class _SoundToggleState extends State<SoundToggle>
       buildWhen: (previous, current) => previous.isEnabled != current.isEnabled,
       builder: (context, state) {
         final enabled = state.isEnabled;
+        final languageController = context.read<LanguageCubit>();
+        final tooltip = languageController.getText(
+          enabled
+              ? 'accessibility.mute_sound_effects'
+              : 'accessibility.enable_sound_effects',
+          defaultValue: enabled ? 'Mute sound effects' : 'Enable sound effects',
+        );
 
-        return Semantics(
-          label: enabled ? 'Mute sound effects' : 'Enable sound effects',
-          child: Stack(
-            alignment: Alignment.center,
-            clipBehavior: Clip.none,
-            children: [
-              // ── Main toggle button ──────────────────────────────────
-              IconButton(
-                onPressed: () => _onToggle(controller),
-                tooltip: enabled ? 'Mute sounds' : 'Unmute sounds',
-                icon: AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 250),
-                  switchInCurve: Curves.easeOutCubic,
-                  switchOutCurve: Curves.easeInCubic,
-                  transitionBuilder: (child, animation) => FadeTransition(
-                    opacity: animation,
-                    child: ScaleTransition(
-                      scale: Tween<double>(
-                        begin: 0.7,
-                        end: 1.0,
-                      ).animate(animation),
-                      child: child,
-                    ),
-                  ),
-                  child: Icon(
-                    enabled
-                        ? Icons.volume_up_rounded
-                        : Icons.volume_off_rounded,
-                    key: ValueKey(enabled),
-                    color: iconColor,
-                    size: 22,
+        return Stack(
+          alignment: Alignment.center,
+          clipBehavior: Clip.none,
+          children: [
+            // ── Main toggle button ──────────────────────────────────
+            IconButton(
+              onPressed: () => _onToggle(controller),
+              tooltip: tooltip,
+              icon: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 250),
+                switchInCurve: Curves.easeOutCubic,
+                switchOutCurve: Curves.easeInCubic,
+                transitionBuilder: (child, animation) => FadeTransition(
+                  opacity: animation,
+                  child: ScaleTransition(
+                    scale: Tween<double>(
+                      begin: 0.7,
+                      end: 1.0,
+                    ).animate(animation),
+                    child: child,
                   ),
                 ),
-              ),
-
-              // ── Volume indicator pill ───────────────────────────────
-              Positioned(
-                bottom: -4,
-                child: FadeTransition(
-                  opacity: _indicatorOpacity,
-                  child: _VolumeIndicatorDot(enabled: enabled),
+                child: Icon(
+                  enabled ? Icons.volume_up_rounded : Icons.volume_off_rounded,
+                  key: ValueKey(enabled),
+                  color: iconColor,
+                  size: 22,
                 ),
               ),
-            ],
-          ),
+            ),
+
+            // ── Volume indicator pill ───────────────────────────────
+            Positioned(
+              bottom: -4,
+              child: FadeTransition(
+                opacity: _indicatorOpacity,
+                child: _VolumeIndicatorDot(enabled: enabled),
+              ),
+            ),
+          ],
         );
       },
     );

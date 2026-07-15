@@ -24,6 +24,7 @@ jobs:
           cache: true
       - run: flutter clean
       - run: flutter pub get
+      - run: npm run verify:source
       - run: flutter build web --release --wasm --no-web-resources-cdn --base-href "/${{ github.event.repository.name }}/"
       - run: npm ci
       - run: npm run prepare:bundle

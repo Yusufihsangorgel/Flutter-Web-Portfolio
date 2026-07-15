@@ -5,7 +5,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_web_portfolio/app/core/theme/app_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
-import 'package:flutter_web_portfolio/app/controllers/sound_controller.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
 import 'package:flutter_web_portfolio/app/core/constants/cinematic_curves.dart';
 import 'package:flutter_web_portfolio/app/core/constants/durations.dart';
@@ -14,7 +13,6 @@ import 'package:flutter_web_portfolio/app/utils/responsive_utils.dart';
 import 'package:flutter_web_portfolio/app/widgets/border_light_card.dart';
 import 'package:flutter_web_portfolio/app/widgets/cinematic_focusable.dart';
 import 'package:flutter_web_portfolio/app/widgets/numbered_section_heading.dart';
-import 'package:flutter_web_portfolio/app/widgets/project_detail_overlay.dart';
 import 'package:flutter_web_portfolio/app/widgets/scroll_fade_in.dart';
 import 'package:flutter_web_portfolio/app/widgets/scene_accent_builder.dart';
 import 'package:flutter_web_portfolio/app/widgets/text_scramble.dart';
@@ -207,50 +205,38 @@ class _CategoryChipState extends State<_CategoryChip> {
   bool _hovered = false;
 
   @override
-  Widget build(BuildContext context) => Semantics(
-    button: true,
+  Widget build(BuildContext context) => CinematicFocusable(
+    onTap: widget.onTap,
+    onHoverChanged: (hovered) => setState(() => _hovered = hovered),
+    semanticLabel: widget.label,
     selected: widget.isSelected,
-    label: widget.label,
-    child: MouseRegion(
-      cursor: SystemMouseCursors.click,
-      onEnter: (_) {
-        setState(() => _hovered = true);
-        context.read<SoundController>().playHover();
-      },
-      onExit: (_) => setState(() => _hovered = false),
-      child: GestureDetector(
-        onTap: () {
-          context.read<SoundController>().playClick();
-          widget.onTap();
-        },
-        child: AnimatedContainer(
-          duration: AppDurations.fast,
-          curve: Curves.easeOut,
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          decoration: BoxDecoration(
-            color: widget.isSelected
-                ? widget.accent.withValues(alpha: 0.15)
-                : _hovered
-                ? widget.accent.withValues(alpha: 0.06)
-                : Colors.transparent,
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(
-              color: widget.isSelected
-                  ? widget.accent
-                  : _hovered
-                  ? widget.accent.withValues(alpha: 0.4)
-                  : AppColors.textSecondary.withValues(alpha: 0.3),
-              width: widget.isSelected ? 1.5 : 1,
-            ),
-          ),
-          child: Text(
-            widget.label,
-            style: AppFonts.jetBrainsMono(
-              fontSize: 13,
-              fontWeight: widget.isSelected ? FontWeight.w600 : FontWeight.w400,
-              color: widget.isSelected ? widget.accent : AppColors.textPrimary,
-            ),
-          ),
+    borderRadius: BorderRadius.circular(20),
+    child: AnimatedContainer(
+      duration: AppDurations.fast,
+      curve: Curves.easeOut,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      decoration: BoxDecoration(
+        color: widget.isSelected
+            ? widget.accent.withValues(alpha: 0.15)
+            : _hovered
+            ? widget.accent.withValues(alpha: 0.06)
+            : Colors.transparent,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: widget.isSelected
+              ? widget.accent
+              : _hovered
+              ? widget.accent.withValues(alpha: 0.4)
+              : AppColors.textSecondary.withValues(alpha: 0.3),
+          width: widget.isSelected ? 1.5 : 1,
+        ),
+      ),
+      child: Text(
+        widget.label,
+        style: AppFonts.jetBrainsMono(
+          fontSize: 13,
+          fontWeight: widget.isSelected ? FontWeight.w600 : FontWeight.w400,
+          color: widget.isSelected ? widget.accent : AppColors.textPrimary,
         ),
       ),
     ),
@@ -299,7 +285,9 @@ class _ProjectCardState extends State<_ProjectCard> {
     return SceneAccentBuilder(
       builder: (context, accent) {
         final frontCard = MouseRegion(
-          cursor: SystemMouseCursors.click,
+          cursor: _hasCaseStudy
+              ? SystemMouseCursors.click
+              : SystemMouseCursors.basic,
           onEnter: (_) => setState(() => _hovered = true),
           onExit: (_) => setState(() => _hovered = false),
           child: AnimatedContainer(
@@ -359,16 +347,20 @@ class _ProjectCardState extends State<_ProjectCard> {
         );
 
         if (!_hasCaseStudy) {
-          return GestureDetector(
-            onTap: () => ProjectDetailOverlay.show(context, project),
-            child: frontCard,
-          );
+          return frontCard;
         }
+
+        final caseStudyLabel = context.read<LanguageCubit>().getText(
+          'projects_section.case_study_label',
+          defaultValue: 'Case Study',
+        );
+        final semanticLabel = '$caseStudyLabel: $title';
 
         // On mobile, show case study in a bottom sheet instead of 3D flip
         if (isMobile) {
-          return GestureDetector(
+          return CinematicFocusable(
             onTap: () => _showCaseStudySheet(context, project, accent),
+            semanticLabel: semanticLabel,
             child: Stack(
               children: [
                 frontCard,
@@ -414,6 +406,7 @@ class _ProjectCardState extends State<_ProjectCard> {
         }
 
         return _FlipCard(
+          semanticLabel: semanticLabel,
           front: frontCard,
           back: _ProjectCardBack(
             project: project,
@@ -479,6 +472,7 @@ class _ProjectCardState extends State<_ProjectCard> {
                     Padding(
                       padding: const EdgeInsets.only(left: 8),
                       child: _PlatformIcon(
+                        projectTitle: title,
                         platform: entry.key,
                         url: entry.value,
                         accent: accent,
@@ -531,7 +525,7 @@ class _ProjectCardState extends State<_ProjectCard> {
             ),
             if (url.isNotEmpty) ...[
               const SizedBox(width: 16),
-              _VisitButton(url: url, accent: accent),
+              _VisitButton(projectTitle: title, url: url, accent: accent),
             ],
           ],
         ),
@@ -574,7 +568,8 @@ class _ProjectCardState extends State<_ProjectCard> {
               ),
             ),
           ),
-          if (url.isNotEmpty) _ProjectLink(url: url, accent: accent),
+          if (url.isNotEmpty)
+            _ProjectLink(projectTitle: title, url: url, accent: accent),
         ],
       ),
       const SizedBox(height: 12),
@@ -626,7 +621,13 @@ class _ProjectCardState extends State<_ProjectCard> {
 
 // Project link icon
 class _ProjectLink extends StatefulWidget {
-  const _ProjectLink({required this.url, required this.accent});
+  const _ProjectLink({
+    required this.projectTitle,
+    required this.url,
+    required this.accent,
+  });
+
+  final String projectTitle;
   final String url;
   final Color accent;
 
@@ -651,6 +652,9 @@ class _ProjectLinkState extends State<_ProjectLink> {
       }
     },
     onHoverChanged: (hovered) => setState(() => _hovered = hovered),
+    semanticLabel:
+        '${context.read<LanguageCubit>().getText('projects_section.open_project', defaultValue: 'Open project')}: ${widget.projectTitle}',
+    semanticRole: CinematicControlRole.link,
     borderRadius: BorderRadius.circular(6),
     child: AnimatedContainer(
       duration: AppDurations.fast,
@@ -687,11 +691,13 @@ class _ProjectLinkState extends State<_ProjectLink> {
 /// Small platform icon (web, Play Store, App Store) with tooltip + launch.
 class _PlatformIcon extends StatefulWidget {
   const _PlatformIcon({
+    required this.projectTitle,
     required this.platform,
     required this.url,
     required this.accent,
   });
 
+  final String projectTitle;
   final String platform;
   final String url;
   final Color accent;
@@ -716,13 +722,15 @@ class _PlatformIconState extends State<_PlatformIcon> {
   };
 
   @override
-  Widget build(BuildContext context) => Tooltip(
-    message: _label,
-    child: MouseRegion(
-      cursor: SystemMouseCursors.click,
-      onEnter: (_) => setState(() => _hovered = true),
-      onExit: (_) => setState(() => _hovered = false),
-      child: GestureDetector(
+  Widget build(BuildContext context) {
+    final label = context.read<LanguageCubit>().getText(
+      'projects_section.link_labels.${widget.platform}',
+      defaultValue: _label,
+    );
+
+    return Tooltip(
+      message: label,
+      child: CinematicFocusable(
         onTap: () async {
           var urlString = widget.url;
           if (!urlString.startsWith('http')) urlString = 'https://$urlString';
@@ -731,6 +739,10 @@ class _PlatformIconState extends State<_PlatformIcon> {
             await launchUrl(uri, mode: LaunchMode.externalApplication);
           }
         },
+        onHoverChanged: (hovered) => setState(() => _hovered = hovered),
+        semanticLabel: '$label: ${widget.projectTitle}',
+        semanticRole: CinematicControlRole.link,
+        borderRadius: BorderRadius.circular(6),
         child: AnimatedContainer(
           duration: AppDurations.fast,
           padding: const EdgeInsets.all(6),
@@ -747,13 +759,19 @@ class _PlatformIconState extends State<_PlatformIcon> {
           ),
         ),
       ),
-    ),
-  );
+    );
+  }
 }
 
 /// Prominent "Visit" CTA button for project cards.
 class _VisitButton extends StatefulWidget {
-  const _VisitButton({required this.url, required this.accent});
+  const _VisitButton({
+    required this.projectTitle,
+    required this.url,
+    required this.accent,
+  });
+
+  final String projectTitle;
   final String url;
   final Color accent;
 
@@ -775,6 +793,9 @@ class _VisitButtonState extends State<_VisitButton> {
       }
     },
     onHoverChanged: (hovered) => setState(() => _hovered = hovered),
+    semanticLabel:
+        '${context.read<LanguageCubit>().getText('projects_section.open_project', defaultValue: 'Open project')}: ${widget.projectTitle}',
+    semanticRole: CinematicControlRole.link,
     borderRadius: BorderRadius.circular(8),
     child: AnimatedContainer(
       duration: AppDurations.fast,
@@ -900,7 +921,12 @@ void _showCaseStudySheet(
 // ──────────────────────────────────────────────────────────────────────────────
 
 class _FlipCard extends StatefulWidget {
-  const _FlipCard({required this.front, required this.back});
+  const _FlipCard({
+    required this.semanticLabel,
+    required this.front,
+    required this.back,
+  });
+  final String semanticLabel;
   final Widget front;
   final Widget back;
 
@@ -938,8 +964,9 @@ class _FlipCardState extends State<_FlipCard>
   }
 
   @override
-  Widget build(BuildContext context) => GestureDetector(
+  Widget build(BuildContext context) => CinematicFocusable(
     onTap: _flip,
+    semanticLabel: widget.semanticLabel,
     child: AnimatedBuilder(
       animation: _controller,
       builder: (context, _) {
@@ -1073,7 +1100,7 @@ class _ProjectCardBack extends StatelessWidget {
                 // Link button
                 if (url.isNotEmpty) ...[
                   const SizedBox(height: 12),
-                  _ProjectLink(url: url, accent: accent),
+                  _ProjectLink(projectTitle: title, url: url, accent: accent),
                 ],
               ],
             ),

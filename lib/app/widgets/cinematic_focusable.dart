@@ -3,6 +3,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_web_portfolio/app/controllers/sound_controller.dart';
 
+/// Accessibility role exposed by [CinematicFocusable].
+enum CinematicControlRole { button, link }
+
 /// Focusable interaction wrapper — keyboard nav, hover, tap, focus ring.
 /// Replaces raw MouseRegion + GestureDetector with accessibility baked in.
 class CinematicFocusable extends StatefulWidget {
@@ -15,6 +18,9 @@ class CinematicFocusable extends StatefulWidget {
     this.showFocusRing = true,
     this.cursor = SystemMouseCursors.click,
     this.borderRadius = BorderRadius.zero,
+    this.semanticLabel,
+    this.semanticRole = CinematicControlRole.button,
+    this.selected,
   });
 
   final Widget child;
@@ -24,6 +30,9 @@ class CinematicFocusable extends StatefulWidget {
   final bool showFocusRing;
   final MouseCursor cursor;
   final BorderRadius borderRadius;
+  final String? semanticLabel;
+  final CinematicControlRole semanticRole;
+  final bool? selected;
 
   @override
   State<CinematicFocusable> createState() => _CinematicFocusableState();
@@ -36,7 +45,7 @@ class _CinematicFocusableState extends State<CinematicFocusable> {
   Widget build(BuildContext context) {
     final focusColor = widget.focusColor ?? Colors.white.withValues(alpha: 0.4);
 
-    return FocusableActionDetector(
+    final control = FocusableActionDetector(
       mouseCursor: widget.cursor,
       onShowHoverHighlight: (hovered) {
         if (hovered) {
@@ -72,6 +81,20 @@ class _CinematicFocusableState extends State<CinematicFocusable> {
           child: widget.child,
         ),
       ),
+    );
+
+    final semanticLabel = widget.semanticLabel?.trim();
+    if (semanticLabel == null || semanticLabel.isEmpty) return control;
+
+    return Semantics(
+      button: widget.semanticRole == CinematicControlRole.button,
+      link: widget.semanticRole == CinematicControlRole.link,
+      selected: widget.selected,
+      focusable: true,
+      label: semanticLabel,
+      onTap: widget.onTap,
+      excludeSemantics: true,
+      child: control,
     );
   }
 }

@@ -33,6 +33,7 @@ const engineRevision = extractEngineRevision(bootstrap);
 const versionedBootstrap = versionEntrypoints(bootstrap, releaseId);
 await writeFile(bootstrapPath, versionedBootstrap);
 await versionRendererDirectory(engineRevision);
+await normalizeNoticeWhitespace();
 
 console.log(
   `Removed ${symbolFiles.length} renderer symbol files (${formatBytes(removedBytes)}) from the public release.`,
@@ -111,6 +112,13 @@ async function versionRendererDirectory(engineRevision) {
       ),
     ),
   );
+}
+
+async function normalizeNoticeWhitespace() {
+  const noticesPath = path.join(webRoot, 'assets', 'NOTICES');
+  const notices = await readFile(noticesPath, 'utf8');
+  const normalized = notices.replace(/[\t ]+$/gm, '');
+  if (normalized !== notices) await writeFile(noticesPath, normalized);
 }
 
 async function collectFiles(directory) {

@@ -197,6 +197,13 @@
     "projects": "Sistemas",
     "proof": "Pruebas"
   },
+  "accessibility": {
+    "skip_to_content": "Saltar al contenido",
+    "back_to_top": "Volver arriba",
+    "language_menu": "Menú de idiomas",
+    "mute_sound_effects": "Silenciar efectos de sonido",
+    "enable_sound_effects": "Activar efectos de sonido"
+  },
   "about_section": {
     "title": "Perfil de sistemas",
     "bio": "Este portafolio documenta cómo se diseña, mide, prueba y opera el software sin exponer identidad personal.",

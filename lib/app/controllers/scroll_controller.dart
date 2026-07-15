@@ -58,6 +58,7 @@ final class AppScrollController extends Cubit<AppScrollState>
   final Map<String, double> _sectionOffsets = {};
   final Map<String, double> _sectionHeights = {};
   bool _isManualScrolling = false;
+  bool _reduceMotion = false;
   bool _suppressNextHistoryUpdate = false;
   Timer? _debounceTimer;
   String? _pendingSection;
@@ -71,6 +72,11 @@ final class AppScrollController extends Cubit<AppScrollState>
       _pendingSection = hash;
       _setActiveSection(hash, syncUrl: false);
     }
+  }
+
+  /// Keeps navigation aligned with the platform accessibility preference.
+  void setReduceMotion(bool reduceMotion) {
+    _reduceMotion = reduceMotion;
   }
 
   void handleInitialDeepLink() {
@@ -203,15 +209,20 @@ final class AppScrollController extends Cubit<AppScrollState>
             scrollController.position.maxScrollExtent,
           );
 
-      unawaited(
-        scrollController
-            .animateTo(
-              targetScrollOffset,
-              duration: AppDurations.sectionScroll,
-              curve: Curves.easeInOut,
-            )
-            .then((_) => _finishScrolling()),
-      );
+      if (_reduceMotion) {
+        scrollController.jumpTo(targetScrollOffset);
+        _finishScrolling();
+      } else {
+        unawaited(
+          scrollController
+              .animateTo(
+                targetScrollOffset,
+                duration: AppDurations.sectionScroll,
+                curve: Curves.easeInOut,
+              )
+              .then((_) => _finishScrolling()),
+        );
+      }
     } catch (error, stackTrace) {
       dev.log(
         'Scroll to section failed',

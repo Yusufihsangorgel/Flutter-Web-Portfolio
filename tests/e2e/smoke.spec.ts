@@ -6,8 +6,14 @@ async function openPortfolio(page: Page) {
     state: 'attached',
     timeout: 20000,
   });
-  await expect(page.getByRole('heading').first()).toBeAttached();
   await expect(page.locator('#bootstrap-surface')).toHaveCount(0);
+  await expect(page.getByRole('heading').first()).toBeAttached();
+}
+
+async function readAccessibilityTree(page: Page) {
+  const session = await page.context().newCDPSession(page);
+  await session.send('Accessibility.enable');
+  return session;
 }
 
 test('boots the Flutter experience without browser errors', async ({ page }) => {
@@ -28,9 +34,93 @@ test('boots the Flutter experience without browser errors', async ({ page }) => 
     state: 'attached',
     timeout: 20000,
   });
-  await expect(page.getByRole('heading').first()).toBeAttached();
   await expect(page.locator('#bootstrap-surface')).toHaveCount(0);
+  await expect(page.getByRole('heading').first()).toBeAttached();
   expect(errors).toEqual([]);
+});
+
+test('publishes a clean heading and control hierarchy', async ({
+  page,
+  isMobile,
+}) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  const accessibility = await readAccessibilityTree(page);
+  await openPortfolio(page);
+
+  const initialTree = await accessibility.send(
+    'Accessibility.getFullAXTree',
+  );
+  const initialNodes = initialTree.nodes.filter((node) => !node.ignored);
+  const headings = initialNodes
+    .filter((node) => node.role?.value === 'heading')
+    .map((node) => ({
+      name: node.name?.value ?? '',
+      level: node.properties?.find((property) => property.name === 'level')
+        ?.value?.value,
+    }));
+  const controls = initialNodes
+    .filter((node) => ['button', 'link'].includes(node.role?.value ?? ''))
+    .map((node) => node.name?.value ?? '');
+
+  expect(headings).toContainEqual({ name: 'SYSTEMS PORTFOLIO.', level: 1 });
+  expect(controls).toEqual(
+    expect.arrayContaining([
+      'Skip to content',
+      'Back to top',
+      ...(isMobile
+        ? ['Open navigation menu']
+        : ['Profile', 'Work', 'Evidence', 'Systems']),
+      'Language menu: English',
+    ]),
+  );
+  expect(controls.every((name) => name.trim().length > 0)).toBe(true);
+  expect(controls.join('\n')).not.toMatch(
+    /Profile PROFILE|Show menu|Scroll to top|🇬🇧/,
+  );
+
+  if (isMobile) {
+    await page
+      .getByRole('button', { name: 'Open navigation menu', exact: true })
+      .click();
+  }
+  await page.getByRole('button', { name: 'Profile', exact: true }).click();
+  await expect(page).toHaveURL(/#\/about$/);
+  await expect(page.getByRole('heading', { name: 'Systems Profile' })).toBeAttached();
+
+  const sectionTree = await accessibility.send(
+    'Accessibility.getFullAXTree',
+  );
+  const sectionHeading = sectionTree.nodes.find(
+    (node) =>
+      !node.ignored &&
+      node.role?.value === 'heading' &&
+      node.name?.value === 'Systems Profile',
+  );
+  expect(
+    sectionHeading?.properties?.find((property) => property.name === 'level')
+      ?.value?.value,
+  ).toBe(2);
+
+  if (isMobile) {
+    await page
+      .getByRole('button', { name: 'Open navigation menu', exact: true })
+      .click();
+  }
+  await page.getByRole('button', { name: 'Systems', exact: true }).click();
+  await expect(page).toHaveURL(/#\/projects$/);
+  await expect(
+    page.getByRole('heading', { name: 'Selected Systems' }),
+  ).toBeAttached();
+
+  const projectsTree = await accessibility.send(
+    'Accessibility.getFullAXTree',
+  );
+  const projectLinks = projectsTree.nodes
+    .filter((node) => !node.ignored && node.role?.value === 'link')
+    .map((node) => node.name?.value ?? '');
+  expect(projectLinks).toContain('Open Project: FakeCallApp');
+  expect(projectLinks).not.toContain('Open Project');
+  expect(projectLinks).not.toContain('Website');
 });
 
 test('paints an accessible engineering shell before the Wasm canvas', async ({

@@ -116,6 +116,7 @@ class _HomeViewState extends State<HomeView> {
   Widget build(BuildContext context) {
     final scrollController = context.read<AppScrollController>();
     final languageController = BlocProvider.of<LanguageCubit>(context);
+    scrollController.setReduceMotion(MediaQuery.disableAnimationsOf(context));
 
     // After first frame: recalculate scene + handle deep-link scroll
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -216,6 +217,10 @@ class _HomeViewState extends State<HomeView> {
         left: 0,
         right: 0,
         child: _SkipToContentLink(
+          label: languageController.getText(
+            'accessibility.skip_to_content',
+            defaultValue: 'Skip to content',
+          ),
           visible: _skipLinkVisible,
           focusNode: _skipLinkFocusNode,
           onFocusChanged: (focused) {
@@ -358,12 +363,14 @@ class _HomeViewState extends State<HomeView> {
 /// Invisible by default; becomes visible when focused via Tab key.
 class _SkipToContentLink extends StatelessWidget {
   const _SkipToContentLink({
+    required this.label,
     required this.visible,
     required this.focusNode,
     required this.onFocusChanged,
     required this.onActivate,
   });
 
+  final String label;
   final bool visible;
   final FocusNode focusNode;
   final ValueChanged<bool> onFocusChanged;
@@ -371,40 +378,48 @@ class _SkipToContentLink extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Semantics(
-    label: 'Skip to content',
+    label: label,
     button: true,
-    child: Focus(
-      focusNode: focusNode,
-      onFocusChange: onFocusChanged,
-      onKeyEvent: (_, event) {
-        if (event is KeyDownEvent &&
-            (event.logicalKey == LogicalKeyboardKey.enter ||
-                event.logicalKey == LogicalKeyboardKey.space)) {
-          onActivate();
-          return KeyEventResult.handled;
-        }
-        return KeyEventResult.ignored;
-      },
-      child: AnimatedOpacity(
-        opacity: visible ? 1.0 : 0.0,
-        duration: AppDurations.fast,
-        child: AnimatedContainer(
+    focusable: true,
+    onTap: onActivate,
+    excludeSemantics: true,
+    child: ExcludeSemantics(
+      child: Focus(
+        focusNode: focusNode,
+        onFocusChange: onFocusChanged,
+        onKeyEvent: (_, event) {
+          if (event is KeyDownEvent &&
+              (event.logicalKey == LogicalKeyboardKey.enter ||
+                  event.logicalKey == LogicalKeyboardKey.space)) {
+            onActivate();
+            return KeyEventResult.handled;
+          }
+          return KeyEventResult.ignored;
+        },
+        child: AnimatedOpacity(
+          opacity: visible ? 1.0 : 0.0,
           duration: AppDurations.fast,
-          transform: Matrix4.translationValues(0, visible ? 0 : -48, 0),
-          child: Center(
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-              decoration: BoxDecoration(
-                color: AppColors.accent,
-                borderRadius: BorderRadius.circular(4),
-              ),
-              child: const Text(
-                'Skip to content',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  decoration: TextDecoration.none,
+          child: AnimatedContainer(
+            duration: AppDurations.fast,
+            transform: Matrix4.translationValues(0, visible ? 0 : -48, 0),
+            child: Center(
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 12,
+                ),
+                decoration: BoxDecoration(
+                  color: AppColors.accent,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: Text(
+                  label,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    decoration: TextDecoration.none,
+                  ),
                 ),
               ),
             ),

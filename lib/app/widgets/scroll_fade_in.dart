@@ -59,17 +59,34 @@ class _ScrollFadeInState extends State<ScrollFadeIn>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    // Listen to the nearest scroll controller
-    _scrollPosition?.removeListener(_checkVisibility);
+    _scrollPosition?.removeListener(_handleScrollPositionChanged);
+
+    if (MediaQuery.disableAnimationsOf(context)) {
+      _triggered = true;
+      _controller.value = 1;
+      _scrollPosition = null;
+      return;
+    }
+
+    // Listen to the nearest scroll controller.
     _scrollPosition = Scrollable.maybeOf(context)?.position;
-    _scrollPosition?.addListener(_checkVisibility);
+    _scrollPosition?.addListener(_handleScrollPositionChanged);
   }
 
   @override
   void dispose() {
-    _scrollPosition?.removeListener(_checkVisibility);
+    _scrollPosition?.removeListener(_handleScrollPositionChanged);
     _controller.dispose();
     super.dispose();
+  }
+
+  void _handleScrollPositionChanged() {
+    _checkVisibility();
+
+    // jumpTo notifies listeners before the next layout pass. Recheck after
+    // layout so keyboard navigation cannot leave a just-jumped section at
+    // opacity zero.
+    WidgetsBinding.instance.addPostFrameCallback((_) => _checkVisibility());
   }
 
   void _checkVisibility() {
@@ -84,7 +101,7 @@ class _ScrollFadeInState extends State<ScrollFadeIn>
     if (position.dy < screenHeight * 0.9 &&
         position.dy > -renderBox.size.height) {
       _triggered = true;
-      _scrollPosition?.removeListener(_checkVisibility);
+      _scrollPosition?.removeListener(_handleScrollPositionChanged);
 
       if (widget.delay == Duration.zero) {
         _controller.forward();

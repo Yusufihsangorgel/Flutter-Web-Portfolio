@@ -133,5 +133,65 @@ void main() {
 
       expect(find.text('Rounded'), findsOneWidget);
     });
+
+    testWidgets('publishes one authoritative button name', (tester) async {
+      final semantics = tester.ensureSemantics();
+      try {
+        await tester.pumpWidget(
+          _buildSubject(
+            CinematicFocusable(
+              onTap: () {},
+              semanticLabel: 'Launch system',
+              child: const Text('VISIBLE LABEL'),
+            ),
+          ),
+        );
+
+        expect(find.bySemanticsLabel('Launch system'), findsOneWidget);
+        expect(
+          tester.getSemantics(find.bySemanticsLabel('Launch system')),
+          matchesSemantics(
+            label: 'Launch system',
+            isButton: true,
+            isFocusable: true,
+            hasTapAction: true,
+          ),
+        );
+        expect(find.bySemanticsLabel('VISIBLE LABEL'), findsNothing);
+      } finally {
+        semantics.dispose();
+      }
+    });
+
+    testWidgets('can expose a selected link role', (tester) async {
+      final semantics = tester.ensureSemantics();
+      try {
+        await tester.pumpWidget(
+          _buildSubject(
+            CinematicFocusable(
+              onTap: () {},
+              semanticLabel: 'Open live system',
+              semanticRole: CinematicControlRole.link,
+              selected: true,
+              child: const Icon(Icons.open_in_new),
+            ),
+          ),
+        );
+
+        expect(
+          tester.getSemantics(find.bySemanticsLabel('Open live system')),
+          matchesSemantics(
+            label: 'Open live system',
+            isLink: true,
+            hasSelectedState: true,
+            isSelected: true,
+            isFocusable: true,
+            hasTapAction: true,
+          ),
+        );
+      } finally {
+        semantics.dispose();
+      }
+    });
   });
 }

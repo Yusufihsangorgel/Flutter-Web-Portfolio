@@ -11,6 +11,7 @@ import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
 import 'package:flutter_web_portfolio/app/core/constants/cinematic_curves.dart';
 import 'package:flutter_web_portfolio/app/core/constants/durations.dart';
 import 'package:flutter_web_portfolio/app/features/engineering_lab/presentation/engineering_lab.dart';
+import 'package:flutter_web_portfolio/app/widgets/cinematic_focusable.dart';
 
 /// A command entry that the palette can display and execute.
 class _PaletteCommand {
@@ -402,56 +403,55 @@ class _CommandPaletteState extends State<CommandPalette> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             ?categoryHeader,
-            MouseRegion(
-              cursor: SystemMouseCursors.click,
-              onEnter: (_) => setState(() => _selectedIndex = index),
-              child: GestureDetector(
-                onTap: command.onExecute,
-                child: AnimatedContainer(
-                  duration: AppDurations.microFast,
-                  margin: const EdgeInsets.symmetric(
-                    horizontal: 6,
-                    vertical: 1,
-                  ),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 10,
-                  ),
-                  decoration: BoxDecoration(
-                    color: isSelected
-                        ? Colors.white.withValues(alpha: 0.06)
-                        : Colors.transparent,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(
-                        command.icon,
-                        size: 16,
-                        color: isSelected
-                            ? AppColors.heroAccent
-                            : AppColors.textSecondary,
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Text(
-                          command.label,
-                          style: AppFonts.inter(
-                            fontSize: 14,
-                            color: isSelected
-                                ? AppColors.textBright
-                                : AppColors.textPrimary,
-                          ),
+            CinematicFocusable(
+              onTap: command.onExecute,
+              onHoverChanged: (hovered) {
+                if (hovered) setState(() => _selectedIndex = index);
+              },
+              semanticLabel: command.label,
+              selected: isSelected,
+              borderRadius: BorderRadius.circular(8),
+              child: AnimatedContainer(
+                duration: AppDurations.microFast,
+                margin: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 10,
+                ),
+                decoration: BoxDecoration(
+                  color: isSelected
+                      ? Colors.white.withValues(alpha: 0.06)
+                      : Colors.transparent,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      command.icon,
+                      size: 16,
+                      color: isSelected
+                          ? AppColors.heroAccent
+                          : AppColors.textSecondary,
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        command.label,
+                        style: AppFonts.inter(
+                          fontSize: 14,
+                          color: isSelected
+                              ? AppColors.textBright
+                              : AppColors.textPrimary,
                         ),
                       ),
-                      if (isSelected)
-                        const Icon(
-                          Icons.keyboard_return_rounded,
-                          size: 14,
-                          color: AppColors.textSecondary,
-                        ),
-                    ],
-                  ),
+                    ),
+                    if (isSelected)
+                      const Icon(
+                        Icons.keyboard_return_rounded,
+                        size: 14,
+                        color: AppColors.textSecondary,
+                      ),
+                  ],
                 ),
               ),
             ),

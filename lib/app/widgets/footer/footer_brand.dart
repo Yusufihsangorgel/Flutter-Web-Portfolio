@@ -140,6 +140,7 @@ class _CopyrightEasterEggState extends State<_CopyrightEasterEgg>
       mainAxisSize: MainAxisSize.min,
       children: [
         GestureDetector(
+          excludeFromSemantics: true,
           onTap: _onTap,
           child: Text(
             '\u00A9 $year ${widget.name}',

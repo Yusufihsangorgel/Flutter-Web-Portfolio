@@ -135,6 +135,7 @@ class _HomeSectionState extends State<HomeSection>
     );
 
     return GestureDetector(
+      excludeFromSemantics: true,
       onTap: () {
         if (!_entranceCtrl.isCompleted) {
           _entranceCtrl.forward(from: 1.0);
@@ -404,48 +405,56 @@ class _HeroNameWithGradient extends StatelessWidget {
       height: 1.0,
     );
 
-    return Stack(
-      children: [
-        // Base layer — the original ShaderTextReveal with sweep animation
-        FittedBox(
-          fit: BoxFit.scaleDown,
-          child: ShaderTextReveal(
-            text: nameText,
-            style: nameStyle,
-            delay: AppDurations.heroNameRevealDelay,
-            duration: AppDurations.heroNameRevealDuration,
-            textAlign: TextAlign.center,
-          ),
-        ),
-        // Top layer — gradient text that fades in after entrance completes
-        ValueListenableBuilder<bool>(
-          valueListenable: HomeSection.entranceComplete,
-          builder: (context, complete, _) => SceneAccentBuilder(
-            builder: (context, accent) => AnimatedOpacity(
-              opacity: complete ? 1.0 : 0.0,
-              duration: AppDurations.entrance,
-              curve: Curves.easeOut,
-              child: FittedBox(
-                fit: BoxFit.scaleDown,
-                child: ShaderMask(
-                  blendMode: BlendMode.srcIn,
-                  shaderCallback: (bounds) => LinearGradient(
-                    colors: [
-                      AppColors.textBright,
-                      Color.lerp(AppColors.textBright, accent, 0.20)!,
-                    ],
-                  ).createShader(bounds),
-                  child: Text(
-                    nameText,
-                    style: nameStyle,
-                    textAlign: TextAlign.center,
+    return Semantics(
+      header: true,
+      headingLevel: 1,
+      label: nameText,
+      excludeSemantics: true,
+      child: ExcludeSemantics(
+        child: Stack(
+          children: [
+            // Base layer — the original ShaderTextReveal with sweep animation
+            FittedBox(
+              fit: BoxFit.scaleDown,
+              child: ShaderTextReveal(
+                text: nameText,
+                style: nameStyle,
+                delay: AppDurations.heroNameRevealDelay,
+                duration: AppDurations.heroNameRevealDuration,
+                textAlign: TextAlign.center,
+              ),
+            ),
+            // Top layer — gradient text that fades in after entrance completes
+            ValueListenableBuilder<bool>(
+              valueListenable: HomeSection.entranceComplete,
+              builder: (context, complete, _) => SceneAccentBuilder(
+                builder: (context, accent) => AnimatedOpacity(
+                  opacity: complete ? 1.0 : 0.0,
+                  duration: AppDurations.entrance,
+                  curve: Curves.easeOut,
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: ShaderMask(
+                      blendMode: BlendMode.srcIn,
+                      shaderCallback: (bounds) => LinearGradient(
+                        colors: [
+                          AppColors.textBright,
+                          Color.lerp(AppColors.textBright, accent, 0.20)!,
+                        ],
+                      ).createShader(bounds),
+                      child: Text(
+                        nameText,
+                        style: nameStyle,
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
+          ],
         ),
-      ],
+      ),
     );
   }
 }

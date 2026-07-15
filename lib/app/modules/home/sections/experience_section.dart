@@ -239,6 +239,8 @@ class _TimelineEntryState extends State<_TimelineEntry> {
   @override
   Widget build(BuildContext context) => CinematicFocusable(
     onTap: widget.onTap,
+    semanticLabel: widget.label,
+    selected: widget.isActive,
     onHoverChanged: (hovered) => setState(() => _hovered = hovered),
     child: IntrinsicHeight(
       child: Row(
@@ -331,6 +333,8 @@ class _TabButtonState extends State<_TabButton> {
   @override
   Widget build(BuildContext context) => CinematicFocusable(
     onTap: widget.onTap,
+    semanticLabel: widget.label,
+    selected: widget.isActive,
     onHoverChanged: (hovered) => setState(() => _hovered = hovered),
     child: AnimatedContainer(
       duration: AppDurations.fast,

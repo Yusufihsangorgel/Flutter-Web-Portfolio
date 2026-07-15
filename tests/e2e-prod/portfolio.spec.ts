@@ -7,8 +7,8 @@ async function openPortfolio(page: Page) {
     state: 'attached',
     timeout: 75000,
   });
-  await expect(page.getByRole('heading').first()).toBeAttached();
   await expect(page.locator('#bootstrap-surface')).toHaveCount(0);
+  await expect(page.getByRole('heading').first()).toBeAttached();
 }
 
 test('boots the production Wasm release with its security contract', async ({
@@ -70,8 +70,8 @@ test('boots the production Wasm release with its security contract', async ({
     state: 'attached',
     timeout: 75000,
   });
-  await expect(page.getByRole('heading').first()).toBeAttached();
   await expect(page.locator('#bootstrap-surface')).toHaveCount(0);
+  await expect(page.getByRole('heading').first()).toBeAttached();
   expect(await page.evaluate(() => window.crossOriginIsolated)).toBe(true);
   expect(badResponses).toEqual([]);
   expect(errors).toEqual([]);
@@ -86,6 +86,66 @@ test('exposes interactive engineering evidence in production', async ({ page }) 
   await expect(page.getByText('SkWasm', { exact: true })).toBeAttached();
   await expect(page.getByText('main.dart.wasm')).toBeAttached();
   await expect(page.getByText('Flutter scheduler telemetry')).toBeAttached();
+});
+
+test('serves the production accessibility hierarchy', async ({
+  page,
+  isMobile,
+}) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  const accessibility = await page.context().newCDPSession(page);
+  await accessibility.send('Accessibility.enable');
+  await openPortfolio(page);
+
+  const tree = await accessibility.send('Accessibility.getFullAXTree');
+  const nodes = tree.nodes.filter((node) => !node.ignored);
+  const headings = nodes
+    .filter((node) => node.role?.value === 'heading')
+    .map((node) => ({
+      name: node.name?.value ?? '',
+      level: node.properties?.find((property) => property.name === 'level')
+        ?.value?.value,
+    }));
+  const controls = nodes
+    .filter((node) => ['button', 'link'].includes(node.role?.value ?? ''))
+    .map((node) => node.name?.value ?? '');
+
+  expect(headings).toContainEqual({ name: 'SYSTEMS PORTFOLIO.', level: 1 });
+  expect(controls).toEqual(
+    expect.arrayContaining([
+      'Skip to content',
+      'Back to top',
+      ...(isMobile
+        ? ['Open navigation menu']
+        : ['Profile', 'Work', 'Evidence', 'Systems']),
+      'Language menu: English',
+    ]),
+  );
+  expect(controls.every((name) => name.trim().length > 0)).toBe(true);
+  expect(controls.join('\n')).not.toMatch(
+    /Profile PROFILE|Show menu|Scroll to top|🇬🇧/,
+  );
+
+  if (isMobile) {
+    await page
+      .getByRole('button', { name: 'Open navigation menu', exact: true })
+      .click();
+  }
+  await page.getByRole('button', { name: 'Systems', exact: true }).click();
+  await expect(page).toHaveURL(/#\/projects$/);
+  await expect(
+    page.getByRole('heading', { name: 'Selected Systems' }),
+  ).toBeAttached();
+
+  const projectsTree = await accessibility.send(
+    'Accessibility.getFullAXTree',
+  );
+  const projectLinks = projectsTree.nodes
+    .filter((node) => !node.ignored && node.role?.value === 'link')
+    .map((node) => node.name?.value ?? '');
+  expect(projectLinks).toContain('Open Project: FakeCallApp');
+  expect(projectLinks).not.toContain('Open Project');
+  expect(projectLinks).not.toContain('Website');
 });
 
 test('serves the localized Arabic command surface in production', async ({

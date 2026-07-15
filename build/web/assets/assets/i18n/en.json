@@ -197,6 +197,13 @@
     "projects": "Systems",
     "proof": "Evidence"
   },
+  "accessibility": {
+    "skip_to_content": "Skip to content",
+    "back_to_top": "Back to top",
+    "language_menu": "Language menu",
+    "mute_sound_effects": "Mute sound effects",
+    "enable_sound_effects": "Enable sound effects"
+  },
   "about_section": {
     "title": "Systems Profile",
     "bio": "This portfolio documents how software is designed, measured, tested, and operated without exposing personal identity.",
