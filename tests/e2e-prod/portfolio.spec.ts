@@ -222,12 +222,18 @@ test('serves the declared production sharing and font assets', async ({
   expect(font.status()).toBe(200);
   expect(font.headers()['content-type']).toContain('font/woff2');
 
-  const appFont = await request.get(
+  for (const path of [
     '/assets/assets/fonts/inter/Inter-Variable.ttf',
-  );
-  expect(appFont.status()).toBe(200);
-  expect(appFont.headers()['content-type']).toContain('font/ttf');
-  expect(appFont.headers()['content-encoding']).toBe('gzip');
+    '/assets/assets/fonts/instrument_serif/InstrumentSerif-Regular.ttf',
+    '/assets/assets/fonts/instrument_serif/InstrumentSerif-Italic.ttf',
+    '/assets/assets/fonts/noto_sans_arabic/NotoSansArabic-Variable.ttf',
+    '/assets/assets/fonts/noto_sans_devanagari/NotoSansDevanagari-Variable.ttf',
+  ]) {
+    const appFont = await request.get(path);
+    expect(appFont.status(), path).toBe(200);
+    expect(appFont.headers()['content-type'], path).toContain('font/ttf');
+    expect(appFont.headers()['content-encoding'], path).toBe('gzip');
+  }
 
   const missing = await request.get('/assets/fallback_fonts/missing.woff2');
   expect(missing.status()).toBe(404);

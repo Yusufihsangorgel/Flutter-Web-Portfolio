@@ -78,6 +78,31 @@ await Promise.all(
 );
 
 try {
+  const fontManifest = JSON.parse(
+    await readFile(path.join(webRoot, 'assets', 'FontManifest.json'), 'utf8'),
+  );
+  const declaredFonts = fontManifest.flatMap((family) =>
+    family.fonts.map((font) => font.asset),
+  );
+
+  await Promise.all(
+    declaredFonts.map(async (asset) => {
+      const outputPath = path.join(webRoot, 'assets', asset);
+      try {
+        const metadata = await stat(outputPath);
+        if (!metadata.isFile() || metadata.size === 0) {
+          failures.push(`declared font ${asset} is not a non-empty file`);
+        }
+      } catch {
+        failures.push(`declared font ${asset} is missing from the release`);
+      }
+    }),
+  );
+} catch {
+  failures.push('assets/FontManifest.json is missing or invalid');
+}
+
+try {
   const wasmHeader = await readFile(path.join(webRoot, 'main.dart.wasm'));
   const expectedHeader = [0x00, 0x61, 0x73, 0x6d];
   const hasWasmHeader = expectedHeader.every(
