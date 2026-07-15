@@ -3,19 +3,21 @@ import 'dart:math' as math;
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_web_portfolio/app/controllers/scene_director.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
 import 'package:flutter_web_portfolio/app/core/constants/scene_configs.dart';
 import 'package:flutter_web_portfolio/app/features/render_quality/application/render_quality_controller.dart';
 import 'package:flutter_web_portfolio/app/features/render_quality/domain/render_quality.dart';
+import 'package:flutter_web_portfolio/app/narrative/rendering/narrative_spine_geometry.dart';
 import 'package:flutter_web_portfolio/app/utils/motion_preference.dart';
 
-/// A single restrained ambient field shared by the portfolio document.
+/// A restrained ambient field carrying one continuous engineering trace.
 ///
-/// Colour follows the measured scroll geometry exposed by [SceneDirector],
-/// while content and real evidence remain the visual focus.
+/// The trace begins as the hero baseline, becomes a thread and timeline,
+/// branches around open-source work, then closes into a work frame. It is
+/// decorative only; content, focus order and semantics never depend on it.
 class CinematicBackground extends StatefulWidget {
   const CinematicBackground({super.key});
 
@@ -23,30 +25,23 @@ class CinematicBackground extends StatefulWidget {
   State<CinematicBackground> createState() => _CinematicBackgroundState();
 }
 
-class _CinematicBackgroundState extends State<CinematicBackground>
-    with WidgetsBindingObserver {
-  static const _ambientCycle = Duration(seconds: 36);
-
-  late final _RenderAtlasFrame _frame;
-  final Stopwatch _ambientClock = Stopwatch();
-  Timer? _ambientTimer;
+class _CinematicBackgroundState extends State<CinematicBackground> {
+  late final _NarrativeFrame _frame;
   StreamSubscription<SceneState>? _sceneSubscription;
   StreamSubscription<RenderQualityState>? _qualitySubscription;
   SceneDirector? _sceneDirector;
   RenderQualityController? _qualityController;
   ui.Image? _grainTexture;
   bool _reduceMotion = false;
-  bool _appActive = true;
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addObserver(this);
-    _frame = _RenderAtlasFrame(
+    _frame = _NarrativeFrame(
       config: SceneConfigs.hero,
+      cue: const NarrativeSpineCue.origin(),
       quality: RenderQuality.balanced,
     );
-    _syncAmbientClock();
   }
 
   @override
@@ -69,29 +64,17 @@ class _CinematicBackgroundState extends State<CinematicBackground>
     if (!identical(director, _sceneDirector)) {
       _sceneSubscription?.cancel();
       _sceneDirector = director;
-      _frame.queueConfig(_sceneConfigFor(director.state));
-      _sceneSubscription = director.stream.listen((state) {
-        _frame.queueConfig(_sceneConfigFor(state));
-      });
+      _queueScene(director.state);
+      _sceneSubscription = director.stream.listen(_queueScene);
     } else {
-      _frame.queueConfig(_sceneConfigFor(director.state));
+      _queueScene(director.state);
     }
-    _syncAmbientClock();
-  }
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    _appActive = state == AppLifecycleState.resumed;
-    _syncAmbientClock();
   }
 
   @override
   void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
     _sceneSubscription?.cancel();
     _qualitySubscription?.cancel();
-    _ambientTimer?.cancel();
-    _ambientClock.stop();
     _frame.dispose();
     _grainTexture?.dispose();
     super.dispose();
@@ -109,12 +92,22 @@ class _CinematicBackgroundState extends State<CinematicBackground>
     );
   }
 
-  SceneConfig _sceneConfigFor(SceneState state) => _reduceMotion
-      ? SceneConfigs.scenes[state.currentSceneIndex]
-      : state.blendedConfig;
+  void _queueScene(SceneState state) {
+    final config = _reduceMotion
+        ? SceneConfigs.scenes[state.currentSceneIndex]
+        : state.blendedConfig;
+    final cue = NarrativeSpineCue(
+      currentMotif: state.currentMotif,
+      nextMotif: _reduceMotion ? state.currentMotif : state.nextMotif,
+      blend: _reduceMotion ? 0 : state.blendFactor,
+      // Reduced-motion sessions receive a complete, static trace instead of a
+      // continuously growing line tied to every scroll frame.
+      globalProgress: _reduceMotion ? 1 : state.globalProgress,
+    );
+    _frame.queueScene(config: config, cue: cue);
+  }
 
   void _applyQuality(RenderQualityState state) {
-    final qualityChanged = _frame.quality != state.quality;
     _frame.setQuality(state.quality);
     if (!state.quality.profile.trackPointer) {
       _frame.queuePointer(Offset.zero);
@@ -123,35 +116,6 @@ class _CinematicBackgroundState extends State<CinematicBackground>
       _grainTexture = _createGrainTexture();
       _frame.setGrainTexture(_grainTexture);
     }
-    if (qualityChanged) _syncAmbientClock();
-  }
-
-  void _syncAmbientClock() {
-    _ambientTimer?.cancel();
-    _ambientTimer = null;
-    if (!_appActive || _reduceMotion) {
-      _ambientClock.stop();
-      _frame
-        ..queuePointer(Offset.zero)
-        ..queueTime(0);
-      return;
-    }
-    if (!_ambientClock.isRunning) _ambientClock.start();
-    final framesPerSecond = _frame.quality.profile.targetFramesPerSecond;
-    if (framesPerSecond <= 0) return;
-    _ambientTimer = Timer.periodic(
-      Duration(microseconds: Duration.microsecondsPerSecond ~/ framesPerSecond),
-      _publishAmbientFrame,
-    );
-    _publishAmbientFrame();
-  }
-
-  void _publishAmbientFrame([Timer? _]) {
-    if (_reduceMotion || !_appActive) return;
-    final cycleMicroseconds = _ambientCycle.inMicroseconds;
-    final elapsedInCycle =
-        _ambientClock.elapsedMicroseconds % cycleMicroseconds;
-    _frame.queueTime(elapsedInCycle / cycleMicroseconds);
   }
 
   ui.Image _createGrainTexture() {
@@ -183,29 +147,35 @@ class _CinematicBackgroundState extends State<CinematicBackground>
       onPointerHover: _trackPointer,
       onPointerMove: _trackPointer,
       child: CustomPaint(
-        painter: _RenderAtlasPainter(frame: _frame),
+        painter: _NarrativeBackgroundPainter(frame: _frame),
         size: Size.infinite,
       ),
     ),
   );
 }
 
-class _RenderAtlasPainter extends CustomPainter {
-  _RenderAtlasPainter({required this.frame}) : super(repaint: frame);
+final class _NarrativeBackgroundPainter extends CustomPainter {
+  _NarrativeBackgroundPainter({required this.frame}) : super(repaint: frame);
 
-  final _RenderAtlasFrame frame;
-
-  double get time => frame.time;
-  SceneConfig get config => frame.config;
-  Offset get pointer => frame.pointer;
-  ui.Image? get grainImage => frame.grainTexture;
-  RenderQualityProfile get profile => frame.quality.profile;
+  final _NarrativeFrame frame;
 
   static final _paint = Paint()..isAntiAlias = true;
   static final _linePaint = Paint()
     ..isAntiAlias = true
-    ..style = PaintingStyle.stroke;
+    ..style = PaintingStyle.stroke
+    ..strokeCap = StrokeCap.round
+    ..strokeJoin = StrokeJoin.round;
   static final _grainPaint = Paint();
+  Size? _cachedSpineSize;
+  int? _cachedCurrentMotif;
+  int? _cachedNextMotif;
+  double? _cachedBlend;
+  double? _cachedRevealProgress;
+  NarrativeSpineShape? _cachedSpineShape;
+  Path? _cachedPrimaryPath;
+  ui.PathMetric? _cachedPrimaryMetric;
+  Path? _cachedRevealPath;
+  List<Path> _cachedBranchPaths = const [];
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -213,37 +183,33 @@ class _RenderAtlasPainter extends CustomPainter {
     final bounds = Offset.zero & size;
     _paint
       ..shader = null
+      ..style = PaintingStyle.fill
       ..blendMode = BlendMode.srcOver
       ..color = AppColors.background;
     canvas.drawRect(bounds, _paint);
 
     _drawAmbientField(canvas, size, bounds);
-    _drawPerspectiveGrid(canvas, size);
-    _drawAtlas(canvas, size);
-    if (profile.drawRegistrationMarks) {
-      _drawRegistrationMarks(canvas, size);
-    }
+    _drawNarrativeSpine(canvas, size);
     _drawVignette(canvas, size, bounds);
-    if (profile.drawGrain) _drawGrain(canvas, size);
+    if (frame.quality.profile.drawGrain) _drawGrain(canvas, size);
   }
 
   void _drawAmbientField(Canvas canvas, Size size, Rect bounds) {
-    final pulse = 0.02 * math.sin(time * math.pi * 2);
     final center = Offset(
-      size.width * (0.62 + pointer.dx * 0.025),
-      size.height * (0.42 + pointer.dy * 0.025),
+      size.width * (0.62 + frame.pointer.dx * 0.018),
+      size.height * (0.42 + frame.pointer.dy * 0.018),
     );
     _paint
       ..blendMode = BlendMode.screen
       ..shader = ui.Gradient.radial(
         center,
-        size.longestSide * 0.7,
+        size.longestSide * 0.72,
         [
-          config.gradient3.withValues(alpha: 0.105 + pulse),
-          config.gradient2.withValues(alpha: 0.055),
-          config.gradient1.withValues(alpha: 0),
+          frame.config.gradient3.withValues(alpha: 0.09),
+          frame.config.gradient2.withValues(alpha: 0.045),
+          frame.config.gradient1.withValues(alpha: 0),
         ],
-        const [0, 0.42, 1],
+        const [0, 0.44, 1],
       );
     canvas.drawRect(bounds, _paint);
     _paint
@@ -251,234 +217,113 @@ class _RenderAtlasPainter extends CustomPainter {
       ..blendMode = BlendMode.srcOver;
   }
 
-  void _drawPerspectiveGrid(Canvas canvas, Size size) {
-    if (profile.verticalGridLines == 0 && profile.horizontalGridLines == 0) {
-      return;
-    }
-    final morph = config.atlasMorph;
-    final horizon = size.height * (0.56 + math.sin(morph * 0.8) * 0.025);
-    final vanishingPoint = Offset(
-      size.width * (0.58 - morph * 0.025 + pointer.dx * 0.012),
-      horizon + pointer.dy * 4,
-    );
-    _linePaint
-      ..strokeWidth = 0.75
-      ..color = config.accent.withValues(alpha: 0.085);
-
-    final verticalDivisor = math.max(profile.verticalGridLines - 1, 1);
-    for (var index = 0; index < profile.verticalGridLines; index++) {
-      final normalized = index / verticalDivisor * 2 - 1;
-      final bottomX = vanishingPoint.dx + normalized * 10 * size.width * 0.115;
-      canvas.drawLine(
-        vanishingPoint,
-        Offset(bottomX, size.height + 2),
-        _linePaint,
-      );
-    }
-
-    for (var index = 1; index <= profile.horizontalGridLines; index++) {
-      final depth = index / profile.horizontalGridLines;
-      final y = horizon + math.pow(depth, 1.85) * (size.height - horizon);
-      final alpha = 0.035 + depth * 0.07;
-      _linePaint.color = config.accent.withValues(alpha: alpha);
-      canvas.drawLine(Offset(0, y), Offset(size.width, y), _linePaint);
-    }
+  void _drawNarrativeSpine(Canvas canvas, Size size) {
+    final shape = _resolveSpine(size);
+    if (shape.primary.length < 2) return;
+    final primary = _cachedPrimaryPath!;
+    final accent = frame.config.accent;
 
     _linePaint
-      ..strokeWidth = 1
-      ..color = config.accent.withValues(alpha: 0.18);
-    canvas.drawLine(
-      Offset(0, horizon),
-      Offset(size.width, horizon),
-      _linePaint,
-    );
-  }
+      ..strokeWidth = 0.9
+      ..color = accent.withValues(alpha: 0.05);
+    canvas.drawPath(primary, _linePaint);
 
-  void _drawAtlas(Canvas canvas, Size size) {
-    final morph = config.atlasMorph.clamp(0.0, 4.0);
-    final stage = morph.floor();
-    final nextStage = math.min(stage + 1, 4);
-    final stageT = _smoothStep(morph - stage);
-    final planes = <_DrawablePlane>[];
+    _linePaint
+      ..strokeWidth = 1.25
+      ..color = accent.withValues(alpha: 0.15);
+    canvas.drawPath(_cachedRevealPath!, _linePaint);
 
-    final planeIndices = List<int>.generate(
-      profile.planeCount,
-      (index) => profile.planeCount == 1
-          ? 0
-          : (index * 7 / (profile.planeCount - 1)).round(),
-    );
-    for (final index in planeIndices) {
-      final from = _poseFor(stage, index);
-      final to = _poseFor(nextStage, index);
-      final pose = _PlanePose.lerp(from, to, stageT);
-      planes.add(_DrawablePlane(index: index, pose: pose));
-    }
-    planes.sort((a, b) => a.pose.scale.compareTo(b.pose.scale));
-
-    Offset? previousCenter;
-    for (final plane in planes) {
-      final center = _planeCenter(size, plane.pose, plane.index);
-      if (profile.drawConnections &&
-          previousCenter != null &&
-          (morph < 1.25 || morph > 3.5)) {
-        _linePaint
-          ..strokeWidth = 0.65
-          ..color = config.accent.withValues(alpha: 0.09);
-        canvas.drawLine(previousCenter, center, _linePaint);
+    if (shape.branchVisibility > 0.001) {
+      _linePaint
+        ..strokeWidth = 0.9
+        ..color = accent.withValues(alpha: 0.1 * shape.branchVisibility);
+      for (final branch in _cachedBranchPaths) {
+        canvas.drawPath(branch, _linePaint);
       }
-      previousCenter = center;
-      _drawPlane(canvas, size, plane.index, plane.pose, center);
+    }
+
+    if (shape.nodeVisibility > 0.001) {
+      for (final node in shape.nodes) {
+        _paint
+          ..shader = null
+          ..style = PaintingStyle.fill
+          ..color = AppColors.background.withValues(alpha: 0.82);
+        canvas.drawCircle(node, 3.1, _paint);
+        _linePaint
+          ..strokeWidth = 1
+          ..color = accent.withValues(alpha: 0.2 * shape.nodeVisibility);
+        canvas.drawCircle(node, 3.1, _linePaint);
+      }
     }
   }
 
-  Offset _planeCenter(Size size, _PlanePose pose, int index) => Offset(
-    pose.x * size.width + pointer.dx * (3 + index % 3),
-    pose.y * size.height + pointer.dy * (2 + (index + 1) % 3),
-  );
+  NarrativeSpineShape _resolveSpine(Size size) {
+    final cue = frame.cue;
+    final geometryChanged =
+        _cachedSpineSize != size ||
+        _cachedCurrentMotif != cue.currentMotif.index ||
+        _cachedNextMotif != cue.nextMotif.index ||
+        _cachedBlend != cue.blend ||
+        _cachedSpineShape == null;
 
-  void _drawPlane(
-    Canvas canvas,
-    Size size,
-    int index,
-    _PlanePose pose,
-    Offset center,
-  ) {
-    final unit = math.min(size.width, size.height);
-    final width = unit * pose.scale * pose.aspect;
-    final height = unit * pose.scale;
-    final skew = width * pose.tilt * 0.22;
-    final points = <Offset>[
-      Offset(-width / 2 + skew, -height / 2),
-      Offset(width / 2 + skew, -height / 2),
-      Offset(width / 2 - skew, height / 2),
-      Offset(-width / 2 - skew, height / 2),
-    ].map((point) => center + _rotate(point, pose.rotation)).toList();
+    if (geometryChanged) {
+      final shape = NarrativeSpineGeometry.resolve(size: size, cue: cue);
+      final primary = shape.primary.length < 2
+          ? Path()
+          : _pathFrom(shape.primary);
+      final metrics = primary.computeMetrics().iterator;
 
-    final path = Path()
-      ..moveTo(points[0].dx, points[0].dy)
-      ..lineTo(points[1].dx, points[1].dy)
-      ..lineTo(points[2].dx, points[2].dy)
-      ..lineTo(points[3].dx, points[3].dy)
-      ..close();
-    final pulse = (math.sin(time * math.pi * 2 + index * 0.9) + 1) / 2;
-    _paint
-      ..shader = null
-      ..style = PaintingStyle.fill
-      ..color = config.accent.withValues(alpha: 0.018 + pulse * 0.035);
-    canvas.drawPath(path, _paint);
+      _cachedSpineSize = size;
+      _cachedCurrentMotif = cue.currentMotif.index;
+      _cachedNextMotif = cue.nextMotif.index;
+      _cachedBlend = cue.blend;
+      _cachedRevealProgress = null;
+      _cachedSpineShape = shape;
+      _cachedPrimaryPath = primary;
+      _cachedPrimaryMetric = metrics.moveNext() ? metrics.current : null;
+      _cachedBranchPaths = [
+        for (final branch in shape.branches)
+          if (branch.length > 1) _pathFrom(branch),
+      ];
+    }
 
-    _linePaint
-      ..strokeWidth = index == 0 ? 1.4 : 0.8
-      ..color = config.accent.withValues(
-        alpha: (index == 0 ? 0.38 : 0.16) + pulse * 0.08,
-      );
-    canvas.drawPath(path, _linePaint);
+    if (_cachedRevealProgress != cue.globalProgress) {
+      final reveal = (0.16 + cue.globalProgress * 0.84).clamp(0.0, 1.0);
+      final revealPath = Path();
+      final metric = _cachedPrimaryMetric;
+      if (metric != null) {
+        revealPath.addPath(
+          metric.extractPath(0, metric.length * reveal),
+          Offset.zero,
+        );
+      }
+      _cachedRevealProgress = cue.globalProgress;
+      _cachedRevealPath = revealPath;
+    }
 
-    final topMid = Offset.lerp(points[0], points[1], 0.5)!;
-    final bottomMid = Offset.lerp(points[3], points[2], 0.5)!;
-    final leftThird = Offset.lerp(points[0], points[3], 0.32)!;
-    final rightThird = Offset.lerp(points[1], points[2], 0.32)!;
-    _linePaint
-      ..strokeWidth = 0.55
-      ..color = config.accent.withValues(alpha: 0.11);
-    canvas
-      ..drawLine(topMid, bottomMid, _linePaint)
-      ..drawLine(leftThird, rightThird, _linePaint);
-
-    _paint.color = config.accent.withValues(alpha: 0.55);
-    canvas.drawCircle(points[index % points.length], 1.5, _paint);
+    return _cachedSpineShape!;
   }
 
-  _PlanePose _poseFor(int stage, int index) {
-    final phase = time * math.pi * 2;
-    switch (stage) {
-      case 0:
-        final angle = index / 8 * math.pi * 2 + phase * 0.11;
-        final radius = 0.17 + (index.isOdd ? 0.055 : 0);
-        return _PlanePose(
-          x: 0.67 + math.cos(angle) * radius,
-          y: 0.45 + math.sin(angle) * radius * 0.72,
-          scale: 0.105 + (index % 3) * 0.018,
-          aspect: 1.55,
-          rotation: angle + math.pi / 2,
-          tilt: math.sin(angle) * 0.55,
-        );
-      case 1:
-        final column = index % 4;
-        final row = index ~/ 4;
-        return _PlanePose(
-          x: 0.18 + column * 0.22,
-          y: 0.34 + row * 0.25,
-          scale: 0.115 + row * 0.012,
-          aspect: 1.72,
-          rotation: (column - 1.5) * 0.025,
-          tilt: (column - 1.5) * 0.12,
-        );
-      case 2:
-        final depth = index / 7;
-        return _PlanePose(
-          x: 0.5 + math.sin(index * 1.7 + phase * 0.08) * 0.018,
-          y: 0.49,
-          scale: 0.07 + depth * 0.37,
-          aspect: 1.5,
-          rotation: (index.isEven ? -1 : 1) * 0.012,
-          tilt: math.sin(index * 0.7) * 0.18,
-        );
-      case 3:
-        return _PlanePose(
-          x: 0.22 + index * 0.075,
-          y: 0.72 - index * 0.055,
-          scale: 0.125 + index * 0.01,
-          aspect: 2.15,
-          rotation: -0.19,
-          tilt: -0.22,
-        );
-      default:
-        final column = index % 2;
-        final row = index ~/ 2;
-        return _PlanePose(
-          x: 0.26 + column * 0.49,
-          y: 0.22 + row * 0.19,
-          scale: 0.13 + (row % 2) * 0.012,
-          aspect: 2.05,
-          rotation: column == 0 ? -0.018 : 0.018,
-          tilt: column == 0 ? -0.15 : 0.15,
-        );
+  Path _pathFrom(List<Offset> points) {
+    final path = Path()..moveTo(points.first.dx, points.first.dy);
+    for (final point in points.skip(1)) {
+      path.lineTo(point.dx, point.dy);
     }
-  }
-
-  void _drawRegistrationMarks(Canvas canvas, Size size) {
-    final accent = config.accent.withValues(alpha: 0.34);
-    _linePaint
-      ..color = accent
-      ..strokeWidth = 0.8;
-    const inset = 22.0;
-    const length = 14.0;
-    for (final origin in [
-      const Offset(inset, inset),
-      Offset(size.width - inset, inset),
-      Offset(inset, size.height - inset),
-      Offset(size.width - inset, size.height - inset),
-    ]) {
-      final xDirection = origin.dx < size.width / 2 ? 1.0 : -1.0;
-      final yDirection = origin.dy < size.height / 2 ? 1.0 : -1.0;
-      canvas
-        ..drawLine(origin, origin + Offset(length * xDirection, 0), _linePaint)
-        ..drawLine(origin, origin + Offset(0, length * yDirection), _linePaint);
-    }
+    return path;
   }
 
   void _drawVignette(Canvas canvas, Size size, Rect bounds) {
     _paint
+      ..style = PaintingStyle.fill
       ..blendMode = BlendMode.srcOver
       ..shader = ui.Gradient.radial(
         Offset(size.width * 0.5, size.height * 0.48),
         size.longestSide * 0.68,
         [
           Colors.transparent,
-          AppColors.backgroundDark.withValues(alpha: 0.24),
+          AppColors.backgroundDark.withValues(alpha: 0.2),
           AppColors.backgroundDark.withValues(
-            alpha: config.vignetteIntensity.clamp(0.0, 0.72),
+            alpha: frame.config.vignetteIntensity.clamp(0.0, 0.66),
           ),
         ],
         const [0.25, 0.72, 1],
@@ -488,7 +333,7 @@ class _RenderAtlasPainter extends CustomPainter {
   }
 
   void _drawGrain(Canvas canvas, Size size) {
-    final image = grainImage;
+    final image = frame.grainTexture;
     if (image == null) return;
     const tile = 256.0;
     for (double x = 0; x < size.width; x += tile) {
@@ -505,60 +350,46 @@ class _RenderAtlasPainter extends CustomPainter {
     }
   }
 
-  static Offset _rotate(Offset point, double radians) {
-    final cosine = math.cos(radians);
-    final sine = math.sin(radians);
-    return Offset(
-      point.dx * cosine - point.dy * sine,
-      point.dx * sine + point.dy * cosine,
-    );
-  }
-
-  static double _smoothStep(double value) => value * value * (3 - 2 * value);
-
   @override
-  bool shouldRepaint(_RenderAtlasPainter oldDelegate) =>
+  bool shouldRepaint(_NarrativeBackgroundPainter oldDelegate) =>
       !identical(frame, oldDelegate.frame);
 }
 
-/// Coalesces ambient, scroll, and pointer inputs into at most one painter
-/// notification per scheduler frame.
-final class _RenderAtlasFrame extends ChangeNotifier {
-  _RenderAtlasFrame({
+/// Coalesces scroll, quality and pointer inputs into one paint notification.
+final class _NarrativeFrame extends ChangeNotifier {
+  _NarrativeFrame({
     required SceneConfig config,
+    required NarrativeSpineCue cue,
     required RenderQuality quality,
   }) : _config = config,
+       _cue = cue,
        _quality = quality;
 
   SceneConfig _config;
+  NarrativeSpineCue _cue;
   RenderQuality _quality;
-  double _time = 0;
   Offset _pointer = Offset.zero;
   ui.Image? _grainTexture;
 
   SceneConfig? _pendingConfig;
-  double? _pendingTime;
+  NarrativeSpineCue? _pendingCue;
   Offset? _pendingPointer;
   bool _notificationPending = false;
   bool _forceNotification = false;
   bool _disposed = false;
 
   SceneConfig get config => _config;
+  NarrativeSpineCue get cue => _cue;
   RenderQuality get quality => _quality;
-  double get time => _time;
   Offset get pointer => _pointer;
   ui.Image? get grainTexture => _grainTexture;
 
-  void queueConfig(SceneConfig value) {
-    _pendingConfig = value;
-    _scheduleNotification();
-  }
-
-  void queueTime(double value) {
-    if (_pendingTime == value || (_pendingTime == null && _time == value)) {
-      return;
-    }
-    _pendingTime = value;
+  void queueScene({
+    required SceneConfig config,
+    required NarrativeSpineCue cue,
+  }) {
+    _pendingConfig = config;
+    _pendingCue = cue;
     _scheduleNotification();
   }
 
@@ -594,18 +425,18 @@ final class _RenderAtlasFrame extends ChangeNotifier {
       var changed = _forceNotification;
       _forceNotification = false;
       final config = _pendingConfig;
-      final time = _pendingTime;
+      final cue = _pendingCue;
       final pointer = _pendingPointer;
       _pendingConfig = null;
-      _pendingTime = null;
+      _pendingCue = null;
       _pendingPointer = null;
 
       if (config != null && !identical(config, _config)) {
         _config = config;
         changed = true;
       }
-      if (time != null && time != _time) {
-        _time = time;
+      if (cue != null && cue != _cue) {
+        _cue = cue;
         changed = true;
       }
       if (pointer != null && pointer != _pointer) {
@@ -621,38 +452,4 @@ final class _RenderAtlasFrame extends ChangeNotifier {
     _disposed = true;
     super.dispose();
   }
-}
-
-class _DrawablePlane {
-  const _DrawablePlane({required this.index, required this.pose});
-  final int index;
-  final _PlanePose pose;
-}
-
-class _PlanePose {
-  const _PlanePose({
-    required this.x,
-    required this.y,
-    required this.scale,
-    required this.aspect,
-    required this.rotation,
-    required this.tilt,
-  });
-
-  final double x;
-  final double y;
-  final double scale;
-  final double aspect;
-  final double rotation;
-  final double tilt;
-
-  static _PlanePose lerp(_PlanePose from, _PlanePose to, double t) =>
-      _PlanePose(
-        x: ui.lerpDouble(from.x, to.x, t)!,
-        y: ui.lerpDouble(from.y, to.y, t)!,
-        scale: ui.lerpDouble(from.scale, to.scale, t)!,
-        aspect: ui.lerpDouble(from.aspect, to.aspect, t)!,
-        rotation: ui.lerpDouble(from.rotation, to.rotation, t)!,
-        tilt: ui.lerpDouble(from.tilt, to.tilt, t)!,
-      );
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:flutter_web_portfolio/app/controllers/scroll_controller.dart';
+import '../../helpers/narrative_fixture.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -9,7 +10,7 @@ void main() {
   late AppScrollController controller;
 
   setUp(() {
-    controller = AppScrollController();
+    controller = AppScrollController(narrative: loadNarrativeFixture());
     addTearDown(controller.close);
   });
 
@@ -26,14 +27,11 @@ void main() {
 
     test('initializes a distinct key for every section', () {
       final keys = {
-        controller.homeKey,
-        controller.aboutKey,
-        controller.experienceKey,
-        controller.proofKey,
-        controller.projectsKey,
+        for (final sectionId in controller.narrative.sectionIds)
+          controller.keyFor(sectionId),
       };
 
-      expect(keys, hasLength(5));
+      expect(keys, hasLength(controller.narrative.chapters.length));
     });
 
     test('ignores unknown or detached sections safely', () {

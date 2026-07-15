@@ -3,7 +3,6 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_web_portfolio/app/core/theme/app_fonts.dart';
-import 'package:flutter_web_portfolio/app/domain/models/portfolio_document.dart';
 
 import 'package:flutter_web_portfolio/app/controllers/scroll_controller.dart';
 import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
@@ -31,10 +30,10 @@ class FullscreenMenu extends StatefulWidget {
         barrierColor: Colors.transparent,
         transitionDuration: reduceMotion
             ? Duration.zero
-            : const Duration(milliseconds: 600),
+            : const Duration(milliseconds: 420),
         reverseTransitionDuration: reduceMotion
             ? Duration.zero
-            : const Duration(milliseconds: 400),
+            : const Duration(milliseconds: 280),
         pageBuilder: (_, _, _) => const FullscreenMenu(),
       ),
     );
@@ -53,27 +52,18 @@ class _FullscreenMenuState extends State<FullscreenMenu>
   int _hoveredIndex = -1;
   bool _reduceMotion = false;
 
-  static const _iconMap = <String, IconData>{
-    'home': Icons.home_outlined,
-    'about': Icons.person_outline,
-    'experience': Icons.work_outline,
-    'projects': Icons.code_outlined,
-    'proof': Icons.verified_outlined,
-  };
-
   List<_MenuItem> _buildMenuItems() {
     // Drop 'home' — the logo already scrolls to top, so listing it here
     // produces a confusing duplicate row at the top of the drawer.
     final sections = context
-        .read<PortfolioDocument>()
-        .activeSections
+        .read<AppScrollController>()
+        .sectionIds
         .where((s) => s != 'home')
         .toList();
     return [
       for (var i = 0; i < sections.length; i++)
         _MenuItem(
           sectionId: sections[i],
-          icon: _iconMap[sections[i]] ?? Icons.circle_outlined,
           number: (i + 1).toString().padLeft(2, '0'),
         ),
     ];
@@ -85,10 +75,10 @@ class _FullscreenMenuState extends State<FullscreenMenu>
 
     _masterController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 600),
+      duration: const Duration(milliseconds: 420),
     );
 
-    _backdropBlur = Tween<double>(begin: 0, end: 20).animate(
+    _backdropBlur = Tween<double>(begin: 0, end: 8).animate(
       CurvedAnimation(
         parent: _masterController,
         curve: const Interval(0.0, 0.4, curve: Curves.easeOut),
@@ -164,8 +154,8 @@ class _FullscreenMenuState extends State<FullscreenMenu>
                   sigmaY: _reduceMotion ? 0 : _backdropBlur.value,
                 ),
                 child: Container(
-                  color: Colors.black.withValues(
-                    alpha: 0.7 * _overlayOpacity.value,
+                  color: AppColors.backgroundDark.withValues(
+                    alpha: 0.94 * _overlayOpacity.value,
                   ),
                 ),
               ),
@@ -220,7 +210,7 @@ class _FullscreenMenuState extends State<FullscreenMenu>
                   return Opacity(
                     opacity: itemAnimation.value,
                     child: Transform.translate(
-                      offset: Offset(0, 30 * (1 - itemAnimation.value)),
+                      offset: Offset(0, 14 * (1 - itemAnimation.value)),
                       child: _MenuItemWidget(
                         item: item,
                         label: label,
@@ -247,13 +237,8 @@ class _FullscreenMenuState extends State<FullscreenMenu>
 }
 
 class _MenuItem {
-  const _MenuItem({
-    required this.sectionId,
-    required this.icon,
-    required this.number,
-  });
+  const _MenuItem({required this.sectionId, required this.number});
   final String sectionId;
-  final IconData icon;
   final String number;
 }
 
@@ -278,7 +263,7 @@ class _MenuItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const textColor = Colors.white;
+    const textColor = AppColors.textBright;
     const accentColor = AppColors.accent;
     final fontSize = isMobile ? 28.0 : 48.0;
     final motionDuration = prefersReducedMotion(context)
@@ -295,7 +280,7 @@ class _MenuItemWidget extends StatelessWidget {
         curve: Curves.easeOut,
         padding: EdgeInsets.symmetric(
           vertical: isMobile ? 12 : 16,
-          horizontal: isHovered ? 16 : 0,
+          horizontal: 0,
         ),
         decoration: BoxDecoration(
           border: Border(
@@ -310,30 +295,16 @@ class _MenuItemWidget extends StatelessWidget {
             // Number
             AnimatedDefaultTextStyle(
               duration: motionDuration,
-              style: AppFonts.jetBrainsMono(
-                fontSize: isMobile ? 12 : 14,
-                fontWeight: FontWeight.w400,
+              style: AppFonts.instrumentSerif(
+                fontSize: isMobile ? 18 : 22,
+                fontStyle: FontStyle.italic,
                 color: isHovered
                     ? accentColor
                     : textColor.withValues(alpha: 0.4),
-                letterSpacing: 2,
               ),
               child: Text(item.number),
             ),
-            SizedBox(width: isMobile ? 16 : 32),
-
-            // Icon
-            AnimatedContainer(
-              duration: motionDuration,
-              child: Icon(
-                item.icon,
-                size: isMobile ? 20 : 24,
-                color: isHovered
-                    ? accentColor
-                    : textColor.withValues(alpha: 0.5),
-              ),
-            ),
-            SizedBox(width: isMobile ? 12 : 24),
+            SizedBox(width: isMobile ? 22 : 38),
 
             // Label
             Expanded(
@@ -341,9 +312,9 @@ class _MenuItemWidget extends StatelessWidget {
                 duration: motionDuration,
                 style: AppFonts.spaceGrotesk(
                   fontSize: fontSize,
-                  fontWeight: isHovered ? FontWeight.w700 : FontWeight.w300,
+                  fontWeight: FontWeight.w500,
                   color: isHovered ? accentColor : textColor,
-                  letterSpacing: isHovered ? 2 : 0,
+                  letterSpacing: -fontSize * 0.025,
                 ),
                 child: Text(label),
               ),
@@ -357,7 +328,7 @@ class _MenuItemWidget extends StatelessWidget {
                 duration: motionDuration,
                 offset: Offset(isHovered ? 0 : -0.5, 0),
                 child: Icon(
-                  Icons.arrow_forward,
+                  Icons.north_east_rounded,
                   color: accentColor,
                   size: isMobile ? 20 : 28,
                 ),

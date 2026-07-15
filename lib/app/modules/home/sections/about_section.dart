@@ -5,6 +5,7 @@ import 'package:flutter_web_portfolio/app/core/constants/breakpoints.dart';
 import 'package:flutter_web_portfolio/app/core/theme/app_fonts.dart';
 import 'package:flutter_web_portfolio/app/domain/models/portfolio_document.dart';
 import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
+import 'package:flutter_web_portfolio/app/narrative/domain/narrative_document.dart';
 import 'package:flutter_web_portfolio/app/widgets/cinematic_focusable.dart';
 import 'package:flutter_web_portfolio/app/widgets/numbered_section_heading.dart';
 import 'package:flutter_web_portfolio/app/widgets/scene_accent_builder.dart';
@@ -30,7 +31,9 @@ class AboutSection extends StatelessWidget {
               children: [
                 SceneAccentBuilder(
                   builder: (context, accent) => NumberedSectionHeading(
-                    number: portfolio.sectionNumber('about'),
+                    number: context.read<NarrativeDocument>().sectionNumber(
+                      SectionId.about,
+                    ),
                     title: language.getText(
                       'about_section.title',
                       defaultValue: 'About',
@@ -136,7 +139,7 @@ class _AboutDetail extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 22),
         decoration: const BoxDecoration(
           border: Border(
-            top: BorderSide(color: Color(0x365B6CFF)),
+            top: BorderSide(color: Color(0x36E47A57)),
             bottom: BorderSide(color: Color(0x24F2F0E9)),
           ),
         ),
@@ -286,16 +289,16 @@ class _PracticeRow extends StatelessWidget {
   Widget build(BuildContext context) => Container(
     padding: const EdgeInsets.symmetric(vertical: 24),
     decoration: const BoxDecoration(
-      border: Border(top: BorderSide(color: Color(0x3D5B6CFF))),
+      border: Border(top: BorderSide(color: Color(0x3DE47A57))),
     ),
     child: Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           '${index + 1}'.padLeft(2, '0'),
-          style: AppFonts.jetBrainsMono(
-            fontSize: 9,
-            fontWeight: FontWeight.w700,
+          style: AppFonts.instrumentSerif(
+            fontSize: 18,
+            fontStyle: FontStyle.italic,
             color: AppColors.heroAccent,
           ),
         ),

@@ -152,7 +152,9 @@ async function injectBootstrapShell() {
     portfolio.content_version,
     'content_version',
   );
-  const name = requiredString(portfolio.profile?.name, 'profile.name');
+  const displayName = requiredDisplayName(portfolio.profile?.display_name);
+  const namePrimary = displayName.primary;
+  const nameAccent = displayName.accent;
   const role = requiredString(portfolio.profile?.role, 'profile.role');
   const location = requiredString(
     portfolio.profile?.location,
@@ -189,9 +191,6 @@ async function injectBootstrapShell() {
     Array.isArray(portfolio.profile?.links) &&
     portfolio.profile.links.some((link) => link?.id === 'github');
 
-  const nameWords = name.trim().split(/\s+/);
-  const nameAccent = nameWords.pop();
-  const namePrefix = nameWords.join(' ').toUpperCase();
   const facts = [
     ['Based in', location],
     ['Working since', since],
@@ -205,9 +204,6 @@ async function injectBootstrapShell() {
       </li>`,
     )
     .join('\n');
-  const prefixMarkup = namePrefix
-    ? `        <span>${escapeHtml(namePrefix)}</span>\n`
-    : '';
   const actionMarkup = [
     hasWork
       ? `            <span class="bootstrap-action bootstrap-action--primary">${escapeHtml(viewWork)}</span>`
@@ -231,7 +227,8 @@ async function injectBootstrapShell() {
       </div>
       <div class="bootstrap-stage">
         <p class="bootstrap-title">
-${prefixMarkup}        <span class="bootstrap-title-accent">${escapeHtml(nameAccent)}</span>
+        <span>${escapeHtml(namePrimary)}</span>
+        <span class="bootstrap-title-accent">${escapeHtml(nameAccent)}</span>
         </p>
       </div>
       <div class="bootstrap-footer">
@@ -259,6 +256,17 @@ function requiredString(value, path) {
     throw new Error(`${path} must be a non-empty string`);
   }
   return value.trim();
+}
+
+function requiredDisplayName(value) {
+  const displayName = {};
+  for (const field of ['primary', 'accent', 'navigation', 'accessible']) {
+    displayName[field] = requiredString(
+      value?.[field],
+      `profile.display_name.${field}`,
+    );
+  }
+  return displayName;
 }
 
 function escapeHtml(value) {

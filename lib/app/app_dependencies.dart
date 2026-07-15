@@ -12,6 +12,7 @@ import 'package:flutter_web_portfolio/app/data/repositories/portfolio_repository
 import 'package:flutter_web_portfolio/app/domain/models/portfolio_document.dart';
 import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
 import 'package:flutter_web_portfolio/app/features/render_quality/application/render_quality_controller.dart';
+import 'package:flutter_web_portfolio/app/narrative/domain/narrative_document.dart';
 import 'package:flutter_web_portfolio/app/utils/render_quality_sync.dart';
 
 /// Explicit, application-owned dependency graph.
@@ -22,6 +23,7 @@ final class AppDependencies {
   AppDependencies._({
     required this.languageCubit,
     required this.portfolio,
+    required this.narrative,
     required this.scrollController,
     required this.sceneDirector,
     required this.renderQualityController,
@@ -29,6 +31,7 @@ final class AppDependencies {
 
   final LanguageCubit languageCubit;
   final PortfolioDocument portfolio;
+  final NarrativeDocument narrative;
   final AppScrollController scrollController;
   final SceneDirector sceneDirector;
   final RenderQualityController renderQualityController;
@@ -38,6 +41,9 @@ final class AppDependencies {
     final portfolio = await PortfolioRepositoryImpl(
       assetsProvider: assetsProvider,
     ).load();
+    final narrative = NarrativeDocument.fromJson(
+      await assetsProvider.loadNarrative(),
+    ).forActiveSections(portfolio.activeSections);
     final storageProvider = await LocalStorageProvider().init();
     final languageRepository = LanguageRepositoryImpl(
       assetsProvider: assetsProvider,
@@ -46,7 +52,7 @@ final class AppDependencies {
     final languageCubit = LanguageCubit(languageRepository: languageRepository);
     await languageCubit.initialize();
 
-    final scrollController = AppScrollController();
+    final scrollController = AppScrollController(narrative: narrative);
     final sceneDirector = SceneDirector(scrollController: scrollController);
     final renderQualityController = RenderQualityController()
       ..startMonitoring();
@@ -58,6 +64,7 @@ final class AppDependencies {
     return AppDependencies._(
       languageCubit: languageCubit,
       portfolio: portfolio,
+      narrative: narrative,
       scrollController: scrollController,
       sceneDirector: sceneDirector,
       renderQualityController: renderQualityController,
@@ -98,31 +105,34 @@ final class _AppRuntimeState extends State<AppRuntime> {
   Widget build(BuildContext context) =>
       RepositoryProvider<PortfolioDocument>.value(
         value: widget.dependencies.portfolio,
-        child: MultiBlocProvider(
-          providers: [
-            BlocProvider<LanguageCubit>.value(
-              value: widget.dependencies.languageCubit,
+        child: RepositoryProvider<NarrativeDocument>.value(
+          value: widget.dependencies.narrative,
+          child: MultiBlocProvider(
+            providers: [
+              BlocProvider<LanguageCubit>.value(
+                value: widget.dependencies.languageCubit,
+              ),
+              BlocProvider<AppScrollController>.value(
+                value: widget.dependencies.scrollController,
+              ),
+              BlocProvider<SceneDirector>.value(
+                value: widget.dependencies.sceneDirector,
+              ),
+              BlocProvider<RenderQualityController>.value(
+                value: widget.dependencies.renderQualityController,
+              ),
+            ],
+            child: BlocListener<RenderQualityController, RenderQualityState>(
+              listenWhen: (previous, current) =>
+                  previous.quality != current.quality ||
+                  previous.reason != current.reason ||
+                  previous.reducedMotion != current.reducedMotion,
+              listener: (context, state) => syncRenderQualityAttributes(
+                quality: state.quality.name,
+                reason: state.reason.name,
+              ),
+              child: widget.child,
             ),
-            BlocProvider<AppScrollController>.value(
-              value: widget.dependencies.scrollController,
-            ),
-            BlocProvider<SceneDirector>.value(
-              value: widget.dependencies.sceneDirector,
-            ),
-            BlocProvider<RenderQualityController>.value(
-              value: widget.dependencies.renderQualityController,
-            ),
-          ],
-          child: BlocListener<RenderQualityController, RenderQualityState>(
-            listenWhen: (previous, current) =>
-                previous.quality != current.quality ||
-                previous.reason != current.reason ||
-                previous.reducedMotion != current.reducedMotion,
-            listener: (context, state) => syncRenderQualityAttributes(
-              quality: state.quality.name,
-              reason: state.reason.name,
-            ),
-            child: widget.child,
           ),
         ),
       );

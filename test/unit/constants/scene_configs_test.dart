@@ -39,13 +39,6 @@ void main() {
       }
     });
 
-    test('atlas morph advances once per chapter', () {
-      expect(
-        SceneConfigs.scenes.map((scene) => scene.atlasMorph),
-        orderedEquals(const [0, 1, 2, 3, 4]),
-      );
-    });
-
     test('vignetteIntensity is between 0 and 1 for all scenes', () {
       for (final scene in SceneConfigs.scenes) {
         expect(scene.vignetteIntensity, greaterThan(0.0));
@@ -65,7 +58,6 @@ void main() {
       expect(result.gradient2, equals(a.gradient2));
       expect(result.gradient3, equals(a.gradient3));
       expect(result.accent, equals(a.accent));
-      expect(result.atlasMorph, equals(a.atlasMorph));
       expect(result.vignetteIntensity, equals(a.vignetteIntensity));
     });
 
@@ -76,7 +68,6 @@ void main() {
       expect(result.gradient2, equals(b.gradient2));
       expect(result.gradient3, equals(b.gradient3));
       expect(result.accent, equals(b.accent));
-      expect(result.atlasMorph, equals(b.atlasMorph));
       expect(result.vignetteIntensity, equals(b.vignetteIntensity));
     });
 
@@ -100,12 +91,10 @@ void main() {
 
     test('t=0.5 interpolates numeric values to midpoint', () {
       final result = SceneConfig.lerp(a, b, 0.5);
-      final expectedMorph = a.atlasMorph + (b.atlasMorph - a.atlasMorph) * 0.5;
       final expectedVignette =
           a.vignetteIntensity +
           (b.vignetteIntensity - a.vignetteIntensity) * 0.5;
 
-      expect(result.atlasMorph, closeTo(expectedMorph, 0.001));
       expect(result.vignetteIntensity, closeTo(expectedVignette, 0.001));
     });
 
@@ -114,7 +103,7 @@ void main() {
 
       expect(result.gradient1, equals(a.gradient1));
       expect(result.accent, equals(a.accent));
-      expect(result.atlasMorph, equals(a.atlasMorph));
+      expect(result.vignetteIntensity, equals(a.vignetteIntensity));
     });
   });
 }

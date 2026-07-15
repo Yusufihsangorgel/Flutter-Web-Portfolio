@@ -1,4 +1,9 @@
 import { expect, Page, test } from '@playwright/test';
+import { readFileSync } from 'node:fs';
+
+const portfolio = JSON.parse(
+  readFileSync('assets/content/portfolio.json', 'utf8'),
+);
 
 async function settleCompositor(page: Page, frameCount = 3) {
   await page.evaluate(
@@ -62,7 +67,10 @@ async function openStaticPortfolio(page: Page) {
     timeout: 20000,
   });
   await expect(page.locator('#bootstrap-surface')).toHaveCount(0);
-  await waitForHeadingInViewport(page, 'Yusuf İhsan Görgel, Software Engineer');
+  await waitForHeadingInViewport(
+    page,
+    `${portfolio.profile.display_name.accessible}, ${portfolio.profile.role}`,
+  );
   await expect(page.locator('html')).toHaveAttribute(
     'data-render-quality',
     'essential',
@@ -79,6 +87,30 @@ async function openChapter(
   await page.getByText(command, { exact: true }).click();
   await expect(page).toHaveURL(hash);
   await waitForHeadingInViewport(page, heading);
+}
+
+async function scrollToHeading(page: Page, name: string) {
+  const heading = page.getByRole('heading', { name, exact: true });
+  for (let attempt = 0; attempt < 80; attempt += 1) {
+    if ((await heading.count()) > 0) {
+      const [box, viewportHeight] = await Promise.all([
+        heading.boundingBox(),
+        page.evaluate(() => window.innerHeight),
+      ]);
+      if (box && box.y < viewportHeight && box.y + box.height > 0) {
+        const targetY = Math.min(140, viewportHeight * 0.18);
+        await page.mouse.wheel(0, Math.max(0, box.y - targetY));
+        await page.evaluate(() => document.fonts.ready);
+        await settleCompositor(page, 8);
+        await page.waitForTimeout(1000);
+        await settleCompositor(page, 4);
+        return;
+      }
+    }
+    await page.mouse.wheel(0, 500);
+    await settleCompositor(page, 2);
+  }
+  await expect(heading).toBeVisible();
 }
 
 test('keeps the first meaningful paint visually aligned with the portfolio', async ({
@@ -119,4 +151,7 @@ test('preserves the editorial sequence across responsive viewports', async ({
     'Selected Work',
   );
   await expect(page).toHaveScreenshot('systems.png');
+
+  await scrollToHeading(page, 'More work');
+  await expect(page).toHaveScreenshot('archive.png');
 });

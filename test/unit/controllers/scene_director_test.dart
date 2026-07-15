@@ -3,6 +3,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_web_portfolio/app/controllers/scene_director.dart';
 import 'package:flutter_web_portfolio/app/controllers/scroll_controller.dart';
 import 'package:flutter_web_portfolio/app/core/constants/scene_configs.dart';
+import 'package:flutter_web_portfolio/app/narrative/domain/narrative_document.dart';
+import '../../helpers/narrative_fixture.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -11,7 +13,7 @@ void main() {
   late SceneDirector director;
 
   setUp(() {
-    scrollController = AppScrollController();
+    scrollController = AppScrollController(narrative: loadNarrativeFixture());
     director = SceneDirector(scrollController: scrollController);
     addTearDown(() async {
       await director.close();
@@ -22,7 +24,6 @@ void main() {
   group('SceneDirector', () {
     test('starts in the hero scene with zero progress', () {
       expect(director.state.currentSceneIndex, 0);
-      expect(director.state.sceneProgress, 0);
       expect(director.state.globalProgress, 0);
       expect(director.state.blendFactor, 0);
     });
@@ -34,12 +35,13 @@ void main() {
       expect(config.gradient2, SceneConfigs.hero.gradient2);
       expect(config.gradient3, SceneConfigs.hero.gradient3);
       expect(config.accent, SceneConfigs.hero.accent);
-      expect(config.atlasMorph, SceneConfigs.hero.atlasMorph);
       expect(config.vignetteIntensity, SceneConfigs.hero.vignetteIntensity);
     });
 
     test('derives the current accent from the immutable scene snapshot', () {
       expect(director.state.currentAccent, SceneConfigs.hero.accent);
+      expect(director.state.currentMotif, NarrativeMotif.origin);
+      expect(director.state.nextMotif, NarrativeMotif.origin);
     });
 
     test('recalculate is safe before a scroll position is attached', () {
@@ -65,11 +67,12 @@ void main() {
         viewportDimension: 1000,
         maxExtent: 5200,
         sections: sections,
+        narrative: loadNarrativeFixture(),
       );
 
       expect(state.currentSceneIndex, 1);
-      expect(state.sceneProgress, 0);
       expect(state.blendedConfig, SceneConfigs.about);
+      expect(state.currentMotif, NarrativeMotif.thread);
     });
 
     test('smoothly blends between adjacent measured chapters', () {
@@ -84,10 +87,10 @@ void main() {
         viewportDimension: 1000,
         maxExtent: 2400,
         sections: sections,
+        narrative: loadNarrativeFixture(),
       );
 
       expect(state.currentSceneIndex, 1);
-      expect(state.sceneProgress, closeTo(0.5, 0.001));
       expect(state.blendFactor, closeTo(0.5, 0.001));
       expect(
         state.blendedConfig.accent,
@@ -98,6 +101,8 @@ void main() {
         ).accent,
       );
       expect(state.currentAccent, SceneConfigs.about.accent);
+      expect(state.currentMotif, NarrativeMotif.thread);
+      expect(state.nextMotif, NarrativeMotif.timeline);
     });
   });
 }

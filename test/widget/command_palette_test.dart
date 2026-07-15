@@ -7,6 +7,7 @@ import 'package:flutter_web_portfolio/app/domain/repositories/i_language_reposit
 import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
 import 'package:flutter_web_portfolio/app/widgets/command_palette.dart';
 import '../helpers/portfolio_fixture.dart';
+import '../helpers/narrative_fixture.dart';
 
 final class _PaletteLanguageRepository implements ILanguageRepository {
   @override
@@ -40,7 +41,7 @@ void main() {
 
   setUp(() async {
     language = LanguageCubit(languageRepository: _PaletteLanguageRepository());
-    scroll = AppScrollController();
+    scroll = AppScrollController(narrative: loadNarrativeFixture());
     await language.initialize();
     addTearDown(() async {
       await language.close();

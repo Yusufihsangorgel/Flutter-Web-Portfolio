@@ -8,7 +8,7 @@ import 'package:flutter_web_portfolio/app/features/language/application/language
 import 'package:flutter_web_portfolio/app/utils/web_url_strategy.dart'
     as url_strategy;
 
-/// Flag-emoji popup menu for switching the active language.
+/// Compact typographic menu for switching the active language.
 class LanguageSwitcher extends StatelessWidget {
   const LanguageSwitcher({super.key});
 
@@ -36,25 +36,32 @@ class LanguageSwitcher extends StatelessWidget {
               return PopupMenuButton<String>(
                 tooltip: '$menuLabel: $currentLanguage',
                 offset: const Offset(0, 40),
+                padding: const EdgeInsets.symmetric(horizontal: 8),
                 icon: ExcludeSemantics(
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        languageController.languageInfo['flag'] ?? '',
-                        style: const TextStyle(fontSize: 24),
+                        languageState.languageCode.toUpperCase(),
+                        style: AppFonts.spaceGrotesk(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.textBright,
+                          letterSpacing: 1.1,
+                        ),
                       ),
-                      Icon(
-                        Icons.arrow_drop_down,
-                        color: Colors.white.withValues(alpha: 0.3),
-                        size: 18,
+                      const SizedBox(width: 4),
+                      const Icon(
+                        Icons.keyboard_arrow_down_rounded,
+                        color: AppColors.textSecondary,
+                        size: 15,
                       ),
                     ],
                   ),
                 ),
                 color: AppColors.backgroundLight,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(2),
                   side: BorderSide(
                     color:
                         (Theme.of(context).brightness == Brightness.dark
@@ -74,45 +81,50 @@ class LanguageSwitcher extends StatelessWidget {
                       final languageName = LanguageCubit.getLanguageName(
                         languageCode,
                       );
-                      final flag = LanguageCubit.getLanguageFlag(languageCode);
                       final isSelected =
                           languageState.languageCode == languageCode;
 
                       return PopupMenuItem<String>(
                         value: languageCode,
-                        child: Container(
-                          decoration: isSelected
-                              ? BoxDecoration(
-                                  color: accent.withValues(alpha: 0.15),
-                                  borderRadius: BorderRadius.circular(4),
-                                )
-                              : null,
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 4,
-                          ),
-                          child: Row(
-                            children: [
-                              ExcludeSemantics(
-                                child: Text(
-                                  flag,
-                                  style: const TextStyle(fontSize: 24),
+                        height: 48,
+                        child: Row(
+                          children: [
+                            SizedBox(
+                              width: 38,
+                              child: Text(
+                                languageCode.toUpperCase(),
+                                style: AppFonts.spaceGrotesk(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w600,
+                                  color: isSelected
+                                      ? accent
+                                      : AppColors.textSecondary,
+                                  letterSpacing: 0.8,
                                 ),
                               ),
-                              const SizedBox(width: 12),
-                              Text(
+                            ),
+                            Expanded(
+                              child: Text(
                                 languageName,
                                 style: AppFonts.spaceGrotesk(
                                   color: isSelected
                                       ? AppColors.textBright
                                       : AppColors.textPrimary,
                                   fontWeight: isSelected
-                                      ? FontWeight.bold
+                                      ? FontWeight.w600
                                       : FontWeight.normal,
                                 ),
                               ),
+                            ),
+                            if (isSelected) ...[
+                              const SizedBox(width: 12),
+                              Icon(
+                                Icons.check_rounded,
+                                size: 16,
+                                color: accent,
+                              ),
                             ],
-                          ),
+                          ],
                         ),
                       );
                     })

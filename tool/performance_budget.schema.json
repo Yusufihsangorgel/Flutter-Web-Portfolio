@@ -1,0 +1,92 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Flutter Web runtime performance budget",
+  "description": "Release thresholds and the explicit hardware-only enforcement contract.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "$schema",
+    "runs",
+    "startup_timeout_ms",
+    "scroll_sample_ms",
+    "maximum_median",
+    "hardware_only_metrics"
+  ],
+  "properties": {
+    "$schema": {
+      "const": "./performance_budget.schema.json"
+    },
+    "runs": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 10
+    },
+    "startup_timeout_ms": {
+      "type": "number",
+      "minimum": 1000
+    },
+    "scroll_sample_ms": {
+      "type": "number",
+      "minimum": 1000
+    },
+    "maximum_median": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "navigation_to_first_frame_ms",
+        "bootstrap_to_first_frame_ms",
+        "first_frame_to_reveal_frame_intervals",
+        "scroll_frame_p95_over_median_ratio",
+        "scroll_frames_over_50_ms",
+        "long_task_total_ms",
+        "cumulative_layout_shift",
+        "largest_contentful_paint_ms"
+      ],
+      "properties": {
+        "navigation_to_first_frame_ms": {
+          "type": "number",
+          "minimum": 0
+        },
+        "bootstrap_to_first_frame_ms": {
+          "type": "number",
+          "minimum": 0
+        },
+        "first_frame_to_reveal_frame_intervals": {
+          "type": "number",
+          "minimum": 0
+        },
+        "scroll_frame_p95_over_median_ratio": {
+          "type": "number",
+          "minimum": 0
+        },
+        "scroll_frames_over_50_ms": {
+          "type": "number",
+          "minimum": 0
+        },
+        "long_task_total_ms": {
+          "type": "number",
+          "minimum": 0
+        },
+        "cumulative_layout_shift": {
+          "type": "number",
+          "minimum": 0
+        },
+        "largest_contentful_paint_ms": {
+          "type": "number",
+          "minimum": 0
+        }
+      }
+    },
+    "hardware_only_metrics": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "enum": [
+          "scroll_frames_over_50_ms"
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "id": "editorial-engineering-trace",
+  "chapters": [
+    {
+      "id": "home",
+      "motif": "origin"
+    },
+    {
+      "id": "about",
+      "motif": "thread"
+    },
+    {
+      "id": "experience",
+      "motif": "timeline"
+    },
+    {
+      "id": "proof",
+      "motif": "branches"
+    },
+    {
+      "id": "projects",
+      "motif": "bracket"
+    }
+  ]
+}

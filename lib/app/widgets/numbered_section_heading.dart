@@ -37,11 +37,10 @@ class NumberedSectionHeading extends StatelessWidget {
             children: [
               Text(
                 number,
-                style: AppFonts.jetBrainsMono(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w700,
+                style: AppFonts.instrumentSerif(
+                  fontSize: 19,
+                  fontStyle: FontStyle.italic,
                   color: accent,
-                  letterSpacing: 1.1,
                 ),
               ),
               const SizedBox(width: 18),

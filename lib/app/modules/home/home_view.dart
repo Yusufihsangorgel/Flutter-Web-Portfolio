@@ -9,7 +9,6 @@ import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_dimensions.dart';
 import 'package:flutter_web_portfolio/app/core/constants/durations.dart';
 import 'package:flutter_web_portfolio/app/core/constants/breakpoints.dart';
-import 'package:flutter_web_portfolio/app/domain/models/portfolio_document.dart';
 import 'package:flutter_web_portfolio/app/modules/home/sections/home_section.dart';
 import 'package:flutter_web_portfolio/app/modules/home/sections/about_section.dart';
 import 'package:flutter_web_portfolio/app/modules/home/sections/experience_section.dart';
@@ -21,6 +20,7 @@ import 'package:flutter_web_portfolio/app/widgets/custom_sliver_app_bar.dart';
 import 'package:flutter_web_portfolio/app/widgets/premium_footer.dart';
 import 'package:flutter_web_portfolio/app/utils/motion_preference.dart';
 import 'package:flutter_web_portfolio/app/widgets/background/cinematic_background.dart';
+import 'package:flutter_web_portfolio/app/narrative/domain/narrative_document.dart';
 
 /// A single, semantic portfolio document with measured section navigation.
 class HomeView extends StatefulWidget {
@@ -34,6 +34,24 @@ class _HomeViewState extends State<HomeView> {
   final FocusNode _focusNode = FocusNode();
   final FocusNode _skipLinkFocusNode = FocusNode();
   bool _skipLinkVisible = false;
+  AppScrollController? _scheduledScrollController;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final scrollController = context.read<AppScrollController>();
+    if (identical(scrollController, _scheduledScrollController)) return;
+    _scheduledScrollController = scrollController;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted ||
+          !identical(scrollController, _scheduledScrollController)) {
+        return;
+      }
+      scrollController.refreshSectionGeometry();
+      context.read<SceneDirector>().recalculate();
+      scrollController.handleInitialDeepLink();
+    });
+  }
 
   @override
   void dispose() {
@@ -62,27 +80,20 @@ class _HomeViewState extends State<HomeView> {
     final languageController = BlocProvider.of<LanguageCubit>(context);
     scrollController.setReduceMotion(prefersReducedMotion(context));
 
-    // After first frame: recalculate scene + handle deep-link scroll
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      scrollController.refreshSectionGeometry();
-      context.read<SceneDirector>().recalculate();
-      scrollController.handleInitialDeepLink();
-    });
-
     return Focus(
       focusNode: _focusNode,
       autofocus: true,
       onKeyEvent: _handleKeyEvent,
       child: BlocBuilder<LanguageCubit, LanguageState>(
         builder: (context, state) {
-          final active = context.read<PortfolioDocument>().activeSections;
+          final narrative = context.read<NarrativeDocument>();
           return Scaffold(
             backgroundColor: AppColors.background,
             body: _buildBody(
               context,
               scrollController,
               languageController,
-              active,
+              narrative,
             ),
           );
         },
@@ -94,7 +105,7 @@ class _HomeViewState extends State<HomeView> {
     BuildContext context,
     AppScrollController scrollController,
     LanguageCubit languageController,
-    List<String> active,
+    NarrativeDocument narrative,
   ) => Stack(
     children: [
       const Positioned.fill(
@@ -116,7 +127,11 @@ class _HomeViewState extends State<HomeView> {
             setState(() => _skipLinkVisible = focused);
           },
           onActivate: () {
-            scrollController.scrollToSection('about');
+            final firstContentChapter = narrative.chapters.firstWhere(
+              (chapter) => !chapter.id.isHome,
+              orElse: () => narrative.chapters.first,
+            );
+            scrollController.scrollToSection(firstContentChapter.id.value);
           },
         ),
       ),
@@ -132,50 +147,28 @@ class _HomeViewState extends State<HomeView> {
         child: CustomScrollView(
           controller: scrollController.scrollController,
           physics: const ClampingScrollPhysics(),
-          // This is a short, single-document portfolio. Keeping every chapter
-          // mounted makes global navigation, measured scene transitions, and
-          // the accessibility tree deterministic from the first frame.
-          cacheExtent: 16000,
           slivers: [
             CustomSliverAppBar(
               scrollController: scrollController,
               languageController: languageController,
             ),
-            _buildSection(
-              scrollController.homeKey,
-              const HomeSection(),
-              context,
-              isHero: true,
+            // One document box deliberately lays out this short portfolio as
+            // a whole. Every chapter therefore has measured geometry for
+            // deep links and keyboard navigation without a giant cacheExtent.
+            SliverToBoxAdapter(
+              child: Column(
+                children: [
+                  for (final chapter in narrative.chapters)
+                    _buildSection(
+                      scrollController.keyFor(chapter.id),
+                      _widgetFor(chapter.id),
+                      context,
+                      isHero: chapter.id.isHome,
+                    ),
+                  const PremiumFooter(),
+                ],
+              ),
             ),
-            if (active.contains('about')) ...[
-              _buildSection(
-                scrollController.aboutKey,
-                const AboutSection(),
-                context,
-              ),
-            ],
-            if (active.contains('experience')) ...[
-              _buildSection(
-                scrollController.experienceKey,
-                const ExperienceSection(),
-                context,
-              ),
-            ],
-            if (active.contains('proof')) ...[
-              _buildSection(
-                scrollController.proofKey,
-                const ProofSection(),
-                context,
-              ),
-            ],
-            if (active.contains('projects')) ...[
-              _buildSection(
-                scrollController.projectsKey,
-                const ProjectsSection(),
-                context,
-              ),
-            ],
-            const SliverToBoxAdapter(child: PremiumFooter()),
           ],
         ),
       ),
@@ -198,18 +191,27 @@ class _HomeViewState extends State<HomeView> {
     return EdgeInsets.fromLTRB(horizontal, vertical, right, vertical);
   }
 
-  SliverToBoxAdapter _buildSection(
+  Widget _buildSection(
     GlobalKey key,
     Widget child,
     BuildContext context, {
     bool isHero = false,
-  }) => SliverToBoxAdapter(
-    child: Container(
-      key: key,
-      padding: isHero ? EdgeInsets.zero : _sectionPadding(context),
-      child: child,
-    ),
+  }) => Container(
+    key: key,
+    padding: isHero ? EdgeInsets.zero : _sectionPadding(context),
+    child: child,
   );
+
+  Widget _widgetFor(SectionId sectionId) => switch (sectionId.value) {
+    'home' => const HomeSection(),
+    'about' => const AboutSection(),
+    'experience' => const ExperienceSection(),
+    'proof' => const ProofSection(),
+    'projects' => const ProjectsSection(),
+    final value => throw StateError(
+      'No section widget is registered for narrative chapter "$value".',
+    ),
+  };
 }
 
 /// Hidden skip-to-content link for keyboard and screen reader users.

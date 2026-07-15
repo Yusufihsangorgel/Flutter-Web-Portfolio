@@ -6,42 +6,9 @@ import 'package:flutter/foundation.dart';
 /// decorative work changes, so adaptation never changes the information
 /// architecture of the portfolio.
 enum RenderQuality {
-  essential(
-    RenderQualityProfile(
-      targetFramesPerSecond: 15,
-      verticalGridLines: 0,
-      horizontalGridLines: 0,
-      planeCount: 0,
-      drawConnections: false,
-      drawRegistrationMarks: false,
-      drawGrain: false,
-      trackPointer: false,
-    ),
-  ),
-  balanced(
-    RenderQualityProfile(
-      targetFramesPerSecond: 30,
-      verticalGridLines: 0,
-      horizontalGridLines: 0,
-      planeCount: 0,
-      drawConnections: false,
-      drawRegistrationMarks: false,
-      drawGrain: false,
-      trackPointer: true,
-    ),
-  ),
-  cinematic(
-    RenderQualityProfile(
-      targetFramesPerSecond: 60,
-      verticalGridLines: 0,
-      horizontalGridLines: 0,
-      planeCount: 0,
-      drawConnections: false,
-      drawRegistrationMarks: false,
-      drawGrain: true,
-      trackPointer: true,
-    ),
-  );
+  essential(RenderQualityProfile(drawGrain: false, trackPointer: false)),
+  balanced(RenderQualityProfile(drawGrain: false, trackPointer: false)),
+  cinematic(RenderQualityProfile(drawGrain: true, trackPointer: true));
 
   const RenderQuality(this.profile);
 
@@ -63,22 +30,10 @@ enum RenderQuality {
 @immutable
 final class RenderQualityProfile {
   const RenderQualityProfile({
-    required this.targetFramesPerSecond,
-    required this.verticalGridLines,
-    required this.horizontalGridLines,
-    required this.planeCount,
-    required this.drawConnections,
-    required this.drawRegistrationMarks,
     required this.drawGrain,
     required this.trackPointer,
   });
 
-  final int targetFramesPerSecond;
-  final int verticalGridLines;
-  final int horizontalGridLines;
-  final int planeCount;
-  final bool drawConnections;
-  final bool drawRegistrationMarks;
   final bool drawGrain;
   final bool trackPointer;
 }

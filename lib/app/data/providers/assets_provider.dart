@@ -7,15 +7,27 @@ import 'package:flutter_web_portfolio/app/domain/providers/i_assets_provider.dar
 /// Loads and decodes bundled JSON from assets/.
 final class AssetsProvider implements IAssetsProvider {
   @override
-  Future<Map<String, dynamic>> loadPortfolio() async {
-    final jsonString = await rootBundle.loadString(
-      'assets/content/portfolio.json',
-    );
+  Future<Map<String, dynamic>> loadNarrative() => _loadObject(
+    'assets/presentation/narrative.json',
+    description: 'Narrative presentation',
+  );
+
+  @override
+  Future<Map<String, dynamic>> loadPortfolio() => _loadObject(
+    'assets/content/portfolio.json',
+    description: 'Portfolio content',
+  );
+
+  Future<Map<String, dynamic>> _loadObject(
+    String path, {
+    required String description,
+  }) async {
+    final jsonString = await rootBundle.loadString(path);
     final document = json.decode(jsonString);
-    if (document case final Map<String, dynamic> portfolio) {
-      return portfolio;
+    if (document case final Map<String, dynamic> object) {
+      return object;
     }
-    throw const FormatException('Portfolio content must be a JSON object.');
+    throw FormatException('$description must be a JSON object.');
   }
 
   @override

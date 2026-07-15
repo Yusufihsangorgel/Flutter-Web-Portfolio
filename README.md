@@ -3,10 +3,10 @@
 A production-ready Flutter Web portfolio template with typed external content, measured section navigation, accessible responsive layouts, and a dual-runtime Wasm release.
 
 <!-- portfolio-demo:start -->
-[Live site](https://developeryusuf.com) · [Flutter Web first-frame issue](https://github.com/flutter/flutter/issues/189499) · [Engine patch](https://github.com/flutter/flutter/pull/189500)
+[Live site](https://developeryusuf.com/) · [Flutter Web first-frame issue](https://github.com/flutter/flutter/issues/189499) · [Engine patch](https://github.com/flutter/flutter/pull/189500)
 <!-- portfolio-demo:end -->
 
-The live demo uses Yusuf İhsan Görgel's public professional record, but the interface remains a reusable template. Replace `assets/content/portfolio.json` to change the identity, biography, experience, work, links, and contributions without rewriting the widgets. Interface translations stay in `assets/i18n/*.json`.
+The live demo is generated from one public professional record, while the interface remains a reusable template. Replace `assets/content/portfolio.json` to change the identity, biography, experience, work, links, and contributions without rewriting the widgets. Interface translations stay in `assets/i18n/*.json`.
 
 <!-- portfolio-record:start -->
 ## Public engineering record
@@ -15,7 +15,7 @@ The live demo uses Yusuf İhsan Görgel's public professional record, but the in
 
 I work across Flutter, Dart, and Go, turning product ideas into software that holds up on real devices, unreliable networks, and long-lived release cycles.
 
-Source status: `2026.07.15.5`, verified 2026-07-15 against GitHub and LinkedIn.
+Source status: `2026.07.15.6`, verified 2026-07-15 against GitHub and LinkedIn.
 
 ### Accepted upstream changes
 
@@ -47,7 +47,7 @@ Source status: `2026.07.15.5`, verified 2026-07-15 against GitHub and LinkedIn.
 
 ## Content contract
 
-`assets/content/portfolio.json` is the canonical professional record. It contains the profile, optional experience, capabilities, optional contributions and work, source provenance, and site metadata. `PortfolioDocument` parses it into immutable final classes and rejects unsupported schemas, duplicate evidence IDs, invalid URLs, missing featured work, and identity/metadata drift.
+`assets/content/portfolio.json` is the canonical professional record. It contains the profile, explicit display-name composition, optional experience, capabilities, optional contributions and work, source provenance, and site metadata. Featured work carries challenge, approach, outcome, and linked evidence records. `PortfolioDocument` parses it into immutable final classes and rejects unsupported schemas, duplicate content IDs, invalid URLs, incomplete featured case studies, missing featured work, and identity/metadata drift.
 
 Analytics is opt-in through `site.analytics` in the same document. Remove that object for a tracking-free template; the synchronization step removes the script instead of inheriting the demo site's analytics account.
 
@@ -86,16 +86,16 @@ The document and render loop have deliberately different update paths:
 
 - The composition root loads and validates professional content before `runApp`.
 - BLoC/Cubit owns language, scroll, and scene state through explicit dependencies and immutable snapshots.
-- Ambient painting listens to painter-local animation rather than rebuilding the semantic document.
+- Ambient painting listens only to scene and pointer changes rather than rebuilding the semantic document or running an idle animation loop.
 - Section positions are measured after layout. Scene interpolation follows real chapter centres instead of equal scroll bands.
 - Browser history represents positions inside one document; it is not used as a page router.
-- Reduced-motion sessions stop continuous animation while preserving the complete document and navigation model.
+- Reduced-motion sessions suppress pointer motion and animated transitions while preserving the complete document and navigation model.
 
 ## First meaningful frame
 
 The HTML layer contains a critical shell generated from the canonical portfolio manifest during release preparation. It is not a second content source: role, headline, focus areas, and content version are injected from `assets/content/portfolio.json`, then verified against that record. The shell gives a cold Wasm visit a meaningful first paint while Flutter initializes, and it never forces a service-worker cleanup reload.
 
-Cold SkWasm measurements showed that `flutter-first-frame` could precede visible compositor output by 90.3–143.0 ms. The reproducible finding is tracked in [flutter/flutter#189499](https://github.com/flutter/flutter/issues/189499); [flutter/flutter#189500](https://github.com/flutter/flutter/pull/189500) proposes waiting for outstanding scene renders and the next browser frame. The patch is under review with its engine tests passing across seven Chrome renderer/compiler suites.
+The bootstrap treats Flutter's first-frame event as a rendering signal rather than proof that the browser compositor has already presented the pixels. This keeps the release strategy reusable across Flutter engine revisions and browsers instead of coupling the template to one upstream issue or patch.
 
 The handoff retains the visually aligned critical shell for two browser frames after Flutter's event. This avoids a blank flash while the Flutter surface reaches the compositor, then removes the HTML layer once.
 
@@ -109,9 +109,14 @@ npm run measure:runtime
 
 # Apply the checked-in median budget as a local release gate.
 npm run verify:runtime
+
+# On a compatible macOS runner, exercise every threshold on the native GPU.
+PERF_CHROMIUM_ARGS='["--use-angle=metal"]' npm run verify:runtime
 ```
 
-The budget is deliberately separate from content and presentation. It can evolve from measured hardware baselines without introducing device-specific branches into the Flutter document.
+Headless Chromium normally reports a software graphics backend such as SwiftShader. The default gate still records every raw metric, but metrics declared in `hardware_only_metrics` are listed under `enforcement_skips` and accompanied by a console warning instead of being judged against software-GPU readback latency. All other thresholds remain enforced. Native-hardware and unknown backends enforce every threshold, so a failed backend diagnostic cannot silently weaken the gate.
+
+The budget and its JSON Schema are deliberately separate from content and presentation. They can evolve from measured hardware baselines without introducing device-specific branches into the Flutter document.
 
 ## Release model
 
@@ -169,7 +174,7 @@ Useful controls:
 | Ambient render layer | `lib/app/widgets/background/cinematic_background.dart` |
 | Editorial selected-work index | `lib/app/modules/home/sections/projects/projects_section.dart` |
 | Content synchronization | `tool/sync_public_content.mjs` |
-| Runtime measurement | `tool/measure_web_runtime.mjs`, `tool/performance_budget.json` |
+| Runtime measurement | `tool/measure_web_runtime.mjs`, `tool/performance_budget.json`, `tool/performance_budget.schema.json` |
 | Responsive visual regression | `tests/e2e/visual.spec.ts`, `tests/e2e/visual.spec.ts-snapshots/` |
 | Release integrity | `tool/prepare_web_release.mjs`, `tool/verify_web_build.mjs` |
 

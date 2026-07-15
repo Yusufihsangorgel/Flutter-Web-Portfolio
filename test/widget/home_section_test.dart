@@ -7,6 +7,7 @@ import 'package:flutter_web_portfolio/app/domain/repositories/i_language_reposit
 import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
 import 'package:flutter_web_portfolio/app/modules/home/sections/home_section.dart';
 import '../helpers/portfolio_fixture.dart';
+import '../helpers/narrative_fixture.dart';
 
 final class _HomeLanguageRepository implements ILanguageRepository {
   @override
@@ -36,7 +37,7 @@ void main() {
 
   setUp(() async {
     language = LanguageCubit(languageRepository: _HomeLanguageRepository());
-    scroll = AppScrollController();
+    scroll = AppScrollController(narrative: loadNarrativeFixture());
     await language.initialize();
     addTearDown(() async {
       await language.close();
@@ -47,6 +48,7 @@ void main() {
   Widget buildSubject({
     required bool includeWork,
     required bool includeGithub,
+    void Function(Map<String, dynamic> json)? mutate,
   }) {
     final portfolio = loadPortfolioFixture(
       mutate: (json) {
@@ -57,6 +59,7 @@ void main() {
             (link) => (link as Map<String, dynamic>)['id'] == 'github',
           );
         }
+        mutate?.call(json);
       },
     );
     return RepositoryProvider.value(
@@ -100,4 +103,40 @@ void main() {
     await tester.pumpWidget(const SizedBox.shrink());
     await tester.pump();
   });
+
+  testWidgets(
+    'renders configured display-name parts without parsing identity',
+    (tester) async {
+      await tester.pumpWidget(
+        buildSubject(
+          includeWork: true,
+          includeGithub: true,
+          mutate: (json) {
+            final profile = json['profile']! as Map<String, dynamic>;
+            final site = json['site']! as Map<String, dynamic>;
+            profile['name'] = 'Canonical Identity Unrelated To Display';
+            profile['display_name'] = <String, dynamic>{
+              'primary': 'EXPLICIT PRIMARY',
+              'accent': 'Explicit Accent',
+              'navigation': 'Explicit Navigation',
+              'accessible': 'Explicit Accessible Identity',
+            };
+            site['title'] =
+                'Canonical Identity Unrelated To Display — Software Engineer';
+          },
+        ),
+      );
+      await tester.pump(const Duration(milliseconds: 1));
+
+      expect(find.text('EXPLICIT PRIMARY'), findsOneWidget);
+      expect(find.text('Explicit Accent'), findsOneWidget);
+      expect(
+        find.text('Canonical Identity Unrelated To Display'),
+        findsNothing,
+      );
+      expect(tester.takeException(), isNull);
+      await tester.pumpWidget(const SizedBox.shrink());
+      await tester.pump();
+    },
+  );
 }

@@ -4,29 +4,33 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:flutter_web_portfolio/app/controllers/scroll_controller.dart';
 import 'package:flutter_web_portfolio/app/core/constants/scene_configs.dart';
+import 'package:flutter_web_portfolio/app/narrative/domain/narrative_document.dart';
 
 @immutable
 final class SceneState {
   const SceneState({
     required this.currentSceneIndex,
-    required this.sceneProgress,
     required this.globalProgress,
     required this.blendFactor,
     required this.blendedConfig,
+    required this.currentMotif,
+    required this.nextMotif,
   });
 
   const SceneState.initial()
     : currentSceneIndex = 0,
-      sceneProgress = 0,
       globalProgress = 0,
       blendFactor = 0,
-      blendedConfig = SceneConfigs.hero;
+      blendedConfig = SceneConfigs.hero,
+      currentMotif = NarrativeMotif.origin,
+      nextMotif = NarrativeMotif.origin;
 
   final int currentSceneIndex;
-  final double sceneProgress;
   final double globalProgress;
   final double blendFactor;
   final SceneConfig blendedConfig;
+  final NarrativeMotif currentMotif;
+  final NarrativeMotif nextMotif;
 
   /// Stable chapter accent for content widgets.
   ///
@@ -40,18 +44,20 @@ final class SceneState {
       identical(this, other) ||
       other is SceneState &&
           currentSceneIndex == other.currentSceneIndex &&
-          sceneProgress == other.sceneProgress &&
           globalProgress == other.globalProgress &&
           blendFactor == other.blendFactor &&
-          blendedConfig == other.blendedConfig;
+          blendedConfig == other.blendedConfig &&
+          currentMotif == other.currentMotif &&
+          nextMotif == other.nextMotif;
 
   @override
   int get hashCode => Object.hash(
     currentSceneIndex,
-    sceneProgress,
     globalProgress,
     blendFactor,
     blendedConfig,
+    currentMotif,
+    nextMotif,
   );
 }
 
@@ -63,11 +69,18 @@ final class SceneState {
 final class SceneDirector extends Cubit<SceneState> {
   SceneDirector({required AppScrollController scrollController})
     : _scrollController = scrollController,
+      _narrative = scrollController.narrative,
       super(const SceneState.initial()) {
+    if (NarrativeMotif.values.length != SceneConfigs.scenes.length) {
+      throw StateError(
+        'Every narrative motif must have one scene configuration.',
+      );
+    }
     _scrollController.scrollController.addListener(_onScroll);
   }
 
   final AppScrollController _scrollController;
+  final NarrativeDocument _narrative;
   bool _frameScheduled = false;
 
   void _onScroll() {
@@ -90,6 +103,7 @@ final class SceneDirector extends Cubit<SceneState> {
         viewportDimension: scroll.position.viewportDimension,
         maxExtent: scroll.position.maxScrollExtent,
         sections: _scrollController.sectionGeometries,
+        narrative: _narrative,
       ),
     );
   }
@@ -105,6 +119,7 @@ final class SceneDirector extends Cubit<SceneState> {
     required double viewportDimension,
     required double maxExtent,
     required List<SectionGeometry> sections,
+    required NarrativeDocument narrative,
   }) {
     if (sections.isEmpty) return const SceneState.initial();
 
@@ -113,13 +128,15 @@ final class SceneDirector extends Cubit<SceneState> {
     final focalPoint = offset + viewportDimension * 0.44;
 
     if (sections.length == 1 || focalPoint <= sections.first.center) {
-      final sceneIndex = _sceneIndexFor(sections.first.id);
+      final chapter = narrative.chapterFor(SectionId(sections.first.id));
+      final sceneIndex = _sceneIndexFor(chapter);
       return SceneState(
         currentSceneIndex: sceneIndex,
-        sceneProgress: 0,
         globalProgress: globalProgress,
         blendFactor: 0,
         blendedConfig: SceneConfigs.scenes[sceneIndex],
+        currentMotif: chapter.motif,
+        nextMotif: chapter.motif,
       );
     }
 
@@ -133,12 +150,13 @@ final class SceneDirector extends Cubit<SceneState> {
           ? 1.0
           : ((focalPoint - currentSection.center) / distance).clamp(0.0, 1.0);
       final easedProgress = _smoothStep(progress);
-      final sceneIndex = _sceneIndexFor(currentSection.id);
-      final nextSceneIndex = _sceneIndexFor(nextSection.id);
+      final currentChapter = narrative.chapterFor(SectionId(currentSection.id));
+      final nextChapter = narrative.chapterFor(SectionId(nextSection.id));
+      final sceneIndex = _sceneIndexFor(currentChapter);
+      final nextSceneIndex = _sceneIndexFor(nextChapter);
 
       return SceneState(
         currentSceneIndex: sceneIndex,
-        sceneProgress: progress,
         globalProgress: globalProgress,
         blendFactor: easedProgress,
         blendedConfig: easedProgress == 0
@@ -148,35 +166,25 @@ final class SceneDirector extends Cubit<SceneState> {
                 SceneConfigs.scenes[nextSceneIndex],
                 easedProgress,
               ),
+        currentMotif: currentChapter.motif,
+        nextMotif: nextChapter.motif,
       );
     }
 
     final lastSection = sections.last;
-    final lastSceneIndex = _sceneIndexFor(lastSection.id);
-    final documentEnd = maxExtent + viewportDimension;
-    final remainingDistance = documentEnd - lastSection.center;
-    final tailProgress = remainingDistance <= 0
-        ? 1.0
-        : ((focalPoint - lastSection.center) / remainingDistance).clamp(
-            0.0,
-            1.0,
-          );
+    final lastChapter = narrative.chapterFor(SectionId(lastSection.id));
+    final lastSceneIndex = _sceneIndexFor(lastChapter);
     return SceneState(
       currentSceneIndex: lastSceneIndex,
-      sceneProgress: tailProgress,
       globalProgress: globalProgress,
       blendFactor: 0,
       blendedConfig: SceneConfigs.scenes[lastSceneIndex],
+      currentMotif: lastChapter.motif,
+      nextMotif: lastChapter.motif,
     );
   }
 
-  static int _sceneIndexFor(String sectionId) => switch (sectionId) {
-    'about' => 1,
-    'experience' => 2,
-    'proof' => 3,
-    'projects' => 4,
-    _ => 0,
-  };
+  static int _sceneIndexFor(NarrativeChapter chapter) => chapter.motif.index;
 
   static double _smoothStep(double value) => value * value * (3 - 2 * value);
 

@@ -160,11 +160,7 @@ class _PersonalTitle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.sizeOf(context).width;
-    final words = profile.name.trim().split(RegExp(r'\s+'));
-    final lastName = words.length > 1 ? words.last : profile.name;
-    final givenNames = words.length > 1
-        ? words.take(words.length - 1).join(' ')
-        : '';
+    final displayName = profile.displayName;
     final titleSize = width < Breakpoints.tablet
         ? (width * 0.132).clamp(48.0, 64.0)
         : width < Breakpoints.desktop
@@ -174,32 +170,31 @@ class _PersonalTitle extends StatelessWidget {
     return Semantics(
       header: true,
       headingLevel: 1,
-      label: '${profile.name}, ${profile.role}',
+      label: '${displayName.accessible}, ${profile.role}',
       excludeSemantics: true,
       child: ExcludeSemantics(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            if (givenNames.isNotEmpty)
-              SizedBox(
-                width: double.infinity,
-                child: FittedBox(
-                  fit: BoxFit.scaleDown,
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    givenNames.toUpperCase(),
-                    maxLines: 1,
-                    style: AppFonts.spaceGrotesk(
-                      fontSize: titleSize,
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.textBright,
-                      height: 0.82,
-                      letterSpacing: -titleSize * 0.05,
-                    ),
+            SizedBox(
+              width: double.infinity,
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  displayName.primary,
+                  maxLines: 1,
+                  style: AppFonts.spaceGrotesk(
+                    fontSize: titleSize,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.textBright,
+                    height: 0.82,
+                    letterSpacing: -titleSize * 0.05,
                   ),
                 ),
               ),
+            ),
             Transform.translate(
               offset: Offset(0, -titleSize * 0.025),
               child: Align(
@@ -212,7 +207,7 @@ class _PersonalTitle extends StatelessWidget {
                       ? Alignment.centerRight
                       : Alignment.centerLeft,
                   child: Text(
-                    lastName,
+                    displayName.accent,
                     maxLines: 1,
                     style: AppFonts.instrumentSerif(
                       fontSize: titleSize * 1.08,

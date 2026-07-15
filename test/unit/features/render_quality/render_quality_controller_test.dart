@@ -125,17 +125,11 @@ void main() {
 
   group('RenderQuality profiles', () {
     test('reduce decorative work without changing content semantics', () {
-      expect(
-        RenderQuality.essential.profile.targetFramesPerSecond,
-        lessThan(RenderQuality.balanced.profile.targetFramesPerSecond),
-      );
-      expect(
-        RenderQuality.balanced.profile.targetFramesPerSecond,
-        lessThan(RenderQuality.cinematic.profile.targetFramesPerSecond),
-      );
       expect(RenderQuality.essential.profile.drawGrain, isFalse);
       expect(RenderQuality.cinematic.profile.drawGrain, isTrue);
       expect(RenderQuality.essential.profile.trackPointer, isFalse);
+      expect(RenderQuality.balanced.profile.trackPointer, isFalse);
+      expect(RenderQuality.cinematic.profile.trackPointer, isTrue);
     });
   });
 }

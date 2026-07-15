@@ -176,8 +176,8 @@ try {
 
 try {
   const index = await readFile(path.join(webRoot, 'index.html'), 'utf8');
-  if (!index.includes('class="bootstrap-progress"')) {
-    failures.push('the critical-shell progress cue is missing');
+  if (index.includes('bootstrap-progress')) {
+    failures.push('the critical shell must not add a synthetic loading cue');
   }
   if (!index.includes('aria-busy="true"')) {
     failures.push('the critical shell does not expose loading state');
@@ -257,7 +257,15 @@ try {
   if (!bootstrap.includes('"compileTarget":"dart2wasm"')) {
     failures.push('flutter_bootstrap.js does not advertise a dart2wasm build');
   }
-  if (!bootstrap.includes('"useLocalCanvasKit":true')) {
+  const usesLegacyLocalRendererFlag = bootstrap.includes(
+    '"useLocalCanvasKit":true',
+  );
+  const usesExplicitLocalRendererUrl =
+    bootstrap.includes('canvasKitBaseUrl: new URL(') &&
+    bootstrap.includes(
+      '`canvaskit/${_flutter.buildConfig.engineRevision}/`',
+    );
+  if (!usesLegacyLocalRendererFlag && !usesExplicitLocalRendererUrl) {
     failures.push('renderer binaries are not configured for self-hosting');
   }
   for (const artifact of ['main.dart.wasm', 'main.dart.mjs', 'main.dart.js']) {

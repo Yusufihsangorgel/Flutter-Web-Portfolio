@@ -22,7 +22,7 @@ final class PortfolioDocument {
 
   factory PortfolioDocument.fromJson(Map<String, dynamic> json) {
     final schemaVersion = _requiredInt(json, 'schema_version');
-    if (schemaVersion != 2) {
+    if (schemaVersion != 3) {
       throw FormatException(
         'Unsupported portfolio schema version: $schemaVersion',
       );
@@ -70,20 +70,6 @@ final class PortfolioDocument {
     if (systems.isNotEmpty) 'projects',
   ];
 
-  /// One-based editorial number for a mounted content section.
-  ///
-  /// Optional chapters never leave gaps in the visible sequence.
-  String sectionNumber(String sectionId) {
-    final contentSections = activeSections
-        .where((section) => section != 'home')
-        .toList(growable: false);
-    final index = contentSections.indexOf(sectionId);
-    if (index < 0) {
-      throw ArgumentError.value(sectionId, 'sectionId', 'is not active');
-    }
-    return '${index + 1}'.padLeft(2, '0');
-  }
-
   Iterable<PortfolioContribution> get mergedContributions =>
       contributions.where((entry) => entry.status == ContributionStatus.merged);
 
@@ -118,7 +104,16 @@ final class PortfolioDocument {
         'At least one work item must be selected as featured.',
       );
     }
+    if (site.engineeringLinks.isEmpty) {
+      throw const FormatException(
+        'The site must declare at least one engineering link.',
+      );
+    }
     _assertUnique('source', sources.map((entry) => entry.id));
+    _assertUnique(
+      'engineering link',
+      site.engineeringLinks.map((entry) => entry.id),
+    );
     _assertUnique('profile link', profile.links.map((entry) => entry.id));
     _assertUnique('experience', experience.map((entry) => entry.id));
     _assertUnique('capability', capabilities.map((entry) => entry.id));
@@ -128,15 +123,16 @@ final class PortfolioDocument {
 }
 
 final class PortfolioSite {
-  const PortfolioSite({
+  PortfolioSite({
     required this.url,
     required this.title,
     required this.description,
     required this.socialDescription,
     required this.socialImage,
     required this.domainLabel,
+    required List<PortfolioLink> engineeringLinks,
     this.analytics,
-  });
+  }) : engineeringLinks = List.unmodifiable(engineeringLinks);
 
   factory PortfolioSite.fromJson(Map<String, dynamic> json) {
     final socialImage = _requiredString(json, 'social_image');
@@ -152,6 +148,10 @@ final class PortfolioSite {
       socialDescription: _requiredString(json, 'social_description'),
       socialImage: socialImage,
       domainLabel: _requiredString(json, 'domain_label'),
+      engineeringLinks: _objects(
+        json,
+        'engineering_links',
+      ).map(PortfolioLink.fromJson).toList(),
       analytics: switch (_optionalObject(json, 'analytics')) {
         final value? => PortfolioAnalytics.fromJson(value),
         null => null,
@@ -165,6 +165,7 @@ final class PortfolioSite {
   final String socialDescription;
   final String socialImage;
   final String domainLabel;
+  final List<PortfolioLink> engineeringLinks;
   final PortfolioAnalytics? analytics;
 }
 
@@ -206,6 +207,7 @@ final class PortfolioSource {
 final class PortfolioProfile {
   PortfolioProfile({
     required this.name,
+    required this.displayName,
     required this.role,
     required this.location,
     required this.since,
@@ -220,6 +222,9 @@ final class PortfolioProfile {
   factory PortfolioProfile.fromJson(Map<String, dynamic> json) =>
       PortfolioProfile(
         name: _requiredString(json, 'name'),
+        displayName: PortfolioDisplayName.fromJson(
+          _requiredObject(json, 'display_name'),
+        ),
         role: _requiredString(json, 'role'),
         location: _requiredString(json, 'location'),
         since: _requiredString(json, 'since'),
@@ -231,6 +236,7 @@ final class PortfolioProfile {
       );
 
   final String name;
+  final PortfolioDisplayName displayName;
   final String role;
   final String location;
   final String since;
@@ -239,6 +245,32 @@ final class PortfolioProfile {
   final String background;
   final List<String> focus;
   final List<PortfolioLink> links;
+}
+
+/// Explicit identity presentation supplied by the content document.
+///
+/// These values deliberately avoid guessing given names, surnames, or word
+/// order from [PortfolioProfile.name].
+final class PortfolioDisplayName {
+  const PortfolioDisplayName({
+    required this.primary,
+    required this.accent,
+    required this.navigation,
+    required this.accessible,
+  });
+
+  factory PortfolioDisplayName.fromJson(Map<String, dynamic> json) =>
+      PortfolioDisplayName(
+        primary: _requiredString(json, 'primary'),
+        accent: _requiredString(json, 'accent'),
+        navigation: _requiredString(json, 'navigation'),
+        accessible: _requiredString(json, 'accessible'),
+      );
+
+  final String primary;
+  final String accent;
+  final String navigation;
+  final String accessible;
 }
 
 final class PortfolioLink {
@@ -370,23 +402,51 @@ final class PortfolioSystem {
     required this.summary,
     required this.ownership,
     required this.decision,
+    required this.challenge,
+    required this.approach,
+    required this.outcome,
+    required List<PortfolioEvidence> evidence,
     required this.url,
     required List<String> technologies,
-  }) : technologies = List.unmodifiable(technologies);
+  }) : evidence = List.unmodifiable(evidence),
+       technologies = List.unmodifiable(technologies);
 
-  factory PortfolioSystem.fromJson(Map<String, dynamic> json) =>
-      PortfolioSystem(
-        id: _requiredString(json, 'id'),
-        name: _requiredString(json, 'name'),
-        kind: _requiredString(json, 'kind'),
-        year: _requiredString(json, 'year'),
-        featured: _requiredBool(json, 'featured'),
-        summary: _requiredString(json, 'summary'),
-        ownership: _requiredString(json, 'ownership'),
-        decision: _requiredString(json, 'decision'),
-        url: _requiredUri(json, 'url'),
-        technologies: _strings(json, 'technologies'),
+  factory PortfolioSystem.fromJson(Map<String, dynamic> json) {
+    final featured = _requiredBool(json, 'featured');
+    final system = PortfolioSystem(
+      id: _requiredString(json, 'id'),
+      name: _requiredString(json, 'name'),
+      kind: _requiredString(json, 'kind'),
+      year: _requiredString(json, 'year'),
+      featured: featured,
+      summary: _requiredString(json, 'summary'),
+      ownership: _requiredString(json, 'ownership'),
+      decision: _requiredString(json, 'decision'),
+      challenge: featured
+          ? _requiredString(json, 'challenge')
+          : _optionalString(json, 'challenge'),
+      approach: featured
+          ? _requiredString(json, 'approach')
+          : _optionalString(json, 'approach'),
+      outcome: featured
+          ? _requiredString(json, 'outcome')
+          : _optionalString(json, 'outcome'),
+      evidence:
+          (featured
+                  ? _objects(json, 'evidence')
+                  : _optionalObjects(json, 'evidence'))
+              .map(PortfolioEvidence.fromJson)
+              .toList(),
+      url: _requiredUri(json, 'url'),
+      technologies: _strings(json, 'technologies'),
+    );
+    if (featured && system.evidence.isEmpty) {
+      throw FormatException(
+        'Featured system "${system.id}" must declare evidence.',
       );
+    }
+    return system;
+  }
 
   final String id;
   final String name;
@@ -396,8 +456,31 @@ final class PortfolioSystem {
   final String summary;
   final String ownership;
   final String decision;
+  final String? challenge;
+  final String? approach;
+  final String? outcome;
+  final List<PortfolioEvidence> evidence;
   final Uri url;
   final List<String> technologies;
+}
+
+final class PortfolioEvidence {
+  const PortfolioEvidence({
+    required this.label,
+    required this.url,
+    required this.kind,
+  });
+
+  factory PortfolioEvidence.fromJson(Map<String, dynamic> json) =>
+      PortfolioEvidence(
+        label: _requiredString(json, 'label'),
+        url: _requiredUri(json, 'url'),
+        kind: _requiredString(json, 'kind'),
+      );
+
+  final String label;
+  final Uri url;
+  final String kind;
 }
 
 Map<String, dynamic> _requiredObject(Map<String, dynamic> json, String key) =>
@@ -429,6 +512,14 @@ List<Map<String, dynamic>> _objects(Map<String, dynamic> json, String key) =>
       _ => throw FormatException('Expected list at "$key".'),
     };
 
+List<Map<String, dynamic>> _optionalObjects(
+  Map<String, dynamic> json,
+  String key,
+) => switch (json[key]) {
+  null => const <Map<String, dynamic>>[],
+  _ => _objects(json, key),
+};
+
 List<String> _strings(Map<String, dynamic> json, String key) =>
     switch (json[key]) {
       final List<dynamic> value =>
@@ -447,6 +538,13 @@ List<String> _strings(Map<String, dynamic> json, String key) =>
 
 String _requiredString(Map<String, dynamic> json, String key) =>
     switch (json[key]) {
+      final String value when value.trim().isNotEmpty => value,
+      _ => throw FormatException('Expected non-empty string at "$key".'),
+    };
+
+String? _optionalString(Map<String, dynamic> json, String key) =>
+    switch (json[key]) {
+      null => null,
       final String value when value.trim().isNotEmpty => value,
       _ => throw FormatException('Expected non-empty string at "$key".'),
     };

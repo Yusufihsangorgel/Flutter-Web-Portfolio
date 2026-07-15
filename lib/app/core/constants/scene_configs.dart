@@ -8,7 +8,6 @@ final class SceneConfig {
     required this.gradient2,
     required this.gradient3,
     required this.accent,
-    required this.atlasMorph,
     this.vignetteIntensity = 0.4,
   });
 
@@ -17,8 +16,6 @@ final class SceneConfig {
   final Color gradient3;
   final Color accent;
 
-  /// Continuous 0–4 coordinate used by the procedural Render Atlas.
-  final double atlasMorph;
   final double vignetteIntensity;
 
   /// Lerp between two scene configs for crossfade
@@ -28,7 +25,6 @@ final class SceneConfig {
         gradient2: Color.lerp(a.gradient2, b.gradient2, t)!,
         gradient3: Color.lerp(a.gradient3, b.gradient3, t)!,
         accent: Color.lerp(a.accent, b.accent, t)!,
-        atlasMorph: a.atlasMorph + (b.atlasMorph - a.atlasMorph) * t,
         vignetteIntensity:
             a.vignetteIntensity +
             (b.vignetteIntensity - a.vignetteIntensity) * t,
@@ -47,7 +43,6 @@ final class SceneConfigs {
     gradient2: AppColors.heroGradient2,
     gradient3: AppColors.heroGradient3,
     accent: AppColors.heroAccent,
-    atlasMorph: 0,
     vignetteIntensity: 0.3,
   );
 
@@ -57,7 +52,6 @@ final class SceneConfigs {
     gradient2: AppColors.aboutGradient2,
     gradient3: AppColors.aboutGradient3,
     accent: AppColors.aboutAccent,
-    atlasMorph: 1,
     vignetteIntensity: 0.3,
   );
 
@@ -67,7 +61,6 @@ final class SceneConfigs {
     gradient2: AppColors.expGradient2,
     gradient3: AppColors.expGradient3,
     accent: AppColors.expAccent,
-    atlasMorph: 2,
     vignetteIntensity: 0.3,
   );
 
@@ -77,7 +70,6 @@ final class SceneConfigs {
     gradient2: AppColors.projGradient2,
     gradient3: AppColors.projGradient3,
     accent: AppColors.projAccent,
-    atlasMorph: 3,
     vignetteIntensity: 0.25,
   );
 
@@ -87,7 +79,6 @@ final class SceneConfigs {
     gradient2: AppColors.contactGradient2,
     gradient3: AppColors.contactGradient3,
     accent: AppColors.contactAccent,
-    atlasMorph: 4,
     vignetteIntensity: 0.4,
   );
 }

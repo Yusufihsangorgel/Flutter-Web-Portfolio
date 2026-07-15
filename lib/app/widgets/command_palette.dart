@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_web_portfolio/app/core/theme/app_fonts.dart';
-import 'package:flutter_web_portfolio/app/domain/models/portfolio_document.dart';
 
 import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
 import 'package:flutter_web_portfolio/app/controllers/scroll_controller.dart';
@@ -105,7 +104,7 @@ class _CommandPaletteState extends State<CommandPalette> {
         ? urlSection
         : scrollController.activeSection;
     final languageController = context.read<LanguageCubit>();
-    final active = context.read<PortfolioDocument>().activeSections;
+    final active = scrollController.sectionIds;
     final navigateCategory = languageController.getText(
       'command_palette.navigate',
       defaultValue: 'Navigate',

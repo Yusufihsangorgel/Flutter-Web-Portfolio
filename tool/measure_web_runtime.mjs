@@ -4,9 +4,14 @@ import process from 'node:process';
 
 import { chromium } from '@playwright/test';
 
-const budget = JSON.parse(
-  await readFile(new URL('./performance_budget.json', import.meta.url), 'utf8'),
+const [budget, budgetSchema] = await Promise.all(
+  ['./performance_budget.json', './performance_budget.schema.json'].map(
+    async (path) =>
+      JSON.parse(await readFile(new URL(path, import.meta.url), 'utf8')),
+  ),
 );
+validateJsonSchema(budget, budgetSchema, 'performance budget');
+validateBudgetContract(budget);
 const localTarget = 'http://127.0.0.1:4173';
 const target = process.env.PERF_URL ?? localTarget;
 const enforce = process.argv.includes('--enforce');
@@ -14,6 +19,7 @@ const runCount = Number(process.env.PERF_RUNS ?? budget.runs);
 const startupTimeoutMs = Number(
   process.env.PERF_STARTUP_TIMEOUT_MS ?? budget.startup_timeout_ms,
 );
+const chromiumArgs = parseChromiumArgs(process.env.PERF_CHROMIUM_ARGS);
 
 if (!Number.isInteger(runCount) || runCount < 1 || runCount > 10) {
   throw new Error('PERF_RUNS must be an integer between 1 and 10.');
@@ -24,10 +30,12 @@ if (!Number.isFinite(startupTimeoutMs) || startupTimeoutMs < 1000) {
 
 const server = process.env.PERF_URL ? null : await startLocalServer(localTarget);
 let browser;
+let graphicsBackend;
 const runs = [];
 
 try {
-  browser = await chromium.launch({ headless: true });
+  browser = await chromium.launch({ headless: true, args: chromiumArgs });
+  graphicsBackend = await readGraphicsBackend(browser);
   for (let index = 0; index < runCount; index += 1) {
     runs.push(await measureRun(browser, index + 1));
   }
@@ -36,17 +44,40 @@ try {
   server?.kill('SIGTERM');
 }
 
+const median = summarize(runs);
+const enforcementSkips = getEnforcementSkips(
+  budget,
+  graphicsBackend,
+  median,
+);
 const summary = {
   target,
   runs: runCount,
-  median: summarize(runs),
+  chromium_args: chromiumArgs,
+  graphics_backend: graphicsBackend,
+  median,
+  enforcement_skips: enforcementSkips,
   samples: runs,
 };
 
 console.log(JSON.stringify(summary, null, 2));
 
 if (enforce) {
+  const skippedMetrics = new Set(
+    enforcementSkips.map(({ metric }) => metric),
+  );
+  if (enforcementSkips.length > 0) {
+    console.warn('\nRuntime performance enforcement warning:');
+    for (const skip of enforcementSkips) {
+      console.warn(
+        `- ${skip.metric}: measured ${skip.measured_value}, hardware-only ` +
+          `maximum ${skip.maximum_median}; not enforced on the detected ` +
+          'software graphics backend.',
+      );
+    }
+  }
   const failures = Object.entries(budget.maximum_median)
+    .filter(([metric]) => !skippedMetrics.has(metric))
     .filter(([metric, maximum]) => summary.median[metric] > maximum)
     .map(
       ([metric, maximum]) =>
@@ -55,7 +86,195 @@ if (enforce) {
   if (failures.length > 0) {
     console.error('\nRuntime performance budget failed:');
     for (const failure of failures) console.error(`- ${failure}`);
+    console.error(
+      `Graphics backend: ${graphicsBackend.renderer} ` +
+        `(software: ${graphicsBackend.software_rendering})`,
+    );
     process.exitCode = 1;
+  }
+}
+
+function validateJsonSchema(value, schema, path) {
+  if ('const' in schema && !deepEqual(value, schema.const)) {
+    throw new Error(
+      `${path} must equal ${JSON.stringify(schema.const)}.`,
+    );
+  }
+  if (
+    schema.enum &&
+    !schema.enum.some((candidate) => deepEqual(value, candidate))
+  ) {
+    throw new Error(
+      `${path} must be one of ${JSON.stringify(schema.enum)}.`,
+    );
+  }
+  if (schema.type && !matchesJsonType(value, schema.type)) {
+    throw new Error(`${path} must be of type ${schema.type}.`);
+  }
+
+  if (schema.type === 'object') {
+    const properties = schema.properties ?? {};
+    for (const required of schema.required ?? []) {
+      if (!Object.hasOwn(value, required)) {
+        throw new Error(`${path}.${required} is required.`);
+      }
+    }
+    if (schema.additionalProperties === false) {
+      for (const property of Object.keys(value)) {
+        if (!Object.hasOwn(properties, property)) {
+          throw new Error(`${path}.${property} is not allowed.`);
+        }
+      }
+    }
+    for (const [property, propertySchema] of Object.entries(properties)) {
+      if (Object.hasOwn(value, property)) {
+        validateJsonSchema(
+          value[property],
+          propertySchema,
+          `${path}.${property}`,
+        );
+      }
+    }
+  }
+
+  if (schema.type === 'array') {
+    if (schema.minItems !== undefined && value.length < schema.minItems) {
+      throw new Error(
+        `${path} must contain at least ${schema.minItems} item(s).`,
+      );
+    }
+    if (schema.uniqueItems) {
+      const uniqueItems = new Set(value.map((item) => JSON.stringify(item)));
+      if (uniqueItems.size !== value.length) {
+        throw new Error(`${path} must not contain duplicate items.`);
+      }
+    }
+    if (schema.items) {
+      value.forEach((item, index) =>
+        validateJsonSchema(item, schema.items, `${path}[${index}]`),
+      );
+    }
+  }
+
+  if (schema.type === 'number' || schema.type === 'integer') {
+    if (schema.minimum !== undefined && value < schema.minimum) {
+      throw new Error(`${path} must be at least ${schema.minimum}.`);
+    }
+    if (schema.maximum !== undefined && value > schema.maximum) {
+      throw new Error(`${path} must be at most ${schema.maximum}.`);
+    }
+  }
+}
+
+function matchesJsonType(value, type) {
+  return switchJsonType(type, {
+    array: () => Array.isArray(value),
+    integer: () => Number.isInteger(value),
+    number: () => typeof value === 'number' && Number.isFinite(value),
+    object: () =>
+      value !== null && typeof value === 'object' && !Array.isArray(value),
+    string: () => typeof value === 'string',
+  });
+}
+
+function switchJsonType(type, handlers) {
+  const handler = handlers[type];
+  if (!handler) throw new Error(`Unsupported JSON Schema type: ${type}.`);
+  return handler();
+}
+
+function deepEqual(left, right) {
+  return JSON.stringify(left) === JSON.stringify(right);
+}
+
+function validateBudgetContract(value) {
+  for (const metric of value.hardware_only_metrics) {
+    if (!Object.hasOwn(value.maximum_median, metric)) {
+      throw new Error(
+        `Hardware-only metric ${metric} has no maximum_median threshold.`,
+      );
+    }
+  }
+}
+
+function getEnforcementSkips(value, backend, measuredMedian) {
+  // Fail closed: an unavailable/unknown backend diagnostic enforces the full
+  // hardware budget instead of silently opting out.
+  if (backend.software_rendering !== true) return [];
+  return value.hardware_only_metrics.map((metric) => ({
+    metric,
+    measured_value: measuredMedian[metric],
+    maximum_median: value.maximum_median[metric],
+    reason: 'software_graphics_backend',
+  }));
+}
+
+function parseChromiumArgs(value) {
+  if (!value) return [];
+
+  let parsed;
+  try {
+    parsed = JSON.parse(value);
+  } catch (error) {
+    throw new Error(
+      'PERF_CHROMIUM_ARGS must be a JSON array of Chromium arguments.',
+      { cause: error },
+    );
+  }
+  if (
+    !Array.isArray(parsed) ||
+    parsed.some((argument) => typeof argument !== 'string')
+  ) {
+    throw new Error(
+      'PERF_CHROMIUM_ARGS must be a JSON array containing only strings.',
+    );
+  }
+  return parsed;
+}
+
+async function readGraphicsBackend(browserInstance) {
+  let session;
+  try {
+    session = await browserInstance.newBrowserCDPSession();
+    const { gpu } = await session.send('SystemInfo.getInfo');
+    const device = gpu.devices?.[0] ?? {};
+    const attributes = gpu.auxAttributes ?? {};
+    const renderer =
+      attributes.glRenderer ?? device.deviceString ?? 'unavailable';
+    const backendSignals = [
+      attributes.glRenderer,
+      device.deviceString,
+      attributes.displayType,
+      attributes.glImplementationParts,
+      gpu.featureStatus?.gpu_compositing,
+      gpu.featureStatus?.webgl,
+    ].filter(Boolean);
+    const diagnostics = backendSignals.join(' ').toLowerCase();
+    return {
+      renderer,
+      vendor: attributes.glVendor ?? device.vendorString ?? 'unavailable',
+      display_type: attributes.displayType ?? 'unavailable',
+      implementation: attributes.glImplementationParts ?? 'unavailable',
+      software_rendering:
+        backendSignals.length === 0
+          ? null
+          : /swiftshader|llvmpipe|software/.test(diagnostics),
+    };
+  } catch (error) {
+    return {
+      renderer: 'unavailable',
+      vendor: 'unavailable',
+      display_type: 'unavailable',
+      implementation: 'unavailable',
+      software_rendering: null,
+      diagnostic_error: error instanceof Error ? error.message : String(error),
+    };
+  } finally {
+    try {
+      await session?.detach();
+    } catch {
+      // The browser may already be closing after a failed diagnostic request.
+    }
   }
 }
 

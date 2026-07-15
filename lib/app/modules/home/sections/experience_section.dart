@@ -5,6 +5,7 @@ import 'package:flutter_web_portfolio/app/core/constants/breakpoints.dart';
 import 'package:flutter_web_portfolio/app/core/theme/app_fonts.dart';
 import 'package:flutter_web_portfolio/app/domain/models/portfolio_document.dart';
 import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
+import 'package:flutter_web_portfolio/app/narrative/domain/narrative_document.dart';
 import 'package:flutter_web_portfolio/app/widgets/numbered_section_heading.dart';
 import 'package:flutter_web_portfolio/app/widgets/scene_accent_builder.dart';
 
@@ -27,7 +28,9 @@ class ExperienceSection extends StatelessWidget {
               children: [
                 SceneAccentBuilder(
                   builder: (context, accent) => NumberedSectionHeading(
-                    number: portfolio.sectionNumber('experience'),
+                    number: context.read<NarrativeDocument>().sectionNumber(
+                      SectionId.experience,
+                    ),
                     title: language.getText(
                       'experience_section.title',
                       defaultValue: 'Experience',
@@ -68,9 +71,9 @@ class _ExperienceEntry extends StatelessWidget {
           padding: EdgeInsets.symmetric(vertical: compact ? 36 : 48),
           decoration: BoxDecoration(
             border: Border(
-              top: const BorderSide(color: Color(0x3D5B6CFF)),
+              top: const BorderSide(color: Color(0x3DE47A57)),
               bottom: isLast
-                  ? const BorderSide(color: Color(0x3D5B6CFF))
+                  ? const BorderSide(color: Color(0x3DE47A57))
                   : BorderSide.none,
             ),
           ),
@@ -178,27 +181,21 @@ class _ExperienceContent extends StatelessWidget {
         ),
       ),
       const SizedBox(height: 24),
-      Wrap(
-        spacing: 10,
-        runSpacing: 10,
-        children: [
-          for (final item in experience.evidence.take(4))
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 7),
-              decoration: BoxDecoration(
-                border: Border.all(color: const Color(0x365B6CFF)),
-                borderRadius: BorderRadius.circular(999),
-              ),
-              child: Text(
-                item,
-                style: AppFonts.spaceGrotesk(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w500,
-                  color: AppColors.textPrimary,
-                ),
-              ),
-            ),
-        ],
+      Container(
+        constraints: const BoxConstraints(maxWidth: 740),
+        padding: const EdgeInsets.only(top: 16),
+        decoration: const BoxDecoration(
+          border: Border(top: BorderSide(color: Color(0x3DE47A57))),
+        ),
+        child: Text(
+          experience.evidence.take(4).join('  /  '),
+          style: AppFonts.inter(
+            fontSize: 12,
+            fontWeight: FontWeight.w500,
+            color: AppColors.textSecondary,
+            height: 1.65,
+          ),
+        ),
       ),
     ],
   );

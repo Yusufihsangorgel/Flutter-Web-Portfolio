@@ -4,11 +4,13 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:flutter_web_portfolio/app/controllers/scene_director.dart';
 import 'package:flutter_web_portfolio/app/controllers/scroll_controller.dart';
+import 'package:flutter_web_portfolio/app/domain/models/portfolio_document.dart';
 import 'package:flutter_web_portfolio/app/domain/repositories/i_language_repository.dart';
 import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
 import 'package:flutter_web_portfolio/app/modules/home/sections/proof_section.dart';
 import 'package:flutter_web_portfolio/app/widgets/cinematic_focusable.dart';
 import '../helpers/portfolio_fixture.dart';
+import '../helpers/narrative_fixture.dart';
 
 final class _ProofLanguageRepository implements ILanguageRepository {
   @override
@@ -36,11 +38,13 @@ final class _ProofLanguageRepository implements ILanguageRepository {
 
 void main() {
   late LanguageCubit language;
+  late PortfolioDocument portfolio;
   late AppScrollController scroll;
   late SceneDirector scene;
 
   setUp(() async {
-    scroll = AppScrollController();
+    portfolio = loadPortfolioFixture();
+    scroll = AppScrollController(narrative: loadNarrativeFixture());
     scene = SceneDirector(scrollController: scroll);
     language = LanguageCubit(languageRepository: _ProofLanguageRepository());
     await language.initialize();
@@ -52,8 +56,11 @@ void main() {
     expect(scroll.activeSection, 'home');
   });
 
-  Widget buildSubject() => RepositoryProvider.value(
-    value: loadPortfolioFixture(),
+  Widget buildSubject() => MultiRepositoryProvider(
+    providers: [
+      RepositoryProvider.value(value: portfolio),
+      RepositoryProvider.value(value: scroll.narrative),
+    ],
     child: MultiBlocProvider(
       providers: [
         BlocProvider.value(value: language),
@@ -71,19 +78,13 @@ void main() {
     await tester.pump(const Duration(seconds: 1));
 
     expect(find.text('Open Source'), findsOneWidget);
+    for (final contribution in portfolio.contributions) {
+      expect(find.text(contribution.title), findsOneWidget);
+    }
     expect(
-      find.text('Make Firebase core loading deterministic on WebKit'),
-      findsOneWidget,
+      find.text('View pull request'),
+      findsNWidgets(portfolio.contributions.length),
     );
-    expect(
-      find.text('Treat SQLite TRUE and 1 defaults as the same schema'),
-      findsOneWidget,
-    );
-    expect(
-      find.text('Wait for web rendering before the first-frame event'),
-      findsOneWidget,
-    );
-    expect(find.text('View pull request'), findsNWidgets(6));
     expect(find.textContaining('testimonial'), findsNothing);
     expect(tester.takeException(), isNull);
   });
@@ -94,13 +95,14 @@ void main() {
     await tester.pumpWidget(buildSubject());
     await tester.pump(const Duration(seconds: 1));
 
+    final reviewed = portfolio.contributionsUnderReview.first;
     expect(
       find.byWidgetPredicate(
         (widget) =>
             widget is CinematicFocusable &&
             widget.semanticRole == CinematicControlRole.link &&
             widget.semanticLabel?.contains('View pull request') == true &&
-            widget.semanticLabel?.contains('first-frame event') == true,
+            widget.semanticLabel?.contains(reviewed.title) == true,
       ),
       findsOneWidget,
     );
@@ -116,15 +118,9 @@ void main() {
 
     await tester.pumpWidget(buildSubject());
     await tester.pump(const Duration(seconds: 1));
-
-    expect(
-      find.text('Make Firebase core loading deterministic on WebKit'),
-      findsOneWidget,
-    );
-    expect(
-      find.text('Wait for web rendering before the first-frame event'),
-      findsOneWidget,
-    );
+    for (final contribution in portfolio.contributions) {
+      expect(find.text(contribution.title), findsOneWidget);
+    }
     expect(tester.takeException(), isNull);
   });
 }

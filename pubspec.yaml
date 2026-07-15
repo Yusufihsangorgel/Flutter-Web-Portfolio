@@ -37,6 +37,7 @@ flutter:
     - assets/build/
     - assets/content/
     - assets/i18n/
+    - assets/presentation/
 
   fonts:
     - family: Inter

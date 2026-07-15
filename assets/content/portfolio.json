@@ -1,18 +1,35 @@
 {
-  "schema_version": 2,
-  "content_version": "2026.07.15.5",
+  "schema_version": 3,
+  "content_version": "2026.07.15.6",
   "verified_at": "2026-07-15",
   "site": {
     "url": "https://developeryusuf.com",
     "title": "Yusuf İhsan Görgel — Software Engineer",
     "description": "Yusuf İhsan Görgel is a software engineer building cross-platform products with Flutter, Dart, Go, PostgreSQL, Redis, and production infrastructure.",
     "social_description": "Cross-platform product engineering, selected professional work, and verified open-source contributions by Yusuf İhsan Görgel.",
-    "social_image": "/assets/og/engineering-showcase.png?v=2026.07.15.5",
+    "social_image": "/assets/og/engineering-showcase.png?v=2026.07.15.6",
     "domain_label": "DEVELOPERYUSUF.COM",
     "analytics": {
       "script_url": "https://analytics.developeryusuf.com/js/script.js",
       "domain": "developeryusuf.com"
-    }
+    },
+    "engineering_links": [
+      {
+        "id": "live-site",
+        "label": "Live site",
+        "url": "https://developeryusuf.com"
+      },
+      {
+        "id": "first-frame-issue",
+        "label": "Flutter Web first-frame issue",
+        "url": "https://github.com/flutter/flutter/issues/189499"
+      },
+      {
+        "id": "engine-patch",
+        "label": "Engine patch",
+        "url": "https://github.com/flutter/flutter/pull/189500"
+      }
+    ]
   },
   "sources": [
     {
@@ -30,6 +47,12 @@
   ],
   "profile": {
     "name": "Yusuf İhsan Görgel",
+    "display_name": {
+      "primary": "YUSUF İHSAN",
+      "accent": "Görgel",
+      "navigation": "Yusuf Görgel",
+      "accessible": "Yusuf İhsan Görgel"
+    },
     "role": "Software Engineer",
     "location": "Antalya, Türkiye",
     "since": "2022",
@@ -217,6 +240,16 @@
       "summary": "A logistics platform connecting drivers, fleet operators, and weighbridge businesses through mobile and web workflows.",
       "ownership": "I worked across the Flutter application and React web surface, including live vehicle state, maps, API flows, deployment, and QA coordination.",
       "decision": "Keep real-time vehicle and weighbridge state understandable across clients instead of hiding it behind screen-specific workarounds.",
+      "challenge": "Drivers, fleet operators, and weighbridge businesses needed to act on the same changing logistics state across mobile and web workflows.",
+      "approach": "Work across Flutter and React clients, maps, REST and WebSocket flows, deployment, and QA so vehicle and weighbridge state stayed explicit from transport to interface.",
+      "outcome": "Delivered a public logistics product spanning driver, fleet, and weighbridge workflows on mobile and web.",
+      "evidence": [
+        {
+          "label": "Public product website",
+          "url": "https://dorseapp.com/",
+          "kind": "product"
+        }
+      ],
       "url": "https://dorseapp.com/",
       "technologies": ["Flutter", "React", "WebSocket", "Google Maps", "Apple Maps"]
     },
@@ -229,6 +262,21 @@
       "summary": "An MCP server for inspecting and operating Redis-backed Asynq and BullMQ queues without reaching into storage by hand.",
       "ownership": "I designed the command surface, typed validation, queue adapters, and conservative state-changing operations.",
       "decision": "Observation stays read-only by default; retries and destructive operations remain explicit and narrowly scoped.",
+      "challenge": "Queue incidents are described in jobs, states, attempts, and errors, while generic Redis inspection exposes low-level keys and a broader mutation surface.",
+      "approach": "Build typed MCP tools and backend-specific adapters for Asynq, BullMQ, and Sidekiq, with a read-only mode that removes mutating tools from discovery.",
+      "outcome": "Published a six-tool server with a recorded, non-mocked queue recovery flow and explicit safeguards around retries and deletion.",
+      "evidence": [
+        {
+          "label": "Source and recorded CLI flow",
+          "url": "https://github.com/Yusufihsangorgel/queue-inspector-mcp",
+          "kind": "source"
+        },
+        {
+          "label": "Design notes",
+          "url": "https://yusufihsangorgel.github.io/2026/07/08/queue-inspector-mcp.html",
+          "kind": "article"
+        }
+      ],
       "url": "https://github.com/Yusufihsangorgel/queue-inspector-mcp",
       "technologies": ["TypeScript", "MCP", "Redis", "Asynq", "BullMQ"]
     },
@@ -241,6 +289,21 @@
       "summary": "A small single-binary gateway that demonstrates tenant resolution, JWT authentication, per-tenant rate limits, and module boundaries.",
       "ownership": "I designed and implemented the complete reference from transport and tenant resolution through policy and test coverage.",
       "decision": "Keep tenant context explicit from transport through policy rather than hiding it behind global state.",
+      "challenge": "A small team needs tenant isolation and shared policy without multiplying services, deploys, and failure surfaces for every product module.",
+      "approach": "Carry resolved tenant context through one middleware chain, isolate persistent data by schema, and make PostgreSQL and Redis production wiring opt-in without changing module boundaries.",
+      "outcome": "Published a single-binary reference with tests for tenant resolution, authentication, rate limiting, schema isolation, and migration behaviour.",
+      "evidence": [
+        {
+          "label": "Source repository",
+          "url": "https://github.com/Yusufihsangorgel/go-multitenant-gateway",
+          "kind": "source"
+        },
+        {
+          "label": "Architecture record",
+          "url": "https://github.com/Yusufihsangorgel/go-multitenant-gateway/blob/main/ARCHITECTURE.md",
+          "kind": "architecture"
+        }
+      ],
       "url": "https://github.com/Yusufihsangorgel/go-multitenant-gateway",
       "technologies": ["Go", "JWT", "Rate limiting", "Multi-tenancy"]
     },

@@ -31,8 +31,10 @@ class CustomSliverAppBar extends StatefulWidget {
   final List<Widget>? actions;
 
   /// Nav sections derived at build-time from active sections (excludes 'home').
-  static List<String> navSections(PortfolioDocument portfolio) =>
-      portfolio.activeSections.where((section) => section != 'home').toList();
+  static List<String> navSections(AppScrollController scrollController) =>
+      scrollController.sectionIds
+          .where((section) => section != 'home')
+          .toList(growable: false);
 
   /// Maximum (expanded) toolbar height.
   static const _maxHeight = 80.0;
@@ -156,7 +158,7 @@ class _CustomSliverAppBarState extends State<CustomSliverAppBar> {
               previous.activeSection != current.activeSection,
           builder: (context, scrollState) {
             final sections = CustomSliverAppBar.navSections(
-              context.read<PortfolioDocument>(),
+              widget.scrollController,
             );
             return Row(
               mainAxisAlignment: MainAxisAlignment.end,

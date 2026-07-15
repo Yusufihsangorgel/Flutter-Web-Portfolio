@@ -116,14 +116,21 @@ async function syncManifest(data) {
   const current = await readFile(file, 'utf8');
   const manifest = JSON.parse(current);
   manifest.name = `${data.profile.name} — Portfolio`;
-  manifest.short_name = data.profile.name;
+  manifest.short_name = requiredString(
+    data.profile.display_name?.navigation,
+    'profile.display_name.navigation',
+  );
   manifest.start_url = '.';
+  manifest.background_color = '#11100E';
+  manifest.theme_color = '#E47A57';
   manifest.description = data.site.description;
   const currentManifest = JSON.parse(current);
   if (
     currentManifest.name === manifest.name &&
     currentManifest.short_name === manifest.short_name &&
     currentManifest.start_url === manifest.start_url &&
+    currentManifest.background_color === manifest.background_color &&
+    currentManifest.theme_color === manifest.theme_color &&
     currentManifest.description === manifest.description
   ) {
     return { file, changed: false };
@@ -192,7 +199,23 @@ function renderReadmeRecord(data) {
 }
 
 function renderDemoLinks(data) {
-  return `[Live site](${data.site.url}) · [Flutter Web first-frame issue](https://github.com/flutter/flutter/issues/189499) · [Engine patch](https://github.com/flutter/flutter/pull/189500)`;
+  const links = data.site.engineering_links;
+  if (!Array.isArray(links) || links.length === 0) {
+    throw new Error('site.engineering_links must contain at least one link');
+  }
+  return links
+    .map((link, index) => {
+      const label = requiredString(
+        link?.label,
+        `site.engineering_links[${index}].label`,
+      );
+      const url = requiredHttpsUrl(
+        link?.url,
+        `site.engineering_links[${index}].url`,
+      );
+      return `[${markdownLabel(label)}](${url})`;
+    })
+    .join(' · ');
 }
 
 function renderRobots(data) {
@@ -233,6 +256,12 @@ function renderHeadMeta(data) {
   const social = html(site.social_description);
   const role = html(data.profile.role);
   const name = html(data.profile.name);
+  const accessibleName = html(
+    requiredString(
+      data.profile.display_name?.accessible,
+      'profile.display_name.accessible',
+    ),
+  );
   const keywords = html(
     [
       data.profile.role,
@@ -259,14 +288,14 @@ function renderHeadMeta(data) {
   <meta property="og:image:type" content="image/png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
-  <meta property="og:image:alt" content="${name} — ${role}">
+  <meta property="og:image:alt" content="${accessibleName} — ${role}">
   <meta property="og:locale" content="en_US">
 
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="${title}">
   <meta name="twitter:description" content="${social}">
   <meta name="twitter:image" content="${image}">
-  <meta name="twitter:image:alt" content="${name} — ${role}">`;
+  <meta name="twitter:image:alt" content="${accessibleName} — ${role}">`;
 }
 
 function renderStructuredData(data) {
@@ -309,6 +338,29 @@ function renderAnalytics(data) {
 
 function table(value) {
   return String(value).replaceAll('|', '\\|').replaceAll('\n', ' ');
+}
+
+function requiredString(value, path) {
+  if (typeof value !== 'string' || value.trim().length === 0) {
+    throw new Error(`${path} must be a non-empty string`);
+  }
+  return value.trim();
+}
+
+function requiredHttpsUrl(value, path) {
+  const raw = requiredString(value, path);
+  const url = new URL(raw);
+  if (url.protocol !== 'https:') {
+    throw new Error(`${path} must be an absolute HTTPS URL`);
+  }
+  return url.toString();
+}
+
+function markdownLabel(value) {
+  return value
+    .replaceAll('\\', '\\\\')
+    .replaceAll('[', '\\[')
+    .replaceAll(']', '\\]');
 }
 
 function html(value) {

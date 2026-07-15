@@ -5,6 +5,7 @@ import 'package:flutter_web_portfolio/app/core/constants/breakpoints.dart';
 import 'package:flutter_web_portfolio/app/core/theme/app_fonts.dart';
 import 'package:flutter_web_portfolio/app/domain/models/portfolio_document.dart';
 import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
+import 'package:flutter_web_portfolio/app/narrative/domain/narrative_document.dart';
 import 'package:flutter_web_portfolio/app/widgets/cinematic_focusable.dart';
 import 'package:flutter_web_portfolio/app/widgets/numbered_section_heading.dart';
 import 'package:flutter_web_portfolio/app/widgets/scene_accent_builder.dart';
@@ -48,7 +49,9 @@ class ProofSection extends StatelessWidget {
               children: [
                 SceneAccentBuilder(
                   builder: (context, accent) => NumberedSectionHeading(
-                    number: portfolio.sectionNumber('proof'),
+                    number: context.read<NarrativeDocument>().sectionNumber(
+                      SectionId.proof,
+                    ),
                     title: language.getText(
                       'proof_section.title',
                       defaultValue: 'Open Source',

@@ -35,6 +35,11 @@
     "subtitle": "Des produits que j’ai livrés et des outils que je maintiens.",
     "archive": "Autres projets",
     "open_project": "Ouvrir le projet",
+    "challenge": "Le problème",
+    "approach": "L’approche",
+    "outcome": "Le résultat",
+    "evidence": "Preuves",
+    "open_evidence": "Ouvrir la preuve",
     "ownership": "Mon périmètre",
     "decision": "Une décision clé"
   },

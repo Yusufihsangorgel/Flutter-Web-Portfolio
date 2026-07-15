@@ -163,7 +163,7 @@ test('serves the complete professional narrative in production', async ({
   await expect(page.getByRole('heading', { name: 'Open Source' })).toBeAttached();
   await expect(page.getByRole('heading', { name: 'Selected Work' })).toBeAttached();
   await expect(
-    page.getByText(/^FugaSoft\. Software Engineer\./),
+    page.getByText(portfolio.experience[0].company).first(),
   ).toBeAttached();
 });
 
@@ -198,7 +198,7 @@ test('serves the production accessibility hierarchy', async ({
     .map((node) => node.name?.value ?? '');
 
   expect(headings).toContainEqual({
-    name: 'Yusuf İhsan Görgel, Software Engineer',
+    name: `${portfolio.profile.display_name.accessible}, ${portfolio.profile.role}`,
     level: 1,
   });
   expect(controls).toEqual(
@@ -226,16 +226,27 @@ test('serves the production accessibility hierarchy', async ({
   const projectLinks = projectsTree.nodes
     .filter((node) => !node.ignored && node.role?.value === 'link')
     .map((node) => node.name?.value ?? '');
+  const featuredSystem = portfolio.systems.find((system) => system.featured);
+  const supportingSystem = portfolio.systems.find((system) => !system.featured);
+  const reviewedContribution =
+    portfolio.contributions.find(
+      (contribution) => contribution.status === 'under_review',
+    ) ?? portfolio.contributions[0];
+  expect(featuredSystem).toBeTruthy();
+  expect(supportingSystem).toBeTruthy();
+  expect(reviewedContribution).toBeTruthy();
   expect(projectLinks).toEqual(
-    expect.arrayContaining([expect.stringContaining('Flutter Web Portfolio')]),
-  );
-  expect(projectLinks).toContain('Open project: Dorse');
-  expect(projectLinks).toContain(
-    'View pull request. Wait for web rendering before the first-frame event. '
-      + 'Flutter · Under review · 2026-07-15',
+    expect.arrayContaining([
+      expect.stringContaining(supportingSystem.name),
+      `Open project: ${featuredSystem.name}`,
+      `View pull request. ${reviewedContribution.title}. `
+        + `${reviewedContribution.project} · Under review · ${reviewedContribution.date}`,
+    ]),
   );
   expect(projectLinks).toEqual(
-    expect.arrayContaining(['GitHub', 'LinkedIn', 'Writing']),
+    expect.arrayContaining(
+      portfolio.profile.links.map((link) => link.label),
+    ),
   );
   expect(projectLinks).not.toContain('View source');
   expect(projectLinks).not.toContain('Website');
@@ -268,13 +279,13 @@ test('serves the declared production sharing and font assets', async ({
   const document = await request.get('/');
   expect(document.status()).toBe(200);
   const html = await document.text();
-  expect(html).toContain('class="bootstrap-progress"');
+  expect(html).not.toContain('bootstrap-progress');
   expect(html).toContain('aria-busy="true"');
   expect(html).toContain('class="bootstrap-shell" aria-hidden="true"');
   expect(html).toContain(
     `data-content-version="${portfolio.content_version}"`,
   );
-  expect(html).toContain(portfolio.profile.name.toUpperCase().split(' ')[0]);
+  expect(html).toContain(portfolio.profile.display_name.primary);
   expect(html).toContain(portfolio.profile.headline);
   for (const fact of [
     portfolio.profile.location,

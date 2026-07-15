@@ -8,7 +8,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:flutter_web_portfolio/app/core/constants/app_dimensions.dart';
 import 'package:flutter_web_portfolio/app/core/constants/durations.dart';
-import 'package:flutter_web_portfolio/app/routes/app_routes.dart';
+import 'package:flutter_web_portfolio/app/narrative/domain/narrative_document.dart';
 import 'package:flutter_web_portfolio/app/utils/web_url_strategy.dart'
     as url_strategy;
 
@@ -43,7 +43,6 @@ final class SectionGeometry {
   final double top;
   final double height;
 
-  double get bottom => top + height;
   double get center => top + height / 2;
 }
 
@@ -54,7 +53,8 @@ final class SectionGeometry {
 /// subscribe without rebuilding navigation widgets every frame.
 final class AppScrollController extends Cubit<AppScrollState>
     with WidgetsBindingObserver {
-  AppScrollController() : super(const AppScrollState()) {
+  AppScrollController({required this.narrative})
+    : super(const AppScrollState()) {
     _readInitialRoute();
     WidgetsBinding.instance
       ..addObserver(this)
@@ -66,15 +66,31 @@ final class AppScrollController extends Cubit<AppScrollState>
     }
   }
 
-  final homeKey = GlobalKey();
-  final aboutKey = GlobalKey();
-  final experienceKey = GlobalKey();
-  final proofKey = GlobalKey();
-  final projectsKey = GlobalKey();
+  final NarrativeDocument narrative;
+
+  late final Map<SectionId, GlobalKey> _sectionKeys = {
+    for (final chapter in narrative.chapters) chapter.id: GlobalKey(),
+  };
 
   final ScrollController scrollController = ScrollController();
 
   String get activeSection => state.activeSection;
+
+  late final List<String> sectionIds = List.unmodifiable(
+    narrative.chapters.map((chapter) => chapter.id.value),
+  );
+
+  GlobalKey keyFor(SectionId sectionId) {
+    final key = _sectionKeys[sectionId];
+    if (key == null) {
+      throw ArgumentError.value(
+        sectionId.value,
+        'sectionId',
+        'is not mounted by the active narrative',
+      );
+    }
+    return key;
+  }
 
   @visibleForTesting
   static String sectionAtFocalPoint({
@@ -92,15 +108,11 @@ final class AppScrollController extends Cubit<AppScrollState>
     return bestSection;
   }
 
-  List<SectionGeometry> get sectionGeometries => [
-    for (final id in Routes.sectionIds)
-      if (_sectionOffsets[id] case final top?)
-        if (_sectionHeights[id] case final height?)
-          SectionGeometry(id: id, top: top, height: height),
-  ];
+  List<SectionGeometry> get sectionGeometries => _sectionGeometries;
 
   final Map<String, double> _sectionOffsets = {};
   final Map<String, double> _sectionHeights = {};
+  List<SectionGeometry> _sectionGeometries = const [];
   bool _isManualScrolling = false;
   bool _reduceMotion = false;
   int _scrollRequestId = 0;
@@ -113,14 +125,14 @@ final class AppScrollController extends Cubit<AppScrollState>
 
     final hash = url_strategy.getUrlHash();
     final reloadSection = url_strategy.takeReloadSection();
-    if (reloadSection.isNotEmpty && Routes.sectionIds.contains(reloadSection)) {
+    if (reloadSection.isNotEmpty && sectionIds.contains(reloadSection)) {
       // The browser may still expose the old hash during bootstrap and then
       // normalize it while MaterialApp mounts. Delay both scroll and URL sync
       // until the measured document is ready.
       _pendingSection = reloadSection;
       return;
     }
-    if (hash.isNotEmpty && Routes.sectionIds.contains(hash)) {
+    if (hash.isNotEmpty && sectionIds.contains(hash)) {
       _pendingSection = hash;
       _setActiveSection(hash, syncUrl: false);
     }
@@ -155,7 +167,7 @@ final class AppScrollController extends Cubit<AppScrollState>
   }
 
   void _onBrowserNavigation(String hash) {
-    final section = hash.isNotEmpty && Routes.sectionIds.contains(hash)
+    final section = hash.isNotEmpty && sectionIds.contains(hash)
         ? hash
         : 'home';
     scrollToSection(section, syncUrl: false);
@@ -165,11 +177,15 @@ final class AppScrollController extends Cubit<AppScrollState>
   void didChangeMetrics() => refreshSectionGeometry();
 
   void refreshSectionGeometry() {
-    _updateKeyInfo('home', homeKey);
-    _updateKeyInfo('about', aboutKey);
-    _updateKeyInfo('experience', experienceKey);
-    _updateKeyInfo('proof', proofKey);
-    _updateKeyInfo('projects', projectsKey);
+    for (final chapter in narrative.chapters) {
+      _updateKeyInfo(chapter.id.value, keyFor(chapter.id));
+    }
+    _sectionGeometries = List.unmodifiable([
+      for (final id in sectionIds)
+        if (_sectionOffsets[id] case final top?)
+          if (_sectionHeights[id] case final height?)
+            SectionGeometry(id: id, top: top, height: height),
+    ]);
   }
 
   void _updateKeyInfo(String sectionId, GlobalKey key) {
@@ -210,7 +226,7 @@ final class AppScrollController extends Cubit<AppScrollState>
 
       _setActiveSection(
         sectionAtFocalPoint(
-          sectionIds: Routes.sectionIds,
+          sectionIds: sectionIds,
           offsets: _sectionOffsets,
           focalPoint: focalPoint,
         ),

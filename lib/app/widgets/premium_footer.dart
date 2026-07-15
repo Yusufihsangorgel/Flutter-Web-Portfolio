@@ -112,7 +112,7 @@ class _FooterNavigation extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final links = [
-      for (final section in portfolio.activeSections)
+      for (final section in context.read<AppScrollController>().sectionIds)
         if (section != 'home')
           (
             id: section,
