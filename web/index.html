@@ -63,9 +63,9 @@
     body { margin: 0; overflow: hidden; background: #0b0b0d; }
 
     /*
-      A neutral compositor bed, not a second portfolio screen. It has no
-      headline, navigation, or duplicated professional content; Flutter owns
-      the first meaningful frame.
+      The release task replaces the empty bootstrap-content block with a
+      critical rendering shell generated from the canonical portfolio JSON.
+      This template owns layout only; professional copy never lives here.
     */
     #bootstrap-surface {
       position: fixed;
@@ -94,6 +94,115 @@
     #bootstrap-surface.bootstrap-surface--done {
       pointer-events: none;
       opacity: 0;
+    }
+    .bootstrap-shell {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      width: min(100%, 1480px);
+      height: 100%;
+      min-height: 620px;
+      padding: clamp(22px, 3vw, 48px) clamp(22px, 6vw, 96px) clamp(44px, 5vw, 74px);
+      margin: 0 auto;
+      color: #f2f0e9;
+      font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    .bootstrap-rail {
+      display: flex;
+      gap: 28px;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: 14px;
+      border-bottom: 1px solid rgba(242, 240, 233, 0.14);
+      color: rgba(242, 240, 233, 0.72);
+      font: 600 9px/1.4 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+    .bootstrap-rail-end {
+      display: flex;
+      gap: 18px;
+      align-items: center;
+      text-align: right;
+    }
+    .bootstrap-live-dot {
+      width: 7px;
+      height: 7px;
+      flex: 0 0 auto;
+      background: #b9ff5b;
+      border-radius: 50%;
+      box-shadow: 0 0 18px rgba(185, 255, 91, 0.38);
+    }
+    .bootstrap-stage {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: clamp(54px, 8vh, 96px) 0 clamp(34px, 5vh, 64px);
+    }
+    .bootstrap-kicker {
+      margin: 0 0 clamp(24px, 4vh, 44px);
+      color: rgba(242, 240, 233, 0.58);
+      font: 600 10px/1.5 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+    }
+    .bootstrap-title {
+      display: flex;
+      flex-direction: column;
+      margin: 0;
+      font-size: clamp(70px, 10vw, 154px);
+      font-weight: 760;
+      line-height: 0.76;
+      letter-spacing: -0.065em;
+      text-transform: uppercase;
+    }
+    .bootstrap-title-accent {
+      align-self: flex-end;
+      padding-right: 0.04em;
+      color: #5b6cff;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 1.07em;
+      font-style: italic;
+      font-weight: 400;
+      letter-spacing: -0.055em;
+    }
+    .bootstrap-footer {
+      display: grid;
+      grid-template-columns: minmax(0, 1.25fr) minmax(320px, 0.9fr);
+      gap: clamp(52px, 8vw, 110px);
+      align-items: end;
+    }
+    .bootstrap-statement {
+      max-width: 580px;
+      margin: 0;
+      color: rgba(242, 240, 233, 0.94);
+      font-size: clamp(18px, 1.55vw, 22px);
+      font-weight: 520;
+      line-height: 1.36;
+      letter-spacing: -0.02em;
+    }
+    .bootstrap-capabilities {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: clamp(16px, 2vw, 28px);
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+    .bootstrap-capability {
+      padding-top: 9px;
+      border-top: 1px solid rgba(242, 240, 233, 0.24);
+      color: rgba(242, 240, 233, 0.72);
+      font: 600 9px/1.45 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .bootstrap-capability-index {
+      display: block;
+      margin-bottom: 6px;
+      color: #5b6cff;
+      font-size: 8px;
     }
     .bootstrap-progress {
       position: absolute;
@@ -137,6 +246,28 @@
       0% { transform: translateX(-100%); }
       65%, 100% { transform: translateX(460%); }
     }
+    @media (max-width: 760px) {
+      .bootstrap-shell {
+        min-height: 680px;
+        padding: 22px 22px 46px;
+      }
+      .bootstrap-rail-focus { display: none; }
+      .bootstrap-stage { padding: 60px 0 38px; }
+      .bootstrap-title {
+        font-size: clamp(52px, 16.2vw, 72px);
+        line-height: 0.8;
+      }
+      .bootstrap-title-accent { align-self: flex-start; }
+      .bootstrap-footer {
+        grid-template-columns: 1fr;
+        gap: 28px;
+      }
+      .bootstrap-statement {
+        max-width: 34rem;
+        font-size: 18px;
+      }
+      .bootstrap-capability { font-size: 8px; }
+    }
     @media (prefers-reduced-motion: reduce) {
       #bootstrap-surface { transition: none; }
       .bootstrap-progress::after { animation: none; transform: none; width: 100%; opacity: 0.5; }
@@ -146,6 +277,9 @@
 </head>
 <body>
   <div id="bootstrap-surface" role="status" aria-label="Loading interactive portfolio" aria-busy="true">
+    <!-- bootstrap-content:start -->
+    <div class="bootstrap-shell" aria-hidden="true"></div>
+    <!-- bootstrap-content:end -->
     <span class="bootstrap-progress" aria-hidden="true"></span>
   </div>
   <script src="flutter_bootstrap.js"></script>

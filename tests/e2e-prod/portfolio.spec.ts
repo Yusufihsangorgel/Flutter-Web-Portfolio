@@ -1,4 +1,9 @@
 import { expect, Page, test } from '@playwright/test';
+import { readFileSync } from 'node:fs';
+
+const portfolio = JSON.parse(
+  readFileSync('assets/content/portfolio.json', 'utf8'),
+);
 
 async function openPortfolio(page: Page) {
   const response = await page.goto('/', { waitUntil: 'domcontentloaded' });
@@ -18,6 +23,7 @@ async function readRuntimeTimeline(page: Page) {
       'flutter-entrypoint-loaded',
       'flutter-engine-initialized',
       'flutter-first-frame-event',
+      'flutter-first-frame-signal',
       'flutter-surface-reveal-start',
       'flutter-bootstrap-surface-removed',
     ];
@@ -232,7 +238,15 @@ test('serves the declared production sharing and font assets', async ({
   const html = await document.text();
   expect(html).toContain('class="bootstrap-progress"');
   expect(html).toContain('aria-busy="true"');
-  expect(html).not.toContain('class="bootstrap-title"');
+  expect(html).toContain('class="bootstrap-shell" aria-hidden="true"');
+  expect(html).toContain(
+    `data-content-version="${portfolio.content_version}"`,
+  );
+  expect(html).toContain(portfolio.profile.role.toUpperCase().split(' ')[0]);
+  expect(html).toContain(portfolio.profile.headline);
+  for (const focus of portfolio.profile.focus.slice(0, 3)) {
+    expect(html).toContain(focus);
+  }
   expect(html).toContain(
     'content="https://developeryusuf.com/assets/og/engineering-showcase.png"',
   );
@@ -276,5 +290,5 @@ test('serves the declared production sharing and font assets', async ({
 
   const version = await request.get('/version.json');
   expect(version.status()).toBe(200);
-  expect(await version.json()).toMatchObject({ version: '1.3.0' });
+  expect(await version.json()).toMatchObject({ version: '1.4.0' });
 });

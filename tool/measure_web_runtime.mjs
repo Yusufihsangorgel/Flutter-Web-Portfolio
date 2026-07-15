@@ -142,12 +142,18 @@ async function measureRun(browserInstance, run) {
           bootstrapStart: mark('flutter-bootstrap-start'),
           entrypointLoaded: mark('flutter-entrypoint-loaded'),
           engineInitialized: mark('flutter-engine-initialized'),
+          runAppComplete: mark('flutter-run-app-complete'),
           firstFrameEvent: mark('flutter-first-frame-event'),
+          firstFrameSignal: mark('flutter-first-frame-signal'),
+          runAppFallback: mark('flutter-run-app-fallback'),
+          glassPaneFallback: mark('flutter-glass-pane-fallback'),
           revealStart: mark('flutter-surface-reveal-start'),
           surfaceRemoved: mark('flutter-bootstrap-surface-removed'),
         },
         bootstrapToFirstFrame:
           measure('flutter-bootstrap-to-first-frame'),
+        bootstrapToRevealSignal:
+          measure('flutter-bootstrap-to-reveal-signal'),
         firstFrameToReveal: measure('flutter-first-frame-to-reveal'),
         domContentLoaded: navigation?.domContentLoadedEventEnd ?? null,
         wasmDuration: wasm?.duration ?? null,
@@ -164,11 +170,34 @@ async function measureRun(browserInstance, run) {
     );
     return {
       run,
-      navigation_to_first_frame_ms: round(pageMetrics.marks.firstFrameEvent),
+      navigation_to_first_frame_ms: round(
+        pageMetrics.marks.firstFrameEvent ?? pageMetrics.marks.firstFrameSignal,
+      ),
       bootstrap_to_first_frame_ms: round(
-        pageMetrics.bootstrapToFirstFrame,
+        pageMetrics.bootstrapToFirstFrame ??
+          pageMetrics.bootstrapToRevealSignal,
       ),
       first_frame_to_reveal_ms: round(pageMetrics.firstFrameToReveal),
+      bootstrap_start_ms: round(pageMetrics.marks.bootstrapStart),
+      bootstrap_to_entrypoint_ms: round(
+        pageMetrics.marks.entrypointLoaded -
+          pageMetrics.marks.bootstrapStart,
+      ),
+      entrypoint_to_engine_initialized_ms: round(
+        pageMetrics.marks.engineInitialized -
+          pageMetrics.marks.entrypointLoaded,
+      ),
+      engine_initialized_to_render_signal_ms: round(
+        pageMetrics.marks.firstFrameSignal -
+          pageMetrics.marks.engineInitialized,
+      ),
+      first_frame_event_observed:
+        pageMetrics.marks.firstFrameEvent !== null,
+      reveal_source: pageMetrics.marks.firstFrameEvent !== null
+        ? 'flutter-first-frame'
+        : pageMetrics.marks.runAppFallback !== null
+        ? 'run-app-fallback'
+        : 'glass-pane-fallback',
       dom_content_loaded_ms: round(pageMetrics.domContentLoaded),
       wasm_duration_ms: round(pageMetrics.wasmDuration),
       wasm_transfer_bytes: pageMetrics.wasmTransferBytes,
@@ -195,7 +224,7 @@ function assertTimeline(marks) {
     marks.bootstrapStart,
     marks.entrypointLoaded,
     marks.engineInitialized,
-    marks.firstFrameEvent,
+    marks.firstFrameSignal,
     marks.revealStart,
     marks.surfaceRemoved,
   ];
@@ -206,6 +235,14 @@ function assertTimeline(marks) {
     if (ordered[index] < ordered[index - 1]) {
       throw new Error(`Runtime timeline is out of order: ${JSON.stringify(marks)}`);
     }
+  }
+  if (
+    marks.firstFrameEvent !== null &&
+    marks.firstFrameEvent > marks.firstFrameSignal
+  ) {
+    throw new Error(
+      `First-frame event followed its reveal signal: ${JSON.stringify(marks)}`,
+    );
   }
 }
 

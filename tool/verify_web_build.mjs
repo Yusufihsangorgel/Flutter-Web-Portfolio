@@ -134,13 +134,43 @@ try {
 try {
   const index = await readFile(path.join(webRoot, 'index.html'), 'utf8');
   if (!index.includes('class="bootstrap-progress"')) {
-    failures.push('the neutral first-frame progress cue is missing');
+    failures.push('the critical-shell progress cue is missing');
   }
   if (!index.includes('aria-busy="true"')) {
-    failures.push('the neutral first-frame bed does not expose loading state');
+    failures.push('the critical shell does not expose loading state');
   }
-  if (/bootstrap-(?:title|nav|brand|intro)/.test(index)) {
-    failures.push('the HTML bootstrap duplicated meaningful portfolio content');
+  if (!index.includes('class="bootstrap-shell" aria-hidden="true"')) {
+    failures.push('the generated critical rendering shell is missing');
+  }
+  if ((index.match(/<!-- bootstrap-content:start -->/g) ?? []).length !== 1) {
+    failures.push('index.html must contain exactly one bootstrap content block');
+  }
+  try {
+    const portfolio = JSON.parse(
+      await readFile(
+        path.join(
+          webRoot,
+          'assets',
+          'assets',
+          'content',
+          'portfolio.json',
+        ),
+        'utf8',
+      ),
+    );
+    const generatedValues = [
+      portfolio.content_version,
+      portfolio.profile?.role,
+      portfolio.profile?.headline,
+      ...(portfolio.profile?.focus?.slice(0, 3) ?? []),
+    ];
+    for (const value of generatedValues) {
+      if (typeof value !== 'string' || !index.includes(escapeHtml(value))) {
+        failures.push(`the critical shell is not synchronized with ${value}`);
+      }
+    }
+  } catch {
+    failures.push('the critical shell portfolio source is missing or invalid');
   }
   const bootstrap = await readFile(
     path.join(webRoot, 'flutter_bootstrap.js'),
@@ -216,6 +246,12 @@ try {
     failures.push('custom first-frame bootstrap cleanup is missing');
   }
   if (
+    !bootstrap.includes("markRuntime('flutter-run-app-fallback')") ||
+    !bootstrap.includes("document.querySelector('flt-glass-pane')")
+  ) {
+    failures.push('the CanvasKit/WebKit first-frame fallback is missing');
+  }
+  if (
     !bootstrap.includes('window.requestAnimationFrame(() => {') ||
     !bootstrap.includes('window.requestAnimationFrame(removeBootstrapSurface)')
   ) {
@@ -226,9 +262,11 @@ try {
     'flutter-entrypoint-loaded',
     'flutter-engine-initialized',
     'flutter-first-frame-event',
+    'flutter-first-frame-signal',
     'flutter-surface-reveal-start',
     'flutter-bootstrap-surface-removed',
     'flutter-bootstrap-to-first-frame',
+    'flutter-bootstrap-to-reveal-signal',
     'flutter-first-frame-to-reveal',
   ]) {
     if (!bootstrap.includes(`'${timelineEntry}'`)) {
@@ -279,6 +317,19 @@ if (failures.length > 0) {
 
 function formatBytes(bytes) {
   return `${(bytes / 1024 / 1024).toFixed(2)} MiB`;
+}
+
+function escapeHtml(value) {
+  return value.replace(/[&<>"']/g, (character) => {
+    const entities = {
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#39;',
+    };
+    return entities[character];
+  });
 }
 
 async function collectFiles(directory) {

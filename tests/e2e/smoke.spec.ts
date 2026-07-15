@@ -1,4 +1,9 @@
 import { expect, Page, test } from '@playwright/test';
+import { readFileSync } from 'node:fs';
+
+const portfolio = JSON.parse(
+  readFileSync('assets/content/portfolio.json', 'utf8'),
+);
 
 async function openPortfolio(page: Page) {
   await page.goto('/', { waitUntil: 'domcontentloaded' });
@@ -23,6 +28,7 @@ async function readRuntimeTimeline(page: Page) {
       'flutter-entrypoint-loaded',
       'flutter-engine-initialized',
       'flutter-first-frame-event',
+      'flutter-first-frame-signal',
       'flutter-surface-reveal-start',
       'flutter-bootstrap-surface-removed',
     ];
@@ -155,7 +161,7 @@ test('publishes a clean heading and control hierarchy', async ({
   expect(projectLinks).not.toContain('Website');
 });
 
-test('holds a neutral compositor bed before the first Flutter frame', async ({
+test('renders a JSON-derived critical shell before the first Flutter frame', async ({
   page,
 }) => {
   let releaseWasm: (() => void) | undefined;
@@ -173,10 +179,74 @@ test('holds a neutral compositor bed before the first Flutter frame', async ({
   await expect(shell).toHaveAttribute('aria-busy', 'true');
   await expect(shell).toHaveAttribute('aria-label', 'Loading interactive portfolio');
   await expect(shell.locator('.bootstrap-progress')).toBeVisible();
-  await expect(shell.getByRole('heading')).toHaveCount(0);
+  const criticalShell = shell.locator('.bootstrap-shell');
+  await expect(criticalShell).toBeVisible();
+  await expect(criticalShell).toHaveAttribute('aria-hidden', 'true');
+  await expect(criticalShell).toHaveAttribute(
+    'data-content-version',
+    portfolio.content_version,
+  );
+  await expect(criticalShell.locator('.bootstrap-title')).toContainText(
+    portfolio.profile.role.toUpperCase(),
+  );
+  await expect(criticalShell.locator('.bootstrap-statement')).toHaveText(
+    portfolio.profile.headline,
+  );
+  const capabilities = criticalShell.locator('.bootstrap-capability');
+  for (const [index, focus] of portfolio.profile.focus
+    .slice(0, 3)
+    .entries()) {
+    await expect(capabilities.nth(index)).toContainText(focus);
+    await expect(
+      capabilities.nth(index).locator('.bootstrap-capability-index'),
+    ).toHaveText(String(index + 1).padStart(2, '0'));
+  }
 
   releaseWasm?.();
   await expect(shell).toHaveCount(0, { timeout: 20000 });
+});
+
+test('retires the critical shell when a renderer omits the first-frame event', async ({
+  page,
+  isMobile,
+}) => {
+  test.skip(isMobile, 'renderer fallback contract needs one browser project');
+
+  await page.addInitScript(() => {
+    const nativeAddEventListener = window.addEventListener;
+    window.addEventListener = function addEventListenerWithoutFlutterFrame(
+      type,
+      listener,
+      options,
+    ) {
+      if (type === 'flutter-first-frame') return;
+      nativeAddEventListener.call(window, type, listener, options);
+    };
+  });
+
+  await page.goto('/', { waitUntil: 'domcontentloaded' });
+  await page.waitForSelector('flt-semantics-host', {
+    state: 'attached',
+    timeout: 20000,
+  });
+  await expect(page.locator('#bootstrap-surface')).toHaveCount(0, {
+    timeout: 20000,
+  });
+  await expect(page.getByRole('heading').first()).toBeAttached();
+  expect(
+    await page.evaluate(
+      () =>
+        performance.getEntriesByName('flutter-run-app-fallback', 'mark')
+          .length,
+    ),
+  ).toBe(1);
+  expect(
+    await page.evaluate(
+      () =>
+        performance.getEntriesByName('flutter-first-frame-signal', 'mark')
+          .length,
+    ),
+  ).toBe(1);
 });
 
 test('offers an accessible retry when the Wasm artifact cannot load', async ({
@@ -342,7 +412,7 @@ test('does not publish renderer debug symbols', async ({ request }) => {
 
   const version = await request.get('/version.json');
   expect(version.status()).toBe(200);
-  expect(await version.json()).toMatchObject({ version: '1.3.0' });
+  expect(await version.json()).toMatchObject({ version: '1.4.0' });
 });
 
 test('keeps every professional chapter in one accessible document', async ({

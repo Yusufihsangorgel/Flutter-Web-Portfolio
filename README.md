@@ -13,7 +13,7 @@ This repository is the engineering artifact behind the portfolio, not a reusable
 
 My work spans Flutter clients, local and real-time data, native integrations, Go services, queues, and production infrastructure. I stay close to the boundary where product behaviour becomes a systems problem.
 
-Source status: `2026.07.15.2`, verified 2026-07-15 against the public GitHub and LinkedIn records declared in the manifest.
+Source status: `2026.07.15.3`, verified 2026-07-15 against the public GitHub and LinkedIn records declared in the manifest.
 
 ### Accepted upstream changes
 

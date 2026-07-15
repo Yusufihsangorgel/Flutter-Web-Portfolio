@@ -49,11 +49,13 @@ const measureRuntime = (name, start, end) => {
 
 markRuntime('flutter-bootstrap-start');
 
+let revealStarted = false;
+
 const removeBootstrapSurface = () => {
   markRuntime('flutter-surface-reveal-start');
   measureRuntime(
     'flutter-first-frame-to-reveal',
-    'flutter-first-frame-event',
+    'flutter-first-frame-signal',
     'flutter-surface-reveal-start',
   );
   const splash = document.getElementById('bootstrap-surface');
@@ -75,16 +77,40 @@ const removeBootstrapSurface = () => {
 // compositing that frame. Keeping the matching HTML surface for two browser
 // frames prevents a one-frame dark flash on cold GPU/Wasm starts.
 const revealFlutterSurface = () => {
+  if (revealStarted) return;
+  revealStarted = true;
+  markRuntime('flutter-first-frame-signal');
+  measureRuntime(
+    'flutter-bootstrap-to-reveal-signal',
+    'flutter-bootstrap-start',
+    'flutter-first-frame-signal',
+  );
+  window.requestAnimationFrame(() => {
+    markRuntime('flutter-reveal-frame-1');
+    window.requestAnimationFrame(removeBootstrapSurface);
+  });
+};
+
+const onFlutterFirstFrame = () => {
   markRuntime('flutter-first-frame-event');
   measureRuntime(
     'flutter-bootstrap-to-first-frame',
     'flutter-bootstrap-start',
     'flutter-first-frame-event',
   );
-  window.requestAnimationFrame(() => {
-    markRuntime('flutter-reveal-frame-1');
-    window.requestAnimationFrame(removeBootstrapSurface);
-  });
+  revealFlutterSurface();
+};
+
+const revealAfterRunApp = () => {
+  window.setTimeout(() => {
+    window.requestAnimationFrame(() => {
+      window.requestAnimationFrame(() => {
+        if (revealStarted) return;
+        markRuntime('flutter-run-app-fallback');
+        revealFlutterSurface();
+      });
+    });
+  }, 250);
 };
 
 const showBootstrapFailure = (error) => {
@@ -133,12 +159,23 @@ _flutter.loader.load({
   config: engineConfig,
   onEntrypointLoaded: async function onEntrypointLoaded(engineInitializer) {
     markRuntime('flutter-entrypoint-loaded');
-    window.addEventListener('flutter-first-frame', revealFlutterSurface, {
+    window.addEventListener('flutter-first-frame', onFlutterFirstFrame, {
       once: true,
     });
     const appRunner = await engineInitializer.initializeEngine(engineConfig);
     markRuntime('flutter-engine-initialized');
     await appRunner.runApp();
     markRuntime('flutter-run-app-complete');
+    revealAfterRunApp();
   },
 }).catch(showBootstrapFailure);
+
+// Older WebKit/CanvasKit combinations can paint the application without
+// dispatching Flutter's web first-frame event. Keep the generated critical
+// shell until Flutter owns a glass pane, then retire it instead of trapping
+// those browsers behind an otherwise healthy loading surface.
+window.setTimeout(() => {
+  if (revealStarted || !document.querySelector('flt-glass-pane')) return;
+  markRuntime('flutter-glass-pane-fallback');
+  revealFlutterSurface();
+}, 12000);

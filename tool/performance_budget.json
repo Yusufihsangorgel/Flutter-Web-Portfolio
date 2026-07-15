@@ -8,6 +8,7 @@
     "first_frame_to_reveal_ms": 40,
     "scroll_frame_p95_ms": 20,
     "long_task_total_ms": 500,
-    "cumulative_layout_shift": 0.01
+    "cumulative_layout_shift": 0.01,
+    "largest_contentful_paint_ms": 1000
   }
 }

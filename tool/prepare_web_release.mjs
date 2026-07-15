@@ -34,6 +34,7 @@ const versionedBootstrap = versionEntrypoints(bootstrap, releaseId);
 await writeFile(bootstrapPath, versionedBootstrap);
 await versionRendererDirectory(engineRevision);
 await injectReleasePreloads(releaseId, engineRevision);
+await injectBootstrapShell();
 await writeLegacyServiceWorkerKillSwitch();
 await normalizeNoticeWhitespace();
 
@@ -136,6 +137,109 @@ async function injectReleasePreloads(releaseId, engineRevision) {
     indexPath,
     withoutPreviousHints.replace('</head>', `${preloadBlock}\n</head>`),
   );
+}
+
+async function injectBootstrapShell() {
+  const contentPath = path.join(
+    webRoot,
+    'assets',
+    'assets',
+    'content',
+    'portfolio.json',
+  );
+  const portfolio = JSON.parse(await readFile(contentPath, 'utf8'));
+  const contentVersion = requiredString(
+    portfolio.content_version,
+    'content_version',
+  );
+  const role = requiredString(portfolio.profile?.role, 'profile.role');
+  const location = requiredString(
+    portfolio.profile?.location,
+    'profile.location',
+  );
+  const since = requiredString(portfolio.profile?.since, 'profile.since');
+  const headline = requiredString(
+    portfolio.profile?.headline,
+    'profile.headline',
+  );
+  const focus = portfolio.profile?.focus;
+  if (!Array.isArray(focus) || focus.length < 3) {
+    throw new Error('profile.focus must contain at least three values');
+  }
+  const capabilities = focus
+    .slice(0, 3)
+    .map((value, index) => requiredString(value, `profile.focus[${index}]`));
+  const frame = requiredString(
+    portfolio.story?.[0]?.eyebrow,
+    'story[0].eyebrow',
+  );
+
+  const roleWords = role.trim().toUpperCase().split(/\s+/);
+  const roleAccent = roleWords.pop();
+  const rolePrefix = roleWords.join(' ');
+  const capabilityMarkup = capabilities
+    .map(
+      (value, index) => `      <li class="bootstrap-capability">
+        <span class="bootstrap-capability-index">${String(index + 1).padStart(2, '0')}</span>
+        ${escapeHtml(value)}
+      </li>`,
+    )
+    .join('\n');
+  const prefixMarkup = rolePrefix
+    ? `        <span>${escapeHtml(rolePrefix)}</span>\n`
+    : '';
+  const shell = `    <!-- bootstrap-content:start -->
+    <div class="bootstrap-shell" aria-hidden="true" data-content-version="${escapeHtml(contentVersion)}">
+      <div class="bootstrap-rail">
+        <span>${escapeHtml(frame)} / FRAME LIFECYCLE</span>
+        <span class="bootstrap-rail-end">
+          <span class="bootstrap-rail-focus">${escapeHtml(capabilities.slice(0, 2).join(' / '))}</span>
+          <span>${escapeHtml(location)}</span>
+          <span class="bootstrap-live-dot"></span>
+        </span>
+      </div>
+      <div class="bootstrap-stage">
+        <p class="bootstrap-kicker">${escapeHtml(role)} / ${escapeHtml(location)} / SINCE ${escapeHtml(since)}</p>
+        <p class="bootstrap-title">
+${prefixMarkup}        <span class="bootstrap-title-accent">${escapeHtml(roleAccent)}.</span>
+        </p>
+      </div>
+      <div class="bootstrap-footer">
+        <p class="bootstrap-statement">${escapeHtml(headline)}</p>
+        <ol class="bootstrap-capabilities">
+${capabilityMarkup}
+        </ol>
+      </div>
+    </div>
+    <!-- bootstrap-content:end -->`;
+
+  const indexPath = path.join(webRoot, 'index.html');
+  const index = await readFile(indexPath, 'utf8');
+  const marker = /\s*<!-- bootstrap-content:start -->[\s\S]*?<!-- bootstrap-content:end -->/;
+  if (!marker.test(index)) {
+    throw new Error('index.html does not contain the bootstrap content markers');
+  }
+  await writeFile(indexPath, index.replace(marker, `\n${shell}`));
+}
+
+function requiredString(value, path) {
+  if (typeof value !== 'string' || value.trim().length === 0) {
+    throw new Error(`${path} must be a non-empty string`);
+  }
+  return value.trim();
+}
+
+function escapeHtml(value) {
+  return value.replace(/[&<>"']/g, (character) => {
+    const entities = {
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#39;',
+    };
+    return entities[character];
+  });
 }
 
 async function normalizeNoticeWhitespace() {

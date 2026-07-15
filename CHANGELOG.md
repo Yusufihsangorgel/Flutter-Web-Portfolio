@@ -2,6 +2,19 @@
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.0] - 2026-07-15
+
+### Added
+
+- A first-paint critical shell generated from the canonical portfolio JSON, so the professional opening is visible while Flutter's Wasm and renderer binaries compile.
+- A compositor-safe `runApp` fallback for WebKit and CanvasKit paths that paint successfully without dispatching Flutter's web first-frame event.
+- Runtime phase diagnostics that separate entrypoint transfer, engine initialization, render signalling, and reveal timing.
+
+### Changed
+
+- Replaced the anonymous loading bed with the same editorial role, headline, and capability composition used by the Flutter hero, without hardcoding portfolio copy in HTML.
+- Generalized the reveal timeline around a truthful render signal while retaining the upstream first-frame event as the preferred measured path.
+
 ## [1.3.0] - 2026-07-15
 
 ### Added
