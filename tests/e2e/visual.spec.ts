@@ -62,7 +62,7 @@ async function openStaticPortfolio(page: Page) {
     timeout: 20000,
   });
   await expect(page.locator('#bootstrap-surface')).toHaveCount(0);
-  await waitForHeadingInViewport(page, 'SOFTWARE ENGINEER.');
+  await waitForHeadingInViewport(page, 'Yusuf İhsan Görgel, Software Engineer');
   await expect(page.locator('html')).toHaveAttribute(
     'data-render-quality',
     'essential',
@@ -114,9 +114,9 @@ test('preserves the editorial sequence across responsive viewports', async ({
 
   await openChapter(
     page,
-    'Go to Systems',
+    'Go to Work',
     /#\/projects$/,
-    'Selected Systems',
+    'Selected Work',
   );
   await expect(page).toHaveScreenshot('systems.png');
 });

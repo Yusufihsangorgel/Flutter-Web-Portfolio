@@ -1,5 +1,3 @@
-import 'package:flutter/foundation.dart'
-    show TargetPlatform, defaultTargetPlatform;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_web_portfolio/app/controllers/scroll_controller.dart';
@@ -10,10 +8,9 @@ import 'package:flutter_web_portfolio/app/core/theme/app_fonts.dart';
 import 'package:flutter_web_portfolio/app/domain/models/portfolio_document.dart';
 import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
 import 'package:flutter_web_portfolio/app/widgets/cinematic_focusable.dart';
-import 'package:flutter_web_portfolio/app/widgets/command_palette.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-/// A terminal chapter rather than a conventional three-column site footer.
+/// A high-contrast closing section with direct navigation and profile links.
 class PremiumFooter extends StatelessWidget {
   const PremiumFooter({super.key});
 
@@ -25,8 +22,7 @@ class PremiumFooter extends StatelessWidget {
           final portfolio = context.read<PortfolioDocument>();
           final width = MediaQuery.sizeOf(context).width;
           final desktop = width >= Breakpoints.desktop;
-          final name = portfolio.profile.role;
-          final statement = portfolio.profile.headline;
+          final name = portfolio.profile.name;
 
           return Container(
             width: double.infinity,
@@ -38,22 +34,27 @@ class PremiumFooter extends StatelessWidget {
                 padding: EdgeInsets.fromLTRB(
                   desktop ? 72 : 24,
                   desktop ? 54 : 38,
-                  desktop ? 72 : 24,
+                  desktop ? 72 : 68,
                   26,
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const _FooterRail(),
+                    _FooterRail(portfolio: portfolio),
                     SizedBox(height: desktop ? 70 : 48),
-                    Text(
-                      statement,
-                      style: AppFonts.instrumentSerif(
-                        fontSize: desktop ? 92 : 48,
-                        fontStyle: FontStyle.italic,
-                        color: AppColors.background,
-                        height: 0.93,
-                        letterSpacing: desktop ? -3.2 : -1.4,
+                    FittedBox(
+                      fit: BoxFit.scaleDown,
+                      alignment: AlignmentDirectional.centerStart,
+                      child: Text(
+                        name,
+                        maxLines: 1,
+                        style: AppFonts.spaceGrotesk(
+                          fontSize: desktop ? 76 : 44,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.background,
+                          height: 0.98,
+                          letterSpacing: desktop ? -2.8 : -1.2,
+                        ),
                       ),
                     ),
                     SizedBox(height: desktop ? 76 : 54),
@@ -63,11 +64,7 @@ class PremiumFooter extends StatelessWidget {
                       desktop: desktop,
                     ),
                     const SizedBox(height: 44),
-                    _FooterBottom(
-                      name: name,
-                      language: language,
-                      portfolio: portfolio,
-                    ),
+                    _FooterBottom(name: name, portfolio: portfolio),
                   ],
                 ),
               ),
@@ -78,32 +75,24 @@ class PremiumFooter extends StatelessWidget {
 }
 
 class _FooterRail extends StatelessWidget {
-  const _FooterRail();
+  const _FooterRail({required this.portfolio});
+
+  final PortfolioDocument portfolio;
 
   @override
   Widget build(BuildContext context) => ExcludeSemantics(
     child: Row(
       children: [
         Text(
-          '05 / SIGNAL END',
-          style: AppFonts.jetBrainsMono(
-            fontSize: 9,
-            fontWeight: FontWeight.w700,
+          '${portfolio.profile.role} · ${portfolio.profile.location}',
+          style: AppFonts.spaceGrotesk(
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
             color: AppColors.background,
-            letterSpacing: 1.25,
           ),
         ),
         const SizedBox(width: 16),
         const Expanded(child: Divider(color: Color(0x520B0B0D))),
-        const SizedBox(width: 16),
-        Container(
-          width: 7,
-          height: 7,
-          decoration: const BoxDecoration(
-            color: AppColors.hotCoral,
-            shape: BoxShape.circle,
-          ),
-        ),
       ],
     ),
   );
@@ -140,7 +129,6 @@ class _FooterNavigation extends StatelessWidget {
       children: [
         for (var index = 0; index < links.length; index++)
           _FooterLink(
-            index: index,
             label: links[index].label,
             onTap: () => context.read<AppScrollController>().scrollToSection(
               links[index].id,
@@ -152,13 +140,14 @@ class _FooterNavigation extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          language
-              .getText('footer.verification', defaultValue: 'Current focus')
-              .toUpperCase(),
-          style: AppFonts.jetBrainsMono(
-            fontSize: 9,
+          language.getText(
+            'footer.verification',
+            defaultValue: 'Current focus',
+          ),
+          style: AppFonts.spaceGrotesk(
+            fontSize: 12,
+            fontWeight: FontWeight.w500,
             color: AppColors.background.withValues(alpha: 0.62),
-            letterSpacing: 1.1,
           ),
         ),
         const SizedBox(height: 10),
@@ -215,12 +204,11 @@ class _ProfileLink extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            link.label.toUpperCase(),
-            style: AppFonts.jetBrainsMono(
-              fontSize: 9,
-              fontWeight: FontWeight.w700,
+            link.label,
+            style: AppFonts.spaceGrotesk(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
               color: AppColors.background,
-              letterSpacing: 0.8,
             ),
           ),
           const SizedBox(width: 6),
@@ -236,13 +224,8 @@ class _ProfileLink extends StatelessWidget {
 }
 
 class _FooterLink extends StatefulWidget {
-  const _FooterLink({
-    required this.index,
-    required this.label,
-    required this.onTap,
-  });
+  const _FooterLink({required this.label, required this.onTap});
 
-  final int index;
   final String label;
   final VoidCallback onTap;
 
@@ -270,12 +253,12 @@ class _FooterLinkState extends State<_FooterLink> {
         ),
       ),
       child: Text(
-        '${(widget.index + 1).toString().padLeft(2, '0')}  ${widget.label.toUpperCase()}',
-        style: AppFonts.jetBrainsMono(
-          fontSize: 10,
+        widget.label,
+        style: AppFonts.spaceGrotesk(
+          fontSize: 14,
           fontWeight: FontWeight.w600,
           color: AppColors.background,
-          letterSpacing: 0.85,
+          letterSpacing: -0.1,
         ),
       ),
     ),
@@ -283,55 +266,35 @@ class _FooterLinkState extends State<_FooterLink> {
 }
 
 class _FooterBottom extends StatelessWidget {
-  const _FooterBottom({
-    required this.name,
-    required this.language,
-    required this.portfolio,
-  });
+  const _FooterBottom({required this.name, required this.portfolio});
 
   final String name;
-  final LanguageCubit language;
   final PortfolioDocument portfolio;
 
   @override
-  Widget build(BuildContext context) {
-    final shortcut = defaultTargetPlatform == TargetPlatform.macOS
-        ? '\u2318K'
-        : 'CTRL+K';
-    return Container(
-      padding: const EdgeInsets.only(top: 18),
-      decoration: const BoxDecoration(
-        border: Border(top: BorderSide(color: Color(0x3D0B0B0D))),
-      ),
-      child: Wrap(
-        spacing: 24,
-        runSpacing: 12,
-        crossAxisAlignment: WrapCrossAlignment.center,
-        children: [
-          Text(
-            '\u00A9 ${DateTime.now().year} ${name.toUpperCase()}',
-            style: _bottomStyle(),
-          ),
-          Text(
-            portfolio.profile.focus.take(3).join(' / ').toUpperCase(),
-            style: _bottomStyle(),
-          ),
-          CinematicFocusable(
-            onTap: () => CommandPalette.show(context),
-            semanticLabel:
-                '${language.getText('footer.command_hint_prefix', defaultValue: 'Press')} $shortcut ${language.getText('footer.command_hint_suffix', defaultValue: 'to open command palette')}',
-            focusColor: AppColors.background,
-            child: Text('$shortcut / COMMAND', style: _bottomStyle()),
-          ),
-        ],
-      ),
-    );
-  }
+  Widget build(BuildContext context) => Container(
+    padding: const EdgeInsets.only(top: 18),
+    decoration: const BoxDecoration(
+      border: Border(top: BorderSide(color: Color(0x3D0B0B0D))),
+    ),
+    child: Wrap(
+      spacing: 24,
+      runSpacing: 12,
+      crossAxisAlignment: WrapCrossAlignment.center,
+      children: [
+        Text('\u00A9 ${DateTime.now().year} $name', style: _bottomStyle()),
+        Text(
+          portfolio.profile.focus.take(3).join(' · '),
+          style: _bottomStyle(),
+        ),
+      ],
+    ),
+  );
 
-  TextStyle _bottomStyle() => AppFonts.jetBrainsMono(
-    fontSize: 8,
+  TextStyle _bottomStyle() => AppFonts.spaceGrotesk(
+    fontSize: 10,
     fontWeight: FontWeight.w600,
     color: AppColors.background.withValues(alpha: 0.62),
-    letterSpacing: 0.75,
+    letterSpacing: 0.1,
   );
 }

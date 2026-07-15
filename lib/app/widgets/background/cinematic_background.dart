@@ -12,12 +12,10 @@ import 'package:flutter_web_portfolio/app/features/render_quality/application/re
 import 'package:flutter_web_portfolio/app/features/render_quality/domain/render_quality.dart';
 import 'package:flutter_web_portfolio/app/utils/motion_preference.dart';
 
-/// A single procedural stage shared by every portfolio chapter.
+/// A single restrained ambient field shared by the portfolio document.
 ///
-/// The scene unfolds from orbiting interface planes to an atlas, a tunnel,
-/// stacked principles, and finally a product archive. It is drawn entirely by
-/// Flutter, responds gently to the pointer, and follows the measured scroll
-/// geometry exposed by [SceneDirector].
+/// Colour follows the measured scroll geometry exposed by [SceneDirector],
+/// while content and real evidence remain the visual focus.
 class CinematicBackground extends StatefulWidget {
   const CinematicBackground({super.key});
 
@@ -254,6 +252,9 @@ class _RenderAtlasPainter extends CustomPainter {
   }
 
   void _drawPerspectiveGrid(Canvas canvas, Size size) {
+    if (profile.verticalGridLines == 0 && profile.horizontalGridLines == 0) {
+      return;
+    }
     final morph = config.atlasMorph;
     final horizon = size.height * (0.56 + math.sin(morph * 0.8) * 0.025);
     final vanishingPoint = Offset(

@@ -14,17 +14,15 @@ final class PortfolioDocument {
     required List<PortfolioCapability> capabilities,
     required List<PortfolioContribution> contributions,
     required List<PortfolioSystem> systems,
-    required List<PortfolioStoryBeat> story,
   }) : sources = List.unmodifiable(sources),
        experience = List.unmodifiable(experience),
        capabilities = List.unmodifiable(capabilities),
        contributions = List.unmodifiable(contributions),
-       systems = List.unmodifiable(systems),
-       story = List.unmodifiable(story);
+       systems = List.unmodifiable(systems);
 
   factory PortfolioDocument.fromJson(Map<String, dynamic> json) {
     final schemaVersion = _requiredInt(json, 'schema_version');
-    if (schemaVersion != 1) {
+    if (schemaVersion != 2) {
       throw FormatException(
         'Unsupported portfolio schema version: $schemaVersion',
       );
@@ -50,7 +48,6 @@ final class PortfolioDocument {
         'contributions',
       ).map(PortfolioContribution.fromJson).toList(),
       systems: _objects(json, 'systems').map(PortfolioSystem.fromJson).toList(),
-      story: _objects(json, 'story').map(PortfolioStoryBeat.fromJson).toList(),
     ).._validate();
   }
 
@@ -64,7 +61,6 @@ final class PortfolioDocument {
   final List<PortfolioCapability> capabilities;
   final List<PortfolioContribution> contributions;
   final List<PortfolioSystem> systems;
-  final List<PortfolioStoryBeat> story;
 
   List<String> get activeSections => <String>[
     'home',
@@ -74,42 +70,52 @@ final class PortfolioDocument {
     if (systems.isNotEmpty) 'projects',
   ];
 
+  /// One-based editorial number for a mounted content section.
+  ///
+  /// Optional chapters never leave gaps in the visible sequence.
+  String sectionNumber(String sectionId) {
+    final contentSections = activeSections
+        .where((section) => section != 'home')
+        .toList(growable: false);
+    final index = contentSections.indexOf(sectionId);
+    if (index < 0) {
+      throw ArgumentError.value(sectionId, 'sectionId', 'is not active');
+    }
+    return '${index + 1}'.padLeft(2, '0');
+  }
+
   Iterable<PortfolioContribution> get mergedContributions =>
       contributions.where((entry) => entry.status == ContributionStatus.merged);
 
   Iterable<PortfolioContribution> get contributionsUnderReview => contributions
       .where((entry) => entry.status == ContributionStatus.underReview);
 
+  Iterable<PortfolioSystem> get featuredSystems =>
+      systems.where((entry) => entry.featured);
+
+  Iterable<PortfolioSystem> get supportingSystems =>
+      systems.where((entry) => !entry.featured);
+
   void _validate() {
-    if (profile.role != 'Software Engineer') {
+    if (sources.isEmpty || capabilities.isEmpty) {
       throw const FormatException(
-        'The public role must be exactly "Software Engineer".',
+        'Sources and capabilities must not be empty.',
       );
     }
-    if (sources.isEmpty ||
-        experience.isEmpty ||
-        capabilities.isEmpty ||
-        contributions.isEmpty ||
-        systems.isEmpty) {
+    if (profile.focus.length < 3) {
       throw const FormatException(
-        'Sources, experience, capabilities, contributions, and systems '
-        'must not be empty.',
+        'The profile must declare at least three focus areas.',
       );
     }
-    if (mergedContributions.isEmpty) {
+    if (!site.title.contains(profile.name) ||
+        !site.title.contains(profile.role)) {
       throw const FormatException(
-        'At least one accepted upstream contribution is required.',
+        'Site metadata must use the canonical profile name and role.',
       );
     }
-    if (!site.title.contains(profile.role)) {
+    if (systems.isNotEmpty && featuredSystems.isEmpty) {
       throw const FormatException(
-        'Site metadata must use the canonical public role.',
-      );
-    }
-    if (story.length != activeSections.length - 1) {
-      throw FormatException(
-        'The story must contain one transition for each public chapter: '
-        '${activeSections.length - 1} required, ${story.length} provided.',
+        'At least one work item must be selected as featured.',
       );
     }
     _assertUnique('source', sources.map((entry) => entry.id));
@@ -118,7 +124,6 @@ final class PortfolioDocument {
     _assertUnique('capability', capabilities.map((entry) => entry.id));
     _assertUnique('contribution', contributions.map((entry) => entry.id));
     _assertUnique('system', systems.map((entry) => entry.id));
-    _assertUnique('story beat', story.map((entry) => entry.id));
   }
 }
 
@@ -130,6 +135,7 @@ final class PortfolioSite {
     required this.socialDescription,
     required this.socialImage,
     required this.domainLabel,
+    this.analytics,
   });
 
   factory PortfolioSite.fromJson(Map<String, dynamic> json) {
@@ -146,6 +152,10 @@ final class PortfolioSite {
       socialDescription: _requiredString(json, 'social_description'),
       socialImage: socialImage,
       domainLabel: _requiredString(json, 'domain_label'),
+      analytics: switch (_optionalObject(json, 'analytics')) {
+        final value? => PortfolioAnalytics.fromJson(value),
+        null => null,
+      },
     );
   }
 
@@ -155,6 +165,20 @@ final class PortfolioSite {
   final String socialDescription;
   final String socialImage;
   final String domainLabel;
+  final PortfolioAnalytics? analytics;
+}
+
+final class PortfolioAnalytics {
+  const PortfolioAnalytics({required this.scriptUrl, required this.domain});
+
+  factory PortfolioAnalytics.fromJson(Map<String, dynamic> json) =>
+      PortfolioAnalytics(
+        scriptUrl: _requiredUri(json, 'script_url'),
+        domain: _requiredString(json, 'domain'),
+      );
+
+  final Uri scriptUrl;
+  final String domain;
 }
 
 final class PortfolioSource {
@@ -181,11 +205,13 @@ final class PortfolioSource {
 
 final class PortfolioProfile {
   PortfolioProfile({
+    required this.name,
     required this.role,
     required this.location,
     required this.since,
     required this.headline,
     required this.summary,
+    required this.background,
     required List<String> focus,
     required List<PortfolioLink> links,
   }) : focus = List.unmodifiable(focus),
@@ -193,20 +219,24 @@ final class PortfolioProfile {
 
   factory PortfolioProfile.fromJson(Map<String, dynamic> json) =>
       PortfolioProfile(
+        name: _requiredString(json, 'name'),
         role: _requiredString(json, 'role'),
         location: _requiredString(json, 'location'),
         since: _requiredString(json, 'since'),
         headline: _requiredString(json, 'headline'),
         summary: _requiredString(json, 'summary'),
+        background: _requiredString(json, 'background'),
         focus: _strings(json, 'focus'),
         links: _objects(json, 'links').map(PortfolioLink.fromJson).toList(),
       );
 
+  final String name;
   final String role;
   final String location;
   final String since;
   final String headline;
   final String summary;
+  final String background;
   final List<String> focus;
   final List<PortfolioLink> links;
 }
@@ -232,6 +262,7 @@ final class PortfolioLink {
 final class PortfolioExperience {
   PortfolioExperience({
     required this.id,
+    required this.company,
     required this.role,
     required this.domain,
     required this.period,
@@ -242,6 +273,7 @@ final class PortfolioExperience {
   factory PortfolioExperience.fromJson(Map<String, dynamic> json) =>
       PortfolioExperience(
         id: _requiredString(json, 'id'),
+        company: _requiredString(json, 'company'),
         role: _requiredString(json, 'role'),
         domain: _requiredString(json, 'domain'),
         period: _requiredString(json, 'period'),
@@ -250,6 +282,7 @@ final class PortfolioExperience {
       );
 
   final String id;
+  final String company;
   final String role;
   final String domain;
   final String period;
@@ -332,8 +365,10 @@ final class PortfolioSystem {
     required this.id,
     required this.name,
     required this.kind,
-    required this.visual,
+    required this.year,
+    required this.featured,
     required this.summary,
+    required this.ownership,
     required this.decision,
     required this.url,
     required List<String> technologies,
@@ -344,8 +379,10 @@ final class PortfolioSystem {
         id: _requiredString(json, 'id'),
         name: _requiredString(json, 'name'),
         kind: _requiredString(json, 'kind'),
-        visual: PortfolioVisual.parse(_requiredString(json, 'visual')),
+        year: _requiredString(json, 'year'),
+        featured: _requiredBool(json, 'featured'),
         summary: _requiredString(json, 'summary'),
+        ownership: _requiredString(json, 'ownership'),
         decision: _requiredString(json, 'decision'),
         url: _requiredUri(json, 'url'),
         technologies: _strings(json, 'technologies'),
@@ -354,53 +391,24 @@ final class PortfolioSystem {
   final String id;
   final String name;
   final String kind;
-  final PortfolioVisual visual;
+  final String year;
+  final bool featured;
   final String summary;
+  final String ownership;
   final String decision;
   final Uri url;
   final List<String> technologies;
 }
 
-enum PortfolioVisual {
-  framePipeline('frame-pipeline'),
-  queueStates('queue-states'),
-  tenantRouting('tenant-routing'),
-  weightedQueue('weighted-queue'),
-  spatialGrid('spatial-grid');
-
-  const PortfolioVisual(this.wireValue);
-  final String wireValue;
-
-  static PortfolioVisual parse(String value) => values.firstWhere(
-    (entry) => entry.wireValue == value,
-    orElse: () => throw FormatException('Unsupported system visual: $value'),
-  );
-}
-
-final class PortfolioStoryBeat {
-  const PortfolioStoryBeat({
-    required this.id,
-    required this.eyebrow,
-    required this.title,
-    required this.body,
-  });
-
-  factory PortfolioStoryBeat.fromJson(Map<String, dynamic> json) =>
-      PortfolioStoryBeat(
-        id: _requiredString(json, 'id'),
-        eyebrow: _requiredString(json, 'eyebrow'),
-        title: _requiredString(json, 'title'),
-        body: _requiredString(json, 'body'),
-      );
-
-  final String id;
-  final String eyebrow;
-  final String title;
-  final String body;
-}
-
 Map<String, dynamic> _requiredObject(Map<String, dynamic> json, String key) =>
     switch (json[key]) {
+      final Map<String, dynamic> value => value,
+      _ => throw FormatException('Expected object at "$key".'),
+    };
+
+Map<String, dynamic>? _optionalObject(Map<String, dynamic> json, String key) =>
+    switch (json[key]) {
+      null => null,
       final Map<String, dynamic> value => value,
       _ => throw FormatException('Expected object at "$key".'),
     };
@@ -447,6 +455,12 @@ int _requiredInt(Map<String, dynamic> json, String key) => switch (json[key]) {
   final int value => value,
   _ => throw FormatException('Expected integer at "$key".'),
 };
+
+bool _requiredBool(Map<String, dynamic> json, String key) =>
+    switch (json[key]) {
+      final bool value => value,
+      _ => throw FormatException('Expected boolean at "$key".'),
+    };
 
 Uri _requiredUri(Map<String, dynamic> json, String key) {
   final value = Uri.parse(_requiredString(json, key));

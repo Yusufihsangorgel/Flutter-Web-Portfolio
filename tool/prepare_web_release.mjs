@@ -152,6 +152,7 @@ async function injectBootstrapShell() {
     portfolio.content_version,
     'content_version',
   );
+  const name = requiredString(portfolio.profile?.name, 'profile.name');
   const role = requiredString(portfolio.profile?.role, 'profile.role');
   const location = requiredString(
     portfolio.profile?.location,
@@ -166,49 +167,80 @@ async function injectBootstrapShell() {
   if (!Array.isArray(focus) || focus.length < 3) {
     throw new Error('profile.focus must contain at least three values');
   }
-  const capabilities = focus
-    .slice(0, 3)
-    .map((value, index) => requiredString(value, `profile.focus[${index}]`));
-  const frame = requiredString(
-    portfolio.story?.[0]?.eyebrow,
-    'story[0].eyebrow',
+  const primaryFocus = requiredString(focus[0], 'profile.focus[0]');
+  const translationsPath = path.join(
+    webRoot,
+    'assets',
+    'assets',
+    'i18n',
+    'en.json',
   );
+  const translations = JSON.parse(await readFile(translationsPath, 'utf8'));
+  const viewWork = requiredString(
+    translations.home_section?.view_work,
+    'i18n.en.home_section.view_work',
+  );
+  const viewGithub = requiredString(
+    translations.home_section?.view_github,
+    'i18n.en.home_section.view_github',
+  );
+  const hasWork = Array.isArray(portfolio.systems) && portfolio.systems.length > 0;
+  const hasGithub =
+    Array.isArray(portfolio.profile?.links) &&
+    portfolio.profile.links.some((link) => link?.id === 'github');
 
-  const roleWords = role.trim().toUpperCase().split(/\s+/);
-  const roleAccent = roleWords.pop();
-  const rolePrefix = roleWords.join(' ');
-  const capabilityMarkup = capabilities
+  const nameWords = name.trim().split(/\s+/);
+  const nameAccent = nameWords.pop();
+  const namePrefix = nameWords.join(' ').toUpperCase();
+  const facts = [
+    ['Based in', location],
+    ['Working since', since],
+    ['Focus', primaryFocus],
+  ];
+  const factMarkup = facts
     .map(
-      (value, index) => `      <li class="bootstrap-capability">
-        <span class="bootstrap-capability-index">${String(index + 1).padStart(2, '0')}</span>
+      ([label, value]) => `      <li class="bootstrap-fact">
+        <span class="bootstrap-fact-label">${escapeHtml(label)}</span>
         ${escapeHtml(value)}
       </li>`,
     )
     .join('\n');
-  const prefixMarkup = rolePrefix
-    ? `        <span>${escapeHtml(rolePrefix)}</span>\n`
+  const prefixMarkup = namePrefix
+    ? `        <span>${escapeHtml(namePrefix)}</span>\n`
+    : '';
+  const actionMarkup = [
+    hasWork
+      ? `            <span class="bootstrap-action bootstrap-action--primary">${escapeHtml(viewWork)}</span>`
+      : '',
+    hasGithub
+      ? `            <span class="bootstrap-action">${escapeHtml(viewGithub)}</span>`
+      : '',
+  ]
+    .filter(Boolean)
+    .join('\n');
+  const actions = actionMarkup
+    ? `\n          <div class="bootstrap-actions">\n${actionMarkup}\n          </div>`
     : '';
   const shell = `    <!-- bootstrap-content:start -->
     <div class="bootstrap-shell" aria-hidden="true" data-content-version="${escapeHtml(contentVersion)}">
       <div class="bootstrap-rail">
-        <span>${escapeHtml(frame)} / FRAME LIFECYCLE</span>
+        <span>${escapeHtml(role)}</span>
         <span class="bootstrap-rail-end">
-          <span class="bootstrap-rail-focus">${escapeHtml(capabilities.slice(0, 2).join(' / '))}</span>
           <span>${escapeHtml(location)}</span>
-          <span class="bootstrap-live-dot"></span>
         </span>
       </div>
       <div class="bootstrap-stage">
-        <p class="bootstrap-kicker">${escapeHtml(role)} / ${escapeHtml(location)} / SINCE ${escapeHtml(since)}</p>
         <p class="bootstrap-title">
-${prefixMarkup}        <span class="bootstrap-title-accent">${escapeHtml(roleAccent)}.</span>
+${prefixMarkup}        <span class="bootstrap-title-accent">${escapeHtml(nameAccent)}</span>
         </p>
       </div>
       <div class="bootstrap-footer">
-        <p class="bootstrap-statement">${escapeHtml(headline)}</p>
-        <ol class="bootstrap-capabilities">
-${capabilityMarkup}
-        </ol>
+        <div class="bootstrap-statement-group">
+          <p class="bootstrap-statement">${escapeHtml(headline)}</p>${actions}
+        </div>
+        <ul class="bootstrap-facts">
+${factMarkup}
+        </ul>
       </div>
     </div>
     <!-- bootstrap-content:end -->`;
@@ -258,9 +290,19 @@ self.addEventListener('install', (event) => {
 
 self.addEventListener('activate', (event) => {
   event.waitUntil((async () => {
-    await self.registration.unregister();
+    const scope = self.registration.scope;
     const names = await caches.keys();
-    await Promise.all(names.map((name) => caches.delete(name)));
+    await Promise.all(names.map(async (name) => {
+      const cache = await caches.open(name);
+      const requests = await cache.keys();
+      if (
+        requests.length > 0 &&
+        requests.every((request) => request.url.startsWith(scope))
+      ) {
+        await caches.delete(name);
+      }
+    }));
+    await self.registration.unregister();
   })());
 });
 `;

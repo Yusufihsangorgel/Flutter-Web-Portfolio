@@ -158,12 +158,12 @@ test('serves the complete professional narrative in production', async ({
   page,
 }) => {
   await openPortfolio(page);
-  await expect(page.getByRole('heading', { name: 'About Me' })).toBeAttached();
+  await expect(page.getByRole('heading', { name: 'About' })).toBeAttached();
   await expect(page.getByRole('heading', { name: 'Experience' })).toBeAttached();
   await expect(page.getByRole('heading', { name: 'Open Source' })).toBeAttached();
-  await expect(page.getByRole('heading', { name: 'Selected Systems' })).toBeAttached();
+  await expect(page.getByRole('heading', { name: 'Selected Work' })).toBeAttached();
   await expect(
-    page.getByText('Software Engineer — Cross-platform'),
+    page.getByText(/^FugaSoft\. Software Engineer\./),
   ).toBeAttached();
 });
 
@@ -197,14 +197,17 @@ test('serves the production accessibility hierarchy', async ({
     .filter((node) => ['button', 'link'].includes(node.role?.value ?? ''))
     .map((node) => node.name?.value ?? '');
 
-  expect(headings).toContainEqual({ name: 'SOFTWARE ENGINEER.', level: 1 });
+  expect(headings).toContainEqual({
+    name: 'Yusuf İhsan Görgel, Software Engineer',
+    level: 1,
+  });
   expect(controls).toEqual(
     expect.arrayContaining([
       'Skip to content',
       'Back to top',
       ...(isMobile
         ? ['Open navigation menu']
-        : ['About', 'Experience', 'Open Source', 'Systems']),
+        : ['About', 'Experience', 'Open Source', 'Work']),
       'Language menu: English',
     ]),
   );
@@ -214,7 +217,7 @@ test('serves the production accessibility hierarchy', async ({
   );
 
   await expect(
-    page.getByRole('heading', { name: 'Selected Systems' }),
+    page.getByRole('heading', { name: 'Selected Work' }),
   ).toBeAttached();
 
   const projectsTree = await accessibility.send(
@@ -223,10 +226,13 @@ test('serves the production accessibility hierarchy', async ({
   const projectLinks = projectsTree.nodes
     .filter((node) => !node.ignored && node.role?.value === 'link')
     .map((node) => node.name?.value ?? '');
-  expect(projectLinks).toContain('View source: Flutter Web Portfolio');
+  expect(projectLinks).toEqual(
+    expect.arrayContaining([expect.stringContaining('Flutter Web Portfolio')]),
+  );
+  expect(projectLinks).toContain('Open project: Dorse');
   expect(projectLinks).toContain(
-    'Open pull request. Wait for web rendering before the first-frame event. '
-      + 'Flutter · under review · 2026-07-15',
+    'View pull request. Wait for web rendering before the first-frame event. '
+      + 'Flutter · Under review · 2026-07-15',
   );
   expect(projectLinks).toEqual(
     expect.arrayContaining(['GitHub', 'LinkedIn', 'Writing']),
@@ -268,18 +274,22 @@ test('serves the declared production sharing and font assets', async ({
   expect(html).toContain(
     `data-content-version="${portfolio.content_version}"`,
   );
-  expect(html).toContain(portfolio.profile.role.toUpperCase().split(' ')[0]);
+  expect(html).toContain(portfolio.profile.name.toUpperCase().split(' ')[0]);
   expect(html).toContain(portfolio.profile.headline);
-  for (const focus of portfolio.profile.focus.slice(0, 3)) {
-    expect(html).toContain(focus);
+  for (const fact of [
+    portfolio.profile.location,
+    portfolio.profile.since,
+    portfolio.profile.focus[0],
+  ]) {
+    expect(html).toContain(fact);
   }
   expect(html).toContain(
-    'content="https://developeryusuf.com/assets/og/engineering-showcase.png"',
+    `content="${new URL(portfolio.site.social_image, portfolio.site.url)}"`,
   );
   expect(html).toContain('<meta property="og:image:width" content="1200">');
   expect(html).toContain('<meta property="og:image:height" content="630">');
 
-  const image = await request.get('/assets/og/engineering-showcase.png');
+  const image = await request.get(portfolio.site.social_image);
   expect(image.status()).toBe(200);
   expect(image.headers()['content-type']).toContain('image/png');
   const png = await image.body();

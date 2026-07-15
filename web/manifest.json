@@ -1,36 +1,39 @@
 {
-    "name": "Software Engineer Portfolio",
-    "short_name": "Portfolio",
-    "start_url": ".",
-    "display": "standalone",
-    "background_color": "#0B0B0D",
-    "theme_color": "#5B6CFF",
-    "description": "Software engineer building and operating cross-platform products and platform tooling with Flutter, Dart, Go, PostgreSQL, Redis, Docker, and Kubernetes.",
-    "orientation": "any",
-    "categories": ["portfolio", "developer-tools"],
-    "prefer_related_applications": false,
-    "icons": [
-        {
-            "src": "icons/Icon-192.png",
-            "sizes": "192x192",
-            "type": "image/png"
-        },
-        {
-            "src": "icons/Icon-512.png",
-            "sizes": "512x512",
-            "type": "image/png"
-        },
-        {
-            "src": "icons/Icon-maskable-192.png",
-            "sizes": "192x192",
-            "type": "image/png",
-            "purpose": "maskable"
-        },
-        {
-            "src": "icons/Icon-maskable-512.png",
-            "sizes": "512x512",
-            "type": "image/png",
-            "purpose": "maskable"
-        }
-    ]
+  "name": "Yusuf İhsan Görgel — Portfolio",
+  "short_name": "Yusuf İhsan Görgel",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#0B0B0D",
+  "theme_color": "#5B6CFF",
+  "description": "Yusuf İhsan Görgel is a software engineer building cross-platform products with Flutter, Dart, Go, PostgreSQL, Redis, and production infrastructure.",
+  "orientation": "any",
+  "categories": [
+    "portfolio",
+    "developer-tools"
+  ],
+  "prefer_related_applications": false,
+  "icons": [
+    {
+      "src": "icons/Icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/Icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/Icon-maskable-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "icons/Icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
 }

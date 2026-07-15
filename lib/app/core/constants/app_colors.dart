@@ -5,8 +5,8 @@ final class AppColors {
   const AppColors._();
 
   // ─── Render Atlas base ──────────────────────────────────────────────
-  // Near-black ink and warm paper replace the familiar blue-purple
-  // developer-portfolio palette. Signal colours are intentionally sparse.
+  // Near-black ink, warm paper, and one cobalt accent keep the document
+  // visually coherent from the opening through the work index.
   static const background = Color(0xFF0B0B0D);
   static const backgroundDark = Color(0xFF050507);
   static const backgroundLight = Color(0xFF151519);
@@ -15,7 +15,7 @@ final class AppColors {
   // ─── Text hierarchy (dark) ──────────────────────────────────────────
   static const textBright = Color(0xFFF2F0E9);
   static const textPrimary = Color(0xFFB8B6AF);
-  static const textSecondary = Color(0xFF777671);
+  static const textSecondary = Color(0xFF817F79);
   static const white = Color(0xFFFEFDF8);
 
   // ─── Signal palette ─────────────────────────────────────────────────
@@ -31,29 +31,29 @@ final class AppColors {
   static const heroGradient3 = electricCobalt;
   static const heroAccent = electricCobalt;
 
-  // ─── About palette ─────────────────────────────────────────────────
-  static const aboutGradient1 = Color(0xFF14190B);
-  static const aboutGradient2 = Color(0xFF34400F);
-  static const aboutGradient3 = signalLime;
-  static const aboutAccent = signalLime;
+  // ─── Shared document palette ───────────────────────────────────────
+  static const aboutGradient1 = heroGradient1;
+  static const aboutGradient2 = heroGradient2;
+  static const aboutGradient3 = electricCobalt;
+  static const aboutAccent = electricCobalt;
 
   // ─── Experience palette ────────────────────────────────────────────
-  static const expGradient1 = Color(0xFF24100D);
-  static const expGradient2 = Color(0xFF522016);
-  static const expGradient3 = hotCoral;
-  static const expAccent = hotCoral;
+  static const expGradient1 = heroGradient1;
+  static const expGradient2 = heroGradient2;
+  static const expGradient3 = electricCobalt;
+  static const expAccent = electricCobalt;
 
   // ─── Open-source palette ───────────────────────────────────────────
-  static const projGradient1 = Color(0xFF191814);
-  static const projGradient2 = Color(0xFF302F29);
-  static const projGradient3 = paper;
-  static const projAccent = paper;
+  static const projGradient1 = heroGradient1;
+  static const projGradient2 = heroGradient2;
+  static const projGradient3 = electricCobalt;
+  static const projAccent = electricCobalt;
 
-  // ─── Systems palette ───────────────────────────────────────────────
-  static const contactGradient1 = Color(0xFF07171C);
-  static const contactGradient2 = Color(0xFF0C3540);
-  static const contactGradient3 = digitalIce;
-  static const contactAccent = digitalIce;
+  // ─── Selected-work palette ────────────────────────────────────────
+  static const contactGradient1 = heroGradient1;
+  static const contactGradient2 = heroGradient2;
+  static const contactGradient3 = electricCobalt;
+  static const contactAccent = electricCobalt;
 
   // ─── Semantic aliases ──────────────────────────────────────────────
   static const accent = heroAccent;

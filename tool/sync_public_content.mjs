@@ -9,6 +9,12 @@ const sourcePath = path.join(root, 'assets', 'content', 'portfolio.json');
 const document = JSON.parse(await readFile(sourcePath, 'utf8'));
 
 const operations = [
+  () => syncDelimitedFile(
+    path.join(root, 'README.md'),
+    '<!-- portfolio-demo:start -->',
+    '<!-- portfolio-demo:end -->',
+    renderDemoLinks(document),
+  ),
   () => syncMarkedFile(
     path.join(root, 'README.md'),
     'portfolio-record',
@@ -24,6 +30,26 @@ const operations = [
     'portfolio-structured-data',
     renderStructuredData(document),
   ),
+  () => syncMarkedFile(
+    path.join(root, 'web', 'index.html'),
+    'portfolio-analytics',
+    renderAnalytics(document),
+  ),
+  () => syncWholeFile(
+    path.join(root, 'web', 'robots.txt'),
+    renderRobots(document),
+  ),
+  () => syncWholeFile(
+    path.join(root, 'web', 'sitemap.xml'),
+    renderSitemap(document),
+  ),
+  () => syncDelimitedFile(
+    path.join(root, 'nginx', 'default.conf'),
+    '  # portfolio-csp:start',
+    '  # portfolio-csp:end',
+    renderNginxCsp(document),
+  ),
+  () => syncPackage(document),
   () => syncManifest(document),
 ];
 
@@ -45,16 +71,41 @@ if (checkOnly && drift.length > 0) {
 }
 
 async function syncMarkedFile(file, marker, body) {
-  const current = await readFile(file, 'utf8');
   const start = `<!-- ${marker}:start -->`;
   const end = `<!-- ${marker}:end -->`;
+  return syncDelimitedFile(file, start, end, body);
+}
+
+async function syncDelimitedFile(file, start, end, body) {
+  const current = await readFile(file, 'utf8');
   const pattern = new RegExp(
     `${escapeRegExp(start)}[\\s\\S]*?${escapeRegExp(end)}`,
   );
   if (!pattern.test(current)) {
-    throw new Error(`${path.relative(root, file)} is missing ${marker} markers`);
+    throw new Error(
+      `${path.relative(root, file)} is missing the ${start} / ${end} delimiters`,
+    );
   }
   const next = current.replace(pattern, `${start}\n${body}\n${end}`);
+  if (next === current) return { file, changed: false };
+  if (!checkOnly) await writeFile(file, next);
+  return { file, changed: true };
+}
+
+async function syncWholeFile(file, body) {
+  const current = await readFile(file, 'utf8');
+  const next = `${body.trimEnd()}\n`;
+  if (next === current) return { file, changed: false };
+  if (!checkOnly) await writeFile(file, next);
+  return { file, changed: true };
+}
+
+async function syncPackage(data) {
+  const file = path.join(root, 'package.json');
+  const current = await readFile(file, 'utf8');
+  const packageDocument = JSON.parse(current);
+  packageDocument.homepage = data.site.url;
+  const next = `${JSON.stringify(packageDocument, null, 2)}\n`;
   if (next === current) return { file, changed: false };
   if (!checkOnly) await writeFile(file, next);
   return { file, changed: true };
@@ -64,8 +115,8 @@ async function syncManifest(data) {
   const file = path.join(root, 'web', 'manifest.json');
   const current = await readFile(file, 'utf8');
   const manifest = JSON.parse(current);
-  manifest.name = `${data.profile.role} Portfolio`;
-  manifest.short_name = 'Portfolio';
+  manifest.name = `${data.profile.name} — Portfolio`;
+  manifest.short_name = data.profile.name;
   manifest.start_url = '.';
   manifest.description = data.site.description;
   const currentManifest = JSON.parse(current);
@@ -87,33 +138,44 @@ function renderReadmeRecord(data) {
   const review = data.contributions.filter(
     (item) => item.status === 'under_review',
   );
+  const sourceLabels = data.sources.map((source) => source.label).join(' and ');
   const lines = [
     '## Public engineering record',
     '',
-    `**${data.profile.role}.** ${data.profile.headline}`,
+    `**${data.profile.name} — ${data.profile.role}.** ${data.profile.headline}`,
     '',
     `${data.profile.summary}`,
     '',
-    `Source status: \`${data.content_version}\`, verified ${data.verified_at} against the public GitHub and LinkedIn records declared in the manifest.`,
-    '',
-    '### Accepted upstream changes',
-    '',
-    '| Project | Change | Merged | Evidence |',
-    '|---|---|---:|---|',
-    ...merged.map(
-      (item) =>
-        `| ${table(item.project)} | ${table(item.title)} | ${item.date} | [Pull request](${item.url}) |`,
-    ),
-    '',
-    '### Public systems',
-    '',
-    '| System | Engineering focus | Source |',
-    '|---|---|---|',
-    ...data.systems.map(
-      (item) =>
-        `| ${table(item.name)} | ${table(item.decision)} | [Repository](${item.url}) |`,
-    ),
+    `Source status: \`${data.content_version}\`, verified ${data.verified_at} against ${sourceLabels}.`,
   ];
+
+  if (merged.length > 0) {
+    lines.push(
+      '',
+      '### Accepted upstream changes',
+      '',
+      '| Project | Change | Merged | Evidence |',
+      '|---|---|---:|---|',
+      ...merged.map(
+        (item) =>
+          `| ${table(item.project)} | ${table(item.title)} | ${item.date} | [Pull request](${item.url}) |`,
+      ),
+    );
+  }
+
+  if (data.systems.length > 0) {
+    lines.push(
+      '',
+      '### Selected work',
+      '',
+      '| Project | Responsibility | Evidence |',
+      '|---|---|---|',
+      ...data.systems.map(
+        (item) =>
+          `| ${table(item.name)} | ${table(item.ownership)} | [Project](${item.url}) |`,
+      ),
+    );
+  }
 
   if (review.length > 0) {
     lines.push(
@@ -129,6 +191,40 @@ function renderReadmeRecord(data) {
   return lines.join('\n');
 }
 
+function renderDemoLinks(data) {
+  return `[Live site](${data.site.url}) · [Flutter Web first-frame issue](https://github.com/flutter/flutter/issues/189499) · [Engine patch](https://github.com/flutter/flutter/pull/189500)`;
+}
+
+function renderRobots(data) {
+  const site = new URL(data.site.url);
+  return `User-agent: *
+Allow: /
+Sitemap: ${new URL('sitemap.xml', site).toString()}`;
+}
+
+function renderSitemap(data) {
+  const site = new URL(data.site.url);
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>${xml(site.toString())}</loc>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+</urlset>`;
+}
+
+function renderNginxCsp(data) {
+  const analyticsOrigin = data.site.analytics
+    ? new URL(data.site.analytics.script_url).origin
+    : '';
+  const scripts = ["'self'", "'unsafe-inline'", "'unsafe-eval'", analyticsOrigin]
+    .filter(Boolean)
+    .join(' ');
+  const connections = ["'self'", analyticsOrigin].filter(Boolean).join(' ');
+  return `  add_header Content-Security-Policy "default-src 'self'; script-src ${scripts}; worker-src 'self' blob:; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: https: blob:; connect-src ${connections}; frame-ancestors 'self';" always;`;
+}
+
 function renderHeadMeta(data) {
   const site = data.site;
   const image = new URL(site.social_image, site.url).toString();
@@ -136,46 +232,79 @@ function renderHeadMeta(data) {
   const description = html(site.description);
   const social = html(site.social_description);
   const role = html(data.profile.role);
+  const name = html(data.profile.name);
+  const keywords = html(
+    [
+      data.profile.role,
+      ...data.capabilities.flatMap((capability) => capability.items),
+      'Open Source',
+    ]
+      .filter((value, index, values) => values.indexOf(value) === index)
+      .slice(0, 14)
+      .join(', '),
+  );
   return `  <link rel="canonical" href="${site.url}">
   <title>${title}</title>
   <meta name="description" content="${description}">
-  <meta name="keywords" content="Software Engineer, Flutter, Dart, Go, PostgreSQL, Redis, Docker, Kubernetes, Open Source">
-  <meta name="author" content="Portfolio owner">
+  <meta name="keywords" content="${keywords}">
+  <meta name="author" content="${name}">
 
   <meta property="og:type" content="website">
   <meta property="og:url" content="${site.url}">
   <meta property="og:title" content="${title}">
   <meta property="og:description" content="${social}">
-  <meta property="og:site_name" content="${role} Portfolio">
+  <meta property="og:site_name" content="${name} — ${role}">
   <meta property="og:image" content="${image}">
   <meta property="og:image:secure_url" content="${image}">
   <meta property="og:image:type" content="image/png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
-  <meta property="og:image:alt" content="${role} — Flutter, Dart, Go, and selected open-source work">
+  <meta property="og:image:alt" content="${name} — ${role}">
   <meta property="og:locale" content="en_US">
 
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="${title}">
   <meta name="twitter:description" content="${social}">
   <meta name="twitter:image" content="${image}">
-  <meta name="twitter:image:alt" content="${role} — Flutter, Dart, Go, and selected open-source work">`;
+  <meta name="twitter:image:alt" content="${name} — ${role}">`;
 }
 
 function renderStructuredData(data) {
+  const sameAs = data.profile.links.map((link) => link.url);
   return `  <script type="application/ld+json">
   ${JSON.stringify(
     {
       '@context': 'https://schema.org',
-      '@type': 'WebSite',
-      name: `${data.profile.role} Portfolio`,
-      description: data.site.social_description,
-      url: data.site.url,
+      '@graph': [
+        {
+          '@type': 'Person',
+          name: data.profile.name,
+          jobTitle: data.profile.role,
+          address: data.profile.location,
+          url: data.site.url,
+          sameAs,
+        },
+        {
+          '@type': 'WebSite',
+          name: `${data.profile.name} — Portfolio`,
+          description: data.site.social_description,
+          url: data.site.url,
+        },
+      ],
     },
     null,
     2,
   ).replaceAll('\n', '\n  ')}
   </script>`;
+}
+
+function renderAnalytics(data) {
+  const analytics = data.site.analytics;
+  if (!analytics) return '';
+  const scriptUrl = new URL(analytics.script_url).toString();
+  const domain = String(analytics.domain).trim();
+  if (!domain) throw new Error('site.analytics.domain must not be empty');
+  return `  <script defer src="${html(scriptUrl)}" data-domain="${html(domain)}"></script>`;
 }
 
 function table(value) {
@@ -188,6 +317,15 @@ function html(value) {
     .replaceAll('"', '&quot;')
     .replaceAll('<', '&lt;')
     .replaceAll('>', '&gt;');
+}
+
+function xml(value) {
+  return String(value)
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&apos;');
 }
 
 function escapeRegExp(value) {

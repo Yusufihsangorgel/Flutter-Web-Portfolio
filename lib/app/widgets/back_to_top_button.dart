@@ -92,12 +92,13 @@ class _BackToTopButtonState extends State<BackToTopButton>
 
   @override
   Widget build(BuildContext context) {
-    final isMobile = MediaQuery.sizeOf(context).width < Breakpoints.mobile;
-    final buttonSize = isMobile ? 40.0 : 48.0;
+    final useCompactControl =
+        MediaQuery.sizeOf(context).width < Breakpoints.tablet;
+    final buttonSize = useCompactControl ? 36.0 : 48.0;
 
     return Positioned(
-      bottom: isMobile ? 20 : 32,
-      right: isMobile ? 16 : 32,
+      bottom: useCompactControl ? 14 : 32,
+      right: useCompactControl ? 10 : 32,
       child: AnimatedBuilder(
         animation: _entranceAnimation,
         builder: (_, _) {
@@ -141,7 +142,7 @@ class _BackToTopButtonState extends State<BackToTopButton>
                                       : AppDurations.fast,
                                   child: Icon(
                                     Icons.arrow_upward_rounded,
-                                    size: isMobile ? 18 : 22,
+                                    size: useCompactControl ? 18 : 22,
                                     color: _hovered
                                         ? AppColors.accent
                                         : AppColors.textPrimary,

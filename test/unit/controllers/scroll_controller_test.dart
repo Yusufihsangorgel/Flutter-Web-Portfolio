@@ -50,5 +50,34 @@ void main() {
     test('has no fabricated section geometry before layout', () {
       expect(controller.sectionGeometries, isEmpty);
     });
+
+    test(
+      'skips absent optional chapters when detecting the active section',
+      () {
+        final section = AppScrollController.sectionAtFocalPoint(
+          sectionIds: const [
+            'home',
+            'about',
+            'experience',
+            'proof',
+            'projects',
+          ],
+          offsets: const {'home': 0, 'about': 800, 'projects': 2200},
+          focalPoint: 2400,
+        );
+
+        expect(section, 'projects');
+      },
+    );
+
+    test('stops at the last mounted chapter before the focal point', () {
+      final section = AppScrollController.sectionAtFocalPoint(
+        sectionIds: const ['home', 'about', 'projects'],
+        offsets: const {'home': 0, 'about': 800, 'projects': 2200},
+        focalPoint: 1500,
+      );
+
+      expect(section, 'about');
+    });
   });
 }

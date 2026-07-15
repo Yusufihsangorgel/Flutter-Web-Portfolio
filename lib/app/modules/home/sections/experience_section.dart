@@ -8,7 +8,7 @@ import 'package:flutter_web_portfolio/app/features/language/application/language
 import 'package:flutter_web_portfolio/app/widgets/numbered_section_heading.dart';
 import 'package:flutter_web_portfolio/app/widgets/scene_accent_builder.dart';
 
-/// An editorial career ledger with every entry visible in document order.
+/// A readable career chronology with real organisations and responsibilities.
 class ExperienceSection extends StatelessWidget {
   const ExperienceSection({super.key});
 
@@ -17,7 +17,8 @@ class ExperienceSection extends StatelessWidget {
       BlocBuilder<LanguageCubit, LanguageState>(
         builder: (context, _) {
           final language = context.read<LanguageCubit>();
-          final experiences = context.read<PortfolioDocument>().experience;
+          final portfolio = context.read<PortfolioDocument>();
+          final experiences = portfolio.experience;
 
           return ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 1160),
@@ -26,7 +27,7 @@ class ExperienceSection extends StatelessWidget {
               children: [
                 SceneAccentBuilder(
                   builder: (context, accent) => NumberedSectionHeading(
-                    number: '02',
+                    number: portfolio.sectionNumber('experience'),
                     title: language.getText(
                       'experience_section.title',
                       defaultValue: 'Experience',
@@ -36,13 +37,9 @@ class ExperienceSection extends StatelessWidget {
                 ),
                 const SizedBox(height: 66),
                 for (var index = 0; index < experiences.length; index++)
-                  SceneAccentBuilder(
-                    builder: (context, accent) => _ExperienceLedgerRow(
-                      index: index,
-                      experience: experiences[index],
-                      accent: accent,
-                      isLast: index == experiences.length - 1,
-                    ),
+                  _ExperienceEntry(
+                    experience: experiences[index],
+                    isLast: index == experiences.length - 1,
                   ),
               ],
             ),
@@ -51,39 +48,29 @@ class ExperienceSection extends StatelessWidget {
       );
 }
 
-class _ExperienceLedgerRow extends StatelessWidget {
-  const _ExperienceLedgerRow({
-    required this.index,
-    required this.experience,
-    required this.accent,
-    required this.isLast,
-  });
+class _ExperienceEntry extends StatelessWidget {
+  const _ExperienceEntry({required this.experience, required this.isLast});
 
-  final int index;
   final PortfolioExperience experience;
-  final Color accent;
   final bool isLast;
 
   @override
   Widget build(BuildContext context) {
     final compact = MediaQuery.sizeOf(context).width < Breakpoints.tablet;
-    final period = experience.period;
-    final title = experience.role;
-    final position = experience.domain;
-    final description = experience.summary;
-    final technologies = experience.evidence.join(' / ');
-
+    final content = _ExperienceContent(experience: experience);
     return Semantics(
       container: true,
-      label: '$title. $position. $period. $description',
+      label:
+          '${experience.company}. ${experience.role}. ${experience.domain}. '
+          '${experience.period}. ${experience.summary}',
       child: ExcludeSemantics(
         child: Container(
-          padding: EdgeInsets.symmetric(vertical: compact ? 34 : 42),
+          padding: EdgeInsets.symmetric(vertical: compact ? 36 : 48),
           decoration: BoxDecoration(
             border: Border(
-              top: BorderSide(color: accent.withValues(alpha: 0.34)),
+              top: const BorderSide(color: Color(0x3D5B6CFF)),
               bottom: isLast
-                  ? BorderSide(color: accent.withValues(alpha: 0.34))
+                  ? const BorderSide(color: Color(0x3D5B6CFF))
                   : BorderSide.none,
             ),
           ),
@@ -91,39 +78,20 @@ class _ExperienceLedgerRow extends StatelessWidget {
               ? Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _LedgerMeta(index: index, period: period, accent: accent),
-                    const SizedBox(height: 26),
-                    _LedgerRole(title: title, position: position),
-                    const SizedBox(height: 22),
-                    _LedgerDetail(
-                      description: description,
-                      technologies: technologies,
-                    ),
+                    _Period(period: experience.period),
+                    const SizedBox(height: 24),
+                    content,
                   ],
                 )
               : Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     SizedBox(
-                      width: 190,
-                      child: _LedgerMeta(
-                        index: index,
-                        period: period,
-                        accent: accent,
-                      ),
+                      width: 205,
+                      child: _Period(period: experience.period),
                     ),
-                    const SizedBox(width: 42),
-                    SizedBox(
-                      width: 310,
-                      child: _LedgerRole(title: title, position: position),
-                    ),
-                    const SizedBox(width: 56),
-                    Expanded(
-                      child: _LedgerDetail(
-                        description: description,
-                        technologies: technologies,
-                      ),
-                    ),
+                    const SizedBox(width: 64),
+                    Expanded(child: content),
                   ],
                 ),
         ),
@@ -132,40 +100,33 @@ class _ExperienceLedgerRow extends StatelessWidget {
   }
 }
 
-class _LedgerMeta extends StatelessWidget {
-  const _LedgerMeta({
-    required this.index,
-    required this.period,
-    required this.accent,
-  });
+class _Period extends StatelessWidget {
+  const _Period({required this.period});
 
-  final int index;
   final String period;
-  final Color accent;
 
   @override
   Widget build(BuildContext context) => Row(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      Text(
-        '${index + 1}'.padLeft(2, '0'),
-        style: AppFonts.instrumentSerif(
-          fontSize: 40,
-          fontStyle: FontStyle.italic,
-          color: accent,
-          height: 0.8,
+      Container(
+        width: 8,
+        height: 8,
+        margin: const EdgeInsets.only(top: 6),
+        decoration: const BoxDecoration(
+          color: AppColors.heroAccent,
+          shape: BoxShape.circle,
         ),
       ),
-      const SizedBox(width: 18),
+      const SizedBox(width: 14),
       Expanded(
         child: Text(
-          period.toUpperCase(),
-          style: AppFonts.jetBrainsMono(
-            fontSize: 9,
+          period,
+          style: AppFonts.spaceGrotesk(
+            fontSize: 13,
             fontWeight: FontWeight.w600,
             color: AppColors.textPrimary,
-            letterSpacing: 0.65,
-            height: 1.55,
+            height: 1.5,
           ),
         ),
       ),
@@ -173,70 +134,72 @@ class _LedgerMeta extends StatelessWidget {
   );
 }
 
-class _LedgerRole extends StatelessWidget {
-  const _LedgerRole({required this.title, required this.position});
+class _ExperienceContent extends StatelessWidget {
+  const _ExperienceContent({required this.experience});
 
-  final String title;
-  final String position;
+  final PortfolioExperience experience;
 
   @override
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
       Text(
-        title,
-        style: AppFonts.instrumentSerif(
-          fontSize: 36,
-          fontStyle: FontStyle.italic,
-          color: AppColors.textBright,
-          height: 0.95,
-          letterSpacing: -0.65,
-        ),
-      ),
-      const SizedBox(height: 14),
-      Text(
-        position,
+        experience.company,
         style: AppFonts.spaceGrotesk(
-          fontSize: 13,
+          fontSize: MediaQuery.sizeOf(context).width < Breakpoints.tablet
+              ? 31
+              : 42,
           fontWeight: FontWeight.w600,
-          color: AppColors.textPrimary,
-          height: 1.4,
+          color: AppColors.textBright,
+          height: 1.02,
+          letterSpacing: -1.15,
         ),
       ),
-    ],
-  );
-}
-
-class _LedgerDetail extends StatelessWidget {
-  const _LedgerDetail({required this.description, required this.technologies});
-
-  final String description;
-  final String technologies;
-
-  @override
-  Widget build(BuildContext context) => Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
+      const SizedBox(height: 12),
       Text(
-        description,
-        style: AppFonts.inter(
-          fontSize: 14,
-          color: AppColors.textPrimary,
-          height: 1.72,
+        '${experience.role} · ${experience.domain}',
+        style: AppFonts.spaceGrotesk(
+          fontSize: 16,
+          fontWeight: FontWeight.w500,
+          color: AppColors.heroAccent,
+          height: 1.45,
         ),
       ),
-      if (technologies.isNotEmpty) ...[
-        const SizedBox(height: 22),
-        Text(
-          technologies.toUpperCase(),
-          style: AppFonts.jetBrainsMono(
-            fontSize: 9,
-            color: AppColors.textSecondary,
-            height: 1.55,
-            letterSpacing: 0.45,
+      const SizedBox(height: 24),
+      ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 740),
+        child: Text(
+          experience.summary,
+          style: AppFonts.inter(
+            fontSize: 16,
+            color: AppColors.textPrimary,
+            height: 1.72,
           ),
         ),
-      ],
+      ),
+      const SizedBox(height: 24),
+      Wrap(
+        spacing: 10,
+        runSpacing: 10,
+        children: [
+          for (final item in experience.evidence.take(4))
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 7),
+              decoration: BoxDecoration(
+                border: Border.all(color: const Color(0x365B6CFF)),
+                borderRadius: BorderRadius.circular(999),
+              ),
+              child: Text(
+                item,
+                style: AppFonts.spaceGrotesk(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w500,
+                  color: AppColors.textPrimary,
+                ),
+              ),
+            ),
+        ],
+      ),
     ],
   );
 }

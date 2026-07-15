@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 
-/// Visual fidelity tiers for the procedural background.
+/// Visual fidelity tiers for the restrained ambient background.
 ///
 /// Every tier preserves the same content, section geometry, and semantics. Only
 /// decorative work changes, so adaptation never changes the information
@@ -9,9 +9,9 @@ enum RenderQuality {
   essential(
     RenderQualityProfile(
       targetFramesPerSecond: 15,
-      verticalGridLines: 11,
-      horizontalGridLines: 7,
-      planeCount: 4,
+      verticalGridLines: 0,
+      horizontalGridLines: 0,
+      planeCount: 0,
       drawConnections: false,
       drawRegistrationMarks: false,
       drawGrain: false,
@@ -21,11 +21,11 @@ enum RenderQuality {
   balanced(
     RenderQualityProfile(
       targetFramesPerSecond: 30,
-      verticalGridLines: 15,
-      horizontalGridLines: 9,
-      planeCount: 6,
-      drawConnections: true,
-      drawRegistrationMarks: true,
+      verticalGridLines: 0,
+      horizontalGridLines: 0,
+      planeCount: 0,
+      drawConnections: false,
+      drawRegistrationMarks: false,
       drawGrain: false,
       trackPointer: true,
     ),
@@ -33,11 +33,11 @@ enum RenderQuality {
   cinematic(
     RenderQualityProfile(
       targetFramesPerSecond: 60,
-      verticalGridLines: 21,
-      horizontalGridLines: 13,
-      planeCount: 8,
-      drawConnections: true,
-      drawRegistrationMarks: true,
+      verticalGridLines: 0,
+      horizontalGridLines: 0,
+      planeCount: 0,
+      drawConnections: false,
+      drawRegistrationMarks: false,
       drawGrain: true,
       trackPointer: true,
     ),

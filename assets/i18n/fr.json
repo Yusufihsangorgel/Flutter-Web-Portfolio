@@ -4,7 +4,7 @@
     "home": "Accueil",
     "about": "À propos",
     "experience": "Expérience",
-    "projects": "Systèmes",
+    "projects": "Projets",
     "proof": "Open source"
   },
   "accessibility": {
@@ -13,23 +13,38 @@
     "language_menu": "Menu des langues"
   },
   "about_section": {
-    "title": "À propos de moi"
+    "title": "À propos",
+    "practice_title": "Mes domaines de travail",
+    "location": "Basé à",
+    "experience": "Expérience professionnelle depuis"
   },
   "home_section": {
     "view_work": "Voir les projets",
-    "inspect_runtime": "À propos de moi"
+    "inspect_runtime": "À propos de moi",
+    "view_github": "GitHub",
+    "based_in": "Basé à",
+    "working_since": "En activité depuis",
+    "focus": "Priorité"
   },
   "experience_section": {
     "title": "Expérience",
     "present": "En cours"
   },
   "projects_section": {
-    "title": "Systèmes sélectionnés",
-    "archive": "Autres produits",
-    "open_project": "Voir le code source"
+    "title": "Projets sélectionnés",
+    "subtitle": "Des produits que j’ai livrés et des outils que je maintiens.",
+    "archive": "Autres projets",
+    "open_project": "Ouvrir le projet",
+    "ownership": "Mon périmètre",
+    "decision": "Une décision clé"
   },
   "proof_section": {
-    "title": "Open source"
+    "title": "Open source",
+    "merged_summary": "{count} modifications fusionnées dans {projects}.",
+    "review_summary": "{count} modifications open source en cours de révision.",
+    "open_pull_request": "Voir la pull request",
+    "status_merged": "Fusionnée",
+    "status_under_review": "En révision"
   },
   "footer": {
     "command_hint_prefix": "Appuyez sur",

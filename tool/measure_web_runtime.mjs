@@ -111,7 +111,7 @@ async function measureRun(browserInstance, run) {
       { timeout: startupTimeoutMs },
     );
     await page
-      .getByRole('button', { name: 'Systems', exact: true })
+      .getByRole('button', { name: 'Work', exact: true })
       .first()
       .waitFor({ state: 'attached', timeout: startupTimeoutMs });
 
@@ -142,7 +142,7 @@ async function measureRun(browserInstance, run) {
       window.requestAnimationFrame(sampleFrame);
     }, budget.scroll_sample_ms);
 
-    const scrollTargets = ['Systems', 'About'];
+    const scrollTargets = ['Work', 'About'];
     const segmentDuration = Math.floor(
       budget.scroll_sample_ms / scrollTargets.length,
     );

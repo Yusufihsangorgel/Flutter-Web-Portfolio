@@ -81,7 +81,7 @@ final class SceneConfigs {
     vignetteIntensity: 0.25,
   );
 
-  // Chapter 4: Systems
+  // Selected work section
   static const projects = SceneConfig(
     gradient1: AppColors.contactGradient1,
     gradient2: AppColors.contactGradient2,

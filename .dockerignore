@@ -3,5 +3,6 @@
 .dart_tool
 .idea
 test
+tests
 coverage
 *.md

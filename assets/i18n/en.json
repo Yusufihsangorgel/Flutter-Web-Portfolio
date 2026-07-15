@@ -4,7 +4,7 @@
     "home": "Home",
     "about": "About",
     "experience": "Experience",
-    "projects": "Systems",
+    "projects": "Work",
     "proof": "Open Source"
   },
   "accessibility": {
@@ -13,23 +13,38 @@
     "language_menu": "Language menu"
   },
   "about_section": {
-    "title": "About Me"
+    "title": "About",
+    "practice_title": "What I work across",
+    "location": "Based in",
+    "experience": "Professional work since"
   },
   "projects_section": {
-    "title": "Selected Systems",
-    "archive": "More products",
-    "open_project": "View source"
+    "title": "Selected Work",
+    "subtitle": "Products I shipped and tools I continue to maintain.",
+    "archive": "More work",
+    "open_project": "Open project",
+    "ownership": "What I owned",
+    "decision": "A key decision"
   },
   "home_section": {
     "view_work": "View selected work",
-    "inspect_runtime": "About me"
+    "inspect_runtime": "About me",
+    "view_github": "GitHub",
+    "based_in": "Based in",
+    "working_since": "Working since",
+    "focus": "Focus"
   },
   "experience_section": {
     "title": "Experience",
     "present": "Present"
   },
   "proof_section": {
-    "title": "Open Source"
+    "title": "Open Source",
+    "merged_summary": "{count} merged changes across {projects}.",
+    "review_summary": "{count} open-source changes under review.",
+    "open_pull_request": "View pull request",
+    "status_merged": "Merged",
+    "status_under_review": "Under review"
   },
   "footer": {
     "quick_links": "Quick Links",

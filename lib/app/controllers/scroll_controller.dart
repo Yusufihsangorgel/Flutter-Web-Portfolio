@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:developer' as dev;
 
-import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/foundation.dart' show kIsWeb, visibleForTesting;
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -75,6 +75,22 @@ final class AppScrollController extends Cubit<AppScrollState>
   final ScrollController scrollController = ScrollController();
 
   String get activeSection => state.activeSection;
+
+  @visibleForTesting
+  static String sectionAtFocalPoint({
+    required Iterable<String> sectionIds,
+    required Map<String, double> offsets,
+    required double focalPoint,
+  }) {
+    var bestSection = 'home';
+    for (final sectionId in sectionIds) {
+      final top = offsets[sectionId];
+      if (top == null) continue;
+      if (top > focalPoint + 1) break;
+      bestSection = sectionId;
+    }
+    return bestSection;
+  }
 
   List<SectionGeometry> get sectionGeometries => [
     for (final id in Routes.sectionIds)
@@ -192,14 +208,13 @@ final class AppScrollController extends Cubit<AppScrollState>
           : 0.0;
       final focalPoint = scrollOffset + appBarHeight + viewportHeight * 0.28;
 
-      var bestSection = 'home';
-      for (final sectionId in Routes.sectionIds) {
-        final top = _sectionOffsets[sectionId];
-        if (top == null || top > focalPoint + 1) break;
-        bestSection = sectionId;
-      }
-
-      _setActiveSection(bestSection);
+      _setActiveSection(
+        sectionAtFocalPoint(
+          sectionIds: Routes.sectionIds,
+          offsets: _sectionOffsets,
+          focalPoint: focalPoint,
+        ),
+      );
     } catch (error, stackTrace) {
       dev.log(
         'Section detection failed',

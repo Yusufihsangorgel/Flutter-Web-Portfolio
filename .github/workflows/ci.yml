@@ -22,6 +22,7 @@ jobs:
       - run: flutter pub get
       - run: npm ci
       - run: npm run verify:content
+      - run: npm run verify:bundle
       - run: dart format --output=none --set-exit-if-changed lib test
       - run: flutter analyze --fatal-infos
       - run: npm run verify:source
@@ -50,12 +51,14 @@ jobs:
           cache: true
       - run: flutter clean
       - run: flutter pub get
-      - run: flutter build web --release --wasm --no-web-resources-cdn
       - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run verify:content
+      - run: npm run prepare:source
+      - run: flutter build web --release --wasm --no-web-resources-cdn
       - run: npm run prepare:bundle
       - run: npm run verify:bundle
       - run: docker build --tag flutter-web-portfolio:ci .
-      - run: npx playwright install --with-deps chromium
       - run: npm test
       - run: npm run verify:runtime
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1

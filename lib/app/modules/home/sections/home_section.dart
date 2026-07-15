@@ -9,11 +9,12 @@ import 'package:flutter_web_portfolio/app/domain/models/portfolio_document.dart'
 import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
 import 'package:flutter_web_portfolio/app/widgets/cinematic_button.dart';
 import 'package:flutter_web_portfolio/app/widgets/scroll_indicator.dart';
+import 'package:url_launcher/url_launcher.dart';
 
-/// Editorial opening for the Render Atlas.
+/// Personal opening for the portfolio.
 ///
-/// Typography is the principal visual object; the procedural scene behind it
-/// supplies depth without turning the portfolio into a product mock-up.
+/// The person is the visual anchor. Technical detail follows as evidence in
+/// the document instead of masquerading as decorative interface chrome.
 class HomeSection extends StatelessWidget {
   const HomeSection({super.key});
 
@@ -26,6 +27,7 @@ class HomeSection extends StatelessWidget {
           final size = MediaQuery.sizeOf(context);
           final desktop = size.width >= Breakpoints.desktop;
           final tablet = size.width >= Breakpoints.tablet;
+          final veryNarrow = size.width < 340;
           final horizontal = size.width > AppDimensions.maxContentWidth
               ? AppDimensions.sectionPaddingDesktop
               : tablet
@@ -34,41 +36,48 @@ class HomeSection extends StatelessWidget {
           final appBarHeight = tablet
               ? AppDimensions.appBarHeight
               : AppDimensions.appBarHeightMobile;
-          final height = (size.height - appBarHeight).clamp(720.0, 1040.0);
+          final height = (size.height - appBarHeight).clamp(
+            veryNarrow ? 700.0 : 520.0,
+            1040.0,
+          );
 
           return SizedBox(
             width: double.infinity,
             height: height,
             child: Padding(
-              padding: EdgeInsets.fromLTRB(horizontal, 26, horizontal, 0),
+              padding: EdgeInsets.fromLTRB(horizontal, 28, horizontal, 0),
               child: Stack(
                 children: [
                   Positioned(
                     top: 0,
                     left: 0,
                     right: 0,
-                    child: _HeroDataRail(portfolio: portfolio, desktop: tablet),
+                    child: _HeroIdentityRail(
+                      profile: portfolio.profile,
+                      showFocus: tablet,
+                      showLocation: !veryNarrow,
+                    ),
                   ),
                   Positioned.fill(
-                    top: tablet ? 72 : 58,
-                    bottom: desktop ? 170 : 224,
+                    top: tablet ? 82 : 74,
+                    bottom: desktop ? 232 : 310,
                     child: Align(
                       alignment: desktop
-                          ? const Alignment(0, -0.08)
-                          : Alignment.center,
-                      child: _EditorialTitle(portfolio: portfolio),
+                          ? const Alignment(0, -0.02)
+                          : Alignment.centerLeft,
+                      child: _PersonalTitle(profile: portfolio.profile),
                     ),
                   ),
                   Positioned(
                     left: 0,
                     right: 0,
-                    bottom: 66,
+                    bottom: 62,
                     child: desktop
                         ? _DesktopHeroFooter(
                             language: language,
                             portfolio: portfolio,
                           )
-                        : _MobileHeroFooter(
+                        : _CompactHeroFooter(
                             language: language,
                             portfolio: portfolio,
                           ),
@@ -76,7 +85,7 @@ class HomeSection extends StatelessWidget {
                   const Positioned(
                     left: 0,
                     right: 0,
-                    bottom: 18,
+                    bottom: 16,
                     child: ScrollIndicator(delay: Duration.zero),
                   ),
                 ],
@@ -87,120 +96,131 @@ class HomeSection extends StatelessWidget {
       );
 }
 
-class _HeroDataRail extends StatelessWidget {
-  const _HeroDataRail({required this.portfolio, required this.desktop});
+class _HeroIdentityRail extends StatelessWidget {
+  const _HeroIdentityRail({
+    required this.profile,
+    required this.showFocus,
+    required this.showLocation,
+  });
 
-  final PortfolioDocument portfolio;
-  final bool desktop;
+  final PortfolioProfile profile;
+  final bool showFocus;
+  final bool showLocation;
 
   @override
-  Widget build(BuildContext context) {
-    final location = portfolio.profile.location;
-    final focus = portfolio.profile.focus.take(2).join(' / ');
-    final frame = portfolio.story.first.eyebrow;
-    return ExcludeSemantics(
-      child: Container(
-        padding: const EdgeInsets.only(bottom: 14),
-        decoration: const BoxDecoration(
-          border: Border(bottom: BorderSide(color: Color(0x24F2F0E9))),
-        ),
-        child: Row(
-          children: [
-            _RailLabel(value: '$frame / FRAME LIFECYCLE'.toUpperCase()),
-            const Spacer(),
-            if (desktop) ...[
-              _RailLabel(value: focus.toUpperCase()),
-              const SizedBox(width: 52),
-            ],
-            _RailLabel(value: location.toUpperCase()),
-            const SizedBox(width: 18),
-            Container(
-              width: 7,
-              height: 7,
-              decoration: const BoxDecoration(
-                color: AppColors.signalLime,
-                shape: BoxShape.circle,
-              ),
+  Widget build(BuildContext context) => Container(
+    padding: const EdgeInsets.only(bottom: 15),
+    decoration: const BoxDecoration(
+      border: Border(bottom: BorderSide(color: Color(0x24F2F0E9))),
+    ),
+    child: Row(
+      children: [
+        Flexible(
+          child: Text(
+            profile.role,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: AppFonts.spaceGrotesk(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: AppColors.textBright,
+              letterSpacing: -0.1,
             ),
-          ],
+          ),
         ),
-      ),
-    );
-  }
-}
-
-class _RailLabel extends StatelessWidget {
-  const _RailLabel({required this.value});
-  final String value;
-
-  @override
-  Widget build(BuildContext context) => Text(
-    value,
-    style: AppFonts.jetBrainsMono(
-      fontSize: 9,
-      fontWeight: FontWeight.w600,
-      color: AppColors.textPrimary,
-      letterSpacing: 1.25,
+        const Spacer(),
+        if (showFocus) ...[
+          Text(
+            profile.focus.take(2).join(' · '),
+            style: AppFonts.spaceGrotesk(
+              fontSize: 12,
+              color: AppColors.textPrimary,
+            ),
+          ),
+          const SizedBox(width: 42),
+        ],
+        if (showLocation)
+          Text(
+            profile.location,
+            style: AppFonts.spaceGrotesk(
+              fontSize: 12,
+              color: AppColors.textPrimary,
+            ),
+          ),
+      ],
     ),
   );
 }
 
-class _EditorialTitle extends StatelessWidget {
-  const _EditorialTitle({required this.portfolio});
-  final PortfolioDocument portfolio;
+class _PersonalTitle extends StatelessWidget {
+  const _PersonalTitle({required this.profile});
+
+  final PortfolioProfile profile;
 
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.sizeOf(context).width;
-    final title = '${portfolio.profile.role}.'.trim().toUpperCase();
-    final words = title.split(RegExp(r'\s+'));
-    final lastWord = words.isEmpty ? title : words.last;
-    final prefix = words.length > 1
+    final words = profile.name.trim().split(RegExp(r'\s+'));
+    final lastName = words.length > 1 ? words.last : profile.name;
+    final givenNames = words.length > 1
         ? words.take(words.length - 1).join(' ')
         : '';
     final titleSize = width < Breakpoints.tablet
-        ? (width * 0.135).clamp(47.0, 70.0)
+        ? (width * 0.132).clamp(48.0, 64.0)
         : width < Breakpoints.desktop
-        ? (width * 0.092).clamp(74.0, 98.0)
-        : (width * 0.087).clamp(104.0, 154.0);
+        ? (width * 0.09).clamp(72.0, 96.0)
+        : (width * 0.077).clamp(100.0, 132.0);
 
     return Semantics(
       header: true,
       headingLevel: 1,
-      label: title,
+      label: '${profile.name}, ${profile.role}',
       excludeSemantics: true,
       child: ExcludeSemantics(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            if (prefix.isNotEmpty)
-              Text(
-                prefix,
-                maxLines: 2,
-                style: AppFonts.spaceGrotesk(
-                  fontSize: titleSize,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.textBright,
-                  height: 0.78,
-                  letterSpacing: -titleSize * 0.055,
+            if (givenNames.isNotEmpty)
+              SizedBox(
+                width: double.infinity,
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    givenNames.toUpperCase(),
+                    maxLines: 1,
+                    style: AppFonts.spaceGrotesk(
+                      fontSize: titleSize,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.textBright,
+                      height: 0.82,
+                      letterSpacing: -titleSize * 0.05,
+                    ),
+                  ),
                 ),
               ),
             Transform.translate(
-              offset: Offset(0, -titleSize * 0.035),
+              offset: Offset(0, -titleSize * 0.025),
               child: Align(
                 alignment: width >= Breakpoints.tablet
                     ? Alignment.centerRight
                     : Alignment.centerLeft,
-                child: Text(
-                  lastWord,
-                  maxLines: 1,
-                  style: AppFonts.instrumentSerif(
-                    fontSize: titleSize * 1.07,
-                    fontStyle: FontStyle.italic,
-                    color: AppColors.heroAccent,
-                    height: 0.82,
-                    letterSpacing: -titleSize * 0.035,
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: width >= Breakpoints.tablet
+                      ? Alignment.centerRight
+                      : Alignment.centerLeft,
+                  child: Text(
+                    lastName,
+                    maxLines: 1,
+                    style: AppFonts.instrumentSerif(
+                      fontSize: titleSize * 1.08,
+                      fontStyle: FontStyle.italic,
+                      color: AppColors.heroAccent,
+                      height: 0.84,
+                      letterSpacing: -titleSize * 0.035,
+                    ),
                   ),
                 ),
               ),
@@ -214,6 +234,7 @@ class _EditorialTitle extends StatelessWidget {
 
 class _DesktopHeroFooter extends StatelessWidget {
   const _DesktopHeroFooter({required this.language, required this.portfolio});
+
   final LanguageCubit language;
   final PortfolioDocument portfolio;
 
@@ -225,14 +246,18 @@ class _DesktopHeroFooter extends StatelessWidget {
         flex: 5,
         child: _HeroStatement(language: language, portfolio: portfolio),
       ),
-      const SizedBox(width: 80),
-      Expanded(flex: 4, child: _CapabilityIndex(portfolio: portfolio)),
+      const SizedBox(width: 96),
+      Expanded(
+        flex: 4,
+        child: _ProfileFacts(language: language, profile: portfolio.profile),
+      ),
     ],
   );
 }
 
-class _MobileHeroFooter extends StatelessWidget {
-  const _MobileHeroFooter({required this.language, required this.portfolio});
+class _CompactHeroFooter extends StatelessWidget {
+  const _CompactHeroFooter({required this.language, required this.portfolio});
+
   final LanguageCubit language;
   final PortfolioDocument portfolio;
 
@@ -241,114 +266,146 @@ class _MobileHeroFooter extends StatelessWidget {
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
       _HeroStatement(language: language, portfolio: portfolio),
-      const SizedBox(height: 24),
-      _CapabilityIndex(portfolio: portfolio, compact: true),
+      const SizedBox(height: 28),
+      _ProfileFacts(language: language, profile: portfolio.profile),
     ],
   );
 }
 
 class _HeroStatement extends StatelessWidget {
   const _HeroStatement({required this.language, required this.portfolio});
+
   final LanguageCubit language;
   final PortfolioDocument portfolio;
 
   @override
-  Widget build(BuildContext context) => Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 560),
-        child: Text(
-          portfolio.profile.headline,
-          style: AppFonts.spaceGrotesk(
-            fontSize: MediaQuery.sizeOf(context).width < Breakpoints.tablet
-                ? 18
-                : 22,
-            fontWeight: FontWeight.w500,
-            color: AppColors.textBright,
-            height: 1.35,
-            letterSpacing: -0.35,
+  Widget build(BuildContext context) {
+    final github = portfolio.profile.links
+        .where((link) => link.id == 'github')
+        .firstOrNull;
+    final veryNarrow = MediaQuery.sizeOf(context).width < 340;
+    final buttons = <Widget>[
+      if (portfolio.systems.isNotEmpty)
+        CinematicButton(
+          label: language.getText(
+            'home_section.view_work',
+            defaultValue: 'View selected work',
+          ),
+          isPrimary: true,
+          onTap: () =>
+              context.read<AppScrollController>().scrollToSection('projects'),
+        ),
+      if (github != null)
+        CinematicButton(
+          label: language.getText(
+            'home_section.view_github',
+            defaultValue: 'GitHub',
+          ),
+          onTap: () => launchUrl(github.url, webOnlyWindowName: '_blank'),
+        ),
+    ];
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 620),
+          child: Text(
+            portfolio.profile.headline,
+            style: AppFonts.spaceGrotesk(
+              fontSize: MediaQuery.sizeOf(context).width < Breakpoints.tablet
+                  ? 20
+                  : 25,
+              fontWeight: FontWeight.w500,
+              color: AppColors.textBright,
+              height: 1.28,
+              letterSpacing: -0.55,
+            ),
           ),
         ),
-      ),
-      const SizedBox(height: 20),
-      Wrap(
-        spacing: 10,
-        runSpacing: 10,
-        children: [
-          CinematicButton(
-            label: language.getText(
-              'home_section.view_work',
-              defaultValue: 'View selected work',
-            ),
-            isPrimary: true,
-            onTap: () =>
-                context.read<AppScrollController>().scrollToSection('projects'),
-          ),
-          CinematicButton(
-            label: language.getText(
-              'home_section.inspect_runtime',
-              defaultValue: 'About me',
-            ),
-            onTap: () =>
-                context.read<AppScrollController>().scrollToSection('about'),
-          ),
+        if (buttons.isNotEmpty) ...[
+          const SizedBox(height: 22),
+          if (veryNarrow)
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                for (var index = 0; index < buttons.length; index++) ...[
+                  if (index > 0) const SizedBox(height: 10),
+                  buttons[index],
+                ],
+              ],
+            )
+          else
+            Wrap(spacing: 10, runSpacing: 10, children: buttons),
         ],
-      ),
-    ],
-  );
+      ],
+    );
+  }
 }
 
-class _CapabilityIndex extends StatelessWidget {
-  const _CapabilityIndex({required this.portfolio, this.compact = false});
-  final PortfolioDocument portfolio;
-  final bool compact;
+class _ProfileFacts extends StatelessWidget {
+  const _ProfileFacts({required this.language, required this.profile});
+
+  final LanguageCubit language;
+  final PortfolioProfile profile;
 
   @override
   Widget build(BuildContext context) {
-    final values = portfolio.profile.focus.take(3).toList(growable: false);
-    return ExcludeSemantics(
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          for (var index = 0; index < values.length; index++) ...[
-            if (index > 0) SizedBox(width: compact ? 16 : 28),
-            Expanded(
-              child: Container(
-                padding: const EdgeInsets.only(top: 9),
-                decoration: const BoxDecoration(
-                  border: Border(top: BorderSide(color: Color(0x3DF2F0E9))),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      '${index + 1}'.padLeft(2, '0'),
-                      style: AppFonts.jetBrainsMono(
-                        fontSize: 8,
-                        color: AppColors.heroAccent,
-                      ),
+    final facts = [
+      (
+        language.getText('home_section.based_in', defaultValue: 'Based in'),
+        profile.location,
+      ),
+      (
+        language.getText(
+          'home_section.working_since',
+          defaultValue: 'Working since',
+        ),
+        profile.since,
+      ),
+      (
+        language.getText('home_section.focus', defaultValue: 'Focus'),
+        profile.focus.first,
+      ),
+    ];
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        for (var index = 0; index < facts.length; index++) ...[
+          if (index > 0) const SizedBox(width: 24),
+          Expanded(
+            child: Container(
+              padding: const EdgeInsets.only(top: 11),
+              decoration: const BoxDecoration(
+                border: Border(top: BorderSide(color: Color(0x3DF2F0E9))),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    facts[index].$1,
+                    style: AppFonts.spaceGrotesk(
+                      fontSize: 11,
+                      color: AppColors.textSecondary,
                     ),
-                    const SizedBox(height: 6),
-                    Text(
-                      values[index].toUpperCase(),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: AppFonts.jetBrainsMono(
-                        fontSize: compact ? 8 : 9,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.textPrimary,
-                        height: 1.45,
-                        letterSpacing: 0.8,
-                      ),
+                  ),
+                  const SizedBox(height: 7),
+                  Text(
+                    facts[index].$2,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: AppFonts.spaceGrotesk(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.textBright,
+                      height: 1.35,
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
-          ],
+          ),
         ],
-      ),
+      ],
     );
   }
 }

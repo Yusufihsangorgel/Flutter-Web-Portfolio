@@ -23,7 +23,7 @@ final class _PaletteLanguageRepository implements ILanguageRepository {
       'experience': 'Experience',
       'proof': 'Open Source',
       'blog': 'Blog',
-      'projects': 'Systems',
+      'projects': 'Work',
       'contact': 'Contact',
     },
   };
@@ -75,10 +75,10 @@ void main() {
       await tester.pumpWidget(buildSubject());
       await tester.pump();
 
-      await tester.enterText(find.byType(TextField), 'systems');
+      await tester.enterText(find.byType(TextField), 'work');
       await tester.pump();
 
-      expect(find.text('Go to Systems'), findsOneWidget);
+      expect(find.text('Go to Work'), findsOneWidget);
       expect(find.text('Go to Home'), findsNothing);
     });
   });

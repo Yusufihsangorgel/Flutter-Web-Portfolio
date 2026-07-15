@@ -10,14 +10,14 @@ void main() {
           home: Scaffold(
             body: NumberedSectionHeading(
               number: '01',
-              title: 'About Me',
+              title: 'About',
               accent: Colors.cyan,
             ),
           ),
         ),
       );
 
-      expect(find.text('CHAPTER / 01'), findsOneWidget);
+      expect(find.text('01'), findsOneWidget);
     });
 
     testWidgets('renders title text', (tester) async {

@@ -4,7 +4,7 @@
     "home": "Inicio",
     "about": "Sobre mí",
     "experience": "Experiencia",
-    "projects": "Sistemas",
+    "projects": "Proyectos",
     "proof": "Código abierto"
   },
   "accessibility": {
@@ -13,23 +13,38 @@
     "language_menu": "Menú de idiomas"
   },
   "about_section": {
-    "title": "Sobre mí"
+    "title": "Sobre mí",
+    "practice_title": "Áreas en las que trabajo",
+    "location": "Ubicación",
+    "experience": "Experiencia profesional desde"
   },
   "home_section": {
     "view_work": "Ver proyectos",
-    "inspect_runtime": "Sobre mí"
+    "inspect_runtime": "Sobre mí",
+    "view_github": "GitHub",
+    "based_in": "Ubicación",
+    "working_since": "Trabajando desde",
+    "focus": "Enfoque"
   },
   "experience_section": {
     "title": "Experiencia",
     "present": "Actual"
   },
   "projects_section": {
-    "title": "Sistemas seleccionados",
-    "archive": "Más productos",
-    "open_project": "Ver código fuente"
+    "title": "Proyectos seleccionados",
+    "subtitle": "Productos que lancé y herramientas que mantengo.",
+    "archive": "Más proyectos",
+    "open_project": "Abrir proyecto",
+    "ownership": "Mi responsabilidad",
+    "decision": "Una decisión clave"
   },
   "proof_section": {
-    "title": "Código abierto"
+    "title": "Código abierto",
+    "merged_summary": "{count} cambios fusionados en {projects}.",
+    "review_summary": "{count} cambios de código abierto en revisión.",
+    "open_pull_request": "Ver pull request",
+    "status_merged": "Fusionado",
+    "status_under_review": "En revisión"
   },
   "footer": {
     "command_hint_prefix": "Presione",

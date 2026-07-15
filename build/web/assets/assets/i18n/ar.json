@@ -4,7 +4,7 @@
     "home": "الرئيسية",
     "about": "عني",
     "experience": "الخبرة",
-    "projects": "الأنظمة",
+    "projects": "الأعمال",
     "proof": "المصدر المفتوح"
   },
   "accessibility": {
@@ -13,23 +13,38 @@
     "language_menu": "قائمة اللغات"
   },
   "about_section": {
-    "title": "عني"
+    "title": "عني",
+    "practice_title": "مجالات عملي",
+    "location": "الموقع",
+    "experience": "العمل المهني منذ"
   },
   "home_section": {
     "view_work": "عرض المشاريع",
-    "inspect_runtime": "عني"
+    "inspect_runtime": "عني",
+    "view_github": "GitHub",
+    "based_in": "الموقع",
+    "working_since": "أعمل منذ",
+    "focus": "التركيز"
   },
   "experience_section": {
     "title": "الخبرة",
     "present": "حالياً"
   },
   "projects_section": {
-    "title": "أنظمة مختارة",
-    "archive": "منتجات أخرى",
-    "open_project": "عرض المصدر"
+    "title": "أعمال مختارة",
+    "subtitle": "منتجات أطلقتها وأدوات أواصل صيانتها.",
+    "archive": "أعمال أخرى",
+    "open_project": "فتح المشروع",
+    "ownership": "مسؤوليتي",
+    "decision": "قرار رئيسي"
   },
   "proof_section": {
-    "title": "المصدر المفتوح"
+    "title": "المصدر المفتوح",
+    "merged_summary": "{count} تغييرات مدمجة عبر {projects}.",
+    "review_summary": "{count} تغييرات مفتوحة المصدر قيد المراجعة.",
+    "open_pull_request": "عرض طلب السحب",
+    "status_merged": "مدمج",
+    "status_under_review": "قيد المراجعة"
   },
   "footer": {
     "command_hint_prefix": "اضغط",

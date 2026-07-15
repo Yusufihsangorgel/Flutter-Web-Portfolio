@@ -9,15 +9,21 @@ void main() {
     test('loads the verified canonical content manifest', () {
       final document = PortfolioDocument.fromJson(_manifest());
 
-      expect(document.schemaVersion, 1);
-      expect(document.contentVersion, '2026.07.15.3');
+      expect(document.schemaVersion, 2);
+      expect(document.contentVersion, '2026.07.15.5');
+      expect(document.profile.name, 'Yusuf İhsan Görgel');
       expect(document.profile.role, 'Software Engineer');
       expect(document.site.url.toString(), 'https://developeryusuf.com');
       expect(document.site.title, contains(document.profile.role));
+      expect(
+        document.site.analytics?.scriptUrl.toString(),
+        'https://analytics.developeryusuf.com/js/script.js',
+      );
       expect(document.experience, hasLength(4));
       expect(document.mergedContributions, hasLength(4));
-      expect(document.contributionsUnderReview, hasLength(1));
-      expect(document.systems, hasLength(5));
+      expect(document.contributionsUnderReview, hasLength(2));
+      expect(document.systems, hasLength(8));
+      expect(document.featuredSystems, hasLength(3));
       expect(document.activeSections, [
         'home',
         'about',
@@ -25,6 +31,10 @@ void main() {
         'proof',
         'projects',
       ]);
+      expect(document.sectionNumber('about'), '01');
+      expect(document.sectionNumber('experience'), '02');
+      expect(document.sectionNumber('proof'), '03');
+      expect(document.sectionNumber('projects'), '04');
       expect(
         document.sources.every((source) => source.url.scheme == 'https'),
         isTrue,
@@ -35,19 +45,49 @@ void main() {
       );
     });
 
-    test('rejects role inflation in public content', () {
+    test('keeps the content contract reusable across professional roles', () {
       final json = _manifest();
       final profile = json['profile']! as Map<String, dynamic>;
-      profile['role'] = ['Sen', 'ior Software Engineer'].join();
+      final site = json['site']! as Map<String, dynamic>;
+      profile['name'] = 'Example Person';
+      profile['role'] = 'Product Engineer';
+      site['title'] = 'Example Person — Product Engineer';
+      site.remove('analytics');
 
+      final document = PortfolioDocument.fromJson(json);
+      expect(document.profile.name, 'Example Person');
+      expect(document.profile.role, 'Product Engineer');
+      expect(document.site.analytics, isNull);
+    });
+
+    test('supports optional experience, contribution, and work chapters', () {
+      final json = _manifest();
+      json['experience'] = <dynamic>[];
+      json['contributions'] = <dynamic>[];
+      json['systems'] = <dynamic>[];
+
+      final document = PortfolioDocument.fromJson(json);
+      expect(document.activeSections, ['home', 'about']);
+      expect(document.sectionNumber('about'), '01');
       expect(
-        () => PortfolioDocument.fromJson(json),
-        throwsA(isA<FormatException>()),
+        () => document.sectionNumber('projects'),
+        throwsA(isA<ArgumentError>()),
       );
     });
 
+    test('numbers mounted chapters without gaps', () {
+      final json = _manifest();
+      json['experience'] = <dynamic>[];
+      json['contributions'] = <dynamic>[];
+
+      final document = PortfolioDocument.fromJson(json);
+      expect(document.activeSections, ['home', 'about', 'projects']);
+      expect(document.sectionNumber('about'), '01');
+      expect(document.sectionNumber('projects'), '02');
+    });
+
     test('rejects unsupported schemas and duplicate evidence ids', () {
-      final unsupported = _manifest()..['schema_version'] = 2;
+      final unsupported = _manifest()..['schema_version'] = 3;
       expect(
         () => PortfolioDocument.fromJson(unsupported),
         throwsA(isA<FormatException>()),
@@ -77,6 +117,15 @@ void main() {
       site['social_image'] = 'https://example.com/preview.png';
       expect(
         () => PortfolioDocument.fromJson(invalidImage),
+        throwsA(isA<FormatException>()),
+      );
+
+      final mismatchedIdentity = _manifest();
+      final mismatchedSite =
+          mismatchedIdentity['site']! as Map<String, dynamic>;
+      mismatchedSite['title'] = 'Anonymous Portfolio';
+      expect(
+        () => PortfolioDocument.fromJson(mismatchedIdentity),
         throwsA(isA<FormatException>()),
       );
     });

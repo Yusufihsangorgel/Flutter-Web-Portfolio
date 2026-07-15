@@ -2,6 +2,8 @@ import { readFile, readdir, stat } from 'node:fs/promises';
 import path from 'node:path';
 import process from 'node:process';
 
+import { renderSourceManifest } from './source_manifest.mjs';
+
 const webRoot = path.resolve(process.env.WEB_ROOT ?? 'build/web');
 const budgets = {
   'main.dart.wasm': 3 * 1024 * 1024,
@@ -11,6 +13,35 @@ const budgets = {
 
 const failures = [];
 const releaseBudget = 36 * 1024 * 1024;
+const sourcePortfolio = JSON.parse(
+  await readFile(path.resolve('assets', 'content', 'portfolio.json'), 'utf8'),
+);
+const socialImagePath = resolveSocialImagePath(
+  sourcePortfolio.site.social_image,
+);
+
+try {
+  const [embeddedManifest, currentManifest] = await Promise.all([
+    readFile(
+      path.join(
+        webRoot,
+        'assets',
+        'assets',
+        'build',
+        'source_manifest.sha256',
+      ),
+      'utf8',
+    ),
+    renderSourceManifest(),
+  ]);
+  if (embeddedManifest !== currentManifest) {
+    failures.push(
+      'the release was built from stale sources; run npm run prepare:source before flutter build',
+    );
+  }
+} catch {
+  failures.push('the release source manifest is missing or invalid');
+}
 
 async function inspectArtifact(fileName, budget) {
   const filePath = path.join(webRoot, fileName);
@@ -76,6 +107,18 @@ await Promise.all(
     }
   }),
 );
+
+try {
+  const [releaseSocialCard, sourceSocialCard] = await Promise.all([
+    readFile(path.join(webRoot, ...socialImagePath.split('/'))),
+    readFile(path.resolve('web', ...socialImagePath.split('/'))),
+  ]);
+  if (!releaseSocialCard.equals(sourceSocialCard)) {
+    failures.push('the release social preview is stale');
+  }
+} catch {
+  failures.push('the generated social preview is missing');
+}
 
 try {
   const fontManifest = JSON.parse(
@@ -160,9 +203,12 @@ try {
     );
     const generatedValues = [
       portfolio.content_version,
+      portfolio.profile?.name,
       portfolio.profile?.role,
       portfolio.profile?.headline,
-      ...(portfolio.profile?.focus?.slice(0, 3) ?? []),
+      portfolio.profile?.location,
+      portfolio.profile?.since,
+      portfolio.profile?.focus?.[0],
     ];
     for (const value of generatedValues) {
       if (typeof value !== 'string' || !index.includes(escapeHtml(value))) {
@@ -341,4 +387,19 @@ async function collectFiles(directory) {
     }),
   );
   return nested.flat();
+}
+
+function resolveSocialImagePath(value) {
+  const url = new URL(value, 'https://portfolio.invalid');
+  const relative = decodeURIComponent(url.pathname).replace(/^\/+/, '');
+  const normalized = path.posix.normalize(relative);
+  if (
+    !relative ||
+    normalized.startsWith('../') ||
+    path.posix.isAbsolute(normalized) ||
+    path.posix.extname(normalized).toLowerCase() !== '.png'
+  ) {
+    throw new Error('site.social_image must resolve to a safe PNG asset path');
+  }
+  return normalized;
 }

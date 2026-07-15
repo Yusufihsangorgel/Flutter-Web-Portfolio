@@ -23,9 +23,23 @@ class ProofSection extends StatelessWidget {
           final contributions = portfolio.contributions;
           if (contributions.isEmpty) return const SizedBox.shrink();
           final merged = portfolio.mergedContributions.toList();
-          final mergedSummary =
-              '${merged.length} merged changes across '
-              '${merged.map((entry) => entry.project).join(', ')}.';
+          final summary = merged.isEmpty
+              ? language
+                    .getText(
+                      'proof_section.review_summary',
+                      defaultValue: '{count} open-source changes under review.',
+                    )
+                    .replaceAll('{count}', '${contributions.length}')
+              : language
+                    .getText(
+                      'proof_section.merged_summary',
+                      defaultValue: '{count} merged changes across {projects}.',
+                    )
+                    .replaceAll('{count}', '${merged.length}')
+                    .replaceAll(
+                      '{projects}',
+                      merged.map((entry) => entry.project).join(', '),
+                    );
 
           return ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 1160),
@@ -34,7 +48,7 @@ class ProofSection extends StatelessWidget {
               children: [
                 SceneAccentBuilder(
                   builder: (context, accent) => NumberedSectionHeading(
-                    number: '03',
+                    number: portfolio.sectionNumber('proof'),
                     title: language.getText(
                       'proof_section.title',
                       defaultValue: 'Open Source',
@@ -46,7 +60,7 @@ class ProofSection extends StatelessWidget {
                 ConstrainedBox(
                   constraints: const BoxConstraints(maxWidth: 720),
                   child: Text(
-                    mergedSummary,
+                    summary,
                     style: AppFonts.spaceGrotesk(
                       fontSize: 20,
                       fontWeight: FontWeight.w400,
@@ -62,9 +76,23 @@ class ProofSection extends StatelessWidget {
                       for (var index = 0; index < contributions.length; index++)
                         _PrinciplePlate(
                           contribution: contributions[index],
-                          index: index,
                           accent: accent,
                           isLast: index == contributions.length - 1,
+                          statusLabel: language.getText(
+                            contributions[index].status ==
+                                    ContributionStatus.merged
+                                ? 'proof_section.status_merged'
+                                : 'proof_section.status_under_review',
+                            defaultValue:
+                                contributions[index].status ==
+                                    ContributionStatus.merged
+                                ? 'Merged'
+                                : 'Under review',
+                          ),
+                          openLabel: language.getText(
+                            'proof_section.open_pull_request',
+                            defaultValue: 'View pull request',
+                          ),
                         ),
                     ],
                   ),
@@ -79,15 +107,17 @@ class ProofSection extends StatelessWidget {
 class _PrinciplePlate extends StatelessWidget {
   const _PrinciplePlate({
     required this.contribution,
-    required this.index,
     required this.accent,
     required this.isLast,
+    required this.statusLabel,
+    required this.openLabel,
   });
 
   final PortfolioContribution contribution;
-  final int index;
   final Color accent;
   final bool isLast;
+  final String statusLabel;
+  final String openLabel;
 
   @override
   Widget build(BuildContext context) {
@@ -96,23 +126,11 @@ class _PrinciplePlate extends StatelessWidget {
     final detail = contribution.problem;
     final verification = [
       contribution.project,
-      contribution.status.wireValue.replaceAll('_', ' '),
+      statusLabel,
       contribution.date.toIso8601String().split('T').first,
     ].join(' · ');
     final action = contribution.change;
 
-    final number = ExcludeSemantics(
-      child: Text(
-        '${index + 1}'.padLeft(2, '0'),
-        style: AppFonts.instrumentSerif(
-          fontSize: compact ? 68 : 96,
-          fontStyle: FontStyle.italic,
-          color: accent.withValues(alpha: 0.9),
-          height: 0.72,
-          letterSpacing: -3,
-        ),
-      ),
-    );
     final copy = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -152,6 +170,7 @@ class _PrinciplePlate extends StatelessWidget {
       verification: verification,
       url: contribution.url,
       accent: accent,
+      openLabel: openLabel,
     );
     final plate = Container(
       padding: EdgeInsets.symmetric(vertical: compact ? 38 : 54),
@@ -166,21 +185,14 @@ class _PrinciplePlate extends StatelessWidget {
       child: compact
           ? Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                number,
-                const SizedBox(height: 32),
-                copy,
-                const SizedBox(height: 24),
-                verificationWidget,
-              ],
+              children: [verificationWidget, const SizedBox(height: 28), copy],
             )
           : Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SizedBox(width: 170, child: number),
-                Expanded(flex: 6, child: copy),
-                const SizedBox(width: 70),
-                SizedBox(width: 190, child: verificationWidget),
+                SizedBox(width: 210, child: verificationWidget),
+                const SizedBox(width: 72),
+                Expanded(child: copy),
               ],
             ),
     );
@@ -195,17 +207,19 @@ class _EvidenceLink extends StatelessWidget {
     required this.verification,
     required this.url,
     required this.accent,
+    required this.openLabel,
   });
 
   final String title;
   final String verification;
   final Uri url;
   final Color accent;
+  final String openLabel;
 
   @override
   Widget build(BuildContext context) => CinematicFocusable(
     onTap: () => _openEvidence(url),
-    semanticLabel: 'Open pull request. $title. $verification',
+    semanticLabel: '$openLabel. $title. $verification',
     semanticRole: CinematicControlRole.link,
     focusColor: accent,
     child: Padding(
@@ -219,13 +233,12 @@ class _EvidenceLink extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                'PULL REQUEST',
-                style: AppFonts.jetBrainsMono(
-                  fontSize: 9,
-                  fontWeight: FontWeight.w700,
+                openLabel,
+                style: AppFonts.spaceGrotesk(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
                   color: accent,
                   height: 1.4,
-                  letterSpacing: 0.9,
                 ),
               ),
               const SizedBox(width: 8),
@@ -260,11 +273,11 @@ class _Verification extends StatelessWidget {
       const SizedBox(width: 12),
       Expanded(
         child: Text(
-          value.toUpperCase(),
-          style: AppFonts.jetBrainsMono(
-            fontSize: 9,
-            fontWeight: FontWeight.w600,
-            color: AppColors.textPrimary,
+          value,
+          style: AppFonts.spaceGrotesk(
+            fontSize: 11,
+            fontWeight: FontWeight.w500,
+            color: AppColors.textSecondary,
             height: 1.5,
             letterSpacing: 0.9,
           ),

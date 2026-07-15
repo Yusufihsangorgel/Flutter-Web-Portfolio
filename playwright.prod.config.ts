@@ -1,4 +1,9 @@
 import { defineConfig, devices } from '@playwright/test';
+import { readFileSync } from 'node:fs';
+
+const portfolio = JSON.parse(
+  readFileSync('assets/content/portfolio.json', 'utf8'),
+);
 
 export default defineConfig({
   testDir: './tests/e2e-prod',
@@ -9,7 +14,7 @@ export default defineConfig({
   workers: 1,
   reporter: [['list'], ['json', { outputFile: 'test-results/results.json' }]],
   use: {
-    baseURL: 'https://developeryusuf.com',
+    baseURL: portfolio.site.url,
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
     ignoreHTTPSErrors: false,

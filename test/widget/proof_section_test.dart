@@ -20,7 +20,14 @@ final class _ProofLanguageRepository implements ILanguageRepository {
   @override
   Future<Map<String, dynamic>> getTranslations(String languageCode) async => {
     'nav': {'proof': 'Open Source'},
-    'proof_section': {'title': 'Open Source'},
+    'proof_section': {
+      'title': 'Open Source',
+      'merged_summary': '{count} merged changes across {projects}.',
+      'review_summary': '{count} open-source changes under review.',
+      'open_pull_request': 'View pull request',
+      'status_merged': 'Merged',
+      'status_under_review': 'Under review',
+    },
   };
 
   @override
@@ -76,7 +83,7 @@ void main() {
       find.text('Wait for web rendering before the first-frame event'),
       findsOneWidget,
     );
-    expect(find.text('PULL REQUEST'), findsNWidgets(5));
+    expect(find.text('View pull request'), findsNWidgets(6));
     expect(find.textContaining('testimonial'), findsNothing);
     expect(tester.takeException(), isNull);
   });
@@ -92,7 +99,7 @@ void main() {
         (widget) =>
             widget is CinematicFocusable &&
             widget.semanticRole == CinematicControlRole.link &&
-            widget.semanticLabel?.contains('Open pull request') == true &&
+            widget.semanticLabel?.contains('View pull request') == true &&
             widget.semanticLabel?.contains('first-frame event') == true,
       ),
       findsOneWidget,

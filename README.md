@@ -1,19 +1,21 @@
 # Flutter Web Portfolio
 
-A production Flutter Web document built around one continuous render system: typed external content, measured scroll geometry, a procedural scene, and a dual-runtime Wasm release.
+A production-ready Flutter Web portfolio template with typed external content, measured section navigation, accessible responsive layouts, and a dual-runtime Wasm release.
 
+<!-- portfolio-demo:start -->
 [Live site](https://developeryusuf.com) · [Flutter Web first-frame issue](https://github.com/flutter/flutter/issues/189499) · [Engine patch](https://github.com/flutter/flutter/pull/189500)
+<!-- portfolio-demo:end -->
 
-This repository is the engineering artifact behind the portfolio, not a reusable identity template. The public record below is generated from `assets/content/portfolio.json`; widget and painter code contain no role, biography, experience, project, or contribution records.
+The live demo uses Yusuf İhsan Görgel's public professional record, but the interface remains a reusable template. Replace `assets/content/portfolio.json` to change the identity, biography, experience, work, links, and contributions without rewriting the widgets. Interface translations stay in `assets/i18n/*.json`.
 
 <!-- portfolio-record:start -->
 ## Public engineering record
 
-**Software Engineer.** I build cross-platform products and the systems that keep them reliable.
+**Yusuf İhsan Görgel — Software Engineer.** I build cross-platform software, then stay for the hard parts.
 
-My work spans Flutter clients, local and real-time data, native integrations, Go services, queues, and production infrastructure. I stay close to the boundary where product behaviour becomes a systems problem.
+I work across Flutter, Dart, and Go, turning product ideas into software that holds up on real devices, unreliable networks, and long-lived release cycles.
 
-Source status: `2026.07.15.3`, verified 2026-07-15 against the public GitHub and LinkedIn records declared in the manifest.
+Source status: `2026.07.15.5`, verified 2026-07-15 against GitHub and LinkedIn.
 
 ### Accepted upstream changes
 
@@ -24,24 +26,30 @@ Source status: `2026.07.15.3`, verified 2026-07-15 against the public GitHub and
 | Drift | Treat SQLite TRUE and 1 defaults as the same schema | 2026-07-14 | [Pull request](https://github.com/simolus3/drift/pull/3835) |
 | Go Fiber Recipes | Add a Fiber and Asynq background-jobs recipe | 2026-07-12 | [Pull request](https://github.com/gofiber/recipes/pull/4997) |
 
-### Public systems
+### Selected work
 
-| System | Engineering focus | Source |
+| Project | Responsibility | Evidence |
 |---|---|---|
-| Flutter Web Portfolio | Keep the semantic document and high-frequency painter paths separate while one measured scroll model directs both. | [Repository](https://github.com/Yusufihsangorgel/Flutter-Web-Portfolio) |
-| Queue Inspector MCP | Expose queue state, job detail, retries, and dead letters through explicit operations with conservative defaults. | [Repository](https://github.com/Yusufihsangorgel/queue-inspector-mcp) |
-| Multi-tenant Gateway | Keep tenant context explicit from transport through policy rather than hiding it behind global state. | [Repository](https://github.com/Yusufihsangorgel/go-multitenant-gateway) |
-| Redis Task Queue | Make failure states inspectable and scheduling behaviour deterministic without adding a runtime framework. | [Repository](https://github.com/Yusufihsangorgel/redis_task_queue) |
-| Constellation Particles | Use spatial partitioning to avoid comparing every particle pair as the scene grows. | [Repository](https://github.com/Yusufihsangorgel/constellation_particles) |
+| Dorse | I worked across the Flutter application and React web surface, including live vehicle state, maps, API flows, deployment, and QA coordination. | [Project](https://dorseapp.com/) |
+| Queue Inspector MCP | I designed the command surface, typed validation, queue adapters, and conservative state-changing operations. | [Project](https://github.com/Yusufihsangorgel/queue-inspector-mcp) |
+| Multi-tenant Gateway | I designed and implemented the complete reference from transport and tenant resolution through policy and test coverage. | [Project](https://github.com/Yusufihsangorgel/go-multitenant-gateway) |
+| Aydınlık E-Gazete | I delivered Flutter client work across presentation, API integration, and store-ready releases. | [Project](https://apps.apple.com/us/app/ayd%C4%B1nl%C4%B1k-e-gazete/id1560103805) |
+| Bilim ve Ütopya E-Dergi | I built Flutter client features, API integration, localisation, and mobile release workflows. | [Project](https://apps.apple.com/tr/app/bilim-ve-%C3%BCtopya-e-dergi/id6478221195) |
+| Redis Task Queue | I designed the public API, queue semantics, failure handling, and runnable examples. | [Project](https://github.com/Yusufihsangorgel/redis_task_queue) |
+| Constellation Particles | I implemented the painter, pointer interaction, spatial partitioning, and package examples without runtime dependencies. | [Project](https://github.com/Yusufihsangorgel/constellation_particles) |
+| Flutter Web Portfolio | I built the content schema, Flutter interface, renderer handoff, browser tests, runtime budgets, and deployment path. | [Project](https://github.com/Yusufihsangorgel/Flutter-Web-Portfolio) |
 
 ### Work under review
 
 - **Flutter:** [Wait for web rendering before the first-frame event](https://github.com/flutter/flutter/pull/189500) — Wait for outstanding scene renders and the next browser frame before dispatching the event; the pull request is ready for review with seven Chrome renderer and compiler suites passing.
+- **MCP Kotlin SDK:** [Add SEP-2575 request metadata and discovery types](https://github.com/modelcontextprotocol/kotlin-sdk/pull/893) — Add typed experimental metadata accessors, server discovery types, polymorphic codecs, and malformed-input coverage.
 <!-- portfolio-record:end -->
 
 ## Content contract
 
-`assets/content/portfolio.json` is the canonical professional record. It contains the profile, experience, capabilities, verified contributions, public systems, story transitions, source provenance, and site metadata. `PortfolioDocument` parses it into immutable final classes and rejects unsupported schemas, duplicate evidence IDs, invalid URLs, missing chapters, and public-role drift.
+`assets/content/portfolio.json` is the canonical professional record. It contains the profile, optional experience, capabilities, optional contributions and work, source provenance, and site metadata. `PortfolioDocument` parses it into immutable final classes and rejects unsupported schemas, duplicate evidence IDs, invalid URLs, missing featured work, and identity/metadata drift.
+
+Analytics is opt-in through `site.analytics` in the same document. Remove that object for a tracking-free template; the synchronization step removes the script instead of inheriting the demo site's analytics account.
 
 `assets/i18n/*.json` contains interface language only. All seven locale documents share one tested key schema; none may contain biography, experience, project, or contribution records.
 
@@ -66,19 +74,19 @@ assets/i18n/{locale}.json        │
         │ ordered async loading  │
         ▼                        ▼
 LanguageCubit              semantic sections
-                                │ measured chapter centres
+                                │ measured section centres
                                 ▼
 AppScrollController ─────► SceneDirector
                                 │ immutable SceneConfig snapshots
                                 ▼
-                     CinematicBackground / CustomPainter
+                     restrained ambient CustomPainter
 ```
 
 The document and render loop have deliberately different update paths:
 
 - The composition root loads and validates professional content before `runApp`.
 - BLoC/Cubit owns language, scroll, and scene state through explicit dependencies and immutable snapshots.
-- High-frequency ambient painting listens to painter-local animation rather than rebuilding the semantic document.
+- Ambient painting listens to painter-local animation rather than rebuilding the semantic document.
 - Section positions are measured after layout. Scene interpolation follows real chapter centres instead of equal scroll bands.
 - Browser history represents positions inside one document; it is not used as a page router.
 - Reduced-motion sessions stop continuous animation while preserving the complete document and navigation model.
@@ -121,9 +129,11 @@ Build the release used by browser tests:
 ```bash
 flutter pub get
 npm ci
+npx playwright install chromium
 npm run verify:content
 flutter analyze --fatal-infos
 flutter test
+npm run prepare:source
 flutter build web --release --wasm --no-web-resources-cdn
 npm run prepare:bundle
 npm run verify:bundle
@@ -131,7 +141,7 @@ npm run test:visual
 npm test
 ```
 
-The bundle gate checks Wasm headers, dual-runtime configuration, versioned entry points, self-hosted renderer assets, local font coverage, first-frame cleanup, service-worker retirement, and explicit size budgets. Playwright then exercises desktop and mobile semantics, locale/RTL switching, URL history, security headers, and release assets. Twelve checked-in screenshots lock the critical shell, hero, open-source chapter, and systems chapter across desktop, mobile, and tablet viewports with reduced motion enabled.
+The source preparation step renders the social card and writes a source manifest into the Flutter asset bundle. The bundle gate rejects stale tracked output, then checks Wasm headers, dual-runtime configuration, versioned entry points, self-hosted renderer assets, local font coverage, first-frame cleanup, service-worker retirement, and explicit size budgets. Playwright exercises desktop and mobile semantics, locale/RTL switching, URL history, security headers, and release assets. Twelve checked-in screenshots lock the critical shell, hero, open-source chapter, and work chapter across desktop, mobile, and tablet viewports with reduced motion enabled.
 
 ## Local development
 
@@ -156,8 +166,8 @@ Useful controls:
 | Locale concurrency | `lib/app/features/language/application/language_cubit.dart` |
 | Measured document geometry | `lib/app/controllers/scroll_controller.dart` |
 | Scene interpolation | `lib/app/controllers/scene_director.dart` |
-| Procedural render system | `lib/app/widgets/background/cinematic_background.dart` |
-| Full-width system studies | `lib/app/modules/home/sections/projects/projects_section.dart` |
+| Ambient render layer | `lib/app/widgets/background/cinematic_background.dart` |
+| Editorial selected-work index | `lib/app/modules/home/sections/projects/projects_section.dart` |
 | Content synchronization | `tool/sync_public_content.mjs` |
 | Runtime measurement | `tool/measure_web_runtime.mjs`, `tool/performance_budget.json` |
 | Responsive visual regression | `tests/e2e/visual.spec.ts`, `tests/e2e/visual.spec.ts-snapshots/` |

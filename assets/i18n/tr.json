@@ -4,7 +4,7 @@
     "home": "Ana Sayfa",
     "about": "Hakkımda",
     "experience": "Deneyim",
-    "projects": "Sistemler",
+    "projects": "Projeler",
     "proof": "Açık Kaynak"
   },
   "accessibility": {
@@ -13,23 +13,38 @@
     "language_menu": "Dil menüsü"
   },
   "about_section": {
-    "title": "Hakkımda"
+    "title": "Hakkımda",
+    "practice_title": "Çalıştığım alanlar",
+    "location": "Konum",
+    "experience": "Profesyonel başlangıç"
   },
   "projects_section": {
-    "title": "Seçili Sistemler",
-    "archive": "Diğer ürünler",
-    "open_project": "Kaynağı Gör"
+    "title": "Seçili Projeler",
+    "subtitle": "Yayınladığım ürünler ve bakımını sürdürdüğüm araçlar.",
+    "archive": "Diğer çalışmalar",
+    "open_project": "Projeyi aç",
+    "ownership": "Üstlendiğim alan",
+    "decision": "Önemli bir karar"
   },
   "home_section": {
     "view_work": "Seçili projeleri gör",
-    "inspect_runtime": "Hakkımda"
+    "inspect_runtime": "Hakkımda",
+    "view_github": "GitHub",
+    "based_in": "Konum",
+    "working_since": "Çalışma başlangıcı",
+    "focus": "Odak"
   },
   "experience_section": {
     "title": "Deneyim",
     "present": "Devam Ediyor"
   },
   "proof_section": {
-    "title": "Açık Kaynak"
+    "title": "Açık Kaynak",
+    "merged_summary": "{projects} genelinde birleştirilen {count} değişiklik.",
+    "review_summary": "İncelemedeki {count} açık kaynak değişikliği.",
+    "open_pull_request": "Pull request'i görüntüle",
+    "status_merged": "Birleştirildi",
+    "status_under_review": "İncelemede"
   },
   "footer": {
     "command_hint_prefix": "Basın",

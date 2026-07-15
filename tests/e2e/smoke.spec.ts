@@ -122,14 +122,17 @@ test('publishes a clean heading and control hierarchy', async ({
     .filter((node) => ['button', 'link'].includes(node.role?.value ?? ''))
     .map((node) => node.name?.value ?? '');
 
-  expect(headings).toContainEqual({ name: 'SOFTWARE ENGINEER.', level: 1 });
+  expect(headings).toContainEqual({
+    name: 'Yusuf İhsan Görgel, Software Engineer',
+    level: 1,
+  });
   expect(controls).toEqual(
     expect.arrayContaining([
       'Skip to content',
       'Back to top',
       ...(isMobile
         ? ['Open navigation menu']
-        : ['About', 'Experience', 'Open Source', 'Systems']),
+        : ['About', 'Experience', 'Open Source', 'Work']),
       'Language menu: English',
     ]),
   );
@@ -149,7 +152,7 @@ test('publishes a clean heading and control hierarchy', async ({
   });
   await (isMobile ? aboutControl.last() : aboutControl.first()).click();
   await expect(page).toHaveURL(/#\/about$/);
-  await expect(page.getByRole('heading', { name: 'About Me' })).toBeAttached();
+  await expect(page.getByRole('heading', { name: 'About' })).toBeAttached();
 
   const sectionTree = await accessibility.send(
     'Accessibility.getFullAXTree',
@@ -158,7 +161,7 @@ test('publishes a clean heading and control hierarchy', async ({
     (node) =>
       !node.ignored &&
       node.role?.value === 'heading' &&
-      node.name?.value === 'About Me',
+      node.name?.value === 'About',
   );
   expect(
     sectionHeading?.properties?.find((property) => property.name === 'level')
@@ -166,7 +169,7 @@ test('publishes a clean heading and control hierarchy', async ({
   ).toBe(2);
 
   await expect(
-    page.getByRole('heading', { name: 'Selected Systems' }),
+    page.getByRole('heading', { name: 'Selected Work' }),
   ).toBeAttached();
 
   const projectsTree = await accessibility.send(
@@ -175,10 +178,13 @@ test('publishes a clean heading and control hierarchy', async ({
   const projectLinks = projectsTree.nodes
     .filter((node) => !node.ignored && node.role?.value === 'link')
     .map((node) => node.name?.value ?? '');
-  expect(projectLinks).toContain('View source: Flutter Web Portfolio');
+  expect(projectLinks).toEqual(
+    expect.arrayContaining([expect.stringContaining('Flutter Web Portfolio')]),
+  );
+  expect(projectLinks).toContain('Open project: Dorse');
   expect(projectLinks).toContain(
-    'Open pull request. Wait for web rendering before the first-frame event. '
-      + 'Flutter · under review · 2026-07-15',
+    'View pull request. Wait for web rendering before the first-frame event. '
+      + 'Flutter · Under review · 2026-07-15',
   );
   expect(projectLinks).toEqual(
     expect.arrayContaining(['GitHub', 'LinkedIn', 'Writing']),
@@ -212,24 +218,71 @@ test('renders a JSON-derived critical shell before the first Flutter frame', asy
     'data-content-version',
     portfolio.content_version,
   );
+  const nameParts = portfolio.profile.name.trim().split(/\s+/);
   await expect(criticalShell.locator('.bootstrap-title')).toContainText(
-    portfolio.profile.role.toUpperCase(),
+    nameParts.slice(0, -1).join(' ').toUpperCase(),
   );
+  await expect(
+    criticalShell.locator('.bootstrap-title-accent'),
+  ).toHaveText(nameParts.at(-1));
   await expect(criticalShell.locator('.bootstrap-statement')).toHaveText(
     portfolio.profile.headline,
   );
-  const capabilities = criticalShell.locator('.bootstrap-capability');
-  for (const [index, focus] of portfolio.profile.focus
-    .slice(0, 3)
-    .entries()) {
-    await expect(capabilities.nth(index)).toContainText(focus);
-    await expect(
-      capabilities.nth(index).locator('.bootstrap-capability-index'),
-    ).toHaveText(String(index + 1).padStart(2, '0'));
+  await expect(criticalShell.locator('.bootstrap-action')).toHaveText([
+    'View selected work',
+    'GitHub',
+  ]);
+  const facts = criticalShell.locator('.bootstrap-fact');
+  const expectedFacts = [
+    portfolio.profile.location,
+    portfolio.profile.since,
+    portfolio.profile.focus[0],
+  ];
+  for (const [index, value] of expectedFacts.entries()) {
+    await expect(facts.nth(index)).toContainText(value);
   }
 
   releaseWasm?.();
   await expect(shell).toHaveCount(0, { timeout: 20000 });
+});
+
+test('keeps the critical identity inside narrow and short viewports', async ({
+  page,
+  isMobile,
+}) => {
+  test.skip(isMobile, 'one browser project covers the responsive HTML shell');
+  await page.route('**/flutter_bootstrap.js*', (route) =>
+    route.fulfill({
+      body: '',
+      contentType: 'application/javascript',
+      status: 200,
+    }),
+  );
+
+  for (const viewport of [
+    { width: 280, height: 653 },
+    { width: 568, height: 320 },
+  ]) {
+    await page.setViewportSize(viewport);
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
+    const selectors = [
+      '.bootstrap-rail',
+      '.bootstrap-title',
+      '.bootstrap-footer',
+    ];
+    for (const selector of selectors) {
+      const box = await page.locator(selector).boundingBox();
+      expect(box, selector).not.toBeNull();
+      expect(box!.x, selector).toBeGreaterThanOrEqual(-1);
+      expect(box!.y, selector).toBeGreaterThanOrEqual(-1);
+      expect(box!.x + box!.width, selector).toBeLessThanOrEqual(
+        viewport.width + 1,
+      );
+      expect(box!.y + box!.height, selector).toBeLessThanOrEqual(
+        viewport.height + 1,
+      );
+    }
+  }
 });
 
 test('retires the critical shell when a renderer omits the first-frame event', async ({
@@ -379,6 +432,13 @@ test('retires the legacy service worker without keeping a registration', async (
 }) => {
   await page.goto('/', { waitUntil: 'domcontentloaded' });
   await page.evaluate(async () => {
+    const cache = await caches.open('unrelated-origin-contract');
+    await cache.put(
+      new Request('https://unrelated.example/static.css'),
+      new Response('unrelated'),
+    );
+  });
+  await page.evaluate(async () => {
     await navigator.serviceWorker.register('/flutter_service_worker.js');
   });
 
@@ -393,6 +453,12 @@ test('retires the legacy service worker without keeping a registration', async (
       { timeout: 10000 },
     )
     .toBe(0);
+  expect(
+    await page.evaluate(async () =>
+      (await caches.keys()).includes('unrelated-origin-contract'),
+    ),
+  ).toBe(true);
+  await page.evaluate(() => caches.delete('unrelated-origin-contract'));
 });
 
 test('serves same-origin fallback fonts without masking missing assets', async ({
@@ -422,7 +488,7 @@ test('serves same-origin fallback fonts without masking missing assets', async (
 test('ships the social preview at the declared large-card dimensions', async ({
   request,
 }) => {
-  const response = await request.get('/assets/og/engineering-showcase.png');
+  const response = await request.get(portfolio.site.social_image);
   expect(response.status()).toBe(200);
   expect(response.headers()['content-type']).toContain('image/png');
 
@@ -445,15 +511,48 @@ test('keeps every professional chapter in one accessible document', async ({
   page,
 }) => {
   await openPortfolio(page);
-  await expect(page.getByRole('heading', { name: 'About Me' })).toBeAttached();
+  await expect(page.getByRole('heading', { name: 'About' })).toBeAttached();
   await expect(page.getByRole('heading', { name: 'Experience' })).toBeAttached();
   await expect(page.getByRole('heading', { name: 'Open Source' })).toBeAttached();
   await expect(
-    page.getByRole('heading', { name: 'Selected Systems' }),
+    page.getByRole('heading', { name: 'Selected Work' }),
   ).toBeAttached();
   await expect(
-    page.getByText('Software Engineer — Cross-platform'),
+    page.getByText(/^FugaSoft\. Software Engineer\./),
   ).toBeAttached();
+});
+
+test('keeps the personal hero readable at 280 CSS pixels', async ({
+  page,
+  isMobile,
+}) => {
+  test.skip(isMobile, 'one browser project covers the ultra-narrow contract');
+  await page.setViewportSize({ width: 280, height: 653 });
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await openPortfolio(page);
+
+  const heading = page.getByRole('heading', {
+    name: 'Yusuf İhsan Görgel, Software Engineer',
+  });
+  const work = page.getByRole('button', { name: 'View selected work' });
+  const github = page.getByRole('button', { name: 'GitHub', exact: true });
+  const [headingBox, workBox, githubBox] = await Promise.all([
+    heading.boundingBox(),
+    work.boundingBox(),
+    github.boundingBox(),
+  ]);
+
+  for (const [label, box] of [
+    ['heading', headingBox],
+    ['work action', workBox],
+    ['GitHub action', githubBox],
+  ] as const) {
+    expect(box, label).not.toBeNull();
+    expect(box!.x, label).toBeGreaterThanOrEqual(0);
+    expect(box!.x + box!.width, label).toBeLessThanOrEqual(280);
+  }
+  expect(headingBox!.y + headingBox!.height).toBeLessThan(workBox!.y);
+  expect(workBox!.y + workBox!.height).toBeLessThanOrEqual(githubBox!.y);
 });
 
 test('switches to the application-owned Arabic catalog', async ({ page }) => {
@@ -461,7 +560,7 @@ test('switches to the application-owned Arabic catalog', async ({ page }) => {
   page.on('pageerror', (error) => runtimeErrors.push(error.message));
   await openPortfolio(page);
   await page.keyboard.press('Control+KeyK');
-  await page.getByText('Go to Systems', { exact: true }).click();
+  await page.getByText('Go to Work', { exact: true }).click();
   await expect(page).toHaveURL(/#\/projects$/);
 
   await page.keyboard.press('Control+KeyK');
@@ -474,12 +573,12 @@ test('switches to the application-owned Arabic catalog', async ({ page }) => {
   await expect(page.locator('html')).toHaveAttribute('dir', 'rtl');
   await expect(page.getByText('عرض المشاريع', { exact: true })).toBeAttached();
   await expect(
-    page.getByRole('heading', { name: 'أنظمة مختارة' }),
+    page.getByRole('heading', { name: 'أعمال مختارة' }),
   ).toBeAttached();
 
   await page.keyboard.press('Control+KeyK');
   await expect(
-    page.getByText('الانتقال إلى الأنظمة', { exact: true }),
+    page.getByText('الانتقال إلى الأعمال', { exact: true }),
   ).toBeVisible();
   expect(runtimeErrors).toEqual([]);
 });
@@ -499,7 +598,7 @@ test('switches to the application-owned Hindi catalog', async ({ page }) => {
 test('keeps section hashes synchronized with browser history', async ({ page }) => {
   await openPortfolio(page);
   await page.keyboard.press('Control+KeyK');
-  const projectsCommand = page.getByText('Go to Systems', { exact: true });
+  const projectsCommand = page.getByText('Go to Work', { exact: true });
   await expect(projectsCommand).toBeVisible();
   await projectsCommand.click();
   await expect(page).toHaveURL(/#\/projects$/);

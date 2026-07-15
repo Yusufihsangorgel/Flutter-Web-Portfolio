@@ -5,13 +5,12 @@ import 'package:flutter_web_portfolio/app/core/constants/breakpoints.dart';
 import 'package:flutter_web_portfolio/app/core/theme/app_fonts.dart';
 import 'package:flutter_web_portfolio/app/domain/models/portfolio_document.dart';
 import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
+import 'package:flutter_web_portfolio/app/widgets/cinematic_focusable.dart';
 import 'package:flutter_web_portfolio/app/widgets/numbered_section_heading.dart';
 import 'package:flutter_web_portfolio/app/widgets/scene_accent_builder.dart';
+import 'package:url_launcher/url_launcher.dart';
 
-/// Professional context and the complete capability ledger.
-///
-/// The public surface remains identity-safe, while preserving the substantive
-/// career history, scope, and technical profile expected from a portfolio.
+/// Personal context and engineering practice, sourced from the portfolio JSON.
 class AboutSection extends StatelessWidget {
   const AboutSection({super.key});
 
@@ -21,7 +20,8 @@ class AboutSection extends StatelessWidget {
         builder: (context, _) {
           final language = context.read<LanguageCubit>();
           final portfolio = context.read<PortfolioDocument>();
-          final bio = portfolio.profile.summary;
+          final compact =
+              MediaQuery.sizeOf(context).width < Breakpoints.desktop;
 
           return ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 1160),
@@ -30,43 +30,58 @@ class AboutSection extends StatelessWidget {
               children: [
                 SceneAccentBuilder(
                   builder: (context, accent) => NumberedSectionHeading(
-                    number: '01',
+                    number: portfolio.sectionNumber('about'),
                     title: language.getText(
                       'about_section.title',
-                      defaultValue: 'About Me',
+                      defaultValue: 'About',
                     ),
                     accent: accent,
                   ),
                 ),
-                SizedBox(
-                  height: MediaQuery.sizeOf(context).width < Breakpoints.tablet
-                      ? 46
-                      : 76,
-                ),
-                Semantics(
-                  label: bio,
-                  excludeSemantics: true,
-                  child: ExcludeSemantics(
-                    child: Text(
-                      bio,
-                      style: AppFonts.spaceGrotesk(
-                        fontSize:
-                            MediaQuery.sizeOf(context).width <
-                                Breakpoints.tablet
-                            ? 30
-                            : 47,
-                        fontWeight: FontWeight.w500,
-                        color: AppColors.textBright,
-                        height: 1.13,
-                        letterSpacing: -1.5,
+                SizedBox(height: compact ? 54 : 82),
+                compact
+                    ? Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _AboutLead(profile: portfolio.profile),
+                          const SizedBox(height: 34),
+                          _AboutDetail(
+                            language: language,
+                            profile: portfolio.profile,
+                          ),
+                        ],
+                      )
+                    : Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            flex: 6,
+                            child: _AboutLead(profile: portfolio.profile),
+                          ),
+                          const SizedBox(width: 96),
+                          Expanded(
+                            flex: 4,
+                            child: _AboutDetail(
+                              language: language,
+                              profile: portfolio.profile,
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
+                SizedBox(height: compact ? 72 : 112),
+                Text(
+                  language.getText(
+                    'about_section.practice_title',
+                    defaultValue: 'What I work across',
+                  ),
+                  style: AppFonts.spaceGrotesk(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textBright,
                   ),
                 ),
-                const SizedBox(height: 42),
-                _ContextRail(portfolio: portfolio),
-                const SizedBox(height: 72),
-                _CapabilityLedger(capabilities: portfolio.capabilities),
+                const SizedBox(height: 24),
+                _PracticeIndex(capabilities: portfolio.capabilities),
               ],
             ),
           );
@@ -74,220 +89,243 @@ class AboutSection extends StatelessWidget {
       );
 }
 
-class _ContextRail extends StatelessWidget {
-  const _ContextRail({required this.portfolio});
-
-  final PortfolioDocument portfolio;
-
-  @override
-  Widget build(BuildContext context) {
-    final compact = MediaQuery.sizeOf(context).width < Breakpoints.tablet;
-    final detail = portfolio.profile.focus.join('  /  ');
-    final metadata = _AtlasMetadata(profile: portfolio.profile);
-
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 22),
-      decoration: const BoxDecoration(
-        border: Border(
-          top: BorderSide(color: Color(0x36DFFF3F)),
-          bottom: BorderSide(color: Color(0x24F2F0E9)),
-        ),
-      ),
-      child: compact
-          ? Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  detail,
-                  style: AppFonts.inter(
-                    fontSize: 15,
-                    color: AppColors.textPrimary,
-                    height: 1.7,
-                  ),
-                ),
-                const SizedBox(height: 26),
-                metadata,
-              ],
-            )
-          : Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  flex: 7,
-                  child: Text(
-                    detail,
-                    style: AppFonts.inter(
-                      fontSize: 16,
-                      color: AppColors.textPrimary,
-                      height: 1.75,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 80),
-                Expanded(flex: 4, child: metadata),
-              ],
-            ),
-    );
-  }
-}
-
-class _AtlasMetadata extends StatelessWidget {
-  const _AtlasMetadata({required this.profile});
+class _AboutLead extends StatelessWidget {
+  const _AboutLead({required this.profile});
 
   final PortfolioProfile profile;
 
   @override
-  Widget build(BuildContext context) => ExcludeSemantics(
-    child: Row(
-      children: [
-        Expanded(
-          child: _MetadataField(label: 'BASE', value: profile.location),
-        ),
-        const SizedBox(width: 22),
-        Expanded(
-          child: _MetadataField(label: 'MODE', value: profile.headline),
-        ),
-        const SizedBox(width: 22),
-        Expanded(
-          child: _MetadataField(label: 'SINCE', value: profile.since),
-        ),
-      ],
+  Widget build(BuildContext context) => Semantics(
+    label: profile.summary,
+    excludeSemantics: true,
+    child: Text(
+      profile.summary,
+      style: AppFonts.spaceGrotesk(
+        fontSize: MediaQuery.sizeOf(context).width < Breakpoints.tablet
+            ? 29
+            : 43,
+        fontWeight: FontWeight.w500,
+        color: AppColors.textBright,
+        height: 1.15,
+        letterSpacing: -1.25,
+      ),
     ),
   );
 }
 
-class _MetadataField extends StatelessWidget {
-  const _MetadataField({required this.label, required this.value});
-  final String label;
-  final String value;
+class _AboutDetail extends StatelessWidget {
+  const _AboutDetail({required this.language, required this.profile});
+
+  final LanguageCubit language;
+  final PortfolioProfile profile;
 
   @override
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
       Text(
-        label,
-        style: AppFonts.jetBrainsMono(
-          fontSize: 8,
-          color: AppColors.aboutAccent,
-          letterSpacing: 1.2,
+        profile.background,
+        style: AppFonts.inter(
+          fontSize: 16,
+          color: AppColors.textPrimary,
+          height: 1.75,
         ),
       ),
-      const SizedBox(height: 8),
-      Text(
-        value.toUpperCase(),
-        maxLines: 2,
-        overflow: TextOverflow.ellipsis,
-        style: AppFonts.jetBrainsMono(
-          fontSize: 9,
-          fontWeight: FontWeight.w600,
-          color: AppColors.textBright,
-          height: 1.45,
-          letterSpacing: 0.55,
+      const SizedBox(height: 32),
+      Container(
+        padding: const EdgeInsets.symmetric(vertical: 22),
+        decoration: const BoxDecoration(
+          border: Border(
+            top: BorderSide(color: Color(0x365B6CFF)),
+            bottom: BorderSide(color: Color(0x24F2F0E9)),
+          ),
+        ),
+        child: Column(
+          children: [
+            _FactLine(
+              label: language.getText(
+                'about_section.location',
+                defaultValue: 'Based in',
+              ),
+              value: profile.location,
+            ),
+            const SizedBox(height: 14),
+            _FactLine(
+              label: language.getText(
+                'about_section.experience',
+                defaultValue: 'Professional work since',
+              ),
+              value: profile.since,
+            ),
+          ],
+        ),
+      ),
+      const SizedBox(height: 24),
+      Wrap(
+        spacing: 20,
+        runSpacing: 12,
+        children: [for (final link in profile.links) _ProfileLink(link: link)],
+      ),
+    ],
+  );
+}
+
+class _FactLine extends StatelessWidget {
+  const _FactLine({required this.label, required this.value});
+
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) => Row(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Expanded(
+        child: Text(
+          label,
+          style: AppFonts.spaceGrotesk(
+            fontSize: 13,
+            color: AppColors.textSecondary,
+          ),
+        ),
+      ),
+      const SizedBox(width: 20),
+      Flexible(
+        child: Text(
+          value,
+          textAlign: TextAlign.end,
+          style: AppFonts.spaceGrotesk(
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+            color: AppColors.textBright,
+          ),
         ),
       ),
     ],
   );
 }
 
-class _CapabilityLedger extends StatelessWidget {
-  const _CapabilityLedger({required this.capabilities});
+class _ProfileLink extends StatelessWidget {
+  const _ProfileLink({required this.link});
+
+  final PortfolioLink link;
+
+  @override
+  Widget build(BuildContext context) => CinematicFocusable(
+    onTap: () => launchUrl(link.url, webOnlyWindowName: '_blank'),
+    semanticLabel: link.label,
+    semanticRole: CinematicControlRole.link,
+    focusColor: AppColors.heroAccent,
+    child: Padding(
+      padding: const EdgeInsets.symmetric(vertical: 5),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            link.label,
+            style: AppFonts.spaceGrotesk(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: AppColors.textBright,
+            ),
+          ),
+          const SizedBox(width: 7),
+          const Icon(
+            Icons.north_east_rounded,
+            size: 15,
+            color: AppColors.heroAccent,
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
+class _PracticeIndex extends StatelessWidget {
+  const _PracticeIndex({required this.capabilities});
+
   final List<PortfolioCapability> capabilities;
 
   @override
   Widget build(BuildContext context) => LayoutBuilder(
     builder: (context, constraints) {
-      final desktop = constraints.maxWidth >= 900;
-      if (!desktop) {
+      final twoColumns = constraints.maxWidth >= 760;
+      if (!twoColumns) {
         return Column(
           children: [
             for (var index = 0; index < capabilities.length; index++)
-              _CapabilityField(capability: capabilities[index], index: index),
+              _PracticeRow(capability: capabilities[index], index: index),
           ],
         );
       }
-      return Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      return Wrap(
+        spacing: 52,
+        runSpacing: 0,
         children: [
-          for (var index = 0; index < capabilities.length; index++) ...[
-            Expanded(
-              child: _CapabilityField(
+          for (var index = 0; index < capabilities.length; index++)
+            SizedBox(
+              width: (constraints.maxWidth - 52) / 2,
+              child: _PracticeRow(
                 capability: capabilities[index],
                 index: index,
               ),
             ),
-            if (index < capabilities.length - 1) const SizedBox(width: 28),
-          ],
         ],
       );
     },
   );
 }
 
-class _CapabilityField extends StatelessWidget {
-  const _CapabilityField({required this.capability, required this.index});
+class _PracticeRow extends StatelessWidget {
+  const _PracticeRow({required this.capability, required this.index});
 
   final PortfolioCapability capability;
   final int index;
 
   @override
-  Widget build(BuildContext context) {
-    final category = capability.label;
-    final items = capability.items;
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 22),
-      decoration: const BoxDecoration(
-        border: Border(top: BorderSide(color: Color(0x3DDFFF3F))),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
+  Widget build(BuildContext context) => Container(
+    padding: const EdgeInsets.symmetric(vertical: 24),
+    decoration: const BoxDecoration(
+      border: Border(top: BorderSide(color: Color(0x3D5B6CFF))),
+    ),
+    child: Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          '${index + 1}'.padLeft(2, '0'),
+          style: AppFonts.jetBrainsMono(
+            fontSize: 9,
+            fontWeight: FontWeight.w700,
+            color: AppColors.heroAccent,
+          ),
+        ),
+        const SizedBox(width: 22),
+        Expanded(
+          child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                '${index + 1}'.padLeft(2, '0'),
-                style: AppFonts.jetBrainsMono(
-                  fontSize: 9,
-                  color: AppColors.aboutAccent,
+                capability.label,
+                style: AppFonts.spaceGrotesk(
+                  fontSize: 22,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.textBright,
+                  letterSpacing: -0.45,
                 ),
               ),
-              const Spacer(),
+              const SizedBox(height: 10),
               Text(
-                'FIELD',
-                style: AppFonts.jetBrainsMono(
-                  fontSize: 8,
-                  color: AppColors.textSecondary,
-                  letterSpacing: 1,
+                capability.items.join(' · '),
+                style: AppFonts.inter(
+                  fontSize: 14,
+                  color: AppColors.textPrimary,
+                  height: 1.6,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 28),
-          Text(
-            category,
-            style: AppFonts.instrumentSerif(
-              fontSize: 34,
-              fontStyle: FontStyle.italic,
-              color: AppColors.textBright,
-              height: 0.95,
-            ),
-          ),
-          const SizedBox(height: 18),
-          for (final item in items)
-            Padding(
-              padding: const EdgeInsets.only(bottom: 8),
-              child: Text(
-                item,
-                style: AppFonts.jetBrainsMono(
-                  fontSize: 10,
-                  color: AppColors.textPrimary,
-                  height: 1.4,
-                ),
-              ),
-            ),
-        ],
-      ),
-    );
-  }
+        ),
+      ],
+    ),
+  );
 }

@@ -4,18 +4,19 @@ import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
 
 void main() {
   group('AppColors — scene accents', () {
-    test('all scene accents are distinct colors', () {
-      final accents = {
+    test('all sections share one coherent accent', () {
+      final accents = [
         AppColors.heroAccent,
         AppColors.aboutAccent,
         AppColors.expAccent,
         AppColors.projAccent,
         AppColors.contactAccent,
-      };
+      ];
       expect(
-        accents.length,
-        5,
-        reason: 'All 5 scene accent colors must be unique',
+        accents.every((accent) => accent == AppColors.heroAccent),
+        isTrue,
+        reason:
+            'Section accents should not turn the portfolio into five themes',
       );
     });
 

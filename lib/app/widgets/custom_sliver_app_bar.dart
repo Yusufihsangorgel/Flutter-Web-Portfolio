@@ -16,7 +16,7 @@ import 'package:flutter_web_portfolio/app/widgets/fullscreen_menu.dart';
 import 'package:flutter_web_portfolio/app/widgets/language_switcher.dart';
 import 'package:flutter_web_portfolio/app/widgets/scene_accent_builder.dart';
 
-/// Compact atlas navigation for the single-page document.
+/// Compact navigation for the single-page document.
 /// Shrinks from 80px to 60px as the user scrolls down (200px threshold).
 class CustomSliverAppBar extends StatefulWidget {
   const CustomSliverAppBar({
@@ -180,7 +180,7 @@ class _CustomSliverAppBarState extends State<CustomSliverAppBar> {
 }
 
 // ---------------------------------------------------------------------------
-// Identity-safe role mark.
+// Personal wordmark derived from canonical profile data.
 // ---------------------------------------------------------------------------
 class _LogoText extends StatefulWidget {
   const _LogoText({
@@ -213,12 +213,14 @@ class _LogoTextState extends State<_LogoText> {
       child: AnimatedContainer(
         duration: AppDurations.buttonHover,
         child: Text(
-          AppConfig.initials(context.read<PortfolioDocument>()),
-          style: AppFonts.jetBrainsMono(
-            fontSize: 11 * widget.scaleFactor,
+          AppConfig.navigationName(context.read<PortfolioDocument>()),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: AppFonts.spaceGrotesk(
+            fontSize: 13 * widget.scaleFactor,
             fontWeight: FontWeight.w600,
             color: _hovered ? hoverColor : baseColor,
-            letterSpacing: 1.8,
+            letterSpacing: -0.15,
           ),
         ),
       ),
@@ -227,7 +229,7 @@ class _LogoTextState extends State<_LogoText> {
 }
 
 // ---------------------------------------------------------------------------
-// Nav item: uppercase, hover underline animation
+// Nav item: readable case with a restrained active underline.
 // ---------------------------------------------------------------------------
 class _NavItem extends StatefulWidget {
   const _NavItem({
@@ -266,14 +268,14 @@ class _NavItemState extends State<_NavItem> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              widget.label.toUpperCase(),
-              style: AppFonts.jetBrainsMono(
-                fontSize: 9 * widget.scaleFactor,
+              widget.label,
+              style: AppFonts.spaceGrotesk(
+                fontSize: 12 * widget.scaleFactor,
                 fontWeight: widget.isActive ? FontWeight.w600 : FontWeight.w400,
                 color: widget.isActive
                     ? activeColor
                     : (_hovered ? activeColor : inactiveColor),
-                letterSpacing: 1.25,
+                letterSpacing: 0,
               ),
             ),
             const SizedBox(height: 4),

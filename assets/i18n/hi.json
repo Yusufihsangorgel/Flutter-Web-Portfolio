@@ -4,7 +4,7 @@
     "home": "होम",
     "about": "मेरे बारे में",
     "experience": "अनुभव",
-    "projects": "प्रणालियाँ",
+    "projects": "काम",
     "proof": "ओपन सोर्स"
   },
   "accessibility": {
@@ -13,23 +13,38 @@
     "language_menu": "भाषा मेनू"
   },
   "about_section": {
-    "title": "मेरे बारे में"
+    "title": "मेरे बारे में",
+    "practice_title": "मेरे कार्य क्षेत्र",
+    "location": "स्थान",
+    "experience": "पेशेवर कार्य की शुरुआत"
   },
   "home_section": {
     "view_work": "प्रोजेक्ट देखें",
-    "inspect_runtime": "मेरे बारे में"
+    "inspect_runtime": "मेरे बारे में",
+    "view_github": "GitHub",
+    "based_in": "स्थान",
+    "working_since": "काम की शुरुआत",
+    "focus": "फ़ोकस"
   },
   "experience_section": {
     "title": "अनुभव",
     "present": "वर्तमान"
   },
   "projects_section": {
-    "title": "चुनी गई प्रणालियाँ",
-    "archive": "और उत्पाद",
-    "open_project": "स्रोत देखें"
+    "title": "चुने हुए काम",
+    "subtitle": "मेरे जारी किए हुए उत्पाद और वे टूल जिनका मैं रखरखाव करता हूँ।",
+    "archive": "और काम",
+    "open_project": "प्रोजेक्ट खोलें",
+    "ownership": "मेरी जिम्मेदारी",
+    "decision": "एक अहम निर्णय"
   },
   "proof_section": {
-    "title": "ओपन सोर्स"
+    "title": "ओपन सोर्स",
+    "merged_summary": "{projects} में {count} मर्ज किए गए बदलाव।",
+    "review_summary": "{count} ओपन-सोर्स बदलाव समीक्षा में हैं।",
+    "open_pull_request": "पुल रिक्वेस्ट देखें",
+    "status_merged": "मर्ज किया गया",
+    "status_under_review": "समीक्षा में"
   },
   "footer": {
     "command_hint_prefix": "दबाएं",

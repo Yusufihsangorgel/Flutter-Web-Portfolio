@@ -1,8 +1,9 @@
 name: Deploy to GitHub Pages
 
 on:
-  push:
-    branches: [main]
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
 
 permissions:
   contents: read
@@ -15,9 +16,20 @@ concurrency:
 
 jobs:
   build:
+    if: >-
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'push' &&
+      github.event.workflow_run.head_repository.full_name == github.repository &&
+      github.event.workflow_run.head_branch == 'main'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+      - name: Verify this is still the current main commit
+        run: |
+          git fetch origin main --depth=1
+          test "$(git rev-parse HEAD)" = "$(git rev-parse origin/main)"
       - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
         with:
           flutter-version: 3.41.2
@@ -25,8 +37,10 @@ jobs:
       - run: flutter clean
       - run: flutter pub get
       - run: npm ci
+      - run: npx playwright install --with-deps chromium
       - run: npm run verify:content
       - run: npm run verify:source
+      - run: npm run prepare:source
       - run: flutter build web --release --wasm --no-web-resources-cdn --base-href "/${{ github.event.repository.name }}/"
       - run: npm run prepare:bundle
       - run: npm run verify:bundle

@@ -1,4 +1,4 @@
-import { createReadStream, existsSync, statSync } from 'node:fs';
+import { createReadStream, existsSync, readFileSync, statSync } from 'node:fs';
 import { createServer } from 'node:http';
 import { extname, join, normalize, resolve } from 'node:path';
 
@@ -32,6 +32,33 @@ if (!existsSync(join(root, 'index.html'))) {
   );
 }
 
+const portfolio = JSON.parse(
+  readFileSync(
+    join(root, 'assets', 'assets', 'content', 'portfolio.json'),
+    'utf8',
+  ),
+);
+const analyticsOrigin = portfolio.site?.analytics?.script_url
+  ? new URL(portfolio.site.analytics.script_url).origin
+  : '';
+const scriptSources = [
+  "'self'",
+  "'unsafe-inline'",
+  "'unsafe-eval'",
+  analyticsOrigin,
+].filter(Boolean).join(' ');
+const connectSources = [
+  "'self'",
+  'https://api.rss2json.com',
+  'https://api.github.com',
+  analyticsOrigin,
+].filter(Boolean).join(' ');
+const contentSecurityPolicy =
+  `default-src 'self'; script-src ${scriptSources}; ` +
+  "worker-src 'self' blob:; style-src 'self' 'unsafe-inline'; " +
+  "font-src 'self'; img-src 'self' data: https: blob:; " +
+  `connect-src ${connectSources}; frame-ancestors 'self';`;
+
 const server = createServer((request, response) => {
   const requestUrl = new URL(request.url ?? '/', `http://${request.headers.host}`);
   const decodedPath = decodeURIComponent(requestUrl.pathname);
@@ -48,7 +75,7 @@ const server = createServer((request, response) => {
   response.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
   response.setHeader(
     'Content-Security-Policy',
-    "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://analytics.developeryusuf.com; worker-src 'self' blob:; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: https: blob:; connect-src 'self' https://api.rss2json.com https://api.github.com https://analytics.developeryusuf.com; frame-ancestors 'self';",
+    contentSecurityPolicy,
   );
 
   if (existsSync(filePath) && statSync(filePath).isDirectory()) {

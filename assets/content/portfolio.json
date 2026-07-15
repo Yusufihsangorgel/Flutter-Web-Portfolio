@@ -1,35 +1,41 @@
 {
-  "schema_version": 1,
-  "content_version": "2026.07.15.3",
+  "schema_version": 2,
+  "content_version": "2026.07.15.5",
   "verified_at": "2026-07-15",
   "site": {
     "url": "https://developeryusuf.com",
-    "title": "Software Engineer — Flutter, Dart & Go",
-    "description": "Software engineer building and operating cross-platform products and platform tooling with Flutter, Dart, Go, PostgreSQL, Redis, Docker, and Kubernetes.",
-    "social_description": "Cross-platform product engineering, platform tooling, and verified open-source work.",
-    "social_image": "/assets/og/engineering-showcase.png",
-    "domain_label": "DEVELOPERYUSUF.COM"
+    "title": "Yusuf İhsan Görgel — Software Engineer",
+    "description": "Yusuf İhsan Görgel is a software engineer building cross-platform products with Flutter, Dart, Go, PostgreSQL, Redis, and production infrastructure.",
+    "social_description": "Cross-platform product engineering, selected professional work, and verified open-source contributions by Yusuf İhsan Görgel.",
+    "social_image": "/assets/og/engineering-showcase.png?v=2026.07.15.5",
+    "domain_label": "DEVELOPERYUSUF.COM",
+    "analytics": {
+      "script_url": "https://analytics.developeryusuf.com/js/script.js",
+      "domain": "developeryusuf.com"
+    }
   },
   "sources": [
     {
       "id": "github",
       "label": "GitHub",
       "url": "https://github.com/Yusufihsangorgel",
-      "scope": "Public repositories, merged pull requests, and pull-request status"
+      "scope": "Selected public repositories, merged pull requests, and pull-request status"
     },
     {
       "id": "linkedin",
       "label": "LinkedIn",
       "url": "https://www.linkedin.com/in/yusuf-ihsan-g%C3%B6rgel/",
-      "scope": "Current role, professional timeline, and public experience descriptions"
+      "scope": "Public professional timeline, education, and project descriptions"
     }
   ],
   "profile": {
+    "name": "Yusuf İhsan Görgel",
     "role": "Software Engineer",
-    "location": "Remote",
-    "since": "2021",
-    "headline": "I build cross-platform products and the systems that keep them reliable.",
-    "summary": "My work spans Flutter clients, local and real-time data, native integrations, Go services, queues, and production infrastructure. I stay close to the boundary where product behaviour becomes a systems problem.",
+    "location": "Antalya, Türkiye",
+    "since": "2022",
+    "headline": "I build cross-platform software, then stay for the hard parts.",
+    "summary": "I work across Flutter, Dart, and Go, turning product ideas into software that holds up on real devices, unreliable networks, and long-lived release cycles.",
+    "background": "Since 2022 I have shipped mobile, desktop, and web products for retail, logistics, and digital publishing. My work has moved from client applications and native integrations into offline data, real-time synchronisation, backend services, release engineering, and the production systems around them.",
     "focus": [
       "Flutter and Dart",
       "Go services",
@@ -57,11 +63,12 @@
   },
   "experience": [
     {
-      "id": "cross-platform-retail",
-      "role": "Software Engineer — Cross-platform",
-      "domain": "Enterprise retail and point-of-sale systems",
-      "period": "2021 — Present",
-      "summary": "Build and maintain production applications across Android and iOS tablets plus Linux, macOS, and Windows desktops. The work includes offline-first SQLite and Drift data, native integrations, localisation, real-time synchronisation, release engineering, and reliability on point-of-sale hardware.",
+      "id": "fugasoft",
+      "company": "FugaSoft",
+      "role": "Software Engineer",
+      "domain": "Cross-platform ERP and point-of-sale products",
+      "period": "March 2022 — Present",
+      "summary": "Build and maintain production applications across Android and iOS tablets plus Linux, macOS, and Windows desktops. I work on offline-first SQLite and Drift data, native integrations, localisation, real-time synchronisation, release engineering, and reliability on point-of-sale hardware.",
       "evidence": [
         "Flutter",
         "Dart",
@@ -71,11 +78,12 @@
       ]
     },
     {
-      "id": "mobile-web-logistics",
-      "role": "Software Engineer — Mobile and web",
-      "domain": "Logistics platform",
-      "period": "2023 — 2025",
-      "summary": "Delivered mobile and web product work spanning Flutter, React and Next.js, REST and WebSocket data flows, vehicle tracking, and Google and Apple Maps integrations.",
+      "id": "juniustech",
+      "company": "Juniustech",
+      "role": "Full Stack Developer",
+      "domain": "Dorse logistics platform",
+      "period": "April 2024 — January 2025",
+      "summary": "Delivered mobile and web product work spanning Flutter and React, REST and WebSocket data flows, live vehicle tracking, Google and Apple Maps integrations, deployment, and QA coordination.",
       "evidence": [
         "Flutter",
         "React / Next.js",
@@ -85,11 +93,12 @@
       ]
     },
     {
-      "id": "mobile-publishing",
-      "role": "Software Engineer — Mobile",
-      "domain": "Digital publishing products",
-      "period": "2022 — 2024",
-      "summary": "Shipped Android and iOS publishing applications with maintainable presentation boundaries, API integration, localisation, and store-ready release workflows.",
+      "id": "promob-tr",
+      "company": "Promob TR",
+      "role": "Flutter Developer",
+      "domain": "Digital publishing applications",
+      "period": "October 2022 — June 2024",
+      "summary": "Shipped the Aydınlık E-Gazete and Bilim ve Ütopya E-Dergi applications for Android and iOS with maintainable presentation boundaries, API integration, localisation, and store-ready release workflows.",
       "evidence": [
         "Flutter",
         "Dart",
@@ -100,8 +109,9 @@
     },
     {
       "id": "software-engineering-education",
-      "role": "Software Engineering",
-      "domain": "Bachelor's degree",
+      "company": "Mehmet Akif Ersoy University",
+      "role": "B.Sc. Software Engineering",
+      "domain": "Undergraduate education",
       "period": "2021 — 2025",
       "summary": "Formal study in algorithms, data structures, databases, software design, and team-based product development.",
       "evidence": [
@@ -131,7 +141,7 @@
     {
       "id": "operations",
       "label": "Operations",
-      "items": ["Docker", "Kubernetes", "Prometheus", "Grafana", "PostgreSQL HA"]
+      "items": ["Docker", "Kubernetes", "Prometheus", "Grafana", "PostgreSQL operations"]
     }
   ],
   "contributions": [
@@ -185,26 +195,40 @@
       "change": "Wait for outstanding scene renders and the next browser frame before dispatching the event; the pull request is ready for review with seven Chrome renderer and compiler suites passing.",
       "url": "https://github.com/flutter/flutter/pull/189500",
       "issue_url": "https://github.com/flutter/flutter/issues/189499"
+    },
+    {
+      "id": "mcp-kotlin-request-metadata",
+      "project": "MCP Kotlin SDK",
+      "status": "under_review",
+      "date": "2026-07-15",
+      "title": "Add SEP-2575 request metadata and discovery types",
+      "problem": "The SDK needed a wire model for request-scoped protocol and client context without breaking legacy request shapes.",
+      "change": "Add typed experimental metadata accessors, server discovery types, polymorphic codecs, and malformed-input coverage.",
+      "url": "https://github.com/modelcontextprotocol/kotlin-sdk/pull/893"
     }
   ],
   "systems": [
     {
-      "id": "portfolio",
-      "name": "Flutter Web Portfolio",
-      "kind": "Render and accessibility system",
-      "visual": "frame-pipeline",
-      "summary": "A Wasm and SkWasm portfolio used to investigate first-frame timing, semantic document structure, locale transitions, and scroll-directed rendering in Flutter Web.",
-      "decision": "Keep the semantic document and high-frequency painter paths separate while one measured scroll model directs both.",
-      "url": "https://github.com/Yusufihsangorgel/Flutter-Web-Portfolio",
-      "technologies": ["Flutter", "Dart Wasm", "SkWasm", "Playwright"]
+      "id": "dorse",
+      "name": "Dorse",
+      "kind": "Logistics product",
+      "year": "2024 — 2025",
+      "featured": true,
+      "summary": "A logistics platform connecting drivers, fleet operators, and weighbridge businesses through mobile and web workflows.",
+      "ownership": "I worked across the Flutter application and React web surface, including live vehicle state, maps, API flows, deployment, and QA coordination.",
+      "decision": "Keep real-time vehicle and weighbridge state understandable across clients instead of hiding it behind screen-specific workarounds.",
+      "url": "https://dorseapp.com/",
+      "technologies": ["Flutter", "React", "WebSocket", "Google Maps", "Apple Maps"]
     },
     {
       "id": "queue-inspector",
       "name": "Queue Inspector MCP",
       "kind": "Operations tooling",
-      "visual": "queue-states",
+      "year": "2026",
+      "featured": true,
       "summary": "An MCP server for inspecting and operating Redis-backed Asynq and BullMQ queues without reaching into storage by hand.",
-      "decision": "Expose queue state, job detail, retries, and dead letters through explicit operations with conservative defaults.",
+      "ownership": "I designed the command surface, typed validation, queue adapters, and conservative state-changing operations.",
+      "decision": "Observation stays read-only by default; retries and destructive operations remain explicit and narrowly scoped.",
       "url": "https://github.com/Yusufihsangorgel/queue-inspector-mcp",
       "technologies": ["TypeScript", "MCP", "Redis", "Asynq", "BullMQ"]
     },
@@ -212,18 +236,46 @@
       "id": "multitenant-gateway",
       "name": "Multi-tenant Gateway",
       "kind": "Go platform reference",
-      "visual": "tenant-routing",
+      "year": "2026",
+      "featured": true,
       "summary": "A small single-binary gateway that demonstrates tenant resolution, JWT authentication, per-tenant rate limits, and module boundaries.",
+      "ownership": "I designed and implemented the complete reference from transport and tenant resolution through policy and test coverage.",
       "decision": "Keep tenant context explicit from transport through policy rather than hiding it behind global state.",
       "url": "https://github.com/Yusufihsangorgel/go-multitenant-gateway",
       "technologies": ["Go", "JWT", "Rate limiting", "Multi-tenancy"]
     },
     {
+      "id": "aydinlik-e-gazete",
+      "name": "Aydınlık E-Gazete",
+      "kind": "Mobile publishing",
+      "year": "2022 — 2024",
+      "featured": false,
+      "summary": "An iPhone and iPad newspaper application with issue reading, API-backed content, localisation, and release workflows.",
+      "ownership": "I delivered Flutter client work across presentation, API integration, and store-ready releases.",
+      "decision": "Keep the reading experience responsive while the content model and release process remain easy to maintain.",
+      "url": "https://apps.apple.com/us/app/ayd%C4%B1nl%C4%B1k-e-gazete/id1560103805",
+      "technologies": ["Flutter", "Dart", "Dio", "MVVM", "iOS"]
+    },
+    {
+      "id": "bilim-ve-utopya",
+      "name": "Bilim ve Ütopya E-Dergi",
+      "kind": "Mobile publishing",
+      "year": "2022 — 2024",
+      "featured": false,
+      "summary": "A cross-platform magazine reader for browsing and reading digital issues on iPhone and iPad.",
+      "ownership": "I built Flutter client features, API integration, localisation, and mobile release workflows.",
+      "decision": "Use a shared presentation model across platforms while preserving store-specific release behaviour.",
+      "url": "https://apps.apple.com/tr/app/bilim-ve-%C3%BCtopya-e-dergi/id6478221195",
+      "technologies": ["Flutter", "Dart", "Dio", "MVVM", "iOS"]
+    },
+    {
       "id": "redis-task-queue",
       "name": "Redis Task Queue",
       "kind": "Server-side Dart library",
-      "visual": "weighted-queue",
+      "year": "2026",
+      "featured": false,
       "summary": "A Redis-backed task queue for Dart with retries, dead-letter handling, and weighted queues.",
+      "ownership": "I designed the public API, queue semantics, failure handling, and runnable examples.",
       "decision": "Make failure states inspectable and scheduling behaviour deterministic without adding a runtime framework.",
       "url": "https://github.com/Yusufihsangorgel/redis_task_queue",
       "technologies": ["Dart", "Redis", "Retries", "Dead letters"]
@@ -232,37 +284,25 @@
       "id": "constellation-particles",
       "name": "Constellation Particles",
       "kind": "Flutter rendering package",
-      "visual": "spatial-grid",
+      "year": "2026",
+      "featured": false,
       "summary": "A dependency-free particle field for Flutter with pointer interaction and spatial-grid neighbour lookup.",
+      "ownership": "I implemented the painter, pointer interaction, spatial partitioning, and package examples without runtime dependencies.",
       "decision": "Use spatial partitioning to avoid comparing every particle pair as the scene grows.",
       "url": "https://github.com/Yusufihsangorgel/constellation_particles",
       "technologies": ["Flutter", "Dart", "CustomPainter", "Spatial grid"]
-    }
-  ],
-  "story": [
-    {
-      "id": "frame-zero",
-      "eyebrow": "Frame 00",
-      "title": "The interface begins before the first pixel.",
-      "body": "Product constraints, data boundaries, rendering, semantics, and recovery paths are one system—not separate polish passes."
     },
     {
-      "id": "runtime",
-      "eyebrow": "Frame 01",
-      "title": "Build for the conditions the product will actually meet.",
-      "body": "Unreliable networks, offline data, native integrations, and release failures belong in the design from the beginning."
-    },
-    {
-      "id": "upstream",
-      "eyebrow": "Frame 02",
-      "title": "When the boundary is wrong, move the boundary.",
-      "body": "Turn product-level failures into minimal reproductions, tests, and upstream patches instead of hiding them behind local workarounds."
-    },
-    {
-      "id": "systems",
-      "eyebrow": "Frame 03",
-      "title": "Leave the next engineer a system they can change.",
-      "body": "Explicit state, typed data, narrow interfaces, observable failure modes, and verified release paths keep software useful after launch."
+      "id": "portfolio",
+      "name": "Flutter Web Portfolio",
+      "kind": "Web engineering",
+      "year": "2026",
+      "featured": false,
+      "summary": "A production Flutter Web portfolio used to investigate first-frame timing, semantic structure, locale transitions, and release integrity.",
+      "ownership": "I built the content schema, Flutter interface, renderer handoff, browser tests, runtime budgets, and deployment path.",
+      "decision": "Keep the semantic document separate from high-frequency rendering while both follow the same measured scroll geometry.",
+      "url": "https://github.com/Yusufihsangorgel/Flutter-Web-Portfolio",
+      "technologies": ["Flutter", "Dart Wasm", "SkWasm", "Playwright"]
     }
   ]
 }

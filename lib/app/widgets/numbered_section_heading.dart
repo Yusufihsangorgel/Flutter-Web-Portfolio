@@ -3,7 +3,7 @@ import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
 import 'package:flutter_web_portfolio/app/core/theme/app_fonts.dart';
 import 'package:flutter_web_portfolio/app/core/constants/breakpoints.dart';
 
-/// Editorial chapter marker shared by the long-form portfolio document.
+/// Clear editorial marker shared by the portfolio sections.
 class NumberedSectionHeading extends StatelessWidget {
   const NumberedSectionHeading({
     super.key,
@@ -18,7 +18,7 @@ class NumberedSectionHeading extends StatelessWidget {
   /// Section title text.
   final String title;
 
-  /// Scene accent color for number and divider.
+  /// Accent color for the section number and divider.
   final Color accent;
 
   @override
@@ -33,17 +33,18 @@ class NumberedSectionHeading extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Text(
-                'CHAPTER / $number',
+                number,
                 style: AppFonts.jetBrainsMono(
-                  fontSize: 9,
-                  fontWeight: FontWeight.w600,
+                  fontSize: 11,
+                  fontWeight: FontWeight.w700,
                   color: accent,
-                  letterSpacing: 1.3,
+                  letterSpacing: 1.1,
                 ),
               ),
-              const SizedBox(width: 16),
+              const SizedBox(width: 18),
               Expanded(
                 child: Container(
                   key: const ValueKey('chapter-divider'),
@@ -53,35 +54,18 @@ class NumberedSectionHeading extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 18),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Expanded(
-                child: Text(
-                  title,
-                  style: AppFonts.instrumentSerif(
-                    fontSize:
-                        MediaQuery.sizeOf(context).width < Breakpoints.tablet
-                        ? 48
-                        : 72,
-                    fontStyle: FontStyle.italic,
-                    color: AppColors.textBright,
-                    height: 0.9,
-                    letterSpacing: -1.8,
-                  ),
-                ),
-              ),
-              const SizedBox(width: 18),
-              Text(
-                '$number / 04',
-                style: AppFonts.jetBrainsMono(
-                  fontSize: 9,
-                  color: accent,
-                  letterSpacing: 0.9,
-                ),
-              ),
-            ],
+          const SizedBox(height: 24),
+          Text(
+            title,
+            style: AppFonts.spaceGrotesk(
+              fontSize: MediaQuery.sizeOf(context).width < Breakpoints.tablet
+                  ? 44
+                  : 68,
+              fontWeight: FontWeight.w600,
+              color: AppColors.textBright,
+              height: 0.98,
+              letterSpacing: -2.2,
+            ),
           ),
         ],
       ),

@@ -4,7 +4,7 @@
     "home": "Startseite",
     "about": "Über mich",
     "experience": "Erfahrung",
-    "projects": "Systeme",
+    "projects": "Arbeiten",
     "proof": "Open Source"
   },
   "accessibility": {
@@ -13,23 +13,38 @@
     "language_menu": "Sprachmenü"
   },
   "about_section": {
-    "title": "Über mich"
+    "title": "Über mich",
+    "practice_title": "Meine Arbeitsfelder",
+    "location": "Standort",
+    "experience": "Beruflich tätig seit"
   },
   "home_section": {
     "view_work": "Projekte ansehen",
-    "inspect_runtime": "Über mich"
+    "inspect_runtime": "Über mich",
+    "view_github": "GitHub",
+    "based_in": "Standort",
+    "working_since": "Beruflich seit",
+    "focus": "Schwerpunkt"
   },
   "experience_section": {
     "title": "Erfahrung",
     "present": "Aktuell"
   },
   "projects_section": {
-    "title": "Ausgewählte Systeme",
-    "archive": "Weitere Produkte",
-    "open_project": "Quelltext ansehen"
+    "title": "Ausgewählte Arbeiten",
+    "subtitle": "Produkte, die ich veröffentlicht habe, und Werkzeuge, die ich pflege.",
+    "archive": "Weitere Arbeiten",
+    "open_project": "Projekt öffnen",
+    "ownership": "Mein Verantwortungsbereich",
+    "decision": "Eine wichtige Entscheidung"
   },
   "proof_section": {
-    "title": "Open Source"
+    "title": "Open Source",
+    "merged_summary": "{count} zusammengeführte Änderungen in {projects}.",
+    "review_summary": "{count} Open-Source-Änderungen werden geprüft.",
+    "open_pull_request": "Pull Request ansehen",
+    "status_merged": "Zusammengeführt",
+    "status_under_review": "In Prüfung"
   },
   "footer": {
     "command_hint_prefix": "Drücken Sie",
