@@ -3,7 +3,7 @@ import { defineConfig, devices } from '@playwright/test';
 export default defineConfig({
   testDir: './tests/e2e',
   snapshotPathTemplate:
-    '{testDir}/{testFilePath}-snapshots/{arg}{-projectName}{ext}',
+    '{testDir}/{testFilePath}-snapshots/{arg}{-projectName}-{platform}{ext}',
   timeout: 60000,
   expect: {
     timeout: 10000,
@@ -60,6 +60,7 @@ export default defineConfig({
       testMatch: /visual\.spec\.ts/,
       use: {
         ...devices['iPad Pro 11'],
+        browserName: 'chromium',
         colorScheme: 'dark',
         locale: 'en-US',
         timezoneId: 'UTC',
