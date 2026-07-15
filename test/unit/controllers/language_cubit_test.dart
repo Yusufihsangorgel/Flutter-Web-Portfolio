@@ -91,6 +91,25 @@ void main() {
       expect(cubit.state, const LanguageState.initial());
     });
 
+    test('an explicit language selection updates native targets', () async {
+      final repository = _LanguageRepository(
+        documents: {
+          'en': {'app_name': 'Portfolio'},
+          'de': {'app_name': 'Portfolio auf Deutsch'},
+        },
+      );
+      final cubit = LanguageCubit(languageRepository: repository);
+      addTearDown(cubit.close);
+      await cubit.initialize();
+
+      await cubit.selectLanguage('de');
+
+      expect(cubit.state.status, LanguageStatus.ready);
+      expect(cubit.currentLanguage, 'de');
+      expect(cubit.appName, 'Portfolio auf Deutsch');
+      expect(repository.savedLanguages, ['en', 'de']);
+    });
+
     test(
       'empty translation document fails without replacing good data',
       () async {

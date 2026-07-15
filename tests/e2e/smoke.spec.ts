@@ -329,20 +329,31 @@ test('keeps every professional chapter in one accessible document', async ({
 });
 
 test('switches to the application-owned Arabic catalog', async ({ page }) => {
+  const runtimeErrors: string[] = [];
+  page.on('pageerror', (error) => runtimeErrors.push(error.message));
   await openPortfolio(page);
+  await page.keyboard.press('Control+KeyK');
+  await page.getByText('Go to Projects', { exact: true }).click();
+  await expect(page).toHaveURL(/#\/projects$/);
+
   await page.keyboard.press('Control+KeyK');
   await page.getByText('Switch to العربية', { exact: true }).click();
 
   await expect
     .poll(() => page.locator('html').getAttribute('lang'))
     .toBe('ar');
+  await expect(page).toHaveURL(/#\/projects$/);
   await expect(page.locator('html')).toHaveAttribute('dir', 'rtl');
   await expect(page.getByText('عرض المشاريع', { exact: true })).toBeAttached();
+  await expect(
+    page.getByRole('heading', { name: 'مشاريع مختارة' }),
+  ).toBeAttached();
 
   await page.keyboard.press('Control+KeyK');
   await expect(
     page.getByText('الانتقال إلى المشاريع', { exact: true }),
   ).toBeVisible();
+  expect(runtimeErrors).toEqual([]);
 });
 
 test('switches to the application-owned Hindi catalog', async ({ page }) => {

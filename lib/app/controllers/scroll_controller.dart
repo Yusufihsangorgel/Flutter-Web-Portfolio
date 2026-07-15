@@ -96,6 +96,14 @@ final class AppScrollController extends Cubit<AppScrollState>
     if (!kIsWeb) return;
 
     final hash = url_strategy.getUrlHash();
+    final reloadSection = url_strategy.takeReloadSection();
+    if (reloadSection.isNotEmpty && Routes.sectionIds.contains(reloadSection)) {
+      // The browser may still expose the old hash during bootstrap and then
+      // normalize it while MaterialApp mounts. Delay both scroll and URL sync
+      // until the measured document is ready.
+      _pendingSection = reloadSection;
+      return;
+    }
     if (hash.isNotEmpty && Routes.sectionIds.contains(hash)) {
       _pendingSection = hash;
       _setActiveSection(hash, syncUrl: false);
@@ -114,7 +122,8 @@ final class AppScrollController extends Cubit<AppScrollState>
 
     refreshSectionGeometry();
     Future<void>.delayed(const Duration(milliseconds: 100), () {
-      if (!isClosed) scrollToSection(target);
+      if (isClosed) return;
+      scrollToSection(target);
     });
   }
 

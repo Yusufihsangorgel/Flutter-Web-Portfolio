@@ -1,6 +1,8 @@
 import 'dart:js_interop';
 import 'package:web/web.dart' as web;
 
+const _reloadSectionKey = 'render_atlas_reload_section';
+
 /// Returns the URL hash fragment without leading `#` or `#/`.
 ///
 /// Examples:
@@ -27,6 +29,13 @@ void setUrlHash(String hash) {
   web.window.history.pushState(null, '', url);
 }
 
+/// Returns and clears the section captured immediately before a web reload.
+String takeReloadSection() {
+  final section = web.window.sessionStorage.getItem(_reloadSectionKey) ?? '';
+  web.window.sessionStorage.removeItem(_reloadSectionKey);
+  return section;
+}
+
 /// Keeps the root document language and writing direction aligned with the
 /// active application locale for assistive technology and browser tooling.
 void setHtmlLang(String languageCode) {
@@ -38,6 +47,18 @@ void setHtmlLang(String languageCode) {
 
 /// Reloads the current document after an unrecoverable bootstrap failure.
 void reloadPage() => web.window.location.reload();
+
+/// Restarts the web renderer after a persisted user locale change.
+///
+/// Returns `true` so shared application code can stop the in-process locale
+/// rebuild while the browser navigation takes over.
+bool reloadPageForLanguageChange({String? preserveSection}) {
+  if (preserveSection != null && preserveSection.isNotEmpty) {
+    web.window.sessionStorage.setItem(_reloadSectionKey, preserveSection);
+  }
+  web.window.location.reload();
+  return true;
+}
 
 /// Registers a listener for browser back/forward navigation.
 ///

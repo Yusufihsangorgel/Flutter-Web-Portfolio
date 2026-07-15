@@ -10,6 +10,8 @@ import 'package:flutter_web_portfolio/app/controllers/scroll_controller.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
 import 'package:flutter_web_portfolio/app/core/constants/cinematic_curves.dart';
 import 'package:flutter_web_portfolio/app/core/constants/durations.dart';
+import 'package:flutter_web_portfolio/app/utils/web_url_strategy.dart'
+    as url_strategy;
 import 'package:flutter_web_portfolio/app/widgets/cinematic_focusable.dart';
 
 /// A command entry that the palette can display and execute.
@@ -97,6 +99,10 @@ class _CommandPaletteState extends State<CommandPalette> {
 
   List<_PaletteCommand> _buildCommands() {
     final scrollController = context.read<AppScrollController>();
+    final urlSection = url_strategy.getUrlHash();
+    final sectionToPreserve = urlSection.isNotEmpty
+        ? urlSection
+        : scrollController.activeSection;
     final languageController = context.read<LanguageCubit>();
     final active = languageController.activeSections;
     final navigateCategory = languageController.getText(
@@ -151,7 +157,10 @@ class _CommandPaletteState extends State<CommandPalette> {
           category: languageCategory,
           icon: Icons.translate_rounded,
           onExecute: () => _executeAndClose(
-            () => languageController.changeLanguage(entry.key),
+            () => languageController.selectLanguage(
+              entry.key,
+              preserveSection: sectionToPreserve,
+            ),
           ),
         ),
     ];

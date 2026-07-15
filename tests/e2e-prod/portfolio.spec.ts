@@ -185,6 +185,8 @@ test('serves the localized Arabic command surface in production', async ({
 }) => {
   test.skip(isMobile, 'locale contract only needs one browser project');
 
+  const runtimeErrors: string[] = [];
+  page.on('pageerror', (error) => runtimeErrors.push(error.message));
   await openPortfolio(page);
   await page.keyboard.press('Control+KeyK');
   await page.getByText('Switch to العربية', { exact: true }).click();
@@ -192,6 +194,7 @@ test('serves the localized Arabic command surface in production', async ({
   await expect(page.locator('html')).toHaveAttribute('lang', 'ar');
   await expect(page.locator('html')).toHaveAttribute('dir', 'rtl');
   await expect(page.getByText('عرض المشاريع', { exact: true })).toBeAttached();
+  expect(runtimeErrors).toEqual([]);
 });
 
 test('serves the declared production sharing and font assets', async ({

@@ -135,7 +135,24 @@ final class LanguageCubit extends Cubit<LanguageState> {
     }
   }
 
-  Future<void> changeLanguage(String languageCode) async {
+  /// Applies an explicit user language choice.
+  ///
+  /// Flutter Web's SkWasm renderer can lose its scene while rebuilding the
+  /// complete text tree across writing directions. The browser path therefore
+  /// validates and persists the requested catalog, then performs one clean
+  /// document reload. Native targets keep the in-process locale transition.
+  Future<void> selectLanguage(String languageCode, {String? preserveSection}) =>
+      changeLanguage(
+        languageCode,
+        reloadOnWeb: true,
+        preserveSection: preserveSection,
+      );
+
+  Future<void> changeLanguage(
+    String languageCode, {
+    bool reloadOnWeb = false,
+    String? preserveSection,
+  }) async {
     if (!supportedLanguages.containsKey(languageCode)) return;
     if (state.status == LanguageStatus.ready &&
         state.languageCode == languageCode) {
@@ -158,6 +175,12 @@ final class LanguageCubit extends Cubit<LanguageState> {
       await _languageRepository.saveSelectedLanguage(languageCode);
 
       if (isClosed || operationId != _operationId) return;
+      if (reloadOnWeb &&
+          url_strategy.reloadPageForLanguageChange(
+            preserveSection: preserveSection,
+          )) {
+        return;
+      }
       url_strategy.setHtmlLang(languageCode);
       _emitState(
         LanguageState(

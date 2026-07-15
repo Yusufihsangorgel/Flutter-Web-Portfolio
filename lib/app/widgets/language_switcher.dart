@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_web_portfolio/app/core/theme/app_fonts.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
+import 'package:flutter_web_portfolio/app/controllers/scroll_controller.dart';
 import 'package:flutter_web_portfolio/app/controllers/scene_director.dart';
 import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
+import 'package:flutter_web_portfolio/app/utils/web_url_strategy.dart'
+    as url_strategy;
 
 /// Flag-emoji popup menu for switching the active language.
 class LanguageSwitcher extends StatelessWidget {
@@ -25,6 +28,10 @@ class LanguageSwitcher extends StatelessWidget {
               final currentLanguage = LanguageCubit.getLanguageName(
                 languageState.languageCode,
               );
+              final urlSection = url_strategy.getUrlHash();
+              final sectionToPreserve = urlSection.isNotEmpty
+                  ? urlSection
+                  : context.read<AppScrollController>().activeSection;
 
               return PopupMenuButton<String>(
                 tooltip: '$menuLabel: $currentLanguage',
@@ -56,7 +63,10 @@ class LanguageSwitcher extends StatelessWidget {
                             .withValues(alpha: 0.05),
                   ),
                 ),
-                onSelected: languageController.changeLanguage,
+                onSelected: (languageCode) => languageController.selectLanguage(
+                  languageCode,
+                  preserveSection: sectionToPreserve,
+                ),
                 itemBuilder: (BuildContext context) => languageController
                     .supportedLanguages
                     .keys
