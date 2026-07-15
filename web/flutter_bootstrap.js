@@ -16,12 +16,12 @@ const showBootstrapFailure = (error) => {
 
   splash.classList.add('bootstrap-surface--failed');
   splash.setAttribute('aria-busy', 'false');
-  splash.setAttribute('aria-label', 'The Flutter experience could not start');
+  splash.setAttribute('aria-label', 'The portfolio could not start');
   const label = splash.querySelector('.bootstrap-label');
-  if (label) label.textContent = 'FLUTTER WEB / BOOT FAILED';
+  if (label) label.textContent = 'PORTFOLIO / LOAD FAILED';
   const status = splash.querySelector('.bootstrap-status-copy');
   if (status) {
-    status.textContent = 'The live canvas could not start. Retry the isolated runtime.';
+    status.textContent = 'The portfolio could not load. Please try again.';
   }
   const track = splash.querySelector('.bootstrap-track');
   if (track) {

@@ -1,26 +1,26 @@
 {
-  "app_name": "Systemportfolio",
+  "app_name": "Senior Flutter-Entwickler",
   "cv_data": {
     "personal_info": {
-      "name": "Systemportfolio",
+      "name": "Senior Flutter-Entwickler",
       "location": "Ortsunabhängig",
-      "bio": "Ein anonymes Engineering-Portfolio mit Fokus auf Flutter, Go, Datensysteme und messbare Produktionszuverlässigkeit.",
-      "tagline": "Prüfbare Softwaresysteme, in Produktion gemessen",
+      "bio": "Seit 2021 entwickle ich produktive Flutter-Anwendungen für Mobilgeräte, Desktop und Web. Im Mittelpunkt stehen klares Produktverhalten, robuste Offline-Daten, Echtzeitsynchronisierung und wartbarer Code.",
+      "tagline": "Produktorientierte Flutter-Entwicklung",
       "subtitles": [
-        "Flutter-Systeme",
-        "Go-Dienste",
-        "Produktionszuverlässigkeit"
+        "Mobile Produkte",
+        "Offline-First-Anwendungen",
+        "Plattformübergreifende Umsetzung"
       ]
     },
     "experiences": [
       {
-        "title": "Client-Engineering",
-        "company": "Plattformübergreifende Anwendungen",
-        "position": "Flutter-Systeme",
-        "start_date": "",
+        "title": "Flutter-Entwickler",
+        "company": "Unternehmenssoftware für den Einzelhandel",
+        "position": "Mobile- und Desktop-Anwendungen",
+        "start_date": "2022",
         "end_date": "",
-        "period": "Ausgewählte Produktionsarbeit",
-        "description": "Flutter · Offline-First-Daten · native Integrationen · Echtzeitsynchronisierung",
+        "period": "März 2022 — Heute",
+        "description": "Entwicklung produktiver Anwendungen für Android- und iOS-Tablets sowie Linux, macOS und Windows. Dazu gehören Offline-First-Daten mit SQLite und Drift, native Integrationen und zuverlässige Echtzeitsynchronisierung.",
         "technologies": [
           "Flutter",
           "Dart",
@@ -30,102 +30,118 @@
         ]
       },
       {
-        "title": "Backend-Engineering",
-        "company": "API- und Datensysteme",
-        "position": "Go-Dienste",
-        "start_date": "",
-        "end_date": "",
-        "period": "Ausgewählte Produktionsarbeit",
-        "description": "Go Fiber · PostgreSQL · Redis · Objektspeicher · Hintergrundaufgaben",
+        "title": "Leiter Mobile-Team",
+        "company": "Logistikplattform",
+        "position": "Plattformübergreifende Produktentwicklung",
+        "start_date": "2023",
+        "end_date": "2025",
+        "period": "Juni 2023 — Februar 2025",
+        "description": "Verantwortung für die mobile Umsetzung eines Logistikprodukts mit WebSocket-basierter Fahrzeugverfolgung, Google- und Apple-Maps-Integration sowie Abstimmung mit einer React-Webanwendung.",
         "technologies": [
-          "Go",
-          "PostgreSQL",
-          "Redis",
-          "MinIO",
-          "Asynq"
+          "Flutter",
+          "WebSocket",
+          "Google Maps",
+          "Apple Maps",
+          "React"
         ]
       },
       {
-        "title": "Zuverlässigkeitsengineering",
-        "company": "Selbst gehostete Laufzeit",
-        "position": "Produktionsbetrieb",
-        "start_date": "",
-        "end_date": "",
-        "period": "Ausgewählte Produktionsarbeit",
-        "description": "Docker Swarm · unveränderliche Images · Wiederherstellungstests · Beobachtbarkeit · Störungsbehebung",
+        "title": "Flutter-Entwickler",
+        "company": "Digitale Publishing-Produkte",
+        "position": "Android- und iOS-Anwendungen",
+        "start_date": "2022",
+        "end_date": "2024",
+        "period": "Oktober 2022 — Juni 2024",
+        "description": "Umsetzung von Publishing-Anwendungen für Android und iOS mit MVVM, GetX, Dio, Lokalisierung und Store-fertigen Release-Abläufen.",
         "technologies": [
-          "Docker",
-          "Nginx",
-          "Prometheus",
-          "Grafana",
-          "PostgreSQL"
+          "Flutter",
+          "Dart",
+          "MVVM",
+          "GetX",
+          "Dio"
+        ]
+      },
+      {
+        "title": "Software Engineering",
+        "company": "Hochschulausbildung",
+        "position": "Bachelorabschluss",
+        "start_date": "2021",
+        "end_date": "2025",
+        "period": "2021 — 2025",
+        "description": "Software-Engineering-Studium mit Algorithmen, Datenstrukturen, Datenbanken, Softwaredesign und teamorientierter Produktentwicklung.",
+        "technologies": [
+          "Algorithmen",
+          "Datenstrukturen",
+          "Datenbanken",
+          "Softwaredesign",
+          "Teamprojekte"
         ]
       }
     ],
     "projects": [
       {
         "title": "FakeCallApp",
-        "description": "Flutter · Next.js · Go",
+        "description": "Eine spielerische Fake-Videoanruf-Erfahrung mit Figuren, Zeitplanung und mobilen Interaktionen.",
         "category": "Web",
         "url": "https://fakecallapp.com"
       },
       {
         "title": "CleanMyGallery",
-        "description": "Flutter · Bildverarbeitung · EXIF",
+        "description": "Ein praktischer Galerie-Reiniger zum Finden von Datenmüll, Komprimieren von Fotos und Verwalten von Metadaten.",
         "category": "Web",
         "url": "https://cleanmygallery.com"
       },
       {
         "title": "FocusGroves",
-        "description": "Flutter · Fokussysteme · Echtzeiträume",
+        "description": "Ein Fokus-Arbeitsbereich mit Timern, Aufgaben und gemeinsamen Lernräumen.",
         "category": "Web",
         "url": "https://focusgroves.com"
       },
       {
         "title": "MoodGrade",
-        "description": "Flutter · Gesundheitstagebuch · Export",
+        "description": "Ein privates Stimmungstagebuch mit Medikamentenprotokoll, Exporten und langfristigen Mustern.",
         "category": "Web",
         "url": "https://moodgrade.com"
       },
       {
         "title": "GetQrivo",
-        "description": "QR · Kurzlinks · Analysen",
+        "description": "Ein QR-Werkzeugkasten zum Erstellen von Codes, Verwalten kurzer Links und Auswerten von Scans.",
         "category": "Web",
         "url": "https://getqrivo.com"
       },
       {
         "title": "OverlayPhoto",
-        "description": "Flutter · Compositing · Zeitkapseln",
+        "description": "Ein Fotoeditor für Overlays, Rahmen, Filter und Erinnerungen in Zeitkapseln.",
         "category": "Web",
         "url": "https://overlayphoto.com"
       },
       {
         "title": "DistractionKiller",
-        "description": "Flutter · digitales Wohlbefinden · Zeitpläne",
+        "description": "Ein Werkzeug für digitales Wohlbefinden, das Ablenkungen blockiert und Fokuszeit schützt.",
         "category": "Web",
         "url": "https://distractionkiller.com"
       },
       {
         "title": "KPSSHazirlan",
-        "description": "Lernpläne · Übungsengine · Analysen",
+        "description": "Ein Lernplaner für die KPSS-Vorbereitung, Übungseinheiten und Fortschrittsverfolgung.",
         "category": "Web",
         "url": "https://kpsshazirlan.com"
       },
       {
         "title": "EhliyetCoz",
-        "description": "Tägliche Quizze · Fortschrittsmodell · Inhaltsprüfung",
+        "description": "Ein Begleiter für die Führerscheinprüfung mit täglichen Quizzen und klarem Fortschrittsfeedback.",
         "category": "Web",
         "url": "https://ehliyetcoz.com"
       },
       {
         "title": "Kazanamazi",
-        "description": "Gewohnheitsprotokoll · Heatmaps · Erinnerungen",
+        "description": "Ein ruhiges persönliches Protokoll für versäumte Gebete und Fastentage mit Erinnerungen und Verlauf.",
         "category": "Web",
         "url": "https://kazanamazi.net"
       },
       {
         "title": "PDFScanPro",
-        "description": "PDF-Pipeline · Konvertierung · Komprimierung",
+        "description": "Ein fokussierter PDF-Werkzeugkasten zum Scannen, Komprimieren, Zusammenführen, Teilen und Konvertieren.",
         "category": "Web",
         "url": "https://pdfscanpro.com"
       }
@@ -174,28 +190,28 @@
     ],
     "proof": [
       {
-        "title": "Dual-Runtime-Auslieferung",
-        "detail": "WebAssembly mit SkWasm ist das primäre Artefakt; für Browser ohne Unterstützung steht ein JavaScript- und CanvasKit-Fallback bereit.",
-        "verification": "Build-Manifest prüfen"
+        "title": "Verantwortung für das Produkt",
+        "detail": "Ich bleibe vom ersten Nutzungsmoment über Veröffentlichung und Support bis zur nächsten Verbesserung nah am Problem.",
+        "verification": "Das Produkt steht im Mittelpunkt"
       },
       {
-        "title": "Im Browser gemessen",
-        "detail": "Das Engineering Lab zeigt Laufzeit, Renderer, Isolationsstatus und gleitende Frame-Timing-Perzentile der laufenden Anwendung.",
-        "verification": "Engineering Lab öffnen"
+        "title": "Für reale Bedingungen entwickeln",
+        "detail": "Offline-Daten, instabile Netzwerke, native Integrationen und Wiederherstellungspfade gehören zum Produkt und sind keine Nachträge.",
+        "verification": "Robustheit von Anfang an"
       },
       {
-        "title": "Für Produktion gehärtet",
-        "detail": "Automatisierte Tests decken Zustand, Barrierefreiheit, Deep Links, Fehlerwiederherstellung und mobile Layouts ab; der Server erzwingt CSP, COOP, COEP und korrekte Wasm-MIME-Typen.",
-        "verification": "Tests und Nginx-Konfiguration prüfen"
+        "title": "Wartbar bleiben",
+        "detail": "Klare Grenzen, fokussiertes State-Management und sinnvolle Tests erleichtern Änderungen nach der Veröffentlichung.",
+        "verification": "Bereit für die nächste Änderung"
       }
     ]
   },
   "nav": {
     "home": "Startseite",
-    "about": "Profil",
-    "experience": "Arbeit",
-    "projects": "Systeme",
-    "proof": "Nachweise"
+    "about": "Über mich",
+    "experience": "Erfahrung",
+    "projects": "Projekte",
+    "proof": "Arbeitsweise"
   },
   "accessibility": {
     "skip_to_content": "Zum Inhalt springen",
@@ -205,22 +221,23 @@
     "enable_sound_effects": "Soundeffekte aktivieren"
   },
   "about_section": {
-    "title": "Systemprofil",
-    "bio": "Dieses Portfolio dokumentiert Design, Messung, Tests und Betrieb von Software, ohne persönliche Identität offenzulegen.",
-    "bio2": "In den ausgewählten Systemen eingesetzte Technologien:"
+    "title": "Über mich",
+    "bio": "Seit 2021 entwickle ich produktive Flutter-Anwendungen für Mobilgeräte, Desktop und Web. Im Mittelpunkt stehen klares Produktverhalten, robuste Offline-Daten, Echtzeitsynchronisierung und wartbarer Code.",
+    "bio2": "Neben Kundenprojekten entwickle und betreibe ich eigene SaaS-Produkte durchgängig—von Flutter-Oberflächen und Go-APIs bis zu Deployment und Monitoring."
   },
   "home_section": {
-    "title": "SYSTEMPORTFOLIO.",
-    "subtitle": "Unabhängige Softwareentwicklung",
-    "view_work": "Systeme erkunden",
-    "inspect_runtime": "Laufzeit prüfen"
+    "title": "SENIOR FLUTTER-ENTWICKLER.",
+    "subtitle": "Nützliche Produkte für Mobilgeräte, Desktop und Web.",
+    "view_work": "Projekte ansehen",
+    "inspect_runtime": "Über mich"
   },
   "experience_section": {
-    "title": "Ausgewählte Engineering-Arbeit",
+    "title": "Erfahrung",
     "present": "Aktuell"
   },
   "projects_section": {
-    "title": "Ausgewählte Systeme",
+    "title": "Ausgewählte Projekte",
+    "subtitle": "Produkte, die ich konzipiert, entwickelt und fortlaufend verbessert habe.",
     "filter_all": "Alle",
     "case_study_problem": "Die Herausforderung",
     "case_study_solution": "Der Ansatz",
@@ -237,16 +254,16 @@
     "flip_hint": "Klicken, um die Fallstudie anzuzeigen"
   },
   "proof_section": {
-    "title": "Technischer Nachweis",
-    "subtitle": "Aussagen, die im Repository und in der laufenden Anwendung überprüfbar sind"
+    "title": "Meine Arbeitsweise",
+    "subtitle": "Ein pragmatischer Ansatz aus der Entwicklung und Betreuung realer Produkte."
   },
   "footer": {
     "command_hint_prefix": "Drücken Sie",
     "command_hint_suffix": "um die Befehlspalette zu öffnen",
-    "verification": "Verifizierung",
-    "verification_body": "Nachweise zu Laufzeit, Renderer, Isolation und Frame-Zeiten lassen sich direkt auf dieser Seite prüfen.",
+    "verification": "Aktueller Fokus",
+    "verification_body": "Durchdachte Flutter-Produkte und die Go-Dienste dahinter entwickeln.",
     "quick_links": "Schnellzugriff",
-    "easter_egg": "Du hast den Fünf-Klick-Pfad gefunden. Neugier gehört zur Testoberfläche."
+    "easter_egg": "Du hast die ruhige Ecke gefunden. Danke fürs genaue Hinsehen."
   },
   "command_palette": {
     "close": "Befehlspalette schließen",

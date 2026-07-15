@@ -26,9 +26,9 @@ final class _PaletteLanguageRepository implements ILanguageRepository {
       'contact': 'Contact',
     },
     'cv_data': {
-      'personal_info': {'name': 'Systems Portfolio'},
+      'personal_info': {'name': 'Senior Flutter Engineer'},
       'projects': [
-        {'title': 'Inspectable system'},
+        {'title': 'Selected product'},
       ],
     },
   };

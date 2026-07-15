@@ -10,7 +10,6 @@ import 'package:flutter_web_portfolio/app/controllers/scroll_controller.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
 import 'package:flutter_web_portfolio/app/core/constants/cinematic_curves.dart';
 import 'package:flutter_web_portfolio/app/core/constants/durations.dart';
-import 'package:flutter_web_portfolio/app/features/engineering_lab/presentation/engineering_lab.dart';
 import 'package:flutter_web_portfolio/app/widgets/cinematic_focusable.dart';
 
 /// A command entry that the palette can display and execute.
@@ -108,10 +107,6 @@ class _CommandPaletteState extends State<CommandPalette> {
       'command_palette.language',
       defaultValue: 'Language',
     );
-    final actionCategory = languageController.getText(
-      'command_palette.action',
-      defaultValue: 'Action',
-    );
 
     const sectionIcons = <String, IconData>{
       'home': Icons.home_rounded,
@@ -159,25 +154,6 @@ class _CommandPaletteState extends State<CommandPalette> {
             () => languageController.changeLanguage(entry.key),
           ),
         ),
-
-      // ── Actions ─────────────────────────────────────────────────────────
-      _PaletteCommand(
-        label: languageController.getText(
-          'command_palette.open_lab',
-          defaultValue: 'Open Engineering Lab',
-        ),
-        category: actionCategory,
-        icon: Icons.science_rounded,
-        onExecute: () {
-          final navigator = Navigator.of(context, rootNavigator: true)..pop();
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            EngineeringLab.show(
-              navigator.context,
-              activeSection: scrollController.activeSection,
-            );
-          });
-        },
-      ),
     ];
   }
 

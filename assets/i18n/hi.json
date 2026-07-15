@@ -1,26 +1,26 @@
 {
-  "app_name": "सिस्टम पोर्टफोलियो",
+  "app_name": "सीनियर Flutter इंजीनियर",
   "cv_data": {
     "personal_info": {
-      "name": "सिस्टम पोर्टफोलियो",
+      "name": "सीनियर Flutter इंजीनियर",
       "location": "दूरस्थ",
-      "bio": "Flutter, Go, डेटा सिस्टम और मापने योग्य प्रोडक्शन विश्वसनीयता पर केंद्रित एक गुमनाम इंजीनियरिंग पोर्टफोलियो।",
-      "tagline": "निरीक्षण योग्य सॉफ्टवेयर सिस्टम, प्रोडक्शन में मापे गए",
+      "bio": "मैं 2021 से मोबाइल, डेस्कटॉप और वेब के लिए प्रोडक्शन Flutter एप्लिकेशन बना रहा हूँ। मेरा ध्यान स्पष्ट उत्पाद व्यवहार, भरोसेमंद ऑफ़लाइन डेटा, रीयल-टाइम सिंक्रोनाइज़ेशन और रखरखाव योग्य कोड पर है।",
+      "tagline": "उत्पाद-केंद्रित Flutter इंजीनियरिंग",
       "subtitles": [
-        "Flutter सिस्टम",
-        "Go सेवाएँ",
-        "प्रोडक्शन विश्वसनीयता"
+        "मोबाइल उत्पाद",
+        "ऑफ़लाइन-फर्स्ट एप्लिकेशन",
+        "क्रॉस-प्लेटफ़ॉर्म डिलीवरी"
       ]
     },
     "experiences": [
       {
-        "title": "क्लाइंट इंजीनियरिंग",
-        "company": "क्रॉस-प्लेटफ़ॉर्म एप्लिकेशन",
-        "position": "Flutter सिस्टम",
-        "start_date": "",
+        "title": "Flutter डेवलपर",
+        "company": "एंटरप्राइज़ रिटेल सॉफ्टवेयर",
+        "position": "मोबाइल और डेस्कटॉप एप्लिकेशन",
+        "start_date": "2022",
         "end_date": "",
-        "period": "चुना हुआ प्रोडक्शन कार्य",
-        "description": "Flutter · ऑफ़लाइन-फर्स्ट डेटा · नेटिव इंटीग्रेशन · रीयल-टाइम सिंक्रोनाइज़ेशन",
+        "period": "मार्च 2022 — वर्तमान",
+        "description": "Android और iOS टैबलेट तथा Linux, macOS और Windows डेस्कटॉप के लिए प्रोडक्शन एप्लिकेशन। इसमें SQLite और Drift के साथ ऑफ़लाइन डेटा, नेटिव इंटीग्रेशन और भरोसेमंद रीयल-टाइम सिंक्रोनाइज़ेशन शामिल हैं।",
         "technologies": [
           "Flutter",
           "Dart",
@@ -30,102 +30,118 @@
         ]
       },
       {
-        "title": "बैकएंड इंजीनियरिंग",
-        "company": "API और डेटा सिस्टम",
-        "position": "Go सेवाएँ",
-        "start_date": "",
-        "end_date": "",
-        "period": "चुना हुआ प्रोडक्शन कार्य",
-        "description": "Go Fiber · PostgreSQL · Redis · ऑब्जेक्ट स्टोरेज · बैकग्राउंड कार्य",
+        "title": "मोबाइल टीम लीड",
+        "company": "लॉजिस्टिक्स प्लेटफ़ॉर्म",
+        "position": "क्रॉस-प्लेटफ़ॉर्म उत्पाद डिलीवरी",
+        "start_date": "2023",
+        "end_date": "2025",
+        "period": "जून 2023 — फ़रवरी 2025",
+        "description": "WebSocket वाहन ट्रैकिंग, Google और Apple Maps इंटीग्रेशन और React वेब एप्लिकेशन के साथ समन्वय सहित लॉजिस्टिक्स उत्पाद की मोबाइल डिलीवरी का नेतृत्व किया।",
         "technologies": [
-          "Go",
-          "PostgreSQL",
-          "Redis",
-          "MinIO",
-          "Asynq"
+          "Flutter",
+          "WebSocket",
+          "Google Maps",
+          "Apple Maps",
+          "React"
         ]
       },
       {
-        "title": "विश्वसनीयता इंजीनियरिंग",
-        "company": "स्व-होस्टेड रनटाइम",
-        "position": "प्रोडक्शन संचालन",
-        "start_date": "",
-        "end_date": "",
-        "period": "चुना हुआ प्रोडक्शन कार्य",
-        "description": "Docker Swarm · अपरिवर्तनीय इमेज · रीस्टोर ड्रिल · ऑब्ज़र्वेबिलिटी · घटना से पुनर्प्राप्ति",
+        "title": "Flutter डेवलपर",
+        "company": "डिजिटल पब्लिशिंग उत्पाद",
+        "position": "Android और iOS एप्लिकेशन",
+        "start_date": "2022",
+        "end_date": "2024",
+        "period": "अक्टूबर 2022 — जून 2024",
+        "description": "MVVM, GetX, Dio, स्थानीयकरण और स्टोर-तैयार रिलीज़ प्रक्रियाओं के साथ Android और iOS के लिए पब्लिशिंग एप्लिकेशन बनाए।",
         "technologies": [
-          "Docker",
-          "Nginx",
-          "Prometheus",
-          "Grafana",
-          "PostgreSQL"
+          "Flutter",
+          "Dart",
+          "MVVM",
+          "GetX",
+          "Dio"
+        ]
+      },
+      {
+        "title": "सॉफ्टवेयर इंजीनियरिंग",
+        "company": "स्नातक शिक्षा",
+        "position": "स्नातक डिग्री",
+        "start_date": "2021",
+        "end_date": "2025",
+        "period": "2021 — 2025",
+        "description": "एल्गोरिदम, डेटा संरचना, डेटाबेस, सॉफ्टवेयर डिज़ाइन और टीम-आधारित उत्पाद विकास को कवर करने वाली औपचारिक सॉफ्टवेयर इंजीनियरिंग शिक्षा।",
+        "technologies": [
+          "एल्गोरिदम",
+          "डेटा संरचना",
+          "डेटाबेस",
+          "सॉफ्टवेयर डिज़ाइन",
+          "टीम प्रोजेक्ट"
         ]
       }
     ],
     "projects": [
       {
         "title": "FakeCallApp",
-        "description": "Flutter · Next.js · Go",
+        "description": "किरदारों, शेड्यूलिंग और मोबाइल-केंद्रित इंटरैक्शन वाला मज़ेदार नकली वीडियो-कॉल अनुभव।",
         "category": "वेब",
         "url": "https://fakecallapp.com"
       },
       {
         "title": "CleanMyGallery",
-        "description": "Flutter · इमेज पाइपलाइन · EXIF",
+        "description": "गैलरी की अव्यवस्था खोजने, फ़ोटो संपीड़ित करने और मेटाडेटा नियंत्रित रखने का व्यावहारिक टूल।",
         "category": "वेब",
         "url": "https://cleanmygallery.com"
       },
       {
         "title": "FocusGroves",
-        "description": "Flutter · फ़ोकस सिस्टम · रीयल-टाइम रूम",
+        "description": "टाइमर, कार्य और साझा अध्ययन कक्षों को साथ लाने वाला फ़ोकस कार्यक्षेत्र।",
         "category": "वेब",
         "url": "https://focusgroves.com"
       },
       {
         "title": "MoodGrade",
-        "description": "Flutter · स्वास्थ्य जर्नल · निर्यात",
+        "description": "दवा ट्रैकिंग, निर्यात और लंबे समय के पैटर्न वाला निजी मूड जर्नल।",
         "category": "वेब",
         "url": "https://moodgrade.com"
       },
       {
         "title": "GetQrivo",
-        "description": "QR · शॉर्ट लिंक · एनालिटिक्स",
+        "description": "कोड बनाने, छोटे लिंक संभालने और स्कैन समझने के लिए QR टूलकिट।",
         "category": "वेब",
         "url": "https://getqrivo.com"
       },
       {
         "title": "OverlayPhoto",
-        "description": "Flutter · कम्पोज़िटिंग · टाइम कैप्सूल",
+        "description": "ओवरले, फ़्रेम, फ़िल्टर और टाइम-कैप्सूल यादों के लिए फ़ोटो एडिटर।",
         "category": "वेब",
         "url": "https://overlayphoto.com"
       },
       {
         "title": "DistractionKiller",
-        "description": "Flutter · डिजिटल वेलबीइंग · शेड्यूल",
+        "description": "ध्यान भटकाने वाली चीज़ें रोकने और फ़ोकस समय बचाने का डिजिटल वेलबीइंग टूल।",
         "category": "वेब",
         "url": "https://distractionkiller.com"
       },
       {
         "title": "KPSSHazirlan",
-        "description": "लर्निंग प्लान · अभ्यास इंजन · एनालिटिक्स",
+        "description": "KPSS तैयारी, अभ्यास सत्र और प्रगति ट्रैकिंग के लिए अध्ययन योजनाकार।",
         "category": "वेब",
         "url": "https://kpsshazirlan.com"
       },
       {
         "title": "EhliyetCoz",
-        "description": "दैनिक क्विज़ · प्रगति मॉडल · कंटेंट QA",
+        "description": "दैनिक क्विज़ और स्पष्ट प्रगति प्रतिक्रिया वाला ड्राइविंग परीक्षा साथी।",
         "category": "वेब",
         "url": "https://ehliyetcoz.com"
       },
       {
         "title": "Kazanamazi",
-        "description": "आदत लेखा · हीटमैप · रिमाइंडर",
+        "description": "छूटी प्रार्थनाओं और उपवास के दिनों के लिए रिमाइंडर और इतिहास वाला शांत निजी रिकॉर्ड।",
         "category": "वेब",
         "url": "https://kazanamazi.net"
       },
       {
         "title": "PDFScanPro",
-        "description": "PDF पाइपलाइन · रूपांतरण · संपीड़न",
+        "description": "दस्तावेज़ स्कैन, संपीड़ित, जोड़ने, विभाजित और बदलने के लिए केंद्रित PDF टूलकिट।",
         "category": "वेब",
         "url": "https://pdfscanpro.com"
       }
@@ -174,28 +190,28 @@
     ],
     "proof": [
       {
-        "title": "दो रनटाइम डिलीवरी",
-        "detail": "SkWasm वाला WebAssembly मुख्य आउटपुट है; इसे न चला सकने वाले ब्राउज़र के लिए JavaScript और CanvasKit fallback उपलब्ध है।",
-        "verification": "बिल्ड मैनिफेस्ट देखें"
+        "title": "उत्पाद की ज़िम्मेदारी लें",
+        "detail": "मैं पहली बातचीत से लेकर रिलीज़, सहायता और अगले सुधार तक समस्या के करीब रहता हूँ।",
+        "verification": "प्रक्रिया से पहले उत्पाद"
       },
       {
-        "title": "ब्राउज़र में मापा गया",
-        "detail": "Engineering Lab चालू ऐप का runtime, renderer, isolation और rolling frame-timing percentiles दिखाता है।",
-        "verification": "Engineering Lab खोलें"
+        "title": "वास्तविक परिस्थितियों के लिए डिज़ाइन",
+        "detail": "ऑफ़लाइन डेटा, अस्थिर नेटवर्क, नेटिव इंटीग्रेशन और रिकवरी पथ उत्पाद के मूल हिस्से हैं।",
+        "verification": "डिज़ाइन से ही विश्वसनीयता"
       },
       {
-        "title": "प्रोडक्शन के लिए सुदृढ़",
-        "detail": "स्वचालित परीक्षण state, accessibility, deep links, error recovery और mobile layouts को कवर करते हैं; सर्वर CSP, COOP, COEP और सही Wasm MIME लागू करता है।",
-        "verification": "टेस्ट और Nginx कॉन्फ़िग देखें"
+        "title": "रखरखाव आसान रखें",
+        "detail": "स्पष्ट सीमाएँ, केंद्रित स्टेट प्रबंधन और उपयोगी परीक्षण रिलीज़ के बाद बदलाव आसान बनाते हैं।",
+        "verification": "अगले बदलाव के लिए तैयार"
       }
     ]
   },
   "nav": {
     "home": "होम",
-    "about": "प्रोफ़ाइल",
-    "experience": "कार्य",
-    "projects": "सिस्टम",
-    "proof": "प्रमाण"
+    "about": "मेरे बारे में",
+    "experience": "अनुभव",
+    "projects": "प्रोजेक्ट",
+    "proof": "कार्यशैली"
   },
   "accessibility": {
     "skip_to_content": "सामग्री पर जाएँ",
@@ -205,22 +221,23 @@
     "enable_sound_effects": "ध्वनि प्रभाव चालू करें"
   },
   "about_section": {
-    "title": "सिस्टम प्रोफ़ाइल",
-    "bio": "यह पोर्टफोलियो व्यक्तिगत पहचान उजागर किए बिना सॉफ्टवेयर के डिज़ाइन, मापन, परीक्षण और संचालन को दर्ज करता है।",
-    "bio2": "चुने गए सिस्टम में उपयोग की गई तकनीकें:"
+    "title": "मेरे बारे में",
+    "bio": "मैं 2021 से मोबाइल, डेस्कटॉप और वेब के लिए प्रोडक्शन Flutter एप्लिकेशन बना रहा हूँ। मेरा ध्यान स्पष्ट उत्पाद व्यवहार, भरोसेमंद ऑफ़लाइन डेटा, रीयल-टाइम सिंक्रोनाइज़ेशन और रखरखाव योग्य कोड पर है।",
+    "bio2": "क्लाइंट कार्य के साथ मैं स्वतंत्र SaaS उत्पादों को Flutter इंटरफ़ेस और Go API से लेकर डिप्लॉयमेंट और मॉनिटरिंग तक डिज़ाइन और संचालित करता हूँ।"
   },
   "home_section": {
-    "title": "सिस्टम पोर्टफोलियो।",
-    "subtitle": "स्वतंत्र सॉफ्टवेयर इंजीनियरिंग",
-    "view_work": "सिस्टम देखें",
-    "inspect_runtime": "रनटाइम जाँचें"
+    "title": "सीनियर FLUTTER इंजीनियर।",
+    "subtitle": "मोबाइल, डेस्कटॉप और वेब के लिए उपयोगी उत्पाद।",
+    "view_work": "प्रोजेक्ट देखें",
+    "inspect_runtime": "मेरे बारे में"
   },
   "experience_section": {
-    "title": "चुना हुआ इंजीनियरिंग कार्य",
+    "title": "अनुभव",
     "present": "वर्तमान"
   },
   "projects_section": {
-    "title": "चुने गए सिस्टम",
+    "title": "चुने गए प्रोजेक्ट",
+    "subtitle": "वे उत्पाद जिन्हें मैंने डिज़ाइन किया, बनाया और लगातार बेहतर कर रहा हूँ।",
     "filter_all": "सभी",
     "case_study_problem": "चुनौती",
     "case_study_solution": "दृष्टिकोण",
@@ -237,16 +254,16 @@
     "flip_hint": "केस स्टडी देखने के लिए क्लिक करें"
   },
   "proof_section": {
-    "title": "इंजीनियरिंग प्रमाण",
-    "subtitle": "ऐसे दावे जिन्हें repository और live runtime में जांचा जा सकता है"
+    "title": "मैं कैसे काम करता हूँ",
+    "subtitle": "वास्तविक उत्पादों को लॉन्च और बनाए रखने से विकसित व्यावहारिक दृष्टिकोण।"
   },
   "footer": {
     "command_hint_prefix": "दबाएं",
     "command_hint_suffix": "कमांड पैलेट खोलने के लिए",
     "quick_links": "त्वरित लिंक",
-    "verification": "सत्यापन",
-    "verification_body": "रनटाइम, रेंडरर, आइसोलेशन और फ़्रेम टाइमिंग के प्रमाण इस पृष्ठ पर सीधे देखे जा सकते हैं।",
-    "easter_egg": "आपने पाँच-क्लिक वाला रास्ता खोज लिया। जिज्ञासा परीक्षण सतह का हिस्सा है।"
+    "verification": "वर्तमान फ़ोकस",
+    "verification_body": "सोच-समझकर Flutter उत्पाद और उनके पीछे की Go सेवाएँ बनाना।",
+    "easter_egg": "आपने शांत कोना खोज लिया। ध्यान से देखने के लिए धन्यवाद।"
   },
   "command_palette": {
     "close": "कमांड पैलेट बंद करें",

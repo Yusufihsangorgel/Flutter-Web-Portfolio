@@ -1,8 +1,8 @@
 <div align="center">
 
-# Flutter Web, pushed beyond the usual portfolio
+# Flutter Portfolio Template
 
-A graphics-heavy, responsive portfolio built entirely with Flutter widgets and custom painters. The release build ships Dart WebAssembly + SkWasm with a JavaScript/CanvasKit fallback.
+A production-ready personal portfolio template built with Flutter. The current demo presents a senior Flutter engineer's experience and selected products; forks can replace the public content through the locale JSON files without rewriting the interface.
 
 ![Flutter](https://img.shields.io/badge/Flutter-3.41-02569B?logo=flutter)
 ![Dart](https://img.shields.io/badge/Dart-3.11-0175C2?logo=dart)
@@ -12,45 +12,25 @@ A graphics-heavy, responsive portfolio built entirely with Flutter widgets and c
 
 </div>
 
-## This is the demo
+## Customize the portfolio
 
-The page is not a video, a DOM mockup, or a wrapper around a JavaScript animation library. Scroll position drives a scene state machine; that state feeds gradients, particles, accents, vignette intensity, and section transitions on Flutter's canvas.
+Edit `assets/i18n/*.json` to change the role, biography, experience, skills, working principles, projects, and interface labels. Keep the same keys in every locale so the translation catalog remains type-safe.
 
-Before that canvas is ready, the server-rendered instant shell paints the same
-engineering thesis directly from `index.html`. It remains useful on a cold or
-constrained connection, exposes an accessible busy state, and hands off only
-after Flutter emits its first-frame event.
+The public demo intentionally avoids personal contact details. Add only the identity and links you are comfortable publishing.
 
-Open the live site and press:
+Useful keyboard shortcuts:
 
-- `Ctrl/Cmd + Shift + L` — inspect the active runtime, renderer, browser isolation, and live frame timings.
+- `Ctrl/Cmd + Shift + L` — open the optional Flutter runtime diagnostic.
 - `Ctrl/Cmd + K` — open the keyboard-driven command palette.
 
-The Engineering Lab reports values from the current browser session. It deliberately does not publish a fixed FPS score or a hand-picked benchmark.
+## Included
 
-## What makes it interesting
-
-🎬 **Cinematic Backgrounds** — 5 movie-inspired palettes that crossfade as you scroll
-
-✨ **Particle System** — spatial grid with O(n) neighbor lookups, cursor repulsion, connecting lines
-
-🎥 **Procedural Film Grain** — a cached 256×256 texture created via `PictureRecorder` and tiled by a custom painter
-
-🧪 **Engineering Lab** — runtime capability probe plus a rolling `FrameTiming` p50/p95 trace
-
-⌨️ **Command Palette** — Ctrl+K fuzzy search across navigation, languages, and actions
-
-🌍 **7 Languages** — English, Turkish, German, French, Spanish, Arabic (RTL), Hindi
-
-🎯 **Scroll Animations** — fade-in reveals, scene-aware accents, text scramble, shader wipes
-
-🔊 **Sound Design** — Web Audio API synthesized hover, click, and ambient sounds
-
-🎮 **Easter Egg** — Konami code triggers Matrix digital rain
-
-📱 **Responsive** — mobile, tablet, and desktop breakpoints
-
-♿ **Accessible Controls** — one-name controls, H1/H2 semantics, keyboard navigation, skip link, focus states, and reduced-motion-aware navigation
+- Responsive layouts for mobile, tablet, and desktop.
+- English, Turkish, German, French, Spanish, Arabic with RTL, and Hindi.
+- Accessible headings, keyboard navigation, skip links, focus states, and reduced-motion support.
+- Data-driven experience, skills, principles, and project sections.
+- Dart WebAssembly and SkWasm release with a JavaScript and CanvasKit fallback.
+- Playwright coverage for loading, accessibility, localization, routing, and release assets.
 
 ---
 

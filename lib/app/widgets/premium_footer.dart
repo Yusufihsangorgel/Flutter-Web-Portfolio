@@ -1,5 +1,3 @@
-import 'dart:math' as math;
-
 import 'package:flutter/foundation.dart'
     show defaultTargetPlatform, TargetPlatform;
 import 'package:flutter/material.dart';
@@ -11,7 +9,6 @@ import 'package:flutter_web_portfolio/app/core/theme/app_fonts.dart';
 import 'package:flutter_web_portfolio/app/core/constants/breakpoints.dart';
 import 'package:flutter_web_portfolio/app/core/constants/cinematic_curves.dart';
 import 'package:flutter_web_portfolio/app/core/constants/durations.dart';
-import 'package:flutter_web_portfolio/app/features/engineering_lab/presentation/engineering_lab.dart';
 import 'package:flutter_web_portfolio/app/widgets/cinematic_focusable.dart';
 import 'package:flutter_web_portfolio/app/widgets/neon_effects.dart';
 
@@ -20,16 +17,11 @@ part 'footer/footer_quick_links.dart';
 part 'footer/footer_connect.dart';
 part 'footer/footer_bottom_bar.dart';
 
-/// App version displayed in the footer.
-const String _appVersion = '1.1.0';
-
 // =============================================================================
 // PremiumFooter
 // =============================================================================
 
-/// A full-width dark footer with an animated gradient neon top border,
-/// responsive navigation, inspectable runtime evidence, build metadata, and
-/// a deliberately small five-click easter egg.
+/// A compact footer with navigation and current professional focus.
 class PremiumFooter extends StatelessWidget {
   const PremiumFooter({super.key});
 
@@ -98,7 +90,7 @@ class _DesktopLayout extends StatelessWidget {
       // Center — quick navigation links
       Expanded(flex: 2, child: _QuickLinksColumn()),
       SizedBox(width: 48),
-      // Right — inspectable verification note
+      // Right — current professional focus
       Expanded(flex: 3, child: _ConnectColumn()),
     ],
   );

@@ -110,14 +110,14 @@ test('serves the production accessibility hierarchy', async ({
     .filter((node) => ['button', 'link'].includes(node.role?.value ?? ''))
     .map((node) => node.name?.value ?? '');
 
-  expect(headings).toContainEqual({ name: 'SYSTEMS PORTFOLIO.', level: 1 });
+  expect(headings).toContainEqual({ name: 'SENIOR FLUTTER ENGINEER.', level: 1 });
   expect(controls).toEqual(
     expect.arrayContaining([
       'Skip to content',
       'Back to top',
       ...(isMobile
         ? ['Open navigation menu']
-        : ['Profile', 'Work', 'Evidence', 'Systems']),
+        : ['About', 'Experience', 'Approach', 'Projects']),
       'Language menu: English',
     ]),
   );
@@ -131,10 +131,10 @@ test('serves the production accessibility hierarchy', async ({
       .getByRole('button', { name: 'Open navigation menu', exact: true })
       .click();
   }
-  await page.getByRole('button', { name: 'Systems', exact: true }).click();
+  await page.getByRole('button', { name: 'Projects', exact: true }).click();
   await expect(page).toHaveURL(/#\/projects$/);
   await expect(
-    page.getByRole('heading', { name: 'Selected Systems' }),
+    page.getByRole('heading', { name: 'Selected Work' }),
   ).toBeAttached();
 
   const projectsTree = await accessibility.send(
@@ -160,7 +160,7 @@ test('serves the localized Arabic command surface in production', async ({
 
   await expect(page.locator('html')).toHaveAttribute('lang', 'ar');
   await expect(page.locator('html')).toHaveAttribute('dir', 'rtl');
-  await expect(page.getByText('استكشاف الأنظمة', { exact: true })).toBeAttached();
+  await expect(page.getByText('عرض المشاريع', { exact: true })).toBeAttached();
 });
 
 test('serves the declared production sharing and font assets', async ({
@@ -174,7 +174,7 @@ test('serves the declared production sharing and font assets', async ({
   const html = await document.text();
   expect(html).toContain('class="bootstrap-title"');
   expect(html).toContain('aria-busy="true"');
-  expect(html).toContain('Preparing the live canvas');
+  expect(html).toContain('Loading selected work');
   expect(html).toContain(
     'content="https://developeryusuf.com/assets/og/engineering-showcase.png"',
   );

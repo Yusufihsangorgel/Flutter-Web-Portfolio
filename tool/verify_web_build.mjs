@@ -112,13 +112,13 @@ try {
 try {
   const index = await readFile(path.join(webRoot, 'index.html'), 'utf8');
   if (!index.includes('class="bootstrap-title"')) {
-    failures.push('the instant engineering shell headline is missing');
+    failures.push('the instant portfolio shell headline is missing');
   }
   if (!index.includes('aria-busy="true"')) {
-    failures.push('the instant engineering shell does not expose loading state');
+    failures.push('the instant portfolio shell does not expose loading state');
   }
-  if (!index.includes('Preparing the live canvas')) {
-    failures.push('the instant engineering shell status is missing');
+  if (!index.includes('Loading selected work')) {
+    failures.push('the instant portfolio shell status is missing');
   }
 } catch {
   failures.push('index.html is missing');

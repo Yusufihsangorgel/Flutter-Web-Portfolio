@@ -1,26 +1,26 @@
 {
-  "app_name": "Systems Portfolio",
+  "app_name": "Senior Flutter Engineer",
   "cv_data": {
     "personal_info": {
-      "name": "Systems Portfolio",
+      "name": "Senior Flutter Engineer",
       "location": "Remote",
-      "bio": "An anonymous engineering portfolio focused on Flutter, Go, data systems, and measurable production reliability.",
-      "tagline": "Inspectable software systems, measured in production",
+      "bio": "I have been building production Flutter applications since 2021 across mobile, desktop, and web. My work centres on clear product behaviour, resilient offline data, real-time synchronisation, and code that teams can maintain.",
+      "tagline": "Product-minded Flutter engineering",
       "subtitles": [
-        "Flutter systems",
-        "Go services",
-        "Production reliability"
+        "Mobile products",
+        "Offline-first applications",
+        "Cross-platform delivery"
       ]
     },
     "experiences": [
       {
-        "title": "Client engineering",
-        "company": "Cross-platform applications",
-        "position": "Flutter systems",
-        "start_date": "",
+        "title": "Flutter Developer",
+        "company": "Enterprise retail software",
+        "position": "Mobile and desktop applications",
+        "start_date": "2022",
         "end_date": "",
-        "period": "Selected production work",
-        "description": "Flutter · offline-first data · native integrations · realtime synchronization",
+        "period": "March 2022 — Present",
+        "description": "Building production applications for Android and iOS tablets plus Linux, macOS, and Windows desktops. The work includes offline-first SQLite and Drift data, native integrations, and reliable real-time synchronisation.",
         "technologies": [
           "Flutter",
           "Dart",
@@ -30,102 +30,118 @@
         ]
       },
       {
-        "title": "Backend engineering",
-        "company": "API and data systems",
-        "position": "Go services",
-        "start_date": "",
-        "end_date": "",
-        "period": "Selected production work",
-        "description": "Go Fiber · PostgreSQL · Redis · object storage · background jobs",
+        "title": "Mobile Team Lead",
+        "company": "Logistics platform",
+        "position": "Cross-platform product delivery",
+        "start_date": "2023",
+        "end_date": "2025",
+        "period": "June 2023 — February 2025",
+        "description": "Led mobile delivery for a logistics product, including WebSocket-based vehicle tracking, Google and Apple Maps integrations, and coordination with a React web application.",
         "technologies": [
-          "Go",
-          "PostgreSQL",
-          "Redis",
-          "MinIO",
-          "Asynq"
+          "Flutter",
+          "WebSocket",
+          "Google Maps",
+          "Apple Maps",
+          "React"
         ]
       },
       {
-        "title": "Reliability engineering",
-        "company": "Self-hosted runtime",
-        "position": "Production operations",
-        "start_date": "",
-        "end_date": "",
-        "period": "Selected production work",
-        "description": "Docker Swarm · immutable images · backup drills · observability · incident recovery",
+        "title": "Flutter Developer",
+        "company": "Digital publishing products",
+        "position": "Android and iOS applications",
+        "start_date": "2022",
+        "end_date": "2024",
+        "period": "October 2022 — June 2024",
+        "description": "Delivered consumer publishing applications for Android and iOS with MVVM, GetX, Dio, localisation, and store-ready release workflows.",
         "technologies": [
-          "Docker",
-          "Nginx",
-          "Prometheus",
-          "Grafana",
-          "PostgreSQL"
+          "Flutter",
+          "Dart",
+          "MVVM",
+          "GetX",
+          "Dio"
+        ]
+      },
+      {
+        "title": "Software Engineering",
+        "company": "Undergraduate education",
+        "position": "Bachelor’s degree",
+        "start_date": "2021",
+        "end_date": "2025",
+        "period": "2021 — 2025",
+        "description": "Formal software engineering education covering algorithms, data structures, databases, software design, and team-based product development.",
+        "technologies": [
+          "Algorithms",
+          "Data Structures",
+          "Databases",
+          "Software Design",
+          "Team Projects"
         ]
       }
     ],
     "projects": [
       {
         "title": "FakeCallApp",
-        "description": "Flutter · Next.js · Go",
+        "description": "A playful fake video-call experience with characters, scheduling, and mobile-first interactions.",
         "category": "Web",
         "url": "https://fakecallapp.com"
       },
       {
         "title": "CleanMyGallery",
-        "description": "Flutter · image pipeline · EXIF",
+        "description": "A practical gallery cleaner for finding clutter, compressing photos, and keeping metadata under control.",
         "category": "Web",
         "url": "https://cleanmygallery.com"
       },
       {
         "title": "FocusGroves",
-        "description": "Flutter · focus systems · realtime rooms",
+        "description": "A focus workspace that combines timers, tasks, and shared study rooms.",
         "category": "Web",
         "url": "https://focusgroves.com"
       },
       {
         "title": "MoodGrade",
-        "description": "Flutter · health journal · export",
+        "description": "A private mood journal with medication tracking, exports, and useful long-term patterns.",
         "category": "Web",
         "url": "https://moodgrade.com"
       },
       {
         "title": "GetQrivo",
-        "description": "QR · short links · analytics",
+        "description": "A QR toolkit for creating codes, managing short links, and understanding scans.",
         "category": "Web",
         "url": "https://getqrivo.com"
       },
       {
         "title": "OverlayPhoto",
-        "description": "Flutter · compositing · time capsules",
+        "description": "A photo editor for overlays, frames, filters, and time-capsule memories.",
         "category": "Web",
         "url": "https://overlayphoto.com"
       },
       {
         "title": "DistractionKiller",
-        "description": "Flutter · digital wellbeing · schedules",
+        "description": "A digital wellbeing tool for blocking distractions and protecting focus time.",
         "category": "Web",
         "url": "https://distractionkiller.com"
       },
       {
         "title": "KPSSHazirlan",
-        "description": "Learning plans · practice engine · analytics",
+        "description": "A study planner for KPSS preparation, practice sessions, and progress tracking.",
         "category": "Web",
         "url": "https://kpsshazirlan.com"
       },
       {
         "title": "EhliyetCoz",
-        "description": "Daily quizzes · progress model · content QA",
+        "description": "A driving-exam companion with daily quizzes and clear progress feedback.",
         "category": "Web",
         "url": "https://ehliyetcoz.com"
       },
       {
         "title": "Kazanamazi",
-        "description": "Habit ledger · heatmaps · reminders",
+        "description": "A calm personal ledger for missed prayers and fasting days, with reminders and history.",
         "category": "Web",
         "url": "https://kazanamazi.net"
       },
       {
         "title": "PDFScanPro",
-        "description": "PDF pipeline · conversion · compression",
+        "description": "A focused PDF toolbox for scanning, compressing, merging, splitting, and converting documents.",
         "category": "Web",
         "url": "https://pdfscanpro.com"
       }
@@ -174,28 +190,28 @@
     ],
     "proof": [
       {
-        "title": "Dual-runtime delivery",
-        "detail": "WebAssembly with SkWasm is the primary artifact, with a JavaScript and CanvasKit fallback for browsers that cannot run it.",
-        "verification": "Inspect the build manifest"
+        "title": "Own the product",
+        "detail": "I stay close to the problem from the first interaction through release, support, and the next iteration.",
+        "verification": "Product before ceremony"
       },
       {
-        "title": "Measured in the browser",
-        "detail": "The Engineering Lab exposes the active runtime, renderer, isolation status, and rolling frame-timing percentiles from the live app.",
-        "verification": "Open Engineering Lab"
+        "title": "Design for real conditions",
+        "detail": "Offline data, unreliable networks, native integrations, and recovery paths are part of the product—not afterthoughts.",
+        "verification": "Resilience by design"
       },
       {
-        "title": "Production hardened",
-        "detail": "Automated tests cover state, accessibility, deep links, failure recovery, and mobile layouts; the server enforces CSP, COOP, COEP, and correct Wasm MIME types.",
-        "verification": "Inspect tests and Nginx config"
+        "title": "Keep it maintainable",
+        "detail": "Clear boundaries, focused state management, and useful tests make features easier to change after launch.",
+        "verification": "Built for the next change"
       }
     ]
   },
   "nav": {
     "home": "Home",
-    "about": "Profile",
-    "experience": "Work",
-    "projects": "Systems",
-    "proof": "Evidence"
+    "about": "About",
+    "experience": "Experience",
+    "projects": "Projects",
+    "proof": "Approach"
   },
   "accessibility": {
     "skip_to_content": "Skip to content",
@@ -205,12 +221,13 @@
     "enable_sound_effects": "Enable sound effects"
   },
   "about_section": {
-    "title": "Systems Profile",
-    "bio": "This portfolio documents how software is designed, measured, tested, and operated without exposing personal identity.",
-    "bio2": "Technologies used across the selected systems:"
+    "title": "About Me",
+    "bio": "I have been building production Flutter applications since 2021 across mobile, desktop, and web. My work centres on clear product behaviour, resilient offline data, real-time synchronisation, and code that teams can maintain.",
+    "bio2": "Alongside client work, I design and operate independent SaaS products end to end—from Flutter interfaces and Go APIs to deployment and monitoring."
   },
   "projects_section": {
-    "title": "Selected Systems",
+    "title": "Selected Work",
+    "subtitle": "Products I designed, built, and continue to improve.",
     "filter_all": "All",
     "technologies": "Technologies",
     "open_project": "Open Project",
@@ -227,26 +244,26 @@
     "flip_hint": "Click to view case study"
   },
   "home_section": {
-    "title": "SYSTEMS PORTFOLIO.",
-    "subtitle": "Independent Software Engineering",
-    "view_work": "Explore systems",
-    "inspect_runtime": "Inspect runtime"
+    "title": "SENIOR FLUTTER ENGINEER.",
+    "subtitle": "Building useful products across mobile, desktop, and web.",
+    "view_work": "View selected work",
+    "inspect_runtime": "About me"
   },
   "experience_section": {
-    "title": "Selected Engineering Work",
+    "title": "Experience",
     "present": "Present"
   },
   "proof_section": {
-    "title": "Engineering Proof",
-    "subtitle": "Claims you can inspect in the repository and the live runtime"
+    "title": "How I Work",
+    "subtitle": "A practical approach shaped by shipping and maintaining real products."
   },
   "footer": {
     "quick_links": "Quick Links",
     "command_hint_prefix": "Press",
     "command_hint_suffix": "to open command palette",
-    "verification": "Verification",
-    "verification_body": "Runtime, renderer, isolation, and frame timing evidence are inspectable directly from this page.",
-    "easter_egg": "You found the five-click path. Curiosity is part of the test surface."
+    "verification": "Current focus",
+    "verification_body": "Building thoughtful Flutter products and the Go services behind them.",
+    "easter_egg": "You found the quiet corner. Thanks for looking closely."
   },
   "command_palette": {
     "close": "Close command palette",

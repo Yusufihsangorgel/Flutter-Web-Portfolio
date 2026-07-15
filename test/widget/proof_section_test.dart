@@ -7,7 +7,6 @@ import 'package:flutter_web_portfolio/app/controllers/scroll_controller.dart';
 import 'package:flutter_web_portfolio/app/domain/repositories/i_language_repository.dart';
 import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
 import 'package:flutter_web_portfolio/app/modules/home/sections/proof_section.dart';
-import 'package:flutter_web_portfolio/app/widgets/border_light_card.dart';
 
 final class _ProofLanguageRepository implements ILanguageRepository {
   @override
@@ -18,27 +17,27 @@ final class _ProofLanguageRepository implements ILanguageRepository {
 
   @override
   Future<Map<String, dynamic>> getTranslations(String languageCode) async => {
-    'nav': {'proof': 'Proof'},
+    'nav': {'proof': 'Approach'},
     'proof_section': {
-      'title': 'Engineering Proof',
-      'subtitle': 'Inspectable evidence',
+      'title': 'How I Work',
+      'subtitle': 'A practical approach',
     },
     'cv_data': {
       'proof': [
         {
-          'title': 'Dual-runtime delivery',
-          'detail': 'Wasm primary with a JavaScript fallback.',
-          'verification': 'Inspect the build manifest',
+          'title': 'Own the product',
+          'detail': 'Stay close to the problem.',
+          'verification': 'Product before ceremony',
         },
         {
-          'title': 'Measured in the browser',
-          'detail': 'Live runtime telemetry.',
-          'verification': 'Open Engineering Lab',
+          'title': 'Design for real conditions',
+          'detail': 'Build for unreliable networks.',
+          'verification': 'Resilience by design',
         },
         {
-          'title': 'Production hardened',
-          'detail': 'Headers and browser tests.',
-          'verification': 'Inspect tests and Nginx config',
+          'title': 'Keep it maintainable',
+          'detail': 'Make the next change easier.',
+          'verification': 'Built for the next change',
         },
       ],
     },
@@ -77,16 +76,16 @@ void main() {
     ),
   );
 
-  testWidgets('renders inspectable evidence without named endorsements', (
+  testWidgets('renders practical working principles', (
     tester,
   ) async {
     await tester.pumpWidget(buildSubject());
     await tester.pump(const Duration(seconds: 1));
 
-    expect(find.text('Engineering Proof'), findsOneWidget);
-    expect(find.text('Dual-runtime delivery'), findsOneWidget);
-    expect(find.text('Measured in the browser'), findsOneWidget);
-    expect(find.text('Production hardened'), findsOneWidget);
+    expect(find.text('How I Work'), findsOneWidget);
+    expect(find.text('Own the product'), findsOneWidget);
+    expect(find.text('Design for real conditions'), findsOneWidget);
+    expect(find.text('Keep it maintainable'), findsOneWidget);
     expect(find.textContaining('testimonial'), findsNothing);
     expect(tester.takeException(), isNull);
   });
@@ -102,7 +101,9 @@ void main() {
     await tester.pumpWidget(buildSubject());
     await tester.pump(const Duration(seconds: 1));
 
-    expect(find.byType(BorderLightCard), findsNWidgets(3));
+    expect(find.text('Own the product'), findsOneWidget);
+    expect(find.text('Design for real conditions'), findsOneWidget);
+    expect(find.text('Keep it maintainable'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 }

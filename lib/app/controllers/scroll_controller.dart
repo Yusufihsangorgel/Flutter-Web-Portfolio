@@ -195,34 +195,18 @@ final class AppScrollController extends Cubit<AppScrollState>
         _ => null,
       };
       final sectionContext = sectionKey?.currentContext;
-      final renderObject = sectionContext?.findRenderObject();
-      if (renderObject is! RenderBox || !renderObject.hasSize) return;
+      if (sectionContext == null) return;
 
       _isManualScrolling = true;
       _setActiveSection(sectionId);
 
-      const appBarHeight = AppDimensions.appBarHeight;
-      final globalY = renderObject.localToGlobal(Offset.zero).dy;
-      final targetScrollOffset =
-          (globalY + scrollController.offset - appBarHeight).clamp(
-            0.0,
-            scrollController.position.maxScrollExtent,
-          );
-
-      if (_reduceMotion) {
-        scrollController.jumpTo(targetScrollOffset);
-        _finishScrolling();
-      } else {
-        unawaited(
-          scrollController
-              .animateTo(
-                targetScrollOffset,
-                duration: AppDurations.sectionScroll,
-                curve: Curves.easeInOut,
-              )
-              .then((_) => _finishScrolling()),
-        );
-      }
+      final scrollFuture = Scrollable.ensureVisible(
+        sectionContext,
+        alignment: 0,
+        duration: _reduceMotion ? Duration.zero : AppDurations.sectionScroll,
+        curve: Curves.easeInOut,
+      );
+      unawaited(scrollFuture.then((_) => _finishScrolling()));
     } catch (error, stackTrace) {
       dev.log(
         'Scroll to section failed',

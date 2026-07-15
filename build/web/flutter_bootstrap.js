@@ -33,7 +33,7 @@ addEventListener("message", eventListener);
 if (!window._flutter) {
   window._flutter = {};
 }
-_flutter.buildConfig = {"engineRevision":"6c0baaebf70e0148f485f27d5616b3d3382da7bf","builds":[{"compileTarget":"dart2wasm","renderer":"skwasm","mainWasmPath":"main.dart.wasm?v=029eb64c5a223d26","jsSupportRuntimePath":"main.dart.mjs?v=029eb64c5a223d26"},{"compileTarget":"dart2js","renderer":"canvaskit","mainJsPath":"main.dart.js?v=029eb64c5a223d26"}],"useLocalCanvasKit":true};
+_flutter.buildConfig = {"engineRevision":"6c0baaebf70e0148f485f27d5616b3d3382da7bf","builds":[{"compileTarget":"dart2wasm","renderer":"skwasm","mainWasmPath":"main.dart.wasm?v=9ece2020e3522f89","jsSupportRuntimePath":"main.dart.mjs?v=9ece2020e3522f89"},{"compileTarget":"dart2js","renderer":"canvaskit","mainJsPath":"main.dart.js?v=9ece2020e3522f89"}],"useLocalCanvasKit":true};
 
 
 const removeBootstrapSurface = () => {
@@ -51,12 +51,12 @@ const showBootstrapFailure = (error) => {
 
   splash.classList.add('bootstrap-surface--failed');
   splash.setAttribute('aria-busy', 'false');
-  splash.setAttribute('aria-label', 'The Flutter experience could not start');
+  splash.setAttribute('aria-label', 'The portfolio could not start');
   const label = splash.querySelector('.bootstrap-label');
-  if (label) label.textContent = 'FLUTTER WEB / BOOT FAILED';
+  if (label) label.textContent = 'PORTFOLIO / LOAD FAILED';
   const status = splash.querySelector('.bootstrap-status-copy');
   if (status) {
-    status.textContent = 'The live canvas could not start. Retry the isolated runtime.';
+    status.textContent = 'The portfolio could not load. Please try again.';
   }
   const track = splash.querySelector('.bootstrap-track');
   if (track) {

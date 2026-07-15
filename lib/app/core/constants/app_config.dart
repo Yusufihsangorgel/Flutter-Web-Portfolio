@@ -17,7 +17,7 @@ final class AppConfig {
   /// Public display label.
   static String name(LanguageCubit lc) => lc.getText(
     'cv_data.personal_info.name',
-    defaultValue: 'Systems Portfolio',
+    defaultValue: 'Senior Flutter Engineer',
   );
 
   /// Two-letter initials derived from the current public display label.

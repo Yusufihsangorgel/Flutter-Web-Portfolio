@@ -174,8 +174,8 @@ class _CopyrightEasterEggState extends State<_CopyrightEasterEgg>
                         language.getText(
                           'footer.easter_egg',
                           defaultValue:
-                              'You found the five-click path. Curiosity is '
-                              'part of the test surface.',
+                              'You found the quiet corner. Thanks for looking '
+                              'closely.',
                         ),
                         style: AppFonts.jetBrainsMono(
                           fontSize: 11,

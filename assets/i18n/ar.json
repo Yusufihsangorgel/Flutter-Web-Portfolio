@@ -1,26 +1,26 @@
 {
-  "app_name": "ملف الأنظمة",
+  "app_name": "مهندس Flutter أول",
   "cv_data": {
     "personal_info": {
-      "name": "ملف الأنظمة",
+      "name": "مهندس Flutter أول",
       "location": "عن بُعد",
-      "bio": "ملف هندسي مجهول الهوية يركز على Flutter وGo وأنظمة البيانات والموثوقية القابلة للقياس في الإنتاج.",
-      "tagline": "أنظمة برمجية قابلة للفحص ومقاسة في الإنتاج",
+      "bio": "أطوّر منذ عام 2021 تطبيقات Flutter تعمل في الإنتاج للجوال وسطح المكتب والويب، مع اهتمام بسلوك المنتج الواضح والبيانات المتينة دون اتصال والمزامنة الفورية والكود القابل للصيانة.",
+      "tagline": "هندسة Flutter تركز على المنتج",
       "subtitles": [
-        "أنظمة Flutter",
-        "خدمات Go",
-        "موثوقية الإنتاج"
+        "منتجات الجوال",
+        "تطبيقات تعمل دون اتصال أولاً",
+        "تسليم متعدد المنصات"
       ]
     },
     "experiences": [
       {
-        "title": "هندسة تطبيقات العميل",
-        "company": "تطبيقات متعددة المنصات",
-        "position": "أنظمة Flutter",
-        "start_date": "",
+        "title": "مطور Flutter",
+        "company": "برمجيات مؤسسية للبيع بالتجزئة",
+        "position": "تطبيقات الجوال وسطح المكتب",
+        "start_date": "2022",
         "end_date": "",
-        "period": "أعمال إنتاج مختارة",
-        "description": "Flutter · بيانات تعمل دون اتصال أولاً · تكاملات أصلية · مزامنة فورية",
+        "period": "مارس 2022 — حتى الآن",
+        "description": "تطوير تطبيقات إنتاجية لأجهزة Android وiOS اللوحية وأنظمة Linux وmacOS وWindows، بما يشمل بيانات دون اتصال باستخدام SQLite وDrift وتكاملات أصلية ومزامنة فورية موثوقة.",
         "technologies": [
           "Flutter",
           "Dart",
@@ -30,102 +30,118 @@
         ]
       },
       {
-        "title": "هندسة الواجهة الخلفية",
-        "company": "أنظمة API والبيانات",
-        "position": "خدمات Go",
-        "start_date": "",
-        "end_date": "",
-        "period": "أعمال إنتاج مختارة",
-        "description": "Go Fiber · PostgreSQL · Redis · تخزين الكائنات · مهام الخلفية",
+        "title": "قائد فريق الجوال",
+        "company": "منصة لوجستية",
+        "position": "تسليم منتج متعدد المنصات",
+        "start_date": "2023",
+        "end_date": "2025",
+        "period": "يونيو 2023 — فبراير 2025",
+        "description": "قدت تسليم تطبيق جوال لمنتج لوجستي يتضمن تتبع المركبات عبر WebSocket وتكامل Google وApple Maps والتنسيق مع تطبيق ويب مبني بـ React.",
         "technologies": [
-          "Go",
-          "PostgreSQL",
-          "Redis",
-          "MinIO",
-          "Asynq"
+          "Flutter",
+          "WebSocket",
+          "Google Maps",
+          "Apple Maps",
+          "React"
         ]
       },
       {
-        "title": "هندسة الموثوقية",
-        "company": "بيئة تشغيل ذاتية الاستضافة",
-        "position": "عمليات الإنتاج",
-        "start_date": "",
-        "end_date": "",
-        "period": "أعمال إنتاج مختارة",
-        "description": "Docker Swarm · صور غير قابلة للتغيير · اختبارات الاستعادة · قابلية المراقبة · التعافي من الحوادث",
+        "title": "مطور Flutter",
+        "company": "منتجات نشر رقمي",
+        "position": "تطبيقات Android وiOS",
+        "start_date": "2022",
+        "end_date": "2024",
+        "period": "أكتوبر 2022 — يونيو 2024",
+        "description": "تسليم تطبيقات نشر للمستخدمين على Android وiOS باستخدام MVVM وGetX وDio والترجمة ومسارات إصدار جاهزة للمتاجر.",
         "technologies": [
-          "Docker",
-          "Nginx",
-          "Prometheus",
-          "Grafana",
-          "PostgreSQL"
+          "Flutter",
+          "Dart",
+          "MVVM",
+          "GetX",
+          "Dio"
+        ]
+      },
+      {
+        "title": "هندسة البرمجيات",
+        "company": "تعليم جامعي",
+        "position": "درجة البكالوريوس",
+        "start_date": "2021",
+        "end_date": "2025",
+        "period": "2021 — 2025",
+        "description": "دراسة أكاديمية في هندسة البرمجيات تشمل الخوارزميات وهياكل البيانات وقواعد البيانات وتصميم البرمجيات وتطوير المنتجات ضمن فرق.",
+        "technologies": [
+          "الخوارزميات",
+          "هياكل البيانات",
+          "قواعد البيانات",
+          "تصميم البرمجيات",
+          "مشاريع الفريق"
         ]
       }
     ],
     "projects": [
       {
         "title": "FakeCallApp",
-        "description": "Flutter · Next.js · Go",
+        "description": "تجربة مرحة لمكالمة فيديو وهمية تضم شخصيات وجدولة وتفاعلات مصممة للجوال.",
         "category": "ويب",
         "url": "https://fakecallapp.com"
       },
       {
         "title": "CleanMyGallery",
-        "description": "Flutter · معالجة الصور · EXIF",
+        "description": "أداة عملية لاكتشاف فوضى المعرض وضغط الصور والتحكم في البيانات الوصفية.",
         "category": "ويب",
         "url": "https://cleanmygallery.com"
       },
       {
         "title": "FocusGroves",
-        "description": "Flutter · أنظمة التركيز · غرف فورية",
+        "description": "مساحة للتركيز تجمع المؤقتات والمهام وغرف الدراسة المشتركة.",
         "category": "ويب",
         "url": "https://focusgroves.com"
       },
       {
         "title": "MoodGrade",
-        "description": "Flutter · سجل صحي · تصدير",
+        "description": "يوميات خاصة للمزاج مع متابعة الأدوية والتصدير واكتشاف الأنماط طويلة المدى.",
         "category": "ويب",
         "url": "https://moodgrade.com"
       },
       {
         "title": "GetQrivo",
-        "description": "QR · روابط قصيرة · تحليلات",
+        "description": "مجموعة أدوات QR لإنشاء الرموز وإدارة الروابط القصيرة وفهم عمليات المسح.",
         "category": "ويب",
         "url": "https://getqrivo.com"
       },
       {
         "title": "OverlayPhoto",
-        "description": "Flutter · تركيب الصور · كبسولات زمنية",
+        "description": "محرر صور للطبقات والإطارات والمرشحات وذكريات الكبسولة الزمنية.",
         "category": "ويب",
         "url": "https://overlayphoto.com"
       },
       {
         "title": "DistractionKiller",
-        "description": "Flutter · الرفاهية الرقمية · جداول زمنية",
+        "description": "أداة للرفاهية الرقمية تحظر المشتتات وتحمي وقت التركيز.",
         "category": "ويب",
         "url": "https://distractionkiller.com"
       },
       {
         "title": "KPSSHazirlan",
-        "description": "خطط تعلم · محرك تدريب · تحليلات",
+        "description": "مخطط دراسة للتحضير لاختبار KPSS وجلسات التدريب ومتابعة التقدم.",
         "category": "ويب",
         "url": "https://kpsshazirlan.com"
       },
       {
         "title": "EhliyetCoz",
-        "description": "اختبارات يومية · نموذج تقدم · ضبط جودة المحتوى",
+        "description": "مساعد لاختبار القيادة يقدم اختبارات يومية وملاحظات واضحة عن التقدم.",
         "category": "ويب",
         "url": "https://ehliyetcoz.com"
       },
       {
         "title": "Kazanamazi",
-        "description": "سجل عادات · خرائط حرارية · تذكيرات",
+        "description": "سجل شخصي هادئ للصلوات وأيام الصيام الفائتة مع التذكيرات والسجل التاريخي.",
         "category": "ويب",
         "url": "https://kazanamazi.net"
       },
       {
         "title": "PDFScanPro",
-        "description": "مسار PDF · تحويل · ضغط",
+        "description": "مجموعة أدوات PDF لمسح المستندات وضغطها ودمجها وتقسيمها وتحويلها.",
         "category": "ويب",
         "url": "https://pdfscanpro.com"
       }
@@ -174,28 +190,28 @@
     ],
     "proof": [
       {
-        "title": "تسليم ببيئتي تشغيل",
-        "detail": "يعد WebAssembly مع SkWasm المخرج الأساسي، مع بديل JavaScript وCanvasKit للمتصفحات غير المتوافقة.",
-        "verification": "افحص بيان البناء"
+        "title": "تحمّل مسؤولية المنتج",
+        "detail": "أبقى قريباً من المشكلة منذ أول تفاعل وحتى الإطلاق والدعم والتحسين التالي.",
+        "verification": "المنتج قبل الإجراءات"
       },
       {
-        "title": "قياس داخل المتصفح",
-        "detail": "يعرض مختبر الهندسة بيئة التشغيل ومحرك الرسم وحالة العزل ونسب توقيت الإطارات المتحركة من التطبيق الحي.",
-        "verification": "افتح مختبر الهندسة"
+        "title": "صمّم للظروف الحقيقية",
+        "detail": "البيانات دون اتصال والشبكات غير المستقرة والتكاملات الأصلية ومسارات الاستعادة أجزاء أساسية من المنتج.",
+        "verification": "المتانة تبدأ من التصميم"
       },
       {
-        "title": "محصن للإنتاج",
-        "detail": "تغطي الاختبارات الآلية الحالة وإمكانية الوصول والروابط العميقة والتعافي من الأخطاء وتخطيطات الجوال؛ ويفرض الخادم CSP وCOOP وCOEP وأنواع Wasm MIME الصحيحة.",
-        "verification": "افحص الاختبارات وإعداد Nginx"
+        "title": "حافظ على قابلية الصيانة",
+        "detail": "الحدود الواضحة وإدارة الحالة المركزة والاختبارات المفيدة تجعل التغيير بعد الإطلاق أسهل.",
+        "verification": "جاهز للتغيير التالي"
       }
     ]
   },
   "nav": {
     "home": "الرئيسية",
-    "about": "الملف",
-    "experience": "الأعمال",
-    "projects": "الأنظمة",
-    "proof": "الأدلة"
+    "about": "عني",
+    "experience": "الخبرة",
+    "projects": "المشاريع",
+    "proof": "المنهج"
   },
   "accessibility": {
     "skip_to_content": "تخطي إلى المحتوى",
@@ -205,22 +221,23 @@
     "enable_sound_effects": "تفعيل المؤثرات الصوتية"
   },
   "about_section": {
-    "title": "ملف الأنظمة",
-    "bio": "يوثق هذا الملف تصميم البرمجيات وقياسها واختبارها وتشغيلها دون كشف الهوية الشخصية.",
-    "bio2": "التقنيات المستخدمة في الأنظمة المختارة:"
+    "title": "عني",
+    "bio": "أطوّر منذ عام 2021 تطبيقات Flutter تعمل في الإنتاج للجوال وسطح المكتب والويب، مع اهتمام بسلوك المنتج الواضح والبيانات المتينة دون اتصال والمزامنة الفورية والكود القابل للصيانة.",
+    "bio2": "إلى جانب أعمال العملاء، أصمم وأشغّل منتجات SaaS مستقلة من واجهات Flutter وواجهات Go البرمجية إلى النشر والمراقبة."
   },
   "home_section": {
-    "title": "ملف الأنظمة.",
-    "subtitle": "هندسة برمجيات مستقلة",
-    "view_work": "استكشاف الأنظمة",
-    "inspect_runtime": "فحص وقت التشغيل"
+    "title": "مهندس FLUTTER أول.",
+    "subtitle": "منتجات مفيدة للجوال وسطح المكتب والويب.",
+    "view_work": "عرض المشاريع",
+    "inspect_runtime": "عني"
   },
   "experience_section": {
-    "title": "أعمال هندسية مختارة",
+    "title": "الخبرة",
     "present": "حالياً"
   },
   "projects_section": {
-    "title": "أنظمة مختارة",
+    "title": "مشاريع مختارة",
+    "subtitle": "منتجات صممتها وبنيتها وأواصل تحسينها.",
     "filter_all": "الكل",
     "case_study_problem": "التحدي",
     "case_study_solution": "النهج",
@@ -237,16 +254,16 @@
     "flip_hint": "انقر لعرض دراسة الحالة"
   },
   "proof_section": {
-    "title": "أدلة هندسية",
-    "subtitle": "ادعاءات يمكنك التحقق منها في المستودع وبيئة التشغيل الحية"
+    "title": "كيف أعمل",
+    "subtitle": "منهج عملي تشكّل من إطلاق منتجات حقيقية وصيانتها."
   },
   "footer": {
     "command_hint_prefix": "اضغط",
     "command_hint_suffix": "لفتح لوحة الأوامر",
     "quick_links": "روابط سريعة",
-    "verification": "التحقق",
-    "verification_body": "يمكن فحص أدلة وقت التشغيل ومحرك العرض والعزل وتوقيت الإطارات مباشرةً من هذه الصفحة.",
-    "easter_egg": "لقد وجدت مسار النقرات الخمس. الفضول جزء من سطح الاختبار."
+    "verification": "التركيز الحالي",
+    "verification_body": "بناء منتجات Flutter مدروسة وخدمات Go التي تدعمها.",
+    "easter_egg": "لقد وجدت الزاوية الهادئة. شكراً للنظر بعناية."
   },
   "command_palette": {
     "close": "إغلاق لوحة الأوامر",

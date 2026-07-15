@@ -1,7 +1,7 @@
 part of '../premium_footer.dart';
 
 // =============================================================================
-// Right column: a truthful verification note
+// Right column: current professional focus
 // =============================================================================
 
 class _ConnectColumn extends StatelessWidget {
@@ -27,7 +27,7 @@ class _ConnectColumn extends StatelessWidget {
               Text(
                 language.getText(
                   'footer.verification',
-                  defaultValue: 'Verification',
+                  defaultValue: 'Current focus',
                 ),
                 style: AppFonts.jetBrainsMono(
                   fontSize: 14,
@@ -43,8 +43,8 @@ class _ConnectColumn extends StatelessWidget {
                   language.getText(
                     'footer.verification_body',
                     defaultValue:
-                        'Runtime, renderer, isolation, and frame timing '
-                        'evidence are inspectable directly from this page.',
+                        'Building thoughtful Flutter products and the Go '
+                        'services behind them.',
                   ),
                   textAlign: centered ? TextAlign.center : TextAlign.start,
                   style: AppFonts.jetBrainsMono(

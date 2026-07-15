@@ -1,33 +1,33 @@
 {
-  "app_name": "Sistemler Portföyü",
+  "app_name": "Kıdemli Flutter Mühendisi",
   "nav": {
     "home": "Ana Sayfa",
-    "about": "Profil",
-    "experience": "Çalışmalar",
-    "projects": "Sistemler",
-    "proof": "Kanıtlar"
+    "about": "Hakkımda",
+    "experience": "Deneyim",
+    "projects": "Projeler",
+    "proof": "Yaklaşım"
   },
   "cv_data": {
     "personal_info": {
-      "name": "Sistemler Portföyü",
+      "name": "Kıdemli Flutter Mühendisi",
       "location": "Uzaktan",
-      "bio": "Flutter, Go, veri sistemleri ve ölçülebilir üretim güvenilirliğine odaklanan anonim bir mühendislik portföyü.",
-      "tagline": "İncelenebilir yazılım sistemleri, üretimde ölçülmüş",
+      "bio": "2021'den beri mobil, masaüstü ve web için üretimde çalışan Flutter uygulamaları geliştiriyorum. Açık ürün davranışı, dayanıklı çevrimdışı veri, gerçek zamanlı senkronizasyon ve ekiplerin sürdürebileceği kod benim için öncelikli.",
+      "tagline": "Ürün odaklı Flutter mühendisliği",
       "subtitles": [
-        "Flutter sistemleri",
-        "Go servisleri",
-        "Üretim güvenilirliği"
+        "Mobil ürünler",
+        "Çevrimdışı öncelikli uygulamalar",
+        "Çapraz platform teslimi"
       ]
     },
     "experiences": [
       {
-        "title": "İstemci mühendisliği",
-        "company": "Çapraz platform uygulamaları",
-        "position": "Flutter sistemleri",
-        "start_date": "",
+        "title": "Flutter Geliştirici",
+        "company": "Kurumsal perakende yazılımları",
+        "position": "Mobil ve masaüstü uygulamaları",
+        "start_date": "2022",
         "end_date": "",
-        "period": "Seçili üretim çalışmaları",
-        "description": "Flutter · çevrimdışı öncelikli veri · yerel entegrasyonlar · gerçek zamanlı senkronizasyon",
+        "period": "Mart 2022 — Devam ediyor",
+        "description": "Android ve iOS tabletlerin yanında Linux, macOS ve Windows masaüstünde çalışan üretim uygulamaları geliştiriyorum. Çalışmalarım çevrimdışı SQLite ve Drift verisini, yerel entegrasyonları ve güvenilir gerçek zamanlı senkronizasyonu kapsıyor.",
         "technologies": [
           "Flutter",
           "Dart",
@@ -37,102 +37,118 @@
         ]
       },
       {
-        "title": "Backend mühendisliği",
-        "company": "API ve veri sistemleri",
-        "position": "Go servisleri",
-        "start_date": "",
-        "end_date": "",
-        "period": "Seçili üretim çalışmaları",
-        "description": "Go Fiber · PostgreSQL · Redis · nesne depolama · arka plan işleri",
+        "title": "Mobil Takım Lideri",
+        "company": "Lojistik platformu",
+        "position": "Çapraz platform ürün teslimi",
+        "start_date": "2023",
+        "end_date": "2025",
+        "period": "Haziran 2023 — Şubat 2025",
+        "description": "WebSocket tabanlı araç takibi, Google ve Apple Maps entegrasyonları ve React web uygulamasıyla koordinasyon dâhil olmak üzere bir lojistik ürününün mobil teslimine liderlik ettim.",
         "technologies": [
-          "Go",
-          "PostgreSQL",
-          "Redis",
-          "MinIO",
-          "Asynq"
+          "Flutter",
+          "WebSocket",
+          "Google Maps",
+          "Apple Maps",
+          "React"
         ]
       },
       {
-        "title": "Güvenilirlik mühendisliği",
-        "company": "Kendi sunucusunda çalışan altyapı",
-        "position": "Üretim operasyonları",
-        "start_date": "",
-        "end_date": "",
-        "period": "Seçili üretim çalışmaları",
-        "description": "Docker Swarm · değişmez imajlar · geri yükleme provaları · gözlemlenebilirlik · olay kurtarma",
+        "title": "Flutter Geliştirici",
+        "company": "Dijital yayın ürünleri",
+        "position": "Android ve iOS uygulamaları",
+        "start_date": "2022",
+        "end_date": "2024",
+        "period": "Ekim 2022 — Haziran 2024",
+        "description": "MVVM, GetX, Dio, yerelleştirme ve mağaza yayınına hazır süreçlerle Android ve iOS için son kullanıcı yayın uygulamaları geliştirdim.",
         "technologies": [
-          "Docker",
-          "Nginx",
-          "Prometheus",
-          "Grafana",
-          "PostgreSQL"
+          "Flutter",
+          "Dart",
+          "MVVM",
+          "GetX",
+          "Dio"
+        ]
+      },
+      {
+        "title": "Yazılım Mühendisliği",
+        "company": "Lisans eğitimi",
+        "position": "Lisans derecesi",
+        "start_date": "2021",
+        "end_date": "2025",
+        "period": "2021 — 2025",
+        "description": "Algoritmalar, veri yapıları, veritabanları, yazılım tasarımı ve ekip tabanlı ürün geliştirmeyi kapsayan yazılım mühendisliği eğitimi.",
+        "technologies": [
+          "Algoritmalar",
+          "Veri Yapıları",
+          "Veritabanları",
+          "Yazılım Tasarımı",
+          "Ekip Projeleri"
         ]
       }
     ],
     "projects": [
       {
         "title": "FakeCallApp",
-        "description": "Flutter · Next.js · Go",
+        "description": "Karakterler, zamanlama ve mobil odaklı etkileşimlerle eğlenceli bir sahte görüntülü arama deneyimi.",
         "category": "Web",
         "url": "https://fakecallapp.com"
       },
       {
         "title": "CleanMyGallery",
-        "description": "Flutter · görsel işleme hattı · EXIF",
+        "description": "Galerideki dağınıklığı bulmak, fotoğrafları sıkıştırmak ve metaveriyi kontrol etmek için pratik bir araç.",
         "category": "Web",
         "url": "https://cleanmygallery.com"
       },
       {
         "title": "FocusGroves",
-        "description": "Flutter · odak sistemleri · gerçek zamanlı odalar",
+        "description": "Zamanlayıcıları, görevleri ve ortak çalışma odalarını bir araya getiren odak çalışma alanı.",
         "category": "Web",
         "url": "https://focusgroves.com"
       },
       {
         "title": "MoodGrade",
-        "description": "Flutter · sağlık günlüğü · dışa aktarma",
+        "description": "İlaç takibi, dışa aktarma ve uzun dönemli örüntüler sunan özel bir ruh hâli günlüğü.",
         "category": "Web",
         "url": "https://moodgrade.com"
       },
       {
         "title": "GetQrivo",
-        "description": "QR · kısa bağlantılar · analiz",
+        "description": "Kod oluşturma, kısa bağlantı yönetimi ve tarama istatistikleri için QR araç seti.",
         "category": "Web",
         "url": "https://getqrivo.com"
       },
       {
         "title": "OverlayPhoto",
-        "description": "Flutter · kompozitleme · zaman kapsülleri",
+        "description": "Katmanlar, çerçeveler, filtreler ve zaman kapsülleri için fotoğraf düzenleyici.",
         "category": "Web",
         "url": "https://overlayphoto.com"
       },
       {
         "title": "DistractionKiller",
-        "description": "Flutter · dijital esenlik · zamanlamalar",
+        "description": "Dikkat dağıtıcıları engellemek ve odak süresini korumak için dijital denge aracı.",
         "category": "Web",
         "url": "https://distractionkiller.com"
       },
       {
         "title": "KPSSHazirlan",
-        "description": "Öğrenme planları · pratik motoru · analiz",
+        "description": "KPSS hazırlığı, soru pratiği ve ilerleme takibi için çalışma planlayıcısı.",
         "category": "Web",
         "url": "https://kpsshazirlan.com"
       },
       {
         "title": "EhliyetCoz",
-        "description": "Günlük testler · ilerleme modeli · içerik kalite kontrolü",
+        "description": "Günlük testler ve anlaşılır ilerleme geri bildirimi sunan ehliyet sınavı yardımcısı.",
         "category": "Web",
         "url": "https://ehliyetcoz.com"
       },
       {
         "title": "Kazanamazi",
-        "description": "Alışkanlık kaydı · ısı haritaları · hatırlatıcılar",
+        "description": "Kaza namazı ve oruç günlerini hatırlatmalar ve geçmişle sakin biçimde takip eden kişisel kayıt.",
         "category": "Web",
         "url": "https://kazanamazi.net"
       },
       {
         "title": "PDFScanPro",
-        "description": "PDF işleme hattı · dönüştürme · sıkıştırma",
+        "description": "Belgeleri taramak, sıkıştırmak, birleştirmek, bölmek ve dönüştürmek için odaklı PDF araç kutusu.",
         "category": "Web",
         "url": "https://pdfscanpro.com"
       }
@@ -181,19 +197,19 @@
     ],
     "proof": [
       {
-        "title": "Çift çalışma zamanı",
-        "detail": "SkWasm kullanan WebAssembly birincil çıktıdır; bunu çalıştıramayan tarayıcılar için JavaScript ve CanvasKit alternatifi bulunur.",
-        "verification": "Build manifestini incele"
+        "title": "Ürünü sahiplen",
+        "detail": "İlk etkileşimden yayına, destekten sonraki iyileştirmeye kadar problemin yakınında kalırım.",
+        "verification": "Süreçten önce ürün"
       },
       {
-        "title": "Tarayıcıda ölçüm",
-        "detail": "Engineering Lab, canlı uygulamadaki çalışma zamanını, renderer'ı, izolasyon durumunu ve kayan frame timing yüzdeliklerini gösterir.",
-        "verification": "Engineering Lab'i aç"
+        "title": "Gerçek koşullar için tasarla",
+        "detail": "Çevrimdışı veri, kararsız ağlar, yerel entegrasyonlar ve kurtarma yolları ürünün doğal parçasıdır.",
+        "verification": "Dayanıklılık tasarımda başlar"
       },
       {
-        "title": "Üretim için sertleştirilmiş",
-        "detail": "Otomatik testler state, erişilebilirlik, deep link, hata kurtarma ve mobil yerleşimleri kapsar; sunucu CSP, COOP, COEP ve doğru Wasm MIME türlerini uygular.",
-        "verification": "Testleri ve Nginx ayarını incele"
+        "title": "Sürdürülebilir tut",
+        "detail": "Net sınırlar, odaklı durum yönetimi ve yararlı testler yayından sonra değişikliği kolaylaştırır.",
+        "verification": "Bir sonraki değişime hazır"
       }
     ]
   },
@@ -205,12 +221,13 @@
     "enable_sound_effects": "Ses efektlerini aç"
   },
   "about_section": {
-    "title": "Sistem Profili",
-    "bio": "Bu portföy, kişisel kimliği açığa çıkarmadan yazılımın nasıl tasarlandığını, ölçüldüğünü, test edildiğini ve işletildiğini belgeler.",
-    "bio2": "Seçili sistemlerde kullanılan teknolojiler:"
+    "title": "Hakkımda",
+    "bio": "2021'den beri mobil, masaüstü ve web için üretimde çalışan Flutter uygulamaları geliştiriyorum. Açık ürün davranışı, dayanıklı çevrimdışı veri, gerçek zamanlı senkronizasyon ve ekiplerin sürdürebileceği kod benim için öncelikli.",
+    "bio2": "Müşteri işlerinin yanında bağımsız SaaS ürünlerini Flutter arayüzünden Go API'lerine, yayından izlemeye kadar uçtan uca tasarlayıp işletiyorum."
   },
   "projects_section": {
-    "title": "Seçili Sistemler",
+    "title": "Seçili Projeler",
+    "subtitle": "Tasarladığım, geliştirdiğim ve iyileştirmeye devam ettiğim ürünler.",
     "filter_all": "Tümü",
     "technologies": "Teknolojiler",
     "open_project": "Projeyi Aç",
@@ -227,26 +244,26 @@
     "flip_hint": "Vaka çalışmasını görmek için tıklayın"
   },
   "home_section": {
-    "title": "SİSTEMLER PORTFÖYÜ.",
-    "subtitle": "Bağımsız Yazılım Mühendisliği",
-    "view_work": "Sistemleri keşfet",
-    "inspect_runtime": "Çalışma zamanını incele"
+    "title": "KIDEMLİ FLUTTER MÜHENDİSİ.",
+    "subtitle": "Mobil, masaüstü ve web için yararlı ürünler geliştiriyorum.",
+    "view_work": "Seçili projeleri gör",
+    "inspect_runtime": "Hakkımda"
   },
   "experience_section": {
-    "title": "Seçili Mühendislik Çalışmaları",
+    "title": "Deneyim",
     "present": "Devam Ediyor"
   },
   "proof_section": {
-    "title": "Mühendislik Kanıtı",
-    "subtitle": "Repoda ve canlı çalışma zamanında doğrudan inceleyebileceğiniz özellikler"
+    "title": "Nasıl Çalışırım",
+    "subtitle": "Gerçek ürünleri yayınlama ve sürdürme deneyimiyle şekillenen pratik yaklaşım."
   },
   "footer": {
     "command_hint_prefix": "Basın",
     "command_hint_suffix": "komut paletini açmak için",
     "quick_links": "Hızlı Bağlantılar",
-    "verification": "Doğrulama",
-    "verification_body": "Çalışma zamanı, renderer, izolasyon ve kare zamanlama kanıtları doğrudan bu sayfadan incelenebilir.",
-    "easter_egg": "Beş tıklamalı yolu buldun. Merak da test yüzeyinin bir parçası."
+    "verification": "Şu anki odağım",
+    "verification_body": "Özenli Flutter ürünleri ve onların arkasındaki Go servislerini geliştirmek.",
+    "easter_egg": "Sessiz köşeyi buldun. Dikkatle baktığın için teşekkürler."
   },
   "command_palette": {
     "close": "Komut paletini kapat",

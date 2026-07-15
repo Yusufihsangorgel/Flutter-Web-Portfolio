@@ -2,7 +2,7 @@
   "name": "flutter-web-portfolio",
   "version": "1.1.0",
   "private": true,
-  "description": "Flutter WebAssembly portfolio with Playwright release verification.",
+  "description": "Data-driven Flutter portfolio template with accessible multilingual layouts and release verification.",
   "scripts": {
     "test": "playwright test",
     "test:e2e": "playwright test",

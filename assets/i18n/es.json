@@ -1,26 +1,26 @@
 {
-  "app_name": "Portafolio de Sistemas",
+  "app_name": "Ingeniero Flutter senior",
   "cv_data": {
     "personal_info": {
-      "name": "Portafolio de Sistemas",
+      "name": "Ingeniero Flutter senior",
       "location": "Remoto",
-      "bio": "Un portafolio de ingeniería anónimo centrado en Flutter, Go, sistemas de datos y fiabilidad medible en producción.",
-      "tagline": "Sistemas de software inspeccionables, medidos en producción",
+      "bio": "Desde 2021 desarrollo aplicaciones Flutter en producción para móvil, escritorio y web. Me centro en un comportamiento de producto claro, datos offline resistentes, sincronización en tiempo real y código mantenible.",
+      "tagline": "Ingeniería Flutter orientada al producto",
       "subtitles": [
-        "Sistemas Flutter",
-        "Servicios Go",
-        "Fiabilidad en producción"
+        "Productos móviles",
+        "Aplicaciones offline-first",
+        "Entrega multiplataforma"
       ]
     },
     "experiences": [
       {
-        "title": "Ingeniería de cliente",
-        "company": "Aplicaciones multiplataforma",
-        "position": "Sistemas Flutter",
-        "start_date": "",
+        "title": "Desarrollador Flutter",
+        "company": "Software empresarial para retail",
+        "position": "Aplicaciones móviles y de escritorio",
+        "start_date": "2022",
         "end_date": "",
-        "period": "Trabajo de producción seleccionado",
-        "description": "Flutter · datos offline-first · integraciones nativas · sincronización en tiempo real",
+        "period": "Marzo de 2022 — Actualidad",
+        "description": "Desarrollo de aplicaciones en producción para tabletas Android e iOS y escritorios Linux, macOS y Windows. El trabajo incluye datos offline con SQLite y Drift, integraciones nativas y sincronización fiable en tiempo real.",
         "technologies": [
           "Flutter",
           "Dart",
@@ -30,102 +30,118 @@
         ]
       },
       {
-        "title": "Ingeniería backend",
-        "company": "Sistemas de API y datos",
-        "position": "Servicios Go",
-        "start_date": "",
-        "end_date": "",
-        "period": "Trabajo de producción seleccionado",
-        "description": "Go Fiber · PostgreSQL · Redis · almacenamiento de objetos · tareas en segundo plano",
+        "title": "Líder del equipo móvil",
+        "company": "Plataforma logística",
+        "position": "Entrega de producto multiplataforma",
+        "start_date": "2023",
+        "end_date": "2025",
+        "period": "Junio de 2023 — Febrero de 2025",
+        "description": "Lideré la entrega móvil de un producto logístico con seguimiento de vehículos mediante WebSocket, integraciones con Google y Apple Maps y coordinación con una aplicación web React.",
         "technologies": [
-          "Go",
-          "PostgreSQL",
-          "Redis",
-          "MinIO",
-          "Asynq"
+          "Flutter",
+          "WebSocket",
+          "Google Maps",
+          "Apple Maps",
+          "React"
         ]
       },
       {
-        "title": "Ingeniería de fiabilidad",
-        "company": "Entorno autoalojado",
-        "position": "Operaciones de producción",
-        "start_date": "",
-        "end_date": "",
-        "period": "Trabajo de producción seleccionado",
-        "description": "Docker Swarm · imágenes inmutables · simulacros de restauración · observabilidad · recuperación de incidentes",
+        "title": "Desarrollador Flutter",
+        "company": "Productos de publicación digital",
+        "position": "Aplicaciones Android e iOS",
+        "start_date": "2022",
+        "end_date": "2024",
+        "period": "Octubre de 2022 — Junio de 2024",
+        "description": "Entregué aplicaciones de publicación para Android e iOS con MVVM, GetX, Dio, localización y procesos de lanzamiento listos para las tiendas.",
         "technologies": [
-          "Docker",
-          "Nginx",
-          "Prometheus",
-          "Grafana",
-          "PostgreSQL"
+          "Flutter",
+          "Dart",
+          "MVVM",
+          "GetX",
+          "Dio"
+        ]
+      },
+      {
+        "title": "Ingeniería de Software",
+        "company": "Formación universitaria",
+        "position": "Grado universitario",
+        "start_date": "2021",
+        "end_date": "2025",
+        "period": "2021 — 2025",
+        "description": "Formación en ingeniería de software con algoritmos, estructuras de datos, bases de datos, diseño de software y desarrollo de productos en equipo.",
+        "technologies": [
+          "Algoritmos",
+          "Estructuras de datos",
+          "Bases de datos",
+          "Diseño de software",
+          "Proyectos en equipo"
         ]
       }
     ],
     "projects": [
       {
         "title": "FakeCallApp",
-        "description": "Flutter · Next.js · Go",
+        "description": "Una experiencia divertida de videollamada falsa con personajes, programación e interacciones pensadas para móvil.",
         "category": "Web",
         "url": "https://fakecallapp.com"
       },
       {
         "title": "CleanMyGallery",
-        "description": "Flutter · procesamiento de imágenes · EXIF",
+        "description": "Una herramienta práctica para encontrar desorden, comprimir fotos y mantener los metadatos bajo control.",
         "category": "Web",
         "url": "https://cleanmygallery.com"
       },
       {
         "title": "FocusGroves",
-        "description": "Flutter · sistemas de concentración · salas en tiempo real",
+        "description": "Un espacio de concentración que combina temporizadores, tareas y salas de estudio compartidas.",
         "category": "Web",
         "url": "https://focusgroves.com"
       },
       {
         "title": "MoodGrade",
-        "description": "Flutter · diario de salud · exportación",
+        "description": "Un diario privado del estado de ánimo con seguimiento de medicación, exportaciones y patrones a largo plazo.",
         "category": "Web",
         "url": "https://moodgrade.com"
       },
       {
         "title": "GetQrivo",
-        "description": "QR · enlaces cortos · analítica",
+        "description": "Un conjunto de herramientas QR para crear códigos, gestionar enlaces cortos y entender los escaneos.",
         "category": "Web",
         "url": "https://getqrivo.com"
       },
       {
         "title": "OverlayPhoto",
-        "description": "Flutter · composición · cápsulas del tiempo",
+        "description": "Un editor de fotos para superposiciones, marcos, filtros y recuerdos en cápsulas del tiempo.",
         "category": "Web",
         "url": "https://overlayphoto.com"
       },
       {
         "title": "DistractionKiller",
-        "description": "Flutter · bienestar digital · horarios",
+        "description": "Una herramienta de bienestar digital para bloquear distracciones y proteger el tiempo de concentración.",
         "category": "Web",
         "url": "https://distractionkiller.com"
       },
       {
         "title": "KPSSHazirlan",
-        "description": "Planes de aprendizaje · motor de práctica · analítica",
+        "description": "Un planificador de estudio para preparar KPSS, practicar y seguir el progreso.",
         "category": "Web",
         "url": "https://kpsshazirlan.com"
       },
       {
         "title": "EhliyetCoz",
-        "description": "Cuestionarios diarios · modelo de progreso · control de contenido",
+        "description": "Un compañero para el examen de conducir con cuestionarios diarios y comentarios claros sobre el progreso.",
         "category": "Web",
         "url": "https://ehliyetcoz.com"
       },
       {
         "title": "Kazanamazi",
-        "description": "Registro de hábitos · mapas de calor · recordatorios",
+        "description": "Un registro personal sereno de oraciones y días de ayuno pendientes, con recordatorios e historial.",
         "category": "Web",
         "url": "https://kazanamazi.net"
       },
       {
         "title": "PDFScanPro",
-        "description": "Pipeline PDF · conversión · compresión",
+        "description": "Una caja de herramientas PDF para escanear, comprimir, unir, dividir y convertir documentos.",
         "category": "Web",
         "url": "https://pdfscanpro.com"
       }
@@ -174,28 +190,28 @@
     ],
     "proof": [
       {
-        "title": "Entrega con doble runtime",
-        "detail": "WebAssembly con SkWasm es el artefacto principal, con una alternativa JavaScript y CanvasKit para navegadores incompatibles.",
-        "verification": "Inspeccionar el manifiesto de compilación"
+        "title": "Hacerse cargo del producto",
+        "detail": "Me mantengo cerca del problema desde la primera interacción hasta el lanzamiento, el soporte y la siguiente iteración.",
+        "verification": "El producto antes que la ceremonia"
       },
       {
-        "title": "Medido en el navegador",
-        "detail": "Engineering Lab muestra el entorno de ejecución, el motor de renderizado, el aislamiento y los percentiles móviles del tiempo de fotograma de la aplicación activa.",
-        "verification": "Abrir Engineering Lab"
+        "title": "Diseñar para condiciones reales",
+        "detail": "Los datos sin conexión, las redes inestables, las integraciones nativas y las rutas de recuperación forman parte del producto.",
+        "verification": "Resiliencia desde el diseño"
       },
       {
-        "title": "Reforzado para producción",
-        "detail": "Las pruebas automatizadas cubren estado, accesibilidad, enlaces profundos, recuperación de errores y diseños móviles; el servidor aplica CSP, COOP, COEP y los tipos MIME Wasm correctos.",
-        "verification": "Inspeccionar las pruebas y Nginx"
+        "title": "Mantenerlo sostenible",
+        "detail": "Límites claros, gestión de estado enfocada y pruebas útiles facilitan los cambios después del lanzamiento.",
+        "verification": "Listo para el próximo cambio"
       }
     ]
   },
   "nav": {
     "home": "Inicio",
-    "about": "Perfil",
-    "experience": "Trabajo",
-    "projects": "Sistemas",
-    "proof": "Pruebas"
+    "about": "Sobre mí",
+    "experience": "Experiencia",
+    "projects": "Proyectos",
+    "proof": "Enfoque"
   },
   "accessibility": {
     "skip_to_content": "Saltar al contenido",
@@ -205,22 +221,23 @@
     "enable_sound_effects": "Activar efectos de sonido"
   },
   "about_section": {
-    "title": "Perfil de sistemas",
-    "bio": "Este portafolio documenta cómo se diseña, mide, prueba y opera el software sin exponer identidad personal.",
-    "bio2": "Tecnologías utilizadas en los sistemas seleccionados:"
+    "title": "Sobre mí",
+    "bio": "Desde 2021 desarrollo aplicaciones Flutter en producción para móvil, escritorio y web. Me centro en un comportamiento de producto claro, datos offline resistentes, sincronización en tiempo real y código mantenible.",
+    "bio2": "Además del trabajo para clientes, diseño y opero productos SaaS independientes de principio a fin, desde interfaces Flutter y API Go hasta despliegue y monitorización."
   },
   "home_section": {
-    "title": "PORTAFOLIO DE SISTEMAS.",
-    "subtitle": "Ingeniería de software independiente",
-    "view_work": "Explorar sistemas",
-    "inspect_runtime": "Inspeccionar ejecución"
+    "title": "INGENIERO FLUTTER SENIOR.",
+    "subtitle": "Productos útiles para móvil, escritorio y web.",
+    "view_work": "Ver proyectos",
+    "inspect_runtime": "Sobre mí"
   },
   "experience_section": {
-    "title": "Trabajo de ingeniería seleccionado",
+    "title": "Experiencia",
     "present": "Actual"
   },
   "projects_section": {
-    "title": "Sistemas seleccionados",
+    "title": "Proyectos seleccionados",
+    "subtitle": "Productos que diseñé, construí y sigo mejorando.",
     "filter_all": "Todos",
     "case_study_problem": "El desafío",
     "case_study_solution": "El enfoque",
@@ -237,16 +254,16 @@
     "flip_hint": "Haz clic para ver el caso de estudio"
   },
   "proof_section": {
-    "title": "Pruebas de ingeniería",
-    "subtitle": "Afirmaciones verificables en el repositorio y la aplicación en vivo"
+    "title": "Cómo trabajo",
+    "subtitle": "Un enfoque práctico formado al lanzar y mantener productos reales."
   },
   "footer": {
     "command_hint_prefix": "Presione",
     "command_hint_suffix": "para abrir la paleta de comandos",
     "quick_links": "Enlaces rápidos",
-    "verification": "Verificación",
-    "verification_body": "Las pruebas del entorno de ejecución, el renderizador, el aislamiento y los tiempos de fotograma se pueden inspeccionar directamente en esta página.",
-    "easter_egg": "Has encontrado la ruta de cinco clics. La curiosidad forma parte de la superficie de prueba."
+    "verification": "Enfoque actual",
+    "verification_body": "Crear productos Flutter cuidados y los servicios Go que los respaldan.",
+    "easter_egg": "Encontraste el rincón tranquilo. Gracias por mirar con atención."
   },
   "command_palette": {
     "close": "Cerrar la paleta de comandos",

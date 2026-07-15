@@ -6,8 +6,7 @@ import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
 import 'package:flutter_web_portfolio/app/core/constants/cinematic_curves.dart';
 import 'package:flutter_web_portfolio/app/widgets/preloader_animations.dart';
 
-/// Cinematic preloader — a jaw-dropping intro sequence that plays once per
-/// session before revealing the main portfolio content.
+/// Short preloader that plays once per session before revealing the portfolio.
 ///
 /// Sequence (across the short master timeline):
 ///   0.00–0.05  Fade-in background & particles
@@ -28,8 +27,8 @@ class CinematicPreloader extends StatefulWidget {
     super.key,
     required this.child,
     this.onLoadingComplete,
-    this.displayName = 'SYSTEMS PORTFOLIO',
-    this.tagline = 'Crafting digital experiences',
+    this.displayName = 'FLUTTER PORTFOLIO',
+    this.tagline = 'Mobile, desktop, and web products',
     this.minimumDuration = const Duration(milliseconds: 700),
     this.exitDuration = const Duration(milliseconds: 250),
   });
@@ -46,7 +45,7 @@ class CinematicPreloader extends StatefulWidget {
   /// Tagline that fades in below the name.
   final String tagline;
 
-  /// Minimum wall-clock time the preloader is visible (for dramatic effect).
+  /// Minimum wall-clock time the preloader is visible.
   final Duration minimumDuration;
 
   /// Duration of the circle-expand exit animation.

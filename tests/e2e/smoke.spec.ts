@@ -62,14 +62,14 @@ test('publishes a clean heading and control hierarchy', async ({
     .filter((node) => ['button', 'link'].includes(node.role?.value ?? ''))
     .map((node) => node.name?.value ?? '');
 
-  expect(headings).toContainEqual({ name: 'SYSTEMS PORTFOLIO.', level: 1 });
+  expect(headings).toContainEqual({ name: 'SENIOR FLUTTER ENGINEER.', level: 1 });
   expect(controls).toEqual(
     expect.arrayContaining([
       'Skip to content',
       'Back to top',
       ...(isMobile
         ? ['Open navigation menu']
-        : ['Profile', 'Work', 'Evidence', 'Systems']),
+        : ['About', 'Experience', 'Approach', 'Projects']),
       'Language menu: English',
     ]),
   );
@@ -83,9 +83,9 @@ test('publishes a clean heading and control hierarchy', async ({
       .getByRole('button', { name: 'Open navigation menu', exact: true })
       .click();
   }
-  await page.getByRole('button', { name: 'Profile', exact: true }).click();
+  await page.getByRole('button', { name: 'About', exact: true }).click();
   await expect(page).toHaveURL(/#\/about$/);
-  await expect(page.getByRole('heading', { name: 'Systems Profile' })).toBeAttached();
+  await expect(page.getByRole('heading', { name: 'About Me' })).toBeAttached();
 
   const sectionTree = await accessibility.send(
     'Accessibility.getFullAXTree',
@@ -94,7 +94,7 @@ test('publishes a clean heading and control hierarchy', async ({
     (node) =>
       !node.ignored &&
       node.role?.value === 'heading' &&
-      node.name?.value === 'Systems Profile',
+      node.name?.value === 'About Me',
   );
   expect(
     sectionHeading?.properties?.find((property) => property.name === 'level')
@@ -106,10 +106,10 @@ test('publishes a clean heading and control hierarchy', async ({
       .getByRole('button', { name: 'Open navigation menu', exact: true })
       .click();
   }
-  await page.getByRole('button', { name: 'Systems', exact: true }).click();
+  await page.getByRole('button', { name: 'Projects', exact: true }).click();
   await expect(page).toHaveURL(/#\/projects$/);
   await expect(
-    page.getByRole('heading', { name: 'Selected Systems' }),
+    page.getByRole('heading', { name: 'Selected Work' }),
   ).toBeAttached();
 
   const projectsTree = await accessibility.send(
@@ -123,7 +123,7 @@ test('publishes a clean heading and control hierarchy', async ({
   expect(projectLinks).not.toContain('Website');
 });
 
-test('paints an accessible engineering shell before the Wasm canvas', async ({
+test('paints an accessible portfolio shell before the Wasm canvas', async ({
   page,
 }) => {
   let releaseWasm: (() => void) | undefined;
@@ -139,10 +139,10 @@ test('paints an accessible engineering shell before the Wasm canvas', async ({
   const shell = page.locator('#bootstrap-surface');
   await expect(shell).toBeVisible();
   await expect(shell).toHaveAttribute('aria-busy', 'true');
-  await expect(shell.getByRole('heading', { name: /FLUTTER WEB/ })).toBeVisible();
-  await expect(shell.getByText('Release contract')).toBeVisible();
-  await expect(shell.getByText('main.dart.wasm')).toBeVisible();
-  await expect(shell.getByText('Preparing the live canvas')).toBeVisible();
+  await expect(shell.getByRole('heading', { name: /PRODUCTS FOR/ })).toBeVisible();
+  await expect(shell.getByText('Selected focus')).toBeVisible();
+  await expect(shell.getByText('Android · iOS')).toBeVisible();
+  await expect(shell.getByText('Loading selected work')).toBeVisible();
 
   releaseWasm?.();
   await expect(shell).toHaveCount(0, { timeout: 20000 });
@@ -154,20 +154,20 @@ test('offers an accessible retry when the Wasm artifact cannot load', async ({
   await page.route('**/main.dart.wasm*', (route) => route.abort('failed'));
   await page.goto('/', { waitUntil: 'domcontentloaded' });
 
-  await expect(page.getByText('FLUTTER WEB / BOOT FAILED')).toBeVisible({
+  await expect(page.getByText('PORTFOLIO / LOAD FAILED')).toBeVisible({
     timeout: 20000,
   });
   await expect(page.getByRole('button', { name: 'RETRY' })).toBeVisible();
   await expect(page.locator('#bootstrap-surface')).toHaveAttribute(
     'aria-label',
-    'The Flutter experience could not start',
+    'The portfolio could not start',
   );
   await expect(page.locator('#bootstrap-surface')).toHaveAttribute(
     'aria-busy',
     'false',
   );
   await expect(
-    page.getByText('The live canvas could not start. Retry the isolated runtime.'),
+    page.getByText('The portfolio could not load. Please try again.'),
   ).toBeVisible();
 });
 
@@ -289,18 +289,18 @@ test('switches to the application-owned Arabic catalog', async ({ page }) => {
     .poll(() => page.locator('html').getAttribute('lang'))
     .toBe('ar');
   await expect(page.locator('html')).toHaveAttribute('dir', 'rtl');
-  await expect(page.getByText('استكشاف الأنظمة', { exact: true })).toBeAttached();
+  await expect(page.getByText('عرض المشاريع', { exact: true })).toBeAttached();
 
   await page.keyboard.press('Control+KeyK');
   await expect(
-    page.getByText('الانتقال إلى الأنظمة', { exact: true }),
+    page.getByText('الانتقال إلى المشاريع', { exact: true }),
   ).toBeVisible();
 });
 
 test('keeps section hashes synchronized with browser history', async ({ page }) => {
   await openPortfolio(page);
   await page.keyboard.press('Control+KeyK');
-  const projectsCommand = page.getByText('Go to Systems', { exact: true });
+  const projectsCommand = page.getByText('Go to Projects', { exact: true });
   await expect(projectsCommand).toBeVisible();
   await projectsCommand.click();
   await expect(page).toHaveURL(/#\/projects$/);
