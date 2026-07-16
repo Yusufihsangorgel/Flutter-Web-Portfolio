@@ -34,6 +34,13 @@ final class _ProofLanguageRepository implements ILanguageRepository {
       'open_pull_request': 'View pull request',
       'status_merged': 'Merged',
       'status_under_review': 'Under review',
+      'event_lab_label': 'Event order lab',
+      'event_lab_without_patch': 'Without patch',
+      'event_lab_with_patch': 'With patch',
+      'event_lab_replay': 'Replay sequence',
+      'event_lab_sequence': 'Event sequence',
+      'event_lab_risk': 'Risk',
+      'event_lab_step': 'Step',
     },
   };
 
@@ -61,7 +68,10 @@ void main() {
     expect(scroll.activeSection, 'home');
   });
 
-  Widget buildSubject() => MultiRepositoryProvider(
+  Widget buildSubject({
+    bool reducedMotion = false,
+    TextDirection textDirection = TextDirection.ltr,
+  }) => MultiRepositoryProvider(
     providers: [
       RepositoryProvider.value(value: portfolio),
       RepositoryProvider.value(value: scroll.narrative),
@@ -72,8 +82,20 @@ void main() {
         BlocProvider.value(value: scroll),
         BlocProvider.value(value: scene),
       ],
-      child: const MaterialApp(
-        home: Scaffold(body: SingleChildScrollView(child: ProofSection())),
+      child: MaterialApp(
+        home: Builder(
+          builder: (context) => MediaQuery(
+            data: MediaQuery.of(
+              context,
+            ).copyWith(disableAnimations: reducedMotion),
+            child: Directionality(
+              textDirection: textDirection,
+              child: const Scaffold(
+                body: SingleChildScrollView(child: ProofSection()),
+              ),
+            ),
+          ),
+        ),
       ),
     ),
   );
@@ -90,6 +112,8 @@ void main() {
       expect(find.text(contribution.title), findsOneWidget);
     }
     expect(find.text('View pull request'), findsOneWidget);
+    expect(find.text('First Frame Lab'), findsOneWidget);
+    expect(find.textContaining('Blank handoff window'), findsOneWidget);
     expect(
       find.byWidgetPredicate(
         (widget) =>
@@ -99,6 +123,125 @@ void main() {
       findsNWidgets(portfolio.contributions.length),
     );
     expect(find.textContaining('testimonial'), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('replays event progress and stops cleanly after the final step', (
+    tester,
+  ) async {
+    await tester.pumpWidget(buildSubject());
+    await tester.pump();
+    await tester.ensureVisible(find.text('With patch'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('With patch'));
+    await tester.pump();
+
+    final browserFrame = find.byKey(
+      const ValueKey('event-lab-event-browser_frame'),
+    );
+    final inactiveBorder = _animatedBorderColor(tester, browserFrame);
+
+    await tester.pump(const Duration(milliseconds: 900));
+    final activeBorder = _animatedBorderColor(tester, browserFrame);
+    expect(activeBorder, isNot(inactiveBorder));
+
+    await tester.tap(find.text('Replay sequence'));
+    await tester.pump();
+    expect(_animatedBorderColor(tester, browserFrame), inactiveBorder);
+
+    await tester.pump(const Duration(seconds: 2));
+    expect(_animatedBorderColor(tester, browserFrame), activeBorder);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('reduced motion applies the complete sequence immediately', (
+    tester,
+  ) async {
+    await tester.pumpWidget(buildSubject(reducedMotion: true));
+    await tester.pump();
+    await tester.ensureVisible(find.text('With patch'));
+    await tester.pump();
+    await tester.tap(find.text('With patch'));
+    await tester.pump();
+
+    final first = find.byKey(
+      const ValueKey('event-lab-event-framework_signal'),
+    );
+    final browserFrame = find.byKey(
+      const ValueKey('event-lab-event-browser_frame'),
+    );
+    expect(
+      _animatedBorderColor(tester, browserFrame),
+      _animatedBorderColor(tester, first),
+    );
+    expect(
+      tester.widget<AnimatedContainer>(browserFrame).duration,
+      Duration.zero,
+    );
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('cancels an active replay when the lab leaves the tree', (
+    tester,
+  ) async {
+    await tester.pumpWidget(buildSubject());
+    await tester.pump();
+    await tester.ensureVisible(find.text('Replay sequence'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Replay sequence'));
+    await tester.pump();
+
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pump(const Duration(seconds: 2));
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('compares the baseline and patched event order on demand', (
+    tester,
+  ) async {
+    await tester.pumpWidget(buildSubject());
+    await tester.pump();
+
+    expect(find.textContaining('Blank handoff window'), findsOneWidget);
+    expect(find.text('Next browser animation frame'), findsNothing);
+
+    await tester.ensureVisible(find.text('With patch'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('With patch'));
+    await tester.pump();
+
+    expect(find.textContaining('Blank handoff window'), findsNothing);
+    expect(find.text('Next browser animation frame'), findsOneWidget);
+    expect(
+      find.byWidgetPredicate(
+        (widget) =>
+            widget is CinematicFocusable &&
+            widget.semanticLabel == 'With patch' &&
+            widget.selected == true,
+      ),
+      findsOneWidget,
+    );
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('omits the lab when contribution metadata does not declare it', (
+    tester,
+  ) async {
+    portfolio = loadPortfolioFixture(
+      mutate: (json) {
+        final contributions = json['contributions']! as List<dynamic>;
+        contributions
+            .cast<Map<String, dynamic>>()
+            .firstWhere((entry) => entry['featured'] == true)
+            .remove('event_order_lab');
+      },
+    );
+
+    await tester.pumpWidget(buildSubject());
+    await tester.pump();
+
+    expect(find.text('First Frame Lab'), findsNothing);
+    expect(find.byKey(const Key('contribution-event-order-lab')), findsNothing);
     expect(tester.takeException(), isNull);
   });
 
@@ -134,6 +277,43 @@ void main() {
     for (final contribution in portfolio.contributions) {
       expect(find.text(contribution.title), findsOneWidget);
     }
+    expect(find.text('First Frame Lab'), findsOneWidget);
+    expect(find.textContaining('Blank handoff window'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
+
+  testWidgets('keeps the horizontal sequence ordered from the right in RTL', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(760, 1600);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(
+      buildSubject(textDirection: TextDirection.rtl, reducedMotion: true),
+    );
+    await tester.pump();
+    await tester.ensureVisible(find.text('First Frame Lab'));
+    await tester.pump();
+
+    final first = find.byKey(
+      const ValueKey('event-lab-event-framework_signal'),
+    );
+    final last = find.byKey(
+      const ValueKey('event-lab-event-scene_render_complete'),
+    );
+    expect(
+      tester.getTopLeft(first).dx,
+      greaterThan(tester.getTopLeft(last).dx),
+    );
+    expect(tester.takeException(), isNull);
+  });
+}
+
+Color _animatedBorderColor(WidgetTester tester, Finder finder) {
+  final container = tester.widget<AnimatedContainer>(finder);
+  final decoration = container.decoration! as BoxDecoration;
+  final border = decoration.border! as Border;
+  return border.top.color;
 }

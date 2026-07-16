@@ -59,6 +59,13 @@
     "problem_label": "Hata",
     "change_label": "Yama",
     "open_pull_request": "Pull request'i görüntüle",
+    "event_lab_label": "Olay sırası laboratuvarı",
+    "event_lab_without_patch": "Yama olmadan",
+    "event_lab_with_patch": "Yama ile",
+    "event_lab_replay": "Sırayı yeniden oynat",
+    "event_lab_sequence": "Olay sırası",
+    "event_lab_risk": "Risk",
+    "event_lab_step": "Adım",
     "status_merged": "Birleştirildi",
     "status_under_review": "İncelemede"
   },

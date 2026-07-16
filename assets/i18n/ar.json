@@ -59,6 +59,13 @@
     "problem_label": "العطل",
     "change_label": "التصحيح",
     "open_pull_request": "عرض طلب السحب",
+    "event_lab_label": "مختبر ترتيب الأحداث",
+    "event_lab_without_patch": "من دون التصحيح",
+    "event_lab_with_patch": "مع التصحيح",
+    "event_lab_replay": "إعادة تشغيل التسلسل",
+    "event_lab_sequence": "تسلسل الأحداث",
+    "event_lab_risk": "خطر",
+    "event_lab_step": "الخطوة",
     "status_merged": "مدمج",
     "status_under_review": "قيد المراجعة"
   },

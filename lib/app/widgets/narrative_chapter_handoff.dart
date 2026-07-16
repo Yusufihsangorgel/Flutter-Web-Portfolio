@@ -9,14 +9,13 @@ import 'package:flutter_web_portfolio/app/core/constants/breakpoints.dart';
 import 'package:flutter_web_portfolio/app/core/theme/app_fonts.dart';
 import 'package:flutter_web_portfolio/app/narrative/application/narrative_position.dart';
 import 'package:flutter_web_portfolio/app/narrative/domain/narrative_document.dart';
-import 'package:flutter_web_portfolio/app/narrative/rendering/narrative_handoff_geometry.dart';
 import 'package:flutter_web_portfolio/app/utils/motion_preference.dart';
 
-/// A scroll-driven editorial portal carrying one chapter into the next.
+/// A quiet chapter seam inside the portfolio's persistent narrative stage.
 ///
-/// The visible label and number are supplied by the external locale and
-/// narrative documents. The portal remains decorative: the destination
-/// chapter owns the actual heading and semantic node.
+/// The former full-screen portals restarted the visual language between every
+/// section. This seam only identifies the next chapter and leaves the measured
+/// content-to-content signal in [NarrativeStage] visually uninterrupted.
 class NarrativeChapterHandoff extends StatefulWidget {
   const NarrativeChapterHandoff({
     super.key,
@@ -40,7 +39,7 @@ class NarrativeChapterHandoff extends StatefulWidget {
 
 final class _NarrativeChapterHandoffState
     extends State<NarrativeChapterHandoff> {
-  final _typography = _HandoffTypographyCache();
+  final _HandoffTypographyCache _typography = _HandoffTypographyCache();
   _NarrativeBoundaryProgress? _progress;
   List<NarrativeChapter>? _chapterOrder;
   bool? _reducedMotion;
@@ -93,11 +92,10 @@ final class _NarrativeChapterHandoffState
   Widget build(BuildContext context) {
     final width = MediaQuery.sizeOf(context).width;
     final height = width >= Breakpoints.desktop
-        ? 360.0
+        ? 104.0
         : width >= Breakpoints.tablet
-        ? 280.0
-        : 220.0;
-    final progress = _progress!;
+        ? 88.0
+        : 72.0;
     final locale = Localizations.maybeLocaleOf(context) ?? const Locale('en');
 
     return ExcludeSemantics(
@@ -111,9 +109,8 @@ final class _NarrativeChapterHandoffState
             height: height,
             child: CustomPaint(
               painter: _NarrativeChapterHandoffPainter(
-                from: widget.from,
                 to: widget.to,
-                progress: progress,
+                progress: _progress!,
                 textDirection: Directionality.of(context),
                 locale: locale,
                 chapterNumber: widget.chapterNumber,
@@ -130,7 +127,6 @@ final class _NarrativeChapterHandoffState
 
 final class _NarrativeChapterHandoffPainter extends CustomPainter {
   _NarrativeChapterHandoffPainter({
-    required this.from,
     required this.to,
     required this.progress,
     required this.textDirection,
@@ -140,7 +136,6 @@ final class _NarrativeChapterHandoffPainter extends CustomPainter {
     required this.typography,
   }) : super(repaint: progress);
 
-  final NarrativeChapter from;
   final NarrativeChapter to;
   final ValueListenable<double> progress;
   final TextDirection textDirection;
@@ -149,190 +144,67 @@ final class _NarrativeChapterHandoffPainter extends CustomPainter {
   final String label;
   final _HandoffTypographyCache typography;
 
-  final Paint _fillPaint = Paint()..isAntiAlias = true;
   final Paint _trackPaint = Paint()
     ..isAntiAlias = true
     ..style = PaintingStyle.stroke
-    ..strokeCap = StrokeCap.round
-    ..strokeWidth = 0.8;
-  final Paint _revealPaint = Paint()
-    ..isAntiAlias = true
-    ..style = PaintingStyle.stroke
-    ..strokeCap = StrokeCap.round
-    ..strokeWidth = 1.3;
+    ..strokeCap = StrokeCap.round;
+  final Paint _fillPaint = Paint()..isAntiAlias = true;
 
   @override
   void paint(Canvas canvas, Size size) {
     if (size.isEmpty) return;
-    final palette = _ChapterPortalPalette.forMotif(to.motif);
+    final accent = _accentFor(to.motif);
     final eased = _smoothStep(progress.value.clamp(0.0, 1.0));
-    final rtl = textDirection == TextDirection.rtl;
-
-    _fillPaint
-      ..style = PaintingStyle.fill
-      ..color = palette.background;
-    canvas.drawRect(Offset.zero & size, _fillPaint);
-    _drawGrid(canvas, size, palette);
-
-    final shape = NarrativeHandoffGeometry.resolve(
-      size: size,
-      from: from.motif,
-      to: to.motif,
-      textDirection: textDirection,
-    );
-    final path = shape.toPath();
-    _trackPaint.color = palette.foreground.withValues(alpha: 0.18);
-    canvas.drawPath(path, _trackPaint);
-
-    _revealPaint.color = palette.foreground.withValues(alpha: 0.72);
-    final pathReveal = rtl
-        ? Rect.fromLTWH(
-            size.width * (1 - eased),
-            0,
-            size.width * eased,
-            size.height,
-          )
-        : Rect.fromLTWH(0, 0, size.width * eased, size.height);
-    canvas
-      ..save()
-      ..clipRect(pathReveal)
-      ..drawPath(path, _revealPaint)
-      ..restore();
-
-    typography.layout(
-      size: size,
-      palette: palette,
-      textDirection: textDirection,
-      locale: locale,
+    final inset = size.width >= Breakpoints.tablet ? 36.0 : 20.0;
+    final y = size.height * 0.5;
+    final labelPainter = typography.layout(
       chapterNumber: chapterNumber,
       label: label,
-    );
-    final outlineTitle = typography.outlineTitle;
-    final filledTitle = typography.filledTitle;
-    final invertedTitle = typography.invertedTitle;
-    final titleStart = rtl
-        ? size.width - outlineTitle.width + outlineTitle.width * 0.2
-        : -outlineTitle.width * 0.2;
-    final titleEnd = (size.width - outlineTitle.width) / 2;
-    final titleX = ui.lerpDouble(titleStart, titleEnd, eased)!;
-    final titleY = size.height * 0.38;
-    final titleOffset = Offset(titleX, titleY);
-
-    outlineTitle.paint(canvas, titleOffset);
-
-    final textReveal = rtl
-        ? Rect.fromLTWH(
-            size.width * (1 - eased),
-            0,
-            size.width * eased,
-            size.height,
-          )
-        : Rect.fromLTWH(0, 0, size.width * eased, size.height);
-    canvas
-      ..save()
-      ..clipRect(textReveal);
-    filledTitle.paint(canvas, titleOffset);
-    canvas.restore();
-
-    final bandWidth =
-        size.width * (size.width >= Breakpoints.tablet ? 0.12 : 0.18);
-    final bandInset = size.width >= Breakpoints.tablet ? 24.0 : 14.0;
-    final bandLeading = ui.lerpDouble(
-      rtl ? size.width + bandWidth : -bandWidth,
-      rtl ? bandInset : size.width - bandWidth - bandInset,
-      eased,
-    )!;
-    final band = Rect.fromLTWH(
-      bandLeading,
-      size.height * 0.2,
-      bandWidth,
-      size.height * 0.62,
-    );
-    _fillPaint.color = palette.accent;
-    canvas
-      ..drawRect(band, _fillPaint)
-      ..save()
-      ..clipRect(band);
-    invertedTitle.paint(canvas, titleOffset);
-    canvas.restore();
-
-    _drawRail(canvas, size, palette, eased);
-    _drawNodes(canvas, shape, palette, eased);
-  }
-
-  void _drawGrid(Canvas canvas, Size size, _ChapterPortalPalette palette) {
-    _trackPaint
-      ..strokeWidth = 0.65
-      ..color = palette.foreground.withValues(alpha: 0.12);
-    final upperY = size.height * 0.2;
-    final lowerY = size.height * 0.82;
-    canvas
-      ..drawLine(Offset(0, upperY), Offset(size.width, upperY), _trackPaint)
-      ..drawLine(Offset(0, lowerY), Offset(size.width, lowerY), _trackPaint);
-    for (var column = 1; column < 4; column += 1) {
-      final x = size.width * column / 4;
-      canvas.drawLine(Offset(x, upperY), Offset(x, lowerY), _trackPaint);
-    }
-  }
-
-  void _drawRail(
-    Canvas canvas,
-    Size size,
-    _ChapterPortalPalette palette,
-    double progress,
-  ) {
-    final railText = typography.railText;
-    final inset = size.width >= Breakpoints.tablet ? 36.0 : 20.0;
-    final rail = NarrativeHandoffRailGeometry.resolve(
-      size: size,
-      labelSize: railText.size,
+      locale: locale,
       textDirection: textDirection,
-      inset: inset,
-      labelY: size.height * 0.085,
-      lineY: size.height * 0.115,
+      maxWidth: math.max(1, size.width * 0.46),
     );
-    railText.paint(canvas, rail.labelOffset);
+    final rtl = textDirection == TextDirection.rtl;
+    final labelX = rtl ? size.width - inset - labelPainter.width : inset;
+    labelPainter.paint(canvas, Offset(labelX, y - labelPainter.height * 0.5));
+
+    final lineStart = rtl
+        ? Offset(labelX - 16, y)
+        : Offset(labelX + labelPainter.width + 16, y);
+    final lineEnd = rtl ? Offset(inset, y) : Offset(size.width - inset, y);
+    if ((lineEnd.dx - lineStart.dx).abs() < 1) return;
 
     _trackPaint
-      ..strokeWidth = 1
-      ..color = palette.foreground.withValues(alpha: 0.3);
-    canvas.drawLine(rail.lineStart, rail.lineEnd, _trackPaint);
+      ..strokeWidth = 0.8
+      ..color = AppColors.textBright.withValues(alpha: 0.18);
+    canvas.drawLine(lineStart, lineEnd, _trackPaint);
 
-    final progressEnd = Offset(
-      ui.lerpDouble(rail.lineStart.dx, rail.lineEnd.dx, progress)!,
-      rail.lineStart.dy,
-    );
-    _revealPaint
-      ..strokeWidth = 2
-      ..color = palette.accent;
-    canvas.drawLine(rail.lineStart, progressEnd, _revealPaint);
-  }
+    final active = Offset(ui.lerpDouble(lineStart.dx, lineEnd.dx, eased)!, y);
+    _trackPaint
+      ..strokeWidth = 1.5
+      ..color = accent.withValues(alpha: 0.78);
+    canvas.drawLine(lineStart, active, _trackPaint);
 
-  void _drawNodes(
-    Canvas canvas,
-    NarrativeHandoffShape shape,
-    _ChapterPortalPalette palette,
-    double progress,
-  ) {
-    _fillPaint.color = palette.background;
-    _revealPaint
+    _fillPaint.color = AppColors.paper.withValues(alpha: 0.96);
+    canvas.drawCircle(active, 4.6, _fillPaint);
+    _trackPaint
       ..strokeWidth = 1.2
-      ..color = palette.foreground.withValues(alpha: 0.65);
-    for (final point in [shape.start, shape.end]) {
-      canvas
-        ..drawCircle(point, 4.5, _fillPaint)
-        ..drawCircle(point, 4.5, _revealPaint);
-    }
-    final active = shape.pointAt(progress);
-    _fillPaint.color = palette.accent;
-    canvas.drawCircle(active, 4.2, _fillPaint);
+      ..color = accent;
+    canvas.drawCircle(active, 4.6, _trackPaint);
   }
+
+  static Color _accentFor(NarrativeMotif motif) => switch (motif) {
+    NarrativeMotif.origin => AppColors.cobalt,
+    NarrativeMotif.thread => const Color(0xFFFF704F),
+    NarrativeMotif.timeline => AppColors.cobalt,
+    NarrativeMotif.branches => AppColors.textBright,
+    NarrativeMotif.bracket => AppColors.cobalt,
+  };
 
   static double _smoothStep(double value) => value * value * (3 - 2 * value);
 
   @override
   bool shouldRepaint(_NarrativeChapterHandoffPainter oldDelegate) =>
-      oldDelegate.from != from ||
       oldDelegate.to != to ||
       !identical(oldDelegate.progress, progress) ||
       oldDelegate.textDirection != textDirection ||
@@ -342,10 +214,10 @@ final class _NarrativeChapterHandoffPainter extends CustomPainter {
       !identical(oldDelegate.typography, typography);
 }
 
-/// Measured single-line typography used by a chapter handoff.
+/// Measured single-line typography used by a chapter seam.
 ///
-/// Exposed so narrow translated labels can be regression-tested without
-/// relying on pixel sampling.
+/// This public metric surface keeps locale and narrow-layout regressions
+/// testable without relying on screenshot pixel sampling.
 @immutable
 final class NarrativeHandoffTypographyMetrics {
   const NarrativeHandoffTypographyMetrics({
@@ -365,7 +237,6 @@ final class NarrativeHandoffTypographyMetrics {
   final double maxRailWidth;
 }
 
-/// Locale-aware, measured typography for the decorative portal.
 abstract final class NarrativeHandoffTypography {
   static String uppercaseLabel(String label, Locale locale) {
     final languageCode = locale.languageCode.toLowerCase();
@@ -389,79 +260,57 @@ abstract final class NarrativeHandoffTypography {
       throw ArgumentError.value(size, 'size', 'must be finite and positive');
     }
     final normalizedLabel = uppercaseLabel(label.trim(), locale);
-    final inset = size.width >= Breakpoints.tablet ? 36.0 : 20.0;
-    final titleMaxWidth = math.max(1.0, size.width - inset * 2);
-    final titleMaxHeight = size.height * 0.42;
-    final titleFontSize = _fitSingleLineFontSize(
-      text: chapterNumber,
-      textDirection: textDirection,
-      minFontSize: 36,
-      maxFontSize: math.min(176, size.height * 0.43),
-      maxWidth: titleMaxWidth,
-      maxHeight: titleMaxHeight,
-      styleFor: (fontSize) =>
-          _titleStyle(fontSize: fontSize, color: AppColors.textBright),
-    );
+    final titleFontSize = size.width >= Breakpoints.tablet ? 11.0 : 9.0;
+    final railFontSize = titleFontSize;
+    final maxRailWidth = math.max(1.0, size.width * 0.46);
     final titleSize = _measure(
       text: chapterNumber,
       textDirection: textDirection,
-      style: _titleStyle(fontSize: titleFontSize, color: AppColors.textBright),
+      style: _style(fontSize: titleFontSize, color: AppColors.cobalt),
     );
-
-    // Preserve a visible rail after the full translated label. The text is
-    // scaled from measured paragraph bounds; it is never clipped heuristically.
-    final maxRailWidth = math.max(1.0, size.width - inset * 2 - 40);
-    final railFontSize = _fitSingleLineFontSize(
-      text: normalizedLabel,
+    final railSize = _measureFitted(
+      text: '$chapterNumber  $normalizedLabel',
       textDirection: textDirection,
-      minFontSize: 6,
-      maxFontSize: size.width >= Breakpoints.tablet ? 12 : 10,
       maxWidth: maxRailWidth,
-      maxHeight: size.height * 0.12,
-      styleFor: (fontSize) =>
-          _railStyle(fontSize: fontSize, color: AppColors.textBright),
+      maxFontSize: railFontSize,
     );
-    final railSize = _measure(
-      text: normalizedLabel,
-      textDirection: textDirection,
-      style: _railStyle(fontSize: railFontSize, color: AppColors.textBright),
-    );
-
     return NarrativeHandoffTypographyMetrics(
       normalizedLabel: normalizedLabel,
       titleFontSize: titleFontSize,
       titleSize: titleSize,
-      railFontSize: railFontSize,
-      railSize: railSize,
+      railFontSize: railSize.$2,
+      railSize: railSize.$1,
       maxRailWidth: maxRailWidth,
     );
   }
 
-  static double _fitSingleLineFontSize({
+  static (Size, double) _measureFitted({
     required String text,
     required TextDirection textDirection,
-    required double minFontSize,
-    required double maxFontSize,
     required double maxWidth,
-    required double maxHeight,
-    required TextStyle Function(double fontSize) styleFor,
+    required double maxFontSize,
   }) {
-    var lower = minFontSize;
-    var upper = math.max(minFontSize, maxFontSize);
-    for (var iteration = 0; iteration < 14; iteration += 1) {
-      final candidate = (lower + upper) / 2;
-      final measured = _measure(
+    var lower = 6.0;
+    var upper = maxFontSize;
+    for (var iteration = 0; iteration < 12; iteration += 1) {
+      final candidate = (lower + upper) * 0.5;
+      final size = _measure(
         text: text,
         textDirection: textDirection,
-        style: styleFor(candidate),
+        style: _style(fontSize: candidate, color: AppColors.textBright),
       );
-      if (measured.width <= maxWidth && measured.height <= maxHeight) {
+      if (size.width <= maxWidth) {
         lower = candidate;
       } else {
         upper = candidate;
       }
     }
-    return lower;
+    final size = _measure(
+      text: text,
+      textDirection: textDirection,
+      style: _style(fontSize: lower, color: AppColors.textBright),
+    );
+    return (size, lower);
   }
 
   static Size _measure({
@@ -479,159 +328,68 @@ abstract final class NarrativeHandoffTypography {
     return size;
   }
 
-  static TextStyle _titleStyle({
-    required double fontSize,
-    required Color color,
-  }) => AppFonts.spaceGrotesk(
-    fontSize: fontSize,
-    fontWeight: FontWeight.w700,
-    height: 0.9,
-    letterSpacing: -fontSize * 0.045,
-    color: color,
-  );
-
-  static TextStyle _railStyle({
-    required double fontSize,
-    required Color color,
-  }) => AppFonts.jetBrainsMono(
-    fontSize: fontSize,
-    fontWeight: FontWeight.w600,
-    letterSpacing: 0.8,
-    color: color,
-  );
+  static TextStyle _style({required double fontSize, required Color color}) =>
+      AppFonts.jetBrainsMono(
+        fontSize: fontSize,
+        fontWeight: FontWeight.w600,
+        letterSpacing: 0.8,
+        color: color,
+      );
 }
 
 final class _HandoffTypographyCache {
-  TextPainter? _outlineTitle;
-  TextPainter? _filledTitle;
-  TextPainter? _invertedTitle;
-  TextPainter? _railText;
-  Size? _size;
-  String? _chapterNumber;
-  String? _normalizedLabel;
+  TextPainter? _painter;
+  String? _text;
   TextDirection? _textDirection;
-  Locale? _locale;
-  _ChapterPortalPalette? _palette;
+  double? _maxWidth;
+  double? _fontSize;
 
-  TextPainter get outlineTitle => _outlineTitle!;
-  TextPainter get filledTitle => _filledTitle!;
-  TextPainter get invertedTitle => _invertedTitle!;
-  TextPainter get railText => _railText!;
-
-  void layout({
-    required Size size,
-    required _ChapterPortalPalette palette,
-    required TextDirection textDirection,
-    required Locale locale,
+  TextPainter layout({
     required String chapterNumber,
     required String label,
-  }) {
-    final normalizedLabel = NarrativeHandoffTypography.uppercaseLabel(
-      label.trim(),
-      locale,
-    );
-    if (_size == size &&
-        _chapterNumber == chapterNumber &&
-        _normalizedLabel == normalizedLabel &&
-        _textDirection == textDirection &&
-        _locale == locale &&
-        _palette == palette) {
-      return;
-    }
-
-    _disposePainters();
-    _size = size;
-    _chapterNumber = chapterNumber;
-    _normalizedLabel = normalizedLabel;
-    _textDirection = textDirection;
-    _locale = locale;
-    _palette = palette;
-
-    final metrics = NarrativeHandoffTypography.resolve(
-      size: size,
-      chapterNumber: chapterNumber,
-      label: label,
-      locale: locale,
-      textDirection: textDirection,
-    );
-    final outline = Paint()
-      ..isAntiAlias = true
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = size.width >= Breakpoints.tablet ? 1.35 : 1
-      ..color = palette.foreground.withValues(alpha: 0.42);
-    _outlineTitle = TextPainter(
-      text: TextSpan(
-        text: chapterNumber,
-        style: AppFonts.spaceGrotesk(
-          fontSize: metrics.titleFontSize,
-          fontWeight: FontWeight.w700,
-          height: 0.9,
-          letterSpacing: -metrics.titleFontSize * 0.045,
-          foreground: outline,
-        ),
-      ),
-      maxLines: 1,
-      textDirection: textDirection,
-    )..layout();
-    _filledTitle = _titlePainter(
-      text: chapterNumber,
-      fontSize: metrics.titleFontSize,
-      color: palette.foreground,
-      textDirection: textDirection,
-    );
-    _invertedTitle = _titlePainter(
-      text: chapterNumber,
-      fontSize: metrics.titleFontSize,
-      color: palette.onAccent,
-      textDirection: textDirection,
-    );
-    _railText = TextPainter(
-      text: TextSpan(
-        text: metrics.normalizedLabel,
-        style: AppFonts.jetBrainsMono(
-          fontSize: metrics.railFontSize,
-          fontWeight: FontWeight.w600,
-          letterSpacing: 0.8,
-          color: palette.foreground,
-        ),
-      ),
-      maxLines: 1,
-      textDirection: textDirection,
-    )..layout();
-  }
-
-  TextPainter _titlePainter({
-    required String text,
-    required double fontSize,
-    required Color color,
+    required Locale locale,
     required TextDirection textDirection,
-  }) => TextPainter(
-    text: TextSpan(
+    required double maxWidth,
+  }) {
+    final text =
+        '$chapterNumber  '
+        '${NarrativeHandoffTypography.uppercaseLabel(label.trim(), locale)}';
+    final measured = NarrativeHandoffTypography._measureFitted(
       text: text,
-      style: AppFonts.spaceGrotesk(
-        fontSize: fontSize,
-        fontWeight: FontWeight.w700,
-        height: 0.9,
-        letterSpacing: -fontSize * 0.045,
-        color: color,
+      textDirection: textDirection,
+      maxWidth: maxWidth,
+      maxFontSize: maxWidth >= Breakpoints.tablet ? 11 : 9,
+    );
+    if (_painter != null &&
+        _text == text &&
+        _textDirection == textDirection &&
+        _maxWidth == maxWidth &&
+        _fontSize == measured.$2) {
+      return _painter!;
+    }
+    _painter?.dispose();
+    _text = text;
+    _textDirection = textDirection;
+    _maxWidth = maxWidth;
+    _fontSize = measured.$2;
+    _painter = TextPainter(
+      text: TextSpan(
+        text: text,
+        style: NarrativeHandoffTypography._style(
+          fontSize: measured.$2,
+          color: AppColors.textBright,
+        ),
       ),
-    ),
-    maxLines: 1,
-    textDirection: textDirection,
-  )..layout();
-
-  void _disposePainters() {
-    _outlineTitle?.dispose();
-    _filledTitle?.dispose();
-    _invertedTitle?.dispose();
-    _railText?.dispose();
-    _outlineTitle = null;
-    _filledTitle = null;
-    _invertedTitle = null;
-    _railText = null;
+      maxLines: 1,
+      textDirection: textDirection,
+    )..layout(maxWidth: maxWidth);
+    return _painter!;
   }
 
-  void dispose() => _disposePainters();
+  void dispose() {
+    _painter?.dispose();
+    _painter = null;
+  }
 }
 
 final class _NarrativeBoundaryProgress extends ChangeNotifier
@@ -682,60 +440,10 @@ final class _NarrativeBoundaryProgress extends ChangeNotifier
   }
 }
 
-@immutable
-final class _ChapterPortalPalette {
-  const _ChapterPortalPalette({
-    required this.background,
-    required this.foreground,
-    required this.accent,
-    required this.onAccent,
-  });
-
-  final Color background;
-  final Color foreground;
-  final Color accent;
-  final Color onAccent;
-
-  static _ChapterPortalPalette forMotif(NarrativeMotif motif) =>
-      switch (motif) {
-        NarrativeMotif.origin => const _ChapterPortalPalette(
-          background: AppColors.paper,
-          foreground: AppColors.textBright,
-          accent: AppColors.cobalt,
-          onAccent: AppColors.white,
-        ),
-        NarrativeMotif.timeline => const _ChapterPortalPalette(
-          background: AppColors.cobalt,
-          foreground: AppColors.white,
-          accent: AppColors.acid,
-          onAccent: AppColors.textBright,
-        ),
-        NarrativeMotif.branches => const _ChapterPortalPalette(
-          background: AppColors.textBright,
-          foreground: AppColors.white,
-          accent: AppColors.cobalt,
-          onAccent: AppColors.white,
-        ),
-        NarrativeMotif.bracket => const _ChapterPortalPalette(
-          background: AppColors.acid,
-          foreground: AppColors.textBright,
-          accent: AppColors.cobalt,
-          onAccent: AppColors.white,
-        ),
-        NarrativeMotif.thread => const _ChapterPortalPalette(
-          background: Color(0xFFFF704F),
-          foreground: AppColors.textBright,
-          accent: AppColors.white,
-          onAccent: AppColors.textBright,
-        ),
-      };
-}
-
 /// Resolves the persistent reveal state of one chapter boundary.
 ///
-/// Only the currently active boundary interpolates. Boundaries earlier in the
-/// configured narrative remain fully drawn, while later boundaries stay on
-/// their quiet track until the reading position reaches them.
+/// Only the current seam interpolates. Earlier seams remain complete and later
+/// seams stay quiet until the reader reaches them.
 abstract final class NarrativeHandoffReveal {
   static double resolve({
     required NarrativePosition snapshot,

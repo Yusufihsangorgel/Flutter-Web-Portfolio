@@ -9,6 +9,8 @@ environment:
   flutter: '>=3.44.0'
 
 dependencies:
+  adaptive_render_budget:
+    path: packages/adaptive_render_budget
   flutter:
     sdk: flutter
   flutter_localizations:

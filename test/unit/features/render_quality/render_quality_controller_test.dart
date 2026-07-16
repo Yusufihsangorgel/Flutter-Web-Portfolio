@@ -1,3 +1,7 @@
+import 'dart:collection';
+
+import 'package:adaptive_render_budget/adaptive_render_budget.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:flutter_web_portfolio/app/features/render_quality/application/render_quality_controller.dart';
@@ -6,130 +10,184 @@ import 'package:flutter_web_portfolio/app/features/render_quality/domain/render_
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  RenderQualityController buildController({
-    int downgradeWindows = 2,
-    int upgradeWindows = 3,
-    int warmUpFrames = 0,
-  }) => RenderQualityController(
-    sampler: FrameBudgetSampler(windowSize: 4),
-    pressureWindowsBeforeDowngrade: downgradeWindows,
-    headroomWindowsBeforeUpgrade: upgradeWindows,
-    warmUpFrameCount: warmUpFrames,
-  );
+  late _FakeTimingSource timingSource;
+  late _FakeRefreshRateSource refreshRateSource;
+  late _FakeClock clock;
+  late RenderQualityController controller;
 
-  void recordWindow(RenderQualityController controller, Duration duration) {
-    controller.recordFrameDurations(List.filled(4, duration));
-  }
+  setUp(() {
+    timingSource = _FakeTimingSource();
+    refreshRateSource = _FakeRefreshRateSource(60);
+    clock = _FakeClock();
+    controller = RenderQualityController(
+      timingSource: timingSource,
+      refreshRateSource: refreshRateSource,
+      clock: clock,
+      policy: _testPolicy,
+    );
+  });
 
-  group('FrameBudgetSampler', () {
-    test('reports deterministic p95, maximum, and slow-frame ratio', () {
-      final sampler = FrameBudgetSampler(windowSize: 4);
-
-      expect(sampler.add(const Duration(milliseconds: 10)), isNull);
-      expect(sampler.add(const Duration(milliseconds: 18)), isNull);
-      expect(sampler.add(const Duration(milliseconds: 24)), isNull);
-      final window = sampler.add(const Duration(milliseconds: 40));
-
-      expect(window, isNotNull);
-      expect(window!.sampleCount, 4);
-      expect(window.p95, const Duration(milliseconds: 40));
-      expect(window.maximum, const Duration(milliseconds: 40));
-      expect(window.slowFrameRatio, 0.5);
-    });
+  tearDown(() async {
+    await controller.close();
+    refreshRateSource.dispose();
   });
 
   group('RenderQualityController', () {
-    test('starts balanced for every device', () async {
-      final controller = buildController();
-      addTearDown(controller.close);
-
+    test('starts in the balanced tier for every display', () {
       expect(controller.state.quality, RenderQuality.balanced);
       expect(controller.state.reason, RenderQualityReason.startup);
+      expect(controller.state.refreshRateHz, 60);
       expect(controller.state.adaptationCount, 0);
     });
 
-    test('downgrades only after consecutive pressure windows', () async {
-      final controller = buildController();
-      addTearDown(controller.close);
+    test('maps sustained normalized load to the essential tier', () {
+      timingSource.emitRepeated(_slowFrame, 4);
 
-      recordWindow(controller, const Duration(milliseconds: 30));
-      expect(controller.state.quality, RenderQuality.balanced);
-      expect(controller.state.pressureWindows, 1);
-
-      recordWindow(controller, const Duration(milliseconds: 30));
       expect(controller.state.quality, RenderQuality.essential);
       expect(controller.state.reason, RenderQualityReason.sustainedPressure);
       expect(controller.state.adaptationCount, 1);
     });
 
-    test('upgrades only after a longer stable headroom streak', () async {
-      final controller = buildController();
-      addTearDown(controller.close);
+    test('maps a verified upward probe to the cinematic tier', () {
+      timingSource.emitRepeated(_healthyFrame, 4);
 
-      for (var index = 0; index < 2; index++) {
-        recordWindow(controller, const Duration(milliseconds: 12));
-      }
-      expect(controller.state.quality, RenderQuality.balanced);
-
-      recordWindow(controller, const Duration(milliseconds: 12));
       expect(controller.state.quality, RenderQuality.cinematic);
       expect(controller.state.reason, RenderQualityReason.sustainedHeadroom);
-    });
+      expect(controller.state.probing, isTrue);
 
-    test('neutral timing resets pressure hysteresis', () async {
-      final controller = buildController();
-      addTearDown(controller.close);
+      timingSource.emitRepeated(_healthyFrame, 4);
 
-      recordWindow(controller, const Duration(milliseconds: 30));
-      expect(controller.state.pressureWindows, 1);
-
-      recordWindow(controller, const Duration(milliseconds: 19));
-      expect(controller.state.pressureWindows, 0);
-      expect(controller.state.headroomWindows, 0);
-
-      recordWindow(controller, const Duration(milliseconds: 30));
-      expect(controller.state.quality, RenderQuality.balanced);
-      expect(controller.state.pressureWindows, 1);
-    });
-
-    test('reduced motion is an absolute quality override', () async {
-      final controller = buildController(upgradeWindows: 1);
-      addTearDown(controller.close);
-
-      recordWindow(controller, const Duration(milliseconds: 12));
       expect(controller.state.quality, RenderQuality.cinematic);
+      expect(controller.state.probing, isFalse);
+      expect(controller.state.adaptationCount, 1);
+    });
 
+    test('reduced motion pauses adaptation and restores the verified tier', () {
       controller.setReducedMotion(true);
+
       expect(controller.state.quality, RenderQuality.essential);
       expect(controller.state.reason, RenderQualityReason.reducedMotion);
       expect(controller.state.reducedMotion, isTrue);
+      expect(controller.budgetState.isPaused, isTrue);
+
+      timingSource.emitRepeated(_slowFrame, 8);
+      expect(controller.budgetStatistics.sampleCount, 0);
 
       controller.setReducedMotion(false);
-      expect(controller.state.quality, RenderQuality.cinematic);
+
+      expect(controller.state.quality, RenderQuality.balanced);
       expect(controller.state.reason, RenderQualityReason.startup);
       expect(controller.state.reducedMotion, isFalse);
+      expect(controller.budgetState.isPaused, isFalse);
     });
 
-    test('ignores warm-up frames before evaluating a window', () async {
-      final controller = buildController(downgradeWindows: 1, warmUpFrames: 4);
-      addTearDown(controller.close);
+    test('publishes material display refresh-rate changes', () {
+      refreshRateSource.setRefreshRate(120);
 
-      recordWindow(controller, const Duration(milliseconds: 30));
-      expect(controller.state.lastWindow, isNull);
-      expect(controller.state.quality, RenderQuality.balanced);
+      expect(controller.state.refreshRateHz, 120);
+      expect(controller.state.reason, RenderQualityReason.refreshRateChanged);
+    });
 
-      recordWindow(controller, const Duration(milliseconds: 30));
-      expect(controller.state.quality, RenderQuality.essential);
+    test('close detaches the package core from its sources', () async {
+      expect(timingSource.listenerCount, 1);
+      expect(refreshRateSource.listenerCount, 1);
+
+      await controller.close();
+
+      expect(timingSource.listenerCount, 0);
+      expect(refreshRateSource.listenerCount, 0);
     });
   });
 
   group('RenderQuality profiles', () {
-    test('reduce decorative work without changing content semantics', () {
-      expect(RenderQuality.essential.profile.drawGrain, isFalse);
+    test('reduce decoration without changing content semantics', () {
+      expect(RenderQuality.essential.profile.drawAmbientField, isFalse);
+      expect(RenderQuality.balanced.profile.drawAmbientField, isTrue);
       expect(RenderQuality.cinematic.profile.drawGrain, isTrue);
       expect(RenderQuality.essential.profile.trackPointer, isFalse);
       expect(RenderQuality.balanced.profile.trackPointer, isFalse);
       expect(RenderQuality.cinematic.profile.trackPointer, isTrue);
     });
   });
+}
+
+final _testPolicy = AdaptiveRenderBudgetPolicy(
+  windowCapacity: 8,
+  minimumSamples: 4,
+  evaluationIntervalFrames: 1,
+  downgradeP95Threshold: 1.1,
+  downgradeOverloadedFraction: 0.5,
+  recoveryP95Threshold: 0.7,
+  recoveryOverloadedFraction: 0,
+  probeSampleCount: 4,
+  rollbackMinimumSamples: 2,
+  rollbackOverloadedFraction: 0.5,
+  cooldown: Duration.zero,
+);
+
+final _healthyFrame = RenderFrameTiming(
+  buildDuration: const Duration(milliseconds: 5),
+  rasterDuration: const Duration(milliseconds: 4),
+);
+
+final _slowFrame = RenderFrameTiming(
+  buildDuration: const Duration(milliseconds: 20),
+  rasterDuration: const Duration(milliseconds: 18),
+);
+
+final class _FakeTimingSource implements RenderFrameTimingSource {
+  final Set<RenderFrameTimingCallback> _listeners =
+      LinkedHashSet<RenderFrameTimingCallback>.identity();
+
+  int get listenerCount => _listeners.length;
+
+  @override
+  void addListener(RenderFrameTimingCallback listener) {
+    _listeners.add(listener);
+  }
+
+  @override
+  void removeListener(RenderFrameTimingCallback listener) {
+    _listeners.remove(listener);
+  }
+
+  void emitRepeated(RenderFrameTiming timing, int count) {
+    final batch = List<RenderFrameTiming>.filled(count, timing);
+    for (final listener in List<RenderFrameTimingCallback>.of(_listeners)) {
+      listener(batch);
+    }
+  }
+}
+
+final class _FakeRefreshRateSource extends ChangeNotifier
+    implements RefreshRateSource {
+  _FakeRefreshRateSource(this._refreshRateHz);
+
+  double _refreshRateHz;
+  int listenerCount = 0;
+
+  @override
+  double get refreshRateHz => _refreshRateHz;
+
+  @override
+  void addListener(VoidCallback listener) {
+    listenerCount += 1;
+    super.addListener(listener);
+  }
+
+  @override
+  void removeListener(VoidCallback listener) {
+    listenerCount -= 1;
+    super.removeListener(listener);
+  }
+
+  void setRefreshRate(double value) {
+    _refreshRateHz = value;
+    notifyListeners();
+  }
+}
+
+final class _FakeClock implements MonotonicClock {
+  @override
+  Duration elapsed = Duration.zero;
 }

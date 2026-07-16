@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_web_portfolio/app/controllers/scroll_controller.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
 import 'package:flutter_web_portfolio/app/core/constants/breakpoints.dart';
 import 'package:flutter_web_portfolio/app/core/theme/app_fonts.dart';
@@ -43,6 +44,11 @@ class ExperienceSection extends StatelessWidget {
                   _ExperienceEntry(
                     experience: experiences[index],
                     isLast: index == experiences.length - 1,
+                    anchorKey: index == 0
+                        ? context.read<AppScrollController>().anchorKeyFor(
+                            SectionId.experience,
+                          )
+                        : null,
                   ),
               ],
             ),
@@ -52,10 +58,15 @@ class ExperienceSection extends StatelessWidget {
 }
 
 class _ExperienceEntry extends StatelessWidget {
-  const _ExperienceEntry({required this.experience, required this.isLast});
+  const _ExperienceEntry({
+    required this.experience,
+    required this.isLast,
+    this.anchorKey,
+  });
 
   final PortfolioExperience experience;
   final bool isLast;
+  final Key? anchorKey;
 
   @override
   Widget build(BuildContext context) {
@@ -81,7 +92,7 @@ class _ExperienceEntry extends StatelessWidget {
               ? Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _Period(period: experience.period),
+                    _Period(period: experience.period, anchorKey: anchorKey),
                     const SizedBox(height: 24),
                     content,
                   ],
@@ -91,7 +102,10 @@ class _ExperienceEntry extends StatelessWidget {
                   children: [
                     SizedBox(
                       width: 205,
-                      child: _Period(period: experience.period),
+                      child: _Period(
+                        period: experience.period,
+                        anchorKey: anchorKey,
+                      ),
                     ),
                     const SizedBox(width: 64),
                     Expanded(child: content),
@@ -104,21 +118,25 @@ class _ExperienceEntry extends StatelessWidget {
 }
 
 class _Period extends StatelessWidget {
-  const _Period({required this.period});
+  const _Period({required this.period, this.anchorKey});
 
   final String period;
+  final Key? anchorKey;
 
   @override
   Widget build(BuildContext context) => Row(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      Container(
-        width: 8,
-        height: 8,
-        margin: const EdgeInsets.only(top: 6),
-        decoration: const BoxDecoration(
-          color: AppColors.heroAccent,
-          shape: BoxShape.circle,
+      KeyedSubtree(
+        key: anchorKey,
+        child: Container(
+          width: 8,
+          height: 8,
+          margin: const EdgeInsets.only(top: 6),
+          decoration: const BoxDecoration(
+            color: AppColors.heroAccent,
+            shape: BoxShape.circle,
+          ),
         ),
       ),
       const SizedBox(width: 14),

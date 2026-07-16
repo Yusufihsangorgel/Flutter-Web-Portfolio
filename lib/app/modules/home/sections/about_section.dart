@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_web_portfolio/app/controllers/scroll_controller.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
 import 'package:flutter_web_portfolio/app/core/constants/breakpoints.dart';
 import 'package:flutter_web_portfolio/app/core/theme/app_fonts.dart';
@@ -39,6 +40,9 @@ class AboutSection extends StatelessWidget {
                       defaultValue: 'About',
                     ),
                     accent: accent,
+                    anchorKey: context.read<AppScrollController>().anchorKeyFor(
+                      SectionId.about,
+                    ),
                   ),
                 ),
                 SizedBox(height: compact ? 54 : 82),

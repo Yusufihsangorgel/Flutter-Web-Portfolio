@@ -59,27 +59,27 @@ void main() {
     ),
   );
 
-  testWidgets('uses one cinematic responsive portal height', (tester) async {
+  testWidgets('uses a compact responsive seam height', (tester) async {
     addTearDown(() => tester.binding.setSurfaceSize(null));
     await tester.binding.setSurfaceSize(const Size(899, 800));
     await tester.pumpWidget(subject(width: 899));
     expect(
       tester.getSize(find.byKey(const ValueKey('handoff-home-experience'))),
-      const Size(899, 220),
+      const Size(899, 72),
     );
 
     await tester.binding.setSurfaceSize(const Size(900, 800));
     await tester.pumpWidget(subject(width: 900));
     expect(
       tester.getSize(find.byKey(const ValueKey('handoff-home-experience'))),
-      const Size(900, 280),
+      const Size(900, 88),
     );
 
     await tester.binding.setSurfaceSize(const Size(1200, 800));
     await tester.pumpWidget(subject(width: 1200));
     expect(
       tester.getSize(find.byKey(const ValueKey('handoff-home-experience'))),
-      const Size(1200, 360),
+      const Size(1200, 104),
     );
   });
 
@@ -104,10 +104,10 @@ void main() {
     }
   });
 
-  test('measures full translated labels at narrow portal widths', () {
+  test('measures full translated labels at narrow seam widths', () {
     for (final width in [280.0, 320.0]) {
       final turkish = NarrativeHandoffTypography.resolve(
-        size: Size(width, 220),
+        size: Size(width, 72),
         chapterNumber: '01',
         label: 'Deneyim',
         locale: const Locale('tr'),
@@ -117,7 +117,7 @@ void main() {
       expect(turkish.railSize.width, lessThanOrEqualTo(turkish.maxRailWidth));
 
       final rtl = NarrativeHandoffTypography.resolve(
-        size: Size(width, 220),
+        size: Size(width, 72),
         chapterNumber: '01',
         label: 'الخبرة المهنية',
         locale: const Locale('ar'),
@@ -170,9 +170,9 @@ void main() {
     );
     await tester.pumpWidget(subject(width: 1200));
 
-    final portal = find.byKey(const ValueKey('handoff-home-experience'));
+    final seam = find.byKey(const ValueKey('handoff-home-experience'));
     final customPaint = tester.widget<CustomPaint>(
-      find.descendant(of: portal, matching: find.byType(CustomPaint)),
+      find.descendant(of: seam, matching: find.byType(CustomPaint)),
     );
     var notifications = 0;
     void listener() => notifications += 1;

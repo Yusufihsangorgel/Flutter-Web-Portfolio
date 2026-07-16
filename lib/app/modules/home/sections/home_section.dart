@@ -295,26 +295,31 @@ class _PersonalTitle extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 8),
-            Container(
-              color: AppColors.heroAccent,
-              padding: EdgeInsets.fromLTRB(
-                titleSize * 0.08,
-                titleSize * 0.15,
-                titleSize * 0.11,
-                titleSize * 0.08,
+            KeyedSubtree(
+              key: context.read<AppScrollController>().anchorKeyFor(
+                SectionId.home,
               ),
-              child: FittedBox(
-                fit: BoxFit.scaleDown,
-                alignment: AlignmentDirectional.centerStart,
-                child: Text(
-                  displayName.accent,
-                  maxLines: 1,
-                  style: AppFonts.spaceGrotesk(
-                    fontSize: titleSize * 0.9,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.white,
-                    height: 1,
-                    letterSpacing: -titleSize * 0.045,
+              child: Container(
+                color: AppColors.heroAccent,
+                padding: EdgeInsets.fromLTRB(
+                  titleSize * 0.08,
+                  titleSize * 0.15,
+                  titleSize * 0.11,
+                  titleSize * 0.08,
+                ),
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: AlignmentDirectional.centerStart,
+                  child: Text(
+                    displayName.accent,
+                    maxLines: 1,
+                    style: AppFonts.spaceGrotesk(
+                      fontSize: titleSize * 0.9,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.white,
+                      height: 1,
+                      letterSpacing: -titleSize * 0.045,
+                    ),
                   ),
                 ),
               ),

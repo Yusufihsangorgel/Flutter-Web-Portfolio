@@ -6,9 +6,27 @@ import 'package:flutter/foundation.dart';
 /// decorative work changes, so adaptation never changes the information
 /// architecture of the portfolio.
 enum RenderQuality {
-  essential(RenderQualityProfile(drawGrain: false, trackPointer: false)),
-  balanced(RenderQualityProfile(drawGrain: false, trackPointer: false)),
-  cinematic(RenderQualityProfile(drawGrain: true, trackPointer: true));
+  essential(
+    RenderQualityProfile(
+      drawAmbientField: false,
+      drawGrain: false,
+      trackPointer: false,
+    ),
+  ),
+  balanced(
+    RenderQualityProfile(
+      drawAmbientField: true,
+      drawGrain: false,
+      trackPointer: false,
+    ),
+  ),
+  cinematic(
+    RenderQualityProfile(
+      drawAmbientField: true,
+      drawGrain: true,
+      trackPointer: true,
+    ),
+  );
 
   const RenderQuality(this.profile);
 
@@ -30,58 +48,12 @@ enum RenderQuality {
 @immutable
 final class RenderQualityProfile {
   const RenderQualityProfile({
+    required this.drawAmbientField,
     required this.drawGrain,
     required this.trackPointer,
   });
 
+  final bool drawAmbientField;
   final bool drawGrain;
   final bool trackPointer;
-}
-
-@immutable
-final class FrameBudgetWindow {
-  const FrameBudgetWindow({
-    required this.sampleCount,
-    required this.p95,
-    required this.maximum,
-    required this.slowFrameRatio,
-  });
-
-  final int sampleCount;
-  final Duration p95;
-  final Duration maximum;
-  final double slowFrameRatio;
-}
-
-/// Collects fixed-size windows so quality decisions are deterministic and
-/// independently testable from Flutter's frame scheduler.
-final class FrameBudgetSampler {
-  FrameBudgetSampler({
-    this.windowSize = 90,
-    this.slowFrameThreshold = const Duration(milliseconds: 20),
-  }) : assert(windowSize > 0);
-
-  final int windowSize;
-  final Duration slowFrameThreshold;
-  final List<int> _samples = [];
-
-  FrameBudgetWindow? add(Duration duration) {
-    _samples.add(duration.inMicroseconds);
-    if (_samples.length < windowSize) return null;
-
-    final sorted = List<int>.of(_samples)..sort();
-    final p95Index = ((sorted.length - 1) * 0.95).ceil();
-    final slowThreshold = slowFrameThreshold.inMicroseconds;
-    final slowFrames = sorted.where((sample) => sample > slowThreshold).length;
-    final window = FrameBudgetWindow(
-      sampleCount: sorted.length,
-      p95: Duration(microseconds: sorted[p95Index]),
-      maximum: Duration(microseconds: sorted.last),
-      slowFrameRatio: slowFrames / sorted.length,
-    );
-    _samples.clear();
-    return window;
-  }
-
-  void reset() => _samples.clear();
 }

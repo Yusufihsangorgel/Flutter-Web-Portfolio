@@ -11,6 +11,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:flutter_web_portfolio/app/core/constants/app_dimensions.dart';
 import 'package:flutter_web_portfolio/app/core/constants/durations.dart';
+import 'package:flutter_web_portfolio/app/narrative/domain/narrative_anchor.dart';
 import 'package:flutter_web_portfolio/app/narrative/application/narrative_position.dart';
 import 'package:flutter_web_portfolio/app/narrative/domain/narrative_document.dart';
 import 'package:flutter_web_portfolio/app/narrative/domain/section_geometry.dart';
@@ -57,15 +58,22 @@ final class AppScrollController extends Cubit<AppScrollState>
   late final Map<SectionId, GlobalKey> _sectionKeys = {
     for (final chapter in narrative.chapters) chapter.id: GlobalKey(),
   };
+  late final Map<SectionId, GlobalKey> _anchorKeys = {
+    for (final chapter in narrative.chapters) chapter.id: GlobalKey(),
+  };
 
   final ScrollController scrollController = ScrollController();
   final ValueNotifier<NarrativePosition> _narrativePosition = ValueNotifier(
     const NarrativePosition.initial(),
   );
+  final ValueNotifier<NarrativeAnchorSnapshot> _narrativeAnchors =
+      ValueNotifier(const NarrativeAnchorSnapshot.empty());
 
   String get activeSection => state.activeSection;
   ValueListenable<NarrativePosition> get narrativePosition =>
       _narrativePosition;
+  ValueListenable<NarrativeAnchorSnapshot> get narrativeAnchors =>
+      _narrativeAnchors;
 
   late final List<String> sectionIds = List.unmodifiable(
     narrative.chapters.map((chapter) => chapter.id.value),
@@ -78,6 +86,23 @@ final class AppScrollController extends Cubit<AppScrollState>
         sectionId.value,
         'sectionId',
         'is not mounted by the active narrative',
+      );
+    }
+    return key;
+  }
+
+  /// Returns the single visual attachment point owned by a narrative chapter.
+  ///
+  /// Sections choose a meaningful, content-derived widget for this key; the
+  /// controller measures it into document coordinates during the same bounded
+  /// geometry pass used by navigation.
+  GlobalKey anchorKeyFor(SectionId sectionId) {
+    final key = _anchorKeys[sectionId];
+    if (key == null) {
+      throw ArgumentError.value(
+        sectionId.value,
+        'sectionId',
+        'does not have a narrative anchor',
       );
     }
     return key;
@@ -220,8 +245,39 @@ final class AppScrollController extends Cubit<AppScrollState>
     if (!listEquals(_sectionGeometries, nextGeometries)) {
       _sectionGeometries = nextGeometries;
     }
+    _refreshNarrativeAnchors();
     if (restoreAnchor != null) _restoreReadingAnchor(restoreAnchor);
     _updateNarrativePosition();
+  }
+
+  void _refreshNarrativeAnchors() {
+    final scrollOffset = scrollController.hasClients
+        ? scrollController.offset
+        : 0.0;
+    final anchors = <NarrativeAnchorGeometry>[];
+    for (final chapter in narrative.chapters) {
+      final context = anchorKeyFor(chapter.id).currentContext;
+      final renderObject = context?.findRenderObject();
+      if (renderObject is! RenderBox || !renderObject.hasSize) continue;
+      final viewportCenter = renderObject.localToGlobal(
+        renderObject.size.center(Offset.zero),
+      );
+      anchors.add(
+        NarrativeAnchorGeometry(
+          sectionId: chapter.id,
+          motif: chapter.motif,
+          documentCenter: Offset(
+            viewportCenter.dx,
+            viewportCenter.dy + scrollOffset,
+          ),
+          size: renderObject.size,
+        ),
+      );
+    }
+    final snapshot = NarrativeAnchorSnapshot(anchors);
+    if (_narrativeAnchors.value != snapshot) {
+      _narrativeAnchors.value = snapshot;
+    }
   }
 
   _ReadingAnchor? _captureReadingAnchor() {
@@ -444,6 +500,7 @@ final class AppScrollController extends Cubit<AppScrollState>
     WidgetsBinding.instance.removeObserver(this);
     _disposePopState?.call();
     _narrativePosition.dispose();
+    _narrativeAnchors.dispose();
     scrollController
       ..removeListener(_handleScroll)
       ..dispose();

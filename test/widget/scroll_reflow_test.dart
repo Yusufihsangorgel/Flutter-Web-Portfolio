@@ -8,6 +8,71 @@ import '../helpers/narrative_fixture.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
+  testWidgets('keeps measured content anchors stable in document space', (
+    tester,
+  ) async {
+    await tester.binding.setSurfaceSize(const Size(1200, 800));
+    final controller = AppScrollController(narrative: loadNarrativeFixture());
+    addTearDown(() async {
+      await tester.pumpWidget(const SizedBox.shrink());
+      await controller.close();
+      await tester.binding.setSurfaceSize(null);
+    });
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: CustomScrollView(
+          controller: controller.scrollController,
+          slivers: [
+            SliverToBoxAdapter(
+              child: Column(
+                children: [
+                  for (
+                    var index = 0;
+                    index < controller.narrative.chapters.length;
+                    index += 1
+                  )
+                    SizedBox(
+                      key: controller.keyFor(
+                        controller.narrative.chapters[index].id,
+                      ),
+                      height: 900,
+                      child: Align(
+                        alignment: Alignment(-0.7 + index * 0.3, 0),
+                        child: SizedBox(
+                          key: controller.anchorKeyFor(
+                            controller.narrative.chapters[index].id,
+                          ),
+                          width: 24 + index * 4,
+                          height: 24 + index * 4,
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+    await tester.pump();
+    controller.refreshSectionGeometry();
+    final before = controller.narrativeAnchors.value;
+
+    expect(before.covers(controller.narrative.sectionIds), isTrue);
+    expect(
+      before.anchors.map((anchor) => anchor.documentCenter.dy),
+      orderedEquals([450, 1350, 2250, 3150, 4050]),
+    );
+
+    controller.scrollController.jumpTo(1250);
+    await tester.pump();
+    controller.refreshSectionGeometry();
+    final after = controller.narrativeAnchors.value;
+
+    expect(after, before);
+  });
+
   testWidgets('preserves the chapter-relative reading anchor through reflow', (
     tester,
   ) async {

@@ -10,14 +10,13 @@ import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
 import 'package:flutter_web_portfolio/app/core/constants/scene_configs.dart';
 import 'package:flutter_web_portfolio/app/features/render_quality/application/render_quality_controller.dart';
 import 'package:flutter_web_portfolio/app/features/render_quality/domain/render_quality.dart';
-import 'package:flutter_web_portfolio/app/narrative/rendering/narrative_spine_geometry.dart';
 import 'package:flutter_web_portfolio/app/utils/motion_preference.dart';
 
-/// A restrained ambient field carrying one continuous engineering trace.
+/// A restrained ambient field beneath the content-anchored narrative stage.
 ///
-/// The trace begins as the hero baseline, becomes a thread and timeline,
-/// branches around open-source work, then closes into a work frame. It is
-/// decorative only; content, focus order and semantics never depend on it.
+/// This painter owns only atmosphere, vignette, and optional grain. The one
+/// persistent engineering signal is measured from real content by
+/// `NarrativeStage`, avoiding a second disconnected decorative path.
 class CinematicBackground extends StatefulWidget {
   const CinematicBackground({super.key});
 
@@ -27,7 +26,6 @@ class CinematicBackground extends StatefulWidget {
 
 class _CinematicBackgroundState extends State<CinematicBackground> {
   late final _NarrativeFrame _frame;
-  late final NarrativeSpineRenderKernel _spineKernel;
   StreamSubscription<SceneState>? _sceneSubscription;
   StreamSubscription<RenderQualityState>? _qualitySubscription;
   SceneDirector? _sceneDirector;
@@ -38,12 +36,7 @@ class _CinematicBackgroundState extends State<CinematicBackground> {
   @override
   void initState() {
     super.initState();
-    _frame = _NarrativeFrame(
-      SceneConfigs.hero,
-      const NarrativeSpineCue.origin(),
-      RenderQuality.balanced,
-    );
-    _spineKernel = NarrativeSpineRenderKernel();
+    _frame = _NarrativeFrame(SceneConfigs.hero, RenderQuality.balanced);
   }
 
   @override
@@ -98,15 +91,7 @@ class _CinematicBackgroundState extends State<CinematicBackground> {
     final config = _reduceMotion
         ? SceneConfigs.scenes[state.currentSceneIndex]
         : state.blendedConfig;
-    final cue = NarrativeSpineCue(
-      currentMotif: _reduceMotion ? state.activeMotif : state.currentMotif,
-      nextMotif: _reduceMotion ? state.activeMotif : state.nextMotif,
-      blend: _reduceMotion ? 0 : state.blendFactor,
-      // Reduced-motion sessions receive a complete, static trace instead of a
-      // continuously growing line tied to every scroll frame.
-      globalProgress: _reduceMotion ? 1 : state.globalProgress,
-    );
-    _frame.queueScene(config: config, cue: cue);
+    _frame.queueScene(config);
   }
 
   void _applyQuality(RenderQualityState state) {
@@ -149,11 +134,7 @@ class _CinematicBackgroundState extends State<CinematicBackground> {
       onPointerHover: _trackPointer,
       onPointerMove: _trackPointer,
       child: CustomPaint(
-        painter: _NarrativeBackgroundPainter(
-          frame: _frame,
-          spineKernel: _spineKernel,
-          textDirection: Directionality.of(context),
-        ),
+        painter: _NarrativeBackgroundPainter(frame: _frame),
         size: Size.infinite,
       ),
     ),
@@ -161,22 +142,11 @@ class _CinematicBackgroundState extends State<CinematicBackground> {
 }
 
 final class _NarrativeBackgroundPainter extends CustomPainter {
-  _NarrativeBackgroundPainter({
-    required this.frame,
-    required this.spineKernel,
-    required this.textDirection,
-  }) : super(repaint: frame);
+  _NarrativeBackgroundPainter({required this.frame}) : super(repaint: frame);
 
   final _NarrativeFrame frame;
-  final NarrativeSpineRenderKernel spineKernel;
-  final TextDirection textDirection;
 
   static final _paint = Paint()..isAntiAlias = true;
-  static final _linePaint = Paint()
-    ..isAntiAlias = true
-    ..style = PaintingStyle.stroke
-    ..strokeCap = StrokeCap.round
-    ..strokeJoin = StrokeJoin.round;
   static final _grainPaint = Paint();
 
   @override
@@ -190,8 +160,9 @@ final class _NarrativeBackgroundPainter extends CustomPainter {
       ..color = AppColors.background;
     canvas.drawRect(bounds, _paint);
 
-    _drawAmbientField(canvas, size, bounds);
-    _drawNarrativeSpine(canvas, size);
+    if (frame.quality.profile.drawAmbientField) {
+      _drawAmbientField(canvas, size, bounds);
+    }
     _drawVignette(canvas, size, bounds);
     if (frame.quality.profile.drawGrain) _drawGrain(canvas, size);
   }
@@ -217,58 +188,6 @@ final class _NarrativeBackgroundPainter extends CustomPainter {
     _paint
       ..shader = null
       ..blendMode = BlendMode.srcOver;
-  }
-
-  void _drawNarrativeSpine(Canvas canvas, Size size) {
-    spineKernel.update(size: size, cue: frame.cue);
-    if (spineKernel.isEmpty) return;
-    final accent = frame.config.accent;
-
-    canvas.save();
-    if (textDirection == TextDirection.rtl) {
-      canvas
-        ..translate(size.width, 0)
-        ..scale(-1, 1);
-    }
-
-    _linePaint
-      ..strokeWidth = 0.9
-      ..color = accent.withValues(alpha: 0.05);
-    canvas.drawPath(spineKernel.primaryPath, _linePaint);
-
-    _linePaint
-      ..strokeWidth = 1.25
-      ..color = accent.withValues(alpha: 0.15);
-    canvas.drawPath(spineKernel.revealPath, _linePaint);
-
-    if (spineKernel.branchVisibility > 0.001) {
-      _linePaint
-        ..strokeWidth = 0.9
-        ..color = accent.withValues(alpha: 0.1 * spineKernel.branchVisibility);
-      for (var index = 0; index < spineKernel.branchPathCount; index += 1) {
-        canvas.drawPath(spineKernel.branchPathAt(index), _linePaint);
-      }
-    }
-
-    if (spineKernel.nodeVisibility > 0.001) {
-      _paint
-        ..shader = null
-        ..style = PaintingStyle.fill
-        ..color = AppColors.background.withValues(alpha: 0.82);
-      _linePaint
-        ..strokeWidth = 1
-        ..color = accent.withValues(alpha: 0.2 * spineKernel.nodeVisibility);
-      for (var index = 0; index < spineKernel.nodeCount; index += 1) {
-        final node = Offset(
-          spineKernel.nodeXAt(index),
-          spineKernel.nodeYAt(index),
-        );
-        canvas
-          ..drawCircle(node, 3.1, _paint)
-          ..drawCircle(node, 3.1, _linePaint);
-      }
-    }
-    canvas.restore();
   }
 
   void _drawVignette(Canvas canvas, Size size, Rect bounds) {
@@ -311,39 +230,31 @@ final class _NarrativeBackgroundPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(_NarrativeBackgroundPainter oldDelegate) =>
-      !identical(frame, oldDelegate.frame) ||
-      textDirection != oldDelegate.textDirection;
+      !identical(frame, oldDelegate.frame);
 }
 
 /// Coalesces scroll, quality and pointer inputs into one paint notification.
 final class _NarrativeFrame extends ChangeNotifier {
-  _NarrativeFrame(this._config, this._cue, this._quality);
+  _NarrativeFrame(this._config, this._quality);
 
   SceneConfig _config;
-  NarrativeSpineCue _cue;
   RenderQuality _quality;
   Offset _pointer = Offset.zero;
   ui.Image? _grainTexture;
 
   SceneConfig? _pendingConfig;
-  NarrativeSpineCue? _pendingCue;
   Offset? _pendingPointer;
   bool _notificationPending = false;
   bool _forceNotification = false;
   bool _disposed = false;
 
   SceneConfig get config => _config;
-  NarrativeSpineCue get cue => _cue;
   RenderQuality get quality => _quality;
   Offset get pointer => _pointer;
   ui.Image? get grainTexture => _grainTexture;
 
-  void queueScene({
-    required SceneConfig config,
-    required NarrativeSpineCue cue,
-  }) {
+  void queueScene(SceneConfig config) {
     _pendingConfig = config;
-    _pendingCue = cue;
     _scheduleNotification();
   }
 
@@ -379,18 +290,12 @@ final class _NarrativeFrame extends ChangeNotifier {
       var changed = _forceNotification;
       _forceNotification = false;
       final config = _pendingConfig;
-      final cue = _pendingCue;
       final pointer = _pendingPointer;
       _pendingConfig = null;
-      _pendingCue = null;
       _pendingPointer = null;
 
       if (config != null && !identical(config, _config)) {
         _config = config;
-        changed = true;
-      }
-      if (cue != null && cue != _cue) {
-        _cue = cue;
         changed = true;
       }
       if (pointer != null && pointer != _pointer) {

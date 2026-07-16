@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_web_portfolio/app/controllers/scroll_controller.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
 import 'package:flutter_web_portfolio/app/core/constants/breakpoints.dart';
 import 'package:flutter_web_portfolio/app/core/theme/app_fonts.dart';
 import 'package:flutter_web_portfolio/app/domain/models/portfolio_document.dart';
 import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
+import 'package:flutter_web_portfolio/app/modules/home/sections/proof/widgets/contribution_event_order_lab.dart';
 import 'package:flutter_web_portfolio/app/narrative/domain/narrative_document.dart';
 import 'package:flutter_web_portfolio/app/widgets/cinematic_focusable.dart';
 import 'package:flutter_web_portfolio/app/widgets/numbered_section_heading.dart';
@@ -47,6 +49,36 @@ class ProofSection extends StatelessWidget {
         'proof_section.open_pull_request',
         defaultValue: 'View pull request',
       );
+      final eventOrderLabels = ContributionEventOrderLabLabels(
+        eyebrow: language.getText(
+          'proof_section.event_lab_label',
+          defaultValue: 'Event order lab',
+        ),
+        withoutPatch: language.getText(
+          'proof_section.event_lab_without_patch',
+          defaultValue: 'Without patch',
+        ),
+        withPatch: language.getText(
+          'proof_section.event_lab_with_patch',
+          defaultValue: 'With patch',
+        ),
+        replay: language.getText(
+          'proof_section.event_lab_replay',
+          defaultValue: 'Replay sequence',
+        ),
+        sequence: language.getText(
+          'proof_section.event_lab_sequence',
+          defaultValue: 'Event sequence',
+        ),
+        risk: language.getText(
+          'proof_section.event_lab_risk',
+          defaultValue: 'Risk',
+        ),
+        step: language.getText(
+          'proof_section.event_lab_step',
+          defaultValue: 'Step',
+        ),
+      );
 
       return ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 1160),
@@ -87,6 +119,9 @@ class ProofSection extends StatelessWidget {
                     _FeaturedContribution(
                       contribution: featured,
                       accent: accent,
+                      anchorKey: context
+                          .read<AppScrollController>()
+                          .anchorKeyFor(SectionId.proof),
                       eyebrow: language.getText(
                         'proof_section.featured_label',
                         defaultValue: 'Featured contribution',
@@ -101,6 +136,7 @@ class ProofSection extends StatelessWidget {
                       ),
                       statusLabel: _statusLabel(language, featured),
                       openLabel: openLabel,
+                      eventOrderLabels: eventOrderLabels,
                     ),
                   if (accepted.isNotEmpty) ...[
                     SizedBox(height: featured == null ? 0 : 92),
@@ -159,6 +195,8 @@ class _FeaturedContribution extends StatelessWidget {
     required this.changeLabel,
     required this.statusLabel,
     required this.openLabel,
+    required this.eventOrderLabels,
+    this.anchorKey,
   });
 
   final PortfolioContribution contribution;
@@ -168,6 +206,8 @@ class _FeaturedContribution extends StatelessWidget {
   final String changeLabel;
   final String statusLabel;
   final String openLabel;
+  final ContributionEventOrderLabLabels eventOrderLabels;
+  final Key? anchorKey;
 
   @override
   Widget build(BuildContext context) {
@@ -176,6 +216,7 @@ class _FeaturedContribution extends StatelessWidget {
       contribution: contribution,
       statusLabel: statusLabel,
       accent: accent,
+      anchorKey: anchorKey,
     );
     final metadataAndLink = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -270,6 +311,14 @@ class _FeaturedContribution extends StatelessWidget {
                 Expanded(child: story),
               ],
             ),
+          if (contribution.eventOrderLab != null) ...[
+            SizedBox(height: compact ? 46 : 64),
+            ContributionEventOrderLab(
+              lab: contribution.eventOrderLab!,
+              labels: eventOrderLabels,
+              accent: accent,
+            ),
+          ],
         ],
       ),
     );
@@ -318,17 +367,19 @@ class _ContributionMetadata extends StatelessWidget {
     required this.contribution,
     required this.statusLabel,
     required this.accent,
+    this.anchorKey,
   });
 
   final PortfolioContribution contribution;
   final String statusLabel;
   final Color accent;
+  final Key? anchorKey;
 
   @override
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      _SignalDot(accent: accent),
+      _SignalDot(accent: accent, anchorKey: anchorKey),
       const SizedBox(height: 18),
       Text(
         contribution.project,
@@ -664,15 +715,19 @@ class _OpenPullRequest extends StatelessWidget {
 }
 
 class _SignalDot extends StatelessWidget {
-  const _SignalDot({required this.accent});
+  const _SignalDot({required this.accent, this.anchorKey});
 
   final Color accent;
+  final Key? anchorKey;
 
   @override
-  Widget build(BuildContext context) => Container(
-    width: 8,
-    height: 8,
-    decoration: BoxDecoration(color: accent, shape: BoxShape.circle),
+  Widget build(BuildContext context) => KeyedSubtree(
+    key: anchorKey,
+    child: Container(
+      width: 8,
+      height: 8,
+      decoration: BoxDecoration(color: accent, shape: BoxShape.circle),
+    ),
   );
 }
 

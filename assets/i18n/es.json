@@ -59,6 +59,13 @@
     "problem_label": "El fallo",
     "change_label": "El parche",
     "open_pull_request": "Ver pull request",
+    "event_lab_label": "Laboratorio de orden de eventos",
+    "event_lab_without_patch": "Sin el parche",
+    "event_lab_with_patch": "Con el parche",
+    "event_lab_replay": "Repetir la secuencia",
+    "event_lab_sequence": "Secuencia de eventos",
+    "event_lab_risk": "Riesgo",
+    "event_lab_step": "Paso",
     "status_merged": "Fusionado",
     "status_under_review": "En revisión"
   },

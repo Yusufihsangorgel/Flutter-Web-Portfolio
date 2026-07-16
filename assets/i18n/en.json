@@ -59,6 +59,13 @@
     "problem_label": "The failure",
     "change_label": "The patch",
     "open_pull_request": "View pull request",
+    "event_lab_label": "Event order lab",
+    "event_lab_without_patch": "Without patch",
+    "event_lab_with_patch": "With patch",
+    "event_lab_replay": "Replay sequence",
+    "event_lab_sequence": "Event sequence",
+    "event_lab_risk": "Risk",
+    "event_lab_step": "Step",
     "status_merged": "Merged",
     "status_under_review": "Under review"
   },

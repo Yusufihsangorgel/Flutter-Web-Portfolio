@@ -18,6 +18,7 @@ import 'package:flutter_web_portfolio/app/widgets/command_palette.dart';
 import 'package:flutter_web_portfolio/app/widgets/custom_sliver_app_bar.dart';
 import 'package:flutter_web_portfolio/app/widgets/premium_footer.dart';
 import 'package:flutter_web_portfolio/app/widgets/narrative_chapter_handoff.dart';
+import 'package:flutter_web_portfolio/app/widgets/narrative_stage.dart';
 import 'package:flutter_web_portfolio/app/utils/motion_preference.dart';
 import 'package:flutter_web_portfolio/app/widgets/background/cinematic_background.dart';
 import 'package:flutter_web_portfolio/app/narrative/domain/narrative_document.dart';
@@ -174,7 +175,10 @@ class _HomeViewState extends State<HomeView> {
           ],
         ),
       ),
-      // Layer 4: Back-to-top button with scroll progress
+      // Layer 4: one measured signal connects real content anchors across
+      // otherwise independent chapter surfaces.
+      const NarrativeStage(),
+      // Layer 5: Back-to-top button with scroll progress
       const BackToTopButton(),
     ],
   );

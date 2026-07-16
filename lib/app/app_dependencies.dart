@@ -54,8 +54,7 @@ final class AppDependencies {
 
     final scrollController = AppScrollController(narrative: narrative);
     final sceneDirector = SceneDirector(scrollController: scrollController);
-    final renderQualityController = RenderQualityController()
-      ..startMonitoring();
+    final renderQualityController = RenderQualityController();
     syncRenderQualityAttributes(
       quality: renderQualityController.state.quality.name,
       reason: renderQualityController.state.reason.name,

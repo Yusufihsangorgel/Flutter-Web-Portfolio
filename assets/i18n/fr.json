@@ -59,6 +59,13 @@
     "problem_label": "La défaillance",
     "change_label": "Le correctif",
     "open_pull_request": "Voir la pull request",
+    "event_lab_label": "Laboratoire de séquencement",
+    "event_lab_without_patch": "Sans le correctif",
+    "event_lab_with_patch": "Avec le correctif",
+    "event_lab_replay": "Rejouer la séquence",
+    "event_lab_sequence": "Séquence d’événements",
+    "event_lab_risk": "Risque",
+    "event_lab_step": "Étape",
     "status_merged": "Fusionnée",
     "status_under_review": "En révision"
   },

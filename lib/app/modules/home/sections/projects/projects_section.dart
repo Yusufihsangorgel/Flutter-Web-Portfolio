@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_web_portfolio/app/controllers/scroll_controller.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_dimensions.dart';
 import 'package:flutter_web_portfolio/app/core/constants/breakpoints.dart';
@@ -131,6 +132,9 @@ final class _ProjectsIntroduction extends StatelessWidget {
                   defaultValue: 'Selected Work',
                 ),
                 accent: accent,
+                anchorKey: context.read<AppScrollController>().anchorKeyFor(
+                  SectionId.projects,
+                ),
               ),
             ),
             const SizedBox(height: 26),
