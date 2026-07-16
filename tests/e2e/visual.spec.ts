@@ -113,6 +113,25 @@ async function scrollToHeading(page: Page, name: string) {
   await expect(heading).toBeVisible();
 }
 
+async function scrollToText(page: Page, text: string) {
+  const target = page.getByText(text).first();
+  for (let attempt = 0; attempt < 80; attempt += 1) {
+    if ((await target.count()) > 0) {
+      const [box, viewportHeight] = await Promise.all([
+        target.boundingBox(),
+        page.evaluate(() => window.innerHeight),
+      ]);
+      if (box && box.y < viewportHeight && box.y + box.height > 0) {
+        return target;
+      }
+    }
+    await page.mouse.wheel(0, 420);
+    await settleCompositor(page, 2);
+  }
+  await expect(target).toBeVisible();
+  return target;
+}
+
 test('keeps the first meaningful paint visually aligned with the portfolio', async ({
   page,
 }) => {
@@ -154,4 +173,36 @@ test('preserves the editorial sequence across responsive viewports', async ({
 
   await scrollToHeading(page, 'More work');
   await expect(page).toHaveScreenshot('archive.png');
+});
+
+test('renders a real supporting-work artifact in the ledger', async (
+  { page },
+  testInfo,
+) => {
+  await openStaticPortfolio(page);
+  await openChapter(page, 'Go to Work', /#\/projects$/, 'Selected Work');
+  await scrollToHeading(page, 'More work');
+
+  const supporting = portfolio.systems.filter((system) => !system.featured);
+  const mobile = testInfo.project.name === 'mobile';
+  const selected = mobile
+    ? supporting[0]
+    : supporting.find(
+        (system) => system.artifact.width > system.artifact.height,
+      );
+  if (!selected) throw new Error('Expected a landscape supporting artifact.');
+  const selector = await scrollToText(page, selected.name);
+  if (!mobile) await selector.click();
+
+  const artifact = page.getByRole('img', { name: selected.artifact.alt });
+  await expect(artifact).toBeAttached();
+  for (let attempt = 0; attempt < 12; attempt += 1) {
+    const box = await selector.boundingBox();
+    if (box && Math.abs(box.y - 120) <= 20) break;
+    await page.mouse.wheel(0, box ? box.y - 120 : 360);
+    await settleCompositor(page, 2);
+  }
+  await settleCompositor(page, 8);
+  await page.waitForTimeout(500);
+  await expect(page).toHaveScreenshot('archive-selected.png');
 });

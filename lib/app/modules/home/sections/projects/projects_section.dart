@@ -52,6 +52,17 @@ final class ProjectsSection extends StatelessWidget {
           defaultValue: 'Open evidence',
         ),
       );
+      final archiveLabels = ProjectArchiveLabels(
+        scope: language.getText(
+          'projects_section.ownership',
+          defaultValue: 'What I owned',
+        ),
+        decision: language.getText(
+          'projects_section.decision',
+          defaultValue: 'Engineering focus',
+        ),
+        openEvidence: labels.openEvidence,
+      );
 
       return ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 1160),
@@ -122,7 +133,7 @@ final class ProjectsSection extends StatelessWidget {
                 },
               ),
               const SizedBox(height: 22),
-              ProjectArchive(systems: supporting),
+              ProjectArchive(systems: supporting, labels: archiveLabels),
             ],
           ],
         ),

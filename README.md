@@ -1,12 +1,12 @@
 # Flutter Web Portfolio
 
-A production-ready Flutter Web portfolio template with typed external content, measured section navigation, accessible responsive layouts, and a dual-runtime Wasm release.
+A production Flutter Web engineering record for Yusuf İhsan Görgel, backed by typed external content, measured section navigation, accessible responsive layouts, and a dual-runtime Wasm release.
 
 <!-- portfolio-demo:start -->
 [Live site](https://developeryusuf.com/) · [Flutter Web first-frame issue](https://github.com/flutter/flutter/issues/189499) · [Engine patch](https://github.com/flutter/flutter/pull/189500)
 <!-- portfolio-demo:end -->
 
-The live demo is generated from one public professional record, while the interface remains a reusable template. Replace `assets/content/portfolio.json` to change the identity, biography, experience, work, links, and contributions without rewriting the widgets. Interface translations stay in `assets/i18n/*.json`.
+The site reads identity, biography, experience, work, links, and contributions from `assets/content/portfolio.json`; presentation code contains no Yusuf- or project-specific branches. The same validated content contract keeps the interface reusable without turning the public site into a generic demo. Interface translations stay in `assets/i18n/*.json`.
 
 <!-- portfolio-record:start -->
 ## Public engineering record
@@ -15,7 +15,7 @@ The live demo is generated from one public professional record, while the interf
 
 I work across Flutter, Dart, and Go, turning product ideas into software that holds up on real devices, unreliable networks, and long-lived release cycles.
 
-Source status: `2026.07.16.1`, verified 2026-07-16 against GitHub and LinkedIn.
+Source status: `2026.07.16.3`, verified 2026-07-16 against GitHub and LinkedIn.
 
 ### Accepted upstream changes
 
@@ -34,11 +34,11 @@ Source status: `2026.07.16.1`, verified 2026-07-16 against GitHub and LinkedIn.
 | Dorse | I worked across the Flutter application and React web surface, including live vehicle state, maps, API flows, deployment, and QA coordination. | [Project](https://dorseapp.com/) |
 | Queue Inspector MCP | I designed the command surface, typed validation, queue adapters, and conservative state-changing operations. | [Project](https://github.com/Yusufihsangorgel/queue-inspector-mcp) |
 | Multi-tenant Gateway | I designed and implemented the complete reference from transport and tenant resolution through policy and test coverage. | [Project](https://github.com/Yusufihsangorgel/go-multitenant-gateway) |
-| Aydınlık E-Gazete | I delivered Flutter client work across presentation, API integration, and store-ready releases. | [Project](https://apps.apple.com/us/app/ayd%C4%B1nl%C4%B1k-e-gazete/id1560103805) |
-| Bilim ve Ütopya E-Dergi | I built Flutter client features, API integration, localisation, and mobile release workflows. | [Project](https://apps.apple.com/tr/app/bilim-ve-%C3%BCtopya-e-dergi/id6478221195) |
+| Aydınlık E-Gazete | At Promob TR, I worked on the Flutter client, API-backed issue flow, localisation, and mobile releases. | [Project](https://apps.apple.com/us/app/ayd%C4%B1nl%C4%B1k-e-gazete/id1560103805) |
+| Bilim ve Ütopya E-Dergi | At Promob TR, I worked on Flutter features, API integration, localisation, and release support. | [Project](https://apps.apple.com/tr/app/bilim-ve-%C3%BCtopya-e-dergi/id6478221195) |
 | Redis Task Queue | I designed the public API, queue semantics, failure handling, and runnable examples. | [Project](https://github.com/Yusufihsangorgel/redis_task_queue) |
 | Constellation Particles | I implemented the painter, pointer interaction, spatial partitioning, and package examples without runtime dependencies. | [Project](https://github.com/Yusufihsangorgel/constellation_particles) |
-| Flutter Web Portfolio | I built the content schema, Flutter interface, renderer handoff, browser tests, runtime budgets, and deployment path. | [Project](https://github.com/Yusufihsangorgel/Flutter-Web-Portfolio) |
+| Flutter Web Portfolio | I built and run the Flutter Web site, its content pipeline, accessibility layer, browser regression suite, and production deployment. | [Project](https://github.com/Yusufihsangorgel/Flutter-Web-Portfolio) |
 
 ### Work under review
 
@@ -51,7 +51,7 @@ Source status: `2026.07.16.1`, verified 2026-07-16 against GitHub and LinkedIn.
 
 `assets/content/portfolio.json` is the canonical professional record. It contains the profile, explicit display-name composition, optional experience, capabilities, optional contributions and work, source provenance, and site metadata. Featured work carries challenge, approach, outcome, and linked evidence records. `PortfolioDocument` parses it into immutable final classes and rejects unsupported schemas, duplicate content IDs, invalid URLs, incomplete featured case studies, missing featured work, and identity/metadata drift.
 
-Analytics is opt-in through `site.analytics` in the same document. Remove that object for a tracking-free template; the synchronization step removes the script instead of inheriting the demo site's analytics account.
+Analytics is opt-in through `site.analytics` in the same document. Remove that object for a tracking-free deployment; the synchronization step removes the script instead of inheriting this site's analytics account.
 
 `assets/i18n/*.json` contains interface language only. All seven locale documents share one tested key schema; none may contain biography, experience, project, or contribution records.
 
@@ -97,7 +97,7 @@ The document and render loop have deliberately different update paths:
 
 The HTML layer contains a critical shell generated from the canonical portfolio manifest during release preparation. It is not a second content source: role, headline, focus areas, and content version are injected from `assets/content/portfolio.json`, then verified against that record. The shell gives a cold Wasm visit a meaningful first paint while Flutter initializes, and it never forces a service-worker cleanup reload.
 
-The bootstrap treats Flutter's first-frame event as a rendering signal rather than proof that the browser compositor has already presented the pixels. This keeps the release strategy reusable across Flutter engine revisions and browsers instead of coupling the template to one upstream issue or patch.
+The bootstrap treats Flutter's first-frame event as a rendering signal rather than proof that the browser compositor has already presented the pixels. This keeps the release strategy reusable across Flutter engine revisions and browsers instead of coupling the implementation to one upstream issue or patch.
 
 The handoff retains the visually aligned critical shell for two browser frames after Flutter's event. This avoids a blank flash while the Flutter surface reaches the compositor, then removes the HTML layer once.
 

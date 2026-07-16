@@ -2,6 +2,25 @@
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.7.0] - 2026-07-16
+
+### Added
+
+- A schema-validated supporting-work artifact contract with local, source-backed product, package, animation, and release evidence.
+- Responsive interaction and accessibility coverage for active-record preservation, keyboard selection, reduced motion, and complete mobile reading.
+- Sealed featured and supporting work records so required case-study chapters and artifact evidence are enforced by the type system.
+
+### Changed
+
+- Replaced the repeated supporting-project card and preview pattern with one continuous editorial release ledger.
+- Made supporting work lead with real App Store captures, repository media, and the exact successful release run instead of decorative project mockups.
+- Kept the archive fully content-driven: ownership, engineering decisions, evidence links, image treatment, captions, and dimensions now come from the canonical JSON document.
+- Added portrait and landscape evidence compositions without project-specific rendering branches.
+
+### Fixed
+
+- Kept an activated ledger row at the same viewport position while the previous record closes, and made focus alone non-mutating.
+
 ## [1.6.1] - 2026-07-16
 
 ### Added

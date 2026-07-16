@@ -20,6 +20,7 @@ class CinematicFocusable extends StatefulWidget {
     this.semanticLabel,
     this.semanticRole = CinematicControlRole.button,
     this.selected,
+    this.expanded,
   });
 
   final Widget child;
@@ -33,6 +34,7 @@ class CinematicFocusable extends StatefulWidget {
   final String? semanticLabel;
   final CinematicControlRole semanticRole;
   final bool? selected;
+  final bool? expanded;
 
   @override
   State<CinematicFocusable> createState() => _CinematicFocusableState();
@@ -85,6 +87,7 @@ class _CinematicFocusableState extends State<CinematicFocusable> {
       button: widget.semanticRole == CinematicControlRole.button,
       link: widget.semanticRole == CinematicControlRole.link,
       selected: widget.selected,
+      expanded: widget.expanded,
       focusable: true,
       label: semanticLabel,
       onTap: widget.onTap,

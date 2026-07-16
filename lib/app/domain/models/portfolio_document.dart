@@ -22,7 +22,7 @@ final class PortfolioDocument {
 
   factory PortfolioDocument.fromJson(Map<String, dynamic> json) {
     final schemaVersion = _requiredInt(json, 'schema_version');
-    if (schemaVersion != 4) {
+    if (schemaVersion != 5) {
       throw FormatException(
         'Unsupported portfolio schema version: $schemaVersion',
       );
@@ -83,11 +83,11 @@ final class PortfolioDocument {
     return null;
   }
 
-  Iterable<PortfolioSystem> get featuredSystems =>
-      systems.where((entry) => entry.featured);
+  Iterable<PortfolioFeaturedSystem> get featuredSystems =>
+      systems.whereType<PortfolioFeaturedSystem>();
 
-  Iterable<PortfolioSystem> get supportingSystems =>
-      systems.where((entry) => !entry.featured);
+  Iterable<PortfolioSupportingSystem> get supportingSystems =>
+      systems.whereType<PortfolioSupportingSystem>();
 
   void _validate() {
     if (sources.isEmpty || capabilities.isEmpty) {
@@ -131,6 +131,10 @@ final class PortfolioDocument {
     _assertUnique('capability', capabilities.map((entry) => entry.id));
     _assertUnique('contribution', contributions.map((entry) => entry.id));
     _assertUnique('system', systems.map((entry) => entry.id));
+    _assertUnique(
+      'supporting artifact asset',
+      supportingSystems.map((entry) => entry.artifact.asset),
+    );
   }
 }
 
@@ -407,19 +411,15 @@ final class PortfolioContribution {
   final Uri? issueUrl;
 }
 
-final class PortfolioSystem {
+sealed class PortfolioSystem {
   PortfolioSystem({
     required this.id,
     required this.name,
     required this.kind,
     required this.year,
-    required this.featured,
     required this.summary,
     required this.ownership,
     required this.decision,
-    required this.challenge,
-    required this.approach,
-    required this.outcome,
     required List<PortfolioEvidence> evidence,
     required this.url,
     required List<String> technologies,
@@ -428,55 +428,113 @@ final class PortfolioSystem {
 
   factory PortfolioSystem.fromJson(Map<String, dynamic> json) {
     final featured = _requiredBool(json, 'featured');
-    final system = PortfolioSystem(
-      id: _requiredString(json, 'id'),
-      name: _requiredString(json, 'name'),
-      kind: _requiredString(json, 'kind'),
-      year: _requiredString(json, 'year'),
-      featured: featured,
-      summary: _requiredString(json, 'summary'),
-      ownership: _requiredString(json, 'ownership'),
-      decision: _requiredString(json, 'decision'),
-      challenge: featured
-          ? _requiredString(json, 'challenge')
-          : _optionalString(json, 'challenge'),
-      approach: featured
-          ? _requiredString(json, 'approach')
-          : _optionalString(json, 'approach'),
-      outcome: featured
-          ? _requiredString(json, 'outcome')
-          : _optionalString(json, 'outcome'),
-      evidence:
-          (featured
-                  ? _objects(json, 'evidence')
-                  : _optionalObjects(json, 'evidence'))
-              .map(PortfolioEvidence.fromJson)
-              .toList(),
-      url: _requiredUri(json, 'url'),
-      technologies: _strings(json, 'technologies'),
-    );
-    if (featured && system.evidence.isEmpty) {
-      throw FormatException(
-        'Featured system "${system.id}" must declare evidence.',
+    final id = _requiredString(json, 'id');
+    final name = _requiredString(json, 'name');
+    final kind = _requiredString(json, 'kind');
+    final year = _requiredString(json, 'year');
+    final summary = _requiredString(json, 'summary');
+    final ownership = _requiredString(json, 'ownership');
+    final decision = _requiredString(json, 'decision');
+    final evidence = _objects(
+      json,
+      'evidence',
+    ).map(PortfolioEvidence.fromJson).toList();
+    final url = _requiredUri(json, 'url');
+    final technologies = _strings(json, 'technologies');
+    if (evidence.isEmpty) {
+      throw FormatException('System "$id" must declare evidence.');
+    }
+
+    if (featured) {
+      if (_optionalObject(json, 'artifact') != null) {
+        throw FormatException(
+          'Featured system "$id" cannot declare a supporting artifact.',
+        );
+      }
+      return PortfolioFeaturedSystem(
+        id: id,
+        name: name,
+        kind: kind,
+        year: year,
+        summary: summary,
+        ownership: ownership,
+        decision: decision,
+        challenge: _requiredString(json, 'challenge'),
+        approach: _requiredString(json, 'approach'),
+        outcome: _requiredString(json, 'outcome'),
+        evidence: evidence,
+        url: url,
+        technologies: technologies,
       );
     }
-    return system;
+
+    return PortfolioSupportingSystem(
+      id: id,
+      name: name,
+      kind: kind,
+      year: year,
+      summary: summary,
+      ownership: ownership,
+      decision: decision,
+      evidence: evidence,
+      artifact: PortfolioSystemArtifact.fromJson(
+        _requiredObject(json, 'artifact'),
+      ),
+      url: url,
+      technologies: technologies,
+    );
   }
 
   final String id;
   final String name;
   final String kind;
   final String year;
-  final bool featured;
   final String summary;
   final String ownership;
   final String decision;
-  final String? challenge;
-  final String? approach;
-  final String? outcome;
   final List<PortfolioEvidence> evidence;
   final Uri url;
   final List<String> technologies;
+}
+
+final class PortfolioFeaturedSystem extends PortfolioSystem {
+  PortfolioFeaturedSystem({
+    required super.id,
+    required super.name,
+    required super.kind,
+    required super.year,
+    required super.summary,
+    required super.ownership,
+    required super.decision,
+    required this.challenge,
+    required this.approach,
+    required this.outcome,
+    required super.evidence,
+    required super.url,
+    required super.technologies,
+  });
+
+  final String challenge;
+  final String approach;
+  final String outcome;
+}
+
+final class PortfolioSupportingSystem extends PortfolioSystem {
+  PortfolioSupportingSystem({
+    required super.id,
+    required super.name,
+    required super.kind,
+    required super.year,
+    required super.summary,
+    required super.ownership,
+    required super.decision,
+    required super.evidence,
+    required this.artifact,
+    required super.url,
+    required super.technologies,
+  });
+
+  final PortfolioSystemArtifact artifact;
 }
 
 final class PortfolioEvidence {
@@ -496,6 +554,119 @@ final class PortfolioEvidence {
   final String label;
   final Uri url;
   final String kind;
+}
+
+/// A real, content-authored artifact for a supporting project.
+///
+/// Asset choice, alternative text, caption, intrinsic dimensions, fit, and
+/// alignment all live in the external content document. The rendering layer
+/// never branches on project ids, names, or technologies.
+final class PortfolioSystemArtifact {
+  const PortfolioSystemArtifact({
+    required this.label,
+    required this.asset,
+    required this.alt,
+    required this.caption,
+    required this.width,
+    required this.height,
+    required this.fit,
+    required this.alignment,
+    required this.composition,
+  });
+
+  factory PortfolioSystemArtifact.fromJson(Map<String, dynamic> json) {
+    final asset = _requiredString(json, 'asset');
+    final alt = _requiredString(json, 'alt');
+    final caption = _requiredString(json, 'caption');
+    final width = _requiredInt(json, 'width');
+    final height = _requiredInt(json, 'height');
+    if (!asset.startsWith('assets/work/') ||
+        asset.contains('..') ||
+        !const ['.png', '.jpg', '.jpeg', '.webp'].any(asset.endsWith) ||
+        width <= 0 ||
+        height <= 0 ||
+        alt == caption) {
+      throw const FormatException(
+        'Project artifacts require a supported local asset, positive dimensions, and distinct accessible copy.',
+      );
+    }
+    final artifact = PortfolioSystemArtifact(
+      label: _requiredString(json, 'label'),
+      asset: asset,
+      alt: alt,
+      caption: caption,
+      width: width,
+      height: height,
+      fit: PortfolioArtifactFit.parse(_requiredString(json, 'fit')),
+      alignment: PortfolioArtifactAlignment.parse(
+        _requiredString(json, 'alignment'),
+      ),
+      composition: PortfolioArtifactComposition.parse(
+        _requiredString(json, 'composition'),
+      ),
+    );
+    if ((artifact.composition == PortfolioArtifactComposition.portraitSplit &&
+            artifact.width >= artifact.height) ||
+        (artifact.composition == PortfolioArtifactComposition.evidenceStack &&
+            artifact.width < artifact.height)) {
+      throw const FormatException(
+        'Project artifact composition must match its intrinsic orientation.',
+      );
+    }
+    return artifact;
+  }
+
+  final String label;
+  final String asset;
+  final String alt;
+  final String caption;
+  final int width;
+  final int height;
+  final PortfolioArtifactFit fit;
+  final PortfolioArtifactAlignment alignment;
+  final PortfolioArtifactComposition composition;
+}
+
+enum PortfolioArtifactFit {
+  contain('contain'),
+  cover('cover');
+
+  const PortfolioArtifactFit(this.wireValue);
+  final String wireValue;
+
+  static PortfolioArtifactFit parse(String value) => values.firstWhere(
+    (entry) => entry.wireValue == value,
+    orElse: () => throw FormatException('Unsupported artifact fit: $value'),
+  );
+}
+
+enum PortfolioArtifactAlignment {
+  start('start'),
+  center('center'),
+  end('end');
+
+  const PortfolioArtifactAlignment(this.wireValue);
+  final String wireValue;
+
+  static PortfolioArtifactAlignment parse(String value) => values.firstWhere(
+    (entry) => entry.wireValue == value,
+    orElse: () =>
+        throw FormatException('Unsupported artifact alignment: $value'),
+  );
+}
+
+enum PortfolioArtifactComposition {
+  portraitSplit('portrait_split'),
+  evidenceStack('evidence_stack');
+
+  const PortfolioArtifactComposition(this.wireValue);
+  final String wireValue;
+
+  static PortfolioArtifactComposition parse(String value) => values.firstWhere(
+    (entry) => entry.wireValue == value,
+    orElse: () =>
+        throw FormatException('Unsupported artifact composition: $value'),
+  );
 }
 
 Map<String, dynamic> _requiredObject(Map<String, dynamic> json, String key) =>
@@ -527,14 +698,6 @@ List<Map<String, dynamic>> _objects(Map<String, dynamic> json, String key) =>
       _ => throw FormatException('Expected list at "$key".'),
     };
 
-List<Map<String, dynamic>> _optionalObjects(
-  Map<String, dynamic> json,
-  String key,
-) => switch (json[key]) {
-  null => const <Map<String, dynamic>>[],
-  _ => _objects(json, key),
-};
-
 List<String> _strings(Map<String, dynamic> json, String key) =>
     switch (json[key]) {
       final List<dynamic> value =>
@@ -553,13 +716,6 @@ List<String> _strings(Map<String, dynamic> json, String key) =>
 
 String _requiredString(Map<String, dynamic> json, String key) =>
     switch (json[key]) {
-      final String value when value.trim().isNotEmpty => value,
-      _ => throw FormatException('Expected non-empty string at "$key".'),
-    };
-
-String? _optionalString(Map<String, dynamic> json, String key) =>
-    switch (json[key]) {
-      null => null,
       final String value when value.trim().isNotEmpty => value,
       _ => throw FormatException('Expected non-empty string at "$key".'),
     };

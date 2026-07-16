@@ -2,7 +2,7 @@ name: flutter_web_portfolio
 description: 'A data-driven Flutter Web portfolio for verified engineering work.'
 publish_to: 'none'
 
-version: 1.6.1+8
+version: 1.7.0+9
 
 environment:
   sdk: '>=3.12.0 <4.0.0'
@@ -38,6 +38,7 @@ flutter:
     - assets/content/
     - assets/i18n/
     - assets/presentation/
+    - assets/work/
 
   fonts:
     - family: Inter

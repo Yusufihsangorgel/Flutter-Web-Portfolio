@@ -1,10 +1,15 @@
-import { expect, Page, test } from '@playwright/test';
+import { expect, Locator, Page, test } from '@playwright/test';
 import { readFileSync } from 'node:fs';
 
 const portfolio = JSON.parse(
   readFileSync('assets/content/portfolio.json', 'utf8'),
 );
 const packageMetadata = JSON.parse(readFileSync('package.json', 'utf8'));
+const localReleasePreview = (() => {
+  const value = process.env.PLAYWRIGHT_BASE_URL;
+  if (!value) return false;
+  return ['127.0.0.1', 'localhost'].includes(new URL(value).hostname);
+})();
 
 async function openPortfolio(page: Page) {
   const response = await page.goto('/', { waitUntil: 'domcontentloaded' });
@@ -51,6 +56,28 @@ async function scrollToHeading(page: Page, name: string) {
     await page.mouse.wheel(0, 500);
   }
   await expect(heading).toBeVisible();
+}
+
+async function scrollToLocator(page: Page, locator: Locator) {
+  for (let attempt = 0; attempt < 80; attempt += 1) {
+    if ((await locator.count()) > 0) {
+      const [box, viewportHeight] = await Promise.all([
+        locator.first().boundingBox(),
+        page.evaluate(() => window.innerHeight),
+      ]);
+      if (box && box.y < viewportHeight && box.y + box.height > 0) {
+        return locator.first();
+      }
+    }
+    await page.mouse.wheel(0, 420);
+    await page.waitForTimeout(60);
+  }
+  await expect(locator.first()).toBeVisible();
+  return locator.first();
+}
+
+async function scrollToText(page: Page, text: string) {
+  return scrollToLocator(page, page.getByText(text).first());
 }
 
 async function scrollToContributionLink(page: Page, title: string) {
@@ -152,11 +179,15 @@ test('boots the production Wasm release with its security contract', async ({
   expect(wasm.status()).toBe(200);
   expect(wasm.url()).toMatch(/main\.dart\.wasm\?v=[0-9a-f]{16}$/);
   expect(wasm.headers()['content-type']).toContain('application/wasm');
-  expect(wasm.headers()['cache-control']).toContain('max-age=31536000');
+  expect(wasm.headers()['cache-control']).toContain(
+    localReleasePreview ? 'no-store' : 'max-age=31536000',
+  );
   expect(runtime.status()).toBe(200);
   expect(runtime.headers()['content-type']).toContain('javascript');
   expect(renderer.status()).toBe(200);
-  expect(renderer.headers()['cache-control']).toContain('max-age=31536000');
+  expect(renderer.headers()['cache-control']).toContain(
+    localReleasePreview ? 'no-store' : 'max-age=31536000',
+  );
   const preloadHints = await page.locator('head link').evaluateAll((links) =>
     links.map((link) => ({
       rel: link.getAttribute('rel'),
@@ -219,6 +250,7 @@ test('boots the production Wasm release with its security contract', async ({
 
 test('serves the complete professional narrative in production', async ({
   page,
+  isMobile,
 }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await openPortfolio(page);
@@ -247,9 +279,29 @@ test('serves the complete professional narrative in production', async ({
     'Selected Work',
   );
   await scrollToHeading(page, 'More work');
-  const supportingSystem = portfolio.systems.find((system) => !system.featured);
-  expect(supportingSystem).toBeTruthy();
+  const supportingSystems = portfolio.systems.filter(
+    (system) => !system.featured,
+  );
+  expect(supportingSystems.length).toBeGreaterThan(1);
+  const supportingSystem = supportingSystems[0];
   await expect(page.getByText(supportingSystem.name).first()).toBeAttached();
+  await expect(
+    page.getByRole('img', { name: supportingSystem.artifact.alt }),
+  ).toBeAttached();
+  await scrollToText(page, supportingSystem.ownership);
+
+  if (!isMobile) {
+    const nextSystem = supportingSystems[1];
+    const selector = await scrollToText(page, nextSystem.name);
+    await selector.click();
+    await scrollToLocator(
+      page,
+      page.getByRole('img', { name: nextSystem.artifact.alt }),
+    );
+    await expect(
+      page.getByRole('img', { name: supportingSystem.artifact.alt }),
+    ).toHaveCount(0);
+  }
 });
 
 test('serves the production accessibility hierarchy', async ({
@@ -347,12 +399,75 @@ test('serves the production accessibility hierarchy', async ({
   expect(projectLinks).not.toContain('Website');
 
   await scrollToHeading(page, 'More work');
-  const archiveTree = await accessibility.send('Accessibility.getFullAXTree');
-  const archiveLinks = archiveTree.nodes
+  const archiveHeaderTree = await accessibility.send(
+    'Accessibility.getFullAXTree',
+  );
+  const archiveHeaderLinks = archiveHeaderTree.nodes
     .filter((node) => !node.ignored && node.role?.value === 'link')
     .map((node) => node.name?.value ?? '');
-  expect(archiveLinks).toEqual(
-    expect.arrayContaining([expect.stringContaining(supportingSystem.name)]),
+  const archiveButtons = archiveHeaderTree.nodes
+    .filter((node) => !node.ignored && node.role?.value === 'button')
+    .map((node) => node.name?.value ?? '');
+  if (isMobile) {
+    expect(archiveHeaderLinks).toEqual(
+      expect.arrayContaining([expect.stringContaining(supportingSystem.name)]),
+    );
+  } else {
+    expect(archiveButtons).toEqual(
+      expect.arrayContaining([expect.stringContaining(supportingSystem.name)]),
+    );
+    const supportingSystems = portfolio.systems.filter(
+      (system) => !system.featured,
+    );
+    const activeArchiveButton = archiveHeaderTree.nodes.find(
+      (node) =>
+        !node.ignored &&
+        node.role?.value === 'button' &&
+        (node.name?.value ?? '').includes(supportingSystems[0].name),
+    );
+    const inactiveArchiveButton = archiveHeaderTree.nodes.find(
+      (node) =>
+        !node.ignored &&
+        node.role?.value === 'button' &&
+        (node.name?.value ?? '').includes(supportingSystems[1].name),
+    );
+    expect(
+      activeArchiveButton?.properties?.find(
+        (property) => property.name === 'expanded',
+      )?.value?.value,
+    ).toBe(true);
+    expect(
+      inactiveArchiveButton?.properties?.find(
+        (property) => property.name === 'expanded',
+      )?.value?.value,
+    ).toBe(false);
+  }
+
+  await scrollToLocator(
+    page,
+    page.getByRole('img', { name: supportingSystem.artifact.alt }),
+  );
+  const archiveArtifactTree = await accessibility.send(
+    'Accessibility.getFullAXTree',
+  );
+  const archiveImages = archiveArtifactTree.nodes
+    .filter((node) => !node.ignored && node.role?.value === 'image')
+    .map((node) => node.name?.value ?? '');
+  expect(archiveImages).toContain(supportingSystem.artifact.alt);
+
+  await scrollToText(page, supportingSystem.evidence[0].label);
+  const archiveEvidenceTree = await accessibility.send(
+    'Accessibility.getFullAXTree',
+  );
+  const archiveEvidenceLinks = archiveEvidenceTree.nodes
+    .filter((node) => !node.ignored && node.role?.value === 'link')
+    .map((node) => node.name?.value ?? '');
+  expect(archiveEvidenceLinks).toEqual(
+    expect.arrayContaining([
+      expect.stringContaining(
+        `Open evidence: ${supportingSystem.name}, ${supportingSystem.evidence[0].label}`,
+      ),
+    ]),
   );
 });
 
@@ -441,7 +556,9 @@ test('serves the declared production sharing and font assets', async ({
     const appFont = await request.get(path);
     expect(appFont.status(), path).toBe(200);
     expect(appFont.headers()['content-type'], path).toContain('font/ttf');
-    expect(appFont.headers()['content-encoding'], path).toBe('gzip');
+    if (!localReleasePreview) {
+      expect(appFont.headers()['content-encoding'], path).toBe('gzip');
+    }
   }
 
   const missing = await request.get('/assets/fallback_fonts/missing.woff2');

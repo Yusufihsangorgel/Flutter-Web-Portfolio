@@ -105,7 +105,8 @@
     /*
       The release task replaces the empty bootstrap-content block with a
       critical rendering shell generated from the canonical portfolio JSON.
-      This template owns layout only; professional copy never lives here.
+      The HTML shell owns pre-frame layout only; professional copy comes from
+      the canonical portfolio document.
     */
     #bootstrap-surface {
       position: fixed;
@@ -332,15 +333,15 @@
   <script defer src="https://analytics.developeryusuf.com/js/script.js" data-domain="developeryusuf.com"></script>
 <!-- portfolio-analytics:end -->
   <!-- release-preloads:start -->
-  <link rel="preload" href="main.dart.wasm?v=7cb562b42503e8a7" as="fetch" type="application/wasm" crossorigin fetchpriority="high">
-  <link rel="modulepreload" href="main.dart.mjs?v=7cb562b42503e8a7" crossorigin fetchpriority="high">
+  <link rel="preload" href="main.dart.wasm?v=8dc3eb100c2238ac" as="fetch" type="application/wasm" crossorigin fetchpriority="high">
+  <link rel="modulepreload" href="main.dart.mjs?v=8dc3eb100c2238ac" crossorigin fetchpriority="high">
   <link rel="preload" href="canvaskit/83675ed27633283e7fc296c8bca22e841224c096/skwasm.wasm" as="fetch" type="application/wasm" crossorigin fetchpriority="high">
   <!-- release-preloads:end -->
 </head>
 <body>
   <div id="bootstrap-surface" role="status" aria-label="Loading interactive portfolio" aria-busy="true">
     <!-- bootstrap-content:start -->
-    <div class="bootstrap-shell" aria-hidden="true" data-content-version="2026.07.16.1">
+    <div class="bootstrap-shell" aria-hidden="true" data-content-version="2026.07.16.3">
       <div class="bootstrap-rail">
         <span>Software Engineer</span>
         <span class="bootstrap-rail-end">

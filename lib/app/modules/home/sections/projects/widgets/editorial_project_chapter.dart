@@ -38,7 +38,7 @@ final class EditorialProjectChapter extends StatelessWidget {
     required this.labels,
   });
 
-  final PortfolioSystem system;
+  final PortfolioFeaturedSystem system;
   final int index;
   final ProjectChapterLabels labels;
 
@@ -87,7 +87,7 @@ final class _ProjectIntroduction extends StatelessWidget {
     required this.openLabel,
   });
 
-  final PortfolioSystem system;
+  final PortfolioFeaturedSystem system;
   final int index;
   final String openLabel;
 
@@ -172,7 +172,7 @@ final class _ProjectIntroduction extends StatelessWidget {
 final class _ProjectNarrative extends StatelessWidget {
   const _ProjectNarrative({required this.system, required this.labels});
 
-  final PortfolioSystem system;
+  final PortfolioFeaturedSystem system;
   final ProjectChapterLabels labels;
 
   @override
@@ -187,19 +187,19 @@ final class _ProjectNarrative extends StatelessWidget {
         _NarrativeBeat(
           key: ValueKey('project-beat-${system.id}-challenge'),
           label: labels.challenge,
-          value: system.challenge!,
+          value: system.challenge,
         ),
         const SizedBox(height: 34),
         _NarrativeBeat(
           key: ValueKey('project-beat-${system.id}-approach'),
           label: labels.approach,
-          value: system.approach!,
+          value: system.approach,
         ),
         const SizedBox(height: 34),
         _NarrativeBeat(
           key: ValueKey('project-beat-${system.id}-outcome'),
           label: labels.outcome,
-          value: system.outcome!,
+          value: system.outcome,
         ),
         if (independentEvidence.isNotEmpty) ...[
           const SizedBox(height: 46),

@@ -14,7 +14,7 @@ export default defineConfig({
   workers: 1,
   reporter: [['list'], ['json', { outputFile: 'test-results/results.json' }]],
   use: {
-    baseURL: portfolio.site.url,
+    baseURL: process.env.PLAYWRIGHT_BASE_URL ?? portfolio.site.url,
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
     ignoreHTTPSErrors: false,
