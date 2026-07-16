@@ -80,7 +80,7 @@ async function scrollToText(page: Page, text: string) {
   return scrollToLocator(page, page.getByText(text).first());
 }
 
-async function scrollToContributionLink(page: Page, title: string) {
+async function scrollToSemanticLink(page: Page, title: string) {
   // Flutter exposes this tappable Semantics node to Chromium's AX tree as a
   // link, but its generated <a> intentionally has no href. Playwright's DOM
   // role selector therefore cannot see it; the CDP AX assertion below still
@@ -278,13 +278,12 @@ test('serves the complete professional narrative in production', async ({
     /#\/projects$/,
     'Selected Work',
   );
-  await scrollToHeading(page, 'More work');
   const supportingSystems = portfolio.systems.filter(
     (system) => !system.featured,
   );
   expect(supportingSystems.length).toBeGreaterThan(1);
   const supportingSystem = supportingSystems[0];
-  await expect(page.getByText(supportingSystem.name).first()).toBeAttached();
+  await scrollToHeading(page, supportingSystem.name);
   await expect(
     page.getByRole('img', { name: supportingSystem.artifact.alt }),
   ).toBeAttached();
@@ -292,15 +291,11 @@ test('serves the complete professional narrative in production', async ({
 
   if (!isMobile) {
     const nextSystem = supportingSystems[1];
-    const selector = await scrollToText(page, nextSystem.name);
-    await selector.click();
+    await scrollToHeading(page, nextSystem.name);
     await scrollToLocator(
       page,
       page.getByRole('img', { name: nextSystem.artifact.alt }),
     );
-    await expect(
-      page.getByRole('img', { name: supportingSystem.artifact.alt }),
-    ).toHaveCount(0);
   }
 });
 
@@ -363,7 +358,7 @@ test('serves the production accessibility hierarchy', async ({
     portfolio.contributions.find((contribution) => contribution.featured) ??
     portfolio.contributions[0];
   expect(visibleContribution).toBeTruthy();
-  await scrollToContributionLink(page, visibleContribution.title);
+  await scrollToSemanticLink(page, visibleContribution.title);
   const proofTree = await accessibility.send('Accessibility.getFullAXTree');
   const proofLinks = proofTree.nodes
     .filter((node) => !node.ignored && node.role?.value === 'link')
@@ -392,77 +387,55 @@ test('serves the production accessibility hierarchy', async ({
   const supportingSystem = portfolio.systems.find((system) => !system.featured);
   expect(featuredSystem).toBeTruthy();
   expect(supportingSystem).toBeTruthy();
-  expect(projectLinks).toEqual(
+  await scrollToSemanticLink(page, `Open project: ${featuredSystem.name}`);
+  const visibleProjectsTree = await accessibility.send(
+    'Accessibility.getFullAXTree',
+  );
+  const visibleProjectLinks = visibleProjectsTree.nodes
+    .filter((node) => !node.ignored && node.role?.value === 'link')
+    .map((node) => node.name?.value ?? '');
+  expect(visibleProjectLinks).toEqual(
     expect.arrayContaining([`Open project: ${featuredSystem.name}`]),
   );
   expect(projectLinks).not.toContain('View source');
   expect(projectLinks).not.toContain('Website');
 
-  await scrollToHeading(page, 'More work');
-  const archiveHeaderTree = await accessibility.send(
+  await scrollToHeading(page, supportingSystem.name);
+  const atlasHeaderTree = await accessibility.send(
     'Accessibility.getFullAXTree',
   );
-  const archiveHeaderLinks = archiveHeaderTree.nodes
-    .filter((node) => !node.ignored && node.role?.value === 'link')
+  const atlasHeadings = atlasHeaderTree.nodes
+    .filter((node) => !node.ignored && node.role?.value === 'heading')
     .map((node) => node.name?.value ?? '');
-  const archiveButtons = archiveHeaderTree.nodes
-    .filter((node) => !node.ignored && node.role?.value === 'button')
-    .map((node) => node.name?.value ?? '');
-  if (isMobile) {
-    expect(archiveHeaderLinks).toEqual(
-      expect.arrayContaining([expect.stringContaining(supportingSystem.name)]),
-    );
-  } else {
-    expect(archiveButtons).toEqual(
-      expect.arrayContaining([expect.stringContaining(supportingSystem.name)]),
-    );
-    const supportingSystems = portfolio.systems.filter(
-      (system) => !system.featured,
-    );
-    const activeArchiveButton = archiveHeaderTree.nodes.find(
-      (node) =>
-        !node.ignored &&
-        node.role?.value === 'button' &&
-        (node.name?.value ?? '').includes(supportingSystems[0].name),
-    );
-    const inactiveArchiveButton = archiveHeaderTree.nodes.find(
-      (node) =>
-        !node.ignored &&
-        node.role?.value === 'button' &&
-        (node.name?.value ?? '').includes(supportingSystems[1].name),
-    );
-    expect(
-      activeArchiveButton?.properties?.find(
-        (property) => property.name === 'expanded',
-      )?.value?.value,
-    ).toBe(true);
-    expect(
-      inactiveArchiveButton?.properties?.find(
-        (property) => property.name === 'expanded',
-      )?.value?.value,
-    ).toBe(false);
-  }
+  const atlasDisclosureButtons = atlasHeaderTree.nodes.filter(
+    (node) =>
+      !node.ignored &&
+      node.role?.value === 'button' &&
+      node.properties?.some((property) => property.name === 'expanded'),
+  );
+  expect(atlasHeadings).toContain(supportingSystem.name);
+  expect(atlasDisclosureButtons).toEqual([]);
 
   await scrollToLocator(
     page,
     page.getByRole('img', { name: supportingSystem.artifact.alt }),
   );
-  const archiveArtifactTree = await accessibility.send(
+  const atlasArtifactTree = await accessibility.send(
     'Accessibility.getFullAXTree',
   );
-  const archiveImages = archiveArtifactTree.nodes
+  const atlasImages = atlasArtifactTree.nodes
     .filter((node) => !node.ignored && node.role?.value === 'image')
     .map((node) => node.name?.value ?? '');
-  expect(archiveImages).toContain(supportingSystem.artifact.alt);
+  expect(atlasImages).toContain(supportingSystem.artifact.alt);
 
   await scrollToText(page, supportingSystem.evidence[0].label);
-  const archiveEvidenceTree = await accessibility.send(
+  const atlasEvidenceTree = await accessibility.send(
     'Accessibility.getFullAXTree',
   );
-  const archiveEvidenceLinks = archiveEvidenceTree.nodes
+  const atlasEvidenceLinks = atlasEvidenceTree.nodes
     .filter((node) => !node.ignored && node.role?.value === 'link')
     .map((node) => node.name?.value ?? '');
-  expect(archiveEvidenceLinks).toEqual(
+  expect(atlasEvidenceLinks).toEqual(
     expect.arrayContaining([
       expect.stringContaining(
         `Open evidence: ${supportingSystem.name}, ${supportingSystem.evidence[0].label}`,
@@ -518,6 +491,8 @@ test('serves the declared production sharing and font assets', async ({
     `data-content-version="${portfolio.content_version}"`,
   );
   expect(html).toContain(portfolio.profile.display_name.primary);
+  expect(html).toContain(portfolio.profile.display_name.accent);
+  expect(html).toContain(portfolio.profile.email);
   expect(html).toContain(portfolio.profile.headline);
   for (const fact of [
     portfolio.profile.location,
@@ -548,8 +523,6 @@ test('serves the declared production sharing and font assets', async ({
 
   for (const path of [
     '/assets/assets/fonts/inter/Inter-Variable.ttf',
-    '/assets/assets/fonts/instrument_serif/InstrumentSerif-Regular.ttf',
-    '/assets/assets/fonts/instrument_serif/InstrumentSerif-Italic.ttf',
     '/assets/assets/fonts/noto_sans_arabic/NotoSansArabic-Variable.ttf',
     '/assets/assets/fonts/noto_sans_devanagari/NotoSansDevanagari-Variable.ttf',
   ]) {

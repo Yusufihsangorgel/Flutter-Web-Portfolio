@@ -15,12 +15,12 @@
     "title": "About",
     "practice_title": "What I work across",
     "location": "Based in",
-    "experience": "Professional work since"
+    "experience": "Professional work since",
+    "email": "Email"
   },
   "projects_section": {
     "title": "Selected Work",
     "subtitle": "Products I shipped and tools I continue to maintain.",
-    "archive": "More work",
     "open_project": "Open project",
     "challenge": "The problem",
     "approach": "The approach",
@@ -31,9 +31,11 @@
     "decision": "Engineering focus"
   },
   "home_section": {
-    "view_work": "View selected work",
+    "view_work": "Explore my work",
     "inspect_runtime": "About me",
     "view_github": "GitHub",
+    "email": "Email me",
+    "currently": "Currently",
     "based_in": "Based in",
     "working_since": "Working since",
     "focus": "Focus"

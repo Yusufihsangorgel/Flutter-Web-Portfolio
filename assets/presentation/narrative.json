@@ -7,10 +7,6 @@
       "motif": "origin"
     },
     {
-      "id": "about",
-      "motif": "thread"
-    },
-    {
       "id": "experience",
       "motif": "timeline"
     },
@@ -21,6 +17,10 @@
     {
       "id": "projects",
       "motif": "bracket"
+    },
+    {
+      "id": "about",
+      "motif": "thread"
     }
   ]
 }

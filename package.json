@@ -1,6 +1,6 @@
 {
   "name": "flutter-web-portfolio",
-  "version": "1.7.0",
+  "version": "1.8.0",
   "private": true,
   "description": "A production Flutter Web document with typed external content, measured scroll geometry, and a dual-runtime Wasm release.",
   "scripts": {

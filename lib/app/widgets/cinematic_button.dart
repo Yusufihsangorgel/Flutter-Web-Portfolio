@@ -60,20 +60,20 @@ class _CinematicButtonState extends State<CinematicButton> {
                   boxShadow: _hovered
                       ? [
                           BoxShadow(
-                            color: AppColors.accent.withValues(alpha: 0.3),
-                            blurRadius: 16,
+                            color: AppColors.textBright.withValues(alpha: 0.12),
+                            offset: const Offset(4, 4),
                           ),
                         ]
                       : [],
                 )
               : BoxDecoration(
                   color: _hovered
-                      ? Colors.white.withValues(alpha: 0.05)
+                      ? AppColors.textBright.withValues(alpha: 0.06)
                       : Colors.transparent,
                   border: Border.all(
                     color: _hovered
-                        ? Colors.white.withValues(alpha: 0.4)
-                        : Colors.white.withValues(alpha: 0.08),
+                        ? AppColors.textBright
+                        : AppColors.textBright.withValues(alpha: 0.28),
                     width: 1,
                   ),
                 ),
@@ -82,9 +82,7 @@ class _CinematicButtonState extends State<CinematicButton> {
             style: AppFonts.spaceGrotesk(
               fontSize: 14,
               fontWeight: FontWeight.w500,
-              color: widget.isPrimary
-                  ? AppColors.white
-                  : (_hovered ? AppColors.white : AppColors.textPrimary),
+              color: widget.isPrimary ? AppColors.white : AppColors.textBright,
               letterSpacing: 2,
             ),
           ),

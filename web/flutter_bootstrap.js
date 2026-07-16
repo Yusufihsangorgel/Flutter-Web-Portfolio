@@ -40,7 +40,7 @@ const removeBootstrapSurface = () => {
 
 // Flutter dispatches its first-frame event while the browser is still
 // compositing that frame. Keeping the matching HTML surface for two browser
-// frames prevents a one-frame dark flash on cold GPU/Wasm starts.
+// frames prevents a one-frame blank flash on cold GPU/Wasm starts.
 const revealFlutterSurface = () => {
   if (revealStarted) return;
   revealStarted = true;

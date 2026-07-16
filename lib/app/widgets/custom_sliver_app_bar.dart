@@ -1,5 +1,4 @@
-import 'dart:ui' show lerpDouble;
-
+import 'package:flutter/foundation.dart' show ValueListenable;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_web_portfolio/app/core/theme/app_fonts.dart';
@@ -11,10 +10,12 @@ import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
 import 'package:flutter_web_portfolio/app/core/constants/breakpoints.dart';
 import 'package:flutter_web_portfolio/app/core/constants/cinematic_curves.dart';
 import 'package:flutter_web_portfolio/app/core/constants/durations.dart';
+import 'package:flutter_web_portfolio/app/core/constants/app_dimensions.dart';
 import 'package:flutter_web_portfolio/app/widgets/cinematic_focusable.dart';
 import 'package:flutter_web_portfolio/app/widgets/fullscreen_menu.dart';
 import 'package:flutter_web_portfolio/app/widgets/language_switcher.dart';
 import 'package:flutter_web_portfolio/app/widgets/scene_accent_builder.dart';
+import 'package:flutter_web_portfolio/app/narrative/application/narrative_position.dart';
 
 /// Compact navigation for the single-page document.
 /// Shrinks from 80px to 60px as the user scrolls down (200px threshold).
@@ -36,24 +37,15 @@ class CustomSliverAppBar extends StatefulWidget {
           .where((section) => section != 'home')
           .toList(growable: false);
 
-  /// Maximum (expanded) toolbar height.
-  static const _maxHeight = 80.0;
-
-  /// Minimum (collapsed) toolbar height.
-  static const _minHeight = 60.0;
-
-  /// Scroll distance over which the bar shrinks.
-  static const _shrinkScrollExtent = 200.0;
-
   @override
   State<CustomSliverAppBar> createState() => _CustomSliverAppBarState();
 }
 
 class _CustomSliverAppBarState extends State<CustomSliverAppBar> {
-  double _toolbarHeight = CustomSliverAppBar._maxHeight;
+  double _toolbarHeight = AppDimensions.appBarHeight;
 
   /// Scale factor for logo and nav items: 1.0 at top, smaller when collapsed.
-  double get _scaleFactor => _toolbarHeight / CustomSliverAppBar._maxHeight;
+  double get _scaleFactor => _toolbarHeight / AppDimensions.appBarHeight;
 
   @override
   void initState() {
@@ -71,19 +63,13 @@ class _CustomSliverAppBarState extends State<CustomSliverAppBar> {
     final controller = widget.scrollController.scrollController;
     if (!controller.hasClients) return;
 
-    final offset = controller.offset.clamp(
-      0.0,
-      CustomSliverAppBar._shrinkScrollExtent,
+    final newHeight = AppDimensions.appBarHeightForScrollOffset(
+      controller.offset,
     );
-    final t = offset / CustomSliverAppBar._shrinkScrollExtent;
-    final newHeight = lerpDouble(
-      CustomSliverAppBar._maxHeight,
-      CustomSliverAppBar._minHeight,
-      t,
-    )!;
 
     if ((newHeight - _toolbarHeight).abs() > 0.5) {
       setState(() => _toolbarHeight = newHeight);
+      widget.scrollController.markGeometryDirty(preserveReadingAnchor: false);
     }
   }
 
@@ -111,7 +97,7 @@ class _CustomSliverAppBarState extends State<CustomSliverAppBar> {
                 // while anchor navigation settles.
                 color: AppColors.background,
                 border: Border(
-                  bottom: BorderSide(color: Color(0x24F2F0E9), width: 1),
+                  bottom: BorderSide(color: Color(0x2412110F), width: 1),
                 ),
               ),
             ),
@@ -257,7 +243,7 @@ class _NavItemState extends State<_NavItem> {
   Widget build(BuildContext context) {
     const activeColor = AppColors.textBright;
     const inactiveColor = AppColors.textPrimary;
-    const underlineColor = Colors.white;
+    const underlineColor = AppColors.heroAccent;
 
     return CinematicFocusable(
       onTap: widget.onTap,
@@ -315,8 +301,9 @@ class _SceneProgressBar extends StatelessWidget {
       builder: (context, accent) => RepaintBoundary(
         child: CustomPaint(
           painter: _SceneProgressPainter(
-            scrollController: scrollController.scrollController,
+            narrativePosition: scrollController.narrativePosition,
             accent: accent,
+            textDirection: Directionality.of(context),
           ),
           size: Size.infinite,
         ),
@@ -326,32 +313,57 @@ class _SceneProgressBar extends StatelessWidget {
 }
 
 final class _SceneProgressPainter extends CustomPainter {
-  _SceneProgressPainter({required this.scrollController, required this.accent})
-    : super(repaint: scrollController);
+  _SceneProgressPainter({
+    required this.narrativePosition,
+    required this.accent,
+    required this.textDirection,
+  }) : super(repaint: narrativePosition);
 
-  final ScrollController scrollController;
+  final ValueListenable<NarrativePosition> narrativePosition;
   final Color accent;
+  final TextDirection textDirection;
 
   @override
   void paint(Canvas canvas, Size size) {
-    if (!scrollController.hasClients || size.isEmpty) return;
-    final maxExtent = scrollController.position.maxScrollExtent;
-    if (maxExtent <= 0) return;
-    final progress = (scrollController.offset / maxExtent).clamp(0.0, 1.0);
-    final width = size.width * progress;
-    if (width <= 0) return;
-    final bounds = Rect.fromLTWH(0, 0, width, size.height);
+    if (size.isEmpty) return;
+    final progress = narrativePosition.value.documentProgress.clamp(0.0, 1.0);
+    final bounds = SceneProgressGeometry.bounds(
+      size: size,
+      progress: progress,
+      textDirection: textDirection,
+    );
+    if (bounds.isEmpty) return;
     canvas.drawRect(
       bounds,
       Paint()
         ..shader = LinearGradient(
           colors: [accent.withValues(alpha: 0.2), accent],
+          begin: textDirection == TextDirection.ltr
+              ? Alignment.centerLeft
+              : Alignment.centerRight,
+          end: textDirection == TextDirection.ltr
+              ? Alignment.centerRight
+              : Alignment.centerLeft,
         ).createShader(bounds),
     );
   }
 
   @override
   bool shouldRepaint(_SceneProgressPainter oldDelegate) =>
-      !identical(scrollController, oldDelegate.scrollController) ||
-      accent != oldDelegate.accent;
+      !identical(narrativePosition, oldDelegate.narrativePosition) ||
+      accent != oldDelegate.accent ||
+      textDirection != oldDelegate.textDirection;
+}
+
+/// Physical bounds of the reading-progress fill in either writing direction.
+abstract final class SceneProgressGeometry {
+  static Rect bounds({
+    required Size size,
+    required double progress,
+    required TextDirection textDirection,
+  }) {
+    final width = size.width * progress.clamp(0.0, 1.0);
+    final left = textDirection == TextDirection.ltr ? 0.0 : size.width - width;
+    return Rect.fromLTWH(left, 0, width, size.height);
+  }
 }

@@ -3,8 +3,8 @@
   "short_name": "Yusuf Görgel",
   "start_url": ".",
   "display": "standalone",
-  "background_color": "#11100E",
-  "theme_color": "#E47A57",
+  "background_color": "#F2EEE5",
+  "theme_color": "#1E51FF",
   "description": "Yusuf İhsan Görgel is a software engineer building cross-platform products with Flutter, Dart, Go, PostgreSQL, Redis, and production infrastructure.",
   "orientation": "any",
   "categories": [

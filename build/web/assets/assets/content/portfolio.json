@@ -1,6 +1,6 @@
 {
-  "schema_version": 5,
-  "content_version": "2026.07.16.3",
+  "schema_version": 6,
+  "content_version": "2026.07.16.4",
   "verified_at": "2026-07-16",
   "site": {
     "url": "https://developeryusuf.com",
@@ -49,16 +49,17 @@
     "name": "Yusuf İhsan Görgel",
     "display_name": {
       "primary": "YUSUF İHSAN",
-      "accent": "Görgel",
+      "accent": "GÖRGEL",
       "navigation": "Yusuf Görgel",
       "accessible": "Yusuf İhsan Görgel"
     },
     "role": "Software Engineer",
     "location": "Antalya, Türkiye",
+    "email": "developeryusuf@icloud.com",
     "since": "2021",
-    "headline": "I build cross-platform software, then stay for the hard parts.",
-    "summary": "I work across Flutter, Dart, and Go, turning product ideas into software that holds up on real devices, unreliable networks, and long-lived release cycles.",
-    "background": "Since 2021 I have shipped mobile, desktop, and web products for retail, logistics, and digital publishing. My work has moved from client applications and native integrations into offline data, real-time synchronisation, backend services, release engineering, and the production systems around them.",
+    "headline": "I’m a software engineer working across Flutter, Dart, Go, and production infrastructure.",
+    "summary": "Since 2021, I have built and maintained software for mobile devices, tablets, desktop operating systems, and the web. My work includes ERP and point-of-sale products, logistics workflows, digital publishing, backend services, and the release systems around them.",
+    "background": "I started with Flutter client applications and grew into the parts around them: native integrations, offline data, real-time synchronisation, Go services, queues, databases, deployment, and production reliability. I still work close to the product and follow features through testing, release, and long-term maintenance.",
     "focus": [
       "Flutter and Dart",
       "Go services",
@@ -91,6 +92,7 @@
       "role": "Flutter Developer",
       "domain": "Cross-platform ERP and point-of-sale products",
       "period": "March 2021 — Present",
+      "current": true,
       "summary": "Project-based since March 2021 and full-time since September 2025. I build and maintain production ERP and point-of-sale applications across Android and iOS tablets plus Linux, macOS, and Windows desktops, with a focus on offline data, native integrations, performance, release reliability, and long-lived product maintenance.",
       "evidence": [
         "Flutter",
@@ -106,6 +108,7 @@
       "role": "Full Stack Developer",
       "domain": "Dorse logistics platform",
       "period": "June 2023 — Present",
+      "current": true,
       "summary": "Delivered mobile and web product work spanning Flutter and React, REST and WebSocket data flows, live vehicle tracking, Google and Apple Maps integrations, deployment, and QA coordination.",
       "evidence": [
         "Flutter",
@@ -121,6 +124,7 @@
       "role": "Flutter Developer",
       "domain": "Mobile product development",
       "period": "May 2022 — November 2025",
+      "current": false,
       "summary": "Contributed to Flutter application delivery and maintenance in a long-running part-time role, carrying product work from implementation through release support.",
       "evidence": [
         "Flutter",
@@ -135,6 +139,7 @@
       "role": "Full Stack Developer",
       "domain": "Digital publishing applications",
       "period": "September 2022 — July 2024",
+      "current": false,
       "summary": "Shipped the Aydınlık E-Gazete and Bilim ve Ütopya E-Dergi applications for Android and iOS, working across Flutter delivery, API integration, localisation, and store-ready release workflows.",
       "evidence": [
         "Flutter",
@@ -150,6 +155,7 @@
       "role": "Software Engineering Intern",
       "domain": "Software engineering internship",
       "period": "June 2024 — August 2024",
+      "current": false,
       "summary": "Completed a software engineering internship focused on production development practices, collaborative delivery, and applying academic foundations inside a working engineering team.",
       "evidence": [
         "Software engineering",
@@ -163,6 +169,7 @@
       "role": "B.Sc. Software Engineering",
       "domain": "Undergraduate education",
       "period": "2021 — 2025",
+      "current": false,
       "summary": "Formal study in algorithms, data structures, databases, software design, and team-based product development.",
       "evidence": [
         "Algorithms",
@@ -299,6 +306,15 @@
       "challenge": "Drivers, fleet operators, and weighbridge businesses needed to act on the same changing logistics state across mobile and web workflows.",
       "approach": "Work across Flutter and React clients, maps, REST and WebSocket flows, deployment, and QA so vehicle and weighbridge state stayed explicit from transport to interface.",
       "outcome": "Delivered a public logistics product spanning driver, fleet, and weighbridge workflows on mobile and web.",
+      "presentation": {
+        "background": "#E6FF57",
+        "foreground": "#11120F",
+        "accent": "#1E51FF",
+        "visual": {
+          "kind": "network",
+          "labels": ["Driver", "Fleet", "Weighbridge", "Live state"]
+        }
+      },
       "evidence": [
         {
           "label": "Public product website",
@@ -321,6 +337,15 @@
       "challenge": "Queue incidents are described in jobs, states, attempts, and errors, while generic Redis inspection exposes low-level keys and a broader mutation surface.",
       "approach": "Build typed MCP tools and backend-specific adapters for Asynq, BullMQ, and Sidekiq, with a read-only mode that removes mutating tools from discovery.",
       "outcome": "Published a six-tool server with a recorded, non-mocked queue recovery flow and explicit safeguards around retries and deletion.",
+      "presentation": {
+        "background": "#1E51FF",
+        "foreground": "#F8F3E8",
+        "accent": "#E6FF57",
+        "visual": {
+          "kind": "flow",
+          "labels": ["Request", "Enqueue", "Queue", "Worker", "Retry"]
+        }
+      },
       "evidence": [
         {
           "label": "Source and recorded CLI flow",
@@ -348,6 +373,15 @@
       "challenge": "A small team needs tenant isolation and shared policy without multiplying services, deploys, and failure surfaces for every product module.",
       "approach": "Carry resolved tenant context through one middleware chain, isolate persistent data by schema, and make PostgreSQL and Redis production wiring opt-in without changing module boundaries.",
       "outcome": "Published a single-binary reference with tests for tenant resolution, authentication, rate limiting, schema isolation, and migration behaviour.",
+      "presentation": {
+        "background": "#FF704F",
+        "foreground": "#11120F",
+        "accent": "#FFF7EA",
+        "visual": {
+          "kind": "lanes",
+          "labels": ["Resolve", "Authenticate", "Limit", "Isolate"]
+        }
+      },
       "evidence": [
         {
           "label": "Source repository",
@@ -372,6 +406,15 @@
       "summary": "A newspaper client for iPhone and iPad with issue browsing, subscriber archive access, API-backed content, and mobile releases.",
       "ownership": "At Promob TR, I worked on the Flutter client, API-backed issue flow, localisation, and mobile releases.",
       "decision": "Issue browsing and the subscriber archive had to remain one clear flow across phone and tablet.",
+      "presentation": {
+        "background": "#D91F26",
+        "foreground": "#FFF8EF",
+        "accent": "#11120F",
+        "visual": {
+          "kind": "artifact",
+          "labels": ["Issue", "Archive", "Release"]
+        }
+      },
       "evidence": [
         {
           "label": "Public App Store listing",
@@ -402,6 +445,15 @@
       "summary": "A magazine client for iPhone and iPad that presents the current issue, archive, and account controls in one Flutter application.",
       "ownership": "At Promob TR, I worked on Flutter features, API integration, localisation, and release support.",
       "decision": "The current issue, archive, and account controls shared one maintainable mobile client.",
+      "presentation": {
+        "background": "#D8C8FF",
+        "foreground": "#17131F",
+        "accent": "#5F32C8",
+        "visual": {
+          "kind": "artifact",
+          "labels": ["Issue", "Reader", "Release"]
+        }
+      },
       "evidence": [
         {
           "label": "Public App Store listing",
@@ -432,6 +484,15 @@
       "summary": "A Redis-backed task queue for Dart with retries, dead-letter handling, and weighted queues.",
       "ownership": "I designed the public API, queue semantics, failure handling, and runnable examples.",
       "decision": "Make failure states inspectable and scheduling behaviour deterministic without adding a runtime framework.",
+      "presentation": {
+        "background": "#F2E6DA",
+        "foreground": "#171310",
+        "accent": "#D62D20",
+        "visual": {
+          "kind": "artifact",
+          "labels": ["Enqueue", "Worker", "Dead letter"]
+        }
+      },
       "evidence": [
         {
           "label": "Source repository",
@@ -462,6 +523,15 @@
       "summary": "A dependency-free particle field for Flutter with pointer interaction and spatial-grid neighbour lookup.",
       "ownership": "I implemented the painter, pointer interaction, spatial partitioning, and package examples without runtime dependencies.",
       "decision": "Use spatial partitioning to avoid comparing every particle pair as the scene grows.",
+      "presentation": {
+        "background": "#0C1830",
+        "foreground": "#F8F3E8",
+        "accent": "#FFE66D",
+        "visual": {
+          "kind": "artifact",
+          "labels": ["Pointer", "Spatial grid", "Painter"]
+        }
+      },
       "evidence": [
         {
           "label": "Source repository",
@@ -492,6 +562,15 @@
       "summary": "This site is the working record of my experience, shipped products, and open-source contributions.",
       "ownership": "I built and run the Flutter Web site, its content pipeline, accessibility layer, browser regression suite, and production deployment.",
       "decision": "Treat the portfolio as an accessible document first; keep ambient rendering outside its semantic path.",
+      "presentation": {
+        "background": "#E6FF57",
+        "foreground": "#11120F",
+        "accent": "#1E51FF",
+        "visual": {
+          "kind": "artifact",
+          "labels": ["Wasm", "Semantics", "Browser tests"]
+        }
+      },
       "evidence": [
         {
           "label": "Source repository",

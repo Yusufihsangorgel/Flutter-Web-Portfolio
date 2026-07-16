@@ -15,12 +15,12 @@
     "title": "Hakkımda",
     "practice_title": "Çalıştığım alanlar",
     "location": "Konum",
-    "experience": "Profesyonel başlangıç"
+    "experience": "Profesyonel başlangıç",
+    "email": "E-posta"
   },
   "projects_section": {
     "title": "Seçili Projeler",
     "subtitle": "Yayınladığım ürünler ve bakımını sürdürdüğüm araçlar.",
-    "archive": "Diğer çalışmalar",
     "open_project": "Projeyi aç",
     "challenge": "Sorun",
     "approach": "Yaklaşım",
@@ -31,9 +31,11 @@
     "decision": "Mühendislik odağı"
   },
   "home_section": {
-    "view_work": "Seçili projeleri gör",
+    "view_work": "Çalışmalarımı incele",
     "inspect_runtime": "Hakkımda",
     "view_github": "GitHub",
+    "email": "E-posta gönder",
+    "currently": "Şu anda",
     "based_in": "Konum",
     "working_since": "Çalışma başlangıcı",
     "focus": "Odak"

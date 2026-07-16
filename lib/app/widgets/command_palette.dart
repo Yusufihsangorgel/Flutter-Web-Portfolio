@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
@@ -39,32 +40,40 @@ class CommandPalette extends StatefulWidget {
   /// Shows the command palette as a modal overlay.
   static void show(BuildContext context) {
     final language = context.read<LanguageCubit>();
-    showGeneralDialog(
-      context: context,
-      barrierDismissible: true,
-      barrierLabel: language.getText(
-        'command_palette.close',
-        defaultValue: 'Close command palette',
-      ),
-      barrierColor: Colors.black.withValues(alpha: 0.6),
-      transitionDuration: AppDurations.medium,
-      transitionBuilder: (context, animation, _, child) {
-        final curved = CurvedAnimation(
-          parent: animation,
-          curve: CinematicCurves.dramaticEntrance,
-        );
-        return FadeTransition(
-          opacity: curved,
-          child: SlideTransition(
-            position: Tween<Offset>(
-              begin: const Offset(0, -0.03),
-              end: Offset.zero,
-            ).animate(curved),
-            child: child,
-          ),
-        );
-      },
-      pageBuilder: (_, _, _) => const CommandPalette(),
+    url_strategy.setTransientOverlayOpen(true);
+    unawaited(
+      showGeneralDialog<void>(
+        context: context,
+        barrierDismissible: true,
+        barrierLabel: language.getText(
+          'command_palette.close',
+          defaultValue: 'Close command palette',
+        ),
+        barrierColor: Colors.black.withValues(alpha: 0.6),
+        transitionDuration: AppDurations.medium,
+        transitionBuilder: (context, animation, _, child) {
+          final curved = CurvedAnimation(
+            parent: animation,
+            curve: CinematicCurves.dramaticEntrance,
+          );
+          return FadeTransition(
+            opacity: curved,
+            child: SlideTransition(
+              position: Tween<Offset>(
+                begin: const Offset(0, -0.03),
+                end: Offset.zero,
+              ).animate(curved),
+              child: child,
+            ),
+          );
+        },
+        pageBuilder: (_, _, _) => PopScope<void>(
+          onPopInvokedWithResult: (didPop, _) {
+            if (didPop) url_strategy.setTransientOverlayOpen(false);
+          },
+          child: const CommandPalette(),
+        ),
+      ).whenComplete(() => url_strategy.setTransientOverlayOpen(false)),
     );
   }
 
@@ -167,6 +176,7 @@ class _CommandPaletteState extends State<CommandPalette> {
   }
 
   void _executeAndClose(VoidCallback action) {
+    url_strategy.setTransientOverlayOpen(false);
     Navigator.of(context).pop();
     action();
   }
@@ -237,6 +247,7 @@ class _CommandPaletteState extends State<CommandPalette> {
     }
 
     if (key == LogicalKeyboardKey.escape) {
+      url_strategy.setTransientOverlayOpen(false);
       Navigator.of(context).pop();
       return KeyEventResult.handled;
     }

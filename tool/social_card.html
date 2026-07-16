@@ -10,11 +10,6 @@
         src: url("../assets/fonts/space_grotesk/SpaceGrotesk-Variable.ttf") format("truetype");
         font-weight: 300 700;
       }
-      @font-face {
-        font-family: "Portfolio Serif";
-        src: url("../assets/fonts/instrument_serif/InstrumentSerif-Italic.ttf") format("truetype");
-        font-style: italic;
-      }
       * { box-sizing: border-box; }
       html, body {
         width: 1200px;
@@ -24,20 +19,20 @@
       }
       body {
         position: relative;
-        color: #f4efe4;
+        color: #12110f;
         background:
-          radial-gradient(circle at 70% 40%, rgba(228, 122, 87, 0.14), transparent 42%),
-          #11100e;
+          radial-gradient(circle at 82% 18%, rgba(30, 81, 255, 0.16), transparent 34%),
+          #f2eee5;
         font-family: "Portfolio Sans", Inter, sans-serif;
       }
       body::before {
         position: absolute;
         top: 0;
         right: 0;
-        width: 17px;
+        width: 22px;
         height: 100%;
         content: "";
-        background: #e47a57;
+        background: #e6ff57;
       }
       .card {
         position: absolute;
@@ -52,8 +47,8 @@
         align-items: center;
         gap: 14px;
         padding-bottom: 14px;
-        border-bottom: 1px solid rgba(244, 239, 228, 0.16);
-        color: #c4bcaf;
+        border-bottom: 1px solid rgba(18, 17, 15, 0.2);
+        color: #403c36;
         font: 600 16px/1 "Portfolio Sans", Inter, sans-serif;
       }
       .rail span:first-child { margin-right: auto; }
@@ -69,8 +64,10 @@
         left: 70px;
         z-index: 2;
         display: flex;
-        width: min(880px, calc(100% - 140px));
-        flex-direction: column;
+        width: min(1060px, calc(100% - 140px));
+        flex-wrap: wrap;
+        gap: 0.1em;
+        align-items: baseline;
         margin: 0;
         font-size: 108px;
         font-weight: 680;
@@ -79,14 +76,16 @@
       }
       .title-primary { display: block; white-space: nowrap; }
       .title-accent {
-        align-self: flex-end;
-        margin-right: 76px;
-        color: #e47a57;
-        font-family: "Portfolio Serif", Georgia, serif;
-        font-size: 1.04em;
-        font-style: italic;
-        font-weight: 400;
-        letter-spacing: -0.035em;
+        padding: 0.16em 0.1em 0.08em;
+        color: #fffcf4;
+        background: #1e51ff;
+        box-shadow: 0 -0.16em 0 #1e51ff;
+        font-family: "Portfolio Sans", Inter, sans-serif;
+        font-size: 1em;
+        font-style: normal;
+        font-weight: 680;
+        letter-spacing: -0.06em;
+        text-transform: uppercase;
       }
       .footer {
         position: absolute;
@@ -101,12 +100,12 @@
       .subtitle {
         max-width: 610px;
         margin: 0;
-        color: #c4bcaf;
+        color: #403c36;
         font-size: 19px;
         line-height: 1.42;
       }
       .domain {
-        color: #e47a57;
+        color: #1e51ff;
         font: 650 10px/1 ui-monospace, SFMono-Regular, Menlo, monospace;
         letter-spacing: 0.12em;
       }

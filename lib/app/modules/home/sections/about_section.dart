@@ -139,8 +139,8 @@ class _AboutDetail extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 22),
         decoration: const BoxDecoration(
           border: Border(
-            top: BorderSide(color: Color(0x36E47A57)),
-            bottom: BorderSide(color: Color(0x24F2F0E9)),
+            top: BorderSide(color: Color(0x361E51FF)),
+            bottom: BorderSide(color: Color(0x2412110F)),
           ),
         ),
         child: Column(
@@ -160,6 +160,14 @@ class _AboutDetail extends StatelessWidget {
               ),
               value: profile.since,
             ),
+            const SizedBox(height: 14),
+            _FactLine(
+              label: language.getText(
+                'about_section.email',
+                defaultValue: 'Email',
+              ),
+              value: profile.email,
+            ),
           ],
         ),
       ),
@@ -167,9 +175,48 @@ class _AboutDetail extends StatelessWidget {
       Wrap(
         spacing: 20,
         runSpacing: 12,
-        children: [for (final link in profile.links) _ProfileLink(link: link)],
+        children: [
+          for (final link in profile.links) _ProfileLink(link: link),
+          _EmailLink(email: profile.email),
+        ],
       ),
     ],
+  );
+}
+
+class _EmailLink extends StatelessWidget {
+  const _EmailLink({required this.email});
+
+  final String email;
+
+  @override
+  Widget build(BuildContext context) => CinematicFocusable(
+    onTap: () => launchUrl(Uri(scheme: 'mailto', path: email)),
+    semanticLabel: email,
+    semanticRole: CinematicControlRole.link,
+    focusColor: AppColors.heroAccent,
+    child: Padding(
+      padding: const EdgeInsets.symmetric(vertical: 5),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            email,
+            style: AppFonts.spaceGrotesk(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: AppColors.textBright,
+            ),
+          ),
+          const SizedBox(width: 7),
+          const Icon(
+            Icons.arrow_outward_rounded,
+            size: 15,
+            color: AppColors.heroAccent,
+          ),
+        ],
+      ),
+    ),
   );
 }
 
@@ -289,17 +336,18 @@ class _PracticeRow extends StatelessWidget {
   Widget build(BuildContext context) => Container(
     padding: const EdgeInsets.symmetric(vertical: 24),
     decoration: const BoxDecoration(
-      border: Border(top: BorderSide(color: Color(0x3DE47A57))),
+      border: Border(top: BorderSide(color: Color(0x3D1E51FF))),
     ),
     child: Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           '${index + 1}'.padLeft(2, '0'),
-          style: AppFonts.instrumentSerif(
-            fontSize: 18,
-            fontStyle: FontStyle.italic,
+          style: AppFonts.spaceGrotesk(
+            fontSize: 12,
+            fontWeight: FontWeight.w800,
             color: AppColors.heroAccent,
+            letterSpacing: 0.4,
           ),
         ),
         const SizedBox(width: 22),

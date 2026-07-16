@@ -15,12 +15,15 @@
     "title": "عني",
     "practice_title": "مجالات عملي",
     "location": "الموقع",
-    "experience": "العمل المهني منذ"
+    "experience": "العمل المهني منذ",
+    "email": "البريد الإلكتروني"
   },
   "home_section": {
-    "view_work": "عرض المشاريع",
+    "view_work": "استكشف عملي",
     "inspect_runtime": "عني",
     "view_github": "GitHub",
+    "email": "راسلني",
+    "currently": "حاليًا",
     "based_in": "الموقع",
     "working_since": "أعمل منذ",
     "focus": "التركيز"
@@ -32,7 +35,6 @@
   "projects_section": {
     "title": "أعمال مختارة",
     "subtitle": "منتجات أطلقتها وأدوات أواصل صيانتها.",
-    "archive": "أعمال أخرى",
     "open_project": "فتح المشروع",
     "challenge": "المشكلة",
     "approach": "النهج",

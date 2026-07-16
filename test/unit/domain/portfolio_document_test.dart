@@ -13,10 +13,11 @@ void main() {
       final profile = manifest['profile']! as Map<String, dynamic>;
       final displayName = profile['display_name']! as Map<String, dynamic>;
 
-      expect(document.schemaVersion, 5);
+      expect(document.schemaVersion, 6);
       expect(document.contentVersion, manifest['content_version']);
       expect(document.profile.name, profile['name']);
       expect(document.profile.role, profile['role']);
+      expect(document.profile.email, profile['email']);
       expect(document.profile.displayName.primary, displayName['primary']);
       expect(document.profile.displayName.accent, displayName['accent']);
       expect(
@@ -37,6 +38,7 @@ void main() {
         analytics['script_url'],
       );
       expect(document.experience, hasLength(6));
+      expect(document.currentExperience, hasLength(2));
       expect(document.mergedContributions, hasLength(5));
       expect(document.contributionsUnderReview, hasLength(3));
       expect(document.featuredContribution, isNotNull);
@@ -48,6 +50,7 @@ void main() {
               system.challenge.isNotEmpty &&
               system.approach.isNotEmpty &&
               system.outcome.isNotEmpty &&
+              system.presentation.visual.labels.length >= 3 &&
               system.evidence.isNotEmpty &&
               system.evidence.every((entry) => entry.url.scheme == 'https'),
         ),
@@ -57,6 +60,8 @@ void main() {
         document.supportingSystems.every(
           (system) =>
               system.artifact.asset.startsWith('assets/work/') &&
+              system.presentation.visual.kind ==
+                  PortfolioSystemVisualKind.artifact &&
               system.artifact.alt.isNotEmpty &&
               system.evidence.isNotEmpty,
         ),
@@ -64,10 +69,10 @@ void main() {
       );
       expect(document.activeSections, [
         'home',
-        'about',
         'experience',
         'proof',
         'projects',
+        'about',
       ]);
       expect(
         document.sources.every((source) => source.url.scheme == 'https'),
@@ -156,7 +161,7 @@ void main() {
       json['contributions'] = <dynamic>[];
 
       final document = PortfolioDocument.fromJson(json);
-      expect(document.activeSections, ['home', 'about', 'projects']);
+      expect(document.activeSections, ['home', 'projects', 'about']);
     });
 
     test('rejects unsupported schemas and duplicate content ids', () {
@@ -240,6 +245,32 @@ void main() {
       (systems.first as Map<String, dynamic>).remove('challenge');
       expect(
         () => PortfolioDocument.fromJson(incompleteCaseStudy),
+        throwsA(isA<FormatException>()),
+      );
+
+      final invalidProjectColour = _manifest();
+      final invalidColourSystems =
+          invalidProjectColour['systems']! as List<dynamic>;
+      final invalidPresentation =
+          (invalidColourSystems.first as Map<String, dynamic>)['presentation']!
+              as Map<String, dynamic>;
+      invalidPresentation['background'] = 'blue';
+      expect(
+        () => PortfolioDocument.fromJson(invalidProjectColour),
+        throwsA(isA<FormatException>()),
+      );
+
+      final underspecifiedVisual = _manifest();
+      final underspecifiedSystems =
+          underspecifiedVisual['systems']! as List<dynamic>;
+      final visual =
+          ((underspecifiedSystems.first
+                      as Map<String, dynamic>)['presentation']!
+                  as Map<String, dynamic>)['visual']!
+              as Map<String, dynamic>;
+      visual['labels'] = <dynamic>['Only one'];
+      expect(
+        () => PortfolioDocument.fromJson(underspecifiedVisual),
         throwsA(isA<FormatException>()),
       );
 

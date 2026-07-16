@@ -6,10 +6,10 @@ import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
 final class AppTheme {
   const AppTheme._();
 
-  static ThemeData get dark {
+  static ThemeData get light {
     final colorScheme = ColorScheme.fromSeed(
       seedColor: AppColors.accent,
-      brightness: Brightness.dark,
+      brightness: Brightness.light,
       secondary: AppColors.accent,
       surface: AppColors.backgroundLight,
       onSurface: AppColors.textBright,
@@ -19,7 +19,7 @@ final class AppTheme {
       useMaterial3: true,
       fontFamilyFallback: AppFonts.scriptFallbackFamilies,
       colorScheme: colorScheme,
-      brightness: Brightness.dark,
+      brightness: Brightness.light,
       scaffoldBackgroundColor: AppColors.background,
       appBarTheme: const AppBarTheme(
         elevation: 0,
@@ -46,7 +46,7 @@ final class AppTheme {
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(foregroundColor: AppColors.accent),
       ),
-      textTheme: AppFonts.interTextTheme(ThemeData.dark().textTheme),
+      textTheme: AppFonts.interTextTheme(ThemeData.light().textTheme),
     );
   }
 }

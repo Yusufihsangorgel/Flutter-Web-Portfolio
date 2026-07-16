@@ -24,6 +24,7 @@ class _BackToTopButtonState extends State<BackToTopButton>
   bool _hovered = false;
   bool _reduceMotion = false;
   double _scrollProgress = 0;
+  late final AppScrollController _scrollController;
   late final AnimationController _entranceController;
   late final Animation<double> _entranceAnimation;
 
@@ -38,7 +39,9 @@ class _BackToTopButtonState extends State<BackToTopButton>
       parent: _entranceController,
       curve: CinematicCurves.dramaticEntrance,
     );
-    context.read<AppScrollController>().scrollController.addListener(_onScroll);
+    _scrollController = context.read<AppScrollController>();
+    _scrollController.scrollController.addListener(_onScroll);
+    _scrollController.narrativePosition.addListener(_onNarrativePosition);
   }
 
   @override
@@ -53,7 +56,7 @@ class _BackToTopButtonState extends State<BackToTopButton>
   }
 
   void _onScroll() {
-    final controller = context.read<AppScrollController>().scrollController;
+    final controller = _scrollController.scrollController;
     if (!controller.hasClients) return;
 
     final shouldShow = controller.offset > 500;
@@ -67,11 +70,10 @@ class _BackToTopButtonState extends State<BackToTopButton>
         _entranceController.reverse();
       }
     }
+  }
 
-    final maxExtent = controller.position.maxScrollExtent;
-    final progress = maxExtent > 0
-        ? (controller.offset / maxExtent).clamp(0.0, 1.0)
-        : 0.0;
+  void _onNarrativePosition() {
+    final progress = _scrollController.narrativePosition.value.documentProgress;
     if ((progress - _scrollProgress).abs() > 0.005) {
       setState(() => _scrollProgress = progress);
     }
@@ -79,15 +81,14 @@ class _BackToTopButtonState extends State<BackToTopButton>
 
   @override
   void dispose() {
-    context.read<AppScrollController>().scrollController.removeListener(
-      _onScroll,
-    );
+    _scrollController.scrollController.removeListener(_onScroll);
+    _scrollController.narrativePosition.removeListener(_onNarrativePosition);
     _entranceController.dispose();
     super.dispose();
   }
 
   void _scrollToTop() {
-    context.read<AppScrollController>().scrollToSection('home');
+    _scrollController.scrollToSection('home');
   }
 
   @override

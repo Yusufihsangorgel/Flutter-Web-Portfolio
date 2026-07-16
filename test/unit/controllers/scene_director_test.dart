@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_web_portfolio/app/controllers/scene_director.dart';
 import 'package:flutter_web_portfolio/app/controllers/scroll_controller.dart';
 import 'package:flutter_web_portfolio/app/core/constants/scene_configs.dart';
+import 'package:flutter_web_portfolio/app/narrative/application/narrative_position.dart';
 import 'package:flutter_web_portfolio/app/narrative/domain/narrative_document.dart';
 import '../../helpers/narrative_fixture.dart';
 
@@ -53,56 +54,54 @@ void main() {
       expect(director.stream, isA<Stream<SceneState>>());
     });
 
-    test('uses measured chapter centres instead of equal document bands', () {
-      const sections = [
-        SectionGeometry(id: 'home', top: 0, height: 800),
-        SectionGeometry(id: 'about', top: 900, height: 400),
-        SectionGeometry(id: 'experience', top: 1500, height: 1400),
-        SectionGeometry(id: 'proof', top: 3000, height: 500),
-        SectionGeometry(id: 'projects', top: 3600, height: 2400),
-      ];
-
+    test('maps a stable shared position to one chapter scene', () {
       final state = SceneDirector.calculateState(
-        offset: 660,
-        viewportDimension: 1000,
-        maxExtent: 5200,
-        sections: sections,
+        position: const NarrativePosition(
+          activeSectionId: 'experience',
+          currentSectionId: 'experience',
+          nextSectionId: 'experience',
+          focalPoint: 1800,
+          boundaryProgress: 0,
+          documentProgress: 0.32,
+        ),
         narrative: loadNarrativeFixture(),
       );
 
-      expect(state.currentSceneIndex, 1);
-      expect(state.blendedConfig, SceneConfigs.about);
-      expect(state.currentMotif, NarrativeMotif.thread);
+      expect(state.currentSceneIndex, 2);
+      expect(state.globalProgress, 0.32);
+      expect(state.blendedConfig, SceneConfigs.experience);
+      expect(state.currentMotif, NarrativeMotif.timeline);
+      expect(state.nextMotif, NarrativeMotif.timeline);
+      expect(state.activeMotif, NarrativeMotif.timeline);
     });
 
-    test('smoothly blends between adjacent measured chapters', () {
-      const sections = [
-        SectionGeometry(id: 'home', top: 0, height: 800),
-        SectionGeometry(id: 'about', top: 900, height: 400),
-        SectionGeometry(id: 'experience', top: 1500, height: 1400),
-      ];
-
+    test('smoothly blends only the boundary described by the resolver', () {
       final state = SceneDirector.calculateState(
-        offset: 1210,
-        viewportDimension: 1000,
-        maxExtent: 2400,
-        sections: sections,
+        position: const NarrativePosition(
+          activeSectionId: 'proof',
+          currentSectionId: 'experience',
+          nextSectionId: 'proof',
+          focalPoint: 3000,
+          boundaryProgress: 0.5,
+          documentProgress: 0.5,
+        ),
         narrative: loadNarrativeFixture(),
       );
 
-      expect(state.currentSceneIndex, 1);
+      expect(state.currentSceneIndex, 3);
       expect(state.blendFactor, closeTo(0.5, 0.001));
       expect(
         state.blendedConfig.accent,
         SceneConfig.lerp(
-          SceneConfigs.about,
           SceneConfigs.experience,
+          SceneConfigs.proof,
           0.5,
         ).accent,
       );
-      expect(state.currentAccent, SceneConfigs.about.accent);
-      expect(state.currentMotif, NarrativeMotif.thread);
-      expect(state.nextMotif, NarrativeMotif.timeline);
+      expect(state.currentAccent, SceneConfigs.proof.accent);
+      expect(state.currentMotif, NarrativeMotif.timeline);
+      expect(state.nextMotif, NarrativeMotif.branches);
+      expect(state.activeMotif, NarrativeMotif.branches);
     });
   });
 }

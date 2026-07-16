@@ -26,7 +26,6 @@ class PremiumFooter extends StatelessWidget {
 
           return Container(
             width: double.infinity,
-            margin: EdgeInsets.only(top: desktop ? 160 : 96),
             color: AppColors.textBright,
             child: DefaultTextStyle.merge(
               style: const TextStyle(color: AppColors.background),
@@ -166,6 +165,7 @@ class _FooterNavigation extends StatelessWidget {
           children: [
             for (final link in portfolio.profile.links)
               _ProfileLink(link: link),
+            _FooterEmail(email: portfolio.profile.email),
           ],
         ),
       ],
@@ -185,6 +185,42 @@ class _FooterNavigation extends StatelessWidget {
             children: [navigation, const SizedBox(height: 36), focus],
           );
   }
+}
+
+class _FooterEmail extends StatelessWidget {
+  const _FooterEmail({required this.email});
+
+  final String email;
+
+  @override
+  Widget build(BuildContext context) => CinematicFocusable(
+    onTap: () => launchUrl(Uri(scheme: 'mailto', path: email)),
+    semanticLabel: email,
+    semanticRole: CinematicControlRole.link,
+    focusColor: AppColors.background,
+    child: Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            email,
+            style: AppFonts.spaceGrotesk(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: AppColors.background,
+            ),
+          ),
+          const SizedBox(width: 6),
+          const Icon(
+            Icons.arrow_outward_rounded,
+            size: 14,
+            color: AppColors.background,
+          ),
+        ],
+      ),
+    ),
+  );
 }
 
 class _ProfileLink extends StatelessWidget {

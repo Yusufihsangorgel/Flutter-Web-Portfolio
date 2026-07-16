@@ -5,6 +5,12 @@ final class AppDimensions {
   static const double appBarHeight = 80.0;
   static const double appBarHeightMobile = 60.0;
   static const double appBarHeightTablet = 70.0;
+  static const double appBarCollapseExtent = 200.0;
+
+  static double appBarHeightForScrollOffset(double offset) {
+    final progress = (offset / appBarCollapseExtent).clamp(0.0, 1.0);
+    return appBarHeight + (appBarHeightMobile - appBarHeight) * progress;
+  }
 
   static const double sectionPaddingDesktop = 160.0;
   static const double sectionPaddingTablet = 80.0;

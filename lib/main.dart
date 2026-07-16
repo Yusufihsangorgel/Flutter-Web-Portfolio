@@ -33,8 +33,8 @@ void main() {
       SystemChrome.setSystemUIOverlayStyle(
         const SystemUiOverlayStyle(
           statusBarColor: Colors.transparent,
-          statusBarIconBrightness: Brightness.light,
-          statusBarBrightness: Brightness.dark,
+          statusBarIconBrightness: Brightness.dark,
+          statusBarBrightness: Brightness.light,
         ),
       );
 
@@ -63,9 +63,9 @@ class _BootstrapFailureApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) => MaterialApp(
     debugShowCheckedModeBanner: false,
-    theme: AppTheme.dark,
+    theme: AppTheme.light,
     home: Scaffold(
-      backgroundColor: const Color(0xFF00101F),
+      backgroundColor: const Color(0xFFF2EEE5),
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(24),
@@ -77,7 +77,7 @@ class _BootstrapFailureApp extends StatelessWidget {
                 const Icon(
                   Icons.sync_problem_rounded,
                   size: 42,
-                  color: Color(0xFF12B8D0),
+                  color: Color(0xFF1E51FF),
                 ),
                 const SizedBox(height: 20),
                 Text(
@@ -124,9 +124,8 @@ class MyApp extends StatelessWidget {
           return MaterialApp(
             title: appTitle,
             debugShowCheckedModeBanner: false,
-            theme: AppTheme.dark,
-            darkTheme: AppTheme.dark,
-            themeMode: ThemeMode.dark,
+            theme: AppTheme.light,
+            themeMode: ThemeMode.light,
             locale: currentLocale,
             localizationsDelegates: [
               GlobalMaterialLocalizations.delegate,

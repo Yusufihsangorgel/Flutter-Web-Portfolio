@@ -34,18 +34,13 @@ void main() {
     });
   });
 
-  group('AppColors — dark mode base', () {
-    test('background is darker than backgroundLight', () {
-      // A darker color has a lower luminance
+  group('AppColors — editorial document base', () {
+    test('paper background sits between the light and dark surfaces', () {
       final bgLuminance = AppColors.background.computeLuminance();
       final bgLightLuminance = AppColors.backgroundLight.computeLuminance();
       expect(bgLuminance, lessThan(bgLightLuminance));
-    });
-
-    test('backgroundDark is darker than background', () {
       final bgDarkLum = AppColors.backgroundDark.computeLuminance();
-      final bgLum = AppColors.background.computeLuminance();
-      expect(bgDarkLum, lessThanOrEqualTo(bgLum));
+      expect(bgDarkLum, lessThan(bgLuminance));
     });
 
     test('all base colors are non-null', () {

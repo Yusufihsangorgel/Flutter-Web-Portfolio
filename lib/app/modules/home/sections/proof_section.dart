@@ -11,7 +11,7 @@ import 'package:flutter_web_portfolio/app/widgets/numbered_section_heading.dart'
 import 'package:flutter_web_portfolio/app/widgets/scene_accent_builder.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-/// Verified upstream work presented as one editorial case and a compact ledger.
+/// Verified upstream work presented as one editorial case and a compact record.
 class ProofSection extends StatelessWidget {
   const ProofSection({super.key});
 
@@ -390,10 +390,11 @@ class _ContributionLedger extends StatelessWidget {
             ),
             Text(
               entries.length.toString().padLeft(2, '0'),
-              style: AppFonts.instrumentSerif(
-                fontSize: 17,
-                fontStyle: FontStyle.italic,
+              style: AppFonts.spaceGrotesk(
+                fontSize: 12,
+                fontWeight: FontWeight.w800,
                 color: accent,
+                letterSpacing: 0.4,
               ),
             ),
           ],

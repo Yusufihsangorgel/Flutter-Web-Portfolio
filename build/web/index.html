@@ -35,12 +35,12 @@
 
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="Portfolio">
   <link rel="apple-touch-icon" href="icons/Icon-192.png">
 
-  <meta name="theme-color" content="#11100E">
-  <meta name="msapplication-TileColor" content="#11100E">
+  <meta name="theme-color" content="#F2EEE5">
+  <meta name="msapplication-TileColor" content="#F2EEE5">
   <link rel="icon" type="image/png" href="favicon.png">
   <link rel="manifest" href="manifest.json">
 
@@ -53,6 +53,7 @@
         "@type": "Person",
         "name": "Yusuf İhsan Görgel",
         "jobTitle": "Software Engineer",
+        "email": "developeryusuf@icloud.com",
         "address": "Antalya, Türkiye",
         "url": "https://developeryusuf.com",
         "sameAs": [
@@ -73,7 +74,6 @@
 <!-- portfolio-structured-data:end -->
 
   <link rel="preload" href="assets/assets/fonts/space_grotesk/SpaceGrotesk-Variable.ttf" as="font" type="font/ttf" crossorigin>
-  <link rel="preload" href="assets/assets/fonts/instrument_serif/InstrumentSerif-Italic.ttf" as="font" type="font/ttf" crossorigin>
   <link rel="preload" href="assets/assets/fonts/jetbrains_mono/JetBrainsMono-Variable.ttf" as="font" type="font/ttf" crossorigin>
   <style>
     @font-face {
@@ -84,23 +84,16 @@
       font-weight: 300 700;
     }
     @font-face {
-      font-family: "Instrument Serif Critical";
-      src: url("assets/assets/fonts/instrument_serif/InstrumentSerif-Italic.ttf") format("truetype");
-      font-display: optional;
-      font-style: italic;
-      font-weight: 400;
-    }
-    @font-face {
       font-family: "JetBrains Mono Critical";
       src: url("assets/assets/fonts/jetbrains_mono/JetBrainsMono-Variable.ttf") format("truetype");
       font-display: optional;
       font-style: normal;
       font-weight: 400 700;
     }
-    :root { color-scheme: dark; background: #11100e; }
+    :root { color-scheme: light; background: #f2eee5; }
     * { box-sizing: border-box; }
     html, body { height: 100%; }
-    body { margin: 0; overflow: hidden; background: #11100e; }
+    body { margin: 0; overflow: hidden; background: #f2eee5; }
 
     /*
       The release task replaces the empty bootstrap-content block with a
@@ -114,8 +107,8 @@
       z-index: 9999;
       overflow: hidden;
       background:
-        radial-gradient(circle at 62% 40%, rgba(228, 122, 87, 0.1), transparent 46%),
-        #11100e;
+        radial-gradient(circle at 78% 18%, rgba(30, 81, 255, 0.14), transparent 34%),
+        #f2eee5;
       opacity: 1;
       transition: opacity 90ms linear;
     }
@@ -132,7 +125,7 @@
       height: 100%;
       min-height: 620px;
       padding: 108px 160px 62px;
-      color: #f4efe4;
+      color: #12110f;
       font-family: "Space Grotesk Critical", ui-sans-serif, sans-serif;
     }
     .bootstrap-rail {
@@ -141,8 +134,8 @@
       align-items: center;
       justify-content: space-between;
       padding-bottom: 14px;
-      border-bottom: 1px solid rgba(244, 239, 228, 0.14);
-      color: #c4bcaf;
+      border-bottom: 1px solid rgba(18, 17, 15, 0.2);
+      color: #403c36;
       font: 600 13px/1.4 "Space Grotesk Critical", ui-sans-serif, sans-serif;
     }
     .bootstrap-rail-end {
@@ -159,24 +152,28 @@
     }
     .bootstrap-title {
       display: flex;
-      flex-direction: column;
+      flex-flow: row wrap;
+      gap: 0.1em;
+      align-items: baseline;
       margin: 0;
       font-size: clamp(100px, 7.7vw, 132px);
       font-weight: 760;
       line-height: 0.82;
       letter-spacing: -0.05em;
+      color: #12110f;
       text-transform: uppercase;
     }
     .bootstrap-title-accent {
-      align-self: flex-end;
-      padding-right: 0.04em;
-      color: #e47a57;
-      font-family: "Instrument Serif Critical", Georgia, serif;
-      font-size: 1.07em;
-      font-style: italic;
-      font-weight: 400;
-      letter-spacing: -0.035em;
-      text-transform: none;
+      padding: 0.16em 0.11em 0.08em;
+      color: #fffcf4;
+      background: #1e51ff;
+      box-shadow: 0 -0.16em 0 #1e51ff;
+      font-family: "Space Grotesk Critical", ui-sans-serif, sans-serif;
+      font-size: 1em;
+      font-style: normal;
+      font-weight: 760;
+      letter-spacing: -0.05em;
+      text-transform: uppercase;
     }
     .bootstrap-footer {
       display: grid;
@@ -192,7 +189,7 @@
     .bootstrap-statement {
       max-width: 580px;
       margin: 0;
-      color: #f4efe4;
+      color: #12110f;
       font-size: clamp(18px, 1.55vw, 22px);
       font-weight: 520;
       line-height: 1.36;
@@ -207,16 +204,17 @@
     .bootstrap-action {
       box-sizing: border-box;
       padding: 16px 32px;
-      color: #c4bcaf;
+      color: #403c36;
       white-space: nowrap;
-      border: 1px solid rgba(244, 239, 228, 0.08);
+      border: 1px solid rgba(18, 17, 15, 0.24);
       font: 500 14px/1.55 "Space Grotesk Critical", ui-sans-serif, sans-serif;
       letter-spacing: 2px;
     }
     .bootstrap-action--primary {
-      color: #11100e;
-      background: #e47a57;
-      border-color: rgba(228, 122, 87, 0.8);
+      color: #fffcf4;
+      background: #1e51ff;
+      border-color: #1e51ff;
+      box-shadow: 4px 4px 0 #12110f;
     }
     .bootstrap-facts {
       display: grid;
@@ -228,14 +226,14 @@
     }
     .bootstrap-fact {
       padding-top: 11px;
-      border-top: 1px solid rgba(244, 239, 228, 0.24);
-      color: #f4efe4;
+      border-top: 1px solid rgba(18, 17, 15, 0.24);
+      color: #12110f;
       font: 600 13px/1.35 "Space Grotesk Critical", ui-sans-serif, sans-serif;
     }
     .bootstrap-fact-label {
       display: block;
       margin-bottom: 7px;
-      color: #8e877c;
+      color: #756e64;
       font-size: 11px;
       font-weight: 400;
     }
@@ -244,7 +242,7 @@
       top: 50%;
       left: 50%;
       width: min(420px, calc(100% - 48px));
-      color: #f4efe4;
+      color: #12110f;
       font: 500 15px/1.6 "JetBrains Mono Critical", ui-monospace, monospace;
       text-align: center;
       transform: translate(-50%, -50%);
@@ -253,10 +251,10 @@
       display: block;
       margin: 22px auto 0;
       padding: 10px 16px;
-      color: #f4efe4;
+      color: #12110f;
       cursor: pointer;
-      background: rgba(228, 122, 87, 0.12);
-      border: 1px solid rgba(228, 122, 87, 0.72);
+      background: rgba(30, 81, 255, 0.1);
+      border: 1px solid rgba(30, 81, 255, 0.72);
       font: inherit;
     }
     @media (max-width: 1400px) and (min-width: 900px) {
@@ -277,7 +275,7 @@
         font-size: clamp(38px, 12.5vw, 64px);
         line-height: 0.82;
       }
-      .bootstrap-title-accent { align-self: flex-start; }
+      .bootstrap-title-accent { align-self: auto; }
       .bootstrap-footer {
         grid-template-columns: 1fr;
         gap: 28px;
@@ -329,19 +327,65 @@
       #bootstrap-surface { transition: none; }
     }
   </style>
+  <script>
+    // Flutter's Navigator 1.0 normally creates a second, synthetic browser
+    // history entry during bootstrap. This document owns chapter history
+    // itself, so mark the direct-load entry as Flutter-managed before the
+    // engine starts and keep deep links as a single browser entry.
+    if (!history.state || history.state.flutter !== true) {
+      history.replaceState({ flutter: true }, 'flutter', location.href);
+    }
+
+    // This single-page document owns chapter history, while Flutter owns
+    // transient overlay routes. A chapter pop is forwarded only to the document
+    // controller. When an overlay is open, an Escape key event closes it through
+    // Flutter's normal Navigator lifecycle, then the browser history cursor is
+    // restored without consuming a chapter entry.
+    var restoringHistoryAfterModal = false;
+    window.addEventListener('popstate', function (event) {
+      if (restoringHistoryAfterModal) {
+        restoringHistoryAfterModal = false;
+        event.stopImmediatePropagation();
+        return;
+      }
+      var transientOverlayOpen = document.documentElement.getAttribute(
+        'data-portfolio-transient-overlay'
+      ) === 'true';
+      if (transientOverlayOpen) {
+        event.stopImmediatePropagation();
+        restoringHistoryAfterModal = true;
+        window.dispatchEvent(new KeyboardEvent('keydown', {
+          key: 'Escape',
+          code: 'Escape',
+          bubbles: true,
+        }));
+        window.dispatchEvent(new KeyboardEvent('keyup', {
+          key: 'Escape',
+          code: 'Escape',
+          bubbles: true,
+        }));
+        window.setTimeout(function () {
+          window.history.forward();
+        }, 120);
+        return;
+      }
+      event.stopImmediatePropagation();
+      window.dispatchEvent(new Event('portfolio-popstate'));
+    }, true);
+  </script>
   <!-- portfolio-analytics:start -->
   <script defer src="https://analytics.developeryusuf.com/js/script.js" data-domain="developeryusuf.com"></script>
 <!-- portfolio-analytics:end -->
   <!-- release-preloads:start -->
-  <link rel="preload" href="main.dart.wasm?v=8dc3eb100c2238ac" as="fetch" type="application/wasm" crossorigin fetchpriority="high">
-  <link rel="modulepreload" href="main.dart.mjs?v=8dc3eb100c2238ac" crossorigin fetchpriority="high">
+  <link rel="preload" href="main.dart.wasm?v=13a4e353fdae1d9e" as="fetch" type="application/wasm" crossorigin fetchpriority="high">
+  <link rel="modulepreload" href="main.dart.mjs?v=13a4e353fdae1d9e" crossorigin fetchpriority="high">
   <link rel="preload" href="canvaskit/83675ed27633283e7fc296c8bca22e841224c096/skwasm.wasm" as="fetch" type="application/wasm" crossorigin fetchpriority="high">
   <!-- release-preloads:end -->
 </head>
 <body>
   <div id="bootstrap-surface" role="status" aria-label="Loading interactive portfolio" aria-busy="true">
     <!-- bootstrap-content:start -->
-    <div class="bootstrap-shell" aria-hidden="true" data-content-version="2026.07.16.3">
+    <div class="bootstrap-shell" aria-hidden="true" data-content-version="2026.07.16.4">
       <div class="bootstrap-rail">
         <span>Software Engineer</span>
         <span class="bootstrap-rail-end">
@@ -351,15 +395,15 @@
       <div class="bootstrap-stage">
         <p class="bootstrap-title">
         <span>YUSUF İHSAN</span>
-        <span class="bootstrap-title-accent">Görgel</span>
+        <span class="bootstrap-title-accent">GÖRGEL</span>
         </p>
       </div>
       <div class="bootstrap-footer">
         <div class="bootstrap-statement-group">
-          <p class="bootstrap-statement">I build cross-platform software, then stay for the hard parts.</p>
+          <p class="bootstrap-statement">I’m a software engineer working across Flutter, Dart, Go, and production infrastructure.</p>
           <div class="bootstrap-actions">
-            <span class="bootstrap-action bootstrap-action--primary">View selected work</span>
-            <span class="bootstrap-action">GitHub</span>
+            <span class="bootstrap-action bootstrap-action--primary">Explore my work</span>
+            <span class="bootstrap-action">Email me</span>
           </div>
         </div>
         <ul class="bootstrap-facts">

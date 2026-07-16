@@ -11,11 +11,11 @@ The site reads identity, biography, experience, work, links, and contributions f
 <!-- portfolio-record:start -->
 ## Public engineering record
 
-**Yusuf İhsan Görgel — Software Engineer.** I build cross-platform software, then stay for the hard parts.
+**Yusuf İhsan Görgel — Software Engineer.** I’m a software engineer working across Flutter, Dart, Go, and production infrastructure.
 
-I work across Flutter, Dart, and Go, turning product ideas into software that holds up on real devices, unreliable networks, and long-lived release cycles.
+Since 2021, I have built and maintained software for mobile devices, tablets, desktop operating systems, and the web. My work includes ERP and point-of-sale products, logistics workflows, digital publishing, backend services, and the release systems around them.
 
-Source status: `2026.07.16.3`, verified 2026-07-16 against GitHub and LinkedIn.
+Source status: `2026.07.16.4`, verified 2026-07-16 against GitHub and LinkedIn.
 
 ### Accepted upstream changes
 
@@ -49,7 +49,7 @@ Source status: `2026.07.16.3`, verified 2026-07-16 against GitHub and LinkedIn.
 
 ## Content contract
 
-`assets/content/portfolio.json` is the canonical professional record. It contains the profile, explicit display-name composition, optional experience, capabilities, optional contributions and work, source provenance, and site metadata. Featured work carries challenge, approach, outcome, and linked evidence records. `PortfolioDocument` parses it into immutable final classes and rejects unsupported schemas, duplicate content IDs, invalid URLs, incomplete featured case studies, missing featured work, and identity/metadata drift.
+`assets/content/portfolio.json` is the canonical professional record. It contains the profile, contact details, explicit display-name composition, current-role markers, optional experience, capabilities, optional contributions and work, source provenance, and site metadata. Every work record also owns its palette and visual grammar; featured work carries challenge, approach, outcome, and linked evidence records. `PortfolioDocument` parses it into immutable final classes and rejects unsupported schemas, duplicate content IDs, invalid URLs, malformed presentation colours, incomplete visual labels, incomplete featured case studies, missing featured work, and identity/metadata drift.
 
 Analytics is opt-in through `site.analytics` in the same document. Remove that object for a tracking-free deployment; the synchronization step removes the script instead of inheriting this site's analytics account.
 
@@ -72,16 +72,23 @@ assets/content/portfolio.json
         ▼
 PortfolioDocument ───────────────┐
                                 │
+assets/presentation/narrative.json
+        │ chapter order + motif  │
+        ▼                        │
+NarrativeDocument               │
+        │                        │
 assets/i18n/{locale}.json        │
         │ ordered async loading  │
         ▼                        ▼
 LanguageCubit              semantic sections
-                                │ measured section centres
+                                │ measured chapter bounds
                                 ▼
-AppScrollController ─────► SceneDirector
-                                │ immutable SceneConfig snapshots
-                                ▼
-                     restrained ambient CustomPainter
+AppScrollController ─────► NarrativePosition
+        │                       │
+        │ browser history       ├────► SceneDirector
+        │ + visible progress    │           │
+        ▼                       ▼           ▼
+chapter navigation      hairline handoffs  ambient CustomPainter
 ```
 
 The document and render loop have deliberately different update paths:
@@ -89,8 +96,10 @@ The document and render loop have deliberately different update paths:
 - The composition root loads and validates professional content before `runApp`.
 - BLoC/Cubit owns language, scroll, and scene state through explicit dependencies and immutable snapshots.
 - Ambient painting listens only to scene and pointer changes rather than rebuilding the semantic document or running an idle animation loop.
-- Section positions are measured after layout. Scene interpolation follows real chapter centres instead of equal scroll bands.
-- Browser history represents positions inside one document; it is not used as a page router.
+- Section positions are measured after layout. One boundary-local reading snapshot drives active navigation, URL state, scene interpolation, and every visible progress indicator.
+- Responsive reflow preserves the reader's chapter-relative focal point instead of retaining a stale raw pixel offset.
+- Browser history represents positions inside one document. An early popstate bridge prevents Flutter's root Navigator from consuming chapter navigation twice while preserving the command palette's normal modal lifecycle.
+- Decorative chapter handoffs reuse the ambient motif endpoints, mirror in RTL, and add no copy or semantic nodes.
 - Reduced-motion sessions suppress pointer motion and animated transitions while preserving the complete document and navigation model.
 
 ## First meaningful frame
@@ -148,7 +157,7 @@ npm run test:visual
 npm test
 ```
 
-The source preparation step renders the social card and writes a source manifest into the Flutter asset bundle. The bundle gate rejects stale tracked output, then checks Wasm headers, dual-runtime configuration, versioned entry points, self-hosted renderer assets, local font coverage, first-frame cleanup, service-worker retirement, and explicit size budgets. Playwright exercises desktop and mobile semantics, locale/RTL switching, URL history, security headers, and release assets. Checked-in platform baselines lock the critical shell, hero, open-source chapter, selected systems, and supporting-work archive across desktop, mobile, and tablet viewports with reduced motion enabled.
+The source preparation step renders the social card and writes a source manifest into the Flutter asset bundle. The bundle gate rejects stale tracked output, then checks Wasm headers, dual-runtime configuration, versioned entry points, self-hosted renderer assets, local font coverage, first-frame cleanup, service-worker retirement, and explicit size budgets. Playwright exercises desktop and mobile semantics, locale/RTL switching, URL history, security headers, and release assets. Checked-in platform baselines lock the critical shell, personal hero, open-source chapter, and full-width work atlas across desktop, mobile, and tablet viewports with reduced motion enabled.
 
 ## Local development
 
@@ -174,7 +183,7 @@ Useful controls:
 | Measured document geometry | `lib/app/controllers/scroll_controller.dart` |
 | Scene interpolation | `lib/app/controllers/scene_director.dart` |
 | Ambient render layer | `lib/app/widgets/background/cinematic_background.dart` |
-| Editorial selected-work index | `lib/app/modules/home/sections/projects/projects_section.dart` |
+| Full-width selected-work atlas | `lib/app/modules/home/sections/projects/projects_section.dart`, `lib/app/modules/home/sections/projects/widgets/project_atlas.dart` |
 | Content synchronization | `tool/sync_public_content.mjs` |
 | Runtime measurement | `tool/measure_web_runtime.mjs`, `tool/performance_budget.json`, `tool/performance_budget.schema.json` |
 | Responsive visual regression | `tests/e2e/visual.spec.ts`, `tests/e2e/visual.spec.ts-snapshots/` |

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
 import 'package:flutter_web_portfolio/app/core/constants/cinematic_curves.dart';
 import 'package:flutter_web_portfolio/app/core/constants/durations.dart';
 import 'package:flutter_web_portfolio/app/utils/motion_preference.dart';
@@ -88,7 +89,7 @@ class _ScrollIndicatorState extends State<ScrollIndicator>
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
                     colors: [
-                      Colors.white.withValues(alpha: 0.3),
+                      AppColors.textBright.withValues(alpha: 0.3),
                       Colors.transparent,
                     ],
                   ),
@@ -103,15 +104,11 @@ class _ScrollIndicatorState extends State<ScrollIndicator>
                     width: 3,
                     height: 3,
                     decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.8),
+                      color: AppColors.textBright.withValues(alpha: 0.8),
                       shape: BoxShape.circle,
                       boxShadow: [
                         BoxShadow(
-                          color:
-                              (Theme.of(context).brightness == Brightness.dark
-                                      ? Colors.white
-                                      : Colors.black)
-                                  .withValues(alpha: 0.4),
+                          color: AppColors.textBright.withValues(alpha: 0.4),
                           blurRadius: 6,
                         ),
                       ],

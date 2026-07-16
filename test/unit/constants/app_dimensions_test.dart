@@ -7,6 +7,7 @@ void main() {
       expect(AppDimensions.appBarHeight, greaterThan(0));
       expect(AppDimensions.appBarHeightMobile, greaterThan(0));
       expect(AppDimensions.appBarHeightTablet, greaterThan(0));
+      expect(AppDimensions.appBarCollapseExtent, greaterThan(0));
       expect(AppDimensions.sectionPaddingDesktop, greaterThan(0));
       expect(AppDimensions.sectionPaddingTablet, greaterThan(0));
       expect(AppDimensions.sectionPaddingMobile, greaterThan(0));
@@ -53,10 +54,19 @@ void main() {
       expect(AppDimensions.maxContentWidth, lessThanOrEqualTo(1920));
     });
 
+    test('app bar height follows the shared collapse curve', () {
+      expect(AppDimensions.appBarHeightForScrollOffset(-20), 80);
+      expect(AppDimensions.appBarHeightForScrollOffset(0), 80);
+      expect(AppDimensions.appBarHeightForScrollOffset(100), 70);
+      expect(AppDimensions.appBarHeightForScrollOffset(200), 60);
+      expect(AppDimensions.appBarHeightForScrollOffset(800), 60);
+    });
+
     test('dimension values match expected constants', () {
       expect(AppDimensions.appBarHeight, 80.0);
       expect(AppDimensions.appBarHeightMobile, 60.0);
       expect(AppDimensions.appBarHeightTablet, 70.0);
+      expect(AppDimensions.appBarCollapseExtent, 200.0);
       expect(AppDimensions.sectionPaddingDesktop, 160.0);
       expect(AppDimensions.sectionPaddingTablet, 80.0);
       expect(AppDimensions.sectionPaddingMobile, 24.0);

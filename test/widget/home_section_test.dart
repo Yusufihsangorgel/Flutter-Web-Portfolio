@@ -19,8 +19,10 @@ final class _HomeLanguageRepository implements ILanguageRepository {
   @override
   Future<Map<String, dynamic>> getTranslations(String languageCode) async => {
     'home_section': {
-      'view_work': 'View selected work',
+      'view_work': 'Explore my work',
       'view_github': 'GitHub',
+      'email': 'Email me',
+      'currently': 'Currently',
       'based_in': 'Based in',
       'working_since': 'Working since',
       'focus': 'Focus',
@@ -63,20 +65,23 @@ void main() {
       },
     );
     return RepositoryProvider.value(
-      value: portfolio,
-      child: MultiBlocProvider(
-        providers: [
-          BlocProvider.value(value: language),
-          BlocProvider.value(value: scroll),
-        ],
-        child: const MaterialApp(
-          home: Scaffold(body: SingleChildScrollView(child: HomeSection())),
+      value: loadNarrativeFixture(activeSections: portfolio.activeSections),
+      child: RepositoryProvider.value(
+        value: portfolio,
+        child: MultiBlocProvider(
+          providers: [
+            BlocProvider.value(value: language),
+            BlocProvider.value(value: scroll),
+          ],
+          child: const MaterialApp(
+            home: Scaffold(body: SingleChildScrollView(child: HomeSection())),
+          ),
         ),
       ),
     );
   }
 
-  testWidgets('shows only actions backed by configured portfolio data', (
+  testWidgets('keeps the narrative action when project records are absent', (
     tester,
   ) async {
     await tester.pumpWidget(
@@ -84,20 +89,23 @@ void main() {
     );
     await tester.pump(const Duration(milliseconds: 1));
 
-    expect(find.text('View selected work'), findsNothing);
+    expect(find.text('Explore my work'), findsOneWidget);
     expect(find.text('GitHub'), findsOneWidget);
+    expect(find.text('Uzman Adres / FugaSoft'), findsOneWidget);
+    expect(find.text('JuniusTech'), findsOneWidget);
+    expect(find.text('Email me'), findsOneWidget);
     expect(tester.takeException(), isNull);
     await tester.pumpWidget(const SizedBox.shrink());
     await tester.pump();
   });
 
-  testWidgets('does not render no-op hero actions', (tester) async {
+  testWidgets('removes only unavailable external hero actions', (tester) async {
     await tester.pumpWidget(
       buildSubject(includeWork: false, includeGithub: false),
     );
     await tester.pump(const Duration(milliseconds: 1));
 
-    expect(find.text('View selected work'), findsNothing);
+    expect(find.text('Explore my work'), findsOneWidget);
     expect(find.text('GitHub'), findsNothing);
     expect(tester.takeException(), isNull);
     await tester.pumpWidget(const SizedBox.shrink());

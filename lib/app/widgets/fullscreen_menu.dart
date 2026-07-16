@@ -1,7 +1,9 @@
+import 'dart:async';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_web_portfolio/app/core/theme/app_fonts.dart';
 
 import 'package:flutter_web_portfolio/app/controllers/scroll_controller.dart';
@@ -11,6 +13,8 @@ import 'package:flutter_web_portfolio/app/core/constants/breakpoints.dart';
 import 'package:flutter_web_portfolio/app/core/constants/cinematic_curves.dart';
 import 'package:flutter_web_portfolio/app/widgets/cinematic_focusable.dart';
 import 'package:flutter_web_portfolio/app/utils/motion_preference.dart';
+import 'package:flutter_web_portfolio/app/utils/web_url_strategy.dart'
+    as url_strategy;
 
 /// Full-screen navigation for compact viewports.
 ///
@@ -23,19 +27,24 @@ class FullscreenMenu extends StatefulWidget {
 
   static void show(BuildContext context) {
     final reduceMotion = prefersReducedMotion(context);
-    Navigator.of(context).push(
-      PageRouteBuilder(
-        opaque: false,
-        barrierDismissible: true,
-        barrierColor: Colors.transparent,
-        transitionDuration: reduceMotion
-            ? Duration.zero
-            : const Duration(milliseconds: 420),
-        reverseTransitionDuration: reduceMotion
-            ? Duration.zero
-            : const Duration(milliseconds: 280),
-        pageBuilder: (_, _, _) => const FullscreenMenu(),
-      ),
+    url_strategy.setTransientOverlayOpen(true);
+    unawaited(
+      Navigator.of(context)
+          .push(
+            PageRouteBuilder<void>(
+              opaque: false,
+              barrierDismissible: true,
+              barrierColor: Colors.transparent,
+              transitionDuration: reduceMotion
+                  ? Duration.zero
+                  : const Duration(milliseconds: 420),
+              reverseTransitionDuration: reduceMotion
+                  ? Duration.zero
+                  : const Duration(milliseconds: 280),
+              pageBuilder: (_, _, _) => const FullscreenMenu(),
+            ),
+          )
+          .whenComplete(() => url_strategy.setTransientOverlayOpen(false)),
     );
   }
 
@@ -51,6 +60,15 @@ class _FullscreenMenuState extends State<FullscreenMenu>
 
   int _hoveredIndex = -1;
   bool _reduceMotion = false;
+
+  KeyEventResult _handleKeyEvent(FocusNode _, KeyEvent event) {
+    if (event is KeyDownEvent &&
+        event.logicalKey == LogicalKeyboardKey.escape) {
+      _close();
+      return KeyEventResult.handled;
+    }
+    return KeyEventResult.ignored;
+  }
 
   List<_MenuItem> _buildMenuItems() {
     // Drop 'home' — the logo already scrolls to top, so listing it here
@@ -113,6 +131,7 @@ class _FullscreenMenuState extends State<FullscreenMenu>
   }
 
   void _close() {
+    url_strategy.setTransientOverlayOpen(false);
     if (_reduceMotion) {
       Navigator.of(context).pop();
       return;
@@ -140,97 +159,106 @@ class _FullscreenMenuState extends State<FullscreenMenu>
     final isMobile = screenWidth < Breakpoints.tablet;
     final menuItems = _buildMenuItems();
 
-    return AnimatedBuilder(
-      animation: _masterController,
-      builder: (context, _) => Stack(
-        children: [
-          Positioned.fill(
-            child: GestureDetector(
-              excludeFromSemantics: true,
-              onTap: _close,
-              child: BackdropFilter(
-                filter: ImageFilter.blur(
-                  sigmaX: _reduceMotion ? 0 : _backdropBlur.value,
-                  sigmaY: _reduceMotion ? 0 : _backdropBlur.value,
-                ),
-                child: Container(
-                  color: AppColors.backgroundDark.withValues(
-                    alpha: 0.94 * _overlayOpacity.value,
+    return Focus(
+      autofocus: true,
+      onKeyEvent: _handleKeyEvent,
+      child: AnimatedBuilder(
+        animation: _masterController,
+        builder: (context, _) => Stack(
+          children: [
+            Positioned.fill(
+              child: GestureDetector(
+                excludeFromSemantics: true,
+                onTap: _close,
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(
+                    sigmaX: _reduceMotion ? 0 : _backdropBlur.value,
+                    sigmaY: _reduceMotion ? 0 : _backdropBlur.value,
+                  ),
+                  child: Container(
+                    color: AppColors.cobalt.withValues(
+                      alpha: 0.94 * _overlayOpacity.value,
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
 
-          Positioned(
-            top: 24,
-            right: 24,
-            child: Opacity(
-              opacity: _overlayOpacity.value,
-              child: IconButton(
-                onPressed: _close,
-                tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
-                icon: const Icon(Icons.close, color: Colors.white, size: 32),
+            Positioned(
+              top: 24,
+              right: 24,
+              child: Opacity(
+                opacity: _overlayOpacity.value,
+                child: IconButton(
+                  onPressed: _close,
+                  tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
+                  icon: const Icon(Icons.close, color: Colors.white, size: 32),
+                ),
               ),
             ),
-          ),
 
-          // Menu items
-          Center(
-            child: ConstrainedBox(
-              constraints: BoxConstraints(
-                maxWidth: isMobile ? screenWidth * 0.9 : 700,
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: List.generate(menuItems.length, (index) {
-                  final item = menuItems[index];
-                  final itemDelay = 0.15 + (index * 0.06);
-                  final itemEnd = (itemDelay + 0.25).clamp(0.0, 1.0);
+            // Menu items
+            Center(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  maxWidth: isMobile ? screenWidth * 0.9 : 700,
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: List.generate(menuItems.length, (index) {
+                    final item = menuItems[index];
+                    final itemDelay = 0.15 + (index * 0.06);
+                    final itemEnd = (itemDelay + 0.25).clamp(0.0, 1.0);
 
-                  final itemAnimation = Tween<double>(begin: 0, end: 1).animate(
-                    CurvedAnimation(
-                      parent: _masterController,
-                      curve: Interval(
-                        itemDelay,
-                        itemEnd,
-                        curve: CinematicCurves.dramaticEntrance,
+                    final itemAnimation = Tween<double>(begin: 0, end: 1)
+                        .animate(
+                          CurvedAnimation(
+                            parent: _masterController,
+                            curve: Interval(
+                              itemDelay,
+                              itemEnd,
+                              curve: CinematicCurves.dramaticEntrance,
+                            ),
+                          ),
+                        );
+
+                    final label = languageController.getText(
+                      'nav.${item.sectionId}',
+                      defaultValue:
+                          item.sectionId[0].toUpperCase() +
+                          item.sectionId.substring(1),
+                    );
+
+                    return Opacity(
+                      opacity: itemAnimation.value,
+                      child: Transform.translate(
+                        offset: Offset(0, 14 * (1 - itemAnimation.value)),
+                        child: _MenuItemWidget(
+                          item: item,
+                          label: label,
+                          isSelected:
+                              context
+                                  .read<AppScrollController>()
+                                  .activeSection ==
+                              item.sectionId,
+                          isHovered: _hoveredIndex == index,
+                          isMobile: isMobile,
+                          onTap: () => _navigateToSection(item.sectionId),
+                          onHover: (hovered) {
+                            setState(
+                              () => _hoveredIndex = hovered ? index : -1,
+                            );
+                          },
+                        ),
                       ),
-                    ),
-                  );
-
-                  final label = languageController.getText(
-                    'nav.${item.sectionId}',
-                    defaultValue:
-                        item.sectionId[0].toUpperCase() +
-                        item.sectionId.substring(1),
-                  );
-
-                  return Opacity(
-                    opacity: itemAnimation.value,
-                    child: Transform.translate(
-                      offset: Offset(0, 14 * (1 - itemAnimation.value)),
-                      child: _MenuItemWidget(
-                        item: item,
-                        label: label,
-                        isSelected:
-                            context.read<AppScrollController>().activeSection ==
-                            item.sectionId,
-                        isHovered: _hoveredIndex == index,
-                        isMobile: isMobile,
-                        onTap: () => _navigateToSection(item.sectionId),
-                        onHover: (hovered) {
-                          setState(() => _hoveredIndex = hovered ? index : -1);
-                        },
-                      ),
-                    ),
-                  );
-                }),
+                    );
+                  }),
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -263,8 +291,8 @@ class _MenuItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const textColor = AppColors.textBright;
-    const accentColor = AppColors.accent;
+    const textColor = AppColors.white;
+    const accentColor = AppColors.acid;
     final fontSize = isMobile ? 28.0 : 48.0;
     final motionDuration = prefersReducedMotion(context)
         ? Duration.zero
@@ -295,9 +323,9 @@ class _MenuItemWidget extends StatelessWidget {
             // Number
             AnimatedDefaultTextStyle(
               duration: motionDuration,
-              style: AppFonts.instrumentSerif(
+              style: AppFonts.spaceGrotesk(
                 fontSize: isMobile ? 18 : 22,
-                fontStyle: FontStyle.italic,
+                fontWeight: FontWeight.w700,
                 color: isHovered
                     ? accentColor
                     : textColor.withValues(alpha: 0.4),

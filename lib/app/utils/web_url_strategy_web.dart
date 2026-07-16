@@ -19,14 +19,19 @@ String getUrlHash() {
   return hash;
 }
 
-/// Pushes a new browser history entry with the given hash.
-///
-/// If [hash] is empty or 'home', sets the URL to `#/` (root).
-/// Otherwise sets it to `#/<hash>` (e.g. `#/about`).
-void setUrlHash(String hash) {
+/// Pushes an explicit chapter navigation into browser history.
+void pushUrlHash(String hash) {
+  web.window.history.pushState(null, '', _urlForHash(hash));
+}
+
+/// Synchronises passive reading progress without creating a history entry.
+void replaceUrlHash(String hash) {
+  web.window.history.replaceState(null, '', _urlForHash(hash));
+}
+
+String _urlForHash(String hash) {
   final normalised = (hash.isEmpty || hash == 'home') ? '' : hash;
-  final url = normalised.isEmpty ? '#/' : '#/$normalised';
-  web.window.history.pushState(null, '', url);
+  return normalised.isEmpty ? '#/' : '#/$normalised';
 }
 
 /// Returns and clears the section captured immediately before a web reload.
@@ -43,6 +48,16 @@ void setHtmlLang(String languageCode) {
   web.document.documentElement
     ?..setAttribute('lang', languageCode)
     ..setAttribute('dir', languageCode == 'ar' ? 'rtl' : 'ltr');
+}
+
+/// Exposes transient Navigator overlays to the document-level history bridge.
+void setTransientOverlayOpen(bool open) {
+  final root = web.document.documentElement;
+  if (open) {
+    root?.setAttribute('data-portfolio-transient-overlay', 'true');
+  } else {
+    root?.removeAttribute('data-portfolio-transient-overlay');
+  }
 }
 
 /// Reloads the current document after an unrecoverable bootstrap failure.
@@ -64,11 +79,11 @@ bool reloadPageForLanguageChange({String? preserveSection}) {
 ///
 /// Returns a dispose function that removes the listener.
 void Function() onPopState(void Function(String hash) callback) {
-  void handler(web.PopStateEvent event) {
+  void handler(web.Event event) {
     callback(getUrlHash());
   }
 
   final jsHandler = handler.toJS;
-  web.window.addEventListener('popstate', jsHandler);
-  return () => web.window.removeEventListener('popstate', jsHandler);
+  web.window.addEventListener('portfolio-popstate', jsHandler);
+  return () => web.window.removeEventListener('portfolio-popstate', jsHandler);
 }

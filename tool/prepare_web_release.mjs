@@ -182,14 +182,13 @@ async function injectBootstrapShell() {
     translations.home_section?.view_work,
     'i18n.en.home_section.view_work',
   );
-  const viewGithub = requiredString(
-    translations.home_section?.view_github,
-    'i18n.en.home_section.view_github',
+  const email = requiredString(portfolio.profile?.email, 'profile.email');
+  const emailLabel = requiredString(
+    translations.home_section?.email,
+    'i18n.en.home_section.email',
   );
   const hasWork = Array.isArray(portfolio.systems) && portfolio.systems.length > 0;
-  const hasGithub =
-    Array.isArray(portfolio.profile?.links) &&
-    portfolio.profile.links.some((link) => link?.id === 'github');
+  const hasEmail = email.includes('@');
 
   const facts = [
     ['Based in', location],
@@ -208,8 +207,8 @@ async function injectBootstrapShell() {
     hasWork
       ? `            <span class="bootstrap-action bootstrap-action--primary">${escapeHtml(viewWork)}</span>`
       : '',
-    hasGithub
-      ? `            <span class="bootstrap-action">${escapeHtml(viewGithub)}</span>`
+    hasEmail
+      ? `            <span class="bootstrap-action">${escapeHtml(emailLabel)}</span>`
       : '',
   ]
     .filter(Boolean)

@@ -71,9 +71,9 @@ class _ExperienceEntry extends StatelessWidget {
           padding: EdgeInsets.symmetric(vertical: compact ? 36 : 48),
           decoration: BoxDecoration(
             border: Border(
-              top: const BorderSide(color: Color(0x3DE47A57)),
+              top: const BorderSide(color: Color(0x3D1E51FF)),
               bottom: isLast
-                  ? const BorderSide(color: Color(0x3DE47A57))
+                  ? const BorderSide(color: Color(0x3D1E51FF))
                   : BorderSide.none,
             ),
           ),
@@ -185,7 +185,7 @@ class _ExperienceContent extends StatelessWidget {
         constraints: const BoxConstraints(maxWidth: 740),
         padding: const EdgeInsets.only(top: 16),
         decoration: const BoxDecoration(
-          border: Border(top: BorderSide(color: Color(0x3DE47A57))),
+          border: Border(top: BorderSide(color: Color(0x3D1E51FF))),
         ),
         child: Text(
           experience.evidence.take(4).join('  /  '),

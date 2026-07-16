@@ -121,8 +121,8 @@ async function syncManifest(data) {
     'profile.display_name.navigation',
   );
   manifest.start_url = '.';
-  manifest.background_color = '#11100E';
-  manifest.theme_color = '#E47A57';
+  manifest.background_color = '#F2EEE5';
+  manifest.theme_color = '#1E51FF';
   manifest.description = data.site.description;
   const currentManifest = JSON.parse(current);
   if (
@@ -309,6 +309,7 @@ function renderStructuredData(data) {
           '@type': 'Person',
           name: data.profile.name,
           jobTitle: data.profile.role,
+          email: data.profile.email,
           address: data.profile.location,
           url: data.site.url,
           sameAs,

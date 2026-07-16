@@ -15,12 +15,15 @@
     "title": "Sobre mí",
     "practice_title": "Áreas en las que trabajo",
     "location": "Ubicación",
-    "experience": "Experiencia profesional desde"
+    "experience": "Experiencia profesional desde",
+    "email": "Correo electrónico"
   },
   "home_section": {
-    "view_work": "Ver proyectos",
+    "view_work": "Explorar mi trabajo",
     "inspect_runtime": "Sobre mí",
     "view_github": "GitHub",
+    "email": "Envíame un correo",
+    "currently": "Actualmente",
     "based_in": "Ubicación",
     "working_since": "Trabajando desde",
     "focus": "Enfoque"
@@ -32,7 +35,6 @@
   "projects_section": {
     "title": "Proyectos seleccionados",
     "subtitle": "Productos que lancé y herramientas que mantengo.",
-    "archive": "Más proyectos",
     "open_project": "Abrir proyecto",
     "challenge": "El problema",
     "approach": "El enfoque",

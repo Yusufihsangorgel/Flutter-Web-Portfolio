@@ -40,7 +40,7 @@ export default defineConfig({
       name: 'desktop',
       use: {
         ...devices['Desktop Chrome'],
-        colorScheme: 'dark',
+        colorScheme: 'light',
         locale: 'en-US',
         timezoneId: 'UTC',
         viewport: { width: 1440, height: 900 },
@@ -50,7 +50,7 @@ export default defineConfig({
       name: 'mobile',
       use: {
         ...devices['Pixel 7'],
-        colorScheme: 'dark',
+        colorScheme: 'light',
         locale: 'en-US',
         timezoneId: 'UTC',
       },
@@ -61,7 +61,7 @@ export default defineConfig({
       use: {
         ...devices['iPad Pro 11'],
         browserName: 'chromium',
-        colorScheme: 'dark',
+        colorScheme: 'light',
         locale: 'en-US',
         timezoneId: 'UTC',
       },

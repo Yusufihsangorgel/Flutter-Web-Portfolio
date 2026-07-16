@@ -4,7 +4,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
 import 'package:flutter_web_portfolio/app/controllers/scroll_controller.dart';
-import 'package:flutter_web_portfolio/app/controllers/scene_director.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_dimensions.dart';
 import 'package:flutter_web_portfolio/app/core/constants/durations.dart';
@@ -18,6 +17,7 @@ import 'package:flutter_web_portfolio/app/widgets/back_to_top_button.dart';
 import 'package:flutter_web_portfolio/app/widgets/command_palette.dart';
 import 'package:flutter_web_portfolio/app/widgets/custom_sliver_app_bar.dart';
 import 'package:flutter_web_portfolio/app/widgets/premium_footer.dart';
+import 'package:flutter_web_portfolio/app/widgets/narrative_chapter_handoff.dart';
 import 'package:flutter_web_portfolio/app/utils/motion_preference.dart';
 import 'package:flutter_web_portfolio/app/widgets/background/cinematic_background.dart';
 import 'package:flutter_web_portfolio/app/narrative/domain/narrative_document.dart';
@@ -47,9 +47,9 @@ class _HomeViewState extends State<HomeView> {
           !identical(scrollController, _scheduledScrollController)) {
         return;
       }
-      scrollController.refreshSectionGeometry();
-      context.read<SceneDirector>().recalculate();
-      scrollController.handleInitialDeepLink();
+      scrollController
+        ..refreshSectionGeometry()
+        ..handleInitialDeepLink();
     });
   }
 
@@ -156,17 +156,19 @@ class _HomeViewState extends State<HomeView> {
             // a whole. Every chapter therefore has measured geometry for
             // deep links and keyboard navigation without a giant cacheExtent.
             SliverToBoxAdapter(
-              child: Column(
-                children: [
-                  for (final chapter in narrative.chapters)
-                    _buildSection(
-                      scrollController.keyFor(chapter.id),
-                      _widgetFor(chapter.id),
-                      context,
-                      isHero: chapter.id.isHome,
-                    ),
-                  const PremiumFooter(),
-                ],
+              child: NotificationListener<SizeChangedLayoutNotification>(
+                onNotification: (_) {
+                  scrollController.markGeometryDirty();
+                  return false;
+                },
+                child: SizeChangedLayoutNotifier(
+                  child: Column(
+                    children: [
+                      ..._buildChapters(context, scrollController, narrative),
+                      const PremiumFooter(),
+                    ],
+                  ),
+                ),
               ),
             ),
           ],
@@ -177,18 +179,51 @@ class _HomeViewState extends State<HomeView> {
     ],
   );
 
-  EdgeInsets _sectionPadding(BuildContext context) {
+  List<Widget> _buildChapters(
+    BuildContext context,
+    AppScrollController scrollController,
+    NarrativeDocument narrative,
+  ) {
+    final chapters = <Widget>[];
+    for (var index = 0; index < narrative.chapters.length; index += 1) {
+      final chapter = narrative.chapters[index];
+      final isLast = index == narrative.chapters.length - 1;
+      chapters.add(
+        _buildSection(
+          scrollController.keyFor(chapter.id),
+          _widgetFor(chapter.id),
+          context,
+          isHero: chapter.id.isHome,
+          fullBleed: chapter.id == SectionId.projects,
+          isLast: isLast,
+        ),
+      );
+      if (!isLast) {
+        chapters.add(
+          NarrativeChapterHandoff(
+            from: chapter,
+            to: narrative.chapters[index + 1],
+            position: scrollController.narrativePosition,
+          ),
+        );
+      }
+    }
+    return chapters;
+  }
+
+  EdgeInsets _sectionPadding(BuildContext context, {required bool isLast}) {
     final width = MediaQuery.sizeOf(context).width;
     final horizontal = width > AppDimensions.maxContentWidth
         ? AppDimensions.sectionPaddingDesktop
-        : (width > Breakpoints.tablet
+        : (width >= Breakpoints.tablet
               ? AppDimensions.sectionPaddingTablet
               : AppDimensions.sectionPaddingMobile);
-    final vertical = width > Breakpoints.tablet ? 96.0 : 58.0;
+    final top = width >= Breakpoints.tablet ? 80.0 : 44.0;
+    final bottom = isLast ? (width >= Breakpoints.tablet ? 96.0 : 58.0) : 0.0;
     final right = width < Breakpoints.mobile
         ? horizontal + 44
         : (width < Breakpoints.tablet ? horizontal + 24 : horizontal);
-    return EdgeInsets.fromLTRB(horizontal, vertical, right, vertical);
+    return EdgeInsets.fromLTRB(horizontal, top, right, bottom);
   }
 
   Widget _buildSection(
@@ -196,9 +231,13 @@ class _HomeViewState extends State<HomeView> {
     Widget child,
     BuildContext context, {
     bool isHero = false,
+    bool fullBleed = false,
+    bool isLast = false,
   }) => Container(
     key: key,
-    padding: isHero ? EdgeInsets.zero : _sectionPadding(context),
+    padding: isHero || fullBleed
+        ? EdgeInsets.zero
+        : _sectionPadding(context, isLast: isLast),
     child: child,
   );
 

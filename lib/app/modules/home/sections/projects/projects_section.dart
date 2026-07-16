@@ -1,70 +1,96 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
+import 'package:flutter_web_portfolio/app/core/constants/app_dimensions.dart';
+import 'package:flutter_web_portfolio/app/core/constants/breakpoints.dart';
 import 'package:flutter_web_portfolio/app/core/theme/app_fonts.dart';
 import 'package:flutter_web_portfolio/app/domain/models/portfolio_document.dart';
 import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
+import 'package:flutter_web_portfolio/app/modules/home/sections/projects/widgets/project_atlas.dart';
 import 'package:flutter_web_portfolio/app/narrative/domain/narrative_document.dart';
-import 'package:flutter_web_portfolio/app/modules/home/sections/projects/widgets/editorial_project_chapter.dart';
-import 'package:flutter_web_portfolio/app/modules/home/sections/projects/widgets/project_archive.dart';
 import 'package:flutter_web_portfolio/app/widgets/numbered_section_heading.dart';
 import 'package:flutter_web_portfolio/app/widgets/scene_accent_builder.dart';
 
-/// Selected professional and independent work as a continuous editorial index.
-///
-/// Featured systems read as case-study chapters. Supporting systems remain a
-/// compact archive so the section never falls back to a card catalogue.
+/// Real products and public engineering work presented as one continuous
+/// full-width atlas. No card grid, accordion, or project-specific widget copy.
 final class ProjectsSection extends StatelessWidget {
   const ProjectsSection({super.key});
 
   @override
-  Widget build(
-    BuildContext context,
-  ) => BlocBuilder<LanguageCubit, LanguageState>(
-    builder: (context, _) {
-      final language = context.read<LanguageCubit>();
-      final portfolio = context.read<PortfolioDocument>();
-      final featured = portfolio.featuredSystems.toList(growable: false);
-      final supporting = portfolio.supportingSystems.toList(growable: false);
-      final labels = ProjectChapterLabels(
-        challenge: language.getText(
-          'projects_section.challenge',
-          defaultValue: 'The problem',
-        ),
-        approach: language.getText(
-          'projects_section.approach',
-          defaultValue: 'The approach',
-        ),
-        outcome: language.getText(
-          'projects_section.outcome',
-          defaultValue: 'The result',
-        ),
-        evidence: language.getText(
-          'projects_section.evidence',
-          defaultValue: 'Evidence',
-        ),
-        openProject: language.getText(
-          'projects_section.open_project',
-          defaultValue: 'Open project',
-        ),
-        openEvidence: language.getText(
-          'projects_section.open_evidence',
-          defaultValue: 'Open evidence',
-        ),
-      );
-      final archiveLabels = ProjectArchiveLabels(
-        scope: language.getText(
-          'projects_section.ownership',
-          defaultValue: 'What I owned',
-        ),
-        decision: language.getText(
-          'projects_section.decision',
-          defaultValue: 'Engineering focus',
-        ),
-        openEvidence: labels.openEvidence,
-      );
+  Widget build(BuildContext context) =>
+      BlocBuilder<LanguageCubit, LanguageState>(
+        builder: (context, _) {
+          final language = context.read<LanguageCubit>();
+          final portfolio = context.read<PortfolioDocument>();
+          final labels = ProjectAtlasLabels(
+            challenge: language.getText(
+              'projects_section.challenge',
+              defaultValue: 'The problem',
+            ),
+            approach: language.getText(
+              'projects_section.approach',
+              defaultValue: 'The approach',
+            ),
+            outcome: language.getText(
+              'projects_section.outcome',
+              defaultValue: 'The result',
+            ),
+            ownership: language.getText(
+              'projects_section.ownership',
+              defaultValue: 'What I owned',
+            ),
+            decision: language.getText(
+              'projects_section.decision',
+              defaultValue: 'Engineering focus',
+            ),
+            evidence: language.getText(
+              'projects_section.evidence',
+              defaultValue: 'Evidence',
+            ),
+            openProject: language.getText(
+              'projects_section.open_project',
+              defaultValue: 'Open project',
+            ),
+            openEvidence: language.getText(
+              'projects_section.open_evidence',
+              defaultValue: 'Open evidence',
+            ),
+          );
 
-      return ConstrainedBox(
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              _ProjectsIntroduction(language: language),
+              ProjectAtlas(systems: portfolio.systems, labels: labels),
+            ],
+          );
+        },
+      );
+}
+
+final class _ProjectsIntroduction extends StatelessWidget {
+  const _ProjectsIntroduction({required this.language});
+
+  final LanguageCubit language;
+
+  @override
+  Widget build(BuildContext context) {
+    final width = MediaQuery.sizeOf(context).width;
+    final tablet = width >= Breakpoints.tablet;
+    final horizontal = width > AppDimensions.maxContentWidth
+        ? AppDimensions.sectionPaddingDesktop
+        : tablet
+        ? AppDimensions.sectionPaddingTablet
+        : AppDimensions.sectionPaddingMobile;
+
+    return Padding(
+      padding: EdgeInsets.fromLTRB(
+        horizontal,
+        tablet ? 80 : 44,
+        horizontal,
+        tablet ? 72 : 48,
+      ),
+      child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 1160),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -83,61 +109,25 @@ final class ProjectsSection extends StatelessWidget {
             ),
             const SizedBox(height: 26),
             ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 720),
+              constraints: const BoxConstraints(maxWidth: 760),
               child: Text(
                 language.getText(
                   'projects_section.subtitle',
                   defaultValue:
                       'Products I shipped and tools I continue to maintain.',
                 ),
-                style: AppFonts.inter(
-                  fontSize: 17,
-                  color: AppColors.textPrimary,
-                  height: 1.65,
+                style: AppFonts.spaceGrotesk(
+                  fontSize: tablet ? 26 : 20,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.textBright,
+                  height: 1.35,
+                  letterSpacing: -0.45,
                 ),
               ),
             ),
-            const SizedBox(height: 60),
-            for (var index = 0; index < featured.length; index++)
-              EditorialProjectChapter(
-                key: ValueKey('project-chapter-${featured[index].id}'),
-                system: featured[index],
-                index: index,
-                labels: labels,
-              ),
-            if (supporting.isNotEmpty) ...[
-              const SizedBox(height: 108),
-              Builder(
-                builder: (context) {
-                  final label = language.getText(
-                    'projects_section.archive',
-                    defaultValue: 'More work',
-                  );
-                  return Semantics(
-                    header: true,
-                    headingLevel: 3,
-                    label: label,
-                    excludeSemantics: true,
-                    child: ExcludeSemantics(
-                      child: Text(
-                        label,
-                        style: AppFonts.spaceGrotesk(
-                          fontSize: 26,
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.textBright,
-                          letterSpacing: -0.55,
-                        ),
-                      ),
-                    ),
-                  );
-                },
-              ),
-              const SizedBox(height: 22),
-              ProjectArchive(systems: supporting, labels: archiveLabels),
-            ],
           ],
         ),
-      );
-    },
-  );
+      ),
+    );
+  }
 }

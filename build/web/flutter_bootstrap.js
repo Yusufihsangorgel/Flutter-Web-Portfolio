@@ -33,7 +33,7 @@ addEventListener("message", eventListener);
 if (!window._flutter) {
   window._flutter = {};
 }
-_flutter.buildConfig = {"engineRevision":"83675ed27633283e7fc296c8bca22e841224c096","builds":[{"compileTarget":"dart2wasm","renderer":"skwasm","mainWasmPath":"main.dart.wasm?v=8dc3eb100c2238ac","jsSupportRuntimePath":"main.dart.mjs?v=8dc3eb100c2238ac"},{"compileTarget":"dart2js","renderer":"canvaskit","mainJsPath":"main.dart.js?v=8dc3eb100c2238ac"}],"useLocalCanvasKit":true};
+_flutter.buildConfig = {"engineRevision":"83675ed27633283e7fc296c8bca22e841224c096","builds":[{"compileTarget":"dart2wasm","renderer":"skwasm","mainWasmPath":"main.dart.wasm?v=13a4e353fdae1d9e","jsSupportRuntimePath":"main.dart.mjs?v=13a4e353fdae1d9e"},{"compileTarget":"dart2js","renderer":"canvaskit","mainJsPath":"main.dart.js?v=13a4e353fdae1d9e"}],"useLocalCanvasKit":true};
 
 
 const markRuntime = (name) => window.performance?.mark(name);
@@ -75,7 +75,7 @@ const removeBootstrapSurface = () => {
 
 // Flutter dispatches its first-frame event while the browser is still
 // compositing that frame. Keeping the matching HTML surface for two browser
-// frames prevents a one-frame dark flash on cold GPU/Wasm starts.
+// frames prevents a one-frame blank flash on cold GPU/Wasm starts.
 const revealFlutterSurface = () => {
   if (revealStarted) return;
   revealStarted = true;

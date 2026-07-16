@@ -15,12 +15,15 @@
     "title": "मेरे बारे में",
     "practice_title": "मेरे कार्य क्षेत्र",
     "location": "स्थान",
-    "experience": "पेशेवर कार्य की शुरुआत"
+    "experience": "पेशेवर कार्य की शुरुआत",
+    "email": "ईमेल"
   },
   "home_section": {
-    "view_work": "प्रोजेक्ट देखें",
+    "view_work": "मेरा काम देखें",
     "inspect_runtime": "मेरे बारे में",
     "view_github": "GitHub",
+    "email": "ईमेल करें",
+    "currently": "वर्तमान में",
     "based_in": "स्थान",
     "working_since": "काम की शुरुआत",
     "focus": "फ़ोकस"
@@ -32,7 +35,6 @@
   "projects_section": {
     "title": "चुने हुए काम",
     "subtitle": "मेरे जारी किए हुए उत्पाद और वे टूल जिनका मैं रखरखाव करता हूँ।",
-    "archive": "और काम",
     "open_project": "प्रोजेक्ट खोलें",
     "challenge": "समस्या",
     "approach": "दृष्टिकोण",

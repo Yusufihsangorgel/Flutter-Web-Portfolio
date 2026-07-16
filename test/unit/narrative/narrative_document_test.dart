@@ -16,15 +16,18 @@ void main() {
       expect(document.schemaVersion, 1);
       expect(document.sectionIds.map((section) => section.value), [
         'home',
-        'about',
         'experience',
         'proof',
         'projects',
+        'about',
       ]);
-      expect(
-        document.chapters.map((chapter) => chapter.motif),
-        NarrativeMotif.values,
-      );
+      expect(document.chapters.map((chapter) => chapter.motif), const [
+        NarrativeMotif.origin,
+        NarrativeMotif.timeline,
+        NarrativeMotif.branches,
+        NarrativeMotif.bracket,
+        NarrativeMotif.thread,
+      ]);
     });
 
     test('presentation data contains no personal or project copy', () {
@@ -48,17 +51,17 @@ void main() {
 
       expect(document.sectionIds.map((section) => section.value), [
         'home',
-        'about',
         'proof',
         'projects',
+        'about',
       ]);
       expect(
         document.chapterFor(SectionId.proof).motif,
         NarrativeMotif.branches,
       );
-      expect(document.sectionNumber(SectionId.about), '01');
-      expect(document.sectionNumber(SectionId.proof), '02');
-      expect(document.sectionNumber(SectionId.projects), '03');
+      expect(document.sectionNumber(SectionId.proof), '01');
+      expect(document.sectionNumber(SectionId.projects), '02');
+      expect(document.sectionNumber(SectionId.about), '03');
       expect(
         () => document.sectionNumber(SectionId.experience),
         throwsArgumentError,

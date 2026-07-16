@@ -4,6 +4,7 @@ import { readFileSync } from 'node:fs';
 const portfolio = JSON.parse(
   readFileSync('assets/content/portfolio.json', 'utf8'),
 );
+const english = JSON.parse(readFileSync('assets/i18n/en.json', 'utf8'));
 
 async function settleCompositor(page: Page, frameCount = 3) {
   await page.evaluate(
@@ -58,7 +59,7 @@ async function waitForHeadingInViewport(page: Page, name: string) {
 
 async function openStaticPortfolio(page: Page) {
   await page.emulateMedia({
-    colorScheme: 'dark',
+    colorScheme: 'light',
     reducedMotion: 'reduce',
   });
   await page.goto('/', { waitUntil: 'domcontentloaded' });
@@ -113,6 +114,38 @@ async function scrollToHeading(page: Page, name: string) {
   await expect(heading).toBeVisible();
 }
 
+async function scrollToChapterBoundary(page: Page, name: string) {
+  const heading = page.getByRole('heading', { name, exact: true });
+  for (let attempt = 0; attempt < 180; attempt += 1) {
+    if ((await heading.count()) === 0) {
+      await page.mouse.wheel(0, 900);
+      await settleCompositor(page, 2);
+      continue;
+    }
+    const [box, viewportHeight] = await Promise.all([
+      heading.boundingBox(),
+      page.evaluate(() => window.innerHeight),
+    ]);
+    if (box) {
+      const targetY = Math.round(viewportHeight * 0.7);
+      const delta = box.y - targetY;
+      if (Math.abs(delta) <= 1) {
+        await page.evaluate(() => document.fonts.ready);
+        await settleCompositor(page, 8);
+        await page.waitForTimeout(500);
+        await settleCompositor(page, 4);
+        const settledBox = await heading.boundingBox();
+        if (settledBox && Math.abs(settledBox.y - targetY) <= 1) return;
+      }
+      await page.mouse.wheel(0, Math.max(-640, Math.min(640, delta)));
+    } else {
+      await page.mouse.wheel(0, 500);
+    }
+    await settleCompositor(page, 2);
+  }
+  throw new Error(`Could not position the ${name} chapter boundary.`);
+}
+
 async function scrollToText(page: Page, text: string) {
   const target = page.getByText(text).first();
   for (let attempt = 0; attempt < 80; attempt += 1) {
@@ -136,7 +169,7 @@ test('keeps the first meaningful paint visually aligned with the portfolio', asy
   page,
 }) => {
   await page.emulateMedia({
-    colorScheme: 'dark',
+    colorScheme: 'light',
     reducedMotion: 'reduce',
   });
 
@@ -158,6 +191,17 @@ test('preserves the editorial sequence across responsive viewports', async ({
   page,
 }) => {
   await openStaticPortfolio(page);
+  await expect(
+    page.getByRole('button', {
+      name: english.home_section.view_work,
+      exact: true,
+    }),
+  ).toBeVisible();
+  if ((page.viewportSize()?.width ?? 0) >= 900) {
+    await expect(
+      page.getByText(`${portfolio.profile.since} →`, { exact: true }).first(),
+    ).toBeVisible();
+  }
   await expect(page).toHaveScreenshot('hero.png');
 
   await openChapter(page, 'Go to Open Source', /#\/proof$/, 'Open Source');
@@ -171,18 +215,30 @@ test('preserves the editorial sequence across responsive viewports', async ({
   );
   await expect(page).toHaveScreenshot('systems.png');
 
-  await scrollToHeading(page, 'More work');
+  const firstSupporting = portfolio.systems.find(
+    (system) => !system.featured,
+  );
+  if (!firstSupporting) throw new Error('Expected supporting work.');
+  await scrollToHeading(page, firstSupporting.name);
   await expect(page).toHaveScreenshot('archive.png');
 });
 
-test('renders a real supporting-work artifact in the ledger', async (
+test('connects chapters during real document scrolling', async ({ page }) => {
+  await openStaticPortfolio(page);
+
+  await scrollToChapterBoundary(page, 'Experience');
+  await expect(page).toHaveScreenshot('boundary-experience.png');
+
+  await scrollToChapterBoundary(page, 'About');
+  await expect(page).toHaveScreenshot('boundary-about.png');
+});
+
+test('renders a real supporting-work artifact in the atlas', async (
   { page },
   testInfo,
 ) => {
   await openStaticPortfolio(page);
   await openChapter(page, 'Go to Work', /#\/projects$/, 'Selected Work');
-  await scrollToHeading(page, 'More work');
-
   const supporting = portfolio.systems.filter((system) => !system.featured);
   const mobile = testInfo.project.name === 'mobile';
   const selected = mobile
@@ -192,15 +248,13 @@ test('renders a real supporting-work artifact in the ledger', async (
       );
   if (!selected) throw new Error('Expected a landscape supporting artifact.');
   const selector = await scrollToText(page, selected.name);
-  if (!mobile) await selector.click();
-
   const artifact = page.getByRole('img', { name: selected.artifact.alt });
   await expect(artifact).toBeAttached();
-  for (let attempt = 0; attempt < 12; attempt += 1) {
+  for (let attempt = 0; attempt < 24; attempt += 1) {
     const box = await selector.boundingBox();
-    if (box && Math.abs(box.y - 120) <= 20) break;
+    if (box && Math.abs(box.y - 120) <= 1) break;
     await page.mouse.wheel(0, box ? box.y - 120 : 360);
-    await settleCompositor(page, 2);
+    await settleCompositor(page, 3);
   }
   await settleCompositor(page, 8);
   await page.waitForTimeout(500);

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:flutter_web_portfolio/app/controllers/scroll_controller.dart';
 import 'package:flutter_web_portfolio/app/core/constants/scene_configs.dart';
+import 'package:flutter_web_portfolio/app/narrative/application/narrative_position.dart';
 import 'package:flutter_web_portfolio/app/narrative/domain/narrative_document.dart';
 
 @immutable
@@ -15,6 +15,7 @@ final class SceneState {
     required this.blendedConfig,
     required this.currentMotif,
     required this.nextMotif,
+    required this.activeMotif,
   });
 
   const SceneState.initial()
@@ -23,7 +24,8 @@ final class SceneState {
       blendFactor = 0,
       blendedConfig = SceneConfigs.hero,
       currentMotif = NarrativeMotif.origin,
-      nextMotif = NarrativeMotif.origin;
+      nextMotif = NarrativeMotif.origin,
+      activeMotif = NarrativeMotif.origin;
 
   final int currentSceneIndex;
   final double globalProgress;
@@ -31,11 +33,12 @@ final class SceneState {
   final SceneConfig blendedConfig;
   final NarrativeMotif currentMotif;
   final NarrativeMotif nextMotif;
+  final NarrativeMotif activeMotif;
 
   /// Stable chapter accent for content widgets.
   ///
   /// The painter consumes [blendedConfig] continuously, while headings and
-  /// cards change accent only when the active chapter changes. This prevents
+  /// content changes accent only when the active chapter changes. This prevents
   /// scroll-frequency content rebuilds during palette crossfades.
   Color get currentAccent => SceneConfigs.scenes[currentSceneIndex].accent;
 
@@ -48,7 +51,8 @@ final class SceneState {
           blendFactor == other.blendFactor &&
           blendedConfig == other.blendedConfig &&
           currentMotif == other.currentMotif &&
-          nextMotif == other.nextMotif;
+          nextMotif == other.nextMotif &&
+          activeMotif == other.activeMotif;
 
   @override
   int get hashCode => Object.hash(
@@ -58,6 +62,7 @@ final class SceneState {
     blendedConfig,
     currentMotif,
     nextMotif,
+    activeMotif,
   );
 }
 
@@ -76,111 +81,57 @@ final class SceneDirector extends Cubit<SceneState> {
         'Every narrative motif must have one scene configuration.',
       );
     }
-    _scrollController.scrollController.addListener(_onScroll);
+    _scrollController.narrativePosition.addListener(_onPosition);
+    _emitCurrentState();
   }
 
   final AppScrollController _scrollController;
   final NarrativeDocument _narrative;
-  bool _frameScheduled = false;
-
-  void _onScroll() {
-    if (_frameScheduled) return;
-    _frameScheduled = true;
-    SchedulerBinding.instance.scheduleFrameCallback((_) {
-      _frameScheduled = false;
-      if (isClosed) return;
-      _emitCurrentState();
-    });
-  }
+  void _onPosition() => _emitCurrentState();
 
   void _emitCurrentState() {
-    final scroll = _scrollController.scrollController;
-    if (!scroll.hasClients) return;
-
     emit(
       calculateState(
-        offset: scroll.offset,
-        viewportDimension: scroll.position.viewportDimension,
-        maxExtent: scroll.position.maxScrollExtent,
-        sections: _scrollController.sectionGeometries,
+        position: _scrollController.narrativePosition.value,
         narrative: _narrative,
       ),
     );
   }
 
-  /// Calculates scene state from measured chapter centres.
-  ///
-  /// The viewport focal point travels between adjacent chapter centres, and
-  /// the palette follows that real journey. Uneven content no longer makes a
-  /// scene change early or linger after its chapter has left the viewport.
+  /// Maps the shared reading position to one boundary-local scene blend.
   @visibleForTesting
   static SceneState calculateState({
-    required double offset,
-    required double viewportDimension,
-    required double maxExtent,
-    required List<SectionGeometry> sections,
+    required NarrativePosition position,
     required NarrativeDocument narrative,
   }) {
-    if (sections.isEmpty) return const SceneState.initial();
+    final currentChapter = narrative.chapterFor(
+      SectionId(position.currentSectionId),
+    );
+    final nextChapter = narrative.chapterFor(SectionId(position.nextSectionId));
+    final activeChapter = narrative.chapterFor(
+      SectionId(position.activeSectionId),
+    );
+    final currentSceneIndex = _sceneIndexFor(currentChapter);
+    final nextSceneIndex = _sceneIndexFor(nextChapter);
+    final activeSceneIndex = _sceneIndexFor(activeChapter);
+    final transition = currentChapter.id == nextChapter.id
+        ? 0.0
+        : _smoothStep(position.boundaryProgress);
 
-    final safeMaxExtent = maxExtent <= 0 ? 1.0 : maxExtent;
-    final globalProgress = (offset / safeMaxExtent).clamp(0.0, 1.0);
-    final focalPoint = offset + viewportDimension * 0.44;
-
-    if (sections.length == 1 || focalPoint <= sections.first.center) {
-      final chapter = narrative.chapterFor(SectionId(sections.first.id));
-      final sceneIndex = _sceneIndexFor(chapter);
-      return SceneState(
-        currentSceneIndex: sceneIndex,
-        globalProgress: globalProgress,
-        blendFactor: 0,
-        blendedConfig: SceneConfigs.scenes[sceneIndex],
-        currentMotif: chapter.motif,
-        nextMotif: chapter.motif,
-      );
-    }
-
-    for (var index = 0; index < sections.length - 1; index++) {
-      final currentSection = sections[index];
-      final nextSection = sections[index + 1];
-      if (focalPoint >= nextSection.center) continue;
-
-      final distance = nextSection.center - currentSection.center;
-      final progress = distance <= 0
-          ? 1.0
-          : ((focalPoint - currentSection.center) / distance).clamp(0.0, 1.0);
-      final easedProgress = _smoothStep(progress);
-      final currentChapter = narrative.chapterFor(SectionId(currentSection.id));
-      final nextChapter = narrative.chapterFor(SectionId(nextSection.id));
-      final sceneIndex = _sceneIndexFor(currentChapter);
-      final nextSceneIndex = _sceneIndexFor(nextChapter);
-
-      return SceneState(
-        currentSceneIndex: sceneIndex,
-        globalProgress: globalProgress,
-        blendFactor: easedProgress,
-        blendedConfig: easedProgress == 0
-            ? SceneConfigs.scenes[sceneIndex]
-            : SceneConfig.lerp(
-                SceneConfigs.scenes[sceneIndex],
-                SceneConfigs.scenes[nextSceneIndex],
-                easedProgress,
-              ),
-        currentMotif: currentChapter.motif,
-        nextMotif: nextChapter.motif,
-      );
-    }
-
-    final lastSection = sections.last;
-    final lastChapter = narrative.chapterFor(SectionId(lastSection.id));
-    final lastSceneIndex = _sceneIndexFor(lastChapter);
     return SceneState(
-      currentSceneIndex: lastSceneIndex,
-      globalProgress: globalProgress,
-      blendFactor: 0,
-      blendedConfig: SceneConfigs.scenes[lastSceneIndex],
-      currentMotif: lastChapter.motif,
-      nextMotif: lastChapter.motif,
+      currentSceneIndex: activeSceneIndex,
+      globalProgress: position.documentProgress,
+      blendFactor: transition,
+      blendedConfig: transition == 0
+          ? SceneConfigs.scenes[currentSceneIndex]
+          : SceneConfig.lerp(
+              SceneConfigs.scenes[currentSceneIndex],
+              SceneConfigs.scenes[nextSceneIndex],
+              transition,
+            ),
+      currentMotif: currentChapter.motif,
+      nextMotif: nextChapter.motif,
+      activeMotif: activeChapter.motif,
     );
   }
 
@@ -195,11 +146,11 @@ final class SceneDirector extends Cubit<SceneState> {
 
   static double _smoothStep(double value) => value * value * (3 - 2 * value);
 
-  void recalculate() => _onScroll();
+  void recalculate() => _emitCurrentState();
 
   @override
   Future<void> close() {
-    _scrollController.scrollController.removeListener(_onScroll);
+    _scrollController.narrativePosition.removeListener(_onPosition);
     return super.close();
   }
 }

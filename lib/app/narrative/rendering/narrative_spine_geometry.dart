@@ -4,6 +4,9 @@ import 'dart:ui';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_web_portfolio/app/narrative/domain/narrative_document.dart';
 
+/// The entry or exit edge of one normalized narrative motif.
+enum NarrativeSpineEdge { entry, exit }
+
 /// Scroll snapshot consumed by the continuous editorial trace.
 @immutable
 final class NarrativeSpineCue {
@@ -361,6 +364,15 @@ abstract final class NarrativeSpineGeometry {
   static final List<_NormalizedSpineShape> _motifSamples = List.unmodifiable(
     NarrativeMotif.values.map(_sampleMotif),
   );
+
+  /// Returns the canonical normalized endpoint used by every trace renderer.
+  ///
+  /// Foreground chapter handoffs use this API instead of maintaining a second
+  /// table of motif coordinates that could drift from the ambient spine.
+  static Offset normalizedAnchor(
+    NarrativeMotif motif,
+    NarrativeSpineEdge edge,
+  ) => _pointFor(motif, edge == NarrativeSpineEdge.entry ? 0 : 1);
 
   static NarrativeSpineShape resolve({
     required Size size,

@@ -22,7 +22,7 @@ final class PortfolioDocument {
 
   factory PortfolioDocument.fromJson(Map<String, dynamic> json) {
     final schemaVersion = _requiredInt(json, 'schema_version');
-    if (schemaVersion != 5) {
+    if (schemaVersion != 6) {
       throw FormatException(
         'Unsupported portfolio schema version: $schemaVersion',
       );
@@ -64,14 +64,17 @@ final class PortfolioDocument {
 
   List<String> get activeSections => <String>[
     'home',
-    'about',
     if (experience.isNotEmpty) 'experience',
     if (contributions.isNotEmpty) 'proof',
     if (systems.isNotEmpty) 'projects',
+    'about',
   ];
 
   Iterable<PortfolioContribution> get mergedContributions =>
       contributions.where((entry) => entry.status == ContributionStatus.merged);
+
+  Iterable<PortfolioExperience> get currentExperience =>
+      experience.where((entry) => entry.current);
 
   Iterable<PortfolioContribution> get contributionsUnderReview => contributions
       .where((entry) => entry.status == ContributionStatus.underReview);
@@ -226,6 +229,7 @@ final class PortfolioProfile {
     required this.displayName,
     required this.role,
     required this.location,
+    required this.email,
     required this.since,
     required this.headline,
     required this.summary,
@@ -243,6 +247,7 @@ final class PortfolioProfile {
         ),
         role: _requiredString(json, 'role'),
         location: _requiredString(json, 'location'),
+        email: _requiredEmail(json, 'email'),
         since: _requiredString(json, 'since'),
         headline: _requiredString(json, 'headline'),
         summary: _requiredString(json, 'summary'),
@@ -255,6 +260,7 @@ final class PortfolioProfile {
   final PortfolioDisplayName displayName;
   final String role;
   final String location;
+  final String email;
   final String since;
   final String headline;
   final String summary;
@@ -314,6 +320,7 @@ final class PortfolioExperience {
     required this.role,
     required this.domain,
     required this.period,
+    required this.current,
     required this.summary,
     required List<String> evidence,
   }) : evidence = List.unmodifiable(evidence);
@@ -325,6 +332,7 @@ final class PortfolioExperience {
         role: _requiredString(json, 'role'),
         domain: _requiredString(json, 'domain'),
         period: _requiredString(json, 'period'),
+        current: _requiredBool(json, 'current'),
         summary: _requiredString(json, 'summary'),
         evidence: _strings(json, 'evidence'),
       );
@@ -334,6 +342,7 @@ final class PortfolioExperience {
   final String role;
   final String domain;
   final String period;
+  final bool current;
   final String summary;
   final List<String> evidence;
 }
@@ -420,6 +429,7 @@ sealed class PortfolioSystem {
     required this.summary,
     required this.ownership,
     required this.decision,
+    required this.presentation,
     required List<PortfolioEvidence> evidence,
     required this.url,
     required List<String> technologies,
@@ -435,6 +445,9 @@ sealed class PortfolioSystem {
     final summary = _requiredString(json, 'summary');
     final ownership = _requiredString(json, 'ownership');
     final decision = _requiredString(json, 'decision');
+    final presentation = PortfolioSystemPresentation.fromJson(
+      _requiredObject(json, 'presentation'),
+    );
     final evidence = _objects(
       json,
       'evidence',
@@ -459,6 +472,7 @@ sealed class PortfolioSystem {
         summary: summary,
         ownership: ownership,
         decision: decision,
+        presentation: presentation,
         challenge: _requiredString(json, 'challenge'),
         approach: _requiredString(json, 'approach'),
         outcome: _requiredString(json, 'outcome'),
@@ -476,6 +490,7 @@ sealed class PortfolioSystem {
       summary: summary,
       ownership: ownership,
       decision: decision,
+      presentation: presentation,
       evidence: evidence,
       artifact: PortfolioSystemArtifact.fromJson(
         _requiredObject(json, 'artifact'),
@@ -492,6 +507,7 @@ sealed class PortfolioSystem {
   final String summary;
   final String ownership;
   final String decision;
+  final PortfolioSystemPresentation presentation;
   final List<PortfolioEvidence> evidence;
   final Uri url;
   final List<String> technologies;
@@ -506,6 +522,7 @@ final class PortfolioFeaturedSystem extends PortfolioSystem {
     required super.summary,
     required super.ownership,
     required super.decision,
+    required super.presentation,
     required this.challenge,
     required this.approach,
     required this.outcome,
@@ -528,6 +545,7 @@ final class PortfolioSupportingSystem extends PortfolioSystem {
     required super.summary,
     required super.ownership,
     required super.decision,
+    required super.presentation,
     required super.evidence,
     required this.artifact,
     required super.url,
@@ -535,6 +553,68 @@ final class PortfolioSupportingSystem extends PortfolioSystem {
   });
 
   final PortfolioSystemArtifact artifact;
+}
+
+/// Content-authored visual direction for a project chapter.
+///
+/// The renderer understands a small reusable visual grammar; project names,
+/// brand colours, labels, and composition choices remain in JSON.
+final class PortfolioSystemPresentation {
+  PortfolioSystemPresentation({
+    required this.background,
+    required this.foreground,
+    required this.accent,
+    required this.visual,
+  });
+
+  factory PortfolioSystemPresentation.fromJson(Map<String, dynamic> json) =>
+      PortfolioSystemPresentation(
+        background: _requiredHexColor(json, 'background'),
+        foreground: _requiredHexColor(json, 'foreground'),
+        accent: _requiredHexColor(json, 'accent'),
+        visual: PortfolioSystemVisual.fromJson(_requiredObject(json, 'visual')),
+      );
+
+  final String background;
+  final String foreground;
+  final String accent;
+  final PortfolioSystemVisual visual;
+}
+
+final class PortfolioSystemVisual {
+  PortfolioSystemVisual({required this.kind, required List<String> labels})
+    : labels = List.unmodifiable(labels) {
+    if (kind != PortfolioSystemVisualKind.artifact && labels.length < 3) {
+      throw const FormatException(
+        'Generated project visuals require at least three authored labels.',
+      );
+    }
+  }
+
+  factory PortfolioSystemVisual.fromJson(Map<String, dynamic> json) =>
+      PortfolioSystemVisual(
+        kind: PortfolioSystemVisualKind.parse(_requiredString(json, 'kind')),
+        labels: _strings(json, 'labels'),
+      );
+
+  final PortfolioSystemVisualKind kind;
+  final List<String> labels;
+}
+
+enum PortfolioSystemVisualKind {
+  network('network'),
+  flow('flow'),
+  lanes('lanes'),
+  artifact('artifact');
+
+  const PortfolioSystemVisualKind(this.wireValue);
+  final String wireValue;
+
+  static PortfolioSystemVisualKind parse(String value) => values.firstWhere(
+    (entry) => entry.wireValue == value,
+    orElse: () =>
+        throw FormatException('Unsupported project visual kind: $value'),
+  );
 }
 
 final class PortfolioEvidence {
@@ -719,6 +799,25 @@ String _requiredString(Map<String, dynamic> json, String key) =>
       final String value when value.trim().isNotEmpty => value,
       _ => throw FormatException('Expected non-empty string at "$key".'),
     };
+
+String _requiredEmail(Map<String, dynamic> json, String key) {
+  final value = _requiredString(json, key);
+  final separator = value.indexOf('@');
+  if (separator <= 0 ||
+      separator == value.length - 1 ||
+      !value.substring(separator + 1).contains('.')) {
+    throw FormatException('Expected an email address at "$key".');
+  }
+  return value;
+}
+
+String _requiredHexColor(Map<String, dynamic> json, String key) {
+  final value = _requiredString(json, key);
+  if (!RegExp(r'^#[0-9A-Fa-f]{6}$').hasMatch(value)) {
+    throw FormatException('Expected a six-digit hex colour at "$key".');
+  }
+  return value.toUpperCase();
+}
 
 int _requiredInt(Map<String, dynamic> json, String key) => switch (json[key]) {
   final int value => value,

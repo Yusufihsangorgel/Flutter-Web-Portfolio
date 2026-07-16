@@ -2,6 +2,32 @@
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.8.0] - 2026-07-16
+
+### Added
+
+- One boundary-local reading position shared by navigation, browser history, scene transitions, and visible document progress.
+- Responsive, RTL-aware hairline handoffs that connect chapters without adding cards, labels, or decorative copy.
+- Direct-link, back/forward, responsive geometry, and real boundary-scroll regression coverage.
+- A schema-validated personal contact and current-role contract so the reusable template cannot hide the person it represents.
+- Per-project palettes and generated visual grammars for a full-width work atlas, with real local artifacts for shipped products and public tools.
+
+### Changed
+
+- Reordered the document as hero, experience, open source, selected work, and personal context so the portfolio reads as one professional story.
+- Made the hero action enter the first available evidence chapter instead of skipping directly to selected work.
+- Preserved the reader's local opening position and chapter-relative progress across responsive reflow, and aligned every progress indicator with the narrative bounds rather than the footer.
+- Replaced the black-and-clay developer-template treatment with a paper, cobalt, and acid editorial system led by Yusuf's full identity, direct summary, current roles, links, and email.
+- Replaced the supporting-work ledger and disclosure controls with uninterrupted, full-width project chapters on every viewport.
+
+### Fixed
+
+- Prevented initial deep links from being overwritten during the first geometry pass and canonicalized unknown chapter hashes.
+- Kept command-palette Back navigation from consuming chapter history and made the bridge durable across generated-content synchronization.
+- Kept completed chapter handoffs visible, re-measured geometry while the pinned toolbar collapses, and mirrored both the continuous trace and progress fill for RTL locales.
+- Reserved a tablet-safe action gutter so the floating return control cannot compete with project evidence links.
+- Kept portrait product evidence and its caption readable side by side on narrow mobile layouts.
+
 ## [1.7.0] - 2026-07-16
 
 ### Added

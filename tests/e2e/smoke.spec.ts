@@ -27,6 +27,31 @@ async function readAccessibilityTree(page: Page) {
   return session;
 }
 
+async function expectHeadingInViewport(page: Page, name: string) {
+  const heading = page.getByRole('heading', { name, exact: true });
+  await expect(heading).toBeAttached();
+  await expect
+    .poll(async () => {
+      const [box, viewport] = await Promise.all([
+        heading.boundingBox(),
+        page.evaluate(() => ({
+          width: window.innerWidth,
+          height: window.innerHeight,
+        })),
+      ]);
+      return Boolean(
+        box &&
+          box.width > 0 &&
+          box.height > 0 &&
+          box.x < viewport.width &&
+          box.x + box.width > 0 &&
+          box.y < viewport.height &&
+          box.y + box.height > 0,
+      );
+    })
+    .toBe(true);
+}
+
 async function openChapterFromPalette(
   page: Page,
   command: string,
@@ -36,9 +61,7 @@ async function openChapterFromPalette(
   await page.keyboard.press('Control+KeyK');
   await page.getByText(command, { exact: true }).click();
   await expect(page).toHaveURL(hash);
-  await expect(
-    page.getByRole('heading', { name: heading, exact: true }),
-  ).toBeAttached();
+  await expectHeadingInViewport(page, heading);
 }
 
 async function openChapterFromNavigation(
@@ -56,12 +79,10 @@ async function openChapterFromNavigation(
   const target = page.getByRole('button', { name: control, exact: true });
   await (isMobile ? target.last() : target.first()).click();
   await expect(page).toHaveURL(hash);
-  await expect(
-    page.getByRole('heading', { name: heading, exact: true }),
-  ).toBeAttached();
+  await expectHeadingInViewport(page, heading);
 }
 
-async function scrollToContributionLink(page: Page, title: string) {
+async function scrollToSemanticLink(page: Page, title: string) {
   // Flutter exposes this tappable Semantics node to Chromium's AX tree as a
   // link, but its generated <a> intentionally has no href. Playwright's DOM
   // role selector therefore cannot see it; the CDP AX assertion below still
@@ -233,7 +254,9 @@ test('publishes a clean heading and control hierarchy', async ({
       ?.value?.value,
   ).toBe(2);
 
-  const aboutLinks = sectionTree.nodes
+  await scrollToSemanticLink(page, portfolio.profile.links[0].label);
+  const aboutTree = await accessibility.send('Accessibility.getFullAXTree');
+  const aboutLinks = aboutTree.nodes
     .filter((node) => !node.ignored && node.role?.value === 'link')
     .map((node) => node.name?.value ?? '');
   expect(aboutLinks).toEqual(
@@ -253,7 +276,7 @@ test('publishes a clean heading and control hierarchy', async ({
     portfolio.contributions.find((contribution) => contribution.featured) ??
     portfolio.contributions[0];
   expect(visibleContribution).toBeTruthy();
-  await scrollToContributionLink(page, visibleContribution.title);
+  await scrollToSemanticLink(page, visibleContribution.title);
   const proofTree = await accessibility.send('Accessibility.getFullAXTree');
   const proofLinks = proofTree.nodes
     .filter((node) => !node.ignored && node.role?.value === 'link')
@@ -285,7 +308,14 @@ test('publishes a clean heading and control hierarchy', async ({
     .map((node) => node.name?.value ?? '');
   const featuredSystem = portfolio.systems.find((system) => system.featured);
   expect(featuredSystem).toBeTruthy();
-  expect(projectLinks).toEqual(
+  await scrollToSemanticLink(page, `Open project: ${featuredSystem.name}`);
+  const visibleProjectsTree = await accessibility.send(
+    'Accessibility.getFullAXTree',
+  );
+  const visibleProjectLinks = visibleProjectsTree.nodes
+    .filter((node) => !node.ignored && node.role?.value === 'link')
+    .map((node) => node.name?.value ?? '');
+  expect(visibleProjectLinks).toEqual(
     expect.arrayContaining([
       `Open project: ${featuredSystem.name}`,
     ]),
@@ -329,8 +359,8 @@ test('renders a JSON-derived critical shell before the first Flutter frame', asy
     portfolio.profile.headline,
   );
   await expect(criticalShell.locator('.bootstrap-action')).toHaveText([
-    'View selected work',
-    'GitHub',
+    'Explore my work',
+    'Email me',
   ]);
   const facts = criticalShell.locator('.bootstrap-fact');
   const expectedFacts = [
@@ -572,7 +602,6 @@ test('serves same-origin fallback fonts without masking missing assets', async (
 
   for (const path of [
     '/assets/assets/fonts/inter/Inter-Variable.ttf',
-    '/assets/assets/fonts/instrument_serif/InstrumentSerif-Regular.ttf',
     '/assets/assets/fonts/noto_sans_arabic/NotoSansArabic-Variable.ttf',
     '/assets/assets/fonts/noto_sans_devanagari/NotoSansDevanagari-Variable.ttf',
   ]) {
@@ -647,25 +676,29 @@ test('keeps the personal hero readable at 280 CSS pixels', async ({
   const heading = page.getByRole('heading', {
     name: `${portfolio.profile.display_name.accessible}, ${portfolio.profile.role}`,
   });
-  const work = page.getByRole('button', { name: 'View selected work' });
-  const github = page.getByRole('button', { name: 'GitHub', exact: true });
-  const [headingBox, workBox, githubBox] = await Promise.all([
-    heading.boundingBox(),
-    work.boundingBox(),
-    github.boundingBox(),
-  ]);
+  await expectHeadingInViewport(
+    page,
+    `${portfolio.profile.display_name.accessible}, ${portfolio.profile.role}`,
+  );
+  const headingBox = await heading.boundingBox();
+  expect(headingBox).not.toBeNull();
+  expect(headingBox!.x).toBeGreaterThanOrEqual(0);
+  expect(headingBox!.x + headingBox!.width).toBeLessThanOrEqual(280);
 
-  for (const [label, box] of [
-    ['heading', headingBox],
-    ['work action', workBox],
-    ['GitHub action', githubBox],
-  ] as const) {
-    expect(box, label).not.toBeNull();
-    expect(box!.x, label).toBeGreaterThanOrEqual(0);
-    expect(box!.x + box!.width, label).toBeLessThanOrEqual(280);
+  for (const label of ['Explore my work', 'Email me']) {
+    const action = page.getByRole('button', { name: label, exact: true });
+    for (let attempt = 0; attempt < 24; attempt += 1) {
+      const box = (await action.count()) > 0 ? await action.boundingBox() : null;
+      if (box && box.y < 653 && box.y + box.height > 0) break;
+      await page.mouse.wheel(0, 160);
+      await page.waitForTimeout(60);
+    }
+    await expect(action).toBeVisible();
+    const actionBox = await action.boundingBox();
+    expect(actionBox, label).not.toBeNull();
+    expect(actionBox!.x, label).toBeGreaterThanOrEqual(0);
+    expect(actionBox!.x + actionBox!.width, label).toBeLessThanOrEqual(280);
   }
-  expect(headingBox!.y + headingBox!.height).toBeLessThan(workBox!.y);
-  expect(workBox!.y + workBox!.height).toBeLessThanOrEqual(githubBox!.y);
 });
 
 test('switches to the application-owned Arabic catalog', async ({ page }) => {
@@ -704,17 +737,161 @@ test('switches to the application-owned Hindi catalog', async ({ page }) => {
     .poll(() => page.locator('html').getAttribute('lang'))
     .toBe('hi');
   await expect(page.locator('html')).toHaveAttribute('dir', 'ltr');
-  await expect(page.getByText('प्रोजेक्ट देखें', { exact: true })).toBeAttached();
+  await expect(page.getByText('मेरा काम देखें', { exact: true })).toBeAttached();
 });
 
-test('keeps section hashes synchronized with browser history', async ({ page }) => {
-  await openPortfolio(page);
-  await page.keyboard.press('Control+KeyK');
-  const projectsCommand = page.getByText('Go to Work', { exact: true });
-  await expect(projectsCommand).toBeVisible();
-  await projectsCommand.click();
+test('preserves a direct chapter link without duplicating history', async ({
+  page,
+}) => {
+  await page.goto('/#/projects', { waitUntil: 'domcontentloaded' });
+  const initialHistoryLength = await page.evaluate(() => history.length);
+  await page.waitForSelector('flt-semantics-host', {
+    state: 'attached',
+    timeout: 20000,
+  });
+  await expect(page.locator('#bootstrap-surface')).toHaveCount(0);
   await expect(page).toHaveURL(/#\/projects$/);
+  await expectHeadingInViewport(page, 'Selected Work');
+  await expect.poll(() => page.evaluate(() => history.length)).toBe(
+    initialHistoryLength,
+  );
+});
+
+test('canonicalizes an unknown chapter hash to the document origin', async ({
+  page,
+}) => {
+  await page.goto('/#/unknown-chapter', { waitUntil: 'domcontentloaded' });
+  await page.waitForSelector('flt-semantics-host', {
+    state: 'attached',
+    timeout: 20000,
+  });
+  await expect(page.locator('#bootstrap-surface')).toHaveCount(0);
+  await expect.poll(() => page.evaluate(() => window.location.hash)).toBe('');
+  await expectHeadingInViewport(
+    page,
+    `${portfolio.profile.display_name.accessible}, ${portfolio.profile.role}`,
+  );
+});
+
+test('keeps explicit chapter navigation synchronized with history', async ({
+  page,
+}) => {
+  await openPortfolio(page);
+  const initialHistoryLength = await page.evaluate(() => history.length);
+  await openChapterFromPalette(
+    page,
+    'Go to Experience',
+    /#\/experience$/,
+    'Experience',
+  );
+  await openChapterFromPalette(
+    page,
+    'Go to Work',
+    /#\/projects$/,
+    'Selected Work',
+  );
+  await expect.poll(() => page.evaluate(() => history.length)).toBe(
+    initialHistoryLength + 2,
+  );
 
   await page.goBack();
-  await expect.poll(() => page.evaluate(() => window.location.hash)).toBe('');
+  await expect(page).toHaveURL(/#\/experience$/);
+  await expectHeadingInViewport(page, 'Experience');
+
+  await page.goForward();
+  await expect(page).toHaveURL(/#\/projects$/);
+  await expectHeadingInViewport(page, 'Selected Work');
+});
+
+test('does not mask chapter Back while the command palette is closing', async ({
+  page,
+}) => {
+  await openPortfolio(page);
+  await openChapterFromPalette(
+    page,
+    'Go to Experience',
+    /#\/experience$/,
+    'Experience',
+  );
+
+  await page.keyboard.press('Control+KeyK');
+  await page.getByText('Go to Work', { exact: true }).click();
+  await expect(page).toHaveURL(/#\/projects$/);
+  await page.evaluate(() => history.back());
+
+  await expect(page).toHaveURL(/#\/experience$/);
+  await expectHeadingInViewport(page, 'Experience');
+});
+
+test('browser Back closes a command palette without consuming chapter history', async ({
+  page,
+}) => {
+  await openPortfolio(page);
+  const initialHistoryLength = await page.evaluate(() => history.length);
+  await openChapterFromPalette(
+    page,
+    'Go to Experience',
+    /#\/experience$/,
+    'Experience',
+  );
+  await openChapterFromPalette(
+    page,
+    'Go to Work',
+    /#\/projects$/,
+    'Selected Work',
+  );
+
+  await page.keyboard.press('Control+KeyK');
+  const paletteCommand = page.getByText('Go to Experience', { exact: true });
+  await expect(paletteCommand).toBeVisible();
+  await page.evaluate(() => history.back());
+
+  await expect(paletteCommand).not.toBeVisible();
+  await expect(page).toHaveURL(/#\/projects$/);
+  await expectHeadingInViewport(page, 'Selected Work');
+  await expect.poll(() => page.evaluate(() => history.length)).toBe(
+    initialHistoryLength + 2,
+  );
+
+  await page.evaluate(() => history.back());
+  await expect(page).toHaveURL(/#\/experience$/);
+  await expectHeadingInViewport(page, 'Experience');
+});
+
+test('browser Back closes compact navigation without consuming chapter history', async ({
+  page,
+}, testInfo) => {
+  test.skip(testInfo.project.name !== 'mobile');
+  await openPortfolio(page);
+  const initialHistoryLength = await page.evaluate(() => history.length);
+  await openChapterFromPalette(
+    page,
+    'Go to Experience',
+    /#\/experience$/,
+    'Experience',
+  );
+  await openChapterFromPalette(
+    page,
+    'Go to Work',
+    /#\/projects$/,
+    'Selected Work',
+  );
+
+  await page
+    .getByRole('button', { name: 'Open navigation menu', exact: true })
+    .click();
+  const menuItem = page.getByRole('button', { name: 'Experience', exact: true });
+  await expect(menuItem.last()).toBeVisible();
+  await page.evaluate(() => history.back());
+
+  await expect(menuItem.last()).not.toBeVisible();
+  await expect(page).toHaveURL(/#\/projects$/);
+  await expectHeadingInViewport(page, 'Selected Work');
+  await expect.poll(() => page.evaluate(() => history.length)).toBe(
+    initialHistoryLength + 2,
+  );
+
+  await page.evaluate(() => history.back());
+  await expect(page).toHaveURL(/#\/experience$/);
+  await expectHeadingInViewport(page, 'Experience');
 });

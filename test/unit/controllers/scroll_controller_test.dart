@@ -49,33 +49,19 @@ void main() {
       expect(controller.sectionGeometries, isEmpty);
     });
 
-    test(
-      'skips absent optional chapters when detecting the active section',
-      () {
-        final section = AppScrollController.sectionAtFocalPoint(
-          sectionIds: const [
-            'home',
-            'about',
-            'experience',
-            'proof',
-            'projects',
-          ],
-          offsets: const {'home': 0, 'about': 800, 'projects': 2200},
-          focalPoint: 2400,
-        );
+    test('exposes one shared initial narrative position', () {
+      final position = controller.narrativePosition.value;
 
-        expect(section, 'projects');
-      },
-    );
+      expect(position.activeSectionId, 'home');
+      expect(position.currentSectionId, 'home');
+      expect(position.nextSectionId, 'home');
+      expect(position.documentProgress, 0);
+    });
 
-    test('stops at the last mounted chapter before the focal point', () {
-      final section = AppScrollController.sectionAtFocalPoint(
-        sectionIds: const ['home', 'about', 'projects'],
-        offsets: const {'home': 0, 'about': 800, 'projects': 2200},
-        focalPoint: 1500,
-      );
-
-      expect(section, 'about');
+    test('coalesces detached geometry invalidation safely', () {
+      expect(controller.markGeometryDirty, returnsNormally);
+      expect(controller.markGeometryDirty, returnsNormally);
+      expect(controller.sectionGeometries, isEmpty);
     });
   });
 }

@@ -99,8 +99,8 @@ class _CinematicBackgroundState extends State<CinematicBackground> {
         ? SceneConfigs.scenes[state.currentSceneIndex]
         : state.blendedConfig;
     final cue = NarrativeSpineCue(
-      currentMotif: state.currentMotif,
-      nextMotif: _reduceMotion ? state.currentMotif : state.nextMotif,
+      currentMotif: _reduceMotion ? state.activeMotif : state.currentMotif,
+      nextMotif: _reduceMotion ? state.activeMotif : state.nextMotif,
       blend: _reduceMotion ? 0 : state.blendFactor,
       // Reduced-motion sessions receive a complete, static trace instead of a
       // continuously growing line tied to every scroll frame.
@@ -152,6 +152,7 @@ class _CinematicBackgroundState extends State<CinematicBackground> {
         painter: _NarrativeBackgroundPainter(
           frame: _frame,
           spineKernel: _spineKernel,
+          textDirection: Directionality.of(context),
         ),
         size: Size.infinite,
       ),
@@ -160,11 +161,15 @@ class _CinematicBackgroundState extends State<CinematicBackground> {
 }
 
 final class _NarrativeBackgroundPainter extends CustomPainter {
-  _NarrativeBackgroundPainter({required this.frame, required this.spineKernel})
-    : super(repaint: frame);
+  _NarrativeBackgroundPainter({
+    required this.frame,
+    required this.spineKernel,
+    required this.textDirection,
+  }) : super(repaint: frame);
 
   final _NarrativeFrame frame;
   final NarrativeSpineRenderKernel spineKernel;
+  final TextDirection textDirection;
 
   static final _paint = Paint()..isAntiAlias = true;
   static final _linePaint = Paint()
@@ -219,6 +224,13 @@ final class _NarrativeBackgroundPainter extends CustomPainter {
     if (spineKernel.isEmpty) return;
     final accent = frame.config.accent;
 
+    canvas.save();
+    if (textDirection == TextDirection.rtl) {
+      canvas
+        ..translate(size.width, 0)
+        ..scale(-1, 1);
+    }
+
     _linePaint
       ..strokeWidth = 0.9
       ..color = accent.withValues(alpha: 0.05);
@@ -256,6 +268,7 @@ final class _NarrativeBackgroundPainter extends CustomPainter {
           ..drawCircle(node, 3.1, _linePaint);
       }
     }
+    canvas.restore();
   }
 
   void _drawVignette(Canvas canvas, Size size, Rect bounds) {
@@ -298,7 +311,8 @@ final class _NarrativeBackgroundPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(_NarrativeBackgroundPainter oldDelegate) =>
-      !identical(frame, oldDelegate.frame);
+      !identical(frame, oldDelegate.frame) ||
+      textDirection != oldDelegate.textDirection;
 }
 
 /// Coalesces scroll, quality and pointer inputs into one paint notification.

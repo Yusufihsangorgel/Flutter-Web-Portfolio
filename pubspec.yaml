@@ -2,7 +2,7 @@ name: flutter_web_portfolio
 description: 'A data-driven Flutter Web portfolio for verified engineering work.'
 publish_to: 'none'
 
-version: 1.7.0+9
+version: 1.8.0+10
 
 environment:
   sdk: '>=3.12.0 <4.0.0'
@@ -91,13 +91,6 @@ flutter:
           weight: 700
         - asset: assets/fonts/jetbrains_mono/JetBrainsMono-Variable.ttf
           weight: 800
-    - family: Instrument Serif
-      fonts:
-        - asset: assets/fonts/instrument_serif/InstrumentSerif-Regular.ttf
-          weight: 400
-        - asset: assets/fonts/instrument_serif/InstrumentSerif-Italic.ttf
-          weight: 400
-          style: italic
     - family: Noto Sans Arabic
       fonts:
         - asset: assets/fonts/noto_sans_arabic/NotoSansArabic-Variable.ttf
