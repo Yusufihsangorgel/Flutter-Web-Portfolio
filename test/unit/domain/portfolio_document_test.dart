@@ -13,7 +13,7 @@ void main() {
       final profile = manifest['profile']! as Map<String, dynamic>;
       final displayName = profile['display_name']! as Map<String, dynamic>;
 
-      expect(document.schemaVersion, 7);
+      expect(document.schemaVersion, 8);
       expect(document.contentVersion, manifest['content_version']);
       expect(document.profile.name, profile['name']);
       expect(document.profile.role, profile['role']);
@@ -42,6 +42,11 @@ void main() {
       expect(document.mergedContributions, hasLength(5));
       expect(document.contributionsUnderReview, hasLength(3));
       expect(document.featuredContribution, isNotNull);
+      expect(document.featuredContribution?.eventOrderLab, isNotNull);
+      expect(
+        document.featuredContribution?.eventOrderLab?.withPatch.order,
+        contains('browser_frame'),
+      );
       expect(document.systems, hasLength(10));
       expect(document.featuredSystems, hasLength(2));
       expect(
@@ -125,7 +130,91 @@ void main() {
         expect(frame.image.height, artifact.height, reason: system.id);
         frame.image.dispose();
         codec.dispose();
+
+        final compact = artifact.compact;
+        if (compact == null) continue;
+        expect(compact.asset, startsWith('assets/work/'), reason: system.id);
+        final compactFile = File(compact.asset);
+        expect(compactFile.existsSync(), isTrue, reason: system.id);
+
+        final compactCodec = await ui.instantiateImageCodec(
+          compactFile.readAsBytesSync(),
+        );
+        final compactFrame = await compactCodec.getNextFrame();
+        expect(compactFrame.image.width, compact.width, reason: system.id);
+        expect(compactFrame.image.height, compact.height, reason: system.id);
+        expect(
+          compactFrame.image.width < compactFrame.image.height,
+          isTrue,
+          reason: '${system.id} compact artifact must be portrait',
+        );
+        compactFrame.image.dispose();
+        compactCodec.dispose();
       }
+    });
+
+    test('rejects invalid compact artifact variants', () {
+      Map<String, dynamic> compactOf(Map<String, dynamic> manifest) {
+        final systems = manifest['systems']! as List<dynamic>;
+        final system = systems.cast<Map<String, dynamic>>().firstWhere(
+          (entry) => entry['artifact'] != null,
+        );
+        final artifact = system['artifact']! as Map<String, dynamic>;
+        return artifact['compact']! as Map<String, dynamic>;
+      }
+
+      final landscapeCompact = _manifest();
+      compactOf(landscapeCompact)
+        ..['width'] = 1600
+        ..['height'] = 1000;
+      expect(
+        () => PortfolioDocument.fromJson(landscapeCompact),
+        throwsA(isA<FormatException>()),
+      );
+
+      final invalidCompactPath = _manifest();
+      compactOf(invalidCompactPath)['asset'] = '../generated/compact.jpg';
+      expect(
+        () => PortfolioDocument.fromJson(invalidCompactPath),
+        throwsA(isA<FormatException>()),
+      );
+
+      final invalidCompactFit = _manifest();
+      compactOf(invalidCompactFit)['fit'] = 'parallax';
+      expect(
+        () => PortfolioDocument.fromJson(invalidCompactFit),
+        throwsA(isA<FormatException>()),
+      );
+
+      Map<String, dynamic> artifactAt(List<dynamic> systems, int index) =>
+          (systems[index] as Map<String, dynamic>)['artifact']!
+              as Map<String, dynamic>;
+
+      final compactDuplicatesMainAsset = _manifest();
+      final duplicateSystems =
+          compactDuplicatesMainAsset['systems']! as List<dynamic>;
+      (artifactAt(duplicateSystems, 0)['compact']!
+          as Map<String, dynamic>)['asset'] = artifactAt(
+        duplicateSystems,
+        1,
+      )['asset'];
+      expect(
+        () => PortfolioDocument.fromJson(compactDuplicatesMainAsset),
+        throwsA(isA<FormatException>()),
+      );
+
+      final compactSharedAcrossRecords = _manifest();
+      final sharedSystems =
+          compactSharedAcrossRecords['systems']! as List<dynamic>;
+      final firstCompact =
+          artifactAt(sharedSystems, 0)['compact']! as Map<String, dynamic>;
+      final secondCompact =
+          artifactAt(sharedSystems, 1)['compact']! as Map<String, dynamic>;
+      secondCompact['asset'] = firstCompact['asset'];
+      expect(
+        () => PortfolioDocument.fromJson(compactSharedAcrossRecords),
+        throwsA(isA<FormatException>()),
+      );
     });
 
     test('supports optional experience, contribution, and work chapters', () {
@@ -143,11 +232,14 @@ void main() {
       () {
         final json = _manifest();
         final contributions = json['contributions']! as List<dynamic>;
+        Object? eventOrderLab;
         for (final contribution in contributions.cast<Map<String, dynamic>>()) {
           contribution['featured'] = false;
+          eventOrderLab ??= contribution.remove('event_order_lab');
         }
         final selected = contributions.first as Map<String, dynamic>;
         selected['featured'] = true;
+        selected['event_order_lab'] = eventOrderLab;
 
         final document = PortfolioDocument.fromJson(json);
         expect(document.featuredContribution?.id, selected['id']);
@@ -161,6 +253,43 @@ void main() {
 
       final document = PortfolioDocument.fromJson(json);
       expect(document.activeSections, ['home', 'projects', 'about']);
+    });
+
+    test('keeps event-order labs on the selected contribution only', () {
+      final json = _manifest();
+      final contributions = (json['contributions']! as List<dynamic>)
+          .cast<Map<String, dynamic>>();
+      final currentFeatured = contributions.firstWhere(
+        (entry) => entry['featured'] == true,
+      );
+      final replacement = contributions.firstWhere(
+        (entry) => entry['featured'] == false,
+      );
+      currentFeatured['featured'] = false;
+      replacement['featured'] = true;
+
+      expect(
+        () => PortfolioDocument.fromJson(json),
+        throwsA(isA<FormatException>()),
+      );
+    });
+
+    test('rejects an event-order lab that does not close its risk gap', () {
+      final json = _manifest();
+      final contributions = (json['contributions']! as List<dynamic>)
+          .cast<Map<String, dynamic>>();
+      final featured = contributions.firstWhere(
+        (entry) => entry['featured'] == true,
+      );
+      final lab = featured['event_order_lab']! as Map<String, dynamic>;
+      final baseline = lab['baseline']! as Map<String, dynamic>;
+      final gap = baseline['gap']! as Map<String, dynamic>;
+      gap['before'] = 'browser_frame';
+
+      expect(
+        () => PortfolioDocument.fromJson(json),
+        throwsA(isA<FormatException>()),
+      );
     });
 
     test('rejects unsupported schemas and duplicate content ids', () {

@@ -22,7 +22,7 @@ final class PortfolioDocument {
 
   factory PortfolioDocument.fromJson(Map<String, dynamic> json) {
     final schemaVersion = _requiredInt(json, 'schema_version');
-    if (schemaVersion != 7) {
+    if (schemaVersion != 8) {
       throw FormatException(
         'Unsupported portfolio schema version: $schemaVersion',
       );
@@ -124,6 +124,13 @@ final class PortfolioDocument {
         'At most one open-source contribution may be featured.',
       );
     }
+    if (contributions.any(
+      (entry) => entry.eventOrderLab != null && !entry.featured,
+    )) {
+      throw const FormatException(
+        'An event-order lab may only belong to the featured contribution.',
+      );
+    }
     _assertUnique('source', sources.map((entry) => entry.id));
     _assertUnique(
       'engineering link',
@@ -136,7 +143,12 @@ final class PortfolioDocument {
     _assertUnique('system', systems.map((entry) => entry.id));
     _assertUnique(
       'work artifact asset',
-      systems.map((entry) => entry.artifact.asset),
+      systems.expand(
+        (entry) => [
+          entry.artifact.asset,
+          if (entry.artifact.compact case final compact?) compact.asset,
+        ],
+      ),
     );
   }
 }
@@ -392,6 +404,7 @@ final class PortfolioContribution {
     required this.url,
     required this.featured,
     this.issueUrl,
+    this.eventOrderLab,
   });
 
   factory PortfolioContribution.fromJson(Map<String, dynamic> json) =>
@@ -406,6 +419,10 @@ final class PortfolioContribution {
         url: _requiredUri(json, 'url'),
         featured: _requiredBool(json, 'featured'),
         issueUrl: _optionalUri(json, 'issue_url'),
+        eventOrderLab: switch (_optionalObject(json, 'event_order_lab')) {
+          final value? => PortfolioEventOrderLab.fromJson(value),
+          null => null,
+        },
       );
 
   final String id;
@@ -418,6 +435,149 @@ final class PortfolioContribution {
   final Uri url;
   final bool featured;
   final Uri? issueUrl;
+  final PortfolioEventOrderLab? eventOrderLab;
+}
+
+/// A content-authored comparison of two event sequences.
+///
+/// This is deliberately contribution-agnostic: the renderer only understands
+/// ordered events, a baseline risk window, and a proposed ordering.
+final class PortfolioEventOrderLab {
+  PortfolioEventOrderLab({
+    required this.title,
+    required List<PortfolioEventOrderItem> events,
+    required this.baseline,
+    required this.withPatch,
+  }) : events = List.unmodifiable(events);
+
+  factory PortfolioEventOrderLab.fromJson(Map<String, dynamic> json) {
+    final lab = PortfolioEventOrderLab(
+      title: _requiredString(json, 'title'),
+      events: _objects(
+        json,
+        'events',
+      ).map(PortfolioEventOrderItem.fromJson).toList(),
+      baseline: PortfolioEventSequence.fromJson(
+        _requiredObject(json, 'baseline'),
+      ),
+      withPatch: PortfolioEventSequence.fromJson(
+        _requiredObject(json, 'with_patch'),
+      ),
+    ).._validate();
+    return lab;
+  }
+
+  final String title;
+  final List<PortfolioEventOrderItem> events;
+  final PortfolioEventSequence baseline;
+  final PortfolioEventSequence withPatch;
+
+  PortfolioEventOrderItem eventById(String id) =>
+      events.firstWhere((event) => event.id == id);
+
+  void _validate() {
+    if (events.length < 3) {
+      throw const FormatException(
+        'An event-order lab requires at least three events.',
+      );
+    }
+    _assertUnique('event-order lab event', events.map((event) => event.id));
+    final eventIds = events.map((event) => event.id).toSet();
+    for (final sequence in [baseline, withPatch]) {
+      if (sequence.order.length < 2 ||
+          sequence.order.toSet().length != sequence.order.length ||
+          sequence.order.any((id) => !eventIds.contains(id))) {
+        throw const FormatException(
+          'Event-order sequences require unique, declared event ids.',
+        );
+      }
+    }
+    final usedIds = {...baseline.order, ...withPatch.order};
+    if (!usedIds.containsAll(eventIds) || usedIds.length != eventIds.length) {
+      throw const FormatException(
+        'Every declared event must be used by an event-order sequence.',
+      );
+    }
+    if (_sameStrings(baseline.order, withPatch.order)) {
+      throw const FormatException(
+        'Baseline and patched event orders must differ.',
+      );
+    }
+
+    final gap = baseline.gap;
+    if (gap == null || withPatch.gap != null) {
+      throw const FormatException(
+        'Only the baseline sequence must declare one risk gap.',
+      );
+    }
+    final baselineAfter = baseline.order.indexOf(gap.after);
+    final baselineBefore = baseline.order.indexOf(gap.before);
+    final patchedAfter = withPatch.order.indexOf(gap.after);
+    final patchedBefore = withPatch.order.indexOf(gap.before);
+    if (baselineAfter < 0 ||
+        baselineBefore != baselineAfter + 1 ||
+        patchedBefore < 0 ||
+        patchedAfter < 0 ||
+        patchedBefore >= patchedAfter) {
+      throw const FormatException(
+        'The patched order must close the baseline risk gap.',
+      );
+    }
+  }
+}
+
+final class PortfolioEventOrderItem {
+  const PortfolioEventOrderItem({required this.id, required this.label});
+
+  factory PortfolioEventOrderItem.fromJson(Map<String, dynamic> json) =>
+      PortfolioEventOrderItem(
+        id: _requiredString(json, 'id'),
+        label: _requiredString(json, 'label'),
+      );
+
+  final String id;
+  final String label;
+}
+
+final class PortfolioEventSequence {
+  PortfolioEventSequence({
+    required this.summary,
+    required List<String> order,
+    this.gap,
+  }) : order = List.unmodifiable(order);
+
+  factory PortfolioEventSequence.fromJson(Map<String, dynamic> json) =>
+      PortfolioEventSequence(
+        summary: _requiredString(json, 'summary'),
+        order: _strings(json, 'order'),
+        gap: switch (_optionalObject(json, 'gap')) {
+          final value? => PortfolioEventGap.fromJson(value),
+          null => null,
+        },
+      );
+
+  final String summary;
+  final List<String> order;
+  final PortfolioEventGap? gap;
+}
+
+final class PortfolioEventGap {
+  const PortfolioEventGap({
+    required this.after,
+    required this.before,
+    required this.label,
+  });
+
+  factory PortfolioEventGap.fromJson(Map<String, dynamic> json) =>
+      PortfolioEventGap(
+        after: _requiredString(json, 'after'),
+        before: _requiredString(json, 'before'),
+        label: _requiredString(json, 'label'),
+      );
+
+  final String after;
+  final String before;
+  final String label;
 }
 
 sealed class PortfolioSystem {
@@ -628,6 +788,7 @@ final class PortfolioSystemArtifact {
     required this.fit,
     required this.alignment,
     required this.composition,
+    this.compact,
   });
 
   factory PortfolioSystemArtifact.fromJson(Map<String, dynamic> json) {
@@ -636,16 +797,13 @@ final class PortfolioSystemArtifact {
     final caption = _requiredString(json, 'caption');
     final width = _requiredInt(json, 'width');
     final height = _requiredInt(json, 'height');
-    if (!asset.startsWith('assets/work/') ||
-        asset.contains('..') ||
-        !const ['.png', '.jpg', '.jpeg', '.webp'].any(asset.endsWith) ||
-        width <= 0 ||
-        height <= 0 ||
-        alt == caption) {
-      throw const FormatException(
-        'Project artifacts require a supported local asset, positive dimensions, and distinct accessible copy.',
-      );
-    }
+    _validateArtifactMedia(
+      asset: asset,
+      alt: alt,
+      caption: caption,
+      width: width,
+      height: height,
+    );
     final artifact = PortfolioSystemArtifact(
       label: _requiredString(json, 'label'),
       asset: asset,
@@ -660,6 +818,10 @@ final class PortfolioSystemArtifact {
       composition: PortfolioArtifactComposition.parse(
         _requiredString(json, 'composition'),
       ),
+      compact: switch (_optionalObject(json, 'compact')) {
+        final value? => PortfolioArtifactVariant.fromJson(value),
+        null => null,
+      },
     );
     if ((artifact.composition == PortfolioArtifactComposition.portraitSplit &&
             artifact.width >= artifact.height) ||
@@ -681,6 +843,62 @@ final class PortfolioSystemArtifact {
   final PortfolioArtifactFit fit;
   final PortfolioArtifactAlignment alignment;
   final PortfolioArtifactComposition composition;
+  final PortfolioArtifactVariant? compact;
+}
+
+/// An optional portrait asset authored for compact project stages.
+///
+/// It carries its own accessible copy and intrinsic dimensions so the renderer
+/// can switch media without project-specific branches or fabricated crops.
+final class PortfolioArtifactVariant {
+  const PortfolioArtifactVariant({
+    required this.asset,
+    required this.alt,
+    required this.caption,
+    required this.width,
+    required this.height,
+    required this.fit,
+    required this.alignment,
+  });
+
+  factory PortfolioArtifactVariant.fromJson(Map<String, dynamic> json) {
+    final asset = _requiredString(json, 'asset');
+    final alt = _requiredString(json, 'alt');
+    final caption = _requiredString(json, 'caption');
+    final width = _requiredInt(json, 'width');
+    final height = _requiredInt(json, 'height');
+    _validateArtifactMedia(
+      asset: asset,
+      alt: alt,
+      caption: caption,
+      width: width,
+      height: height,
+    );
+    if (width >= height) {
+      throw const FormatException(
+        'Compact project artifacts must use a portrait asset.',
+      );
+    }
+    return PortfolioArtifactVariant(
+      asset: asset,
+      alt: alt,
+      caption: caption,
+      width: width,
+      height: height,
+      fit: PortfolioArtifactFit.parse(_requiredString(json, 'fit')),
+      alignment: PortfolioArtifactAlignment.parse(
+        _requiredString(json, 'alignment'),
+      ),
+    );
+  }
+
+  final String asset;
+  final String alt;
+  final String caption;
+  final int width;
+  final int height;
+  final PortfolioArtifactFit fit;
+  final PortfolioArtifactAlignment alignment;
 }
 
 enum PortfolioArtifactFit {
@@ -830,5 +1048,32 @@ void _assertUnique(String label, Iterable<String> ids) {
     if (!seen.add(id)) {
       throw FormatException('Duplicate $label id: $id');
     }
+  }
+}
+
+bool _sameStrings(List<String> first, List<String> second) {
+  if (first.length != second.length) return false;
+  for (var index = 0; index < first.length; index += 1) {
+    if (first[index] != second[index]) return false;
+  }
+  return true;
+}
+
+void _validateArtifactMedia({
+  required String asset,
+  required String alt,
+  required String caption,
+  required int width,
+  required int height,
+}) {
+  if (!asset.startsWith('assets/work/') ||
+      asset.contains('..') ||
+      !const ['.png', '.jpg', '.jpeg', '.webp'].any(asset.endsWith) ||
+      width <= 0 ||
+      height <= 0 ||
+      alt == caption) {
+    throw const FormatException(
+      'Project artifacts require a supported local asset, positive dimensions, and distinct accessible copy.',
+    );
   }
 }

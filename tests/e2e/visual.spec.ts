@@ -78,6 +78,30 @@ async function openStaticPortfolio(page: Page) {
   );
 }
 
+async function openMotionPortfolio(page: Page) {
+  await page.emulateMedia({
+    colorScheme: 'light',
+    reducedMotion: 'no-preference',
+  });
+  await page.goto('/', { waitUntil: 'domcontentloaded' });
+  await page.waitForSelector('flt-semantics-host', {
+    state: 'attached',
+    timeout: 20000,
+  });
+  await expect(page.locator('#bootstrap-surface')).toHaveCount(0);
+  await waitForHeadingInViewport(
+    page,
+    `${portfolio.profile.display_name.accessible}, ${portfolio.profile.role}`,
+  );
+  await expect
+    .poll(() =>
+      page.evaluate(
+        () => window.matchMedia('(prefers-reduced-motion: reduce)').matches,
+      ),
+    )
+    .toBe(false);
+}
+
 async function openChapter(
   page: Page,
   command: string,
@@ -206,6 +230,8 @@ test('preserves the editorial sequence across responsive viewports', async ({
 
   await openChapter(page, 'Go to Open Source', /#\/proof$/, 'Open Source');
   await expect(page).toHaveScreenshot('open-source.png');
+  await scrollToHeading(page, 'First Frame Lab');
+  await expect(page).toHaveScreenshot('first-frame-lab.png');
 
   await openChapter(
     page,
@@ -231,6 +257,56 @@ test('connects chapters during real document scrolling', async ({ page }) => {
 
   await scrollToChapterBoundary(page, 'About');
   await expect(page).toHaveScreenshot('boundary-about.png');
+});
+
+test('keeps one content-anchored signal in the default motion experience', async ({
+  page,
+}) => {
+  await openMotionPortfolio(page);
+
+  await scrollToChapterBoundary(page, 'Experience');
+  await expect(page).toHaveScreenshot('narrative-stage-experience.png', {
+    maxDiffPixelRatio: 0.0001,
+  });
+
+  const primaryCase = portfolio.systems.find((system) => system.featured);
+  if (!primaryCase) throw new Error('Expected a primary professional case.');
+  const heading = page.getByRole('heading', {
+    name: primaryCase.name,
+    exact: true,
+  });
+  for (let attempt = 0; attempt < 100; attempt += 1) {
+    if ((await heading.count()) > 0) {
+      const box = await heading.boundingBox();
+      if (box) break;
+    }
+    await page.mouse.wheel(0, 600);
+    await settleCompositor(page, 2);
+  }
+  await expect(heading).toBeVisible();
+  for (let attempt = 0; attempt < 24; attempt += 1) {
+    const [box, viewportHeight] = await Promise.all([
+      heading.boundingBox(),
+      page.evaluate(() => window.innerHeight),
+    ]);
+    if (box && Math.abs(box.y - viewportHeight * 0.2) <= 2) break;
+    await page.mouse.wheel(
+      0,
+      box ? box.y - viewportHeight * 0.2 : viewportHeight * 0.5,
+    );
+    await settleCompositor(page, 3);
+  }
+  await settleCompositor(page, 8);
+  // The narrative cursor is a pure function of scroll offset, but wheel input
+  // only lands the heading within ±2px of the target, and here the cursor sits
+  // over the high-contrast FugaSoft board, so that sub-pixel scroll drift moves
+  // more antialiased edges than the calmer Experience anchor above. This bound
+  // still proves the motion frame equals the static baseline except for the one
+  // small animated signal, while staying reproducible; it remains far tighter
+  // than the project-wide 0.003 default.
+  await expect(page).toHaveScreenshot('narrative-stage-work.png', {
+    maxDiffPixelRatio: 0.0009,
+  });
 });
 
 test('renders a real supporting-work artifact in the atlas', async (
@@ -268,7 +344,15 @@ test('renders a real supporting-work artifact in the atlas', async (
     await page.mouse.wheel(0, box ? box.y - 120 : 360);
     await settleCompositor(page, 3);
   }
-  const artifact = page.getByRole('img', { name: selected.artifact.alt });
+  // The renderer swaps in the portrait compact variant whenever the viewport
+  // is narrower than the Flutter tablet breakpoint (900 logical pixels), so
+  // the expected media must be chosen from the actual viewport width.
+  const compactViewport = (page.viewportSize()?.width ?? 0) < 900;
+  const expectedArtifact =
+    compactViewport && selected.artifact.compact
+      ? selected.artifact.compact
+      : selected.artifact;
+  const artifact = page.getByRole('img', { name: expectedArtifact.alt });
   await expect(artifact).toBeAttached();
   await settleCompositor(page, 8);
   await page.waitForTimeout(500);

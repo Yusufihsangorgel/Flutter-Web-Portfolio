@@ -1,6 +1,6 @@
 {
-  "schema_version": 7,
-  "content_version": "2026.07.16.9",
+  "schema_version": 8,
+  "content_version": "2026.07.16.11",
   "verified_at": "2026-07-16",
   "site": {
     "url": "https://developeryusuf.com",
@@ -285,7 +285,50 @@
       "change": "Wait for outstanding scene renders and the next browser frame before dispatching the event; the pull request is ready for review with seven Chrome renderer and compiler suites passing.",
       "url": "https://github.com/flutter/flutter/pull/189500",
       "issue_url": "https://github.com/flutter/flutter/issues/189499",
-      "featured": true
+      "featured": true,
+      "event_order_lab": {
+        "title": "First Frame Lab",
+        "events": [
+          {
+            "id": "framework_signal",
+            "label": "Framework sends flutter/service_worker"
+          },
+          {
+            "id": "first_frame_event",
+            "label": "Engine dispatches flutter-first-frame"
+          },
+          {
+            "id": "scene_render_complete",
+            "label": "Outstanding scene render completes"
+          },
+          {
+            "id": "browser_frame",
+            "label": "Next browser animation frame"
+          }
+        ],
+        "baseline": {
+          "summary": "The browser event can overtake asynchronous scene rendering.",
+          "order": [
+            "framework_signal",
+            "first_frame_event",
+            "scene_render_complete"
+          ],
+          "gap": {
+            "after": "first_frame_event",
+            "before": "scene_render_complete",
+            "label": "Blank handoff window"
+          }
+        },
+        "with_patch": {
+          "summary": "The event waits for pending scene renders and the next browser frame.",
+          "order": [
+            "framework_signal",
+            "scene_render_complete",
+            "browser_frame",
+            "first_frame_event"
+          ]
+        }
+      }
     },
     {
       "id": "flutter-vector-graphics-font-weight",
@@ -355,7 +398,16 @@
         "height": 1000,
         "fit": "contain",
         "alignment": "center",
-        "composition": "evidence_stack"
+        "composition": "evidence_stack",
+        "compact": {
+          "asset": "assets/work/fugasoft-product-compact.jpg",
+          "alt": "Compact FugaSoft evidence board with the current public company website and point-of-sale product surface.",
+          "caption": "FugaSoft company website · compact source-backed view.",
+          "width": 900,
+          "height": 1200,
+          "fit": "contain",
+          "alignment": "center"
+        }
       },
       "url": "https://fugasoft.com/",
       "technologies": ["Flutter", "Dart", "Drift", "Native integrations", "Cross-platform release"]
@@ -393,7 +445,16 @@
         "height": 1000,
         "fit": "contain",
         "alignment": "center",
-        "composition": "evidence_stack"
+        "composition": "evidence_stack",
+        "compact": {
+          "asset": "assets/work/dorse-product-compact.jpg",
+          "alt": "Compact Dorse evidence board built around the public vehicle and trailer settings screen.",
+          "caption": "Dorse vehicle workflow · compact first-party product view.",
+          "width": 900,
+          "height": 1200,
+          "fit": "contain",
+          "alignment": "center"
+        }
       },
       "url": "https://dorseapp.com/",
       "technologies": ["Flutter", "React", "Next.js", "WebSocket", "Maps"]
@@ -435,7 +496,16 @@
         "height": 1000,
         "fit": "contain",
         "alignment": "center",
-        "composition": "evidence_stack"
+        "composition": "evidence_stack",
+        "compact": {
+          "asset": "assets/work/aydinlik-release-compact.jpg",
+          "alt": "Compact Aydınlık E-Gazete release board with a large daily edition screen and audio reader screen.",
+          "caption": "Aydınlık edition and reader · compact public release evidence.",
+          "width": 900,
+          "height": 1200,
+          "fit": "contain",
+          "alignment": "center"
+        }
       },
       "url": "https://apps.apple.com/tr/app/ayd%C4%B1nl%C4%B1k-e-gazete/id1560103805",
       "technologies": ["Flutter", "Dart", "Dio", "MVVM", "iOS"]
@@ -477,7 +547,16 @@
         "height": 1000,
         "fit": "contain",
         "alignment": "center",
-        "composition": "evidence_stack"
+        "composition": "evidence_stack",
+        "compact": {
+          "asset": "assets/work/bilim-utopya-release-compact.jpg",
+          "alt": "Compact Bilim ve Ütopya release board with readable issue and subscriber archive screens.",
+          "caption": "Bilim ve Ütopya issue and archive · compact public release evidence.",
+          "width": 900,
+          "height": 1200,
+          "fit": "contain",
+          "alignment": "center"
+        }
       },
       "url": "https://apps.apple.com/tr/app/bilim-ve-%C3%BCtopya-e-dergi/id6478221195",
       "technologies": ["Flutter", "Dart", "Dio", "MVVM", "iOS"]
@@ -519,7 +598,16 @@
         "height": 1000,
         "fit": "contain",
         "alignment": "center",
-        "composition": "evidence_stack"
+        "composition": "evidence_stack",
+        "compact": {
+          "asset": "assets/work/galvapedia-release-compact.jpg",
+          "alt": "Compact Galvapedia release board with reference modules and zinc calculation screens.",
+          "caption": "Galvapedia reference and calculator · compact public release evidence.",
+          "width": 900,
+          "height": 1200,
+          "fit": "contain",
+          "alignment": "center"
+        }
       },
       "url": "https://apps.apple.com/tr/app/galvapedia/id1592744617",
       "technologies": ["Flutter", "Dart", "Node.js", "Express", "MongoDB"]
@@ -561,7 +649,16 @@
         "height": 840,
         "fit": "contain",
         "alignment": "center",
-        "composition": "evidence_stack"
+        "composition": "evidence_stack",
+        "compact": {
+          "asset": "assets/work/queue-inspector-compact.jpg",
+          "alt": "Compact Queue Inspector MCP evidence board preserving the authored Redis queue architecture diagram.",
+          "caption": "Queue Inspector MCP · compact source-backed architecture view.",
+          "width": 900,
+          "height": 1200,
+          "fit": "contain",
+          "alignment": "center"
+        }
       },
       "url": "https://github.com/Yusufihsangorgel/queue-inspector-mcp",
       "technologies": ["TypeScript", "MCP", "Redis", "Asynq", "BullMQ"]
@@ -603,7 +700,16 @@
         "height": 1000,
         "fit": "contain",
         "alignment": "center",
-        "composition": "evidence_stack"
+        "composition": "evidence_stack",
+        "compact": {
+          "asset": "assets/work/go-multitenant-gateway-compact.jpg",
+          "alt": "Compact multi-tenant gateway evidence board showing real Go middleware wiring and request order.",
+          "caption": "Go gateway request chain · compact source-backed view.",
+          "width": 900,
+          "height": 1200,
+          "fit": "contain",
+          "alignment": "center"
+        }
       },
       "url": "https://github.com/Yusufihsangorgel/go-multitenant-gateway",
       "technologies": ["Go", "JWT", "PostgreSQL", "Redis", "Multi-tenancy"]
@@ -640,7 +746,16 @@
         "height": 840,
         "fit": "contain",
         "alignment": "center",
-        "composition": "evidence_stack"
+        "composition": "evidence_stack",
+        "compact": {
+          "asset": "assets/work/redis-task-queue-compact.jpg",
+          "alt": "Compact Redis Task Queue board showing the server-side Dart enqueue, worker, retry, and dead-letter flow.",
+          "caption": "Redis Task Queue · compact package architecture view.",
+          "width": 900,
+          "height": 1200,
+          "fit": "contain",
+          "alignment": "center"
+        }
       },
       "url": "https://github.com/Yusufihsangorgel/redis_task_queue",
       "technologies": ["Dart", "Redis", "Retries", "Dead letters"]
@@ -677,7 +792,16 @@
         "height": 425,
         "fit": "contain",
         "alignment": "center",
-        "composition": "evidence_stack"
+        "composition": "evidence_stack",
+        "compact": {
+          "asset": "assets/work/constellation-demo-compact.jpg",
+          "alt": "Compact Constellation Particles evidence board framing the actual Flutter rendering demo.",
+          "caption": "Constellation Particles · compact rendered package demo.",
+          "width": 900,
+          "height": 1200,
+          "fit": "contain",
+          "alignment": "center"
+        }
       },
       "url": "https://github.com/Yusufihsangorgel/constellation_particles",
       "technologies": ["Flutter", "Dart", "CustomPainter", "Spatial grid"]
@@ -719,7 +843,16 @@
         "height": 1000,
         "fit": "contain",
         "alignment": "center",
-        "composition": "evidence_stack"
+        "composition": "evidence_stack",
+        "compact": {
+          "asset": "assets/work/portfolio-current-compact.jpg",
+          "alt": "Compact Flutter Web Portfolio preview showing the selected-work chapter and current FugaSoft case.",
+          "caption": "Current Flutter Web portfolio · compact verified release view.",
+          "width": 900,
+          "height": 1200,
+          "fit": "contain",
+          "alignment": "center"
+        }
       },
       "url": "https://developeryusuf.com",
       "technologies": ["Flutter", "Dart Wasm", "SkWasm", "Playwright"]

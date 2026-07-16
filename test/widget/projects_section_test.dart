@@ -226,6 +226,38 @@ void main() {
     }
     expect(tester.takeException(), isNull);
   });
+
+  testWidgets('shows compact portrait artifacts on a narrow mobile viewport', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(buildSubject());
+    await tester.pump(const Duration(milliseconds: 200));
+
+    final assets = _assetNames(tester);
+    for (final system in portfolio.featuredSystems) {
+      final compact = system.artifact.compact;
+      if (compact == null) continue;
+      expect(assets, contains(compact.asset), reason: system.id);
+      expect(assets, isNot(contains(system.artifact.asset)), reason: system.id);
+    }
+
+    final selected = portfolio.supportingSystems.first;
+    final selectedCompact = selected.artifact.compact;
+    if (selectedCompact != null) {
+      expect(assets, contains(selectedCompact.asset), reason: selected.id);
+      expect(
+        assets,
+        isNot(contains(selected.artifact.asset)),
+        reason: selected.id,
+      );
+    }
+    expect(tester.takeException(), isNull);
+  });
 }
 
 Color _hexColor(String value) =>

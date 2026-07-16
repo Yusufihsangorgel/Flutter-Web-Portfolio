@@ -80,6 +80,17 @@ async function scrollToText(page: Page, text: string) {
   return scrollToLocator(page, page.getByText(text).first());
 }
 
+// The renderer swaps in the portrait compact variant whenever the viewport is
+// narrower than the Flutter tablet breakpoint (900 logical pixels), so the
+// expected media must be derived from the viewport width, not the project
+// name.
+function expectedArtifact(page: Page, system: (typeof portfolio.systems)[0]) {
+  const compactViewport = (page.viewportSize()?.width ?? 0) < 900;
+  return compactViewport && system.artifact.compact
+    ? system.artifact.compact
+    : system.artifact;
+}
+
 async function scrollToSemanticLink(page: Page, title: string) {
   // Flutter exposes this tappable Semantics node to Chromium's AX tree as a
   // link, but its generated <a> intentionally has no href. Playwright's DOM
@@ -285,7 +296,7 @@ test('serves the complete professional narrative in production', async ({
   const supportingSystem = supportingSystems[0];
   await scrollToHeading(page, supportingSystem.name);
   await expect(
-    page.getByRole('img', { name: supportingSystem.artifact.alt }),
+    page.getByRole('img', { name: expectedArtifact(page, supportingSystem).alt }),
   ).toBeAttached();
   await scrollToText(page, supportingSystem.ownership);
 
@@ -300,7 +311,7 @@ test('serves the complete professional narrative in production', async ({
     await scrollToHeading(page, nextSystem.name);
     await scrollToLocator(
       page,
-      page.getByRole('img', { name: nextSystem.artifact.alt }),
+      page.getByRole('img', { name: expectedArtifact(page, nextSystem).alt }),
     );
   }
 });
@@ -428,9 +439,10 @@ test('serves the production accessibility hierarchy', async ({
   expect(atlasHeadings).toContain(supportingSystem.name);
   expect(atlasDisclosureButtons.length).toBeGreaterThanOrEqual(1);
 
+  const supportingArtifact = expectedArtifact(page, supportingSystem);
   await scrollToLocator(
     page,
-    page.getByRole('img', { name: supportingSystem.artifact.alt }),
+    page.getByRole('img', { name: supportingArtifact.alt }),
   );
   const atlasArtifactTree = await accessibility.send(
     'Accessibility.getFullAXTree',
@@ -438,7 +450,7 @@ test('serves the production accessibility hierarchy', async ({
   const atlasImages = atlasArtifactTree.nodes
     .filter((node) => !node.ignored && node.role?.value === 'image')
     .map((node) => node.name?.value ?? '');
-  expect(atlasImages).toContain(supportingSystem.artifact.alt);
+  expect(atlasImages).toContain(supportingArtifact.alt);
 
   await scrollToText(page, supportingSystem.evidence[0].label);
   const atlasEvidenceTree = await accessibility.send(

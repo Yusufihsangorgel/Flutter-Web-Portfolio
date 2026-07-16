@@ -15,7 +15,7 @@ The site reads identity, biography, experience, work, links, and contributions f
 
 Since 2021, I have built and maintained software for mobile devices, tablets, desktop operating systems, and the web. My work includes ERP and point-of-sale products, logistics workflows, digital publishing, backend services, and the release systems around them.
 
-Source status: `2026.07.16.9`, verified 2026-07-16 against GitHub and LinkedIn and FugaSoft and Dorse and Medium.
+Source status: `2026.07.16.11`, verified 2026-07-16 against GitHub and LinkedIn and FugaSoft and Dorse and Medium.
 
 ### Accepted upstream changes
 

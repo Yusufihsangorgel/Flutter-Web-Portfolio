@@ -492,11 +492,19 @@ final class _ArtifactStage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final artifact = system.artifact;
-    final fit = switch (artifact.fit) {
+    final compact = MediaQuery.sizeOf(context).width < Breakpoints.tablet
+        ? artifact.compact
+        : null;
+    final asset = compact?.asset ?? artifact.asset;
+    final alt = compact?.alt ?? artifact.alt;
+    final caption = compact?.caption ?? artifact.caption;
+    final width = compact?.width ?? artifact.width;
+    final height = compact?.height ?? artifact.height;
+    final fit = switch (compact?.fit ?? artifact.fit) {
       PortfolioArtifactFit.contain => BoxFit.contain,
       PortfolioArtifactFit.cover => BoxFit.cover,
     };
-    final alignment = switch (artifact.alignment) {
+    final alignment = switch (compact?.alignment ?? artifact.alignment) {
       PortfolioArtifactAlignment.start => AlignmentDirectional.centerStart,
       PortfolioArtifactAlignment.center => Alignment.center,
       PortfolioArtifactAlignment.end => AlignmentDirectional.centerEnd,
@@ -519,7 +527,7 @@ final class _ArtifactStage extends StatelessWidget {
               ),
             ),
             Text(
-              '${artifact.width} × ${artifact.height}',
+              '$width × $height',
               style: AppFonts.spaceGrotesk(
                 fontSize: 9,
                 fontWeight: FontWeight.w600,
@@ -537,16 +545,16 @@ final class _ArtifactStage extends StatelessWidget {
             ),
           ),
           child: AspectRatio(
-            aspectRatio: artifact.width / artifact.height,
+            aspectRatio: width / height,
             child: Padding(
               padding: EdgeInsets.all(prominent ? 10 : 8),
               child: Semantics(
                 image: true,
-                label: artifact.alt,
+                label: alt,
                 excludeSemantics: true,
                 child: ExcludeSemantics(
                   child: Image.asset(
-                    artifact.asset,
+                    asset,
                     fit: fit,
                     alignment: alignment,
                     filterQuality: FilterQuality.high,
@@ -558,7 +566,7 @@ final class _ArtifactStage extends StatelessWidget {
         ),
         const SizedBox(height: 12),
         Text(
-          artifact.caption,
+          caption,
           style: AppFonts.inter(
             fontSize: 11,
             color: palette.foreground.withValues(alpha: 0.68),
