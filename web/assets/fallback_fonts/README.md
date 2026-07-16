@@ -1,6 +1,6 @@
 # Flutter engine fallback fonts
 
-These WOFF2 files mirror the fallback URLs used by the pinned Flutter 3.41
+These WOFF2 files mirror the fallback URLs used by the pinned Flutter 3.44
 web engine so the renderer does not contact `fonts.gstatic.com` for Roboto or
 emoji glyphs.
 

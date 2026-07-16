@@ -159,18 +159,18 @@ abstract final class NarrativeSpineGeometry {
   static Offset _pointFor(NarrativeMotif motif, double t) => switch (motif) {
     NarrativeMotif.origin => Offset(
       0.08 + t * 0.74,
-      0.74 - math.sin(t * math.pi) * 0.025,
+      0.95 - math.sin(t * math.pi) * 0.012,
     ),
     NarrativeMotif.thread => Offset(
-      0.17 + math.sin(t * math.pi) * 0.055,
+      0.025 + math.sin(t * math.pi) * 0.004,
       0.08 + t * 0.84,
     ),
     NarrativeMotif.timeline => Offset(
-      0.17 + math.sin(t * math.pi * 3) * 0.008,
+      0.025 + math.sin(t * math.pi * 3) * 0.003,
       0.06 + t * 0.88,
     ),
     NarrativeMotif.branches => Offset(
-      0.14 + t * 0.7,
+      0.02 + t * 0.004 + math.sin(t * math.pi) * 0.006,
       0.1 + t * 0.78 - math.sin(t * math.pi) * 0.08,
     ),
     NarrativeMotif.bracket => _bracketPoint(t),
@@ -179,17 +179,17 @@ abstract final class NarrativeSpineGeometry {
   static Offset _bracketPoint(double t) {
     const capFraction = 0.14;
     if (t < capFraction) {
-      return Offset(0.08 + (t / capFraction) * 0.08, 0.16);
+      return Offset(0.012 + (t / capFraction) * 0.023, 0.16);
     }
     if (t > 1 - capFraction) {
       return Offset(
-        0.16 - ((t - (1 - capFraction)) / capFraction) * 0.08,
+        0.035 - ((t - (1 - capFraction)) / capFraction) * 0.023,
         0.84,
       );
     }
     final vertical = (t - capFraction) / (1 - capFraction * 2);
     return Offset(
-      0.16 + math.sin(vertical * math.pi) * 0.025,
+      0.035 + math.sin(vertical * math.pi) * 0.004,
       0.16 + vertical * 0.68,
     );
   }
@@ -200,8 +200,12 @@ abstract final class NarrativeSpineGeometry {
     if (motif != NarrativeMotif.branches) return anchor;
 
     final direction = branch.isEven ? -1.0 : 1.0;
+    final horizontalDirection = branch.isEven ? -1.0 : 1.0;
     final destination = Offset(
-      (anchor.dx + 0.16 + branch * 0.035).clamp(0.08, 0.92),
+      (anchor.dx + horizontalDirection * (0.018 + branch * 0.003)).clamp(
+        0.008,
+        0.04,
+      ),
       (anchor.dy + direction * (0.12 + branch * 0.018)).clamp(0.08, 0.92),
     );
     final control = Offset(

@@ -12,7 +12,11 @@ const budgets = {
 };
 
 const failures = [];
-const releaseBudget = 36 * 1024 * 1024;
+// Flutter 3.44's self-hosted dual-runtime bundle carries mutually exclusive
+// CanvasKit, SkWasm, and fallback renderer variants. Only one is requested by
+// a browser; the entrypoint budgets above guard actual user payload while this
+// aggregate budget guards the deployment footprint.
+const releaseBudget = 40 * 1024 * 1024;
 const sourcePortfolio = JSON.parse(
   await readFile(path.resolve('assets', 'content', 'portfolio.json'), 'utf8'),
 );

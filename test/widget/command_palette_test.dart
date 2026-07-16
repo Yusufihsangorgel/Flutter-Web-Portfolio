@@ -11,7 +11,7 @@ import '../helpers/narrative_fixture.dart';
 
 final class _PaletteLanguageRepository implements ILanguageRepository {
   @override
-  Map<String, String> getSupportedLanguages() => const {'en': 'English'};
+  Set<String> getSupportedLanguages() => const {'en'};
 
   @override
   Future<String> getSelectedLanguage() async => 'en';

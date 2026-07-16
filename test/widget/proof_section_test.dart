@@ -14,7 +14,7 @@ import '../helpers/narrative_fixture.dart';
 
 final class _ProofLanguageRepository implements ILanguageRepository {
   @override
-  Map<String, String> getSupportedLanguages() => const {'en': 'EN'};
+  Set<String> getSupportedLanguages() => const {'en'};
 
   @override
   Future<String> getSelectedLanguage() async => 'en';
@@ -24,8 +24,13 @@ final class _ProofLanguageRepository implements ILanguageRepository {
     'nav': {'proof': 'Open Source'},
     'proof_section': {
       'title': 'Open Source',
-      'merged_summary': '{count} merged changes across {projects}.',
-      'review_summary': '{count} open-source changes under review.',
+      'summary':
+          '{merged} changes accepted upstream; {review} more under review.',
+      'featured_label': 'Featured contribution',
+      'accepted_title': 'Accepted upstream',
+      'review_title': 'In review',
+      'problem_label': 'The failure',
+      'change_label': 'The patch',
       'open_pull_request': 'View pull request',
       'status_merged': 'Merged',
       'status_under_review': 'Under review',
@@ -78,37 +83,45 @@ void main() {
     await tester.pump(const Duration(seconds: 1));
 
     expect(find.text('Open Source'), findsOneWidget);
+    expect(find.text('Featured contribution'.toUpperCase()), findsOneWidget);
+    expect(find.text('Accepted upstream'), findsOneWidget);
+    expect(find.text('In review'), findsOneWidget);
     for (final contribution in portfolio.contributions) {
       expect(find.text(contribution.title), findsOneWidget);
     }
+    expect(find.text('View pull request'), findsOneWidget);
     expect(
-      find.text('View pull request'),
+      find.byWidgetPredicate(
+        (widget) =>
+            widget is CinematicFocusable &&
+            widget.semanticRole == CinematicControlRole.link,
+      ),
       findsNWidgets(portfolio.contributions.length),
     );
     expect(find.textContaining('testimonial'), findsNothing);
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('configures the Flutter engine patch as an accessible link', (
+  testWidgets('configures the content-selected contribution as a link', (
     tester,
   ) async {
     await tester.pumpWidget(buildSubject());
     await tester.pump(const Duration(seconds: 1));
 
-    final reviewed = portfolio.contributionsUnderReview.first;
+    final featured = portfolio.featuredContribution!;
     expect(
       find.byWidgetPredicate(
         (widget) =>
             widget is CinematicFocusable &&
             widget.semanticRole == CinematicControlRole.link &&
             widget.semanticLabel?.contains('View pull request') == true &&
-            widget.semanticLabel?.contains(reviewed.title) == true,
+            widget.semanticLabel?.contains(featured.title) == true,
       ),
       findsOneWidget,
     );
   });
 
-  testWidgets('keeps every evidence plate visible on a narrow viewport', (
+  testWidgets('keeps every contribution visible on a narrow viewport', (
     tester,
   ) async {
     tester.view.physicalSize = const Size(390, 844);

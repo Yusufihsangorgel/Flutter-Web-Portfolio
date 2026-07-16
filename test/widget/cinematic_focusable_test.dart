@@ -69,6 +69,26 @@ void main() {
       expect(lastHoverState, isFalse);
     });
 
+    testWidgets('onFocusChanged callback follows keyboard focus', (
+      tester,
+    ) async {
+      final focusStates = <bool>[];
+      await tester.pumpWidget(
+        _buildSubject(
+          CinematicFocusable(
+            onTap: () {},
+            onFocusChanged: focusStates.add,
+            child: const Text('Focus preview'),
+          ),
+        ),
+      );
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      await tester.pump();
+
+      expect(focusStates, contains(true));
+    });
+
     testWidgets('keyboard Enter triggers onTap', (tester) async {
       var activated = false;
 

@@ -13,10 +13,7 @@ final class _SwitcherLanguageRepository implements ILanguageRepository {
   String selectedLanguage = 'en';
 
   @override
-  Map<String, String> getSupportedLanguages() => const {
-    'en': 'English',
-    'tr': 'Türkçe',
-  };
+  Set<String> getSupportedLanguages() => const {'en', 'tr'};
 
   @override
   Future<String> getSelectedLanguage() async => selectedLanguage;
@@ -69,7 +66,7 @@ void main() {
     await tester.pump();
 
     expect(find.text('EN'), findsOneWidget);
-    expect(find.text(LanguageCubit.getLanguageFlag('en')), findsNothing);
+    expect(find.text('🇬🇧'), findsNothing);
     expect(find.byTooltip('Language menu: English'), findsOneWidget);
   });
 
@@ -86,7 +83,7 @@ void main() {
     expect(find.text('Türkçe'), findsOneWidget);
     expect(find.text('TR'), findsOneWidget);
     expect(find.byIcon(Icons.check_rounded), findsOneWidget);
-    expect(find.text(LanguageCubit.getLanguageFlag('tr')), findsNothing);
+    expect(find.text('🇹🇷'), findsNothing);
 
     await tester.tap(find.text('TR'));
     await tester.pumpAndSettle();

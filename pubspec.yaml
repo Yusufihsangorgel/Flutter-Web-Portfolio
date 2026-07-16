@@ -2,11 +2,11 @@ name: flutter_web_portfolio
 description: 'A data-driven Flutter Web portfolio for verified engineering work.'
 publish_to: 'none'
 
-version: 1.5.0+6
+version: 1.6.0+7
 
 environment:
-  sdk: '>=3.11.0 <4.0.0'
-  flutter: '>=3.41.2'
+  sdk: '>=3.12.0 <4.0.0'
+  flutter: '>=3.44.0'
 
 dependencies:
   flutter:

@@ -34,6 +34,7 @@ void main() {
         final document = entry.value;
         final navigation = document['nav']! as Map<String, dynamic>;
 
+        expect(document, isNot(contains('app_name')));
         expect(document.keys, isNot(contains(anyOf(retiredTopLevelKeys))));
         expect(navigation.keys, isNot(contains(anyOf(retiredNavigationKeys))));
         for (final section in [

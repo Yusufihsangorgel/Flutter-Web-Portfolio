@@ -4,6 +4,7 @@ import { readFileSync } from 'node:fs';
 const portfolio = JSON.parse(
   readFileSync('assets/content/portfolio.json', 'utf8'),
 );
+const packageMetadata = JSON.parse(readFileSync('package.json', 'utf8'));
 
 async function openPortfolio(page: Page) {
   const response = await page.goto('/', { waitUntil: 'domcontentloaded' });
@@ -14,6 +15,7 @@ async function openPortfolio(page: Page) {
   });
   await expect(page.locator('#bootstrap-surface')).toHaveCount(0);
   await expect(page.getByRole('heading').first()).toBeAttached();
+  await expect(page).toHaveTitle(portfolio.site.title);
   await expect(page.locator('html')).toHaveAttribute(
     'data-render-quality',
     /^(essential|balanced|cinematic)$/,
@@ -49,6 +51,35 @@ async function scrollToHeading(page: Page, name: string) {
     await page.mouse.wheel(0, 500);
   }
   await expect(heading).toBeVisible();
+}
+
+async function scrollToContributionLink(page: Page, title: string) {
+  // Flutter exposes this tappable Semantics node to Chromium's AX tree as a
+  // link, but its generated <a> intentionally has no href. Playwright's DOM
+  // role selector therefore cannot see it; the CDP AX assertion below still
+  // verifies the real link role and accessible name.
+  const link = page
+    .locator('flt-semantics-host a')
+    .filter({ hasText: title });
+  // Route navigation animates the Flutter scroll position. Give the target
+  // semantics node a chance to enter the viewport before sending wheel input,
+  // otherwise mobile emulation can race past the short link target.
+  await link
+    .first()
+    .waitFor({ state: 'attached', timeout: 1200 })
+    .catch(() => undefined);
+  for (let attempt = 0; attempt < 80; attempt += 1) {
+    if ((await link.count()) > 0) {
+      const [box, viewportHeight] = await Promise.all([
+        link.first().boundingBox(),
+        page.evaluate(() => window.innerHeight),
+      ]);
+      if (box && box.y < viewportHeight && box.y + box.height > 0) return;
+    }
+    await page.mouse.wheel(0, 420);
+    await page.waitForTimeout(80);
+  }
+  await expect(link.first()).toBeVisible();
 }
 
 async function readRuntimeTimeline(page: Page) {
@@ -176,6 +207,7 @@ test('boots the production Wasm release with its security contract', async ({
   });
   await expect(page.locator('#bootstrap-surface')).toHaveCount(0);
   await expect(page.getByRole('heading').first()).toBeAttached();
+  await expect(page).toHaveTitle(portfolio.site.title);
   const timeline = await readRuntimeTimeline(page);
   expect(timeline.every((value) => Number.isFinite(value))).toBe(true);
   expect(timeline).toEqual([...timeline].sort((a, b) => a! - b!));
@@ -275,16 +307,22 @@ test('serves the production accessibility hierarchy', async ({
     /#\/proof$/,
     'Open Source',
   );
+  const visibleContribution =
+    portfolio.contributions.find((contribution) => contribution.featured) ??
+    portfolio.contributions[0];
+  expect(visibleContribution).toBeTruthy();
+  await scrollToContributionLink(page, visibleContribution.title);
   const proofTree = await accessibility.send('Accessibility.getFullAXTree');
   const proofLinks = proofTree.nodes
     .filter((node) => !node.ignored && node.role?.value === 'link')
     .map((node) => node.name?.value ?? '');
-  const visibleContribution = portfolio.contributions[0];
-  expect(visibleContribution).toBeTruthy();
+  const contributionStatus =
+    visibleContribution.status === 'merged' ? 'Merged' : 'Under review';
   expect(proofLinks).toEqual(
     expect.arrayContaining([
-      `View pull request. ${visibleContribution.title}. ` +
-        `${visibleContribution.project} · Merged · ${visibleContribution.date}`,
+      expect.stringContaining(
+        `View pull request. ${visibleContribution.title}. ${visibleContribution.project}. ${contributionStatus}.`,
+      ),
     ]),
   );
 
@@ -416,5 +454,7 @@ test('serves the declared production sharing and font assets', async ({
 
   const version = await request.get('/version.json');
   expect(version.status()).toBe(200);
-  expect(await version.json()).toMatchObject({ version: '1.5.0' });
+  expect(await version.json()).toMatchObject({
+    version: packageMetadata.version,
+  });
 });

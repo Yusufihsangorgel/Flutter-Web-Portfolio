@@ -1,5 +1,4 @@
 {
-  "app_name": "Software Engineer",
   "nav": {
     "home": "Home",
     "about": "About",
@@ -45,8 +44,12 @@
   },
   "proof_section": {
     "title": "Open Source",
-    "merged_summary": "{count} merged changes across {projects}.",
-    "review_summary": "{count} open-source changes under review.",
+    "summary": "{merged} changes accepted upstream; {review} more under review.",
+    "featured_label": "Featured contribution",
+    "accepted_title": "Accepted upstream",
+    "review_title": "In review",
+    "problem_label": "The failure",
+    "change_label": "The patch",
     "open_pull_request": "View pull request",
     "status_merged": "Merged",
     "status_under_review": "Under review"

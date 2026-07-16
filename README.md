@@ -15,12 +15,13 @@ The live demo is generated from one public professional record, while the interf
 
 I work across Flutter, Dart, and Go, turning product ideas into software that holds up on real devices, unreliable networks, and long-lived release cycles.
 
-Source status: `2026.07.15.6`, verified 2026-07-15 against GitHub and LinkedIn.
+Source status: `2026.07.16.1`, verified 2026-07-16 against GitHub and LinkedIn.
 
 ### Accepted upstream changes
 
 | Project | Change | Merged | Evidence |
 |---|---|---:|---|
+| Dart MCP | Separate server feature registration from legacy initialization | 2026-07-15 | [Pull request](https://github.com/dart-lang/ai/pull/524) |
 | FlutterFire | Make Firebase core loading deterministic on WebKit | 2026-07-15 | [Pull request](https://github.com/firebase/flutterfire/pull/18443) |
 | Flutter Form Builder | Reset unknown dropdown initial values on first build | 2026-07-14 | [Pull request](https://github.com/flutter-form-builder-ecosystem/flutter_form_builder/pull/1512) |
 | Drift | Treat SQLite TRUE and 1 defaults as the same schema | 2026-07-14 | [Pull request](https://github.com/simolus3/drift/pull/3835) |
@@ -42,6 +43,7 @@ Source status: `2026.07.15.6`, verified 2026-07-15 against GitHub and LinkedIn.
 ### Work under review
 
 - **Flutter:** [Wait for web rendering before the first-frame event](https://github.com/flutter/flutter/pull/189500) — Wait for outstanding scene renders and the next browser frame before dispatching the event; the pull request is ready for review with seven Chrome renderer and compiler suites passing.
+- **Flutter Packages:** [Ignore unrecognized SVG font-weight values](https://github.com/flutter/packages/pull/12199) — Treat unrecognized font-weight values as unspecified, preserve supported mappings, and cover the parser behaviour with the existing vector-graphics test suite.
 - **MCP Kotlin SDK:** [Add SEP-2575 request metadata and discovery types](https://github.com/modelcontextprotocol/kotlin-sdk/pull/893) — Add typed experimental metadata accessors, server discovery types, polymorphic codecs, and malformed-input coverage.
 <!-- portfolio-record:end -->
 
@@ -146,7 +148,7 @@ npm run test:visual
 npm test
 ```
 
-The source preparation step renders the social card and writes a source manifest into the Flutter asset bundle. The bundle gate rejects stale tracked output, then checks Wasm headers, dual-runtime configuration, versioned entry points, self-hosted renderer assets, local font coverage, first-frame cleanup, service-worker retirement, and explicit size budgets. Playwright exercises desktop and mobile semantics, locale/RTL switching, URL history, security headers, and release assets. Twelve checked-in screenshots lock the critical shell, hero, open-source chapter, and work chapter across desktop, mobile, and tablet viewports with reduced motion enabled.
+The source preparation step renders the social card and writes a source manifest into the Flutter asset bundle. The bundle gate rejects stale tracked output, then checks Wasm headers, dual-runtime configuration, versioned entry points, self-hosted renderer assets, local font coverage, first-frame cleanup, service-worker retirement, and explicit size budgets. Playwright exercises desktop and mobile semantics, locale/RTL switching, URL history, security headers, and release assets. Checked-in platform baselines lock the critical shell, hero, open-source chapter, selected systems, and supporting-work archive across desktop, mobile, and tablet viewports with reduced motion enabled.
 
 ## Local development
 

@@ -1,5 +1,4 @@
 {
-  "app_name": "Softwareentwickler",
   "nav": {
     "home": "Startseite",
     "about": "Über mich",
@@ -45,8 +44,12 @@
   },
   "proof_section": {
     "title": "Open Source",
-    "merged_summary": "{count} zusammengeführte Änderungen in {projects}.",
-    "review_summary": "{count} Open-Source-Änderungen werden geprüft.",
+    "summary": "{merged} Änderungen wurden upstream übernommen; {review} weitere werden geprüft.",
+    "featured_label": "Ausgewählter Beitrag",
+    "accepted_title": "Upstream übernommen",
+    "review_title": "In Prüfung",
+    "problem_label": "Der Fehler",
+    "change_label": "Der Patch",
     "open_pull_request": "Pull Request ansehen",
     "status_merged": "Zusammengeführt",
     "status_under_review": "In Prüfung"

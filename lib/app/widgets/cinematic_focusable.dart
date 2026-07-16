@@ -12,6 +12,7 @@ class CinematicFocusable extends StatefulWidget {
     required this.child,
     required this.onTap,
     this.onHoverChanged,
+    this.onFocusChanged,
     this.focusColor,
     this.showFocusRing = true,
     this.cursor = SystemMouseCursors.click,
@@ -24,6 +25,7 @@ class CinematicFocusable extends StatefulWidget {
   final Widget child;
   final VoidCallback onTap;
   final ValueChanged<bool>? onHoverChanged;
+  final ValueChanged<bool>? onFocusChanged;
   final Color? focusColor;
   final bool showFocusRing;
   final MouseCursor cursor;
@@ -46,7 +48,10 @@ class _CinematicFocusableState extends State<CinematicFocusable> {
     final control = FocusableActionDetector(
       mouseCursor: widget.cursor,
       onShowHoverHighlight: widget.onHoverChanged,
-      onShowFocusHighlight: (focused) => setState(() => _focused = focused),
+      onShowFocusHighlight: (focused) {
+        if (_focused != focused) setState(() => _focused = focused);
+        widget.onFocusChanged?.call(focused);
+      },
       actions: {
         ActivateIntent: CallbackAction<ActivateIntent>(
           onInvoke: (_) {

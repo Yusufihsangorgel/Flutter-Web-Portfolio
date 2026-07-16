@@ -101,6 +101,24 @@ void main() {
       expect(shape(NarrativeMotif.bracket).branchVisibility, 0);
     });
 
+    test('keeps document motifs inside a collision-safe margin corridor', () {
+      for (final motif in NarrativeMotif.values.where(
+        (motif) => motif != NarrativeMotif.origin,
+      )) {
+        final result = shape(motif);
+        for (final point in [
+          ...result.primary,
+          ...result.branches.expand((branch) => branch),
+        ]) {
+          expect(
+            point.dx,
+            lessThanOrEqualTo(size.width * 0.045),
+            reason: '$motif must not cross the document copy column',
+          );
+        }
+      }
+    });
+
     test('work motif stays open as an editorial bracket', () {
       final bracket = shape(NarrativeMotif.bracket).primary;
 

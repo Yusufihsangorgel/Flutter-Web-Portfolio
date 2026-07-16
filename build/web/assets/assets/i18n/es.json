@@ -1,5 +1,4 @@
 {
-  "app_name": "Ingeniero de software",
   "nav": {
     "home": "Inicio",
     "about": "Sobre mí",
@@ -45,8 +44,12 @@
   },
   "proof_section": {
     "title": "Código abierto",
-    "merged_summary": "{count} cambios fusionados en {projects}.",
-    "review_summary": "{count} cambios de código abierto en revisión.",
+    "summary": "{merged} cambios aceptados upstream; {review} más en revisión.",
+    "featured_label": "Contribución destacada",
+    "accepted_title": "Aceptados upstream",
+    "review_title": "En revisión",
+    "problem_label": "El fallo",
+    "change_label": "El parche",
     "open_pull_request": "Ver pull request",
     "status_merged": "Fusionado",
     "status_under_review": "En revisión"

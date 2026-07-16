@@ -143,7 +143,7 @@ class _CommandPaletteState extends State<CommandPalette> {
         ),
 
       // ── Language ────────────────────────────────────────────────────────
-      for (final entry in languageController.supportedLanguages.entries)
+      for (final languageCode in languageController.supportedLanguages)
         _PaletteCommand(
           label: languageController
               .getText(
@@ -152,13 +152,13 @@ class _CommandPaletteState extends State<CommandPalette> {
               )
               .replaceAll(
                 '{language}',
-                LanguageCubit.getLanguageName(entry.key),
+                LanguageCubit.getLanguageName(languageCode),
               ),
           category: languageCategory,
           icon: Icons.translate_rounded,
           onExecute: () => _executeAndClose(
             () => languageController.selectLanguage(
-              entry.key,
+              languageCode,
               preserveSection: sectionToPreserve,
             ),
           ),

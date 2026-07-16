@@ -38,9 +38,9 @@ class _CinematicBackgroundState extends State<CinematicBackground> {
   void initState() {
     super.initState();
     _frame = _NarrativeFrame(
-      config: SceneConfigs.hero,
-      cue: const NarrativeSpineCue.origin(),
-      quality: RenderQuality.balanced,
+      SceneConfigs.hero,
+      const NarrativeSpineCue.origin(),
+      RenderQuality.balanced,
     );
   }
 
@@ -357,13 +357,7 @@ final class _NarrativeBackgroundPainter extends CustomPainter {
 
 /// Coalesces scroll, quality and pointer inputs into one paint notification.
 final class _NarrativeFrame extends ChangeNotifier {
-  _NarrativeFrame({
-    required SceneConfig config,
-    required NarrativeSpineCue cue,
-    required RenderQuality quality,
-  }) : _config = config,
-       _cue = cue,
-       _quality = quality;
+  _NarrativeFrame(this._config, this._cue, this._quality);
 
   SceneConfig _config;
   NarrativeSpineCue _cue;

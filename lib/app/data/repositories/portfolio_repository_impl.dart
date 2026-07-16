@@ -3,8 +3,10 @@ import 'package:flutter_web_portfolio/app/domain/providers/i_assets_provider.dar
 import 'package:flutter_web_portfolio/app/domain/repositories/i_portfolio_repository.dart';
 
 final class PortfolioRepositoryImpl implements IPortfolioRepository {
-  const PortfolioRepositoryImpl({required IAssetsProvider assetsProvider})
-    : _assetsProvider = assetsProvider;
+  factory PortfolioRepositoryImpl({required IAssetsProvider assetsProvider}) =>
+      PortfolioRepositoryImpl._(assetsProvider);
+
+  const PortfolioRepositoryImpl._(this._assetsProvider);
 
   final IAssetsProvider _assetsProvider;
 

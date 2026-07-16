@@ -17,11 +17,14 @@ jobs:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
         with:
-          flutter-version: 3.41.2
+          flutter-version: 3.44.6
           cache: true
       - run: flutter pub get
       - run: npm ci
       - run: npm run verify:content
+      - run: npm run audit:sources
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
       - run: npm run verify:bundle
       - run: dart format --output=none --set-exit-if-changed lib test
       - run: flutter analyze --fatal-infos
@@ -34,7 +37,7 @@ jobs:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
         with:
-          flutter-version: 3.41.2
+          flutter-version: 3.44.6
           cache: true
       - run: flutter pub get
       - run: flutter test
@@ -47,7 +50,7 @@ jobs:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
         with:
-          flutter-version: 3.41.2
+          flutter-version: 3.44.6
           cache: true
       - run: flutter clean
       - run: flutter pub get

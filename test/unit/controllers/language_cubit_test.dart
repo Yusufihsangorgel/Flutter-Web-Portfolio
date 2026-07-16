@@ -16,11 +16,7 @@ final class _LanguageRepository implements ILanguageRepository {
   final List<String> savedLanguages = [];
 
   @override
-  Map<String, String> getSupportedLanguages() => const {
-    'en': 'EN',
-    'tr': 'TR',
-    'de': 'DE',
-  };
+  Set<String> getSupportedLanguages() => const {'en', 'tr', 'de'};
 
   @override
   Future<String> getSelectedLanguage() async => selectedLanguage;
@@ -55,7 +51,7 @@ void main() {
         selectedLanguage: 'tr',
         documents: {
           'tr': {
-            'app_name': 'Portföy',
+            'screen': {'label': 'Portföy'},
             'cv_data': {
               'personal_info': {'name': 'Test'},
             },
@@ -73,7 +69,7 @@ void main() {
       await stateExpectation;
 
       expect(cubit.currentLanguage, 'tr');
-      expect(cubit.appName, 'Portföy');
+      expect(cubit.getText('screen.label'), 'Portföy');
       expect(repository.savedLanguages, ['tr']);
     });
 
@@ -93,8 +89,12 @@ void main() {
     test('an explicit language selection updates native targets', () async {
       final repository = _LanguageRepository(
         documents: {
-          'en': {'app_name': 'Portfolio'},
-          'de': {'app_name': 'Portfolio auf Deutsch'},
+          'en': {
+            'screen': {'label': 'Portfolio'},
+          },
+          'de': {
+            'screen': {'label': 'Portfolio auf Deutsch'},
+          },
         },
       );
       final cubit = LanguageCubit(languageRepository: repository);
@@ -105,7 +105,7 @@ void main() {
 
       expect(cubit.state.status, LanguageStatus.ready);
       expect(cubit.currentLanguage, 'de');
-      expect(cubit.appName, 'Portfolio auf Deutsch');
+      expect(cubit.getText('screen.label'), 'Portfolio auf Deutsch');
       expect(repository.savedLanguages, ['en', 'de']);
     });
 
@@ -114,7 +114,9 @@ void main() {
       () async {
         final repository = _LanguageRepository(
           documents: {
-            'en': {'app_name': 'Portfolio'},
+            'en': {
+              'screen': {'label': 'Portfolio'},
+            },
             'tr': <String, dynamic>{},
           },
         );
@@ -126,7 +128,7 @@ void main() {
 
         expect(cubit.state.status, LanguageStatus.failure);
         expect(cubit.state.languageCode, 'en');
-        expect(cubit.appName, 'Portfolio');
+        expect(cubit.getText('screen.label'), 'Portfolio');
         expect(repository.savedLanguages, ['en']);
       },
     );
@@ -136,8 +138,12 @@ void main() {
       () async {
         final repository = _LanguageRepository(
           documents: {
-            'tr': {'app_name': 'Türkçe'},
-            'de': {'app_name': 'Deutsch'},
+            'tr': {
+              'screen': {'label': 'Türkçe'},
+            },
+            'de': {
+              'screen': {'label': 'Deutsch'},
+            },
           },
           delays: const {
             'tr': Duration(milliseconds: 20),
@@ -154,7 +160,7 @@ void main() {
 
         expect(cubit.state.status, LanguageStatus.ready);
         expect(cubit.currentLanguage, 'de');
-        expect(cubit.appName, 'Deutsch');
+        expect(cubit.getText('screen.label'), 'Deutsch');
         expect(repository.savedLanguages, ['de']);
       },
     );
@@ -194,7 +200,6 @@ void main() {
 
       test('returns safe fallbacks for unknown locale codes', () {
         expect(LanguageCubit.getLanguageName('ja'), 'Unknown');
-        expect(LanguageCubit.getLanguageFlag('xx'), isNotEmpty);
       });
     });
   });

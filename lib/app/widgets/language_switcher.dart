@@ -76,7 +76,6 @@ class LanguageSwitcher extends StatelessWidget {
                 ),
                 itemBuilder: (BuildContext context) => languageController
                     .supportedLanguages
-                    .keys
                     .map((String languageCode) {
                       final languageName = LanguageCubit.getLanguageName(
                         languageCode,

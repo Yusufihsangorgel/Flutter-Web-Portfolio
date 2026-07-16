@@ -1,5 +1,4 @@
 {
-  "app_name": "Ingénieur logiciel",
   "nav": {
     "home": "Accueil",
     "about": "À propos",
@@ -45,8 +44,12 @@
   },
   "proof_section": {
     "title": "Open source",
-    "merged_summary": "{count} modifications fusionnées dans {projects}.",
-    "review_summary": "{count} modifications open source en cours de révision.",
+    "summary": "{merged} modifications acceptées en amont ; {review} autres en cours de révision.",
+    "featured_label": "Contribution à la une",
+    "accepted_title": "Acceptées en amont",
+    "review_title": "En révision",
+    "problem_label": "La défaillance",
+    "change_label": "Le correctif",
     "open_pull_request": "Voir la pull request",
     "status_merged": "Fusionnée",
     "status_under_review": "En révision"

@@ -12,7 +12,7 @@ void main() {
       final profile = manifest['profile']! as Map<String, dynamic>;
       final displayName = profile['display_name']! as Map<String, dynamic>;
 
-      expect(document.schemaVersion, 3);
+      expect(document.schemaVersion, 4);
       expect(document.contentVersion, manifest['content_version']);
       expect(document.profile.name, profile['name']);
       expect(document.profile.role, profile['role']);
@@ -35,9 +35,10 @@ void main() {
         document.site.analytics?.scriptUrl.toString(),
         analytics['script_url'],
       );
-      expect(document.experience, hasLength(4));
-      expect(document.mergedContributions, hasLength(4));
-      expect(document.contributionsUnderReview, hasLength(2));
+      expect(document.experience, hasLength(6));
+      expect(document.mergedContributions, hasLength(5));
+      expect(document.contributionsUnderReview, hasLength(3));
+      expect(document.featuredContribution, isNotNull);
       expect(document.systems, hasLength(8));
       expect(document.featuredSystems, hasLength(3));
       expect(
@@ -106,6 +107,22 @@ void main() {
       expect(document.activeSections, ['home', 'about']);
     });
 
+    test(
+      'selects the featured contribution from external content metadata',
+      () {
+        final json = _manifest();
+        final contributions = json['contributions']! as List<dynamic>;
+        for (final contribution in contributions.cast<Map<String, dynamic>>()) {
+          contribution['featured'] = false;
+        }
+        final selected = contributions.first as Map<String, dynamic>;
+        selected['featured'] = true;
+
+        final document = PortfolioDocument.fromJson(json);
+        expect(document.featuredContribution?.id, selected['id']);
+      },
+    );
+
     test('preserves active chapter order without optional records', () {
       final json = _manifest();
       json['experience'] = <dynamic>[];
@@ -116,7 +133,7 @@ void main() {
     });
 
     test('rejects unsupported schemas and duplicate content ids', () {
-      final unsupported = _manifest()..['schema_version'] = 4;
+      final unsupported = _manifest()..['schema_version'] = 5;
       expect(
         () => PortfolioDocument.fromJson(unsupported),
         throwsA(isA<FormatException>()),
@@ -153,6 +170,15 @@ void main() {
       );
       expect(
         () => PortfolioDocument.fromJson(duplicateEngineeringLink),
+        throwsA(isA<FormatException>()),
+      );
+
+      final multipleFeatured = _manifest();
+      final featuredContributions =
+          multipleFeatured['contributions']! as List<dynamic>;
+      (featuredContributions.first as Map<String, dynamic>)['featured'] = true;
+      expect(
+        () => PortfolioDocument.fromJson(multipleFeatured),
         throwsA(isA<FormatException>()),
       );
 

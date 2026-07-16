@@ -1,6 +1,6 @@
 {
   "name": "flutter-web-portfolio",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "private": true,
   "description": "A production Flutter Web document with typed external content, measured scroll geometry, and a dual-runtime Wasm release.",
   "scripts": {
@@ -11,6 +11,7 @@
     "test:visual:update": "playwright test tests/e2e/visual.spec.ts --update-snapshots",
     "sync:content": "node tool/sync_public_content.mjs",
     "verify:content": "node tool/sync_public_content.mjs --check",
+    "audit:sources": "node tool/audit_public_sources.mjs",
     "render:social-card": "node tool/render_social_card.mjs",
     "verify:source": "node tool/verify_dart_reachability.mjs",
     "prepare:source": "node tool/render_social_card.mjs && node tool/write_source_manifest.mjs",

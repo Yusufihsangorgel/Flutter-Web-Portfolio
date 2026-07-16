@@ -22,7 +22,7 @@ final class PortfolioDocument {
 
   factory PortfolioDocument.fromJson(Map<String, dynamic> json) {
     final schemaVersion = _requiredInt(json, 'schema_version');
-    if (schemaVersion != 3) {
+    if (schemaVersion != 4) {
       throw FormatException(
         'Unsupported portfolio schema version: $schemaVersion',
       );
@@ -76,6 +76,13 @@ final class PortfolioDocument {
   Iterable<PortfolioContribution> get contributionsUnderReview => contributions
       .where((entry) => entry.status == ContributionStatus.underReview);
 
+  PortfolioContribution? get featuredContribution {
+    for (final contribution in contributions) {
+      if (contribution.featured) return contribution;
+    }
+    return null;
+  }
+
   Iterable<PortfolioSystem> get featuredSystems =>
       systems.where((entry) => entry.featured);
 
@@ -107,6 +114,11 @@ final class PortfolioDocument {
     if (site.engineeringLinks.isEmpty) {
       throw const FormatException(
         'The site must declare at least one engineering link.',
+      );
+    }
+    if (contributions.where((entry) => entry.featured).length > 1) {
+      throw const FormatException(
+        'At most one open-source contribution may be featured.',
       );
     }
     _assertUnique('source', sources.map((entry) => entry.id));
@@ -365,6 +377,7 @@ final class PortfolioContribution {
     required this.problem,
     required this.change,
     required this.url,
+    required this.featured,
     this.issueUrl,
   });
 
@@ -378,6 +391,7 @@ final class PortfolioContribution {
         problem: _requiredString(json, 'problem'),
         change: _requiredString(json, 'change'),
         url: _requiredUri(json, 'url'),
+        featured: _requiredBool(json, 'featured'),
         issueUrl: _optionalUri(json, 'issue_url'),
       );
 
@@ -389,6 +403,7 @@ final class PortfolioContribution {
   final String problem;
   final String change;
   final Uri url;
+  final bool featured;
   final Uri? issueUrl;
 }
 

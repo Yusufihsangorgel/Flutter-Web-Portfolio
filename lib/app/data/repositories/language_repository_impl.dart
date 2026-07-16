@@ -6,28 +6,29 @@ import 'package:flutter_web_portfolio/app/domain/repositories/i_language_reposit
 
 /// JSON-backed language repo — reads translations from assets, persists preference.
 final class LanguageRepositoryImpl implements ILanguageRepository {
-  LanguageRepositoryImpl({
+  factory LanguageRepositoryImpl({
     required IAssetsProvider assetsProvider,
     required ILocalStorageProvider localStorageProvider,
-  }) : _assetsProvider = assetsProvider,
-       _localStorageProvider = localStorageProvider;
+  }) => LanguageRepositoryImpl._(assetsProvider, localStorageProvider);
+
+  LanguageRepositoryImpl._(this._assetsProvider, this._localStorageProvider);
   final IAssetsProvider _assetsProvider;
   final ILocalStorageProvider _localStorageProvider;
 
   static const String _languageKey = 'selected_language';
 
-  static const Map<String, String> _supportedLanguages = {
-    'tr': '\u{1F1F9}\u{1F1F7}',
-    'en': '\u{1F1EC}\u{1F1E7}',
-    'de': '\u{1F1E9}\u{1F1EA}',
-    'fr': '\u{1F1EB}\u{1F1F7}',
-    'es': '\u{1F1EA}\u{1F1F8}',
-    'ar': '\u{1F1F8}\u{1F1E6}',
-    'hi': '\u{1F1EE}\u{1F1F3}',
+  static const Set<String> _supportedLanguages = {
+    'tr',
+    'en',
+    'de',
+    'fr',
+    'es',
+    'ar',
+    'hi',
   };
 
   @override
-  Map<String, String> getSupportedLanguages() => _supportedLanguages;
+  Set<String> getSupportedLanguages() => _supportedLanguages;
 
   @override
   Future<String> getSelectedLanguage() async {

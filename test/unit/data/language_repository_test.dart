@@ -76,30 +76,21 @@ void main() {
 
       test('contains all expected language codes', () {
         final languages = repository.getSupportedLanguages();
-        expect(languages.containsKey('tr'), isTrue);
-        expect(languages.containsKey('en'), isTrue);
-        expect(languages.containsKey('de'), isTrue);
-        expect(languages.containsKey('fr'), isTrue);
-        expect(languages.containsKey('es'), isTrue);
-        expect(languages.containsKey('ar'), isTrue);
-        expect(languages.containsKey('hi'), isTrue);
+        expect(
+          languages,
+          containsAll(['tr', 'en', 'de', 'fr', 'es', 'ar', 'hi']),
+        );
       });
 
       test('does not contain unsupported language codes', () {
         final languages = repository.getSupportedLanguages();
-        expect(languages.containsKey('ja'), isFalse);
-        expect(languages.containsKey('zh'), isFalse);
-        expect(languages.containsKey('ko'), isFalse);
+        expect(languages, isNot(contains(anyOf(['ja', 'zh', 'ko']))));
       });
 
-      test('each language has a non-empty flag value', () {
+      test('each supported language is a non-empty locale code', () {
         final languages = repository.getSupportedLanguages();
-        for (final entry in languages.entries) {
-          expect(
-            entry.value.isNotEmpty,
-            isTrue,
-            reason: 'Flag for ${entry.key} should not be empty',
-          );
+        for (final languageCode in languages) {
+          expect(languageCode, isNotEmpty);
         }
       });
     });

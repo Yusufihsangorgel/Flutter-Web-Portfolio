@@ -1,13 +1,13 @@
 {
-  "schema_version": 3,
-  "content_version": "2026.07.15.6",
-  "verified_at": "2026-07-15",
+  "schema_version": 4,
+  "content_version": "2026.07.16.1",
+  "verified_at": "2026-07-16",
   "site": {
     "url": "https://developeryusuf.com",
     "title": "Yusuf İhsan Görgel — Software Engineer",
     "description": "Yusuf İhsan Görgel is a software engineer building cross-platform products with Flutter, Dart, Go, PostgreSQL, Redis, and production infrastructure.",
     "social_description": "Cross-platform product engineering, selected professional work, and verified open-source contributions by Yusuf İhsan Görgel.",
-    "social_image": "/assets/og/engineering-showcase.png?v=2026.07.15.6",
+    "social_image": "/assets/og/engineering-showcase.png?v=2026.07.16.1",
     "domain_label": "DEVELOPERYUSUF.COM",
     "analytics": {
       "script_url": "https://analytics.developeryusuf.com/js/script.js",
@@ -55,10 +55,10 @@
     },
     "role": "Software Engineer",
     "location": "Antalya, Türkiye",
-    "since": "2022",
+    "since": "2021",
     "headline": "I build cross-platform software, then stay for the hard parts.",
     "summary": "I work across Flutter, Dart, and Go, turning product ideas into software that holds up on real devices, unreliable networks, and long-lived release cycles.",
-    "background": "Since 2022 I have shipped mobile, desktop, and web products for retail, logistics, and digital publishing. My work has moved from client applications and native integrations into offline data, real-time synchronisation, backend services, release engineering, and the production systems around them.",
+    "background": "Since 2021 I have shipped mobile, desktop, and web products for retail, logistics, and digital publishing. My work has moved from client applications and native integrations into offline data, real-time synchronisation, backend services, release engineering, and the production systems around them.",
     "focus": [
       "Flutter and Dart",
       "Go services",
@@ -87,11 +87,11 @@
   "experience": [
     {
       "id": "fugasoft",
-      "company": "FugaSoft",
-      "role": "Software Engineer",
+      "company": "Uzman Adres / FugaSoft",
+      "role": "Flutter Developer",
       "domain": "Cross-platform ERP and point-of-sale products",
-      "period": "March 2022 — Present",
-      "summary": "Build and maintain production applications across Android and iOS tablets plus Linux, macOS, and Windows desktops. I work on offline-first SQLite and Drift data, native integrations, localisation, real-time synchronisation, release engineering, and reliability on point-of-sale hardware.",
+      "period": "March 2021 — Present",
+      "summary": "Project-based since March 2021 and full-time since September 2025. I build and maintain production ERP and point-of-sale applications across Android and iOS tablets plus Linux, macOS, and Windows desktops, with a focus on offline data, native integrations, performance, release reliability, and long-lived product maintenance.",
       "evidence": [
         "Flutter",
         "Dart",
@@ -102,10 +102,10 @@
     },
     {
       "id": "juniustech",
-      "company": "Juniustech",
+      "company": "JuniusTech",
       "role": "Full Stack Developer",
       "domain": "Dorse logistics platform",
-      "period": "April 2024 — January 2025",
+      "period": "June 2023 — Present",
       "summary": "Delivered mobile and web product work spanning Flutter and React, REST and WebSocket data flows, live vehicle tracking, Google and Apple Maps integrations, deployment, and QA coordination.",
       "evidence": [
         "Flutter",
@@ -116,18 +116,45 @@
       ]
     },
     {
+      "id": "ivent",
+      "company": "iVent",
+      "role": "Flutter Developer",
+      "domain": "Mobile product development",
+      "period": "May 2022 — November 2025",
+      "summary": "Contributed to Flutter application delivery and maintenance in a long-running part-time role, carrying product work from implementation through release support.",
+      "evidence": [
+        "Flutter",
+        "Dart",
+        "Mobile delivery",
+        "Release support"
+      ]
+    },
+    {
       "id": "promob-tr",
       "company": "Promob TR",
-      "role": "Flutter Developer",
+      "role": "Full Stack Developer",
       "domain": "Digital publishing applications",
-      "period": "October 2022 — June 2024",
-      "summary": "Shipped the Aydınlık E-Gazete and Bilim ve Ütopya E-Dergi applications for Android and iOS with maintainable presentation boundaries, API integration, localisation, and store-ready release workflows.",
+      "period": "September 2022 — July 2024",
+      "summary": "Shipped the Aydınlık E-Gazete and Bilim ve Ütopya E-Dergi applications for Android and iOS, working across Flutter delivery, API integration, localisation, and store-ready release workflows.",
       "evidence": [
         "Flutter",
         "Dart",
         "MVVM",
         "Dio",
         "App Store / Play Store"
+      ]
+    },
+    {
+      "id": "extreme-bs",
+      "company": "Extreme BS",
+      "role": "Software Engineering Intern",
+      "domain": "Software engineering internship",
+      "period": "June 2024 — August 2024",
+      "summary": "Completed a software engineering internship focused on production development practices, collaborative delivery, and applying academic foundations inside a working engineering team.",
+      "evidence": [
+        "Software engineering",
+        "Team delivery",
+        "Production practice"
       ]
     },
     {
@@ -169,6 +196,17 @@
   ],
   "contributions": [
     {
+      "id": "dart-mcp-initialization-lifecycle",
+      "project": "Dart MCP",
+      "status": "merged",
+      "date": "2026-07-15",
+      "title": "Separate server feature registration from legacy initialization",
+      "problem": "Feature registration was coupled to the legacy initialization handshake, making the server lifecycle harder to reuse across transports and initialization modes.",
+      "change": "Separate reusable feature and capability registration from legacy protocol negotiation, migrate the mixins and examples, and preserve compatibility with the existing initialization path through regression coverage.",
+      "url": "https://github.com/dart-lang/ai/pull/524",
+      "featured": false
+    },
+    {
       "id": "flutterfire-webkit-ordering",
       "project": "FlutterFire",
       "status": "merged",
@@ -176,7 +214,8 @@
       "title": "Make Firebase core loading deterministic on WebKit",
       "problem": "Component bundles could execute before firebase-app.js was available, producing an initialization race in WebKit browsers.",
       "change": "Load the Firebase core script before component bundles and preserve deterministic dependency order.",
-      "url": "https://github.com/firebase/flutterfire/pull/18443"
+      "url": "https://github.com/firebase/flutterfire/pull/18443",
+      "featured": false
     },
     {
       "id": "form-builder-initial-value",
@@ -186,7 +225,8 @@
       "title": "Reset unknown dropdown initial values on first build",
       "problem": "A dropdown could begin with a value that did not exist in its items and fail before normal field reset behaviour ran.",
       "change": "Normalize the first build and cover the regression with widget tests.",
-      "url": "https://github.com/flutter-form-builder-ecosystem/flutter_form_builder/pull/1512"
+      "url": "https://github.com/flutter-form-builder-ecosystem/flutter_form_builder/pull/1512",
+      "featured": false
     },
     {
       "id": "drift-boolean-default",
@@ -196,7 +236,8 @@
       "title": "Treat SQLite TRUE and 1 defaults as the same schema",
       "problem": "Schema verification reported equivalent SQLite boolean defaults as a migration difference.",
       "change": "Normalize the verifier comparison and add regression coverage for both representations.",
-      "url": "https://github.com/simolus3/drift/pull/3835"
+      "url": "https://github.com/simolus3/drift/pull/3835",
+      "featured": false
     },
     {
       "id": "fiber-asynq-recipe",
@@ -206,7 +247,8 @@
       "title": "Add a Fiber and Asynq background-jobs recipe",
       "problem": "The recipe collection lacked a production-shaped example for enqueueing and processing Redis-backed work outside request handlers.",
       "change": "Add a runnable producer, worker, queue configuration, and usage documentation.",
-      "url": "https://github.com/gofiber/recipes/pull/4997"
+      "url": "https://github.com/gofiber/recipes/pull/4997",
+      "featured": false
     },
     {
       "id": "flutter-first-frame",
@@ -217,7 +259,20 @@
       "problem": "On SkWasm, flutter-first-frame can fire before the compositor presents visible Flutter content, leaving a measurable blank handoff window.",
       "change": "Wait for outstanding scene renders and the next browser frame before dispatching the event; the pull request is ready for review with seven Chrome renderer and compiler suites passing.",
       "url": "https://github.com/flutter/flutter/pull/189500",
-      "issue_url": "https://github.com/flutter/flutter/issues/189499"
+      "issue_url": "https://github.com/flutter/flutter/issues/189499",
+      "featured": true
+    },
+    {
+      "id": "flutter-vector-graphics-font-weight",
+      "project": "Flutter Packages",
+      "status": "under_review",
+      "date": "2026-07-14",
+      "title": "Ignore unrecognized SVG font-weight values",
+      "problem": "SVG text parsing could reject documents when a font-weight value was valid CSS syntax but unsupported by the vector graphics parser.",
+      "change": "Treat unrecognized font-weight values as unspecified, preserve supported mappings, and cover the parser behaviour with the existing vector-graphics test suite.",
+      "url": "https://github.com/flutter/packages/pull/12199",
+      "issue_url": "https://github.com/flutter/flutter/issues/186933",
+      "featured": false
     },
     {
       "id": "mcp-kotlin-request-metadata",
@@ -227,7 +282,8 @@
       "title": "Add SEP-2575 request metadata and discovery types",
       "problem": "The SDK needed a wire model for request-scoped protocol and client context without breaking legacy request shapes.",
       "change": "Add typed experimental metadata accessors, server discovery types, polymorphic codecs, and malformed-input coverage.",
-      "url": "https://github.com/modelcontextprotocol/kotlin-sdk/pull/893"
+      "url": "https://github.com/modelcontextprotocol/kotlin-sdk/pull/893",
+      "featured": false
     }
   ],
   "systems": [

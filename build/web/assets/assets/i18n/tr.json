@@ -1,5 +1,4 @@
 {
-  "app_name": "Yazılım Mühendisi",
   "nav": {
     "home": "Ana Sayfa",
     "about": "Hakkımda",
@@ -45,8 +44,12 @@
   },
   "proof_section": {
     "title": "Açık Kaynak",
-    "merged_summary": "{projects} genelinde birleştirilen {count} değişiklik.",
-    "review_summary": "İncelemedeki {count} açık kaynak değişikliği.",
+    "summary": "{merged} değişiklik upstream'e kabul edildi; {review} değişiklik daha incelemede.",
+    "featured_label": "Öne çıkan katkı",
+    "accepted_title": "Upstream'e kabul edilenler",
+    "review_title": "İncelemede",
+    "problem_label": "Hata",
+    "change_label": "Yama",
     "open_pull_request": "Pull request'i görüntüle",
     "status_merged": "Birleştirildi",
     "status_under_review": "İncelemede"

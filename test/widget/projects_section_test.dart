@@ -14,7 +14,7 @@ import '../helpers/narrative_fixture.dart';
 
 final class _ProjectsLanguageRepository implements ILanguageRepository {
   @override
-  Map<String, String> getSupportedLanguages() => const {'en': 'EN'};
+  Set<String> getSupportedLanguages() => const {'en'};
 
   @override
   Future<String> getSelectedLanguage() async => 'en';
@@ -57,22 +57,28 @@ void main() {
     });
   });
 
-  Widget buildSubject() => MultiRepositoryProvider(
-    providers: [
-      RepositoryProvider.value(value: portfolio),
-      RepositoryProvider.value(value: scroll.narrative),
-    ],
-    child: MultiBlocProvider(
-      providers: [
-        BlocProvider.value(value: language),
-        BlocProvider.value(value: scroll),
-        BlocProvider.value(value: scene),
-      ],
-      child: const MaterialApp(
-        home: Scaffold(body: SingleChildScrollView(child: ProjectsSection())),
-      ),
-    ),
-  );
+  Widget buildSubject({bool disableAnimations = false}) =>
+      MultiRepositoryProvider(
+        providers: [
+          RepositoryProvider.value(value: portfolio),
+          RepositoryProvider.value(value: scroll.narrative),
+        ],
+        child: MultiBlocProvider(
+          providers: [
+            BlocProvider.value(value: language),
+            BlocProvider.value(value: scroll),
+            BlocProvider.value(value: scene),
+          ],
+          child: MaterialApp(
+            home: MediaQuery(
+              data: MediaQueryData(disableAnimations: disableAnimations),
+              child: const Scaffold(
+                body: SingleChildScrollView(child: ProjectsSection()),
+              ),
+            ),
+          ),
+        ),
+      );
 
   testWidgets('renders featured work as problem-to-evidence chapters', (
     tester,
@@ -170,7 +176,7 @@ void main() {
         findsOneWidget,
       );
       expect(
-        find.descendant(of: row, matching: find.text(system.kind)),
+        find.descendant(of: row, matching: find.textContaining(system.kind)),
         findsOneWidget,
       );
       expect(
@@ -188,6 +194,56 @@ void main() {
         (decoration) => decoration.boxShadow?.isEmpty ?? true,
       ),
       isTrue,
+    );
+  });
+
+  testWidgets('desktop archive changes its reading pane on hover', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(1440, 1000);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(buildSubject());
+    await tester.pump(const Duration(seconds: 1));
+
+    final supporting = portfolio.supportingSystems.toList(growable: false);
+    expect(supporting.length, greaterThan(1));
+    expect(find.text(supporting.first.summary), findsOneWidget);
+    expect(find.text(supporting[1].summary), findsNothing);
+
+    final secondRow = find.byKey(
+      ValueKey('project-archive-${supporting[1].id}'),
+    );
+    final hoverTarget = tester.widget<FocusableActionDetector>(
+      find.descendant(
+        of: secondRow,
+        matching: find.byType(FocusableActionDetector),
+      ),
+    );
+    hoverTarget.onShowHoverHighlight!(true);
+    await tester.pumpAndSettle();
+
+    expect(find.text(supporting.first.summary), findsNothing);
+    expect(find.text(supporting[1].summary), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('disables archive transitions when reduced motion is requested', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(1440, 1000);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(buildSubject(disableAnimations: true));
+    await tester.pump(const Duration(seconds: 1));
+
+    expect(
+      tester.widget<AnimatedSwitcher>(find.byType(AnimatedSwitcher)).duration,
+      Duration.zero,
     );
   });
 

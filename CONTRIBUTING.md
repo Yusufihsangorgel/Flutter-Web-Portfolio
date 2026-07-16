@@ -38,7 +38,7 @@ Thanks for your interest in contributing to this project. Here's how to get star
 All quality gates must pass:
 
 ```bash
-# Canonical Dart 3.11 formatting
+# Canonical Dart 3.12 formatting
 dart format --output=none --set-exit-if-changed lib test
 
 # Static analysis — zero warnings, zero infos

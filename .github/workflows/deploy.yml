@@ -32,7 +32,7 @@ jobs:
           test "$(git rev-parse HEAD)" = "$(git rev-parse origin/main)"
       - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
         with:
-          flutter-version: 3.41.2
+          flutter-version: 3.44.6
           cache: true
       - run: flutter clean
       - run: flutter pub get

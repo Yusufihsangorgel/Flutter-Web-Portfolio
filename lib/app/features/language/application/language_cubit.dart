@@ -66,9 +66,11 @@ final class LanguageState {
 /// Locale changes are serialized so a slower request can never overwrite a
 /// newer user choice. This Cubit is the sole localization state source.
 final class LanguageCubit extends Cubit<LanguageState> {
-  LanguageCubit({required ILanguageRepository languageRepository})
-    : _languageRepository = languageRepository,
-      super(const LanguageState.initial());
+  factory LanguageCubit({required ILanguageRepository languageRepository}) =>
+      LanguageCubit._(languageRepository);
+
+  LanguageCubit._(this._languageRepository)
+    : super(const LanguageState.initial());
 
   final ILanguageRepository _languageRepository;
   int _operationId = 0;
@@ -77,17 +79,8 @@ final class LanguageCubit extends Cubit<LanguageState> {
 
   Locale get currentLocale => state.locale;
 
-  Map<String, String> get languageInfo => {
-    'code': currentLanguage,
-    'name': getLanguageName(currentLanguage),
-    'flag': getLanguageFlag(currentLanguage),
-  };
-
-  Map<String, String> get supportedLanguages =>
+  Set<String> get supportedLanguages =>
       _languageRepository.getSupportedLanguages();
-
-  String get appName =>
-      state.translations['app_name']?.toString() ?? 'Portfolio';
 
   String getText(String key, {String defaultValue = ''}) {
     final parts = key.split('.');
@@ -137,7 +130,7 @@ final class LanguageCubit extends Cubit<LanguageState> {
     bool reloadOnWeb = false,
     String? preserveSection,
   }) async {
-    if (!supportedLanguages.containsKey(languageCode)) return;
+    if (!supportedLanguages.contains(languageCode)) return;
     if (state.status == LanguageStatus.ready &&
         state.languageCode == languageCode) {
       return;
@@ -195,19 +188,16 @@ final class LanguageCubit extends Cubit<LanguageState> {
     emit(nextState);
   }
 
-  static const _languageData = <String, (String name, String flag)>{
-    'tr': ('T\u00FCrk\u00E7e', '\u{1F1F9}\u{1F1F7}'),
-    'en': ('English', '\u{1F1EC}\u{1F1E7}'),
-    'de': ('Deutsch', '\u{1F1E9}\u{1F1EA}'),
-    'fr': ('Fran\u00E7ais', '\u{1F1EB}\u{1F1F7}'),
-    'es': ('Espa\u00F1ol', '\u{1F1EA}\u{1F1F8}'),
-    'ar': ('\u0627\u0644\u0639\u0631\u0628\u064A\u0629', '\u{1F1F8}\u{1F1E6}'),
-    'hi': ('\u0939\u093F\u0928\u094D\u0926\u0940', '\u{1F1EE}\u{1F1F3}'),
+  static const _languageNames = <String, String>{
+    'tr': 'T\u00FCrk\u00E7e',
+    'en': 'English',
+    'de': 'Deutsch',
+    'fr': 'Fran\u00E7ais',
+    'es': 'Espa\u00F1ol',
+    'ar': '\u0627\u0644\u0639\u0631\u0628\u064A\u0629',
+    'hi': '\u0939\u093F\u0928\u094D\u0926\u0940',
   };
 
   static String getLanguageName(String languageCode) =>
-      _languageData[languageCode]?.$1 ?? 'Unknown';
-
-  static String getLanguageFlag(String languageCode) =>
-      _languageData[languageCode]?.$2 ?? '\u{1F310}';
+      _languageNames[languageCode] ?? 'Unknown';
 }

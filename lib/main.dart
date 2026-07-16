@@ -6,11 +6,13 @@ import 'package:flutter/semantics.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:flutter_bloc/flutter_bloc.dart' show BlocBuilder, BlocProvider;
+import 'package:flutter_bloc/flutter_bloc.dart'
+    show BlocBuilder, RepositoryProvider;
 
 import 'package:flutter_web_portfolio/app/app_dependencies.dart';
 import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
 import 'package:flutter_web_portfolio/app/core/theme/app_theme.dart';
+import 'package:flutter_web_portfolio/app/domain/models/portfolio_document.dart';
 import 'package:flutter_web_portfolio/app/modules/home/home_view.dart';
 import 'package:flutter_web_portfolio/app/utils/web_url_strategy.dart'
     as url_strategy;
@@ -114,9 +116,10 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) =>
       BlocBuilder<LanguageCubit, LanguageState>(
         builder: (context, state) {
-          final languageCubit = BlocProvider.of<LanguageCubit>(context);
           final currentLocale = state.locale;
-          final appTitle = languageCubit.appName;
+          final appTitle = RepositoryProvider.of<PortfolioDocument>(
+            context,
+          ).site.title;
 
           return MaterialApp(
             title: appTitle,

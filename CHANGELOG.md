@@ -2,6 +2,26 @@
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.6.0] - 2026-07-16
+
+### Added
+
+- A content-selected open-source spotlight with compact accepted and in-review ledgers instead of repeated contribution plates.
+- A source audit that checks every canonical pull-request status and merge date against the GitHub API.
+- A responsive supporting-work index with an interactive desktop reading pane and complete mobile summaries.
+
+### Changed
+
+- Reconciled the professional timeline with the current public LinkedIn record and added the latest accepted Dart MCP contribution.
+- Upgraded the application, CI, and deployment toolchain to Flutter 3.44.6 and Dart 3.12.2.
+- Moved the procedural narrative trace into a collision-safe page-margin corridor so it no longer crosses project copy.
+- Reduced locale catalogs to interface language only; the browser title and professional identity now always come from the canonical portfolio document.
+
+### Fixed
+
+- Removed dormant emoji-flag metadata from the language architecture while retaining seven accessible locale names and compact language codes.
+- Kept the supporting-work index keyboard-aware by updating its reading pane on both hover and focus.
+
 ## [1.5.0] - 2026-07-15
 
 ### Added
@@ -67,7 +87,7 @@ This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Changed
 
-- The public role is `Software Engineer` across the site, repository metadata, sharing surface, and GitHub profile.
+- The public title and role now come from the canonical content record across the site, repository metadata, and sharing surfaces.
 - Professional records now come only from the canonical manifest; locale JSON contains interface language only.
 - The HTML bootstrap is a neutral compositor bed with no duplicate hero, navigation, or professional copy.
 - The README presents verified engineering artifacts and the actual runtime architecture instead of template setup copy.
