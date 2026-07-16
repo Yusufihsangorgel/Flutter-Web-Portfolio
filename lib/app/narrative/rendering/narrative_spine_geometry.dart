@@ -59,6 +59,292 @@ final class NarrativeSpineShape {
   final double nodeVisibility;
 }
 
+/// Stateful, allocation-bounded renderer for the continuous editorial trace.
+///
+/// Motif samples are immutable, while the pixel buffers and [Path] instances
+/// live for the lifetime of the painter. Scroll updates therefore rebuild the
+/// same objects instead of materialising point collections, path metrics and
+/// extracted paths on every frame.
+final class NarrativeSpineRenderKernel {
+  NarrativeSpineRenderKernel()
+    : _primaryCoordinates = Float64List(
+        NarrativeSpineGeometry.primarySampleCount * 2,
+      ),
+      _cumulativeLengths = Float64List(
+        NarrativeSpineGeometry.primarySampleCount,
+      ),
+      _branchCoordinates = Float64List(
+        NarrativeSpineGeometry.branchCount *
+            NarrativeSpineGeometry.branchSampleCount *
+            2,
+      ),
+      _nodeCoordinates = Float64List(
+        NarrativeSpineGeometry._nodeIndices.length * 2,
+      ),
+      _branchPaths = List<Path>.generate(
+        NarrativeSpineGeometry.branchCount,
+        (_) => Path(),
+        growable: false,
+      );
+
+  final Float64List _primaryCoordinates;
+  final Float64List _cumulativeLengths;
+  final Float64List _branchCoordinates;
+  final Float64List _nodeCoordinates;
+  final List<Path> _branchPaths;
+  final Path _primaryPath = Path();
+  final Path _revealPath = Path();
+
+  Size? _size;
+  NarrativeMotif? _currentMotif;
+  NarrativeMotif? _nextMotif;
+  double? _blend;
+  double? _reveal;
+  bool _isEmpty = true;
+  double _branchVisibility = 0;
+  double _nodeVisibility = 0;
+  int _geometryRevision = 0;
+  int _revealRevision = 0;
+
+  Path get primaryPath => _primaryPath;
+  Path get revealPath => _revealPath;
+  int get branchPathCount => _branchPaths.length;
+  int get nodeCount => NarrativeSpineGeometry._nodeIndices.length;
+  bool get isEmpty => _isEmpty;
+  double get branchVisibility => _branchVisibility;
+  double get nodeVisibility => _nodeVisibility;
+
+  Path branchPathAt(int index) => _branchPaths[index];
+  double nodeXAt(int index) => _nodeCoordinates[index * 2];
+  double nodeYAt(int index) => _nodeCoordinates[index * 2 + 1];
+
+  @visibleForTesting
+  int get debugGeometryRevision => _geometryRevision;
+
+  @visibleForTesting
+  int get debugRevealRevision => _revealRevision;
+
+  @visibleForTesting
+  int get debugPrimaryBufferIdentityHash =>
+      identityHashCode(_primaryCoordinates);
+
+  @visibleForTesting
+  int get debugLengthBufferIdentityHash => identityHashCode(_cumulativeLengths);
+
+  @visibleForTesting
+  int get debugBranchBufferIdentityHash => identityHashCode(_branchCoordinates);
+
+  @visibleForTesting
+  Offset debugPrimaryPointAt(int index) => Offset(
+    _primaryCoordinates[index * 2],
+    _primaryCoordinates[index * 2 + 1],
+  );
+
+  @visibleForTesting
+  Offset debugBranchPointAt(int branch, int index) {
+    final coordinateIndex =
+        (branch * NarrativeSpineGeometry.branchSampleCount + index) * 2;
+    return Offset(
+      _branchCoordinates[coordinateIndex],
+      _branchCoordinates[coordinateIndex + 1],
+    );
+  }
+
+  /// Updates geometry and reveal independently.
+  ///
+  /// [NarrativeSpineCue.blend] intentionally receives the same second
+  /// smooth-step as the legacy geometry resolver. The scene director already
+  /// eases chapter travel; preserving that composition keeps visual parity.
+  void update({required Size size, required NarrativeSpineCue cue}) {
+    final blend = cue.currentMotif == cue.nextMotif
+        ? 0.0
+        : NarrativeSpineGeometry._smoothStep(cue.blend.clamp(0.0, 1.0));
+    final reveal = (0.16 + cue.globalProgress * 0.84).clamp(0.0, 1.0);
+    final geometryChanged =
+        _size != size ||
+        _currentMotif != cue.currentMotif ||
+        _nextMotif != cue.nextMotif ||
+        _blend != blend;
+
+    if (geometryChanged) {
+      _size = size;
+      _currentMotif = cue.currentMotif;
+      _nextMotif = cue.nextMotif;
+      _blend = blend;
+      _rebuildGeometry(size, cue.currentMotif, cue.nextMotif, blend);
+      _geometryRevision += 1;
+      _reveal = null;
+    }
+
+    if (_reveal != reveal) {
+      _rebuildReveal(reveal);
+      _reveal = reveal;
+      _revealRevision += 1;
+    }
+  }
+
+  void _rebuildGeometry(
+    Size size,
+    NarrativeMotif currentMotif,
+    NarrativeMotif nextMotif,
+    double blend,
+  ) {
+    _primaryPath.reset();
+    _revealPath.reset();
+    for (var branch = 0; branch < _branchPaths.length; branch += 1) {
+      _branchPaths[branch].reset();
+    }
+
+    if (size.isEmpty) {
+      _isEmpty = true;
+      _branchVisibility = 0;
+      _nodeVisibility = 0;
+      _cumulativeLengths.fillRange(0, _cumulativeLengths.length, 0);
+      _branchCoordinates.fillRange(0, _branchCoordinates.length, 0);
+      _nodeCoordinates.fillRange(0, _nodeCoordinates.length, 0);
+      return;
+    }
+
+    _isEmpty = false;
+    final from = NarrativeSpineGeometry._motifSamples[currentMotif.index];
+    final to = NarrativeSpineGeometry._motifSamples[nextMotif.index];
+    var previousX = 0.0;
+    var previousY = 0.0;
+    var cumulativeLength = 0.0;
+
+    for (
+      var index = 0;
+      index < NarrativeSpineGeometry.primarySampleCount;
+      index += 1
+    ) {
+      final source = from.primary[index];
+      final target = to.primary[index];
+      final x =
+          NarrativeSpineGeometry._mix(source.dx, target.dx, blend) * size.width;
+      final y =
+          NarrativeSpineGeometry._mix(source.dy, target.dy, blend) *
+          size.height;
+      final coordinateIndex = index * 2;
+      _primaryCoordinates[coordinateIndex] = x;
+      _primaryCoordinates[coordinateIndex + 1] = y;
+
+      if (index == 0) {
+        _primaryPath.moveTo(x, y);
+        _cumulativeLengths[index] = 0;
+      } else {
+        _primaryPath.lineTo(x, y);
+        final dx = x - previousX;
+        final dy = y - previousY;
+        cumulativeLength += math.sqrt(dx * dx + dy * dy);
+        _cumulativeLengths[index] = cumulativeLength;
+      }
+      previousX = x;
+      previousY = y;
+    }
+
+    for (var branch = 0; branch < _branchPaths.length; branch += 1) {
+      final branchPath = _branchPaths[branch];
+      final sourceBranch = from.branches[branch];
+      final targetBranch = to.branches[branch];
+      for (
+        var index = 0;
+        index < NarrativeSpineGeometry.branchSampleCount;
+        index += 1
+      ) {
+        final source = sourceBranch[index];
+        final target = targetBranch[index];
+        final x =
+            NarrativeSpineGeometry._mix(source.dx, target.dx, blend) *
+            size.width;
+        final y =
+            NarrativeSpineGeometry._mix(source.dy, target.dy, blend) *
+            size.height;
+        final coordinateIndex =
+            (branch * NarrativeSpineGeometry.branchSampleCount + index) * 2;
+        _branchCoordinates[coordinateIndex] = x;
+        _branchCoordinates[coordinateIndex + 1] = y;
+        if (index == 0) {
+          branchPath.moveTo(x, y);
+        } else {
+          branchPath.lineTo(x, y);
+        }
+      }
+    }
+
+    for (
+      var index = 0;
+      index < NarrativeSpineGeometry._nodeIndices.length;
+      index += 1
+    ) {
+      final sourceIndex = NarrativeSpineGeometry._nodeIndices[index] * 2;
+      final targetIndex = index * 2;
+      _nodeCoordinates[targetIndex] = _primaryCoordinates[sourceIndex];
+      _nodeCoordinates[targetIndex + 1] = _primaryCoordinates[sourceIndex + 1];
+    }
+
+    _branchVisibility = NarrativeSpineGeometry._mix(
+      NarrativeSpineGeometry._branchWeight(currentMotif),
+      NarrativeSpineGeometry._branchWeight(nextMotif),
+      blend,
+    );
+    _nodeVisibility = NarrativeSpineGeometry._mix(
+      NarrativeSpineGeometry._nodeWeight(currentMotif),
+      NarrativeSpineGeometry._nodeWeight(nextMotif),
+      blend,
+    );
+  }
+
+  void _rebuildReveal(double reveal) {
+    _revealPath.reset();
+    if (_isEmpty) return;
+
+    final totalLength = _cumulativeLengths.last;
+    final firstX = _primaryCoordinates[0];
+    final firstY = _primaryCoordinates[1];
+    _revealPath.moveTo(firstX, firstY);
+    if (totalLength <= 0) return;
+
+    final targetLength = totalLength * reveal;
+    for (
+      var index = 1;
+      index < NarrativeSpineGeometry.primarySampleCount;
+      index += 1
+    ) {
+      final coordinateIndex = index * 2;
+      final x = _primaryCoordinates[coordinateIndex];
+      final y = _primaryCoordinates[coordinateIndex + 1];
+      final segmentEnd = _cumulativeLengths[index];
+      if (segmentEnd <= targetLength) {
+        _revealPath.lineTo(x, y);
+        continue;
+      }
+
+      final segmentStart = _cumulativeLengths[index - 1];
+      final segmentLength = segmentEnd - segmentStart;
+      if (segmentLength > 0) {
+        final t = ((targetLength - segmentStart) / segmentLength).clamp(
+          0.0,
+          1.0,
+        );
+        final previousCoordinateIndex = coordinateIndex - 2;
+        _revealPath.lineTo(
+          NarrativeSpineGeometry._mix(
+            _primaryCoordinates[previousCoordinateIndex],
+            x,
+            t,
+          ),
+          NarrativeSpineGeometry._mix(
+            _primaryCoordinates[previousCoordinateIndex + 1],
+            y,
+            t,
+          ),
+        );
+      }
+      break;
+    }
+  }
+}
+
 /// Produces one stable line that changes role as the document advances.
 ///
 /// Every motif has exactly the same number of samples. Interpolating matching

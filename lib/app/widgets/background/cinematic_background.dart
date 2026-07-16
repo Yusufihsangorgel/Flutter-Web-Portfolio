@@ -27,6 +27,7 @@ class CinematicBackground extends StatefulWidget {
 
 class _CinematicBackgroundState extends State<CinematicBackground> {
   late final _NarrativeFrame _frame;
+  late final NarrativeSpineRenderKernel _spineKernel;
   StreamSubscription<SceneState>? _sceneSubscription;
   StreamSubscription<RenderQualityState>? _qualitySubscription;
   SceneDirector? _sceneDirector;
@@ -42,6 +43,7 @@ class _CinematicBackgroundState extends State<CinematicBackground> {
       const NarrativeSpineCue.origin(),
       RenderQuality.balanced,
     );
+    _spineKernel = NarrativeSpineRenderKernel();
   }
 
   @override
@@ -147,7 +149,10 @@ class _CinematicBackgroundState extends State<CinematicBackground> {
       onPointerHover: _trackPointer,
       onPointerMove: _trackPointer,
       child: CustomPaint(
-        painter: _NarrativeBackgroundPainter(frame: _frame),
+        painter: _NarrativeBackgroundPainter(
+          frame: _frame,
+          spineKernel: _spineKernel,
+        ),
         size: Size.infinite,
       ),
     ),
@@ -155,9 +160,11 @@ class _CinematicBackgroundState extends State<CinematicBackground> {
 }
 
 final class _NarrativeBackgroundPainter extends CustomPainter {
-  _NarrativeBackgroundPainter({required this.frame}) : super(repaint: frame);
+  _NarrativeBackgroundPainter({required this.frame, required this.spineKernel})
+    : super(repaint: frame);
 
   final _NarrativeFrame frame;
+  final NarrativeSpineRenderKernel spineKernel;
 
   static final _paint = Paint()..isAntiAlias = true;
   static final _linePaint = Paint()
@@ -166,16 +173,6 @@ final class _NarrativeBackgroundPainter extends CustomPainter {
     ..strokeCap = StrokeCap.round
     ..strokeJoin = StrokeJoin.round;
   static final _grainPaint = Paint();
-  Size? _cachedSpineSize;
-  int? _cachedCurrentMotif;
-  int? _cachedNextMotif;
-  double? _cachedBlend;
-  double? _cachedRevealProgress;
-  NarrativeSpineShape? _cachedSpineShape;
-  Path? _cachedPrimaryPath;
-  ui.PathMetric? _cachedPrimaryMetric;
-  Path? _cachedRevealPath;
-  List<Path> _cachedBranchPaths = const [];
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -218,98 +215,47 @@ final class _NarrativeBackgroundPainter extends CustomPainter {
   }
 
   void _drawNarrativeSpine(Canvas canvas, Size size) {
-    final shape = _resolveSpine(size);
-    if (shape.primary.length < 2) return;
-    final primary = _cachedPrimaryPath!;
+    spineKernel.update(size: size, cue: frame.cue);
+    if (spineKernel.isEmpty) return;
     final accent = frame.config.accent;
 
     _linePaint
       ..strokeWidth = 0.9
       ..color = accent.withValues(alpha: 0.05);
-    canvas.drawPath(primary, _linePaint);
+    canvas.drawPath(spineKernel.primaryPath, _linePaint);
 
     _linePaint
       ..strokeWidth = 1.25
       ..color = accent.withValues(alpha: 0.15);
-    canvas.drawPath(_cachedRevealPath!, _linePaint);
+    canvas.drawPath(spineKernel.revealPath, _linePaint);
 
-    if (shape.branchVisibility > 0.001) {
+    if (spineKernel.branchVisibility > 0.001) {
       _linePaint
         ..strokeWidth = 0.9
-        ..color = accent.withValues(alpha: 0.1 * shape.branchVisibility);
-      for (final branch in _cachedBranchPaths) {
-        canvas.drawPath(branch, _linePaint);
+        ..color = accent.withValues(alpha: 0.1 * spineKernel.branchVisibility);
+      for (var index = 0; index < spineKernel.branchPathCount; index += 1) {
+        canvas.drawPath(spineKernel.branchPathAt(index), _linePaint);
       }
     }
 
-    if (shape.nodeVisibility > 0.001) {
-      for (final node in shape.nodes) {
-        _paint
-          ..shader = null
-          ..style = PaintingStyle.fill
-          ..color = AppColors.background.withValues(alpha: 0.82);
-        canvas.drawCircle(node, 3.1, _paint);
-        _linePaint
-          ..strokeWidth = 1
-          ..color = accent.withValues(alpha: 0.2 * shape.nodeVisibility);
-        canvas.drawCircle(node, 3.1, _linePaint);
-      }
-    }
-  }
-
-  NarrativeSpineShape _resolveSpine(Size size) {
-    final cue = frame.cue;
-    final geometryChanged =
-        _cachedSpineSize != size ||
-        _cachedCurrentMotif != cue.currentMotif.index ||
-        _cachedNextMotif != cue.nextMotif.index ||
-        _cachedBlend != cue.blend ||
-        _cachedSpineShape == null;
-
-    if (geometryChanged) {
-      final shape = NarrativeSpineGeometry.resolve(size: size, cue: cue);
-      final primary = shape.primary.length < 2
-          ? Path()
-          : _pathFrom(shape.primary);
-      final metrics = primary.computeMetrics().iterator;
-
-      _cachedSpineSize = size;
-      _cachedCurrentMotif = cue.currentMotif.index;
-      _cachedNextMotif = cue.nextMotif.index;
-      _cachedBlend = cue.blend;
-      _cachedRevealProgress = null;
-      _cachedSpineShape = shape;
-      _cachedPrimaryPath = primary;
-      _cachedPrimaryMetric = metrics.moveNext() ? metrics.current : null;
-      _cachedBranchPaths = [
-        for (final branch in shape.branches)
-          if (branch.length > 1) _pathFrom(branch),
-      ];
-    }
-
-    if (_cachedRevealProgress != cue.globalProgress) {
-      final reveal = (0.16 + cue.globalProgress * 0.84).clamp(0.0, 1.0);
-      final revealPath = Path();
-      final metric = _cachedPrimaryMetric;
-      if (metric != null) {
-        revealPath.addPath(
-          metric.extractPath(0, metric.length * reveal),
-          Offset.zero,
+    if (spineKernel.nodeVisibility > 0.001) {
+      _paint
+        ..shader = null
+        ..style = PaintingStyle.fill
+        ..color = AppColors.background.withValues(alpha: 0.82);
+      _linePaint
+        ..strokeWidth = 1
+        ..color = accent.withValues(alpha: 0.2 * spineKernel.nodeVisibility);
+      for (var index = 0; index < spineKernel.nodeCount; index += 1) {
+        final node = Offset(
+          spineKernel.nodeXAt(index),
+          spineKernel.nodeYAt(index),
         );
+        canvas
+          ..drawCircle(node, 3.1, _paint)
+          ..drawCircle(node, 3.1, _linePaint);
       }
-      _cachedRevealProgress = cue.globalProgress;
-      _cachedRevealPath = revealPath;
     }
-
-    return _cachedSpineShape!;
-  }
-
-  Path _pathFrom(List<Offset> points) {
-    final path = Path()..moveTo(points.first.dx, points.first.dy);
-    for (final point in points.skip(1)) {
-      path.lineTo(point.dx, point.dy);
-    }
-    return path;
   }
 
   void _drawVignette(Canvas canvas, Size size, Rect bounds) {

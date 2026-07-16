@@ -2,6 +2,18 @@
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.6.1] - 2026-07-16
+
+### Added
+
+- An allocation-bounded narrative spine render kernel backed by persistent typed coordinate buffers and reusable path objects.
+- Exhaustive transition, physical reveal-length, cache invalidation, empty-viewport, and 1,000-frame identity tests for the render kernel.
+
+### Changed
+
+- Replaced scroll-frame point collections, path metrics, and extracted reveal paths with direct scalar path reconstruction that preserves the existing visual geometry.
+- Made the motif-to-scene mapping exhaustive so a future narrative motif cannot silently inherit the wrong palette.
+
 ## [1.6.0] - 2026-07-16
 
 ### Added

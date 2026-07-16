@@ -184,7 +184,14 @@ final class SceneDirector extends Cubit<SceneState> {
     );
   }
 
-  static int _sceneIndexFor(NarrativeChapter chapter) => chapter.motif.index;
+  static int _sceneIndexFor(NarrativeChapter chapter) =>
+      switch (chapter.motif) {
+        NarrativeMotif.origin => 0,
+        NarrativeMotif.thread => 1,
+        NarrativeMotif.timeline => 2,
+        NarrativeMotif.branches => 3,
+        NarrativeMotif.bracket => 4,
+      };
 
   static double _smoothStep(double value) => value * value * (3 - 2 * value);
 
