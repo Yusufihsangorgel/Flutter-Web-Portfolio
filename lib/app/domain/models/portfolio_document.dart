@@ -22,7 +22,7 @@ final class PortfolioDocument {
 
   factory PortfolioDocument.fromJson(Map<String, dynamic> json) {
     final schemaVersion = _requiredInt(json, 'schema_version');
-    if (schemaVersion != 6) {
+    if (schemaVersion != 7) {
       throw FormatException(
         'Unsupported portfolio schema version: $schemaVersion',
       );
@@ -135,8 +135,8 @@ final class PortfolioDocument {
     _assertUnique('contribution', contributions.map((entry) => entry.id));
     _assertUnique('system', systems.map((entry) => entry.id));
     _assertUnique(
-      'supporting artifact asset',
-      supportingSystems.map((entry) => entry.artifact.asset),
+      'work artifact asset',
+      systems.map((entry) => entry.artifact.asset),
     );
   }
 }
@@ -430,6 +430,7 @@ sealed class PortfolioSystem {
     required this.ownership,
     required this.decision,
     required this.presentation,
+    required this.artifact,
     required List<PortfolioEvidence> evidence,
     required this.url,
     required List<String> technologies,
@@ -448,6 +449,9 @@ sealed class PortfolioSystem {
     final presentation = PortfolioSystemPresentation.fromJson(
       _requiredObject(json, 'presentation'),
     );
+    final artifact = PortfolioSystemArtifact.fromJson(
+      _requiredObject(json, 'artifact'),
+    );
     final evidence = _objects(
       json,
       'evidence',
@@ -459,11 +463,6 @@ sealed class PortfolioSystem {
     }
 
     if (featured) {
-      if (_optionalObject(json, 'artifact') != null) {
-        throw FormatException(
-          'Featured system "$id" cannot declare a supporting artifact.',
-        );
-      }
       return PortfolioFeaturedSystem(
         id: id,
         name: name,
@@ -473,6 +472,7 @@ sealed class PortfolioSystem {
         ownership: ownership,
         decision: decision,
         presentation: presentation,
+        artifact: artifact,
         challenge: _requiredString(json, 'challenge'),
         approach: _requiredString(json, 'approach'),
         outcome: _requiredString(json, 'outcome'),
@@ -491,10 +491,10 @@ sealed class PortfolioSystem {
       ownership: ownership,
       decision: decision,
       presentation: presentation,
+      artifact: artifact,
       evidence: evidence,
-      artifact: PortfolioSystemArtifact.fromJson(
-        _requiredObject(json, 'artifact'),
-      ),
+      group: PortfolioSystemGroup.parse(_requiredString(json, 'group')),
+      spotlight: _requiredString(json, 'spotlight'),
       url: url,
       technologies: technologies,
     );
@@ -508,6 +508,7 @@ sealed class PortfolioSystem {
   final String ownership;
   final String decision;
   final PortfolioSystemPresentation presentation;
+  final PortfolioSystemArtifact artifact;
   final List<PortfolioEvidence> evidence;
   final Uri url;
   final List<String> technologies;
@@ -523,6 +524,7 @@ final class PortfolioFeaturedSystem extends PortfolioSystem {
     required super.ownership,
     required super.decision,
     required super.presentation,
+    required super.artifact,
     required this.challenge,
     required this.approach,
     required this.outcome,
@@ -546,25 +548,37 @@ final class PortfolioSupportingSystem extends PortfolioSystem {
     required super.ownership,
     required super.decision,
     required super.presentation,
+    required super.artifact,
     required super.evidence,
-    required this.artifact,
+    required this.group,
+    required this.spotlight,
     required super.url,
     required super.technologies,
   });
 
-  final PortfolioSystemArtifact artifact;
+  final PortfolioSystemGroup group;
+  final String spotlight;
 }
 
-/// Content-authored visual direction for a project chapter.
-///
-/// The renderer understands a small reusable visual grammar; project names,
-/// brand colours, labels, and composition choices remain in JSON.
+enum PortfolioSystemGroup {
+  shippedProduct('shipped_product'),
+  openEngineering('open_engineering');
+
+  const PortfolioSystemGroup(this.wireValue);
+  final String wireValue;
+
+  static PortfolioSystemGroup parse(String value) => values.firstWhere(
+    (entry) => entry.wireValue == value,
+    orElse: () => throw FormatException('Unsupported work group: $value'),
+  );
+}
+
+/// Content-authored palette for a project chapter.
 final class PortfolioSystemPresentation {
   PortfolioSystemPresentation({
     required this.background,
     required this.foreground,
     required this.accent,
-    required this.visual,
   });
 
   factory PortfolioSystemPresentation.fromJson(Map<String, dynamic> json) =>
@@ -572,49 +586,11 @@ final class PortfolioSystemPresentation {
         background: _requiredHexColor(json, 'background'),
         foreground: _requiredHexColor(json, 'foreground'),
         accent: _requiredHexColor(json, 'accent'),
-        visual: PortfolioSystemVisual.fromJson(_requiredObject(json, 'visual')),
       );
 
   final String background;
   final String foreground;
   final String accent;
-  final PortfolioSystemVisual visual;
-}
-
-final class PortfolioSystemVisual {
-  PortfolioSystemVisual({required this.kind, required List<String> labels})
-    : labels = List.unmodifiable(labels) {
-    if (kind != PortfolioSystemVisualKind.artifact && labels.length < 3) {
-      throw const FormatException(
-        'Generated project visuals require at least three authored labels.',
-      );
-    }
-  }
-
-  factory PortfolioSystemVisual.fromJson(Map<String, dynamic> json) =>
-      PortfolioSystemVisual(
-        kind: PortfolioSystemVisualKind.parse(_requiredString(json, 'kind')),
-        labels: _strings(json, 'labels'),
-      );
-
-  final PortfolioSystemVisualKind kind;
-  final List<String> labels;
-}
-
-enum PortfolioSystemVisualKind {
-  network('network'),
-  flow('flow'),
-  lanes('lanes'),
-  artifact('artifact');
-
-  const PortfolioSystemVisualKind(this.wireValue);
-  final String wireValue;
-
-  static PortfolioSystemVisualKind parse(String value) => values.firstWhere(
-    (entry) => entry.wireValue == value,
-    orElse: () =>
-        throw FormatException('Unsupported project visual kind: $value'),
-  );
 }
 
 final class PortfolioEvidence {
@@ -636,7 +612,7 @@ final class PortfolioEvidence {
   final String kind;
 }
 
-/// A real, content-authored artifact for a supporting project.
+/// A real, content-authored artifact for a selected work record.
 ///
 /// Asset choice, alternative text, caption, intrinsic dimensions, fit, and
 /// alignment all live in the external content document. The rendering layer

@@ -308,7 +308,10 @@ test('publishes a clean heading and control hierarchy', async ({
     .map((node) => node.name?.value ?? '');
   const featuredSystem = portfolio.systems.find((system) => system.featured);
   expect(featuredSystem).toBeTruthy();
-  await scrollToSemanticLink(page, `Open project: ${featuredSystem.name}`);
+  const featuredEvidence = featuredSystem.evidence[0];
+  const evidenceSemanticLabel =
+    `Open evidence: ${featuredSystem.name}, ${featuredEvidence.label}`;
+  await scrollToSemanticLink(page, evidenceSemanticLabel);
   const visibleProjectsTree = await accessibility.send(
     'Accessibility.getFullAXTree',
   );
@@ -316,9 +319,10 @@ test('publishes a clean heading and control hierarchy', async ({
     .filter((node) => !node.ignored && node.role?.value === 'link')
     .map((node) => node.name?.value ?? '');
   expect(visibleProjectLinks).toEqual(
-    expect.arrayContaining([
-      `Open project: ${featuredSystem.name}`,
-    ]),
+    expect.arrayContaining([evidenceSemanticLabel]),
+  );
+  expect(projectLinks).not.toEqual(
+    expect.arrayContaining([expect.stringContaining('Open project:')]),
   );
   expect(projectLinks).not.toContain('View source');
   expect(projectLinks).not.toContain('Website');

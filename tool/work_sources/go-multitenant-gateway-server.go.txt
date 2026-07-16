@@ -1,0 +1,8 @@
+app.Use(recover.New())
+modules.Mount(app, health.New())
+
+app.Use(tenantMW)
+app.Use(limiter)
+app.Use(mw.Auth(cfg.JWTSecret))
+
+modules.Mount(app, notesModule)

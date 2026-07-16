@@ -15,7 +15,7 @@ The site reads identity, biography, experience, work, links, and contributions f
 
 Since 2021, I have built and maintained software for mobile devices, tablets, desktop operating systems, and the web. My work includes ERP and point-of-sale products, logistics workflows, digital publishing, backend services, and the release systems around them.
 
-Source status: `2026.07.16.4`, verified 2026-07-16 against GitHub and LinkedIn.
+Source status: `2026.07.16.9`, verified 2026-07-16 against GitHub and LinkedIn and FugaSoft and Dorse and Medium.
 
 ### Accepted upstream changes
 
@@ -31,14 +31,16 @@ Source status: `2026.07.16.4`, verified 2026-07-16 against GitHub and LinkedIn.
 
 | Project | Responsibility | Evidence |
 |---|---|---|
-| Dorse | I worked across the Flutter application and React web surface, including live vehicle state, maps, API flows, deployment, and QA coordination. | [Project](https://dorseapp.com/) |
+| FugaSoft | I work primarily on the Flutter clients and the production concerns around offline data, native integrations, synchronisation, performance, release, and long-term maintenance. | [Project](https://fugasoft.com/) |
+| Dorse | I developed the Flutter application and React web surface across live vehicle state, maps, REST and WebSocket flows, deployment, and QA coordination. | [Project](https://dorseapp.com/) |
+| Aydınlık E-Gazete | At Promob TR, I worked on the Flutter client, API-backed issue flow, localisation, and mobile releases. | [Project](https://apps.apple.com/tr/app/ayd%C4%B1nl%C4%B1k-e-gazete/id1560103805) |
+| Bilim ve Ütopya | At Promob TR, I worked on Flutter features, API integration, localisation, and release support. | [Project](https://apps.apple.com/tr/app/bilim-ve-%C3%BCtopya-e-dergi/id6478221195) |
+| Galvapedia | I built the product with Flutter and a Node.js, Express, and MongoDB service layer. | [Project](https://apps.apple.com/tr/app/galvapedia/id1592744617) |
 | Queue Inspector MCP | I designed the command surface, typed validation, queue adapters, and conservative state-changing operations. | [Project](https://github.com/Yusufihsangorgel/queue-inspector-mcp) |
-| Multi-tenant Gateway | I designed and implemented the complete reference from transport and tenant resolution through policy and test coverage. | [Project](https://github.com/Yusufihsangorgel/go-multitenant-gateway) |
-| Aydınlık E-Gazete | At Promob TR, I worked on the Flutter client, API-backed issue flow, localisation, and mobile releases. | [Project](https://apps.apple.com/us/app/ayd%C4%B1nl%C4%B1k-e-gazete/id1560103805) |
-| Bilim ve Ütopya E-Dergi | At Promob TR, I worked on Flutter features, API integration, localisation, and release support. | [Project](https://apps.apple.com/tr/app/bilim-ve-%C3%BCtopya-e-dergi/id6478221195) |
+| Multi-tenant Gateway | I designed and implemented the reference from transport and tenant resolution through policy, persistence, and test coverage. | [Project](https://github.com/Yusufihsangorgel/go-multitenant-gateway) |
 | Redis Task Queue | I designed the public API, queue semantics, failure handling, and runnable examples. | [Project](https://github.com/Yusufihsangorgel/redis_task_queue) |
 | Constellation Particles | I implemented the painter, pointer interaction, spatial partitioning, and package examples without runtime dependencies. | [Project](https://github.com/Yusufihsangorgel/constellation_particles) |
-| Flutter Web Portfolio | I built and run the Flutter Web site, its content pipeline, accessibility layer, browser regression suite, and production deployment. | [Project](https://github.com/Yusufihsangorgel/Flutter-Web-Portfolio) |
+| Flutter Web Portfolio | I built and run the Flutter Web site, its external content pipeline, accessibility layer, browser regression suite, and production release. | [Project](https://developeryusuf.com) |
 
 ### Work under review
 
@@ -49,7 +51,7 @@ Source status: `2026.07.16.4`, verified 2026-07-16 against GitHub and LinkedIn.
 
 ## Content contract
 
-`assets/content/portfolio.json` is the canonical professional record. It contains the profile, contact details, explicit display-name composition, current-role markers, optional experience, capabilities, optional contributions and work, source provenance, and site metadata. Every work record also owns its palette and visual grammar; featured work carries challenge, approach, outcome, and linked evidence records. `PortfolioDocument` parses it into immutable final classes and rejects unsupported schemas, duplicate content IDs, invalid URLs, malformed presentation colours, incomplete visual labels, incomplete featured case studies, missing featured work, and identity/metadata drift.
+`assets/content/portfolio.json` is the canonical professional record. It contains the profile, contact details, explicit display-name composition, current-role markers, optional experience, capabilities, optional contributions and work, source provenance, and site metadata. Every work record owns a palette and a required, source-backed artifact; featured professional cases additionally carry challenge, approach, outcome, and linked evidence records, while supporting work declares its evidence group and spotlight. `PortfolioDocument` parses the record into immutable final classes and rejects unsupported schemas, duplicate content IDs, invalid URLs, malformed presentation colours, duplicate artifacts, incomplete featured cases, incomplete supporting records, missing featured work, and identity/metadata drift.
 
 Analytics is opt-in through `site.analytics` in the same document. Remove that object for a tracking-free deployment; the synchronization step removes the script instead of inheriting this site's analytics account.
 
@@ -88,7 +90,7 @@ AppScrollController ─────► NarrativePosition
         │ browser history       ├────► SceneDirector
         │ + visible progress    │           │
         ▼                       ▼           ▼
-chapter navigation      hairline handoffs  ambient CustomPainter
+chapter navigation      kinetic portals    ambient CustomPainter
 ```
 
 The document and render loop have deliberately different update paths:
@@ -99,7 +101,7 @@ The document and render loop have deliberately different update paths:
 - Section positions are measured after layout. One boundary-local reading snapshot drives active navigation, URL state, scene interpolation, and every visible progress indicator.
 - Responsive reflow preserves the reader's chapter-relative focal point instead of retaining a stale raw pixel offset.
 - Browser history represents positions inside one document. An early popstate bridge prevents Flutter's root Navigator from consuming chapter navigation twice while preserving the command palette's normal modal lifecycle.
-- Decorative chapter handoffs reuse the ambient motif endpoints, mirror in RTL, and add no copy or semantic nodes.
+- Decorative chapter portals reuse the ambient motif endpoints, derive localized labels from external catalogs, mirror in RTL, and add no semantic nodes.
 - Reduced-motion sessions suppress pointer motion and animated transitions while preserving the complete document and navigation model.
 
 ## First meaningful frame
@@ -183,6 +185,7 @@ Useful controls:
 | Measured document geometry | `lib/app/controllers/scroll_controller.dart` |
 | Scene interpolation | `lib/app/controllers/scene_director.dart` |
 | Ambient render layer | `lib/app/widgets/background/cinematic_background.dart` |
+| Scroll-driven chapter portals | `lib/app/widgets/narrative_chapter_handoff.dart`, `lib/app/narrative/rendering/narrative_handoff_geometry.dart` |
 | Full-width selected-work atlas | `lib/app/modules/home/sections/projects/projects_section.dart`, `lib/app/modules/home/sections/projects/widgets/project_atlas.dart` |
 | Content synchronization | `tool/sync_public_content.mjs` |
 | Runtime measurement | `tool/measure_web_runtime.mjs`, `tool/performance_budget.json`, `tool/performance_budget.schema.json` |

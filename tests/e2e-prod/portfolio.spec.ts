@@ -291,6 +291,12 @@ test('serves the complete professional narrative in production', async ({
 
   if (!isMobile) {
     const nextSystem = supportingSystems[1];
+    const selector = page.getByRole('button', {
+      name: `Select evidence: ${nextSystem.name}`,
+      exact: true,
+    });
+    await scrollToLocator(page, selector);
+    await selector.click();
     await scrollToHeading(page, nextSystem.name);
     await scrollToLocator(
       page,
@@ -387,7 +393,10 @@ test('serves the production accessibility hierarchy', async ({
   const supportingSystem = portfolio.systems.find((system) => !system.featured);
   expect(featuredSystem).toBeTruthy();
   expect(supportingSystem).toBeTruthy();
-  await scrollToSemanticLink(page, `Open project: ${featuredSystem.name}`);
+  const featuredEvidence = featuredSystem.evidence[0];
+  const evidenceSemanticLabel =
+    `Open evidence: ${featuredSystem.name}, ${featuredEvidence.label}`;
+  await scrollToSemanticLink(page, evidenceSemanticLabel);
   const visibleProjectsTree = await accessibility.send(
     'Accessibility.getFullAXTree',
   );
@@ -395,7 +404,10 @@ test('serves the production accessibility hierarchy', async ({
     .filter((node) => !node.ignored && node.role?.value === 'link')
     .map((node) => node.name?.value ?? '');
   expect(visibleProjectLinks).toEqual(
-    expect.arrayContaining([`Open project: ${featuredSystem.name}`]),
+    expect.arrayContaining([evidenceSemanticLabel]),
+  );
+  expect(projectLinks).not.toEqual(
+    expect.arrayContaining([expect.stringContaining('Open project:')]),
   );
   expect(projectLinks).not.toContain('View source');
   expect(projectLinks).not.toContain('Website');
@@ -414,7 +426,7 @@ test('serves the production accessibility hierarchy', async ({
       node.properties?.some((property) => property.name === 'expanded'),
   );
   expect(atlasHeadings).toContain(supportingSystem.name);
-  expect(atlasDisclosureButtons).toEqual([]);
+  expect(atlasDisclosureButtons.length).toBeGreaterThanOrEqual(1);
 
   await scrollToLocator(
     page,

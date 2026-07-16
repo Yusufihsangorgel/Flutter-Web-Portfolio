@@ -24,11 +24,15 @@ final class _ProjectsLanguageRepository implements ILanguageRepository {
     'projects_section': {
       'title': 'Selected Work',
       'subtitle': 'Products and maintained tools.',
+      'selected_cases': 'Professional cases',
+      'evidence_index': 'Evidence index',
+      'evidence_intro': 'Released products and source-backed records.',
+      'shipped_products': 'Shipped products',
+      'open_engineering': 'Open engineering',
+      'select_evidence': 'Select evidence',
       'challenge': 'The problem',
       'approach': 'The approach',
       'outcome': 'The result',
-      'evidence': 'Evidence',
-      'open_project': 'Open project',
       'open_evidence': 'Open evidence',
       'ownership': 'What I owned',
       'decision': 'Engineering focus',
@@ -83,7 +87,7 @@ void main() {
         ),
       );
 
-  testWidgets('renders every work item as a full-width atlas chapter', (
+  testWidgets('renders professional cases followed by one evidence index', (
     tester,
   ) async {
     tester.view.physicalSize = const Size(1440, 1000);
@@ -94,29 +98,32 @@ void main() {
     await tester.pumpWidget(buildSubject());
     await tester.pump(const Duration(milliseconds: 200));
 
-    for (final system in portfolio.systems) {
+    for (final system in portfolio.featuredSystems) {
       expect(
         find.byKey(ValueKey('project-atlas-${system.id}')),
         findsOneWidget,
       );
       expect(find.text(system.name), findsOneWidget);
       expect(find.text(system.summary), findsOneWidget);
-      if (system case final PortfolioFeaturedSystem featured) {
-        expect(find.text(featured.challenge), findsOneWidget);
-        expect(find.text(featured.approach), findsOneWidget);
-        expect(find.text(featured.outcome), findsOneWidget);
-      } else {
-        expect(find.text(system.ownership), findsOneWidget);
-        expect(find.text(system.decision), findsOneWidget);
-      }
+      expect(find.text(system.challenge), findsOneWidget);
+      expect(find.text(system.approach), findsOneWidget);
+      expect(find.text(system.outcome), findsOneWidget);
+    }
+    for (final system in portfolio.supportingSystems) {
+      expect(find.text(system.name), findsWidgets);
+      expect(find.text(system.spotlight), findsWidgets);
     }
 
+    expect(
+      find.byKey(const ValueKey('project-evidence-index')),
+      findsOneWidget,
+    );
+    expect(find.text('Evidence index'), findsOneWidget);
     expect(find.byType(ExpansionTile), findsNothing);
-    expect(find.byType(AnimatedSize), findsNothing);
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('uses the content-authored palette for each project chapter', (
+  testWidgets('uses the content-authored palette for each professional case', (
     tester,
   ) async {
     tester.view.physicalSize = const Size(1440, 1000);
@@ -127,7 +134,7 @@ void main() {
     await tester.pumpWidget(buildSubject());
     await tester.pump(const Duration(milliseconds: 200));
 
-    for (final system in portfolio.systems) {
+    for (final system in portfolio.featuredSystems) {
       final chapter = find.byKey(ValueKey('project-atlas-${system.id}'));
       final surface = find.descendant(
         of: chapter,
@@ -139,7 +146,7 @@ void main() {
     }
   });
 
-  testWidgets('keeps real artifacts and project links in the document', (
+  testWidgets('keeps real artifacts and evidence links in the document', (
     tester,
   ) async {
     tester.view.physicalSize = const Size(1440, 1000);
@@ -152,16 +159,46 @@ void main() {
 
     expect(
       find.byType(Image),
-      findsNWidgets(portfolio.supportingSystems.length),
+      findsAtLeastNWidgets(portfolio.featuredSystems.length + 1),
     );
     final controls = tester
         .widgetList<CinematicFocusable>(find.byType(CinematicFocusable))
         .toList(growable: false);
-    final expectedLinks = portfolio.systems.fold<int>(
-      0,
-      (total, system) => total + 1 + system.evidence.length,
-    );
+    final expectedLinks =
+        portfolio.featuredSystems.fold<int>(
+          0,
+          (total, system) => total + system.evidence.length,
+        ) +
+        portfolio.supportingSystems.first.evidence.length;
     expect(controls.length, greaterThanOrEqualTo(expectedLinks));
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('changes the reading pane from a source-authored index row', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(1440, 1000);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(buildSubject());
+    await tester.pump(const Duration(milliseconds: 200));
+
+    final initial = portfolio.supportingSystems.first;
+    final target = portfolio.supportingSystems.firstWhere(
+      (system) => system.id == 'queue-inspector',
+    );
+    expect(_assetNames(tester), contains(initial.artifact.asset));
+
+    final targetRow = find.text(target.name).first;
+    await tester.ensureVisible(targetRow);
+    await tester.pump();
+    await tester.tap(targetRow);
+    await tester.pumpAndSettle();
+
+    expect(_assetNames(tester), contains(target.artifact.asset));
+    expect(_assetNames(tester), isNot(contains(initial.artifact.asset)));
     expect(tester.takeException(), isNull);
   });
 
@@ -178,11 +215,14 @@ void main() {
     );
     await tester.pump(const Duration(milliseconds: 200));
 
-    for (final system in portfolio.systems) {
+    for (final system in portfolio.featuredSystems) {
       expect(
         find.byKey(ValueKey('project-atlas-${system.id}')),
         findsOneWidget,
       );
+    }
+    for (final system in portfolio.supportingSystems) {
+      expect(find.text(system.name), findsWidgets);
     }
     expect(tester.takeException(), isNull);
   });
@@ -190,3 +230,10 @@ void main() {
 
 Color _hexColor(String value) =>
     Color(int.parse('FF${value.substring(1)}', radix: 16));
+
+Set<String> _assetNames(WidgetTester tester) => tester
+    .widgetList<Image>(find.byType(Image))
+    .map((image) => image.image)
+    .whereType<AssetImage>()
+    .map((image) => image.assetName)
+    .toSet();

@@ -13,7 +13,7 @@ void main() {
       final profile = manifest['profile']! as Map<String, dynamic>;
       final displayName = profile['display_name']! as Map<String, dynamic>;
 
-      expect(document.schemaVersion, 6);
+      expect(document.schemaVersion, 7);
       expect(document.contentVersion, manifest['content_version']);
       expect(document.profile.name, profile['name']);
       expect(document.profile.role, profile['role']);
@@ -38,19 +38,19 @@ void main() {
         analytics['script_url'],
       );
       expect(document.experience, hasLength(6));
-      expect(document.currentExperience, hasLength(2));
+      expect(document.currentExperience, hasLength(1));
       expect(document.mergedContributions, hasLength(5));
       expect(document.contributionsUnderReview, hasLength(3));
       expect(document.featuredContribution, isNotNull);
-      expect(document.systems, hasLength(8));
-      expect(document.featuredSystems, hasLength(3));
+      expect(document.systems, hasLength(10));
+      expect(document.featuredSystems, hasLength(2));
       expect(
         document.featuredSystems.every(
           (system) =>
               system.challenge.isNotEmpty &&
               system.approach.isNotEmpty &&
               system.outcome.isNotEmpty &&
-              system.presentation.visual.labels.length >= 3 &&
+              system.artifact.asset.startsWith('assets/work/') &&
               system.evidence.isNotEmpty &&
               system.evidence.every((entry) => entry.url.scheme == 'https'),
         ),
@@ -60,9 +60,8 @@ void main() {
         document.supportingSystems.every(
           (system) =>
               system.artifact.asset.startsWith('assets/work/') &&
-              system.presentation.visual.kind ==
-                  PortfolioSystemVisualKind.artifact &&
               system.artifact.alt.isNotEmpty &&
+              system.spotlight.isNotEmpty &&
               system.evidence.isNotEmpty,
         ),
         isTrue,
@@ -112,10 +111,10 @@ void main() {
       expect(document.site.analytics, isNull);
     });
 
-    test('binds supporting records to real local artifacts', () async {
+    test('binds every work record to a real local artifact', () async {
       final document = PortfolioDocument.fromJson(_manifest());
 
-      for (final system in document.supportingSystems) {
+      for (final system in document.systems) {
         final artifact = system.artifact;
         final file = File(artifact.asset);
         expect(file.existsSync(), isTrue, reason: system.id);
@@ -260,20 +259,6 @@ void main() {
         throwsA(isA<FormatException>()),
       );
 
-      final underspecifiedVisual = _manifest();
-      final underspecifiedSystems =
-          underspecifiedVisual['systems']! as List<dynamic>;
-      final visual =
-          ((underspecifiedSystems.first
-                      as Map<String, dynamic>)['presentation']!
-                  as Map<String, dynamic>)['visual']!
-              as Map<String, dynamic>;
-      visual['labels'] = <dynamic>['Only one'];
-      expect(
-        () => PortfolioDocument.fromJson(underspecifiedVisual),
-        throwsA(isA<FormatException>()),
-      );
-
       final missingEvidence = _manifest();
       final systemsWithoutEvidence =
           missingEvidence['systems']! as List<dynamic>;
@@ -297,20 +282,52 @@ void main() {
         throwsA(isA<FormatException>()),
       );
 
-      final featuredWithSupportingArtifact = _manifest();
-      final mixedSystems =
-          featuredWithSupportingArtifact['systems']! as List<dynamic>;
-      final featuredSystem = mixedSystems
+      final featuredWithoutArtifact = _manifest();
+      final featuredSystemsWithoutArtifact =
+          featuredWithoutArtifact['systems']! as List<dynamic>;
+      featuredSystemsWithoutArtifact
           .cast<Map<String, dynamic>>()
-          .firstWhere((system) => system['featured'] == true);
-      final supportingSystem = mixedSystems
-          .cast<Map<String, dynamic>>()
-          .firstWhere((system) => system['featured'] == false);
-      featuredSystem['artifact'] = Map<String, dynamic>.from(
-        supportingSystem['artifact']! as Map<String, dynamic>,
-      );
+          .firstWhere((system) => system['featured'] == true)
+          .remove('artifact');
       expect(
-        () => PortfolioDocument.fromJson(featuredWithSupportingArtifact),
+        () => PortfolioDocument.fromJson(featuredWithoutArtifact),
+        throwsA(isA<FormatException>()),
+      );
+
+      final duplicateArtifact = _manifest();
+      final mixedSystems = duplicateArtifact['systems']! as List<dynamic>;
+      final firstArtifact =
+          (mixedSystems.first as Map<String, dynamic>)['artifact']!
+              as Map<String, dynamic>;
+      final secondArtifact =
+          (mixedSystems[1] as Map<String, dynamic>)['artifact']!
+              as Map<String, dynamic>;
+      secondArtifact['asset'] = firstArtifact['asset'];
+      expect(
+        () => PortfolioDocument.fromJson(duplicateArtifact),
+        throwsA(isA<FormatException>()),
+      );
+
+      final missingSupportingGroup = _manifest();
+      final ungroupedSystems =
+          missingSupportingGroup['systems']! as List<dynamic>;
+      ungroupedSystems
+          .cast<Map<String, dynamic>>()
+          .firstWhere((system) => system['featured'] == false)
+          .remove('group');
+      expect(
+        () => PortfolioDocument.fromJson(missingSupportingGroup),
+        throwsA(isA<FormatException>()),
+      );
+
+      final unsupportedSupportingGroup = _manifest();
+      final unsupportedGroupedSystems =
+          unsupportedSupportingGroup['systems']! as List<dynamic>;
+      unsupportedGroupedSystems.cast<Map<String, dynamic>>().firstWhere(
+        (system) => system['featured'] == false,
+      )['group'] = 'client_card';
+      expect(
+        () => PortfolioDocument.fromJson(unsupportedSupportingGroup),
         throwsA(isA<FormatException>()),
       );
 
@@ -389,7 +406,7 @@ void main() {
           .firstWhere((system) => system['featured'] == false);
       final mismatchedCompositionArtifact =
           mismatchedCompositionSystem['artifact']! as Map<String, dynamic>;
-      mismatchedCompositionArtifact['composition'] = 'evidence_stack';
+      mismatchedCompositionArtifact['composition'] = 'portrait_split';
       expect(
         () => PortfolioDocument.fromJson(mismatchedComposition),
         throwsA(isA<FormatException>()),

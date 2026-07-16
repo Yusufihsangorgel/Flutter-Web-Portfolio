@@ -199,11 +199,18 @@ class _HomeViewState extends State<HomeView> {
         ),
       );
       if (!isLast) {
+        final nextChapter = narrative.chapters[index + 1];
+        final language = context.read<LanguageCubit>();
         chapters.add(
           NarrativeChapterHandoff(
             from: chapter,
-            to: narrative.chapters[index + 1],
+            to: nextChapter,
             position: scrollController.narrativePosition,
+            chapterNumber: narrative.sectionNumber(nextChapter.id),
+            label: language.getText(
+              'nav.${nextChapter.id.value}',
+              defaultValue: nextChapter.id.value,
+            ),
           ),
         );
       }

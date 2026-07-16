@@ -17,55 +17,81 @@ final class ProjectsSection extends StatelessWidget {
   const ProjectsSection({super.key});
 
   @override
-  Widget build(BuildContext context) =>
-      BlocBuilder<LanguageCubit, LanguageState>(
-        builder: (context, _) {
-          final language = context.read<LanguageCubit>();
-          final portfolio = context.read<PortfolioDocument>();
-          final labels = ProjectAtlasLabels(
-            challenge: language.getText(
-              'projects_section.challenge',
-              defaultValue: 'The problem',
-            ),
-            approach: language.getText(
-              'projects_section.approach',
-              defaultValue: 'The approach',
-            ),
-            outcome: language.getText(
-              'projects_section.outcome',
-              defaultValue: 'The result',
-            ),
-            ownership: language.getText(
-              'projects_section.ownership',
-              defaultValue: 'What I owned',
-            ),
-            decision: language.getText(
-              'projects_section.decision',
-              defaultValue: 'Engineering focus',
-            ),
-            evidence: language.getText(
-              'projects_section.evidence',
-              defaultValue: 'Evidence',
-            ),
-            openProject: language.getText(
-              'projects_section.open_project',
-              defaultValue: 'Open project',
-            ),
-            openEvidence: language.getText(
-              'projects_section.open_evidence',
-              defaultValue: 'Open evidence',
-            ),
-          );
-
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              _ProjectsIntroduction(language: language),
-              ProjectAtlas(systems: portfolio.systems, labels: labels),
-            ],
-          );
-        },
+  Widget build(
+    BuildContext context,
+  ) => BlocBuilder<LanguageCubit, LanguageState>(
+    builder: (context, _) {
+      final language = context.read<LanguageCubit>();
+      final portfolio = context.read<PortfolioDocument>();
+      final labels = ProjectAtlasLabels(
+        challenge: language.getText(
+          'projects_section.challenge',
+          defaultValue: 'The problem',
+        ),
+        approach: language.getText(
+          'projects_section.approach',
+          defaultValue: 'The approach',
+        ),
+        outcome: language.getText(
+          'projects_section.outcome',
+          defaultValue: 'The result',
+        ),
+        ownership: language.getText(
+          'projects_section.ownership',
+          defaultValue: 'What I owned',
+        ),
+        decision: language.getText(
+          'projects_section.decision',
+          defaultValue: 'Engineering focus',
+        ),
+        selectedCases: language.getText(
+          'projects_section.selected_cases',
+          defaultValue: 'Selected cases',
+        ),
+        evidenceIndex: language.getText(
+          'projects_section.evidence_index',
+          defaultValue: 'Evidence index',
+        ),
+        evidenceIntro: language.getText(
+          'projects_section.evidence_intro',
+          defaultValue:
+              'Released products and public engineering records, shown through their source material.',
+        ),
+        shippedProducts: language.getText(
+          'projects_section.shipped_products',
+          defaultValue: 'Shipped products',
+        ),
+        openEngineering: language.getText(
+          'projects_section.open_engineering',
+          defaultValue: 'Open engineering',
+        ),
+        selectEvidence: language.getText(
+          'projects_section.select_evidence',
+          defaultValue: 'Select evidence',
+        ),
+        openEvidence: language.getText(
+          'projects_section.open_evidence',
+          defaultValue: 'Open evidence',
+        ),
+        caseLabel: language.getText(
+          'projects_section.case_label',
+          defaultValue: 'Case',
+        ),
+        indexLabel: language.getText(
+          'projects_section.index_label',
+          defaultValue: 'Index',
+        ),
       );
+
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          _ProjectsIntroduction(language: language),
+          ProjectAtlas(systems: portfolio.systems, labels: labels),
+        ],
+      );
+    },
+  );
 }
 
 final class _ProjectsIntroduction extends StatelessWidget {

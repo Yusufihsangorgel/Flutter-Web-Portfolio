@@ -1,13 +1,13 @@
 {
-  "schema_version": 6,
-  "content_version": "2026.07.16.4",
+  "schema_version": 7,
+  "content_version": "2026.07.16.9",
   "verified_at": "2026-07-16",
   "site": {
     "url": "https://developeryusuf.com",
     "title": "Yusuf İhsan Görgel — Software Engineer",
     "description": "Yusuf İhsan Görgel is a software engineer building cross-platform products with Flutter, Dart, Go, PostgreSQL, Redis, and production infrastructure.",
     "social_description": "Cross-platform product engineering, selected professional work, and verified open-source contributions by Yusuf İhsan Görgel.",
-    "social_image": "/assets/og/engineering-showcase.png?v=2026.07.16.1",
+    "social_image": "/assets/og/engineering-showcase.png?v=2026.07.16.2",
     "domain_label": "DEVELOPERYUSUF.COM",
     "analytics": {
       "script_url": "https://analytics.developeryusuf.com/js/script.js",
@@ -43,6 +43,24 @@
       "label": "LinkedIn",
       "url": "https://www.linkedin.com/in/yusuf-ihsan-g%C3%B6rgel/",
       "scope": "Public professional timeline, education, and project descriptions"
+    },
+    {
+      "id": "fugasoft",
+      "label": "FugaSoft",
+      "url": "https://fugasoft.com/",
+      "scope": "Current company product surface and public ERP and point-of-sale material"
+    },
+    {
+      "id": "dorse",
+      "label": "Dorse",
+      "url": "https://dorseapp.com/",
+      "scope": "Public logistics product surface and workflow description"
+    },
+    {
+      "id": "medium",
+      "label": "Medium",
+      "url": "https://medium.com/@developeryusufihsan",
+      "scope": "Current public writing record"
     }
   ],
   "profile": {
@@ -88,9 +106,9 @@
   "experience": [
     {
       "id": "fugasoft",
-      "company": "Uzman Adres / FugaSoft",
+      "company": "Uzman Adres",
       "role": "Flutter Developer",
-      "domain": "Cross-platform ERP and point-of-sale products",
+      "domain": "FugaSoft ERP and point-of-sale products",
       "period": "March 2021 — Present",
       "current": true,
       "summary": "Project-based since March 2021 and full-time since September 2025. I build and maintain production ERP and point-of-sale applications across Android and iOS tablets plus Linux, macOS, and Windows desktops, with a focus on offline data, native integrations, performance, release reliability, and long-lived product maintenance.",
@@ -107,8 +125,8 @@
       "company": "JuniusTech",
       "role": "Full Stack Developer",
       "domain": "Dorse logistics platform",
-      "period": "June 2023 — Present",
-      "current": true,
+      "period": "June 2023 — January 2025",
+      "current": false,
       "summary": "Delivered mobile and web product work spanning Flutter and React, REST and WebSocket data flows, live vehicle tracking, Google and Apple Maps integrations, deployment, and QA coordination.",
       "evidence": [
         "Flutter",
@@ -295,69 +313,256 @@
   ],
   "systems": [
     {
-      "id": "dorse",
-      "name": "Dorse",
-      "kind": "Logistics product",
-      "year": "2024 — 2025",
+      "id": "fugasoft",
+      "name": "FugaSoft",
+      "kind": "ERP and point-of-sale platform",
+      "year": "2021 — Present",
       "featured": true,
-      "summary": "A logistics platform connecting drivers, fleet operators, and weighbridge businesses through mobile and web workflows.",
-      "ownership": "I worked across the Flutter application and React web surface, including live vehicle state, maps, API flows, deployment, and QA coordination.",
-      "decision": "Keep real-time vehicle and weighbridge state understandable across clients instead of hiding it behind screen-specific workarounds.",
-      "challenge": "Drivers, fleet operators, and weighbridge businesses needed to act on the same changing logistics state across mobile and web workflows.",
-      "approach": "Work across Flutter and React clients, maps, REST and WebSocket flows, deployment, and QA so vehicle and weighbridge state stayed explicit from transport to interface.",
-      "outcome": "Delivered a public logistics product spanning driver, fleet, and weighbridge workflows on mobile and web.",
+      "summary": "The ERP and point-of-sale product family I continue to build at Uzman Adres for retail teams working across tablets and desktop operating systems.",
+      "ownership": "I work primarily on the Flutter clients and the production concerns around offline data, native integrations, synchronisation, performance, release, and long-term maintenance.",
+      "decision": "Treat local persistence, device integration, and platform behaviour as product architecture rather than client-side afterthoughts.",
+      "challenge": "Retail software has to remain fast and dependable across store hardware, intermittent connectivity, long-running sessions, and several operating systems.",
+      "approach": "Build one shared Flutter product surface while making local data, synchronisation boundaries, native device APIs, and release behaviour explicit for every platform.",
+      "outcome": "Ongoing production delivery for FugaSoft's ERP and point-of-sale platform across Android and iOS tablets plus Linux, macOS, and Windows desktops.",
       "presentation": {
-        "background": "#E6FF57",
-        "foreground": "#11120F",
-        "accent": "#1E51FF",
-        "visual": {
-          "kind": "network",
-          "labels": ["Driver", "Fleet", "Weighbridge", "Live state"]
-        }
+        "background": "#F2EDE4",
+        "foreground": "#12110F",
+        "accent": "#F05A35"
       },
       "evidence": [
         {
-          "label": "Public product website",
+          "label": "FugaSoft company website",
+          "url": "https://fugasoft.com/",
+          "kind": "product"
+        },
+        {
+          "label": "FugaPOS product page",
+          "url": "https://fugasoft.com/tr/anasayfa/fugapos-akilli-ve-hizli-pos-cozumleri/",
+          "kind": "product"
+        },
+        {
+          "label": "FugaERP product page",
+          "url": "https://fugasoft.com/home/vollstaendig-integriertes-unternehmensmanagement-mit-fugaerp/",
+          "kind": "product"
+        }
+      ],
+      "artifact": {
+        "label": "CURRENT PRODUCT",
+        "asset": "assets/work/fugasoft-product.jpg",
+        "alt": "FugaSoft's current public website presenting its point-of-sale and business management platform.",
+        "caption": "Current FugaSoft product website · captured from the public company site.",
+        "width": 1600,
+        "height": 1000,
+        "fit": "contain",
+        "alignment": "center",
+        "composition": "evidence_stack"
+      },
+      "url": "https://fugasoft.com/",
+      "technologies": ["Flutter", "Dart", "Drift", "Native integrations", "Cross-platform release"]
+    },
+    {
+      "id": "dorse",
+      "name": "Dorse",
+      "kind": "Digital logistics platform",
+      "year": "April 2024 — January 2025",
+      "featured": true,
+      "summary": "A public logistics platform connecting drivers, fleet companies, and weighbridge businesses through mobile and web workflows.",
+      "ownership": "I developed the Flutter application and React web surface across live vehicle state, maps, REST and WebSocket flows, deployment, and QA coordination.",
+      "decision": "Keep real-time vehicle and weighbridge state explicit from transport to interface instead of hiding it behind screen-specific workarounds.",
+      "challenge": "Drivers, fleet companies, and weighbridge businesses needed to act on the same changing logistics state across mobile and web.",
+      "approach": "Build Flutter and React clients around shared REST and WebSocket flows, map integrations, offline behaviour, and coordinated release testing.",
+      "outcome": "Delivered the public mobile and web product for driver, fleet, and weighbridge workflows during the verified April 2024 to January 2025 project period.",
+      "presentation": {
+        "background": "#E6FF57",
+        "foreground": "#11120F",
+        "accent": "#1E51FF"
+      },
+      "evidence": [
+        {
+          "label": "Dorse product website",
           "url": "https://dorseapp.com/",
           "kind": "product"
         }
       ],
+      "artifact": {
+        "label": "PUBLIC PRODUCT",
+        "asset": "assets/work/dorse-product.jpg",
+        "alt": "Dorse's current public product website showing the logistics mobile application in use.",
+        "caption": "Dorse product surface · captured from the public company website.",
+        "width": 1600,
+        "height": 1000,
+        "fit": "contain",
+        "alignment": "center",
+        "composition": "evidence_stack"
+      },
       "url": "https://dorseapp.com/",
-      "technologies": ["Flutter", "React", "WebSocket", "Google Maps", "Apple Maps"]
+      "technologies": ["Flutter", "React", "Next.js", "WebSocket", "Maps"]
+    },
+    {
+      "id": "aydinlik-e-gazete",
+      "name": "Aydınlık E-Gazete",
+      "kind": "Mobile publishing",
+      "year": "2022 — 2024",
+      "featured": false,
+      "group": "shipped_product",
+      "spotlight": "Newspaper issues, reader controls, and subscriber archive access in a released Flutter client.",
+      "summary": "A newspaper client for iPhone and iPad with issue browsing, subscriber archive access, API-backed content, and mobile releases.",
+      "ownership": "At Promob TR, I worked on the Flutter client, API-backed issue flow, localisation, and mobile releases.",
+      "decision": "Keep issue browsing, reading, and subscriber archive access inside one legible phone-and-tablet flow.",
+      "presentation": {
+        "background": "#D91F26",
+        "foreground": "#FFF8EF",
+        "accent": "#11120F"
+      },
+      "evidence": [
+        {
+          "label": "View App Store release",
+          "url": "https://apps.apple.com/tr/app/ayd%C4%B1nl%C4%B1k-e-gazete/id1560103805",
+          "kind": "App Store"
+        },
+        {
+          "label": "View Google Play release",
+          "url": "https://play.google.com/store/apps/details?id=com.aydinlikgazetesi.egazete&hl=tr",
+          "kind": "Google Play"
+        }
+      ],
+      "artifact": {
+        "label": "PUBLIC APP STORE RELEASE",
+        "asset": "assets/work/aydinlik-release.jpg",
+        "alt": "Aydınlık E-Gazete public App Store release shown through an edition and newspaper reader screens.",
+        "caption": "Edition and reader surfaces from the public iPhone listing.",
+        "width": 1600,
+        "height": 1000,
+        "fit": "contain",
+        "alignment": "center",
+        "composition": "evidence_stack"
+      },
+      "url": "https://apps.apple.com/tr/app/ayd%C4%B1nl%C4%B1k-e-gazete/id1560103805",
+      "technologies": ["Flutter", "Dart", "Dio", "MVVM", "iOS"]
+    },
+    {
+      "id": "bilim-ve-utopya",
+      "name": "Bilim ve Ütopya",
+      "kind": "Mobile publishing",
+      "year": "2022 — 2024",
+      "featured": false,
+      "group": "shipped_product",
+      "spotlight": "Issue, archive, and account flows for a publicly released digital magazine.",
+      "summary": "A magazine client for iPhone and iPad that presents issue, archive, and account controls in one Flutter application.",
+      "ownership": "At Promob TR, I worked on Flutter features, API integration, localisation, and release support.",
+      "decision": "Keep issue, archive, and account controls inside one maintainable mobile client.",
+      "presentation": {
+        "background": "#D8C8FF",
+        "foreground": "#17131F",
+        "accent": "#5F32C8"
+      },
+      "evidence": [
+        {
+          "label": "View App Store release",
+          "url": "https://apps.apple.com/tr/app/bilim-ve-%C3%BCtopya-e-dergi/id6478221195",
+          "kind": "App Store"
+        },
+        {
+          "label": "View Google Play release",
+          "url": "https://play.google.com/store/apps/details?id=com.aydinlikgazetesi.edergi_v1_bvu",
+          "kind": "Google Play"
+        }
+      ],
+      "artifact": {
+        "label": "PUBLIC APP STORE RELEASE",
+        "asset": "assets/work/bilim-utopya-release.jpg",
+        "alt": "Bilim ve Ütopya E-Dergi public App Store release shown through issue and archive screens.",
+        "caption": "Issue and archive surfaces from the public iPhone listing.",
+        "width": 1600,
+        "height": 1000,
+        "fit": "contain",
+        "alignment": "center",
+        "composition": "evidence_stack"
+      },
+      "url": "https://apps.apple.com/tr/app/bilim-ve-%C3%BCtopya-e-dergi/id6478221195",
+      "technologies": ["Flutter", "Dart", "Dio", "MVVM", "iOS"]
+    },
+    {
+      "id": "galvapedia",
+      "name": "Galvapedia",
+      "kind": "Industrial reference application",
+      "year": "Public release",
+      "featured": false,
+      "group": "shipped_product",
+      "spotlight": "Galvanizing calculators and industrial reference workflows across a released mobile product.",
+      "summary": "A public industrial reference application with galvanizing calculators and technical workflows for field use.",
+      "ownership": "I built the product with Flutter and a Node.js, Express, and MongoDB service layer.",
+      "decision": "Turn specialist coating calculations into focused mobile tools with inputs and results that remain understandable in the field.",
+      "presentation": {
+        "background": "#F2EFE8",
+        "foreground": "#171512",
+        "accent": "#E87124"
+      },
+      "evidence": [
+        {
+          "label": "View App Store release",
+          "url": "https://apps.apple.com/tr/app/galvapedia/id1592744617",
+          "kind": "App Store"
+        },
+        {
+          "label": "View Google Play release",
+          "url": "https://play.google.com/store/apps/details?id=com.animetal.Galvapedia",
+          "kind": "Google Play"
+        }
+      ],
+      "artifact": {
+        "label": "PUBLIC APP STORE RELEASE",
+        "asset": "assets/work/galvapedia-release.jpg",
+        "alt": "Galvapedia public App Store release shown through its main reference menu and zinc-consumption calculator.",
+        "caption": "Reference and calculator surfaces from the public mobile release.",
+        "width": 1600,
+        "height": 1000,
+        "fit": "contain",
+        "alignment": "center",
+        "composition": "evidence_stack"
+      },
+      "url": "https://apps.apple.com/tr/app/galvapedia/id1592744617",
+      "technologies": ["Flutter", "Dart", "Node.js", "Express", "MongoDB"]
     },
     {
       "id": "queue-inspector",
       "name": "Queue Inspector MCP",
       "kind": "Operations tooling",
       "year": "2026",
-      "featured": true,
+      "featured": false,
+      "group": "open_engineering",
+      "spotlight": "Typed inspection and guarded recovery controls for Redis-backed job queues.",
       "summary": "An MCP server for inspecting and operating Redis-backed Asynq and BullMQ queues without reaching into storage by hand.",
       "ownership": "I designed the command surface, typed validation, queue adapters, and conservative state-changing operations.",
-      "decision": "Observation stays read-only by default; retries and destructive operations remain explicit and narrowly scoped.",
-      "challenge": "Queue incidents are described in jobs, states, attempts, and errors, while generic Redis inspection exposes low-level keys and a broader mutation surface.",
-      "approach": "Build typed MCP tools and backend-specific adapters for Asynq, BullMQ, and Sidekiq, with a read-only mode that removes mutating tools from discovery.",
-      "outcome": "Published a six-tool server with a recorded, non-mocked queue recovery flow and explicit safeguards around retries and deletion.",
+      "decision": "Keep observation read-only by default; make retries and destructive operations explicit and narrowly scoped.",
       "presentation": {
-        "background": "#1E51FF",
-        "foreground": "#F8F3E8",
-        "accent": "#E6FF57",
-        "visual": {
-          "kind": "flow",
-          "labels": ["Request", "Enqueue", "Queue", "Worker", "Retry"]
-        }
+        "background": "#0C1426",
+        "foreground": "#F5F1E8",
+        "accent": "#64D9A7"
       },
       "evidence": [
         {
-          "label": "Source and recorded CLI flow",
+          "label": "Open source repository",
           "url": "https://github.com/Yusufihsangorgel/queue-inspector-mcp",
-          "kind": "source"
+          "kind": "Source"
         },
         {
-          "label": "Design notes",
+          "label": "Read design notes",
           "url": "https://yusufihsangorgel.github.io/2026/07/08/queue-inspector-mcp.html",
-          "kind": "article"
+          "kind": "Article"
         }
       ],
+      "artifact": {
+        "label": "REPOSITORY ARTIFACT",
+        "asset": "assets/work/queue-inspector.png",
+        "alt": "Queue Inspector MCP repository cover illustrating guarded inspection and recovery of Redis-backed job queues.",
+        "caption": "Published repository cover · queue inspection and guarded recovery.",
+        "width": 1600,
+        "height": 840,
+        "fit": "contain",
+        "alignment": "center",
+        "composition": "evidence_stack"
+      },
       "url": "https://github.com/Yusufihsangorgel/queue-inspector-mcp",
       "technologies": ["TypeScript", "MCP", "Redis", "Asynq", "BullMQ"]
     },
@@ -366,114 +571,42 @@
       "name": "Multi-tenant Gateway",
       "kind": "Go platform reference",
       "year": "2026",
-      "featured": true,
-      "summary": "A small single-binary gateway that demonstrates tenant resolution, JWT authentication, per-tenant rate limits, and module boundaries.",
-      "ownership": "I designed and implemented the complete reference from transport and tenant resolution through policy and test coverage.",
-      "decision": "Keep tenant context explicit from transport through policy rather than hiding it behind global state.",
-      "challenge": "A small team needs tenant isolation and shared policy without multiplying services, deploys, and failure surfaces for every product module.",
-      "approach": "Carry resolved tenant context through one middleware chain, isolate persistent data by schema, and make PostgreSQL and Redis production wiring opt-in without changing module boundaries.",
-      "outcome": "Published a single-binary reference with tests for tenant resolution, authentication, rate limiting, schema isolation, and migration behaviour.",
+      "featured": false,
+      "group": "open_engineering",
+      "spotlight": "Explicit tenant resolution, authentication, policy, and storage boundaries in one Go binary.",
+      "summary": "A single-binary gateway demonstrating tenant resolution, JWT authentication, per-tenant rate limits, and module boundaries.",
+      "ownership": "I designed and implemented the reference from transport and tenant resolution through policy, persistence, and test coverage.",
+      "decision": "Carry tenant context through the request path instead of hiding it behind global state.",
       "presentation": {
         "background": "#FF704F",
         "foreground": "#11120F",
-        "accent": "#FFF7EA",
-        "visual": {
-          "kind": "lanes",
-          "labels": ["Resolve", "Authenticate", "Limit", "Isolate"]
-        }
+        "accent": "#FFF7EA"
       },
       "evidence": [
         {
-          "label": "Source repository",
+          "label": "Open source repository",
           "url": "https://github.com/Yusufihsangorgel/go-multitenant-gateway",
-          "kind": "source"
+          "kind": "Source"
         },
         {
-          "label": "Architecture record",
+          "label": "Read architecture record",
           "url": "https://github.com/Yusufihsangorgel/go-multitenant-gateway/blob/main/ARCHITECTURE.md",
-          "kind": "architecture"
+          "kind": "Architecture"
         }
       ],
+      "artifact": {
+        "label": "ARCHITECTURE RECORD",
+        "asset": "assets/work/go-multitenant-gateway.jpg",
+        "alt": "Source-derived architecture record for the Go multi-tenant gateway and its explicit request policy chain.",
+        "caption": "Architecture and source path drawn from the public repository.",
+        "width": 1600,
+        "height": 1000,
+        "fit": "contain",
+        "alignment": "center",
+        "composition": "evidence_stack"
+      },
       "url": "https://github.com/Yusufihsangorgel/go-multitenant-gateway",
-      "technologies": ["Go", "JWT", "Rate limiting", "Multi-tenancy"]
-    },
-    {
-      "id": "aydinlik-e-gazete",
-      "name": "Aydınlık E-Gazete",
-      "kind": "Mobile publishing",
-      "year": "2022 — 2024",
-      "featured": false,
-      "summary": "A newspaper client for iPhone and iPad with issue browsing, subscriber archive access, API-backed content, and mobile releases.",
-      "ownership": "At Promob TR, I worked on the Flutter client, API-backed issue flow, localisation, and mobile releases.",
-      "decision": "Issue browsing and the subscriber archive had to remain one clear flow across phone and tablet.",
-      "presentation": {
-        "background": "#D91F26",
-        "foreground": "#FFF8EF",
-        "accent": "#11120F",
-        "visual": {
-          "kind": "artifact",
-          "labels": ["Issue", "Archive", "Release"]
-        }
-      },
-      "evidence": [
-        {
-          "label": "Public App Store listing",
-          "url": "https://apps.apple.com/us/app/ayd%C4%B1nl%C4%B1k-e-gazete/id1560103805",
-          "kind": "public product"
-        }
-      ],
-      "artifact": {
-        "label": "PUBLIC RELEASE",
-        "asset": "assets/work/aydinlik-archive.jpg",
-        "alt": "Aydınlık E-Gazete iPhone archive screen with a date selector and release navigation.",
-        "caption": "Archive date selector from the public iPhone release.",
-        "width": 392,
-        "height": 696,
-        "fit": "contain",
-        "alignment": "start",
-        "composition": "portrait_split"
-      },
-      "url": "https://apps.apple.com/us/app/ayd%C4%B1nl%C4%B1k-e-gazete/id1560103805",
-      "technologies": ["Flutter", "Dart", "Dio", "MVVM", "iOS"]
-    },
-    {
-      "id": "bilim-ve-utopya",
-      "name": "Bilim ve Ütopya E-Dergi",
-      "kind": "Mobile publishing",
-      "year": "2022 — 2024",
-      "featured": false,
-      "summary": "A magazine client for iPhone and iPad that presents the current issue, archive, and account controls in one Flutter application.",
-      "ownership": "At Promob TR, I worked on Flutter features, API integration, localisation, and release support.",
-      "decision": "The current issue, archive, and account controls shared one maintainable mobile client.",
-      "presentation": {
-        "background": "#D8C8FF",
-        "foreground": "#17131F",
-        "accent": "#5F32C8",
-        "visual": {
-          "kind": "artifact",
-          "labels": ["Issue", "Reader", "Release"]
-        }
-      },
-      "evidence": [
-        {
-          "label": "Public App Store listing",
-          "url": "https://apps.apple.com/tr/app/bilim-ve-%C3%BCtopya-e-dergi/id6478221195",
-          "kind": "public product"
-        }
-      ],
-      "artifact": {
-        "label": "PUBLIC RELEASE",
-        "asset": "assets/work/bilim-reader.jpg",
-        "alt": "Bilim ve Ütopya E-Dergi iPhone home screen showing the current issue cover and bottom navigation.",
-        "caption": "Current-issue screen from the public iPhone release.",
-        "width": 392,
-        "height": 696,
-        "fit": "contain",
-        "alignment": "start",
-        "composition": "portrait_split"
-      },
-      "url": "https://apps.apple.com/tr/app/bilim-ve-%C3%BCtopya-e-dergi/id6478221195",
-      "technologies": ["Flutter", "Dart", "Dio", "MVVM", "iOS"]
+      "technologies": ["Go", "JWT", "PostgreSQL", "Redis", "Multi-tenancy"]
     },
     {
       "id": "redis-task-queue",
@@ -481,30 +614,28 @@
       "kind": "Server-side Dart library",
       "year": "2026",
       "featured": false,
+      "group": "open_engineering",
+      "spotlight": "Retries, dead-letter handling, and weighted queues behind a small Dart API.",
       "summary": "A Redis-backed task queue for Dart with retries, dead-letter handling, and weighted queues.",
       "ownership": "I designed the public API, queue semantics, failure handling, and runnable examples.",
       "decision": "Make failure states inspectable and scheduling behaviour deterministic without adding a runtime framework.",
       "presentation": {
         "background": "#F2E6DA",
         "foreground": "#171310",
-        "accent": "#D62D20",
-        "visual": {
-          "kind": "artifact",
-          "labels": ["Enqueue", "Worker", "Dead letter"]
-        }
+        "accent": "#D62D20"
       },
       "evidence": [
         {
-          "label": "Source repository",
+          "label": "Open source repository",
           "url": "https://github.com/Yusufihsangorgel/redis_task_queue",
-          "kind": "public source"
+          "kind": "Source"
         }
       ],
       "artifact": {
         "label": "REPOSITORY ARTIFACT",
         "asset": "assets/work/redis-task-queue.png",
         "alt": "Redis Task Queue repository cover showing API enqueue, queue, worker, success, and dead-letter paths.",
-        "caption": "Published repository cover · queue lifecycle",
+        "caption": "Published repository cover · queue lifecycle.",
         "width": 1600,
         "height": 840,
         "fit": "contain",
@@ -520,30 +651,28 @@
       "kind": "Flutter rendering package",
       "year": "2026",
       "featured": false,
+      "group": "open_engineering",
+      "spotlight": "A dependency-free interactive particle field with spatial-grid neighbour lookup.",
       "summary": "A dependency-free particle field for Flutter with pointer interaction and spatial-grid neighbour lookup.",
       "ownership": "I implemented the painter, pointer interaction, spatial partitioning, and package examples without runtime dependencies.",
       "decision": "Use spatial partitioning to avoid comparing every particle pair as the scene grows.",
       "presentation": {
         "background": "#0C1830",
         "foreground": "#F8F3E8",
-        "accent": "#FFE66D",
-        "visual": {
-          "kind": "artifact",
-          "labels": ["Pointer", "Spatial grid", "Painter"]
-        }
+        "accent": "#FFE66D"
       },
       "evidence": [
         {
-          "label": "Source repository",
+          "label": "Open source repository",
           "url": "https://github.com/Yusufihsangorgel/constellation_particles",
-          "kind": "public source"
+          "kind": "Source"
         }
       ],
       "artifact": {
         "label": "RECORDED DEMO",
         "asset": "assets/work/constellation-demo.png",
         "alt": "Constellation Particles demo frame with pointer-reactive particles and local neighbour links.",
-        "caption": "Frame from the published repository demo · Flutter CustomPainter",
+        "caption": "Frame from the published Flutter CustomPainter demo.",
         "width": 680,
         "height": 425,
         "fit": "contain",
@@ -559,47 +688,40 @@
       "kind": "Web engineering",
       "year": "2026",
       "featured": false,
+      "group": "open_engineering",
+      "spotlight": "A content-driven Flutter Web document with a custom narrative runtime and browser regression suite.",
       "summary": "This site is the working record of my experience, shipped products, and open-source contributions.",
-      "ownership": "I built and run the Flutter Web site, its content pipeline, accessibility layer, browser regression suite, and production deployment.",
-      "decision": "Treat the portfolio as an accessible document first; keep ambient rendering outside its semantic path.",
+      "ownership": "I built and run the Flutter Web site, its external content pipeline, accessibility layer, browser regression suite, and production release.",
+      "decision": "Treat the portfolio as an accessible document first and keep ambient rendering outside its semantic path.",
       "presentation": {
         "background": "#E6FF57",
         "foreground": "#11120F",
-        "accent": "#1E51FF",
-        "visual": {
-          "kind": "artifact",
-          "labels": ["Wasm", "Semantics", "Browser tests"]
-        }
+        "accent": "#1E51FF"
       },
       "evidence": [
         {
-          "label": "Source repository",
+          "label": "Open source repository",
           "url": "https://github.com/Yusufihsangorgel/Flutter-Web-Portfolio",
-          "kind": "public source"
+          "kind": "Source"
         },
         {
-          "label": "Production release",
+          "label": "Open production site",
           "url": "https://developeryusuf.com",
-          "kind": "live site"
-        },
-        {
-          "label": "Successful CI run",
-          "url": "https://github.com/Yusufihsangorgel/Flutter-Web-Portfolio/actions/runs/29483462714",
-          "kind": "release verification"
+          "kind": "Live site"
         }
       ],
       "artifact": {
-        "label": "RELEASE EVIDENCE",
-        "asset": "assets/work/portfolio-ci.png",
-        "alt": "Successful Flutter Web Portfolio run 134 showing analyze, test, and build jobs plus the Playwright summary.",
-        "caption": "Run #134 · analyze, test, and build passed; browser suite 35 passed.",
-        "width": 1280,
-        "height": 900,
+        "label": "VERIFIED PREVIEW",
+        "asset": "assets/work/portfolio-current.jpg",
+        "alt": "The verified Flutter Web portfolio release candidate showing its editorial work index and source-backed product imagery.",
+        "caption": "Release candidate · local Wasm build after desktop, tablet, and mobile browser verification.",
+        "width": 1600,
+        "height": 1000,
         "fit": "contain",
         "alignment": "center",
         "composition": "evidence_stack"
       },
-      "url": "https://github.com/Yusufihsangorgel/Flutter-Web-Portfolio",
+      "url": "https://developeryusuf.com",
       "technologies": ["Flutter", "Dart Wasm", "SkWasm", "Playwright"]
     }
   ]

@@ -247,15 +247,29 @@ test('renders a real supporting-work artifact in the atlas', async (
         (system) => system.artifact.width > system.artifact.height,
       );
   if (!selected) throw new Error('Expected a landscape supporting artifact.');
-  const selector = await scrollToText(page, selected.name);
-  const artifact = page.getByRole('img', { name: selected.artifact.alt });
-  await expect(artifact).toBeAttached();
+  let selector = await scrollToText(page, selected.name);
+  if (mobile) {
+    await page
+      .getByRole('button', {
+        name: `${english.projects_section.select_evidence}: ${selected.name}`,
+        exact: true,
+      })
+      .click();
+    const selectedHeading = page.getByRole('heading', {
+      name: selected.name,
+      exact: true,
+      level: 4,
+    });
+    selector = selectedHeading;
+  }
   for (let attempt = 0; attempt < 24; attempt += 1) {
     const box = await selector.boundingBox();
     if (box && Math.abs(box.y - 120) <= 1) break;
     await page.mouse.wheel(0, box ? box.y - 120 : 360);
     await settleCompositor(page, 3);
   }
+  const artifact = page.getByRole('img', { name: selected.artifact.alt });
+  await expect(artifact).toBeAttached();
   await settleCompositor(page, 8);
   await page.waitForTimeout(500);
   await expect(page).toHaveScreenshot('archive-selected.png');

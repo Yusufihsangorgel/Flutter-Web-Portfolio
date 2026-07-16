@@ -2,6 +2,29 @@
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.9.0] - 2026-07-16
+
+### Added
+
+- Full-width kinetic chapter portals that turn each measured section boundary into a deterministic scroll scene.
+- Allocation-bounded outlined, filled, and inverted typography layers driven by the existing narrative position.
+- Exact cubic sampling for the portal cursor without path metrics or per-frame point collections.
+- A professional-case rail for ongoing FugaSoft work and the completed Dorse engagement.
+- A single evidence index for shipped applications and open engineering, backed by first-party product captures and repository artifacts.
+
+### Changed
+
+- Replaced restrained hairline gaps with cobalt, ink, acid, and coral editorial stages that carry the reader into the next chapter.
+- Kept portal labels external and localized by deriving them from the narrative order and locale catalog instead of embedding portfolio copy in rendering code.
+- Expanded the responsive handoff rhythm to 220, 280, and 360 pixels so section changes read as deliberate scenes on mobile, tablet, and desktop.
+- Reconciled the current-role display with the latest public LinkedIn timeline: Uzman Adres remains current and JuniusTech ends in January 2025.
+- Replaced generated project diagrams, raw mobile screenshots, and the CI page capture with composed evidence from FugaSoft, Dorse, public App Store listings, and source repositories.
+
+### Fixed
+
+- Kept the moving portal cursor on the same cubic path rendered between chapter motifs.
+- Preserved decorative-only semantics, RTL mirroring, reduced-motion completion, deep links, and chapter-relative reflow through the larger transitions.
+
 ## [1.8.0] - 2026-07-16
 
 ### Added
@@ -10,7 +33,7 @@ This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Responsive, RTL-aware hairline handoffs that connect chapters without adding cards, labels, or decorative copy.
 - Direct-link, back/forward, responsive geometry, and real boundary-scroll regression coverage.
 - A schema-validated personal contact and current-role contract so the reusable template cannot hide the person it represents.
-- Per-project palettes and generated visual grammars for a full-width work atlas, with real local artifacts for shipped products and public tools.
+- Per-project palettes and a required source-backed artifact contract for a full-width work atlas.
 
 ### Changed
 
@@ -18,7 +41,7 @@ This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Made the hero action enter the first available evidence chapter instead of skipping directly to selected work.
 - Preserved the reader's local opening position and chapter-relative progress across responsive reflow, and aligned every progress indicator with the narrative bounds rather than the footer.
 - Replaced the black-and-clay developer-template treatment with a paper, cobalt, and acid editorial system led by Yusuf's full identity, direct summary, current roles, links, and email.
-- Replaced the supporting-work ledger and disclosure controls with uninterrupted, full-width project chapters on every viewport.
+- Replaced the repeated work-card treatment with professional cases plus one responsive evidence index.
 
 ### Fixed
 
@@ -39,7 +62,7 @@ This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Changed
 
 - Replaced the repeated supporting-project card and preview pattern with one continuous editorial release ledger.
-- Made supporting work lead with real App Store captures, repository media, and the exact successful release run instead of decorative project mockups.
+- Made supporting work lead with real App Store captures, repository media, and a verified local portfolio release candidate instead of decorative project mockups.
 - Kept the archive fully content-driven: ownership, engineering decisions, evidence links, image treatment, captions, and dimensions now come from the canonical JSON document.
 - Added portrait and landscape evidence compositions without project-specific rendering branches.
 
