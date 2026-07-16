@@ -14,7 +14,7 @@ if (profileGitHubUrl.hostname !== 'github.com' || profileGitHubPath.length !== 1
   throw new Error('profile.links must contain one canonical GitHub profile URL');
 }
 const expectedAuthor = profileGitHubPath[0];
-const token = resolveGitHubToken();
+const token = await resolveGitHubToken();
 const headers = {
   Accept: 'application/vnd.github+json',
   'User-Agent': 'flutter-web-portfolio-source-audit',
@@ -36,9 +36,25 @@ const records = portfolio.contributions.map((contribution, index) => {
   };
 });
 
-const results = await Promise.all(
-  records.map(async ({ contribution, endpoint }) => {
-    const response = await fetch(endpoint, { headers });
+// GitHub's API intermittently answers concurrent bursts and shared egress
+// addresses with transient 5xx pages, so records are audited sequentially
+// with bounded retries. Verification assertions are unchanged.
+async function fetchWithRetry(endpoint, attempts = 4) {
+  let response = null;
+  for (let attempt = 1; attempt <= attempts; attempt += 1) {
+    response = await fetch(endpoint, { headers });
+    if (response.ok || response.status < 500) return response;
+    if (attempt < attempts) {
+      await new Promise((resolve) => setTimeout(resolve, attempt * 2000));
+    }
+  }
+  return response;
+}
+
+const results = [];
+for (const { contribution, endpoint } of records) {
+  const result = await (async () => {
+    const response = await fetchWithRetry(endpoint);
     if (!response.ok) {
       throw new Error(
         `${contribution.url}: GitHub returned ${response.status} ${response.statusText}`,
@@ -75,8 +91,9 @@ const results = await Promise.all(
     }
 
     return `${contribution.project}: ${contribution.status} (${pullRequest.html_url})`;
-  }),
-);
+  })();
+  results.push(result);
+}
 
 console.log(
   `Verified ${results.length} contribution records against the GitHub API:\n${results
@@ -84,15 +101,34 @@ console.log(
     .join('\n')}`,
 );
 
-function resolveGitHubToken() {
+async function resolveGitHubToken() {
+  const candidates = [];
   const environmentToken = process.env.GITHUB_TOKEN?.trim();
-  if (environmentToken) return environmentToken;
+  if (environmentToken) candidates.push(environmentToken);
   try {
-    return execFileSync('gh', ['auth', 'token'], {
+    const cliToken = execFileSync('gh', ['auth', 'token'], {
       encoding: 'utf8',
       stdio: ['ignore', 'pipe', 'ignore'],
     }).trim();
+    if (cliToken) candidates.push(cliToken);
   } catch {
-    return null;
+    // No gh CLI or no stored credential; fall through to anonymous access.
   }
+
+  // A stale keychain credential makes every authenticated request fail even
+  // though anonymous access would succeed, so each candidate token must prove
+  // itself before the audit relies on it. The probe must be an endpoint that
+  // actually validates credentials; /rate_limit accepts broken tokens.
+  for (const candidate of candidates) {
+    const probe = await fetch('https://api.github.com/user', {
+      headers: {
+        Accept: 'application/vnd.github+json',
+        'User-Agent': 'flutter-web-portfolio-source-audit',
+        'X-GitHub-Api-Version': '2022-11-28',
+        Authorization: `Bearer ${candidate}`,
+      },
+    });
+    if (probe.ok) return candidate;
+  }
+  return null;
 }

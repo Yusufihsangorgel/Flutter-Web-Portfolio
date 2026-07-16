@@ -83,6 +83,22 @@ if (symbolFiles.length > 0) {
   );
 }
 
+// These renderer variants are only reachable through engine configuration
+// (`enableWimp`, `canvasKitVariant`) that this release never sets.
+const unreachableRendererFiles = releaseFiles.filter((file) => {
+  const segments = path.relative(webRoot, file).split(path.sep);
+  if (segments[0] !== 'canvaskit') return false;
+  return (
+    segments.includes('experimental_webparagraph') ||
+    segments.at(-1).startsWith('wimp.')
+  );
+});
+if (unreachableRendererFiles.length > 0) {
+  failures.push(
+    `${unreachableRendererFiles.length} unreachable renderer variant files are still publicly shippable; run npm run prepare:bundle`,
+  );
+}
+
 const releaseBytes = (
   await Promise.all(
     releaseFiles.map(async (file) => (await stat(file)).size),

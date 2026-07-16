@@ -16,6 +16,21 @@ const webRoot = path.resolve(process.env.WEB_ROOT ?? 'build/web');
 const files = await collectFiles(webRoot);
 const symbolFiles = files.filter((file) => file.endsWith('.symbols'));
 
+// This release can only ever request the skwasm/skwasm_heavy Wasm renderers
+// plus the chromium/full CanvasKit fallbacks. The wimp and
+// experimental_webparagraph variants are reachable solely through engine
+// configuration (`enableWimp`, `canvasKitVariant`) that neither the build
+// config nor index.html sets, so they are unreachable deployment weight.
+const unreachableRendererFiles = files.filter((file) => {
+  if (file.endsWith('.symbols')) return false;
+  const segments = path.relative(webRoot, file).split(path.sep);
+  if (segments[0] !== 'canvaskit') return false;
+  return (
+    segments.includes('experimental_webparagraph') ||
+    segments.at(-1).startsWith('wimp.')
+  );
+});
+
 const removedBytes = (
   await Promise.all(
     symbolFiles.map(async (file) => {
@@ -25,6 +40,17 @@ const removedBytes = (
     }),
   )
 ).reduce((total, size) => total + size, 0);
+
+const removedRendererBytes = (
+  await Promise.all(
+    unreachableRendererFiles.map(async (file) => {
+      const metadata = await stat(file);
+      await unlink(file);
+      return metadata.size;
+    }),
+  )
+).reduce((total, size) => total + size, 0);
+await removeEmptyDirectories(path.join(webRoot, 'canvaskit'));
 
 const releaseId = await createReleaseId();
 const bootstrapPath = path.join(webRoot, 'flutter_bootstrap.js');
@@ -40,6 +66,9 @@ await normalizeNoticeWhitespace();
 
 console.log(
   `Removed ${symbolFiles.length} renderer symbol files (${formatBytes(removedBytes)}) from the public release.`,
+);
+console.log(
+  `Removed ${unreachableRendererFiles.length} unreachable renderer variant files (${formatBytes(removedRendererBytes)}) from the public release.`,
 );
 console.log(
   `Versioned entrypoints as ${releaseId} and renderer assets as ${engineRevision}.`,
@@ -325,6 +354,18 @@ async function collectFiles(directory) {
     }),
   );
   return nested.flat();
+}
+
+async function removeEmptyDirectories(directory) {
+  const entries = await readdir(directory, { withFileTypes: true });
+  await Promise.all(
+    entries
+      .filter((entry) => entry.isDirectory())
+      .map((entry) => removeEmptyDirectories(path.join(directory, entry.name))),
+  );
+  if ((await readdir(directory)).length === 0) {
+    await rm(directory, { recursive: true, force: true });
+  }
 }
 
 function formatBytes(bytes) {

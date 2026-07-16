@@ -59,6 +59,13 @@
     "problem_label": "विफलता",
     "change_label": "पैच",
     "open_pull_request": "पुल रिक्वेस्ट देखें",
+    "event_lab_label": "घटना-क्रम प्रयोगशाला",
+    "event_lab_without_patch": "पैच के बिना",
+    "event_lab_with_patch": "पैच के साथ",
+    "event_lab_replay": "क्रम फिर चलाएँ",
+    "event_lab_sequence": "घटनाओं का क्रम",
+    "event_lab_risk": "जोखिम",
+    "event_lab_step": "चरण",
     "status_merged": "मर्ज किया गया",
     "status_under_review": "समीक्षा में"
   },

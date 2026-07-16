@@ -59,6 +59,13 @@
     "problem_label": "Der Fehler",
     "change_label": "Der Patch",
     "open_pull_request": "Pull Request ansehen",
+    "event_lab_label": "Labor für Ereignisabläufe",
+    "event_lab_without_patch": "Ohne Patch",
+    "event_lab_with_patch": "Mit Patch",
+    "event_lab_replay": "Sequenz erneut abspielen",
+    "event_lab_sequence": "Ereignisfolge",
+    "event_lab_risk": "Risiko",
+    "event_lab_step": "Schritt",
     "status_merged": "Zusammengeführt",
     "status_under_review": "In Prüfung"
   },
