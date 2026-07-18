@@ -187,6 +187,7 @@ npm run test:clone
 npm run verify:content
 npm run verify:hosting
 npm run audit:sources
+npm run audit:history
 dart format --output=none --set-exit-if-changed lib test tool
 flutter analyze --fatal-infos
 flutter test

@@ -20,6 +20,7 @@ Brief description of what this PR does and why.
 - [ ] `dart format --output=none --set-exit-if-changed lib test tool` passes
 - [ ] `npm run portfolio:validate`, `npm run test:template`, and `npm run test:clone` pass
 - [ ] `npm run verify:content`, `npm run verify:hosting`, and `npm run verify:source` pass
+- [ ] `npm run audit:history` finds no attribution or unresolved development markers
 - [ ] `flutter analyze --fatal-infos` passes with no issues
 - [ ] `flutter test` passes
 - [ ] `npm run build:release` passes

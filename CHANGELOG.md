@@ -16,6 +16,9 @@ This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   for the supported static providers.
 - A clean-clone release gate that proves initialized repositories contain no
   inherited owner artifacts and still produce a verified web bundle.
+- A full-history audit that rejects assistant attribution and control files in
+  every reachable commit while requiring development markers to be resolved at
+  the current head.
 
 ### Changed
 

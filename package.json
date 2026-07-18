@@ -18,6 +18,7 @@
     "sync:content": "node tool/sync_public_content.mjs",
     "verify:content": "node tool/sync_public_content.mjs --check",
     "audit:sources": "node tool/audit_public_sources.mjs",
+    "audit:history": "node tool/audit_repository_history.mjs",
     "render:social-card": "node tool/render_social_card.mjs",
     "render:work-artifacts": "node tool/render_work_artifacts.mjs",
     "verify:source": "node tool/verify_dart_reachability.mjs",

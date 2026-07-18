@@ -52,6 +52,7 @@ npm run test:template
 npm run test:clone
 npm run verify:hosting
 npm run verify:source
+npm run audit:history
 
 # All Dart tests pass
 flutter test
