@@ -21,8 +21,14 @@ flutter run -d chrome
 
 The wizard asks for identity, role, public contact information, canonical
 domain, headline, and at least three focus areas. It intentionally starts with
-no inherited work or social proof. Optional sections disappear until you add
+no inherited work or social proof. It also removes the demo owner’s public work
+artifacts and the source captures used to create them, then regenerates the
+social card and source manifest. Optional sections disappear until you add
 records.
+
+The initializer asks before overwriting the canonical document. In an advanced
+fork where you intentionally want to retain the demo evidence files, pass
+`--keep-demo-assets`; the files still remain unreferenced until you add records.
 
 For automation or a reproducible team setup:
 

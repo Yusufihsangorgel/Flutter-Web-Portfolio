@@ -1,5 +1,5 @@
 import { spawnSync } from 'node:child_process';
-import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, readdir, rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import process from 'node:process';
 import { createInterface } from 'node:readline/promises';
@@ -30,7 +30,13 @@ try {
   console.log(`\nCreated ${path.relative(root, output)}.`);
 
   if (output === defaultOutput && !options.skipSync) {
+    if (!options.keepDemoAssets) {
+      await pruneDemoAssets();
+      console.log('Removed the demo owner’s work artifacts and source captures.');
+    }
     run(process.execPath, [path.join(root, 'tool', 'sync_public_content.mjs')]);
+    run(process.execPath, [path.join(root, 'tool', 'render_social_card.mjs')]);
+    run(process.execPath, [path.join(root, 'tool', 'write_source_manifest.mjs')]);
     console.log('Synchronized metadata, README record, manifest, and hosting files.');
   } else if (output !== defaultOutput) {
     console.log('Skipped repository synchronization for the custom output path.');
@@ -271,6 +277,10 @@ function parseArguments(values) {
       parsed.skipSync = true;
       continue;
     }
+    if (token === '--keep-demo-assets') {
+      parsed.keepDemoAssets = true;
+      continue;
+    }
     if (token === '--help' || token === '-h') {
       parsed.help = true;
       continue;
@@ -283,6 +293,24 @@ function parseArguments(values) {
     index += 1;
   }
   return parsed;
+}
+
+async function pruneDemoAssets() {
+  await pruneDirectory(path.join(root, 'assets', 'work'), new Set(['README.md']));
+  await pruneDirectory(
+    path.join(root, 'tool', 'work_sources'),
+    new Set(['README.md']),
+  );
+}
+
+async function pruneDirectory(directory, keep) {
+  for (const entry of await readdir(directory, { withFileTypes: true })) {
+    if (keep.has(entry.name)) continue;
+    await rm(path.join(directory, entry.name), {
+      recursive: entry.isDirectory(),
+      force: true,
+    });
+  }
 }
 
 function splitDisplayName(name) {
@@ -353,6 +381,6 @@ Non-interactive:
 
 Optional flags:
   --github, --primary, --accent, --navigation, --since, --headline,
-  --summary, --background, --output, --skip-sync, --force
+  --summary, --background, --output, --skip-sync, --keep-demo-assets, --force
 `);
 }

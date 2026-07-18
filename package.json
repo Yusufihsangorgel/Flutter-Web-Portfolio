@@ -7,6 +7,7 @@
     "portfolio:init": "node tool/init_portfolio.mjs",
     "portfolio:validate": "dart run tool/validate_portfolio.dart",
     "test:template": "node tool/test_portfolio_init.mjs",
+    "test:clone": "node tool/test_template_clone.mjs",
     "build:release": "node tool/build_portfolio.mjs",
     "deploy": "node tool/deploy_portfolio.mjs",
     "test": "playwright test",

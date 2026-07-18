@@ -42,8 +42,9 @@ flutter run -d chrome
 The initializer is a real reset, not a search-and-replace checklist. It asks for
 your public identity, role, contact, canonical domain, headline, and focus;
 removes the original owner’s optional work, experience, and contribution data;
-then synchronizes the README record, SEO, JSON-LD, manifest, sitemap, robots
-file, analytics include, and server policy.
+deletes the demo work artifacts and their source captures; then regenerates the
+social card, source manifest, README record, SEO, JSON-LD, web manifest,
+sitemap, robots file, analytics include, and server policy.
 
 ```text
 you answer once
@@ -182,6 +183,7 @@ SwiftShader readback latency.
 ```bash
 npm run portfolio:validate
 npm run test:template
+npm run test:clone
 npm run verify:content
 npm run verify:hosting
 npm run audit:sources

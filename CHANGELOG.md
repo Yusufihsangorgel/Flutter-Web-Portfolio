@@ -14,6 +14,8 @@ This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   Netlify, Cloudflare Pages, Vercel, and Docker.
 - Hosting-native SPA routes, cross-origin isolation headers, and cache policies
   for the supported static providers.
+- A clean-clone release gate that proves initialized repositories contain no
+  inherited owner artifacts and still produce a verified web bundle.
 
 ### Changed
 
@@ -22,6 +24,8 @@ This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   engineering record.
 - Aligned contributor documentation and CI with template initialization,
   content validation, source reachability, and the canonical release command.
+- Made initialization delete demo artifacts and regenerate the social card and
+  source manifest before the first customized build.
 
 ## [1.9.0] - 2026-07-16
 
