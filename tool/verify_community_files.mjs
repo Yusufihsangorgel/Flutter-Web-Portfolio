@@ -10,6 +10,7 @@ const failures = [];
 
 const conduct = await read('CODE_OF_CONDUCT.md');
 const security = await read('SECURITY.md');
+const readme = await read('README.md');
 const issueConfig = await read('.github/ISSUE_TEMPLATE/config.yml');
 const issueForms = await Promise.all([
   read('.github/ISSUE_TEMPLATE/bug.yml'),
@@ -19,6 +20,19 @@ const issueForms = await Promise.all([
 expect(conduct.includes(portfolio.profile.name), 'conduct contact uses the owner name');
 expect(conduct.includes(portfolio.profile.email), 'conduct contact uses the owner email');
 expect(security.includes(portfolio.profile.email), 'security contact uses the owner email');
+const demoLinks = delimitedBody(
+  readme,
+  '<!-- portfolio-demo:start -->',
+  '<!-- portfolio-demo:end -->',
+);
+expect(
+  !/\[[^\]]+\]\([^)]+\)/.test(demoLinks),
+  'README centered demo links use HTML anchors, not raw Markdown syntax',
+);
+for (const [index, link] of portfolio.site.engineering_links.entries()) {
+  const expected = `<a href="${html(new URL(link.url).toString())}">${html(link.label)}</a>`;
+  expect(demoLinks.includes(expected), `README demo link ${index + 1} renders as an HTML anchor`);
+}
 expect(
   issueConfig.includes('blank_issues_enabled: false'),
   'blank issues are disabled',
@@ -59,6 +73,21 @@ if (failures.length > 0) {
 }
 
 console.log('Community contracts verified: conduct, security, and structured issue intake.');
+
+function delimitedBody(value, start, end) {
+  const startIndex = value.indexOf(start);
+  const endIndex = value.indexOf(end, startIndex + start.length);
+  if (startIndex < 0 || endIndex < 0) return '';
+  return value.slice(startIndex + start.length, endIndex).trim();
+}
+
+function html(value) {
+  return String(value)
+    .replaceAll('&', '&amp;')
+    .replaceAll('"', '&quot;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;');
+}
 
 function expect(condition, message) {
   if (!condition) failures.push(message);

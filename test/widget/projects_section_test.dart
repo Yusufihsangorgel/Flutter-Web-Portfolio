@@ -1,3 +1,5 @@
+import 'dart:ui' show PointerDeviceKind;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -25,15 +27,15 @@ final class _ProjectsLanguageRepository implements LanguageRepository {
       'title': 'Selected Work',
       'subtitle': 'Products and maintained tools.',
       'selected_cases': 'Professional cases',
-      'evidence_index': 'Evidence index',
-      'evidence_intro': 'Released products and source-backed records.',
+      'evidence_index': 'More work',
+      'evidence_intro': 'Released products and open-source projects.',
       'shipped_products': 'Shipped products',
       'open_engineering': 'Open engineering',
-      'select_evidence': 'Select evidence',
+      'select_evidence': 'Choose a project',
       'challenge': 'The problem',
       'approach': 'The approach',
       'outcome': 'The result',
-      'open_evidence': 'Open evidence',
+      'open_evidence': 'View project',
       'ownership': 'What I owned',
       'decision': 'Engineering focus',
     },
@@ -63,23 +65,25 @@ void main() {
   });
 
   Widget buildSubject({TextScaler textScaler = TextScaler.noScaling}) =>
-      MultiRepositoryProvider(
-        providers: [
-          RepositoryProvider.value(value: portfolio),
-          RepositoryProvider.value(value: scroll.narrative),
-        ],
-        child: MultiBlocProvider(
+      withPortfolioFixtureAssets(
+        child: MultiRepositoryProvider(
           providers: [
-            BlocProvider.value(value: language),
-            BlocProvider.value(value: scroll),
-            BlocProvider.value(value: scene),
+            RepositoryProvider.value(value: portfolio),
+            RepositoryProvider.value(value: scroll.narrative),
           ],
-          child: MaterialApp(
-            home: Builder(
-              builder: (context) => MediaQuery(
-                data: MediaQuery.of(context).copyWith(textScaler: textScaler),
-                child: const Scaffold(
-                  body: SingleChildScrollView(child: ProjectsSection()),
+          child: MultiBlocProvider(
+            providers: [
+              BlocProvider.value(value: language),
+              BlocProvider.value(value: scroll),
+              BlocProvider.value(value: scene),
+            ],
+            child: MaterialApp(
+              home: Builder(
+                builder: (context) => MediaQuery(
+                  data: MediaQuery.of(context).copyWith(textScaler: textScaler),
+                  child: const Scaffold(
+                    body: SingleChildScrollView(child: ProjectsSection()),
+                  ),
                 ),
               ),
             ),
@@ -87,7 +91,7 @@ void main() {
         ),
       );
 
-  testWidgets('renders professional cases followed by one evidence index', (
+  testWidgets('renders professional cases followed by one work index', (
     tester,
   ) async {
     tester.view.physicalSize = const Size(1440, 1000);
@@ -118,7 +122,7 @@ void main() {
       find.byKey(const ValueKey('project-evidence-index')),
       findsOneWidget,
     );
-    expect(find.text('Evidence index'), findsOneWidget);
+    expect(find.text('More work'), findsOneWidget);
     expect(find.byType(ExpansionTile), findsNothing);
     expect(tester.takeException(), isNull);
   });
@@ -159,7 +163,7 @@ void main() {
 
     expect(
       find.byType(Image),
-      findsAtLeastNWidgets(portfolio.featuredSystems.length + 1),
+      findsNWidgets(portfolio.featuredSystems.length + 1),
     );
     final controls = tester
         .widgetList<AccessibleAction>(find.byType(AccessibleAction))
@@ -189,16 +193,179 @@ void main() {
     final target = portfolio.supportingSystems.firstWhere(
       (system) => system.id == 'queue-inspector',
     );
-    expect(_assetNames(tester), contains(initial.artifact.asset));
+    final initialStage = find.byKey(
+      ValueKey('selected-evidence-${initial.id}'),
+    );
+    final targetStage = find.byKey(ValueKey('selected-evidence-${target.id}'));
+    expect(initialStage, findsOneWidget);
+    expect(targetStage, findsNothing);
 
-    final targetRow = find.text(target.name).first;
+    final targetRow = find.byKey(ValueKey('evidence-row-${target.id}'));
     await tester.ensureVisible(targetRow);
     await tester.pump();
     await tester.tap(targetRow);
     await tester.pumpAndSettle();
 
-    expect(_assetNames(tester), contains(target.artifact.asset));
-    expect(_assetNames(tester), isNot(contains(initial.artifact.asset)));
+    expect(targetStage, findsOneWidget);
+    expect(initialStage, findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets(
+    'swaps desktop hover evidence atomically without moving index rows',
+    (tester) async {
+      tester.view.physicalSize = const Size(1440, 1000);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      await tester.pumpWidget(buildSubject());
+      await tester.pump(const Duration(milliseconds: 200));
+
+      final initial = portfolio.supportingSystems.first;
+      final target = portfolio.supportingSystems.firstWhere(
+        (system) => system.id == 'queue-inspector',
+      );
+      final targetRow = find.byKey(ValueKey('evidence-row-${target.id}'));
+      await tester.ensureVisible(targetRow);
+      await tester.pump();
+
+      final rowFinders = <String, Finder>{
+        for (final system in portfolio.supportingSystems)
+          system.id: find.byKey(ValueKey('evidence-row-${system.id}')),
+      };
+      final before = <String, Rect>{
+        for (final entry in rowFinders.entries)
+          entry.key: tester.getRect(entry.value),
+      };
+      final initialStage = find.byKey(
+        ValueKey('selected-evidence-${initial.id}'),
+      );
+      final targetStage = find.byKey(
+        ValueKey('selected-evidence-${target.id}'),
+      );
+      expect(initialStage, findsOneWidget);
+      expect(targetStage, findsNothing);
+
+      final mouse = await tester.createGesture(kind: PointerDeviceKind.mouse);
+      addTearDown(mouse.removePointer);
+      await mouse.addPointer(location: Offset.zero);
+      await mouse.moveTo(tester.getCenter(targetRow));
+      await tester.pump();
+
+      expect(targetStage, findsOneWidget);
+      expect(initialStage, findsNothing);
+      for (final entry in rowFinders.entries) {
+        expect(
+          tester.getRect(entry.value),
+          before[entry.key],
+          reason: entry.key,
+        );
+      }
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets(
+    'keeps desktop index geometry stable across repeated pointer selections',
+    (tester) async {
+      tester.view.physicalSize = const Size(1440, 1000);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      await tester.pumpWidget(buildSubject());
+      await tester.pump(const Duration(milliseconds: 200));
+
+      final rowFinders = <String, Finder>{
+        for (final system in portfolio.supportingSystems)
+          system.id: find.byKey(ValueKey('evidence-row-${system.id}')),
+      };
+      final mouse = await tester.createGesture(kind: PointerDeviceKind.mouse);
+      addTearDown(mouse.removePointer);
+      await mouse.addPointer(location: Offset.zero);
+
+      // Exercise both fixture panels, return to the initial row, then select
+      // the alternate panel again. This catches height changes that only
+      // become visible after a transition settles or scrolling is clamped.
+      for (final targetId in const [
+        'queue-inspector',
+        'release-dashboard',
+        'queue-inspector',
+      ]) {
+        final targetRow = rowFinders[targetId]!;
+        await tester.ensureVisible(targetRow);
+        await tester.pump();
+
+        final before = <String, Rect>{
+          for (final entry in rowFinders.entries)
+            entry.key: tester.getRect(entry.value),
+        };
+        await mouse.moveTo(tester.getCenter(targetRow));
+        await tester.pump();
+
+        expect(
+          find.byKey(ValueKey('selected-evidence-$targetId')),
+          findsOneWidget,
+        );
+        for (final entry in rowFinders.entries) {
+          expect(tester.getRect(entry.value), before[entry.key]);
+        }
+
+        await tester.pump(const Duration(milliseconds: 250));
+        expect(
+          find.byKey(ValueKey('selected-evidence-$targetId')),
+          findsOneWidget,
+        );
+        for (final entry in rowFinders.entries) {
+          expect(
+            tester.getRect(entry.value),
+            before[entry.key],
+            reason: '$targetId settled: ${entry.key}',
+          );
+        }
+        expect(tester.takeException(), isNull);
+      }
+    },
+  );
+
+  testWidgets('requires an intentional tap for compact pointer layouts', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(1100, 1000);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(buildSubject());
+    await tester.pump(const Duration(milliseconds: 200));
+
+    final initial = portfolio.supportingSystems.first;
+    final target = portfolio.supportingSystems.firstWhere(
+      (system) => system.id == 'queue-inspector',
+    );
+    final initialStage = find.byKey(
+      ValueKey('selected-evidence-${initial.id}'),
+    );
+    final targetStage = find.byKey(ValueKey('selected-evidence-${target.id}'));
+    final targetRow = find.byKey(ValueKey('evidence-row-${target.id}'));
+    await tester.ensureVisible(targetRow);
+    await tester.pump();
+
+    final mouse = await tester.createGesture(kind: PointerDeviceKind.mouse);
+    addTearDown(mouse.removePointer);
+    await mouse.addPointer(location: Offset.zero);
+    await mouse.moveTo(tester.getCenter(targetRow));
+    await tester.pump(const Duration(milliseconds: 250));
+
+    expect(initialStage, findsOneWidget);
+    expect(targetStage, findsNothing);
+
+    await tester.tap(targetRow);
+    await tester.pumpAndSettle();
+
+    expect(initialStage, findsNothing);
+    expect(targetStage, findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 

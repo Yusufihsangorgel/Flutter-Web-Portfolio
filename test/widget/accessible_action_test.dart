@@ -135,6 +135,7 @@ void main() {
             label: 'Launch system',
             isButton: true,
             isFocusable: true,
+            hasFocusAction: true,
             hasTapAction: true,
           ),
         );
@@ -167,6 +168,7 @@ void main() {
             hasSelectedState: true,
             isSelected: true,
             isFocusable: true,
+            hasFocusAction: true,
             hasTapAction: true,
           ),
         );

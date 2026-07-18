@@ -9,6 +9,50 @@ void main() {
       jsonDecode(File('assets/presentation/narrative.json').readAsStringSync())
           as Map<String, dynamic>;
 
+  Set<String> templateIdentityMarkers() {
+    final professional =
+        jsonDecode(File('assets/content/portfolio.json').readAsStringSync())
+            as Map<String, dynamic>;
+    final markers = <String>{};
+    const generic = {
+      'flutter',
+      'github',
+      'linkedin',
+      'medium',
+      'portfolio',
+      'software',
+      'website',
+    };
+
+    void add(Object? value) {
+      if (value is! String) return;
+      final normalized = value.trim().toLowerCase();
+      if (normalized.length >= 4 && !generic.contains(normalized)) {
+        markers.add(normalized);
+      }
+    }
+
+    void addWords(Object? value) {
+      add(value);
+      if (value is! String) return;
+      for (final word in value.split(RegExp(r'[\s\-_/]+'))) {
+        add(word);
+      }
+    }
+
+    final profile = professional['profile']! as Map<String, dynamic>;
+    addWords(profile['name']);
+    add((profile['email'] as String?)?.split('@').first);
+    for (final experience in professional['experience']! as List<dynamic>) {
+      add((experience as Map<String, dynamic>)['company']);
+    }
+    for (final system in professional['systems']! as List<dynamic>) {
+      final record = system as Map<String, dynamic>;
+      if (record['id'] != 'portfolio') add(record['name']);
+    }
+    return markers;
+  }
+
   group('NarrativeDocument', () {
     test('loads the generic presentation asset in editorial order', () {
       final document = NarrativeDocument.fromJson(fixture());
@@ -33,13 +77,7 @@ void main() {
     test('presentation data contains no personal or project copy', () {
       final encoded = jsonEncode(fixture()).toLowerCase();
 
-      for (final disallowed in [
-        'yusuf',
-        'görgel',
-        'gorgel',
-        'fugasoft',
-        'dorse',
-      ]) {
+      for (final disallowed in templateIdentityMarkers()) {
         expect(encoded, isNot(contains(disallowed)));
       }
     });

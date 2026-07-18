@@ -1,0 +1,321 @@
+{
+  "schema_version": 8,
+  "content_version": "test.1",
+  "verified_at": "2026-01-01",
+  "site": {
+    "url": "https://portfolio.example.com",
+    "title": "Ada Example — Software Engineer",
+    "description": "Ada Example builds dependable software products and the systems that support them.",
+    "social_description": "Selected product engineering work and open-source contributions by Ada Example.",
+    "social_image": "/assets/og/engineering-showcase.png",
+    "domain_label": "PORTFOLIO.EXAMPLE.COM",
+    "locales": ["en"],
+    "analytics": {
+      "script_url": "https://analytics.example.com/script.js",
+      "domain": "portfolio.example.com"
+    },
+    "engineering_links": [
+      {
+        "id": "live-site",
+        "label": "Live site",
+        "url": "https://portfolio.example.com"
+      }
+    ]
+  },
+  "sources": [
+    {
+      "id": "source-code",
+      "label": "Source code",
+      "url": "https://example.com/source",
+      "scope": "Public source records used by this test fixture"
+    }
+  ],
+  "profile": {
+    "name": "Ada Example",
+    "display_name": {
+      "primary": "ADA",
+      "accent": "EXAMPLE",
+      "navigation": "Ada Example",
+      "accessible": "Ada Example"
+    },
+    "role": "Software Engineer",
+    "location": "Example City",
+    "email": "ada@example.com",
+    "since": "2020",
+    "headline": "I build reliable client applications and production services.",
+    "summary": "My work spans product delivery, data integrity, accessible interfaces, and release engineering.",
+    "background": "I follow features from their first design decision through testing, deployment, and long-term maintenance.",
+    "focus": [
+      "Client systems",
+      "Backend services",
+      "Production reliability"
+    ],
+    "links": [
+      {
+        "id": "github",
+        "label": "GitHub",
+        "url": "https://example.com/source"
+      },
+      {
+        "id": "writing",
+        "label": "Writing",
+        "url": "https://example.com/writing"
+      }
+    ]
+  },
+  "experience": [
+    {
+      "id": "example-studio",
+      "company": "Example Studio",
+      "role": "Software Engineer",
+      "domain": "Cross-platform product engineering",
+      "period": "2020 — Present",
+      "current": true,
+      "summary": "Builds and maintains production software across client, service, and release boundaries.",
+      "evidence": ["Flutter", "Dart", "Go", "PostgreSQL"]
+    }
+  ],
+  "capabilities": [
+    {
+      "id": "client",
+      "label": "Client systems",
+      "items": ["Flutter", "Dart", "Accessibility"]
+    },
+    {
+      "id": "services",
+      "label": "Services",
+      "items": ["Go", "PostgreSQL", "Redis"]
+    }
+  ],
+  "contributions": [
+    {
+      "id": "parser-boundary",
+      "project": "Example Parser",
+      "status": "merged",
+      "date": "2026-01-01",
+      "title": "Preserve parser boundaries during recovery",
+      "problem": "Malformed input could consume the next valid record during recovery.",
+      "change": "Limit recovery to the current record and cover the boundary with regression tests.",
+      "url": "https://example.com/contributions/parser-boundary",
+      "featured": false
+    },
+    {
+      "id": "cache-lifecycle",
+      "project": "Example Cache",
+      "status": "merged",
+      "date": "2026-01-02",
+      "title": "Close cache resources deterministically",
+      "problem": "A cancellation path could leave an active cache subscription behind.",
+      "change": "Tie subscription cleanup to the owning lifecycle and verify every exit path.",
+      "url": "https://example.com/contributions/cache-lifecycle",
+      "featured": false
+    },
+    {
+      "id": "review-cleanup",
+      "project": "Example Runtime",
+      "status": "under_review",
+      "date": "2026-01-03",
+      "title": "Cancel runtime work at the owning boundary",
+      "problem": "A detached view could retain work scheduled by its previous lifecycle.",
+      "change": "Cancel scheduled work with the owning view and add a disposal regression test.",
+      "url": "https://example.com/contributions/review-cleanup",
+      "featured": false
+    },
+    {
+      "id": "first-frame-order",
+      "project": "Example Renderer",
+      "status": "under_review",
+      "date": "2026-01-04",
+      "title": "Make the first visible frame deterministic",
+      "problem": "A readiness signal could arrive before the browser presented rendered content.",
+      "change": "Wait for scene completion and the next browser frame before exposing the surface.",
+      "url": "https://example.com/contributions/first-frame-order",
+      "issue_url": "https://example.com/issues/first-frame-order",
+      "featured": true,
+      "event_order_lab": {
+        "title": "First Frame Lab",
+        "events": [
+          {
+            "id": "framework_signal",
+            "label": "Framework sends the readiness signal"
+          },
+          {
+            "id": "first_frame_event",
+            "label": "Engine dispatches the first-frame event"
+          },
+          {
+            "id": "scene_render_complete",
+            "label": "Outstanding scene render completes"
+          },
+          {
+            "id": "browser_frame",
+            "label": "Next browser animation frame"
+          }
+        ],
+        "baseline": {
+          "summary": "The readiness event can overtake asynchronous rendering.",
+          "order": [
+            "framework_signal",
+            "first_frame_event",
+            "scene_render_complete"
+          ],
+          "gap": {
+            "after": "first_frame_event",
+            "before": "scene_render_complete",
+            "label": "Blank handoff window"
+          }
+        },
+        "with_patch": {
+          "summary": "The event waits for rendering and a browser frame.",
+          "order": [
+            "framework_signal",
+            "scene_render_complete",
+            "browser_frame",
+            "first_frame_event"
+          ]
+        }
+      }
+    }
+  ],
+  "systems": [
+    {
+      "id": "runtime-lab",
+      "name": "Runtime Lab",
+      "kind": "Rendering diagnostics",
+      "year": "2026",
+      "featured": true,
+      "summary": "A diagnostic surface for observing rendering lifecycle events.",
+      "ownership": "Designed the runtime model, interface, and regression coverage.",
+      "decision": "Make event order visible instead of inferring it from logs.",
+      "challenge": "Asynchronous renderer events are difficult to reason about when their order is hidden.",
+      "approach": "Record each event and present the sequence with deterministic playback controls.",
+      "outcome": "Regression tests can distinguish an early signal from a genuinely visible frame.",
+      "presentation": {
+        "background": "#E9F0FF",
+        "foreground": "#111827",
+        "accent": "#2457FF"
+      },
+      "evidence": [
+        {
+          "label": "Runtime design record",
+          "url": "https://example.com/work/runtime-lab",
+          "kind": "design"
+        }
+      ],
+      "artifact": {
+        "label": "RUNTIME MODEL",
+        "asset": "assets/work/.portfolio-test-runtime.png",
+        "alt": "A diagnostic diagram connecting renderer lifecycle events.",
+        "caption": "Renderer lifecycle events arranged as a diagnostic model.",
+        "width": 680,
+        "height": 425,
+        "fit": "contain",
+        "alignment": "center",
+        "composition": "evidence_stack",
+        "compact": {
+          "asset": "assets/work/.portfolio-test-runtime-compact.png",
+          "alt": "A compact diagnostic diagram of renderer lifecycle events.",
+          "caption": "Compact renderer lifecycle model.",
+          "width": 900,
+          "height": 1200,
+          "fit": "contain",
+          "alignment": "center"
+        }
+      },
+      "url": "https://example.com/work/runtime-lab",
+      "technologies": ["Flutter", "Dart", "Browser APIs"]
+    },
+    {
+      "id": "release-dashboard",
+      "name": "Release Dashboard",
+      "kind": "Operations tooling",
+      "year": "2025",
+      "featured": false,
+      "group": "shipped_product",
+      "spotlight": "A compact view of release health, evidence, and ownership.",
+      "summary": "A release dashboard that keeps operational evidence close to each deployment.",
+      "ownership": "Defined the release checks and the interface used to inspect them.",
+      "decision": "Keep each deploy tied to exact, reviewable evidence.",
+      "presentation": {
+        "background": "#F4EFE6",
+        "foreground": "#16130F",
+        "accent": "#D65A31"
+      },
+      "evidence": [
+        {
+          "label": "Release design record",
+          "url": "https://example.com/work/release-dashboard",
+          "kind": "design"
+        }
+      ],
+      "artifact": {
+        "label": "RELEASE EVIDENCE",
+        "asset": "assets/work/.portfolio-test-release.png",
+        "alt": "An operations dashboard showing a reliable release queue.",
+        "caption": "Release evidence and queue health in one operational view.",
+        "width": 1600,
+        "height": 840,
+        "fit": "contain",
+        "alignment": "center",
+        "composition": "evidence_stack",
+        "compact": {
+          "asset": "assets/work/.portfolio-test-release-compact.png",
+          "alt": "A compact operations dashboard showing release queue health.",
+          "caption": "Compact release queue evidence.",
+          "width": 900,
+          "height": 1200,
+          "fit": "contain",
+          "alignment": "center"
+        }
+      },
+      "url": "https://example.com/work/release-dashboard",
+      "technologies": ["Go", "Redis", "Docker"]
+    },
+    {
+      "id": "queue-inspector",
+      "name": "Queue Inspector",
+      "kind": "Engineering tool",
+      "year": "2025",
+      "featured": false,
+      "group": "open_engineering",
+      "spotlight": "A public view of distributed job state and retries.",
+      "summary": "An engineering tool for inspecting queue state without direct database access.",
+      "ownership": "Built the data adapter, interaction model, and failure-state coverage.",
+      "decision": "Expose bounded operational actions through a narrow interface.",
+      "presentation": {
+        "background": "#E8F5EE",
+        "foreground": "#102019",
+        "accent": "#16825D"
+      },
+      "evidence": [
+        {
+          "label": "Queue inspector source",
+          "url": "https://example.com/work/queue-inspector",
+          "kind": "source"
+        }
+      ],
+      "artifact": {
+        "label": "QUEUE INSPECTION",
+        "asset": "assets/work/.portfolio-test-queue.png",
+        "alt": "A queue inspector presenting jobs, state, and retry controls.",
+        "caption": "Queue state and bounded retry controls.",
+        "width": 1600,
+        "height": 840,
+        "fit": "contain",
+        "alignment": "center",
+        "composition": "evidence_stack",
+        "compact": {
+          "asset": "assets/work/.portfolio-test-queue-compact.png",
+          "alt": "A compact queue inspector presenting job state.",
+          "caption": "Compact queue state inspection.",
+          "width": 900,
+          "height": 1200,
+          "fit": "contain",
+          "alignment": "center"
+        }
+      },
+      "url": "https://example.com/work/queue-inspector",
+      "technologies": ["Dart", "Queues", "Observability"]
+    }
+  ]
+}

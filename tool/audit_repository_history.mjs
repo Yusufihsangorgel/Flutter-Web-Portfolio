@@ -47,8 +47,13 @@ const evolutionExclusions = [
 
 for (const commit of commits) {
   const subject = git(['show', '-s', '--format=%s', commit]).trim();
-  const message = git(['show', '-s', '--format=%B', commit]);
-  if (new RegExp(attributionPattern, 'i').test(message)) {
+  const metadata = git([
+    'show',
+    '-s',
+    '--format=%an <%ae>%n%cn <%ce>%n%B',
+    commit,
+  ]);
+  if (new RegExp(attributionPattern, 'i').test(metadata)) {
     failures.push(`${commit.slice(0, 8)} metadata contains an attribution marker`);
   }
 
@@ -95,8 +100,41 @@ for (const commit of commits) {
   }
 }
 
-const currentSignals = grepCommit(
-  'HEAD',
+for (const target of ['worktree', 'index']) {
+  const currentAttributionHits = grepCurrent(
+    target,
+    attributionPattern,
+    ['.'],
+    [...excluded, ':(exclude)tool/audit_repository_history.mjs'],
+    true,
+  );
+  if (currentAttributionHits.length > 0) {
+    failures.push(
+      `${target} source contains an assistant marker:\n${currentAttributionHits
+        .slice(0, 20)
+        .map((line) => `  ${line}`)
+        .join('\n')}`,
+    );
+  }
+}
+
+const currentPaths = git([
+  'ls-files',
+  '--cached',
+  '--others',
+  '--exclude-standard',
+]);
+const forbiddenCurrentPath = currentPaths
+  .trim()
+  .split('\n')
+  .filter(Boolean)
+  .find((file) => forbiddenPathPattern.test(file));
+if (forbiddenCurrentPath) {
+  failures.push(`current repository contains ${forbiddenCurrentPath}`);
+}
+
+const currentSignals = grepCurrent(
+  'worktree',
   evolutionPattern,
   ['lib', 'test', 'tool'],
   evolutionExclusions,
@@ -104,11 +142,23 @@ const currentSignals = grepCommit(
 );
 if (currentSignals.length > 0) {
   failures.push(
-    `HEAD contains unresolved development markers:\n${currentSignals
+    `worktree contains unresolved development markers:\n${currentSignals
       .slice(0, 20)
       .map((line) => `  ${line}`)
       .join('\n')}`,
   );
+}
+
+const annotatedTags = git([
+  'for-each-ref',
+  '--format=%(objecttype)%00%(refname:short)%00%(contents)',
+  'refs/tags',
+]);
+for (const record of annotatedTags.split('\n')) {
+  const [type, name, ...contents] = record.split('\0');
+  if (type === 'tag' && new RegExp(attributionPattern, 'i').test(contents.join('\0'))) {
+    failures.push(`annotated tag ${name} contains an attribution marker`);
+  }
 }
 
 if (failures.length > 0) {
@@ -117,7 +167,7 @@ if (failures.length > 0) {
 }
 
 console.log(
-  `History audit passed: ${commits.length} commits, zero assistant attribution markers, zero assistant-control paths, and a clean HEAD.`,
+  `History audit passed: ${commits.length} commits, zero assistant attribution markers, zero assistant-control paths, and a clean candidate worktree/index.`,
 );
 if (evolutionSignals.size > 0) {
   console.log(
@@ -126,7 +176,7 @@ if (evolutionSignals.size > 0) {
 }
 if (historicalAttributionResidues.size > 0) {
   console.log(
-    `${historicalAttributionResidues.size} historical snapshots referenced assistant tooling only in tracked text; no such reference remains at HEAD.`,
+    `${historicalAttributionResidues.size} historical snapshots matched attribution-review tokens in tracked text; no match remains in the candidate source.`,
   );
   console.log(
     `Historical reference paths: ${[...historicalAttributionPaths].sort().join(', ')}.`,
@@ -139,6 +189,22 @@ function grepCommit(commit, pattern, paths, exclusions, ignoreCase) {
   const result = spawnSync(
     'git',
     [...flags, '-E', pattern, commit, '--', ...paths, ...exclusions],
+    { cwd: root, encoding: 'utf8' },
+  );
+  if (result.status === 1) return [];
+  if (result.status !== 0) {
+    throw result.error ?? new Error(result.stderr || 'git grep failed');
+  }
+  return result.stdout.trim().split('\n').filter(Boolean);
+}
+
+function grepCurrent(target, pattern, paths, exclusions, ignoreCase) {
+  const flags = ['grep', '-I', '-n'];
+  flags.push(target === 'index' ? '--cached' : '--untracked');
+  if (ignoreCase) flags.push('-i');
+  const result = spawnSync(
+    'git',
+    [...flags, '-E', pattern, '--', ...paths, ...exclusions],
     { cwd: root, encoding: 'utf8' },
   );
   if (result.status === 1) return [];

@@ -1,15 +1,23 @@
 import { expect, Locator, Page, test } from '@playwright/test';
 import { readFileSync } from 'node:fs';
+import type { PortfolioTestData } from '../support/portfolio_test_data';
 
 const portfolio = JSON.parse(
   readFileSync('assets/content/portfolio.json', 'utf8'),
-);
-const packageMetadata = JSON.parse(readFileSync('package.json', 'utf8'));
+) as PortfolioTestData;
+const packageMetadata = JSON.parse(
+  readFileSync('package.json', 'utf8'),
+) as { version: string };
 const localReleasePreview = (() => {
   const value = process.env.PLAYWRIGHT_BASE_URL;
   if (!value) return false;
   return ['127.0.0.1', 'localhost'].includes(new URL(value).hostname);
 })();
+
+function required<T>(value: T | undefined, label: string): T {
+  if (value === undefined) throw new Error(`Expected ${label}.`);
+  return value;
+}
 
 async function openPortfolio(page: Page) {
   const response = await page.goto('/', { waitUntil: 'domcontentloaded' });
@@ -293,7 +301,7 @@ test('serves the complete professional narrative in production', async ({
     (system) => !system.featured,
   );
   expect(supportingSystems.length).toBeGreaterThan(1);
-  const supportingSystem = supportingSystems[0];
+  const supportingSystem = required(supportingSystems[0], 'supporting work');
   await scrollToHeading(page, supportingSystem.name);
   await expect(
     page.getByRole('img', { name: expectedArtifact(page, supportingSystem).alt }),
@@ -301,7 +309,7 @@ test('serves the complete professional narrative in production', async ({
   await scrollToText(page, supportingSystem.ownership);
 
   if (!isMobile) {
-    const nextSystem = supportingSystems[1];
+    const nextSystem = required(supportingSystems[1], 'a second work item');
     const selector = page.getByRole('button', {
       name: `Select evidence: ${nextSystem.name}`,
       exact: true,
@@ -371,9 +379,11 @@ test('serves the production accessibility hierarchy', async ({
     /#\/proof$/,
     'Open Source',
   );
-  const visibleContribution =
+  const visibleContribution = required(
     portfolio.contributions.find((contribution) => contribution.featured) ??
-    portfolio.contributions[0];
+      portfolio.contributions[0],
+    'a visible contribution',
+  );
   expect(visibleContribution).toBeTruthy();
   await scrollToSemanticLink(page, visibleContribution.title);
   const proofTree = await accessibility.send('Accessibility.getFullAXTree');
@@ -400,8 +410,14 @@ test('serves the production accessibility hierarchy', async ({
   const projectLinks = projectsTree.nodes
     .filter((node) => !node.ignored && node.role?.value === 'link')
     .map((node) => node.name?.value ?? '');
-  const featuredSystem = portfolio.systems.find((system) => system.featured);
-  const supportingSystem = portfolio.systems.find((system) => !system.featured);
+  const featuredSystem = required(
+    portfolio.systems.find((system) => system.featured),
+    'a featured system',
+  );
+  const supportingSystem = required(
+    portfolio.systems.find((system) => !system.featured),
+    'supporting work',
+  );
   expect(featuredSystem).toBeTruthy();
   expect(supportingSystem).toBeTruthy();
   const featuredEvidence = featuredSystem.evidence[0];

@@ -1,18 +1,24 @@
 {
   "name": "flutter-web-portfolio",
-  "version": "1.9.0",
+  "version": "2.0.0",
   "private": true,
   "description": "A JSON-driven Flutter Web portfolio template with measured navigation, accessible editorial layouts, and a dual-runtime Wasm release.",
+  "engines": {
+    "node": "24.x"
+  },
   "scripts": {
+    "setup:browsers": "playwright install chromium",
     "portfolio:init": "node tool/init_portfolio.mjs",
     "portfolio:validate": "dart run tool/validate_portfolio.dart",
     "test:template": "node tool/test_portfolio_init.mjs",
     "test:clone": "node tool/test_template_clone.mjs",
+    "test:release-security": "node tool/test_release_security.mjs",
     "build:release": "node tool/build_portfolio.mjs",
     "deploy": "node tool/deploy_portfolio.mjs",
     "test": "playwright test",
     "test:e2e": "playwright test",
     "test:e2e:prod": "playwright test --config playwright.prod.config.ts",
+    "typecheck": "tsc --noEmit",
     "test:visual": "playwright test tests/e2e/visual.spec.ts",
     "test:visual:update": "playwright test tests/e2e/visual.spec.ts --update-snapshots",
     "sync:content": "node tool/sync_public_content.mjs",
@@ -20,10 +26,12 @@
     "audit:sources": "node tool/audit_public_sources.mjs",
     "audit:history": "node tool/audit_repository_history.mjs",
     "render:social-card": "node tool/render_social_card.mjs",
+    "verify:social-card": "node tool/render_social_card.mjs --verify",
     "render:work-artifacts": "node tool/render_work_artifacts.mjs",
     "verify:source": "node tool/verify_dart_reachability.mjs",
     "verify:hosting": "node tool/verify_hosting_configs.mjs",
     "verify:community": "node tool/verify_community_files.mjs",
+    "verify:toolchain": "node tool/verify_toolchain.mjs --current",
     "prepare:source": "node tool/render_social_card.mjs && node tool/write_source_manifest.mjs",
     "prepare:bundle": "node tool/prepare_web_release.mjs",
     "verify:bundle": "node tool/verify_web_build.mjs",
@@ -46,6 +54,12 @@
   "type": "commonjs",
   "homepage": "https://developeryusuf.com",
   "devDependencies": {
-    "@playwright/test": "^1.59.1"
+    "@playwright/test": "^1.59.1",
+    "@types/node": "24.13.3",
+    "typescript": "7.0.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Yusufihsangorgel/Flutter-Web-Portfolio.git"
   }
 }

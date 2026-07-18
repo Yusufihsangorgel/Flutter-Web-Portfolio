@@ -17,22 +17,35 @@ jobs:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           fetch-depth: 0
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
+        with:
+          node-version: 24.18.0
+          cache: npm
       - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
         with:
           flutter-version: 3.44.6
           cache: true
+      - run: node tool/verify_toolchain.mjs --current
       - run: flutter pub get
       - run: npm ci
       - run: npm run verify:content
       - run: npm run portfolio:validate
       - run: npm run test:template
+      - run: npm run test:release-security
       - run: npm run verify:hosting
       - run: npm run verify:community
       - run: npm run audit:sources
         env:
           GITHUB_TOKEN: ${{ github.token }}
       - run: npm run audit:history
-      - run: npm run verify:bundle
+      - run: npm run typecheck
+      - name: Verify tracked release when present
+        run: |
+          if [[ -d build/web ]]; then
+            npm run verify:bundle
+          else
+            echo "No tracked build/web after template initialization; build job will create and verify it."
+          fi
       - run: dart format --output=none --set-exit-if-changed lib test tool
       - run: bash -n tool/hosted_build.sh
       - run: node --check tool/init_portfolio.mjs
@@ -43,6 +56,7 @@ jobs:
       - run: node --check tool/verify_community_files.mjs
       - run: node --check tool/test_portfolio_init.mjs
       - run: node --check tool/test_template_clone.mjs
+      - run: node --check tool/smoke_clean_template.mjs
       - run: node --check tool/audit_repository_history.mjs
       - run: flutter analyze --fatal-infos
       - run: npm run verify:source
@@ -52,10 +66,15 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
+        with:
+          node-version: 24.18.0
+          cache: npm
       - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
         with:
           flutter-version: 3.44.6
           cache: true
+      - run: node tool/verify_toolchain.mjs --current
       - run: flutter pub get
       - run: flutter test
 
@@ -65,10 +84,15 @@ jobs:
     needs: [analyze, test]
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
+        with:
+          node-version: 24.18.0
+          cache: npm
       - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
         with:
           flutter-version: 3.44.6
           cache: true
+      - run: node tool/verify_toolchain.mjs --current
       - run: flutter clean
       - run: flutter pub get
       - run: npm ci

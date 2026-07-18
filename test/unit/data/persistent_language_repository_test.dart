@@ -50,6 +50,7 @@ void main() {
     repository = PersistentLanguageRepository(
       assetLoader: _StubAssetLoader(),
       preferenceStore: preferences,
+      supportedLanguages: const {'tr', 'en', 'de', 'fr', 'es', 'ar', 'hi'},
     );
   });
 
@@ -81,10 +82,11 @@ void main() {
         final unavailable = PersistentLanguageRepository(
           assetLoader: _StubAssetLoader(),
           preferenceStore: _FailingKeyValueStore(),
+          supportedLanguages: const {'en', 'fr'},
         );
 
         expect(await unavailable.getSelectedLanguage(), 'en');
-        await expectLater(unavailable.saveSelectedLanguage('fr'), completes);
+        expect(() => unavailable.saveSelectedLanguage('fr'), throwsStateError);
       },
     );
   });

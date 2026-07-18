@@ -1,10 +1,23 @@
 import { expect, Page, test } from '@playwright/test';
 import { readFileSync } from 'node:fs';
+import type {
+  InterfaceTestData,
+  PortfolioTestData,
+} from '../support/portfolio_test_data';
 
 const portfolio = JSON.parse(
   readFileSync('assets/content/portfolio.json', 'utf8'),
+) as PortfolioTestData;
+const english = JSON.parse(
+  readFileSync('assets/i18n/en.json', 'utf8'),
+) as InterfaceTestData;
+
+test.skip(
+  portfolio.experience.length === 0 &&
+    portfolio.contributions.length === 0 &&
+    portfolio.systems.length === 0,
+  'demo visual baselines do not apply to an initialized empty portfolio',
 );
-const english = JSON.parse(readFileSync('assets/i18n/en.json', 'utf8'));
 
 async function settleCompositor(page: Page, frameCount = 3) {
   await page.evaluate(
@@ -299,7 +312,7 @@ test('keeps one content-anchored signal in the default motion experience', async
   await settleCompositor(page, 8);
   // The narrative cursor is a pure function of scroll offset, but wheel input
   // only lands the heading within ±2px of the target, and here the cursor sits
-  // over the high-contrast FugaSoft board, so that sub-pixel scroll drift moves
+  // over the high-contrast featured-work board, so sub-pixel scroll drift moves
   // more antialiased edges than the calmer Experience anchor above. This bound
   // still proves the motion frame equals the static baseline except for the one
   // small animated signal, while staying reproducible; it remains far tighter

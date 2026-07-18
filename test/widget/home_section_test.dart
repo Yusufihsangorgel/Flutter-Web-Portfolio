@@ -91,8 +91,8 @@ void main() {
 
     expect(find.text('Explore my work'), findsOneWidget);
     expect(find.text('GitHub'), findsOneWidget);
-    expect(find.text('Uzman Adres'), findsOneWidget);
-    expect(find.text('JuniusTech'), findsNothing);
+    expect(find.text('Example Studio'), findsOneWidget);
+    expect(find.text('Previous Example Company'), findsNothing);
     expect(find.text('Email me'), findsOneWidget);
     expect(tester.takeException(), isNull);
     await tester.pumpWidget(const SizedBox.shrink());

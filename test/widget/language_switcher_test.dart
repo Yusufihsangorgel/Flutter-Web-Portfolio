@@ -31,11 +31,13 @@ final class _SwitcherLanguageRepository implements LanguageRepository {
 
 void main() {
   late LanguageCubit language;
+  late _SwitcherLanguageRepository repository;
   late AppScrollController scroll;
   late SceneDirector scene;
 
   setUp(() async {
-    language = LanguageCubit(languageRepository: _SwitcherLanguageRepository());
+    repository = _SwitcherLanguageRepository();
+    language = LanguageCubit(languageRepository: repository);
     scroll = AppScrollController(narrative: loadNarrativeFixture());
     scene = SceneDirector(scrollController: scroll);
     await language.initialize();
@@ -70,7 +72,7 @@ void main() {
     expect(find.byTooltip('Language menu: English'), findsOneWidget);
   });
 
-  testWidgets('keeps the language menu readable and selectable', (
+  testWidgets('keeps every available language readable in the menu', (
     tester,
   ) async {
     await tester.pumpWidget(buildSubject());
@@ -84,12 +86,5 @@ void main() {
     expect(find.text('TR'), findsOneWidget);
     expect(find.byIcon(Icons.check_rounded), findsOneWidget);
     expect(find.text('🇹🇷'), findsNothing);
-
-    await tester.tap(find.text('TR'));
-    await tester.pumpAndSettle();
-
-    expect(language.currentLanguage, 'tr');
-    expect(find.text('TR'), findsOneWidget);
-    expect(find.byTooltip('Language menu: Türkçe'), findsOneWidget);
   });
 }

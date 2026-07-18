@@ -7,12 +7,17 @@ final class _LanguageRepository implements LanguageRepository {
     this.selectedLanguage = 'en',
     Map<String, Map<String, dynamic>>? documents,
     Map<String, Duration>? delays,
+    Map<String, Duration>? saveDelays,
+    this.saveError,
   }) : documents = documents ?? <String, Map<String, dynamic>>{},
-       delays = delays ?? <String, Duration>{};
+       delays = delays ?? <String, Duration>{},
+       saveDelays = saveDelays ?? <String, Duration>{};
 
   String selectedLanguage;
   final Map<String, Map<String, dynamic>> documents;
   final Map<String, Duration> delays;
+  final Map<String, Duration> saveDelays;
+  final Object? saveError;
   final List<String> savedLanguages = [];
 
   @override
@@ -30,6 +35,10 @@ final class _LanguageRepository implements LanguageRepository {
 
   @override
   Future<void> saveSelectedLanguage(String languageCode) async {
+    final delay = saveDelays[languageCode];
+    if (delay != null) await Future<void>.delayed(delay);
+    final error = saveError;
+    if (error != null) throw error;
     selectedLanguage = languageCode;
     savedLanguages.add(languageCode);
   }
@@ -110,6 +119,65 @@ void main() {
     });
 
     test(
+      'applies a valid locale in-process when persistence is unavailable',
+      () async {
+        final repository = _LanguageRepository(
+          documents: {
+            'en': {
+              'screen': {'label': 'Portfolio'},
+            },
+            'de': {
+              'screen': {'label': 'Portfolio auf Deutsch'},
+            },
+          },
+          saveError: StateError('storage blocked'),
+        );
+        final cubit = LanguageCubit(languageRepository: repository);
+        addTearDown(cubit.close);
+        await cubit.initialize();
+
+        await cubit.selectLanguage('de');
+
+        expect(cubit.state.status, LanguageStatus.ready);
+        expect(cubit.currentLanguage, 'de');
+        expect(cubit.getText('screen.label'), 'Portfolio auf Deutsch');
+        expect(
+          cubit.state.errorMessage,
+          'Your language preference could not be saved. '
+          'This language will remain active for this visit.',
+        );
+        expect(cubit.state.errorMessage, isNot(contains('storage blocked')));
+        expect(repository.savedLanguages, isEmpty);
+      },
+    );
+
+    test('uses a localized, non-technical persistence warning', () async {
+      final repository = _LanguageRepository(
+        selectedLanguage: 'de',
+        documents: {
+          'de': {
+            'accessibility': {
+              'language_not_saved':
+                  'Die Sprachauswahl konnte nicht gespeichert werden.',
+            },
+          },
+        },
+        saveError: StateError('internal storage implementation detail'),
+      );
+      final cubit = LanguageCubit(languageRepository: repository);
+      addTearDown(cubit.close);
+
+      await cubit.initialize();
+
+      expect(cubit.state.status, LanguageStatus.ready);
+      expect(
+        cubit.state.errorMessage,
+        'Die Sprachauswahl konnte nicht gespeichert werden.',
+      );
+      expect(cubit.state.errorMessage, isNot(contains('internal storage')));
+    });
+
+    test(
       'empty translation document fails without replacing good data',
       () async {
         final repository = _LanguageRepository(
@@ -126,9 +194,73 @@ void main() {
 
         await cubit.changeLanguage('tr');
 
-        expect(cubit.state.status, LanguageStatus.failure);
+        expect(cubit.state.status, LanguageStatus.ready);
         expect(cubit.state.languageCode, 'en');
         expect(cubit.getText('screen.label'), 'Portfolio');
+        expect(
+          cubit.state.errorMessage,
+          'That language could not be loaded. '
+          'Your current language is still active.',
+        );
+        expect(repository.savedLanguages, ['en']);
+      },
+    );
+
+    test(
+      'rejects an incomplete matching-locale catalog before persistence',
+      () async {
+        final repository = _LanguageRepository(
+          selectedLanguage: 'tr',
+          documents: {
+            'en': {
+              'portfolio_content': {'required': 'present'},
+            },
+            'tr': {'locale': 'tr', 'portfolio_content': <String, dynamic>{}},
+          },
+        );
+        final cubit = LanguageCubit(
+          languageRepository: repository,
+          validateTranslations: (translations) {
+            final content = translations['portfolio_content'];
+            if (content is! Map<String, dynamic> ||
+                content['required'] != 'present') {
+              throw const FormatException('incomplete portfolio overlay');
+            }
+          },
+        );
+        addTearDown(cubit.close);
+
+        await cubit.initialize();
+
+        expect(cubit.state.status, LanguageStatus.ready);
+        expect(cubit.state.languageCode, 'en');
+        expect(repository.selectedLanguage, 'en');
+        expect(repository.savedLanguages, ['en']);
+        expect(cubit.state.errorMessage, isNull);
+      },
+    );
+
+    test(
+      'a broken saved catalog deterministically falls back to English',
+      () async {
+        final repository = _LanguageRepository(
+          selectedLanguage: 'tr',
+          documents: {
+            'en': {
+              'screen': {'label': 'Portfolio'},
+            },
+            'tr': <String, dynamic>{},
+          },
+        );
+        final cubit = LanguageCubit(languageRepository: repository);
+        addTearDown(cubit.close);
+
+        await cubit.initialize();
+
+        expect(cubit.state.status, LanguageStatus.ready);
+        expect(cubit.state.languageCode, 'en');
+        expect(cubit.getText('screen.label'), 'Portfolio');
+        expect(repository.selectedLanguage, 'en');
         expect(repository.savedLanguages, ['en']);
       },
     );
@@ -153,15 +285,48 @@ void main() {
         final cubit = LanguageCubit(languageRepository: repository);
         addTearDown(cubit.close);
 
-        await Future.wait([
-          cubit.changeLanguage('tr'),
-          cubit.changeLanguage('de'),
-        ]);
+        final staleSelection = cubit.changeLanguage('tr');
+        await Future<void>.delayed(Duration.zero);
+        final latestSelection = cubit.changeLanguage('de');
+        await Future.wait([staleSelection, latestSelection]);
 
         expect(cubit.state.status, LanguageStatus.ready);
         expect(cubit.currentLanguage, 'de');
         expect(cubit.getText('screen.label'), 'Deutsch');
         expect(repository.savedLanguages, ['de']);
+      },
+    );
+
+    test(
+      'persistence is ordered and a stale save cannot overwrite the latest choice',
+      () async {
+        final repository = _LanguageRepository(
+          documents: {
+            'tr': {
+              'screen': {'label': 'Türkçe'},
+            },
+            'de': {
+              'screen': {'label': 'Deutsch'},
+            },
+          },
+          saveDelays: const {
+            'tr': Duration(milliseconds: 20),
+            'de': Duration(milliseconds: 1),
+          },
+        );
+        final cubit = LanguageCubit(languageRepository: repository);
+        addTearDown(cubit.close);
+
+        final staleSelection = cubit.changeLanguage('tr');
+        await Future<void>.delayed(Duration.zero);
+        final latestSelection = cubit.changeLanguage('de');
+        await Future.wait([staleSelection, latestSelection]);
+
+        expect(repository.savedLanguages, ['tr', 'de']);
+        expect(repository.selectedLanguage, 'de');
+        expect(cubit.state.status, LanguageStatus.ready);
+        expect(cubit.currentLanguage, 'de');
+        expect(cubit.getText('screen.label'), 'Deutsch');
       },
     );
 

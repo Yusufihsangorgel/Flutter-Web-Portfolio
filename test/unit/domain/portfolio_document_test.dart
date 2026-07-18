@@ -1,13 +1,14 @@
-import 'dart:convert';
 import 'dart:io';
 import 'dart:ui' as ui;
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_web_portfolio/app/domain/models/portfolio_document.dart';
 
+import '../../helpers/portfolio_fixture.dart';
+
 void main() {
   group('PortfolioDocument', () {
-    test('loads the verified canonical content manifest', () {
+    test('loads a complete, identity-neutral portfolio fixture', () {
       final manifest = _manifest();
       final document = PortfolioDocument.fromJson(manifest);
       final profile = manifest['profile']! as Map<String, dynamic>;
@@ -31,24 +32,27 @@ void main() {
       final site = manifest['site']! as Map<String, dynamic>;
       expect(document.site.url.toString(), site['url']);
       expect(document.site.title, contains(document.profile.role));
-      expect(document.site.engineeringLinks, hasLength(3));
+      expect(
+        document.site.engineeringLinks,
+        hasLength((site['engineering_links']! as List<dynamic>).length),
+      );
       final analytics = site['analytics']! as Map<String, dynamic>;
       expect(
         document.site.analytics?.scriptUrl.toString(),
         analytics['script_url'],
       );
-      expect(document.experience, hasLength(6));
+      expect(document.experience, hasLength(1));
       expect(document.currentExperience, hasLength(1));
-      expect(document.mergedContributions, hasLength(5));
-      expect(document.contributionsUnderReview, hasLength(3));
+      expect(document.mergedContributions, hasLength(2));
+      expect(document.contributionsUnderReview, hasLength(2));
       expect(document.featuredContribution, isNotNull);
       expect(document.featuredContribution?.eventOrderLab, isNotNull);
       expect(
         document.featuredContribution?.eventOrderLab?.withPatch.order,
         contains('browser_frame'),
       );
-      expect(document.systems, hasLength(10));
-      expect(document.featuredSystems, hasLength(2));
+      expect(document.systems, hasLength(3));
+      expect(document.featuredSystems, hasLength(1));
       expect(
         document.featuredSystems.every(
           (system) =>
@@ -563,6 +567,4 @@ void main() {
   });
 }
 
-Map<String, dynamic> _manifest() =>
-    jsonDecode(File('assets/content/portfolio.json').readAsStringSync())
-        as Map<String, dynamic>;
+Map<String, dynamic> _manifest() => loadPortfolioFixtureJson();

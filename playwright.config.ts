@@ -1,5 +1,12 @@
 import { defineConfig, devices } from '@playwright/test';
 
+const externalBaseUrl = process.env.PLAYWRIGHT_BASE_URL;
+const previewPort = Number(process.env.PORTFOLIO_TEST_PORT ?? 43177);
+if (!Number.isInteger(previewPort) || previewPort < 1024 || previewPort > 65535) {
+  throw new Error('PORTFOLIO_TEST_PORT must be an integer from 1024 to 65535.');
+}
+const previewUrl = `http://127.0.0.1:${previewPort}`;
+
 export default defineConfig({
   testDir: './tests/e2e',
   snapshotPathTemplate:
@@ -23,18 +30,19 @@ export default defineConfig({
   retries: process.env.CI ? 1 : 0,
   reporter: process.env.CI ? [['github'], ['html', { open: 'never' }]] : 'list',
   use: {
-    baseURL: process.env.PLAYWRIGHT_BASE_URL ?? 'http://127.0.0.1:4173',
+    baseURL: externalBaseUrl ?? previewUrl,
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
   },
-  webServer: process.env.PLAYWRIGHT_BASE_URL
-    ? undefined
-    : {
+  ...(externalBaseUrl
+    ? {}
+    : { webServer: {
         command: 'node tool/serve_web.mjs',
-        url: 'http://127.0.0.1:4173',
-        reuseExistingServer: !process.env.CI,
+        url: previewUrl,
+        env: { PORT: String(previewPort) },
+        reuseExistingServer: false,
         timeout: 15000,
-      },
+      } }),
   projects: [
     {
       name: 'desktop',
@@ -57,7 +65,7 @@ export default defineConfig({
     },
     {
       name: 'tablet-visual',
-      testMatch: /visual\.spec\.ts/,
+      testMatch: /(visual|localization)\.spec\.ts/,
       use: {
         ...devices['iPad Pro 11'],
         browserName: 'chromium',
