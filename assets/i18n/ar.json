@@ -9,7 +9,13 @@
   "accessibility": {
     "skip_to_content": "تخطي إلى المحتوى",
     "back_to_top": "العودة إلى الأعلى",
-    "language_menu": "قائمة اللغات"
+    "go_home": "الانتقال إلى الصفحة الرئيسية",
+    "language_menu": "قائمة اللغات",
+    "loading_portfolio": "جارٍ تحميل معرض الأعمال التفاعلي",
+    "load_failure": "تعذّر تحميل معرض الأعمال. يُرجى المحاولة مرة أخرى.",
+    "retry": "إعادة المحاولة",
+    "language_not_saved": "تعذّر حفظ تفضيل اللغة. ستظل هذه اللغة مفعّلة خلال هذه الزيارة.",
+    "language_change_failed": "تعذّر تحميل هذه اللغة. ستظل لغتك الحالية مفعّلة."
   },
   "about_section": {
     "title": "عني",
@@ -30,31 +36,31 @@
   },
   "experience_section": {
     "title": "الخبرة",
-    "present": "حالياً"
+    "present": "حاليًا"
   },
   "projects_section": {
     "title": "أعمال مختارة",
-    "subtitle": "منتجات مهنية حالية، وتطبيقات منشورة، وأعمال هندسية موثقة بالمصادر.",
-    "selected_cases": "حالات مهنية",
-    "evidence_index": "فهرس الأدلة",
-    "evidence_intro": "منتجات منشورة وسجلات هندسية عامة، معروضة من خلال مواد المنتج والمصدر الأصلية.",
+    "subtitle": "منتجات مهنية حالية، وتطبيقات منشورة، وأعمال هندسية عامة.",
+    "selected_cases": "دراسات حالة",
+    "evidence_index": "أعمال أخرى",
+    "evidence_intro": "منتجات منشورة ومشاريع مفتوحة المصدر، معروضة من خلال واجهاتها ومستودعاتها الأصلية.",
     "shipped_products": "منتجات منشورة",
     "open_engineering": "هندسة مفتوحة",
-    "select_evidence": "اختيار الدليل",
+    "select_evidence": "اختيار مشروع",
     "case_label": "حالة",
     "index_label": "فهرس",
     "challenge": "المشكلة",
     "approach": "النهج",
     "outcome": "النتيجة",
-    "open_evidence": "فتح الدليل",
+    "open_evidence": "عرض المشروع",
     "ownership": "مسؤوليتي",
     "decision": "التركيز الهندسي"
   },
   "proof_section": {
     "title": "المصدر المفتوح",
-    "summary": "قُبل {merged} تغييرًا في المشاريع الأصلية؛ و{review} تغييرات أخرى قيد المراجعة.",
+    "summary": "قُبلت {merged} تغييرات في المشاريع الأصلية، ولا تزال {review} تغييرات أخرى قيد المراجعة.",
     "featured_label": "مساهمة مميزة",
-    "accepted_title": "مقبول في المشاريع الأصلية",
+    "accepted_title": "التغييرات المقبولة في المشاريع الأصلية",
     "review_title": "قيد المراجعة",
     "problem_label": "العطل",
     "change_label": "التصحيح",

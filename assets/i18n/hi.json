@@ -9,7 +9,13 @@
   "accessibility": {
     "skip_to_content": "सामग्री पर जाएँ",
     "back_to_top": "ऊपर जाएँ",
-    "language_menu": "भाषा मेनू"
+    "go_home": "होम पर जाएँ",
+    "language_menu": "भाषा मेनू",
+    "loading_portfolio": "इंटरैक्टिव पोर्टफोलियो लोड हो रहा है",
+    "load_failure": "पोर्टफोलियो लोड नहीं हो सका। कृपया फिर से प्रयास करें।",
+    "retry": "फिर से प्रयास करें",
+    "language_not_saved": "आपकी भाषा प्राथमिकता सहेजी नहीं जा सकी। इस विज़िट के दौरान यही भाषा सक्रिय रहेगी।",
+    "language_change_failed": "यह भाषा लोड नहीं हो सकी। आपकी मौजूदा भाषा सक्रिय है।"
   },
   "about_section": {
     "title": "मेरे बारे में",
@@ -34,25 +40,25 @@
   },
   "projects_section": {
     "title": "चुने हुए काम",
-    "subtitle": "वर्तमान पेशेवर उत्पाद, जारी ऐप और स्रोत-समर्थित इंजीनियरिंग कार्य।",
-    "selected_cases": "पेशेवर केस",
-    "evidence_index": "प्रमाण सूची",
-    "evidence_intro": "जारी उत्पाद और सार्वजनिक इंजीनियरिंग रिकॉर्ड, उनकी मूल उत्पाद और स्रोत सामग्री के साथ।",
+    "subtitle": "वर्तमान पेशेवर उत्पाद, जारी ऐप और सार्वजनिक इंजीनियरिंग कार्य।",
+    "selected_cases": "केस स्टडी",
+    "evidence_index": "अन्य काम",
+    "evidence_intro": "जारी उत्पाद और ओपन-सोर्स प्रोजेक्ट, उनके मूल इंटरफ़ेस और रिपॉज़िटरी के साथ।",
     "shipped_products": "जारी उत्पाद",
     "open_engineering": "खुला इंजीनियरिंग कार्य",
-    "select_evidence": "प्रमाण चुनें",
+    "select_evidence": "प्रोजेक्ट चुनें",
     "case_label": "केस",
     "index_label": "सूचकांक",
     "challenge": "समस्या",
     "approach": "दृष्टिकोण",
     "outcome": "परिणाम",
-    "open_evidence": "प्रमाण खोलें",
+    "open_evidence": "प्रोजेक्ट देखें",
     "ownership": "मेरी जिम्मेदारी",
     "decision": "इंजीनियरिंग फ़ोकस"
   },
   "proof_section": {
     "title": "ओपन सोर्स",
-    "summary": "{merged} बदलाव अपस्ट्रीम स्वीकार हुए; {review} और समीक्षा में हैं।",
+    "summary": "{merged} बदलाव अपस्ट्रीम में स्वीकार हुए; {review} अन्य बदलाव समीक्षा में हैं।",
     "featured_label": "प्रमुख योगदान",
     "accepted_title": "अपस्ट्रीम स्वीकार किए गए",
     "review_title": "समीक्षा में",
@@ -70,7 +76,7 @@
     "status_under_review": "समीक्षा में"
   },
   "footer": {
-    "command_hint_prefix": "दबाएं",
+    "command_hint_prefix": "दबाएँ",
     "command_hint_suffix": "कमांड पैलेट खोलने के लिए",
     "quick_links": "त्वरित लिंक",
     "verification": "वर्तमान फ़ोकस"

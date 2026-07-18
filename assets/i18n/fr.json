@@ -9,7 +9,13 @@
   "accessibility": {
     "skip_to_content": "Aller au contenu",
     "back_to_top": "Retour en haut",
-    "language_menu": "Menu des langues"
+    "go_home": "Aller à l’accueil",
+    "language_menu": "Menu des langues",
+    "loading_portfolio": "Chargement du portfolio interactif",
+    "load_failure": "Le portfolio n’a pas pu être chargé. Veuillez réessayer.",
+    "retry": "Réessayer",
+    "language_not_saved": "Votre choix de langue n’a pas pu être enregistré. Cette langue restera active pendant cette visite.",
+    "language_change_failed": "Cette langue n’a pas pu être chargée. Votre langue actuelle reste active."
   },
   "about_section": {
     "title": "À propos",
@@ -34,19 +40,19 @@
   },
   "projects_section": {
     "title": "Projets sélectionnés",
-    "subtitle": "Produits professionnels actuels, applications publiées et travaux d’ingénierie étayés par leurs sources.",
-    "selected_cases": "Études de cas professionnelles",
-    "evidence_index": "Index des preuves",
-    "evidence_intro": "Produits publiés et dossiers d’ingénierie publics, présentés à partir de leurs sources et interfaces d’origine.",
+    "subtitle": "Produits professionnels actuels, applications publiées et travaux d’ingénierie publics.",
+    "selected_cases": "Études de cas",
+    "evidence_index": "Autres projets",
+    "evidence_intro": "Produits publiés et projets open source, présentés à partir de leurs interfaces et dépôts d’origine.",
     "shipped_products": "Produits publiés",
     "open_engineering": "Ingénierie ouverte",
-    "select_evidence": "Sélectionner la preuve",
+    "select_evidence": "Choisir un projet",
     "case_label": "Cas",
     "index_label": "Index",
     "challenge": "Le problème",
     "approach": "L’approche",
     "outcome": "Le résultat",
-    "open_evidence": "Ouvrir la preuve",
+    "open_evidence": "Voir le projet",
     "ownership": "Mon périmètre",
     "decision": "Axe technique"
   },

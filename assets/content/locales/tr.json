@@ -1,0 +1,231 @@
+{
+  "schema_version": 1,
+  "locale": "tr",
+  "site": {
+    "title": "Yusuf İhsan Görgel — Yazılım Mühendisi",
+    "description": "Yusuf İhsan Görgel; Flutter, Dart, Go, PostgreSQL, Redis ve üretim altyapısıyla çapraz platform ürünler geliştiren bir yazılım mühendisidir.",
+    "social_description": "Yusuf İhsan Görgel'in çapraz platform ürün mühendisliği çalışmaları, seçili profesyonel işleri ve doğrulanmış açık kaynak katkıları.",
+    "engineering_links": {
+      "live-site": "Canlı site",
+      "first-frame-issue": "Flutter Web ilk kare sorunu",
+      "engine-patch": "Flutter motoru yaması"
+    }
+  },
+  "profile": {
+    "role": "Yazılım Mühendisi",
+    "location": "Antalya, Türkiye",
+    "headline": "Flutter, Dart ve Go ile ürünler ve bunları üretimde güvenilir biçimde çalıştıran altyapılar geliştiriyorum.",
+    "summary": "2021'den bu yana mobil cihazlar, tabletler, masaüstü işletim sistemleri ve web için yazılım geliştiriyor ve bakımını yapıyorum. Çalışmalarım ERP ve satış noktası ürünlerini, lojistik iş akışlarını, dijital yayıncılığı, arka uç servislerini ve bunları üretime taşıyan sürüm sistemlerini kapsıyor.",
+    "background": "Flutter istemci uygulamalarıyla başladım; ardından yerel platform entegrasyonları, çevrimdışı veri, gerçek zamanlı eşzamanlama, Go servisleri, kuyruklar, veritabanları, dağıtım ve üretim güvenilirliği alanlarına yöneldim. Ürüne yakın çalışmayı sürdürüyor, özellikleri testten yayına ve uzun vadeli bakıma kadar takip ediyorum.",
+    "focus": [
+      "Flutter ve Dart",
+      "Go servisleri",
+      "Çevrimdışı öncelikli veri",
+      "Dağıtık kuyruklar",
+      "Üretim güvenilirliği"
+    ],
+    "links": {
+      "github": "GitHub",
+      "linkedin": "LinkedIn",
+      "writing": "Yazılar"
+    }
+  },
+  "experience": {
+    "fugasoft": {
+      "role": "Orta Seviye Flutter Geliştiricisi",
+      "domain": "FugaSoft ERP ve satış noktası ürünleri",
+      "period": "Mart 2021 — Halen",
+      "summary": "Mart 2021'den beri proje bazlı, Eylül 2025'ten beri tam zamanlı çalışıyorum. Android ve iOS tabletlerin yanı sıra Linux, macOS ve Windows masaüstlerinde canlıda kullanılan ERP ve satış noktası uygulamalarını; çevrimdışı veri, yerel platform entegrasyonları, performans, güvenilir sürüm süreçleri ve uzun vadeli ürün bakımı odağıyla geliştiriyor ve sürdürüyorum.",
+      "evidence": ["Flutter", "Dart", "SQLite / Drift", "Yerel platform entegrasyonları", "Gerçek zamanlı eşzamanlama"]
+    },
+    "juniustech": {
+      "role": "Full Stack Geliştirici",
+      "domain": "Dorse lojistik platformu",
+      "period": "Haziran 2023 — Ağustos 2025",
+      "summary": "Flutter ve React kullanan mobil ve web ürünlerinde; REST ve WebSocket veri akışları, canlı araç takibi, Google ve Apple Haritalar entegrasyonları, dağıtım ve kalite güvence koordinasyonunu kapsayan çalışmalar teslim ettim.",
+      "evidence": ["Flutter", "React / Next.js", "REST", "WebSocket", "Haritalar"]
+    },
+    "ivent": {
+      "role": "Flutter Geliştiricisi",
+      "domain": "Mobil ürün geliştirme",
+      "period": "Mayıs 2022 — Kasım 2025",
+      "summary": "Uzun süreli yarı zamanlı görevimde Flutter uygulamalarının geliştirilmesine ve bakımına katkı sağladım; ürün çalışmalarını geliştirmeden yayın desteğine kadar taşıdım.",
+      "evidence": ["Flutter", "Dart", "Mobil ürün teslimi", "Yayın desteği"]
+    },
+    "promob-tr": {
+      "role": "Full Stack Geliştirici",
+      "domain": "Dijital yayıncılık uygulamaları",
+      "period": "Eylül 2022 — Temmuz 2024",
+      "summary": "Aydınlık E-Gazete ve Bilim ve Ütopya E-Dergi mobil uygulamalarına katkıda bulundum; Android ve iOS için Flutter geliştirme, API entegrasyonu, yerelleştirme ve yayın süreçlerinde çalıştım.",
+      "evidence": ["Flutter", "Dart", "MVVM", "Dio", "App Store yayınları"]
+    },
+    "deyofu": {
+      "role": "Flutter Geliştiricisi",
+      "domain": "Mobil uygulama projeleri",
+      "period": "Haziran 2022 — Ağustos 2023",
+      "summary": "Uzun süreli yarı zamanlı görevimde Flutter mobil uygulama projelerine katkı sağladım; Dart geliştirme ve ürün teslim süreçlerinde çalıştım.",
+      "evidence": ["Flutter", "Dart", "Mobil uygulamalar", "Yarı zamanlı ürün teslimi"]
+    },
+    "extreme-bs": {
+      "role": "Yazılım Mühendisliği Stajyeri",
+      "domain": "Yazılım mühendisliği stajı",
+      "period": "Haziran 2024 — Ağustos 2024",
+      "summary": "Üretime yönelik geliştirme pratiklerine, ekip içi teslim süreçlerine ve akademik temelleri çalışan bir mühendislik ekibinde uygulamaya odaklanan yazılım mühendisliği stajımı tamamladım.",
+      "evidence": ["Yazılım mühendisliği", "Ekip içi teslim", "Üretim pratikleri"]
+    },
+    "software-engineering-education": {
+      "role": "Yazılım Mühendisliği Lisansı",
+      "domain": "Lisans eğitimi",
+      "period": "2021 — 2025",
+      "summary": "Algoritmalar, veri yapıları, veritabanları, yazılım tasarımı ve ekip tabanlı ürün geliştirme alanlarında örgün eğitim aldım.",
+      "evidence": ["Algoritmalar", "Veri yapıları", "Veritabanları", "Yazılım tasarımı"]
+    }
+  },
+  "capabilities": {
+    "client": {"label": "İstemci sistemleri", "items": ["Flutter", "Dart", "BLoC", "Platform kanalları", "Çevrimdışı öncelikli"]},
+    "services": {"label": "Servisler", "items": ["Go", "Fiber", "PostgreSQL", "Redis", "Asynq"]},
+    "web-runtime": {"label": "Web çalışma zamanı", "items": ["Dart Wasm", "SkWasm", "CanvasKit", "Erişilebilirlik semantiği", "İlk kare yaşam döngüsü"]},
+    "operations": {"label": "Operasyon", "items": ["Docker", "Docker Swarm", "Prometheus", "Grafana", "PostgreSQL operasyonları"]}
+  },
+  "contributions": {
+    "dart-mcp-initialization-lifecycle": {
+      "title": "Sunucu özellik kaydını eski başlatma sürecinden ayırma",
+      "problem": "Özellik kaydı eski başlatma el sıkışmasına bağlıydı; bu durum sunucu yaşam döngüsünün farklı taşıma ve başlatma yöntemlerinde yeniden kullanılmasını zorlaştırıyordu.",
+      "change": "Yeniden kullanılabilir özellik ve yetenek kaydını eski protokol uzlaşmasından ayırdım, mixin'leri ve örnekleri taşıdım, regresyon kapsamıyla mevcut başlatma yolunun uyumluluğunu korudum."
+    },
+    "flutterfire-webkit-ordering": {
+      "title": "Firebase çekirdek yüklemesini WebKit'te belirlenebilir hale getirme",
+      "problem": "Bileşen paketleri firebase-app.js hazır olmadan çalışabiliyor ve WebKit tarayıcılarında bir başlatma yarışına yol açabiliyordu.",
+      "change": "Bileşen paketlerinden önce Firebase çekirdek betiğini yükledim ve bağımlılık sırasını belirlenebilir hale getirdim."
+    },
+    "form-builder-initial-value": {
+      "title": "Bilinmeyen açılır liste başlangıç değerlerini ilk oluşturmada sıfırlama",
+      "problem": "Bir açılır liste, seçeneklerinde bulunmayan bir değerle başlayabiliyor ve normal alan sıfırlama davranışı çalışmadan hata verebiliyordu.",
+      "change": "İlk oluşturmayı normalleştirdim ve regresyonu widget testleriyle güvence altına aldım."
+    },
+    "drift-boolean-default": {
+      "title": "SQLite TRUE ve 1 varsayılanlarını aynı şema olarak değerlendirme",
+      "problem": "Şema doğrulaması, eşdeğer SQLite mantıksal varsayılanlarını bir migration farkı olarak bildiriyordu.",
+      "change": "Doğrulayıcı karşılaştırmasını normalleştirdim ve her iki gösterim için regresyon kapsamı ekledim."
+    },
+    "fiber-asynq-recipe": {
+      "title": "Fiber ve Asynq arka plan işleri örneği ekleme",
+      "problem": "Örnek koleksiyonunda Redis destekli işleri istek işleyicilerinin dışında kuyruğa alan ve işleyen, üretim yapısına yakın bir örnek yoktu.",
+      "change": "Çalıştırılabilir üretici ve işleyiciyi, kuyruk yapılandırmasını ve kullanım belgelerini ekledim."
+    },
+    "flutter-first-frame": {
+      "title": "İlk kare olayı için web çiziminin tamamlanmasını bekleme",
+      "problem": "SkWasm'da flutter-first-frame olayı, grafik birleştiricisi görünür Flutter içeriğini sunmadan önce tetiklenebiliyor ve ölçülebilir bir boş kare aralığı bırakabiliyordu.",
+      "change": "Olayı göndermeden önce bekleyen sahne çizimlerinin tamamlanmasını ve sonraki tarayıcı karesini bekledim; değişiklik isteği, Chrome'un yedi çizici ve derleyici test paketini geçerek incelemeye hazır hale geldi.",
+      "event_order_lab": {
+        "title": "İlk Kare Laboratuvarı",
+        "events": {
+          "framework_signal": "Uygulama çatısı flutter/service_worker sinyalini gönderir",
+          "first_frame_event": "Motor flutter-first-frame olayını gönderir",
+          "scene_render_complete": "Bekleyen sahne çizimi tamamlanır",
+          "browser_frame": "Sonraki tarayıcı animasyon karesi"
+        },
+        "baseline_summary": "Tarayıcı olayı eşzamansız sahne çizimini geçebilir.",
+        "gap_label": "Boş devir penceresi",
+        "with_patch_summary": "Olay, bekleyen sahne çizimlerini ve sonraki tarayıcı karesini bekler."
+      }
+    },
+    "flutter-vector-graphics-font-weight": {
+      "title": "Tanınmayan SVG font-weight değerlerini yok sayma",
+      "problem": "Bir font-weight değeri geçerli CSS sözdizimi taşıdığı halde vector graphics ayrıştırıcısı tarafından desteklenmediğinde SVG metin ayrıştırması belgeyi reddedebiliyordu.",
+      "change": "Tanınmayan font-weight değerlerini belirtilmemiş kabul ettim, desteklenen eşlemeleri korudum ve davranışı mevcut vector graphics test paketiyle güvence altına aldım."
+    },
+    "mcp-kotlin-request-metadata": {
+      "title": "SEP-2575 istek metadata ve keşif türlerini ekleme",
+      "problem": "SDK'nın, eski istek biçimlerini bozmadan istek kapsamındaki protokol ve istemci bağlamını taşıyan bir wire modeline ihtiyacı vardı.",
+      "change": "Tip güvenli deneysel metadata erişimlerini, sunucu keşif türlerini, polimorfik codec'leri ve hatalı girdi kapsamını ekledim."
+    }
+  },
+  "systems": {
+    "fugasoft": {
+      "kind": "ERP ve satış noktası platformu",
+      "summary": "Tablet ve masaüstü işletim sistemlerinde çalışan perakende ekipleri için Uzman Adres'te geliştirmeyi sürdürdüğüm ERP ve satış noktası ürün ailesi.",
+      "ownership": "Öncelikle Flutter istemcilerinde; çevrimdışı veri, yerel platform entegrasyonları, eşzamanlama, performans, sürüm yönetimi ve uzun vadeli bakım gibi üretim konularında çalışıyorum.",
+      "decision": "Yerel kalıcılığı, cihaz entegrasyonunu ve platform davranışını istemci tarafı ayrıntıları değil, ürün mimarisinin parçaları olarak ele almak.",
+      "challenge": "Perakende yazılımı mağaza donanımlarında, kesintili bağlantıda, uzun oturumlarda ve birden fazla işletim sisteminde hızlı ve güvenilir kalmalı.",
+      "approach": "Yerel veri, eşzamanlama sınırları, yerel cihaz API'leri ve sürüm davranışını her platform için açık hale getirirken ortak bir Flutter ürün yüzeyi geliştirmek.",
+      "outcome": "FugaSoft ERP ve satış noktası platformunu Android ve iOS tabletlerin yanı sıra Linux, macOS ve Windows masaüstlerine düzenli olarak üretim sürümü halinde sunmak.",
+      "evidence": ["FugaSoft şirket web sitesi", "FugaSoft ürün ekosistemi"],
+      "artifact": {"label": "RESMÎ ÜRÜN AİLESİ", "alt": "FugaPOS, FugaERP, FugaCLOUD, FugaKIOSK ve FugaSELF-SERVICE ürünlerini sunan resmî FugaSoft ürün ekosistemi.", "caption": "FugaSoft ürün ekosistemi · resmî şirket web sitesi.", "compact_alt": "FugaSoft'un beş ürün ailesini gösteren resmî ürün ekosistemi.", "compact_caption": "FugaSoft ürün ekosistemi · resmî şirket web sitesi."}
+    },
+    "dorse": {
+      "kind": "Dijital lojistik platformu",
+      "summary": "Sürücüleri, filo şirketlerini ve kantar işletmelerini mobil ve web iş akışlarıyla bir araya getiren genel kullanıma açık lojistik platformu.",
+      "ownership": "Canlı araç durumu, haritalar, REST ve WebSocket akışları, dağıtım ve kalite güvence koordinasyonunu kapsayan Flutter uygulamasını ve React web yüzeyini geliştirdim.",
+      "decision": "Gerçek zamanlı araç ve kantar durumunu ekrana özgü geçici çözümlerin arkasına gizlemek yerine taşıma katmanından arayüze kadar açık tutmak.",
+      "challenge": "Sürücüler, filo şirketleri ve kantar işletmeleri mobil ve web üzerinde değişen aynı lojistik durumuna göre hareket etmeliydi.",
+      "approach": "Flutter ve React istemcilerini ortak REST ve WebSocket akışları, harita entegrasyonları, çevrimdışı davranış ve koordineli yayın testleri etrafında geliştirmek.",
+      "outcome": "Doğrulanan Nisan 2024–Ocak 2025 proje döneminde sürücü, filo ve kantar iş akışlarını kapsayan genel mobil ve web ürününü teslim ettim.",
+      "evidence": ["Dorse ürün web sitesi"],
+      "artifact": {"label": "ÜRÜN İŞ AKIŞI", "alt": "Lojistik mobil uygulamasını kullanım halinde gösteren Dorse genel ürün web sitesi.", "caption": "Dorse ürün yüzeyi · şirketin genel web sitesinden alınmıştır.", "compact_alt": "Genel araç ve dorse ayar ekranını temel alan kompakt Dorse panosu.", "compact_caption": "Dorse araç iş akışı · şirketin genel ürün materyali."}
+    },
+    "aydinlik-e-gazete": {
+      "kind": "Mobil yayıncılık",
+      "summary": "Sayı gezintisi, abone arşivi erişimi, API destekli içerik ve mobil yayınları içeren iPhone ve iPad gazete istemcisi.",
+      "ownership": "Promob TR'de Flutter istemcisi, API destekli sayı akışı, yerelleştirme ve mobil yayınlar üzerinde çalıştım.",
+      "decision": "Sayı gezintisini, okumayı ve abone arşivi erişimini tek ve anlaşılır bir telefon-tablet akışında tutmak.",
+      "spotlight": "Yayınlanmış bir Flutter istemcisinde gazete sayıları, okuyucu kontrolleri ve abone arşivi erişimi.",
+      "evidence": ["App Store yayınını görüntüle"],
+      "artifact": {"label": "APP STORE YAYINI", "alt": "Sayı ve gazete okuyucu ekranlarıyla gösterilen Aydınlık E-Gazete App Store yayını.", "caption": "Genel App Store listelemesindeki sayı ve okuyucu yüzeyleri.", "compact_alt": "Günlük sayı ve sesli okuyucu ekranlarını içeren Aydınlık E-Gazete yayın panosu.", "compact_caption": "Aydınlık sayı ve okuyucu · genel App Store yayını."}
+    },
+    "bilim-ve-utopya": {
+      "kind": "Mobil yayıncılık",
+      "summary": "Sayı, arşiv ve hesap kontrollerini tek bir Flutter uygulamasında sunan iPhone ve iPad dergi istemcisi.",
+      "ownership": "Promob TR'de Flutter özellikleri, API entegrasyonu, yerelleştirme ve yayın desteği üzerinde çalıştım.",
+      "decision": "Sayı, arşiv ve hesap kontrollerini bakımı kolay tek bir mobil istemcide tutmak.",
+      "spotlight": "Genel kullanıma sunulmuş bir dijital derginin sayı, arşiv ve hesap akışları.",
+      "evidence": ["App Store yayınını görüntüle"],
+      "artifact": {"label": "APP STORE YAYINI", "alt": "Sayı ve arşiv ekranlarıyla gösterilen Bilim ve Ütopya E-Dergi App Store yayını.", "caption": "Genel App Store listelemesindeki sayı ve arşiv yüzeyleri.", "compact_alt": "Okunabilir sayı ve abone arşivi ekranlarını içeren Bilim ve Ütopya yayın panosu.", "compact_caption": "Bilim ve Ütopya sayı ve arşiv · genel App Store yayını."}
+    },
+    "queue-inspector": {
+      "kind": "Operasyon araçları",
+      "summary": "Redis destekli Asynq, BullMQ ve Sidekiq kuyruklarını tek bir tip güvenli arayüz üzerinden salt okunur inceleyen bir MCP sunucusu.",
+      "ownership": "Komut yüzeyini, tip güvenli doğrulamayı ve üç kuyruk adaptörünü tasarladım.",
+      "decision": "İncelemeyi salt okunur tutmak ve doğrudan depolama müdahalesini ürün yüzeyinin dışında bırakmak.",
+      "spotlight": "Üç kuyruk altyapısı için altı salt okunur araç ve tek bir tip güvenli arayüz.",
+      "evidence": ["Açık kaynak deposunu görüntüle", "Tasarım notlarını oku"],
+      "artifact": {"label": "AÇIK KAYNAK PROJE", "alt": "Asynq, BullMQ ve Sidekiq kuyruklarını tek arayüzde birleştiren Queue Inspector MCP mimarisi.", "caption": "Queue Inspector MCP · üç adaptör ve altı salt okunur araç.", "compact_alt": "Asynq, BullMQ ve Sidekiq adaptörlerini gösteren Queue Inspector MCP mimarisi.", "compact_caption": "Queue Inspector MCP · üç altyapıda tip güvenli inceleme."}
+    },
+    "multitenant-gateway": {
+      "kind": "Go platform referansı",
+      "summary": "Kiracı çözümleme, JWT kimlik doğrulaması, kiracı başına hız sınırları ve modül sınırlarını gösteren tek çalıştırılabilir dosyalı bir Go ağ geçidi örneği.",
+      "ownership": "Bu referansı taşıma ve kiracı çözümlemesinden politika, kalıcılık ve test kapsamına kadar tasarlayıp uyguladım.",
+      "decision": "Kiracı bağlamını genel durumun arkasına gizlemek yerine istek boyunca taşımak.",
+      "spotlight": "Tek bir Go çalıştırılabilir dosyasında açık kiracı çözümleme, kimlik doğrulama, politika ve depolama sınırları.",
+      "evidence": ["Açık kaynak deposunu görüntüle", "Mimari kaydını oku"],
+      "artifact": {"label": "İSTEK HATTI", "alt": "Çok kiracılı Go ağ geçidini ve açık istek politikası zincirini gösteren mimari kayıt.", "caption": "Go ağ geçidi · istek sırası ve ara katman sınırları.", "compact_alt": "Gerçek Go ara katman zincirini ve istek sırasını gösteren çok kiracılı ağ geçidi panosu.", "compact_caption": "Go ağ geçidi · sıralı istek hattı."}
+    },
+    "redis-task-queue": {
+      "kind": "Sunucu tarafı Dart kütüphanesi",
+      "summary": "Yeniden deneme, başarısız ileti işleme ve ağırlıklı kuyruklar sunan Redis destekli Dart görev kuyruğu.",
+      "ownership": "Genel API'yi, kuyruk semantiğini, hata yönetimini ve çalıştırılabilir örnekleri tasarladım.",
+      "decision": "Çalışma zamanı çatısı eklemeden hata durumlarını incelenebilir, zamanlama davranışını belirlenebilir hale getirmek.",
+      "spotlight": "Küçük bir Dart API'sinin arkasında yeniden denemeler, başarısız ileti işleme ve ağırlıklı kuyruklar.",
+      "evidence": ["Açık kaynak deposunu görüntüle"],
+      "artifact": {"label": "AÇIK KAYNAK PAKET", "alt": "API üzerinden kuyruğa alma, işleyici, başarı ve başarısız ileti yollarını gösteren Redis Task Queue depo kapağı.", "caption": "Yayınlanmış depo kapağı · kuyruk yaşam döngüsü.", "compact_alt": "Sunucu tarafı Dart kuyruğa alma, işleyici, yeniden deneme ve başarısız ileti akışını gösteren Redis Task Queue panosu.", "compact_caption": "Redis Task Queue · paket mimarisi."}
+    },
+    "constellation-particles": {
+      "kind": "Flutter çizim paketi",
+      "summary": "İşaretçi etkileşimi ve uzamsal ızgara komşu araması sunan, bağımlılıksız bir Flutter parçacık alanı.",
+      "ownership": "Çizim katmanını, işaretçi etkileşimini, uzamsal bölümlemeyi ve paket örneklerini çalışma zamanı bağımlılığı olmadan geliştirdim.",
+      "decision": "Sahne büyüdükçe her parçacık çiftini karşılaştırmamak için uzamsal bölümleme kullanmak.",
+      "spotlight": "Uzamsal ızgara komşu aramasına sahip, bağımlılıksız etkileşimli parçacık alanı.",
+      "evidence": ["Açık kaynak deposunu görüntüle"],
+      "artifact": {"label": "ÇİZİM DEMOSU", "alt": "İşaretçiye tepki veren parçacıkları ve yerel komşu bağlantılarını gösteren Constellation Particles demo karesi.", "caption": "Yayınlanmış Flutter CustomPainter demosundan bir kare.", "compact_alt": "Gerçek Flutter çizim demosunu çerçeveleyen Constellation Particles panosu.", "compact_caption": "Constellation Particles · çizim paketi demosu."}
+    },
+    "portfolio": {
+      "kind": "Web mühendisliği",
+      "summary": "Bu site deneyimimin, yayınladığım ürünlerin ve açık kaynak katkılarımın çalışan kaydıdır.",
+      "ownership": "Flutter Web sitesini, harici içerik hattını, erişilebilirlik katmanını, tarayıcı regresyon testlerini ve üretim yayınını geliştirdim ve işletiyorum.",
+      "decision": "Portföyü önce erişilebilir bir belge olarak ele almak ve dekoratif çizimleri semantik yolun dışında tutmak.",
+      "spotlight": "Özel bir anlatı çalışma zamanı ve tarayıcı regresyon testleri bulunan, içerik odaklı Flutter Web belgesi.",
+      "evidence": ["Açık kaynak deposunu görüntüle", "Canlı üretim sitesini aç"],
+      "artifact": {"label": "ÇALIŞMA MİMARİSİ", "alt": "Kanonik içerikten yerelleştirme, Dart Wasm çizimi ve tarayıcı regresyon testlerine uzanan Flutter Web portföy mimarisi.", "caption": "Portföy çalışma sistemi · içerik, yerelleştirme, Wasm çizimi ve tarayıcı testleri.", "compact_alt": "İçerikten yerelleştirilmiş tarayıcı çıktısına uzanan Flutter Web portföy mimarisi.", "compact_caption": "Flutter Web portföyü · içerikten tarayıcıya çalışma sistemi."}
+    }
+  }
+}

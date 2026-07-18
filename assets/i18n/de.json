@@ -9,7 +9,13 @@
   "accessibility": {
     "skip_to_content": "Zum Inhalt springen",
     "back_to_top": "Nach oben",
-    "language_menu": "Sprachmenü"
+    "go_home": "Zur Startseite",
+    "language_menu": "Sprachmenü",
+    "loading_portfolio": "Interaktives Portfolio wird geladen",
+    "load_failure": "Das Portfolio konnte nicht geladen werden. Bitte versuchen Sie es erneut.",
+    "retry": "Erneut versuchen",
+    "language_not_saved": "Ihre Sprachauswahl konnte nicht gespeichert werden. Diese Sprache bleibt für diesen Besuch aktiv.",
+    "language_change_failed": "Diese Sprache konnte nicht geladen werden. Ihre aktuelle Sprache bleibt aktiv."
   },
   "about_section": {
     "title": "Über mich",
@@ -34,19 +40,19 @@
   },
   "projects_section": {
     "title": "Ausgewählte Arbeiten",
-    "subtitle": "Aktuelle professionelle Produkte, veröffentlichte Anwendungen und quellengestützte Entwicklungsarbeit.",
-    "selected_cases": "Professionelle Fallstudien",
-    "evidence_index": "Nachweisindex",
-    "evidence_intro": "Veröffentlichte Produkte und öffentliche Entwicklungsnachweise, gezeigt anhand ihres ursprünglichen Produkt- und Quellenmaterials.",
+    "subtitle": "Aktuelle professionelle Produkte, veröffentlichte Anwendungen und öffentliche Entwicklungsarbeit.",
+    "selected_cases": "Fallstudien",
+    "evidence_index": "Weitere Arbeiten",
+    "evidence_intro": "Veröffentlichte Produkte und Open-Source-Projekte, gezeigt anhand ihrer ursprünglichen Oberflächen und Repositories.",
     "shipped_products": "Veröffentlichte Produkte",
     "open_engineering": "Offene Entwicklung",
-    "select_evidence": "Nachweis auswählen",
+    "select_evidence": "Projekt auswählen",
     "case_label": "Fall",
     "index_label": "Index",
     "challenge": "Die Aufgabe",
     "approach": "Der Ansatz",
     "outcome": "Das Ergebnis",
-    "open_evidence": "Nachweis öffnen",
+    "open_evidence": "Projekt ansehen",
     "ownership": "Mein Verantwortungsbereich",
     "decision": "Technischer Fokus"
   },

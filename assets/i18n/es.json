@@ -9,7 +9,13 @@
   "accessibility": {
     "skip_to_content": "Saltar al contenido",
     "back_to_top": "Volver arriba",
-    "language_menu": "Menú de idiomas"
+    "go_home": "Ir al inicio",
+    "language_menu": "Menú de idiomas",
+    "loading_portfolio": "Cargando el portafolio interactivo",
+    "load_failure": "No se pudo cargar el portafolio. Inténtalo de nuevo.",
+    "retry": "Reintentar",
+    "language_not_saved": "No se pudo guardar tu preferencia de idioma. Este idioma permanecerá activo durante esta visita.",
+    "language_change_failed": "No se pudo cargar ese idioma. Tu idioma actual sigue activo."
   },
   "about_section": {
     "title": "Sobre mí",
@@ -30,31 +36,31 @@
   },
   "experience_section": {
     "title": "Experiencia",
-    "present": "Actual"
+    "present": "Actualidad"
   },
   "projects_section": {
     "title": "Proyectos seleccionados",
-    "subtitle": "Productos profesionales actuales, aplicaciones publicadas y trabajo de ingeniería respaldado por sus fuentes.",
-    "selected_cases": "Casos profesionales",
-    "evidence_index": "Índice de evidencias",
-    "evidence_intro": "Productos publicados y registros públicos de ingeniería, mostrados mediante sus interfaces y fuentes originales.",
+    "subtitle": "Productos profesionales actuales, aplicaciones publicadas y trabajo público de ingeniería.",
+    "selected_cases": "Casos de estudio",
+    "evidence_index": "Más proyectos",
+    "evidence_intro": "Productos publicados y proyectos de código abierto, mostrados mediante sus interfaces y repositorios originales.",
     "shipped_products": "Productos publicados",
     "open_engineering": "Ingeniería abierta",
-    "select_evidence": "Seleccionar evidencia",
+    "select_evidence": "Elegir un proyecto",
     "case_label": "Caso",
     "index_label": "Índice",
     "challenge": "El problema",
     "approach": "El enfoque",
     "outcome": "El resultado",
-    "open_evidence": "Abrir evidencia",
+    "open_evidence": "Ver proyecto",
     "ownership": "Mi responsabilidad",
     "decision": "Enfoque técnico"
   },
   "proof_section": {
     "title": "Código abierto",
-    "summary": "{merged} cambios aceptados upstream; {review} más en revisión.",
+    "summary": "{merged} cambios aceptados en los proyectos de origen; {review} más en revisión.",
     "featured_label": "Contribución destacada",
-    "accepted_title": "Aceptados upstream",
+    "accepted_title": "Aceptados en los proyectos de origen",
     "review_title": "En revisión",
     "problem_label": "El fallo",
     "change_label": "El parche",
