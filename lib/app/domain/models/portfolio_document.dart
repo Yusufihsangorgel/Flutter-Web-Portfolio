@@ -996,10 +996,10 @@ String _requiredString(Map<String, dynamic> json, String key) =>
 
 String _requiredEmail(Map<String, dynamic> json, String key) {
   final value = _requiredString(json, key);
-  final separator = value.indexOf('@');
-  if (separator <= 0 ||
-      separator == value.length - 1 ||
-      !value.substring(separator + 1).contains('.')) {
+  if (value.length > 254 ||
+      !RegExp(
+        r'^[A-Za-z0-9._%+\-]+@[A-Za-z0-9](?:[A-Za-z0-9\-]{0,61}[A-Za-z0-9])?(?:\.[A-Za-z0-9](?:[A-Za-z0-9\-]{0,61}[A-Za-z0-9])?)+$',
+      ).hasMatch(value)) {
     throw FormatException('Expected an email address at "$key".');
   }
   return value;

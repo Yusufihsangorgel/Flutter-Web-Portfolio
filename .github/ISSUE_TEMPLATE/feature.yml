@@ -1,0 +1,39 @@
+name: Feature proposal
+description: Propose a focused improvement to the reusable portfolio system.
+title: "[Proposal]: "
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: Describe the user or maintainer problem without prescribing a solution.
+    validations:
+      required: true
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Desired outcome
+      description: State what becomes possible and how success could be verified.
+    validations:
+      required: true
+  - type: textarea
+    id: approach
+    attributes:
+      label: Proposed approach
+      description: Outline the smallest coherent change and its tradeoffs.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+  - type: checkboxes
+    id: contract
+    attributes:
+      label: Template contract
+      options:
+        - label: The proposal remains content-driven and reusable for another portfolio owner.
+          required: true
+        - label: The proposal preserves accessibility, reduced motion, and static deployment.
+          required: true

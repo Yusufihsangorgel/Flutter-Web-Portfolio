@@ -23,6 +23,7 @@
     "render:work-artifacts": "node tool/render_work_artifacts.mjs",
     "verify:source": "node tool/verify_dart_reachability.mjs",
     "verify:hosting": "node tool/verify_hosting_configs.mjs",
+    "verify:community": "node tool/verify_community_files.mjs",
     "prepare:source": "node tool/render_social_card.mjs && node tool/write_source_manifest.mjs",
     "prepare:bundle": "node tool/prepare_web_release.mjs",
     "verify:bundle": "node tool/verify_web_build.mjs",

@@ -33,7 +33,7 @@ addEventListener("message", eventListener);
 if (!window._flutter) {
   window._flutter = {};
 }
-_flutter.buildConfig = {"engineRevision":"83675ed27633283e7fc296c8bca22e841224c096","builds":[{"compileTarget":"dart2wasm","renderer":"skwasm","mainWasmPath":"main.dart.wasm?v=5ba77608158155c5","jsSupportRuntimePath":"main.dart.mjs?v=5ba77608158155c5"},{"compileTarget":"dart2js","renderer":"canvaskit","mainJsPath":"main.dart.js?v=5ba77608158155c5"}],"useLocalCanvasKit":true};
+_flutter.buildConfig = {"engineRevision":"83675ed27633283e7fc296c8bca22e841224c096","builds":[{"compileTarget":"dart2wasm","renderer":"skwasm","mainWasmPath":"main.dart.wasm?v=3eda1e1c3b64bbbe","jsSupportRuntimePath":"main.dart.mjs?v=3eda1e1c3b64bbbe"},{"compileTarget":"dart2js","renderer":"canvaskit","mainJsPath":"main.dart.js?v=3eda1e1c3b64bbbe"}],"useLocalCanvasKit":true};
 
 
 const markRuntime = (name) => window.performance?.mark(name);

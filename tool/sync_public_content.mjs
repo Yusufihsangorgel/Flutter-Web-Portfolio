@@ -35,6 +35,16 @@ const operations = [
     'portfolio-analytics',
     renderAnalytics(document),
   ),
+  () => syncMarkedFile(
+    path.join(root, 'CODE_OF_CONDUCT.md'),
+    'portfolio-conduct-contact',
+    renderConductContact(document),
+  ),
+  () => syncMarkedFile(
+    path.join(root, 'SECURITY.md'),
+    'portfolio-security-contact',
+    renderSecurityContact(document),
+  ),
   () => syncWholeFile(
     path.join(root, 'web', 'robots.txt'),
     renderRobots(document),
@@ -337,6 +347,19 @@ function renderAnalytics(data) {
   return `  <script defer src="${html(scriptUrl)}" data-domain="${html(domain)}"></script>`;
 }
 
+function renderConductContact(data) {
+  const name = markdownLabel(
+    requiredString(data.profile.name, 'profile.name'),
+  );
+  const email = requiredEmail(data.profile.email, 'profile.email');
+  return `Report conduct concerns privately to [${name}](mailto:${email}). Include the relevant context and links. Reports are reviewed discreetly; the maintainer may remove content, close participation, or restrict access when necessary to protect the project and its contributors.`;
+}
+
+function renderSecurityContact(data) {
+  const email = requiredEmail(data.profile.email, 'profile.email');
+  return `Please report vulnerabilities privately to [${email}](mailto:${email}) rather than opening a public issue. Include the affected revision, reproduction steps, impact, and any suggested mitigation. Do not include secrets or personal data in the report.`;
+}
+
 function table(value) {
   return String(value).replaceAll('|', '\\|').replaceAll('\n', ' ');
 }
@@ -352,6 +375,19 @@ function requiredString(value, path) {
     throw new Error(`${path} must be a non-empty string`);
   }
   return value.trim();
+}
+
+function requiredEmail(value, path) {
+  const email = requiredString(value, path);
+  if (
+    email.length > 254 ||
+    !/^[A-Za-z0-9._%+\-]+@[A-Za-z0-9](?:[A-Za-z0-9\-]{0,61}[A-Za-z0-9])?(?:\.[A-Za-z0-9](?:[A-Za-z0-9\-]{0,61}[A-Za-z0-9])?)+$/.test(
+      email,
+    )
+  ) {
+    throw new Error(`${path} must be a safe public email address`);
+  }
+  return email;
 }
 
 function requiredHttpsUrl(value, path) {

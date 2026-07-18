@@ -116,6 +116,25 @@ void main() {
       expect(document.site.analytics, isNull);
     });
 
+    test('rejects unsafe public email values before rendering metadata', () {
+      for (final invalid in [
+        'owner@example',
+        'owner)@example.com',
+        'owner@example..com',
+        'owner@-example.com',
+      ]) {
+        final json = _manifest();
+        final profile = json['profile']! as Map<String, dynamic>;
+        profile['email'] = invalid;
+
+        expect(
+          () => PortfolioDocument.fromJson(json),
+          throwsA(isA<FormatException>()),
+          reason: invalid,
+        );
+      }
+    });
+
     test('binds every work record to a real local artifact', () async {
       final document = PortfolioDocument.fromJson(_manifest());
 

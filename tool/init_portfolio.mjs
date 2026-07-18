@@ -337,7 +337,12 @@ function optionalHttpsUrl(value, label) {
 }
 
 function validateEmail(value) {
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+  if (
+    value.length > 254 ||
+    !/^[A-Za-z0-9._%+\-]+@[A-Za-z0-9](?:[A-Za-z0-9\-]{0,61}[A-Za-z0-9])?(?:\.[A-Za-z0-9](?:[A-Za-z0-9\-]{0,61}[A-Za-z0-9])?)+$/.test(
+      value,
+    )
+  ) {
     throw new Error('Public email must be a valid email address.');
   }
   return value;

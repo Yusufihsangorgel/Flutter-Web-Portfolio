@@ -51,6 +51,7 @@ npm run portfolio:validate
 npm run test:template
 npm run test:clone
 npm run verify:hosting
+npm run verify:community
 npm run verify:source
 npm run audit:history
 

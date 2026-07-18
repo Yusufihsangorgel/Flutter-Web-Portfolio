@@ -38,12 +38,20 @@ jobs:
       - run: flutter pub get
       - run: npm ci
       - run: npx playwright install --with-deps chromium
-      - run: npm run verify:content
-      - run: npm run verify:source
-      - run: npm run prepare:source
-      - run: flutter build web --release --wasm --no-web-resources-cdn --base-href "/${{ github.event.repository.name }}/"
-      - run: npm run prepare:bundle
-      - run: npm run verify:bundle
+      - id: pages-base
+        name: Resolve the Pages base path
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CONFIGURED_BASE_HREF: ${{ vars.PORTFOLIO_BASE_HREF }}
+        run: |
+          cname="$(gh api "repos/${GITHUB_REPOSITORY}/pages" --jq '.cname // ""' 2>/dev/null || true)"
+          base_href="$(node tool/resolve_pages_base_href.mjs \
+            --repository "${GITHUB_REPOSITORY#*/}" \
+            --owner "${GITHUB_REPOSITORY_OWNER}" \
+            --cname "${cname}" \
+            --override "${CONFIGURED_BASE_HREF}")"
+          echo "base_href=${base_href}" >> "${GITHUB_OUTPUT}"
+      - run: npm run build:release -- --base-href "${{ steps.pages-base.outputs.base_href }}"
       - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
         with:
           path: build/web

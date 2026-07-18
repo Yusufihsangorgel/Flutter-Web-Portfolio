@@ -10,6 +10,7 @@ run('npm', ['run', 'verify:content']);
 run('npm', ['run', 'portfolio:validate']);
 run('npm', ['run', 'verify:source']);
 run('npm', ['run', 'verify:hosting']);
+run('npm', ['run', 'verify:community']);
 run('npm', ['run', 'prepare:source']);
 
 const flutterArguments = [

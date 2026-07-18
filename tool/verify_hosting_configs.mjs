@@ -3,6 +3,8 @@ import path from 'node:path';
 import process from 'node:process';
 import { fileURLToPath } from 'node:url';
 
+import { resolvePagesBaseHref } from './resolve_pages_base_href.mjs';
+
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const read = (relativePath) => readFile(path.join(root, relativePath), 'utf8');
 const failures = [];
@@ -13,6 +15,7 @@ const netlify = await read('netlify.toml');
 const headers = await read('web/_headers');
 const redirects = await read('web/_redirects');
 const nginx = await read('nginx/default.conf');
+const pagesWorkflow = await read('.github/workflows/deploy.yml');
 
 expect(firebase.hosting?.public === 'build/web', 'Firebase publishes build/web');
 expect(
@@ -34,6 +37,45 @@ expect(
 expect(
   redirects.includes('/*  /index.html  200'),
   'static providers preserve document routes',
+);
+expect(
+  pagesWorkflow.includes('tool/resolve_pages_base_href.mjs') &&
+    pagesWorkflow.includes('npm run build:release -- --base-href'),
+  'GitHub Pages resolves its hosting path through the canonical release command',
+);
+expect(
+  resolvePagesBaseHref({ repository: 'portfolio', owner: 'ada' }) ===
+    '/portfolio/',
+  'project Pages uses its repository path',
+);
+expect(
+  resolvePagesBaseHref({ repository: 'ada.github.io', owner: 'ada' }) === '/',
+  'user Pages uses the origin root',
+);
+expect(
+  resolvePagesBaseHref({
+    repository: 'portfolio',
+    owner: 'ada',
+    cname: 'portfolio.example.com',
+  }) === '/',
+  'custom-domain Pages uses the origin root',
+);
+expect(
+  resolvePagesBaseHref({
+    repository: 'portfolio',
+    owner: 'ada',
+    override: '/preview/site',
+  }) === '/preview/site/',
+  'an explicit Pages base path is normalized',
+);
+expectThrows(
+  () =>
+    resolvePagesBaseHref({
+      repository: 'portfolio',
+      owner: 'ada',
+      override: '/preview/%2e%2e/private',
+    }),
+  'Pages base paths reject encoded traversal',
 );
 
 for (const [name, value] of [
@@ -90,4 +132,13 @@ console.log('Hosting contracts verified for Firebase, Netlify, Cloudflare, Verce
 
 function expect(condition, message) {
   if (!condition) failures.push(message);
+}
+
+function expectThrows(operation, message) {
+  try {
+    operation();
+    failures.push(message);
+  } catch {
+    // Expected validation failure.
+  }
 }

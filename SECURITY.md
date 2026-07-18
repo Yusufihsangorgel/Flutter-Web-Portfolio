@@ -1,22 +1,28 @@
 # Security Policy
 
-## Reporting a Vulnerability
+## Supported versions
 
-If you discover a security vulnerability, please report it responsibly.
+Security fixes target the current `main` branch and the most recent tagged
+release. Older snapshots are historical records and are not maintained.
 
-**Do not open a public issue.** Use the repository's private vulnerability
-reporting channel with:
+## Reporting a vulnerability
 
-- A description of the vulnerability
-- Steps to reproduce
-- Potential impact
+<!-- portfolio-security-contact:start -->
+Please report vulnerabilities privately to [developeryusuf@icloud.com](mailto:developeryusuf@icloud.com) rather than opening a public issue. Include the affected revision, reproduction steps, impact, and any suggested mitigation. Do not include secrets or personal data in the report.
+<!-- portfolio-security-contact:end -->
 
-Reports are reviewed privately and handled according to impact.
+The maintainer will validate the report, minimize disclosure while a fix is in
+progress, and credit the reporter when requested and appropriate. There is no
+bug-bounty program or guaranteed response window.
 
-## Scope
+## In scope
 
-This is a static portfolio site with no backend, database, or user authentication. The attack surface is limited to:
+- The portfolio source, build and deployment scripts, hosting headers, and
+  checked-in release bundle.
+- A reproducible path that changes public content, executes unintended code,
+  bypasses browser isolation, or exposes information not present in the source
+  document.
 
-- Client-side XSS via URL parameters or hash routing
-- Dependency vulnerabilities in Flutter/Dart packages
-- Misconfigured deployment headers (CSP, CORS, etc.)
+Configuration errors in a downstream deployment and vulnerabilities in an
+unsupported browser or third-party hosting provider should be reported to the
+responsible project or provider first.

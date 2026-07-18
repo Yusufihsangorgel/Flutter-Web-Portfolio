@@ -37,6 +37,20 @@ npm run build:release -- --base-href /repository-name/
 The deploy helper builds first. Add `--skip-build` only when the exact
 `build/web` directory already passed `npm run verify:bundle`.
 
+## GitHub Pages
+
+Enable Pages with **GitHub Actions** as the source, then push `main`. Deployment
+starts only after CI succeeds for that exact commit. The workflow chooses the
+base path automatically:
+
+- `owner.github.io` repositories and configured custom domains use `/`;
+- project sites use `/<repository>/`;
+- the optional repository variable `PORTFOLIO_BASE_HREF` overrides both for an
+  unusual nested preview path.
+
+The resolver is part of the tested hosting contract, so changing a repository
+name or adding a domain does not require editing Dart or workflow code.
+
 ## Firebase Hosting
 
 Install and authenticate the official Firebase CLI, create a Hosting site, then

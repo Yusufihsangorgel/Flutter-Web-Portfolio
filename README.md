@@ -1,6 +1,6 @@
-<p align="center">
+<h1 align="center">
   <img src="docs/readme/hero.svg" width="100%" alt="Flutter Web Portfolio — your work with proof">
-</p>
+</h1>
 
 <p align="center"><strong>A portfolio that behaves like a measured document and ships like a static file.</strong></p>
 
@@ -186,6 +186,7 @@ npm run test:template
 npm run test:clone
 npm run verify:content
 npm run verify:hosting
+npm run verify:community
 npm run audit:sources
 npm run audit:history
 dart format --output=none --set-exit-if-changed lib test tool

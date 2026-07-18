@@ -1,0 +1,63 @@
+name: Bug report
+description: Report a reproducible defect in the template, demo, or release tooling.
+title: "[Bug]: "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: Thanks for taking the time to produce a precise report.
+  - type: textarea
+    id: defect
+    attributes:
+      label: What happened?
+      description: Describe the observable defect and why it is a defect.
+      placeholder: The page or command did…
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Minimal reproduction
+      description: List the smallest deterministic sequence that reproduces it.
+      placeholder: |
+        1. Build with…
+        2. Open…
+        3. Observe…
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: input
+    id: revision
+    attributes:
+      label: Revision
+      description: Commit SHA, tag, or template creation date.
+      placeholder: d9f0b4d
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Flutter version, browser, operating system, viewport, and host.
+      placeholder: Flutter 3.44.6; Chrome 142; macOS; 1440×900; local Nginx
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence
+      description: Add concise logs, screenshots, or a repository link. Remove secrets and personal data.
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Verification
+      options:
+        - label: I searched existing issues for the same defect.
+          required: true
+        - label: This report contains no credentials, private data, or undisclosed vulnerability details.
+          required: true

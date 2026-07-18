@@ -27,6 +27,7 @@ jobs:
       - run: npm run portfolio:validate
       - run: npm run test:template
       - run: npm run verify:hosting
+      - run: npm run verify:community
       - run: npm run audit:sources
         env:
           GITHUB_TOKEN: ${{ github.token }}
@@ -38,6 +39,8 @@ jobs:
       - run: node --check tool/build_portfolio.mjs
       - run: node --check tool/deploy_portfolio.mjs
       - run: node --check tool/verify_hosting_configs.mjs
+      - run: node --check tool/resolve_pages_base_href.mjs
+      - run: node --check tool/verify_community_files.mjs
       - run: node --check tool/test_portfolio_init.mjs
       - run: node --check tool/test_template_clone.mjs
       - run: node --check tool/audit_repository_history.mjs

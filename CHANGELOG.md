@@ -19,6 +19,8 @@ This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - A full-history audit that rejects assistant attribution and control files in
   every reachable commit while requiring development markers to be resolved at
   the current head.
+- Structured issue forms plus synchronized conduct and private security-report
+  contacts for clean template-derived repositories.
 
 ### Changed
 
@@ -29,6 +31,10 @@ This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   content validation, source reachability, and the canonical release command.
 - Made initialization delete demo artifacts and regenerate the social card and
   source manifest before the first customized build.
+- Made GitHub Pages distinguish project sites, user sites, custom domains, and
+  explicit nested paths before running the canonical release build.
+- Aligned initializer, Dart parsing, and generated community contacts on one
+  conservative public-email contract.
 
 ## [1.9.0] - 2026-07-16
 
