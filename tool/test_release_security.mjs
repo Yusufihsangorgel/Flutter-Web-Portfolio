@@ -158,6 +158,60 @@ assert.match(
   sourceManifest,
   /  packages\/adaptive_render_budget\/lib\/adaptive_render_budget\.dart$/m,
 );
+assert.doesNotMatch(
+  sourceManifest,
+  /  packages\/adaptive_render_budget\/pubspec\.lock$/m,
+  "ignored package lockfiles must not make release provenance machine-specific",
+);
+const manifestFixture = await mkdtemp(
+  path.join(os.tmpdir(), "portfolio-source-manifest-"),
+);
+try {
+  await Promise.all(
+    ["assets", "lib", "packages", "tool", "web"].map((directory) =>
+      mkdir(path.join(manifestFixture, directory), { recursive: true }),
+    ),
+  );
+  await Promise.all(
+    [
+      "analysis_options.yaml",
+      "package.json",
+      "package-lock.json",
+      "pubspec.yaml",
+      "pubspec.lock",
+    ].map((file) => writeFile(path.join(manifestFixture, file), `${file}\n`)),
+  );
+  const packageRoot = path.join(manifestFixture, "packages", "fixture");
+  await Promise.all(
+    ["lib", ".dart_tool", "build", "node_modules"].map((directory) =>
+      mkdir(path.join(packageRoot, directory), { recursive: true }),
+    ),
+  );
+  await Promise.all([
+    writeFile(path.join(packageRoot, "lib", "fixture.dart"), "library fixture;\n"),
+    writeFile(path.join(packageRoot, "pubspec.lock"), "generated lock\n"),
+    writeFile(path.join(packageRoot, ".dart_tool", "state"), "generated\n"),
+    writeFile(path.join(packageRoot, "build", "output"), "generated\n"),
+    writeFile(path.join(packageRoot, "node_modules", "package"), "generated\n"),
+  ]);
+
+  const fixtureManifest = await renderSourceManifest(manifestFixture);
+  assert.match(fixtureManifest, /  packages\/fixture\/lib\/fixture\.dart$/m);
+  for (const generatedPath of [
+    "packages/fixture/pubspec.lock",
+    "packages/fixture/.dart_tool/state",
+    "packages/fixture/build/output",
+    "packages/fixture/node_modules/package",
+  ]) {
+    assert.doesNotMatch(
+      fixtureManifest,
+      new RegExp(`  ${generatedPath.replaceAll(".", "\\.")}$`, "m"),
+      `${generatedPath} must not enter release provenance`,
+    );
+  }
+} finally {
+  await rm(manifestFixture, { recursive: true, force: true });
+}
 const dockerfile = await readFile("Dockerfile", "utf8");
 assert.match(dockerfile, /^COPY packages packages$/m);
 assert.match(dockerfile, /^RUN sha256sum -c \/tmp\/source_manifest\.sha256/m);

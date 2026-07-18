@@ -20,6 +20,7 @@ const sourceFiles = [
   'pubspec.lock',
 ];
 const generatedManifest = 'assets/build/source_manifest.sha256';
+const generatedDirectoryNames = new Set(['.dart_tool', 'build', 'node_modules']);
 
 export async function renderSourceManifest(root = portfolioRoot) {
   const files = [
@@ -50,8 +51,22 @@ async function collectFiles(directory, root) {
   const nested = await Promise.all(
     entries.map(async (entry) => {
       const absolute = path.join(directory, entry.name);
-      if (entry.isDirectory()) return collectFiles(absolute, root);
-      return [path.relative(root, absolute).split(path.sep).join('/')];
+      if (entry.isDirectory()) {
+        if (generatedDirectoryNames.has(entry.name)) return [];
+        return collectFiles(absolute, root);
+      }
+
+      const relative = path
+        .relative(root, absolute)
+        .split(path.sep)
+        .join('/');
+      if (
+        relative.startsWith('packages/') &&
+        relative.endsWith('/pubspec.lock')
+      ) {
+        return [];
+      }
+      return [relative];
     }),
   );
   return nested.flat();
