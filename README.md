@@ -90,7 +90,10 @@ AppScrollController ─────► NarrativePosition
         │ browser history       ├────► SceneDirector
         │ + visible progress    │           │
         ▼                       ▼           ▼
-chapter navigation      kinetic portals    ambient CustomPainter
+chapter navigation      chapter anchors    ambient CustomPainter
+                                │
+                                ▼
+                       NarrativeAnchorPath
 ```
 
 The document and render loop have deliberately different update paths:
@@ -101,7 +104,7 @@ The document and render loop have deliberately different update paths:
 - Section positions are measured after layout. One boundary-local reading snapshot drives active navigation, URL state, scene interpolation, and every visible progress indicator.
 - Responsive reflow preserves the reader's chapter-relative focal point instead of retaining a stale raw pixel offset.
 - Browser history represents positions inside one document. An early popstate bridge prevents Flutter's root Navigator from consuming chapter navigation twice while preserving the command palette's normal modal lifecycle.
-- Decorative chapter portals reuse the ambient motif endpoints, derive localized labels from external catalogs, mirror in RTL, and add no semantic nodes.
+- One pointer-transparent narrative stage measures content-authored chapter anchors and paints a continuous path without adding semantic nodes; compact handoff seams retain localized chapter context, mirror in RTL, and remain static under reduced motion.
 - Reduced-motion sessions suppress pointer motion and animated transitions while preserving the complete document and navigation model.
 
 ## First meaningful frame
@@ -185,7 +188,7 @@ Useful controls:
 | Measured document geometry | `lib/app/controllers/scroll_controller.dart` |
 | Scene interpolation | `lib/app/controllers/scene_director.dart` |
 | Ambient render layer | `lib/app/widgets/background/cinematic_background.dart` |
-| Scroll-driven chapter portals | `lib/app/widgets/narrative_chapter_handoff.dart`, `lib/app/narrative/rendering/narrative_handoff_geometry.dart` |
+| Persistent narrative trace and chapter seams | `lib/app/widgets/narrative_stage.dart`, `lib/app/narrative/rendering/narrative_anchor_path.dart`, `lib/app/widgets/narrative_chapter_handoff.dart` |
 | Full-width selected-work atlas | `lib/app/modules/home/sections/projects/projects_section.dart`, `lib/app/modules/home/sections/projects/widgets/project_atlas.dart` |
 | Content synchronization | `tool/sync_public_content.mjs` |
 | Runtime measurement | `tool/measure_web_runtime.mjs`, `tool/performance_budget.json`, `tool/performance_budget.schema.json` |
