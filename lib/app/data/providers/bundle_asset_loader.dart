@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:developer' as dev;
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_web_portfolio/app/domain/providers/asset_loader.dart';
 
@@ -33,11 +34,21 @@ final class BundleAssetLoader implements AssetLoader {
   @override
   Future<Map<String, dynamic>> loadTranslations(String languageCode) async {
     try {
-      final jsonString = await rootBundle.loadString(
+      final translations = await _loadObject(
         'assets/i18n/$languageCode.json',
+        description: '$languageCode interface catalog',
       );
-      final translations = json.decode(jsonString) as Map<String, dynamic>;
-      return translations;
+      if (languageCode == 'en') return translations;
+
+      final portfolioLocalization = await _loadObject(
+        'assets/content/locales/$languageCode.json',
+        description: '$languageCode portfolio localization',
+      );
+      return mergeCatalogs(
+        languageCode: languageCode,
+        interfaceCatalog: translations,
+        portfolioLocalization: portfolioLocalization,
+      );
     } catch (e) {
       dev.log(
         'Failed to load translations for $languageCode',
@@ -46,5 +57,22 @@ final class BundleAssetLoader implements AssetLoader {
       );
       return {};
     }
+  }
+
+  @visibleForTesting
+  static Map<String, dynamic> mergeCatalogs({
+    required String languageCode,
+    required Map<String, dynamic> interfaceCatalog,
+    required Map<String, dynamic> portfolioLocalization,
+  }) {
+    if (portfolioLocalization['locale'] != languageCode) {
+      throw FormatException(
+        'Portfolio localization locale does not match $languageCode.',
+      );
+    }
+    return <String, dynamic>{
+      ...interfaceCatalog,
+      'portfolio_content': portfolioLocalization,
+    };
   }
 }

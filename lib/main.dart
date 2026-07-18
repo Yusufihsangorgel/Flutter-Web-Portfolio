@@ -13,6 +13,7 @@ import 'package:flutter_web_portfolio/app/app_dependencies.dart';
 import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
 import 'package:flutter_web_portfolio/app/core/theme/app_theme.dart';
 import 'package:flutter_web_portfolio/app/domain/models/portfolio_document.dart';
+import 'package:flutter_web_portfolio/app/data/providers/bundle_asset_loader.dart';
 import 'package:flutter_web_portfolio/app/modules/home/home_view.dart';
 import 'package:flutter_web_portfolio/app/utils/web_url_strategy.dart'
     as url_strategy;
@@ -48,7 +49,9 @@ void main() {
           error: error,
           stackTrace: stackTrace,
         );
-        runApp(const _BootstrapFailureApp());
+        final languageCode = url_strategy.getHtmlLanguage();
+        final copy = await _loadBootstrapFailureCopy(languageCode);
+        runApp(_BootstrapFailureApp(languageCode: languageCode, copy: copy));
       }
     },
     (error, stack) {
@@ -57,13 +60,60 @@ void main() {
   );
 }
 
+Future<_BootstrapFailureCopy> _loadBootstrapFailureCopy(
+  String languageCode,
+) async {
+  try {
+    final catalog = await BundleAssetLoader().loadTranslations(languageCode);
+    final accessibility = catalog['accessibility'];
+    if (accessibility is Map<String, dynamic>) {
+      final title = accessibility['load_failure'];
+      final retry = accessibility['retry'];
+      if (title is String &&
+          title.trim().isNotEmpty &&
+          retry is String &&
+          retry.trim().isNotEmpty) {
+        return _BootstrapFailureCopy(title.trim(), retry.trim());
+      }
+    }
+  } on Object catch (error, stackTrace) {
+    dev.log(
+      'Failed to localize bootstrap recovery',
+      name: 'Main',
+      error: error,
+      stackTrace: stackTrace,
+    );
+  }
+  return const _BootstrapFailureCopy(
+    'The portfolio could not load. Please try again.',
+    'Retry',
+  );
+}
+
+@immutable
+final class _BootstrapFailureCopy {
+  const _BootstrapFailureCopy(this.message, this.retry);
+
+  final String message;
+  final String retry;
+}
+
 class _BootstrapFailureApp extends StatelessWidget {
-  const _BootstrapFailureApp();
+  const _BootstrapFailureApp({required this.languageCode, required this.copy});
+
+  final String languageCode;
+  final _BootstrapFailureCopy copy;
 
   @override
   Widget build(BuildContext context) => MaterialApp(
     debugShowCheckedModeBanner: false,
     theme: AppTheme.light,
+    locale: Locale(languageCode),
+    localizationsDelegates: const [
+      GlobalMaterialLocalizations.delegate,
+      GlobalWidgetsLocalizations.delegate,
+    ],
+    supportedLocales: [Locale(languageCode)],
     home: Scaffold(
       backgroundColor: const Color(0xFFF2EEE5),
       body: Center(
@@ -81,22 +131,16 @@ class _BootstrapFailureApp extends StatelessWidget {
                 ),
                 const SizedBox(height: 20),
                 Text(
-                  'The experience could not start',
+                  copy.message,
                   textAlign: TextAlign.center,
                   style: Theme.of(context).textTheme.headlineSmall,
-                ),
-                const SizedBox(height: 10),
-                Text(
-                  'No data was changed. Reload the page to try the bootstrap sequence again.',
-                  textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.bodyMedium,
                 ),
                 if (kIsWeb) ...[
                   const SizedBox(height: 24),
                   FilledButton.icon(
                     onPressed: url_strategy.reloadPage,
                     icon: const Icon(Icons.refresh_rounded),
-                    label: const Text('Reload page'),
+                    label: Text(copy.retry),
                   ),
                 ],
               ],
@@ -117,9 +161,8 @@ class MyApp extends StatelessWidget {
       BlocBuilder<LanguageCubit, LanguageState>(
         builder: (context, state) {
           final currentLocale = state.locale;
-          final appTitle = RepositoryProvider.of<PortfolioDocument>(
-            context,
-          ).site.title;
+          final portfolio = RepositoryProvider.of<PortfolioDocument>(context);
+          final appTitle = portfolio.site.title;
 
           return MaterialApp(
             title: appTitle,
@@ -131,14 +174,8 @@ class MyApp extends StatelessWidget {
               GlobalMaterialLocalizations.delegate,
               GlobalWidgetsLocalizations.delegate,
             ],
-            supportedLocales: const [
-              Locale('en'),
-              Locale('tr'),
-              Locale('de'),
-              Locale('fr'),
-              Locale('es'),
-              Locale('ar'),
-              Locale('hi'),
+            supportedLocales: [
+              for (final locale in portfolio.site.locales) Locale(locale),
             ],
             home: const HomeView(),
           );

@@ -9,10 +9,13 @@ import 'package:flutter_web_portfolio/app/core/constants/motion_curves.dart';
 import 'package:flutter_web_portfolio/app/core/constants/durations.dart';
 import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
 import 'package:flutter_web_portfolio/app/utils/motion_preference.dart';
+import 'package:flutter_web_portfolio/app/widgets/accessible_action.dart';
 
 /// Floating back-to-top control with a live document-scroll progress arc.
 class BackToTopButton extends StatefulWidget {
-  const BackToTopButton({super.key});
+  const BackToTopButton({super.key, this.focusNode});
+
+  final FocusNode? focusNode;
 
   @override
   State<BackToTopButton> createState() => _BackToTopButtonState();
@@ -110,44 +113,46 @@ class _BackToTopButtonState extends State<BackToTopButton>
               offset: Offset(0, 20 * (1 - value)),
               child: Transform.scale(
                 scale: 0.6 + 0.4 * value,
-                child: IgnorePointer(
-                  ignoring: !_visible,
-                  child: MouseRegion(
-                    onEnter: (_) => setState(() => _hovered = true),
-                    onExit: (_) => setState(() => _hovered = false),
-                    cursor: SystemMouseCursors.click,
-                    child: Semantics(
-                      button: true,
-                      focusable: true,
-                      label: context.read<LanguageCubit>().getText(
-                        'accessibility.back_to_top',
-                        defaultValue: 'Back to top',
-                      ),
-                      onTap: _scrollToTop,
-                      excludeSemantics: true,
-                      child: ExcludeSemantics(
-                        child: GestureDetector(
-                          onTap: _scrollToTop,
-                          child: SizedBox.square(
-                            dimension: buttonSize,
-                            child: CustomPaint(
-                              painter: _ScrollProgressPainter(
-                                progress: _scrollProgress,
-                                hovered: _hovered,
-                              ),
-                              child: Center(
-                                child: AnimatedScale(
-                                  scale: _hovered ? 1.15 : 1,
-                                  duration: _reduceMotion
-                                      ? Duration.zero
-                                      : AppDurations.fast,
-                                  child: Icon(
-                                    Icons.arrow_upward_rounded,
-                                    size: useCompactControl ? 18 : 22,
-                                    color: _hovered
-                                        ? AppColors.accent
-                                        : AppColors.textPrimary,
-                                  ),
+                child: ExcludeFocus(
+                  excluding: !_visible,
+                  child: ExcludeSemantics(
+                    excluding: !_visible,
+                    child: IgnorePointer(
+                      ignoring: !_visible,
+                      child: AccessibleAction(
+                        key: const ValueKey('back-to-top-action'),
+                        onTap: _scrollToTop,
+                        focusNode: widget.focusNode,
+                        onHoverChanged: (hovered) {
+                          if (_hovered != hovered) {
+                            setState(() => _hovered = hovered);
+                          }
+                        },
+                        semanticLabel: context.read<LanguageCubit>().getText(
+                          'accessibility.back_to_top',
+                          defaultValue: 'Back to top',
+                        ),
+                        borderRadius: BorderRadius.circular(buttonSize / 2),
+                        focusColor: AppColors.accent,
+                        child: SizedBox.square(
+                          dimension: buttonSize,
+                          child: CustomPaint(
+                            painter: _ScrollProgressPainter(
+                              progress: _scrollProgress,
+                              hovered: _hovered,
+                            ),
+                            child: Center(
+                              child: AnimatedScale(
+                                scale: _hovered ? 1.15 : 1,
+                                duration: _reduceMotion
+                                    ? Duration.zero
+                                    : AppDurations.fast,
+                                child: Icon(
+                                  Icons.arrow_upward_rounded,
+                                  size: useCompactControl ? 18 : 22,
+                                  color: _hovered
+                                      ? AppColors.accent
+                                      : AppColors.textPrimary,
                                 ),
                               ),
                             ),

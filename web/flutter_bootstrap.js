@@ -14,6 +14,12 @@ const measureRuntime = (name, start, end) => {
 
 markRuntime('flutter-bootstrap-start');
 
+const bootstrapCopy = window.__portfolioBootstrapLocale ?? {
+  loadingPortfolio: 'Loading interactive portfolio',
+  loadFailure: 'The portfolio could not load. Please try again.',
+  retry: 'Retry',
+};
+
 let revealStarted = false;
 
 const removeBootstrapSurface = () => {
@@ -46,6 +52,15 @@ const revealFlutterSurface = () => {
   revealStarted = true;
   window.removeEventListener('flutter-first-frame', onFlutterFirstFrame);
   markRuntime('flutter-first-frame-signal');
+  // The observable first surface can come from Flutter's event or from one of
+  // the guarded WebKit/CanvasKit fallbacks below. Record the primary measure
+  // at the shared signal so every successful reveal has exactly one timing
+  // entry, regardless of which supported source won the race.
+  measureRuntime(
+    'flutter-bootstrap-to-first-frame',
+    'flutter-bootstrap-start',
+    'flutter-first-frame-signal',
+  );
   measureRuntime(
     'flutter-bootstrap-to-reveal-signal',
     'flutter-bootstrap-start',
@@ -59,11 +74,6 @@ const revealFlutterSurface = () => {
 
 const onFlutterFirstFrame = () => {
   markRuntime('flutter-first-frame-event');
-  measureRuntime(
-    'flutter-bootstrap-to-first-frame',
-    'flutter-bootstrap-start',
-    'flutter-first-frame-event',
-  );
   revealFlutterSurface();
 };
 
@@ -86,16 +96,16 @@ const showBootstrapFailure = (error) => {
   if (!splash) return;
 
   splash.setAttribute('aria-busy', 'false');
-  splash.setAttribute('aria-label', 'The portfolio could not start');
+  splash.setAttribute('aria-label', bootstrapCopy.loadFailure);
   splash.replaceChildren();
   const status = document.createElement('div');
   status.className = 'bootstrap-error';
   status.setAttribute('role', 'alert');
-  status.textContent = 'The portfolio could not load. Please try again.';
+  status.textContent = bootstrapCopy.loadFailure;
   const retry = document.createElement('button');
   retry.type = 'button';
   retry.className = 'bootstrap-retry';
-  retry.textContent = 'Retry';
+  retry.textContent = bootstrapCopy.retry;
   retry.addEventListener('click', () => window.location.reload());
   status.appendChild(retry);
   splash.appendChild(status);

@@ -1,5 +1,8 @@
 // Stub implementation for non-web platforms — all operations are no-ops.
 
+/// Native bootstrap failures use the English fallback copy.
+String getHtmlLanguage() => 'en';
+
 /// Returns the current URL hash fragment (without leading `#`), or empty string.
 String getUrlHash() => '';
 

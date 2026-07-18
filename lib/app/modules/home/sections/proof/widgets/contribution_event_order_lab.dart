@@ -490,18 +490,15 @@ class _EventNode extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 20),
-              Directionality(
-                textDirection: TextDirection.ltr,
-                child: Text(
-                  event.label,
-                  style: AppFonts.spaceGrotesk(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: visible
-                        ? AppColors.white
-                        : AppColors.white.withValues(alpha: 0.5),
-                    height: 1.3,
-                  ),
+              Text(
+                event.label,
+                style: AppFonts.spaceGrotesk(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: visible
+                      ? AppColors.white
+                      : AppColors.white.withValues(alpha: 0.5),
+                  height: 1.3,
                 ),
               ),
               const SizedBox(height: 10),

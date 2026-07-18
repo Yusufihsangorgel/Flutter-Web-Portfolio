@@ -28,11 +28,6 @@ class LanguageSwitcher extends StatelessWidget {
               final currentLanguage = LanguageCubit.getLanguageName(
                 languageState.languageCode,
               );
-              final urlSection = url_strategy.getUrlHash();
-              final sectionToPreserve = urlSection.isNotEmpty
-                  ? urlSection
-                  : context.read<AppScrollController>().activeSection;
-
               return PopupMenuButton<String>(
                 tooltip: '$menuLabel: $currentLanguage',
                 offset: const Offset(0, 40),
@@ -70,10 +65,19 @@ class LanguageSwitcher extends StatelessWidget {
                             .withValues(alpha: 0.05),
                   ),
                 ),
-                onSelected: (languageCode) => languageController.selectLanguage(
-                  languageCode,
-                  preserveSection: sectionToPreserve,
-                ),
+                onSelected: (languageCode) {
+                  // Read the route at selection time. This widget can outlive
+                  // several chapter changes, so capturing the hash during
+                  // build may preserve a stale section across the web reload.
+                  final urlSection = url_strategy.getUrlHash();
+                  final sectionToPreserve = urlSection.isNotEmpty
+                      ? urlSection
+                      : context.read<AppScrollController>().activeSection;
+                  languageController.selectLanguage(
+                    languageCode,
+                    preserveSection: sectionToPreserve,
+                  );
+                },
                 itemBuilder: (BuildContext context) => languageController
                     .supportedLanguages
                     .map((String languageCode) {

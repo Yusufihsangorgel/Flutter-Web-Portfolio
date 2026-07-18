@@ -92,6 +92,44 @@ final class PortfolioDocument {
   Iterable<PortfolioSupportingSystem> get supportingSystems =>
       systems.whereType<PortfolioSupportingSystem>();
 
+  Set<String> get supportedLocales => site.locales.toSet();
+
+  /// Returns a locale-specific view of the canonical portfolio document.
+  ///
+  /// URLs, identifiers, dates, product names, and other factual fields remain
+  /// owned by `portfolio.json`. Locale documents may replace only authored
+  /// human-facing copy. A locale document is deliberately all-or-nothing: a
+  /// missing field throws instead of silently producing a mixed-language page.
+  PortfolioDocument localized(Map<String, dynamic>? localization) {
+    if (localization == null || localization.isEmpty) return this;
+    final copy = _PortfolioLocalization(localization);
+    final localizedDocument = PortfolioDocument._(
+      schemaVersion: schemaVersion,
+      contentVersion: contentVersion,
+      verifiedAt: verifiedAt,
+      site: _localizedSite(site, copy.object('site')),
+      sources: sources,
+      profile: _localizedProfile(profile, copy.object('profile')),
+      experience: [
+        for (final entry in experience)
+          _localizedExperience(entry, copy.entry('experience', entry.id)),
+      ],
+      capabilities: [
+        for (final entry in capabilities)
+          _localizedCapability(entry, copy.entry('capabilities', entry.id)),
+      ],
+      contributions: [
+        for (final entry in contributions)
+          _localizedContribution(entry, copy.entry('contributions', entry.id)),
+      ],
+      systems: [
+        for (final entry in systems)
+          _localizedSystem(entry, copy.entry('systems', entry.id)),
+      ],
+    ).._validate();
+    return localizedDocument;
+  }
+
   void _validate() {
     if (sources.isEmpty || capabilities.isEmpty) {
       throw const FormatException(
@@ -117,6 +155,13 @@ final class PortfolioDocument {
     if (site.engineeringLinks.isEmpty) {
       throw const FormatException(
         'The site must declare at least one engineering link.',
+      );
+    }
+    if (!site.locales.contains('en') ||
+        site.locales.toSet().length != site.locales.length ||
+        site.locales.any((locale) => !RegExp(r'^[a-z]{2}$').hasMatch(locale))) {
+      throw const FormatException(
+        'Site locales must be unique two-letter codes and include English.',
       );
     }
     if (contributions.where((entry) => entry.featured).length > 1) {
@@ -161,9 +206,11 @@ final class PortfolioSite {
     required this.socialDescription,
     required this.socialImage,
     required this.domainLabel,
+    required List<String> locales,
     required List<PortfolioLink> engineeringLinks,
     this.analytics,
-  }) : engineeringLinks = List.unmodifiable(engineeringLinks);
+  }) : locales = List.unmodifiable(locales),
+       engineeringLinks = List.unmodifiable(engineeringLinks);
 
   factory PortfolioSite.fromJson(Map<String, dynamic> json) {
     final socialImage = _requiredString(json, 'social_image');
@@ -179,6 +226,10 @@ final class PortfolioSite {
       socialDescription: _requiredString(json, 'social_description'),
       socialImage: socialImage,
       domainLabel: _requiredString(json, 'domain_label'),
+      locales: switch (json['locales']) {
+        null => const ['en'],
+        _ => _strings(json, 'locales'),
+      },
       engineeringLinks: _objects(
         json,
         'engineering_links',
@@ -196,6 +247,7 @@ final class PortfolioSite {
   final String socialDescription;
   final String socialImage;
   final String domainLabel;
+  final List<String> locales;
   final List<PortfolioLink> engineeringLinks;
   final PortfolioAnalytics? analytics;
 }
@@ -942,6 +994,245 @@ enum PortfolioArtifactComposition {
         throw FormatException('Unsupported artifact composition: $value'),
   );
 }
+
+final class _PortfolioLocalization {
+  _PortfolioLocalization(Map<String, dynamic> json) : _json = json {
+    if (_requiredInt(json, 'schema_version') != 1) {
+      throw const FormatException(
+        'Unsupported portfolio localization schema version.',
+      );
+    }
+    final locale = _requiredString(json, 'locale');
+    if (!RegExp(r'^[a-z]{2}$').hasMatch(locale) || locale == 'en') {
+      throw FormatException('Invalid translated portfolio locale: $locale');
+    }
+  }
+
+  final Map<String, dynamic> _json;
+
+  Map<String, dynamic> object(String key) => _requiredObject(_json, key);
+
+  Map<String, dynamic> entry(String section, String id) =>
+      _requiredObject(_requiredObject(_json, section), id);
+}
+
+PortfolioSite _localizedSite(PortfolioSite source, Map<String, dynamic> json) =>
+    PortfolioSite(
+      url: source.url,
+      title: _requiredString(json, 'title'),
+      description: _requiredString(json, 'description'),
+      socialDescription: _requiredString(json, 'social_description'),
+      socialImage: source.socialImage,
+      domainLabel: source.domainLabel,
+      locales: source.locales,
+      engineeringLinks: _localizedLinks(
+        source.engineeringLinks,
+        _requiredObject(json, 'engineering_links'),
+      ),
+      analytics: source.analytics,
+    );
+
+PortfolioProfile _localizedProfile(
+  PortfolioProfile source,
+  Map<String, dynamic> json,
+) => PortfolioProfile(
+  name: source.name,
+  displayName: source.displayName,
+  role: _requiredString(json, 'role'),
+  location: _requiredString(json, 'location'),
+  email: source.email,
+  since: source.since,
+  headline: _requiredString(json, 'headline'),
+  summary: _requiredString(json, 'summary'),
+  background: _requiredString(json, 'background'),
+  focus: _strings(json, 'focus'),
+  links: _localizedLinks(source.links, _requiredObject(json, 'links')),
+);
+
+List<PortfolioLink> _localizedLinks(
+  List<PortfolioLink> source,
+  Map<String, dynamic> labels,
+) => [
+  for (final link in source)
+    PortfolioLink(
+      id: link.id,
+      label: _requiredString(labels, link.id),
+      url: link.url,
+    ),
+];
+
+PortfolioExperience _localizedExperience(
+  PortfolioExperience source,
+  Map<String, dynamic> json,
+) => PortfolioExperience(
+  id: source.id,
+  company: source.company,
+  role: _requiredString(json, 'role'),
+  domain: _requiredString(json, 'domain'),
+  period: _requiredString(json, 'period'),
+  current: source.current,
+  summary: _requiredString(json, 'summary'),
+  evidence: _strings(json, 'evidence'),
+);
+
+PortfolioCapability _localizedCapability(
+  PortfolioCapability source,
+  Map<String, dynamic> json,
+) => PortfolioCapability(
+  id: source.id,
+  label: _requiredString(json, 'label'),
+  items: _strings(json, 'items'),
+);
+
+PortfolioContribution _localizedContribution(
+  PortfolioContribution source,
+  Map<String, dynamic> json,
+) => PortfolioContribution(
+  id: source.id,
+  project: source.project,
+  status: source.status,
+  date: source.date,
+  title: _requiredString(json, 'title'),
+  problem: _requiredString(json, 'problem'),
+  change: _requiredString(json, 'change'),
+  url: source.url,
+  featured: source.featured,
+  issueUrl: source.issueUrl,
+  eventOrderLab: switch (source.eventOrderLab) {
+    final lab? => _localizedEventOrderLab(
+      lab,
+      _requiredObject(json, 'event_order_lab'),
+    ),
+    null => null,
+  },
+);
+
+PortfolioEventOrderLab _localizedEventOrderLab(
+  PortfolioEventOrderLab source,
+  Map<String, dynamic> json,
+) {
+  final eventLabels = _requiredObject(json, 'events');
+  return PortfolioEventOrderLab(
+    title: _requiredString(json, 'title'),
+    events: [
+      for (final event in source.events)
+        PortfolioEventOrderItem(
+          id: event.id,
+          label: _requiredString(eventLabels, event.id),
+        ),
+    ],
+    baseline: PortfolioEventSequence(
+      summary: _requiredString(json, 'baseline_summary'),
+      order: source.baseline.order,
+      gap: switch (source.baseline.gap) {
+        final gap? => PortfolioEventGap(
+          after: gap.after,
+          before: gap.before,
+          label: _requiredString(json, 'gap_label'),
+        ),
+        null => null,
+      },
+    ),
+    withPatch: PortfolioEventSequence(
+      summary: _requiredString(json, 'with_patch_summary'),
+      order: source.withPatch.order,
+      gap: null,
+    ),
+  );
+}
+
+PortfolioSystem _localizedSystem(
+  PortfolioSystem source,
+  Map<String, dynamic> json,
+) {
+  final evidenceLabels = _strings(json, 'evidence');
+  if (evidenceLabels.length != source.evidence.length) {
+    throw FormatException(
+      'Localized evidence count does not match system "${source.id}".',
+    );
+  }
+  final evidence = [
+    for (var index = 0; index < source.evidence.length; index++)
+      PortfolioEvidence(
+        label: evidenceLabels[index],
+        url: source.evidence[index].url,
+        kind: source.evidence[index].kind,
+      ),
+  ];
+  final artifact = _localizedArtifact(
+    source.artifact,
+    _requiredObject(json, 'artifact'),
+  );
+  final common = (
+    kind: _requiredString(json, 'kind'),
+    summary: _requiredString(json, 'summary'),
+    ownership: _requiredString(json, 'ownership'),
+    decision: _requiredString(json, 'decision'),
+  );
+
+  return switch (source) {
+    final PortfolioFeaturedSystem featured => PortfolioFeaturedSystem(
+      id: featured.id,
+      name: featured.name,
+      kind: common.kind,
+      year: featured.year,
+      summary: common.summary,
+      ownership: common.ownership,
+      decision: common.decision,
+      presentation: featured.presentation,
+      artifact: artifact,
+      challenge: _requiredString(json, 'challenge'),
+      approach: _requiredString(json, 'approach'),
+      outcome: _requiredString(json, 'outcome'),
+      evidence: evidence,
+      url: featured.url,
+      technologies: featured.technologies,
+    ),
+    final PortfolioSupportingSystem supporting => PortfolioSupportingSystem(
+      id: supporting.id,
+      name: supporting.name,
+      kind: common.kind,
+      year: supporting.year,
+      summary: common.summary,
+      ownership: common.ownership,
+      decision: common.decision,
+      presentation: supporting.presentation,
+      artifact: artifact,
+      evidence: evidence,
+      group: supporting.group,
+      spotlight: _requiredString(json, 'spotlight'),
+      url: supporting.url,
+      technologies: supporting.technologies,
+    ),
+  };
+}
+
+PortfolioSystemArtifact _localizedArtifact(
+  PortfolioSystemArtifact source,
+  Map<String, dynamic> json,
+) => PortfolioSystemArtifact(
+  label: _requiredString(json, 'label'),
+  asset: source.asset,
+  alt: _requiredString(json, 'alt'),
+  caption: _requiredString(json, 'caption'),
+  width: source.width,
+  height: source.height,
+  fit: source.fit,
+  alignment: source.alignment,
+  composition: source.composition,
+  compact: switch (source.compact) {
+    final compact? => PortfolioArtifactVariant(
+      asset: compact.asset,
+      alt: _requiredString(json, 'compact_alt'),
+      caption: _requiredString(json, 'compact_caption'),
+      width: compact.width,
+      height: compact.height,
+      fit: compact.fit,
+      alignment: compact.alignment,
+    ),
+    null => null,
+  },
+);
 
 Map<String, dynamic> _requiredObject(Map<String, dynamic> json, String key) =>
     switch (json[key]) {

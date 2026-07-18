@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" dir="ltr">
 <head>
   <base href="$FLUTTER_BASE_HREF">
   <meta charset="UTF-8">
@@ -18,8 +18,8 @@
   <meta property="og:title" content="Yusuf İhsan Görgel — Software Engineer">
   <meta property="og:description" content="Cross-platform product engineering, selected professional work, and verified open-source contributions by Yusuf İhsan Görgel.">
   <meta property="og:site_name" content="Yusuf İhsan Görgel — Software Engineer">
-  <meta property="og:image" content="https://developeryusuf.com/assets/og/engineering-showcase.png?v=2026.07.16.2">
-  <meta property="og:image:secure_url" content="https://developeryusuf.com/assets/og/engineering-showcase.png?v=2026.07.16.2">
+  <meta property="og:image" content="https://developeryusuf.com/assets/og/engineering-showcase.png?v=2026.07.18.1">
+  <meta property="og:image:secure_url" content="https://developeryusuf.com/assets/og/engineering-showcase.png?v=2026.07.18.1">
   <meta property="og:image:type" content="image/png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
@@ -29,7 +29,7 @@
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Yusuf İhsan Görgel — Software Engineer">
   <meta name="twitter:description" content="Cross-platform product engineering, selected professional work, and verified open-source contributions by Yusuf İhsan Görgel.">
-  <meta name="twitter:image" content="https://developeryusuf.com/assets/og/engineering-showcase.png?v=2026.07.16.2">
+  <meta name="twitter:image" content="https://developeryusuf.com/assets/og/engineering-showcase.png?v=2026.07.18.1">
   <meta name="twitter:image:alt" content="Yusuf İhsan Görgel — Software Engineer">
 <!-- portfolio-meta:end -->
 
@@ -74,7 +74,6 @@
 <!-- portfolio-structured-data:end -->
 
   <link rel="preload" href="assets/assets/fonts/space_grotesk/SpaceGrotesk-Variable.ttf" as="font" type="font/ttf" crossorigin>
-  <link rel="preload" href="assets/assets/fonts/jetbrains_mono/JetBrainsMono-Variable.ttf" as="font" type="font/ttf" crossorigin>
   <style>
     @font-face {
       font-family: "Space Grotesk Critical";
@@ -84,13 +83,30 @@
       font-weight: 300 700;
     }
     @font-face {
-      font-family: "JetBrains Mono Critical";
-      src: url("assets/assets/fonts/jetbrains_mono/JetBrainsMono-Variable.ttf") format("truetype");
+      font-family: "Noto Sans Arabic Critical";
+      src: url("assets/assets/fonts/noto_sans_arabic/NotoSansArabic-Variable.ttf") format("truetype");
       font-display: optional;
       font-style: normal;
-      font-weight: 400 700;
+      font-weight: 100 900;
     }
-    :root { color-scheme: light; background: #f2eee5; }
+    @font-face {
+      font-family: "Noto Sans Devanagari Critical";
+      src: url("assets/assets/fonts/noto_sans_devanagari/NotoSansDevanagari-Variable.ttf") format("truetype");
+      font-display: optional;
+      font-style: normal;
+      font-weight: 100 900;
+    }
+    :root {
+      --bootstrap-sans: "Space Grotesk Critical", ui-sans-serif, sans-serif;
+      color-scheme: light;
+      background: #f2eee5;
+    }
+    html[lang="ar"] {
+      --bootstrap-sans: "Noto Sans Arabic Critical", "Space Grotesk Critical", ui-sans-serif, sans-serif;
+    }
+    html[lang="hi"] {
+      --bootstrap-sans: "Noto Sans Devanagari Critical", "Space Grotesk Critical", ui-sans-serif, sans-serif;
+    }
     * { box-sizing: border-box; }
     html, body { height: 100%; }
     body { margin: 0; overflow: hidden; background: #f2eee5; }
@@ -126,7 +142,7 @@
       min-height: 620px;
       padding: 108px 160px 62px;
       color: #12110f;
-      font-family: "Space Grotesk Critical", ui-sans-serif, sans-serif;
+      font-family: var(--bootstrap-sans);
     }
     .bootstrap-rail {
       display: flex;
@@ -136,7 +152,7 @@
       padding-bottom: 14px;
       border-bottom: 1px solid rgba(18, 17, 15, 0.2);
       color: #403c36;
-      font: 600 13px/1.4 "Space Grotesk Critical", ui-sans-serif, sans-serif;
+      font: 600 13px/1.4 var(--bootstrap-sans);
     }
     .bootstrap-rail-end {
       display: flex;
@@ -153,6 +169,8 @@
     .bootstrap-title {
       display: flex;
       flex-flow: row wrap;
+      direction: ltr;
+      unicode-bidi: isolate;
       gap: 0.1em;
       align-items: baseline;
       margin: 0;
@@ -161,6 +179,7 @@
       line-height: 0.82;
       letter-spacing: -0.05em;
       color: #12110f;
+      font-family: "Space Grotesk Critical", ui-sans-serif, sans-serif;
       text-transform: uppercase;
     }
     .bootstrap-title-accent {
@@ -207,7 +226,7 @@
       color: #403c36;
       white-space: nowrap;
       border: 1px solid rgba(18, 17, 15, 0.24);
-      font: 500 14px/1.55 "Space Grotesk Critical", ui-sans-serif, sans-serif;
+      font: 500 14px/1.55 var(--bootstrap-sans);
       letter-spacing: 2px;
     }
     .bootstrap-action--primary {
@@ -228,7 +247,7 @@
       padding-top: 11px;
       border-top: 1px solid rgba(18, 17, 15, 0.24);
       color: #12110f;
-      font: 600 13px/1.35 "Space Grotesk Critical", ui-sans-serif, sans-serif;
+      font: 600 13px/1.35 var(--bootstrap-sans);
     }
     .bootstrap-fact-label {
       display: block;
@@ -243,7 +262,7 @@
       left: 50%;
       width: min(420px, calc(100% - 48px));
       color: #12110f;
-      font: 500 15px/1.6 "JetBrains Mono Critical", ui-monospace, monospace;
+      font: 500 15px/1.6 var(--bootstrap-sans);
       text-align: center;
       transform: translate(-50%, -50%);
     }
@@ -378,6 +397,28 @@
 <!-- portfolio-analytics:end -->
 </head>
 <body>
+  <noscript>
+    <style>
+      body { overflow: auto; }
+      #bootstrap-surface { display: none; }
+      .noscript-recovery {
+        display: grid;
+        min-height: 100%;
+        place-content: center;
+        max-width: 42rem;
+        margin: 0 auto;
+        padding: 2rem;
+        color: #12110f;
+        font: 400 1rem/1.6 ui-sans-serif, system-ui, sans-serif;
+      }
+      .noscript-recovery h1 { margin: 0 0 0.75rem; font-size: 1.75rem; line-height: 1.2; }
+      .noscript-recovery p { margin: 0; }
+    </style>
+    <main class="noscript-recovery">
+      <h1>JavaScript is required</h1>
+      <p>This interactive portfolio runs in Flutter Web. Enable JavaScript in your browser, then reload this page.</p>
+    </main>
+  </noscript>
   <div id="bootstrap-surface" role="status" aria-label="Loading interactive portfolio" aria-busy="true">
     <!-- bootstrap-content:start -->
     <div class="bootstrap-shell" aria-hidden="true"></div>

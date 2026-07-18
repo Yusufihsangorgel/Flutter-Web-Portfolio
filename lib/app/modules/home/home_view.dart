@@ -14,6 +14,7 @@ import 'package:flutter_web_portfolio/app/modules/home/sections/experience_secti
 import 'package:flutter_web_portfolio/app/modules/home/sections/projects/projects_section.dart';
 import 'package:flutter_web_portfolio/app/modules/home/sections/proof_section.dart';
 import 'package:flutter_web_portfolio/app/widgets/back_to_top_button.dart';
+import 'package:flutter_web_portfolio/app/widgets/accessible_action.dart';
 import 'package:flutter_web_portfolio/app/widgets/command_palette.dart';
 import 'package:flutter_web_portfolio/app/widgets/custom_sliver_app_bar.dart';
 import 'package:flutter_web_portfolio/app/widgets/portfolio_footer.dart';
@@ -34,13 +35,24 @@ class HomeView extends StatefulWidget {
 class _HomeViewState extends State<HomeView> {
   final FocusNode _focusNode = FocusNode();
   final FocusNode _skipLinkFocusNode = FocusNode();
+  final FocusNode _mainContentFocusNode = FocusNode(
+    debugLabel: 'portfolio-main-content',
+    skipTraversal: true,
+  );
   bool _skipLinkVisible = false;
+  String? _lastAnnouncedLanguageWarning;
   AppScrollController? _scheduledScrollController;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     final scrollController = context.read<AppScrollController>();
+    final languageState = context.read<LanguageCubit>().state;
+    final languageWarning = languageState.errorMessage;
+    if (languageState.status == LanguageStatus.ready &&
+        languageWarning != null) {
+      _announceLanguageWarning(languageWarning);
+    }
     if (identical(scrollController, _scheduledScrollController)) return;
     _scheduledScrollController = scrollController;
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -58,6 +70,7 @@ class _HomeViewState extends State<HomeView> {
   void dispose() {
     _focusNode.dispose();
     _skipLinkFocusNode.dispose();
+    _mainContentFocusNode.dispose();
     super.dispose();
   }
 
@@ -75,6 +88,26 @@ class _HomeViewState extends State<HomeView> {
     return KeyEventResult.ignored;
   }
 
+  void _announceLanguageWarning(String message) {
+    if (message.isEmpty || message == _lastAnnouncedLanguageWarning) return;
+    _lastAnnouncedLanguageWarning = message;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(
+            content: Semantics(
+              liveRegion: true,
+              label: message,
+              excludeSemantics: true,
+              child: Text(message),
+            ),
+          ),
+        );
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final scrollController = context.read<AppScrollController>();
@@ -85,19 +118,33 @@ class _HomeViewState extends State<HomeView> {
       focusNode: _focusNode,
       autofocus: true,
       onKeyEvent: _handleKeyEvent,
-      child: BlocBuilder<LanguageCubit, LanguageState>(
-        builder: (context, state) {
-          final narrative = context.read<NarrativeDocument>();
-          return Scaffold(
-            backgroundColor: AppColors.background,
-            body: _buildBody(
-              context,
-              scrollController,
-              languageController,
-              narrative,
-            ),
-          );
+      child: BlocListener<LanguageCubit, LanguageState>(
+        listenWhen: (previous, current) =>
+            current.status == LanguageStatus.ready &&
+            (current.errorMessage != previous.errorMessage ||
+                previous.status != LanguageStatus.ready),
+        listener: (context, state) {
+          final message = state.errorMessage;
+          if (message == null) {
+            _lastAnnouncedLanguageWarning = null;
+          } else {
+            _announceLanguageWarning(message);
+          }
         },
+        child: BlocBuilder<LanguageCubit, LanguageState>(
+          builder: (context, state) {
+            final narrative = context.read<NarrativeDocument>();
+            return Scaffold(
+              backgroundColor: AppColors.background,
+              body: _buildBody(
+                context,
+                scrollController,
+                languageController,
+                narrative,
+              ),
+            );
+          },
+        ),
       ),
     );
   }
@@ -133,6 +180,7 @@ class _HomeViewState extends State<HomeView> {
               orElse: () => narrative.chapters.first,
             );
             scrollController.scrollToSection(firstContentChapter.id.value);
+            _mainContentFocusNode.requestFocus();
           },
         ),
       ),
@@ -189,6 +237,12 @@ class _HomeViewState extends State<HomeView> {
     NarrativeDocument narrative,
   ) {
     final chapters = <Widget>[];
+    final mainContentId = narrative.chapters
+        .firstWhere(
+          (chapter) => !chapter.id.isHome,
+          orElse: () => narrative.chapters.first,
+        )
+        .id;
     for (var index = 0; index < narrative.chapters.length; index += 1) {
       final chapter = narrative.chapters[index];
       final isLast = index == narrative.chapters.length - 1;
@@ -200,6 +254,7 @@ class _HomeViewState extends State<HomeView> {
           isHero: chapter.id.isHome,
           fullBleed: chapter.id == SectionId.projects,
           isLast: isLast,
+          isMainContent: chapter.id == mainContentId,
         ),
       );
       if (!isLast) {
@@ -244,13 +299,25 @@ class _HomeViewState extends State<HomeView> {
     bool isHero = false,
     bool fullBleed = false,
     bool isLast = false,
-  }) => Container(
-    key: key,
-    padding: isHero || fullBleed
-        ? EdgeInsets.zero
-        : _sectionPadding(context, isLast: isLast),
-    child: child,
-  );
+    bool isMainContent = false,
+  }) {
+    final section = Container(
+      key: key,
+      padding: isHero || fullBleed
+          ? EdgeInsets.zero
+          : _sectionPadding(context, isLast: isLast),
+      child: child,
+    );
+    if (!isMainContent) return section;
+    return Semantics(
+      container: true,
+      child: Focus(
+        key: const ValueKey('main-content-focus-target'),
+        focusNode: _mainContentFocusNode,
+        child: section,
+      ),
+    );
+  }
 
   Widget _widgetFor(SectionId sectionId) => switch (sectionId.value) {
     'home' => const HomeSection(),
@@ -283,50 +350,32 @@ class _SkipToContentLink extends StatelessWidget {
   final VoidCallback onActivate;
 
   @override
-  Widget build(BuildContext context) => Semantics(
-    label: label,
-    button: true,
-    focusable: true,
+  Widget build(BuildContext context) => AccessibleAction(
+    focusNode: focusNode,
+    onFocusChanged: onFocusChanged,
     onTap: onActivate,
-    excludeSemantics: true,
-    child: ExcludeSemantics(
-      child: Focus(
-        focusNode: focusNode,
-        onFocusChange: onFocusChanged,
-        onKeyEvent: (_, event) {
-          if (event is KeyDownEvent &&
-              (event.logicalKey == LogicalKeyboardKey.enter ||
-                  event.logicalKey == LogicalKeyboardKey.space)) {
-            onActivate();
-            return KeyEventResult.handled;
-          }
-          return KeyEventResult.ignored;
-        },
-        child: AnimatedOpacity(
-          opacity: visible ? 1.0 : 0.0,
-          duration: AppDurations.fast,
-          child: AnimatedContainer(
-            duration: AppDurations.fast,
-            transform: Matrix4.translationValues(0, visible ? 0 : -48, 0),
-            child: Center(
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 24,
-                  vertical: 12,
-                ),
-                decoration: BoxDecoration(
-                  color: AppColors.accent,
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                child: Text(
-                  label,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    decoration: TextDecoration.none,
-                  ),
-                ),
+    semanticLabel: label,
+    showFocusRing: false,
+    child: AnimatedOpacity(
+      opacity: visible ? 1.0 : 0.0,
+      duration: AppDurations.fast,
+      child: AnimatedContainer(
+        duration: AppDurations.fast,
+        transform: Matrix4.translationValues(0, visible ? 0 : -48, 0),
+        child: Center(
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+            decoration: BoxDecoration(
+              color: AppColors.accent,
+              borderRadius: BorderRadius.circular(4),
+            ),
+            child: Text(
+              label,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                decoration: TextDecoration.none,
               ),
             ),
           ),

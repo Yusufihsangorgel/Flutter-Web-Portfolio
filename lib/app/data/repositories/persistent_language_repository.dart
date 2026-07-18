@@ -9,18 +9,24 @@ final class PersistentLanguageRepository implements LanguageRepository {
   factory PersistentLanguageRepository({
     required AssetLoader assetLoader,
     required KeyValueStore preferenceStore,
-  }) => PersistentLanguageRepository._(assetLoader, preferenceStore);
+    required Set<String> supportedLanguages,
+  }) => PersistentLanguageRepository._(
+    assetLoader,
+    preferenceStore,
+    Set.unmodifiable(supportedLanguages),
+  );
 
   const PersistentLanguageRepository._(
     this._assetLoader,
     this._preferenceStore,
+    this._supportedLanguages,
   );
 
   final AssetLoader _assetLoader;
   final KeyValueStore _preferenceStore;
 
   static const _languageKey = 'selected_language';
-  static const _supportedLanguages = {'tr', 'en', 'de', 'fr', 'es', 'ar', 'hi'};
+  final Set<String> _supportedLanguages;
 
   @override
   Set<String> get supportedLanguages => _supportedLanguages;
@@ -28,7 +34,10 @@ final class PersistentLanguageRepository implements LanguageRepository {
   @override
   Future<String> getSelectedLanguage() async {
     try {
-      return _preferenceStore.readString(_languageKey) ?? 'en';
+      final saved = _preferenceStore.readString(_languageKey);
+      return saved != null && _supportedLanguages.contains(saved)
+          ? saved
+          : 'en';
     } on Object catch (error) {
       dev.log(
         'Failed to load language preference',
@@ -40,17 +49,8 @@ final class PersistentLanguageRepository implements LanguageRepository {
   }
 
   @override
-  Future<void> saveSelectedLanguage(String languageCode) async {
-    try {
-      await _preferenceStore.writeString(_languageKey, languageCode);
-    } on Object catch (error) {
-      dev.log(
-        'Failed to save language preference',
-        name: 'PersistentLanguageRepository',
-        error: error,
-      );
-    }
-  }
+  Future<void> saveSelectedLanguage(String languageCode) =>
+      _preferenceStore.writeString(_languageKey, languageCode);
 
   @override
   Future<Map<String, dynamic>> getTranslations(String languageCode) =>

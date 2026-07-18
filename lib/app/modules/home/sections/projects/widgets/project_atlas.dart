@@ -1,3 +1,4 @@
+import 'dart:async' show unawaited;
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
@@ -43,7 +44,7 @@ final class ProjectAtlasLabels {
   final String indexLabel;
 }
 
-/// Professional cases followed by a compact, source-backed evidence index.
+/// Professional case studies followed by a compact selected-work index.
 ///
 /// Every colour, image, label, URL, and line of project copy comes from the
 /// external content document. The renderer has no project-specific branches.
@@ -234,7 +235,7 @@ final class _CaseRail extends StatelessWidget {
       style: AppFonts.spaceGrotesk(
         fontSize: 11,
         fontWeight: FontWeight.w800,
-        color: palette.accent,
+        color: palette.foreground,
         letterSpacing: 0.7,
       ),
     );
@@ -460,7 +461,7 @@ final class _NarrativeBeat extends StatelessWidget {
           style: AppFonts.spaceGrotesk(
             fontSize: 10,
             fontWeight: FontWeight.w800,
-            color: palette.accent,
+            color: palette.foreground,
             letterSpacing: 0.7,
           ),
         ),
@@ -483,11 +484,15 @@ final class _ArtifactStage extends StatelessWidget {
     required this.system,
     required this.palette,
     required this.prominent,
+    this.renderAsset = true,
+    this.cacheWidth,
   });
 
   final PortfolioSystem system;
   final _ProjectPalette palette;
   final bool prominent;
+  final bool renderAsset;
+  final int? cacheWidth;
 
   @override
   Widget build(BuildContext context) {
@@ -526,14 +531,6 @@ final class _ArtifactStage extends StatelessWidget {
                 ),
               ),
             ),
-            Text(
-              '$width × $height',
-              style: AppFonts.spaceGrotesk(
-                fontSize: 9,
-                fontWeight: FontWeight.w600,
-                color: palette.foreground.withValues(alpha: 0.52),
-              ),
-            ),
           ],
         ),
         const SizedBox(height: 13),
@@ -553,12 +550,15 @@ final class _ArtifactStage extends StatelessWidget {
                 label: alt,
                 excludeSemantics: true,
                 child: ExcludeSemantics(
-                  child: Image.asset(
-                    asset,
-                    fit: fit,
-                    alignment: alignment,
-                    filterQuality: FilterQuality.high,
-                  ),
+                  child: renderAsset
+                      ? Image.asset(
+                          asset,
+                          fit: fit,
+                          alignment: alignment,
+                          filterQuality: FilterQuality.high,
+                          cacheWidth: cacheWidth,
+                        )
+                      : const SizedBox.expand(),
                 ),
               ),
             ),
@@ -767,7 +767,11 @@ final class _DesktopEvidenceIndex extends StatelessWidget {
     children: [
       Expanded(
         flex: 58,
-        child: _SelectedEvidenceStage(system: selected, labels: labels),
+        child: _DesktopSelectedEvidenceStage(
+          systems: systems,
+          selected: selected,
+          labels: labels,
+        ),
       ),
       const SizedBox(width: 68),
       Expanded(
@@ -804,6 +808,90 @@ final class _CompactEvidenceIndex extends StatelessWidget {
     labels: labels,
     onSelect: onSelect,
     compact: true,
+  );
+}
+
+final class _DesktopSelectedEvidenceStage extends StatefulWidget {
+  const _DesktopSelectedEvidenceStage({
+    required this.systems,
+    required this.selected,
+    required this.labels,
+  });
+
+  final List<PortfolioSupportingSystem> systems;
+  final PortfolioSupportingSystem selected;
+  final ProjectAtlasLabels labels;
+
+  @override
+  State<_DesktopSelectedEvidenceStage> createState() =>
+      _DesktopSelectedEvidenceStageState();
+}
+
+final class _DesktopSelectedEvidenceStageState
+    extends State<_DesktopSelectedEvidenceStage> {
+  final Set<int> _scheduledCacheWidths = <int>{};
+
+  int _cacheWidthFor(PortfolioSupportingSystem system, int requestedWidth) =>
+      math.min(system.artifact.width, requestedWidth);
+
+  void _scheduleArtifactPrecache(int requestedWidth) {
+    if (!_scheduledCacheWidths.add(requestedWidth)) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      for (final system in widget.systems) {
+        final provider = ResizeImage.resizeIfNeeded(
+          _cacheWidthFor(system, requestedWidth),
+          null,
+          AssetImage(system.artifact.asset),
+        );
+        unawaited(precacheImage(provider, context));
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) => LayoutBuilder(
+    builder: (context, constraints) {
+      final requestedCacheWidth = math.max(
+        1,
+        (constraints.maxWidth * MediaQuery.devicePixelRatioOf(context)).ceil(),
+      );
+      _scheduleArtifactPrecache(requestedCacheWidth);
+      final selectedIndex = widget.systems.indexWhere(
+        (system) => system.id == widget.selected.id,
+      );
+      final active = widget.systems[selectedIndex < 0 ? 0 : selectedIndex];
+
+      // The stack's transparent, non-interactive children establish the
+      // tallest possible panel for the current locale and viewport. They keep
+      // exact text and aspect-ratio geometry without constructing hidden image
+      // widgets. A post-frame cache warm-up makes the one painted artifact
+      // available before this below-the-fold index enters the viewport.
+      return Stack(
+        children: [
+          for (final system in widget.systems)
+            IgnorePointer(
+              child: ExcludeSemantics(
+                child: Opacity(
+                  opacity: 0,
+                  child: _SelectedEvidenceStage(
+                    system: system,
+                    labels: widget.labels,
+                    measureOnly: true,
+                  ),
+                ),
+              ),
+            ),
+          Positioned.fill(
+            child: _SelectedEvidenceStage(
+              system: active,
+              labels: widget.labels,
+              imageCacheWidth: _cacheWidthFor(active, requestedCacheWidth),
+            ),
+          ),
+        ],
+      );
+    },
   );
 }
 
@@ -844,6 +932,7 @@ final class _EvidenceRows extends StatelessWidget {
               ordinal: ++ordinal,
               selected: system.id == selected.id,
               labels: labels,
+              enableHoverSelection: !compact,
               onSelect: () => onSelect(system),
             ),
             if (compact && system.id == selected.id)
@@ -893,6 +982,7 @@ final class _EvidenceRow extends StatelessWidget {
     required this.ordinal,
     required this.selected,
     required this.labels,
+    required this.enableHoverSelection,
     required this.onSelect,
   });
 
@@ -900,16 +990,20 @@ final class _EvidenceRow extends StatelessWidget {
   final int ordinal;
   final bool selected;
   final ProjectAtlasLabels labels;
+  final bool enableHoverSelection;
   final VoidCallback onSelect;
 
   @override
   Widget build(BuildContext context) {
     final tablet = MediaQuery.sizeOf(context).width >= Breakpoints.tablet;
     return AccessibleAction(
+      key: ValueKey('evidence-row-${system.id}'),
       onTap: onSelect,
-      onHoverChanged: (hovered) {
-        if (hovered) onSelect();
-      },
+      onHoverChanged: enableHoverSelection
+          ? (hovered) {
+              if (hovered) onSelect();
+            }
+          : null,
       semanticLabel: '${labels.selectEvidence}: ${system.name}',
       selected: selected,
       expanded: selected,
@@ -920,7 +1014,7 @@ final class _EvidenceRow extends StatelessWidget {
             : const Duration(milliseconds: 180),
         padding: EdgeInsets.symmetric(
           vertical: tablet ? 18 : 16,
-          horizontal: selected ? 12 : 0,
+          horizontal: enableHoverSelection ? 12 : (selected ? 12 : 0),
         ),
         decoration: BoxDecoration(
           color: selected ? const Color(0x0F1E51FF) : Colors.transparent,
@@ -974,7 +1068,7 @@ final class _EvidenceRow extends StatelessWidget {
                   const SizedBox(height: 7),
                   Text(
                     system.spotlight,
-                    maxLines: selected ? 3 : 2,
+                    maxLines: enableHoverSelection ? 2 : (selected ? 3 : 2),
                     overflow: TextOverflow.ellipsis,
                     style: AppFonts.inter(
                       fontSize: 12,
@@ -1005,33 +1099,36 @@ final class _SelectedEvidenceStage extends StatelessWidget {
     super.key,
     required this.system,
     required this.labels,
+    this.measureOnly = false,
+    this.imageCacheWidth,
   });
 
   final PortfolioSupportingSystem system;
   final ProjectAtlasLabels labels;
+  final bool measureOnly;
+  final int? imageCacheWidth;
 
   @override
   Widget build(BuildContext context) {
     final palette = _ProjectPalette.from(system.presentation);
-    final motionDisabled = MediaQuery.disableAnimationsOf(context);
 
-    return AnimatedContainer(
-      duration: motionDisabled
-          ? Duration.zero
-          : const Duration(milliseconds: 260),
+    // Evidence changes are pointer-driven on desktop. Cross-fading two full
+    // case-study panels makes their text and imagery overlap, while animating
+    // their different heights can move the row beneath a stationary pointer.
+    // Keep the preview swap atomic and reserve motion for non-layout state.
+    return ColoredBox(
       color: palette.background,
-      padding: EdgeInsets.all(
-        MediaQuery.sizeOf(context).width >= Breakpoints.tablet ? 28 : 20,
-      ),
-      child: AnimatedSwitcher(
-        duration: motionDisabled
-            ? Duration.zero
-            : const Duration(milliseconds: 220),
+      child: Padding(
+        padding: EdgeInsets.all(
+          MediaQuery.sizeOf(context).width >= Breakpoints.tablet ? 28 : 20,
+        ),
         child: _SelectedEvidenceContent(
-          key: ValueKey(system.id),
+          key: measureOnly ? null : ValueKey('selected-evidence-${system.id}'),
           system: system,
           labels: labels,
           palette: palette,
+          measureOnly: measureOnly,
+          imageCacheWidth: imageCacheWidth,
         ),
       ),
     );
@@ -1044,11 +1141,15 @@ final class _SelectedEvidenceContent extends StatelessWidget {
     required this.system,
     required this.labels,
     required this.palette,
+    required this.measureOnly,
+    required this.imageCacheWidth,
   });
 
   final PortfolioSupportingSystem system;
   final ProjectAtlasLabels labels;
   final _ProjectPalette palette;
+  final bool measureOnly;
+  final int? imageCacheWidth;
 
   @override
   Widget build(BuildContext context) => Column(
@@ -1063,7 +1164,7 @@ final class _SelectedEvidenceContent extends StatelessWidget {
               style: AppFonts.spaceGrotesk(
                 fontSize: 10,
                 fontWeight: FontWeight.w800,
-                color: palette.accent,
+                color: palette.foreground,
                 letterSpacing: 0.75,
               ),
             ),
@@ -1105,7 +1206,13 @@ final class _SelectedEvidenceContent extends StatelessWidget {
         ),
       ),
       const SizedBox(height: 28),
-      _ArtifactStage(system: system, palette: palette, prominent: false),
+      _ArtifactStage(
+        system: system,
+        palette: palette,
+        prominent: false,
+        renderAsset: !measureOnly,
+        cacheWidth: imageCacheWidth,
+      ),
       const SizedBox(height: 28),
       _NarrativeBeat(
         label: labels.ownership,

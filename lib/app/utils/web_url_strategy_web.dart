@@ -3,6 +3,10 @@ import 'package:web/web.dart' as web;
 
 const _reloadSectionKey = 'render_atlas_reload_section';
 
+/// Returns the language already selected by the critical HTML shell.
+String getHtmlLanguage() =>
+    web.document.documentElement?.getAttribute('lang') ?? 'en';
+
 /// Returns the URL hash fragment without leading `#` or `#/`.
 ///
 /// Examples:

@@ -51,7 +51,7 @@ final class ProjectsSection extends StatelessWidget {
         ),
         evidenceIndex: language.getText(
           'projects_section.evidence_index',
-          defaultValue: 'Evidence index',
+          defaultValue: 'More work',
         ),
         evidenceIntro: language.getText(
           'projects_section.evidence_intro',
@@ -68,11 +68,11 @@ final class ProjectsSection extends StatelessWidget {
         ),
         selectEvidence: language.getText(
           'projects_section.select_evidence',
-          defaultValue: 'Select evidence',
+          defaultValue: 'Choose a project',
         ),
         openEvidence: language.getText(
           'projects_section.open_evidence',
-          defaultValue: 'Open evidence',
+          defaultValue: 'View project',
         ),
         caseLabel: language.getText(
           'projects_section.case_label',

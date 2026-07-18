@@ -8,6 +8,9 @@ import 'package:flutter_web_portfolio/app/utils/web_url_strategy.dart'
 
 enum LanguageStatus { initial, loading, ready, failure }
 
+typedef TranslationDocumentValidator =
+    void Function(Map<String, dynamic> translations);
+
 @immutable
 final class LanguageState {
   const LanguageState({
@@ -66,14 +69,18 @@ final class LanguageState {
 /// Locale changes are serialized so a slower request can never overwrite a
 /// newer user choice. This Cubit is the sole localization state source.
 final class LanguageCubit extends Cubit<LanguageState> {
-  factory LanguageCubit({required LanguageRepository languageRepository}) =>
-      LanguageCubit._(languageRepository);
+  factory LanguageCubit({
+    required LanguageRepository languageRepository,
+    TranslationDocumentValidator? validateTranslations,
+  }) => LanguageCubit._(languageRepository, validateTranslations);
 
-  LanguageCubit._(this._languageRepository)
+  LanguageCubit._(this._languageRepository, this._validateTranslations)
     : super(const LanguageState.initial());
 
   final LanguageRepository _languageRepository;
+  final TranslationDocumentValidator? _validateTranslations;
   int _operationId = 0;
+  Future<void> _persistenceQueue = Future<void>.value();
 
   String get currentLanguage => state.languageCode;
 
@@ -100,6 +107,10 @@ final class LanguageCubit extends Cubit<LanguageState> {
     try {
       final savedLanguage = await _languageRepository.getSelectedLanguage();
       await changeLanguage(savedLanguage);
+      if (state.status != LanguageStatus.ready ||
+          state.languageCode != savedLanguage) {
+        await changeLanguage('en');
+      }
     } catch (error, stackTrace) {
       dev.log(
         'Failed to load saved language',
@@ -147,11 +158,13 @@ final class LanguageCubit extends Cubit<LanguageState> {
       if (translations.isEmpty) {
         throw StateError('Translation document is empty for $languageCode');
       }
+      _validateTranslations?.call(translations);
       if (isClosed || operationId != _operationId) return;
-      await _languageRepository.saveSelectedLanguage(languageCode);
+      final persistenceError = await _persistLanguage(languageCode);
 
       if (isClosed || operationId != _operationId) return;
       if (reloadOnWeb &&
+          persistenceError == null &&
           url_strategy.reloadPageForLanguageChange(
             preserveSection: preserveSection,
           )) {
@@ -163,6 +176,9 @@ final class LanguageCubit extends Cubit<LanguageState> {
           status: LanguageStatus.ready,
           languageCode: languageCode,
           translations: Map<String, dynamic>.unmodifiable(translations),
+          errorMessage: persistenceError == null
+              ? null
+              : _persistenceWarning(translations),
         ),
       );
     } catch (error, stackTrace) {
@@ -175,8 +191,10 @@ final class LanguageCubit extends Cubit<LanguageState> {
       );
       _emitState(
         state.copyWith(
-          status: LanguageStatus.failure,
-          errorMessage: error.toString(),
+          status: state.translations.isEmpty
+              ? LanguageStatus.failure
+              : LanguageStatus.ready,
+          errorMessage: _languageChangeWarning(state.translations),
         ),
       );
     }
@@ -185,6 +203,57 @@ final class LanguageCubit extends Cubit<LanguageState> {
   void _emitState(LanguageState nextState) {
     if (isClosed || nextState == state) return;
     emit(nextState);
+  }
+
+  /// Serializes browser-storage writes so a stale, slower request can never
+  /// overwrite the user's latest selection after that newer choice persists.
+  Future<Object?> _persistLanguage(String languageCode) async {
+    Object? persistenceError;
+    _persistenceQueue = _persistenceQueue.then((_) async {
+      try {
+        await _languageRepository.saveSelectedLanguage(languageCode);
+      } on Object catch (error, stackTrace) {
+        persistenceError = error;
+        dev.log(
+          'Failed to persist language $languageCode; applying it for this session',
+          name: 'LanguageCubit',
+          error: error,
+          stackTrace: stackTrace,
+        );
+      }
+    });
+    await _persistenceQueue;
+    return persistenceError;
+  }
+
+  String _persistenceWarning(Map<String, dynamic> translations) {
+    final accessibility = translations['accessibility'];
+    if (accessibility is Map<String, dynamic>) {
+      final localized = accessibility['language_not_saved'];
+      if (localized is String && localized.trim().isNotEmpty) {
+        return localized.trim();
+      }
+    }
+    return 'Your language preference could not be saved. '
+        'This language will remain active for this visit.';
+  }
+
+  String _languageChangeWarning(Map<String, dynamic> translations) {
+    final accessibility = translations['accessibility'];
+    if (accessibility is Map<String, dynamic>) {
+      final localized = accessibility['language_change_failed'];
+      if (localized is String && localized.trim().isNotEmpty) {
+        return localized.trim();
+      }
+    }
+    return 'That language could not be loaded. '
+        'Your current language is still active.';
+  }
+
+  @override
+  Future<void> close() async {
+    await _persistenceQueue;
+    return super.close();
   }
 
   static const _languageNames = <String, String>{

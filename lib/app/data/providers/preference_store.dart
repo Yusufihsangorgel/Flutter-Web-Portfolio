@@ -28,7 +28,9 @@ final class PreferenceStore implements KeyValueStore {
   @override
   Future<void> writeString(String key, String value) async {
     final preferences = _preferences;
-    if (preferences == null) return;
+    if (preferences == null) {
+      throw StateError('SharedPreferences is unavailable for $key.');
+    }
     final persisted = await preferences.setString(key, value);
     if (!persisted) {
       throw StateError('SharedPreferences rejected the write for $key.');

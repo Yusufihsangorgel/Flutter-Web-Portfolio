@@ -12,6 +12,7 @@ class AccessibleAction extends StatefulWidget {
     required this.onTap,
     this.onHoverChanged,
     this.onFocusChanged,
+    this.focusNode,
     this.focusColor,
     this.showFocusRing = true,
     this.cursor = SystemMouseCursors.click,
@@ -26,6 +27,7 @@ class AccessibleAction extends StatefulWidget {
   final VoidCallback onTap;
   final ValueChanged<bool>? onHoverChanged;
   final ValueChanged<bool>? onFocusChanged;
+  final FocusNode? focusNode;
   final Color? focusColor;
   final bool showFocusRing;
   final MouseCursor cursor;
@@ -46,52 +48,54 @@ class _AccessibleActionState extends State<AccessibleAction> {
   Widget build(BuildContext context) {
     final focusColor = widget.focusColor ?? Colors.white.withValues(alpha: 0.4);
 
-    final control = FocusableActionDetector(
-      mouseCursor: widget.cursor,
-      onShowHoverHighlight: widget.onHoverChanged,
-      onShowFocusHighlight: (focused) {
-        if (_focused != focused) setState(() => _focused = focused);
-        widget.onFocusChanged?.call(focused);
-      },
-      actions: {
-        ActivateIntent: CallbackAction<ActivateIntent>(
-          onInvoke: (_) {
-            widget.onTap();
-            return null;
-          },
+    Widget action = GestureDetector(
+      onTap: widget.onTap,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          borderRadius: widget.borderRadius,
+          border: (_focused && widget.showFocusRing)
+              ? Border.all(color: focusColor, width: 1)
+              : null,
         ),
-      },
-      shortcuts: const {
-        SingleActivator(LogicalKeyboardKey.enter): ActivateIntent(),
-        SingleActivator(LogicalKeyboardKey.space): ActivateIntent(),
-      },
-      child: GestureDetector(
-        onTap: widget.onTap,
-        child: DecoratedBox(
-          decoration: BoxDecoration(
-            borderRadius: widget.borderRadius,
-            border: (_focused && widget.showFocusRing)
-                ? Border.all(color: focusColor, width: 1)
-                : null,
-          ),
-          child: widget.child,
-        ),
+        child: widget.child,
       ),
     );
 
     final semanticLabel = widget.semanticLabel?.trim();
-    if (semanticLabel == null || semanticLabel.isEmpty) return control;
+    if (semanticLabel != null && semanticLabel.isNotEmpty) {
+      action = Semantics(
+        button: widget.semanticRole == ActionSemanticRole.button,
+        link: widget.semanticRole == ActionSemanticRole.link,
+        selected: widget.selected,
+        expanded: widget.expanded,
+        label: semanticLabel,
+        onTap: widget.onTap,
+        excludeSemantics: true,
+        child: action,
+      );
+    }
 
-    return Semantics(
-      button: widget.semanticRole == ActionSemanticRole.button,
-      link: widget.semanticRole == ActionSemanticRole.link,
-      selected: widget.selected,
-      expanded: widget.expanded,
-      focusable: true,
-      label: semanticLabel,
-      onTap: widget.onTap,
-      excludeSemantics: true,
-      child: control,
+    return MouseRegion(
+      cursor: widget.cursor,
+      onEnter: (_) => widget.onHoverChanged?.call(true),
+      onExit: (_) => widget.onHoverChanged?.call(false),
+      child: Focus(
+        focusNode: widget.focusNode,
+        onFocusChange: (focused) {
+          if (_focused != focused) setState(() => _focused = focused);
+          widget.onFocusChanged?.call(focused);
+        },
+        onKeyEvent: (_, event) {
+          if (event is KeyDownEvent &&
+              (event.logicalKey == LogicalKeyboardKey.enter ||
+                  event.logicalKey == LogicalKeyboardKey.space)) {
+            widget.onTap();
+            return KeyEventResult.handled;
+          }
+          return KeyEventResult.ignored;
+        },
+        child: action,
+      ),
     );
   }
 }

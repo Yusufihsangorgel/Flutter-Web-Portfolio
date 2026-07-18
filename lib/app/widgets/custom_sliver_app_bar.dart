@@ -109,8 +109,8 @@ class _CustomSliverAppBarState extends State<CustomSliverAppBar> {
         scaleFactor: _scaleFactor,
         languageController: widget.languageController,
         semanticLabel: widget.languageController.getText(
-          'accessibility.back_to_top',
-          defaultValue: 'Back to top',
+          'accessibility.go_home',
+          defaultValue: 'Go to home',
         ),
       ),
       leading: isMobile

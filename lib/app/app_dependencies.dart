@@ -47,8 +47,18 @@ final class AppDependencies {
     final languageRepository = PersistentLanguageRepository(
       assetLoader: assetLoader,
       preferenceStore: preferenceStore,
+      supportedLanguages: portfolio.supportedLocales,
     );
-    final languageCubit = LanguageCubit(languageRepository: languageRepository);
+    final languageCubit = LanguageCubit(
+      languageRepository: languageRepository,
+      validateTranslations: (translations) {
+        final localization = switch (translations['portfolio_content']) {
+          final Map<String, dynamic> value => value,
+          _ => null,
+        };
+        portfolio.localized(localization);
+      },
+    );
     await languageCubit.initialize();
 
     final scrollController = AppScrollController(narrative: narrative);
@@ -100,26 +110,35 @@ final class _AppRuntimeState extends State<AppRuntime> {
   }
 
   @override
-  Widget build(BuildContext context) =>
-      RepositoryProvider<PortfolioDocument>.value(
-        value: widget.dependencies.portfolio,
-        child: RepositoryProvider<NarrativeDocument>.value(
-          value: widget.dependencies.narrative,
-          child: MultiBlocProvider(
-            providers: [
-              BlocProvider<LanguageCubit>.value(
-                value: widget.dependencies.languageCubit,
-              ),
-              BlocProvider<AppScrollController>.value(
-                value: widget.dependencies.scrollController,
-              ),
-              BlocProvider<SceneDirector>.value(
-                value: widget.dependencies.sceneDirector,
-              ),
-              BlocProvider<RenderQualityController>.value(
-                value: widget.dependencies.renderQualityController,
-              ),
-            ],
+  Widget build(BuildContext context) => MultiBlocProvider(
+    providers: [
+      BlocProvider<LanguageCubit>.value(
+        value: widget.dependencies.languageCubit,
+      ),
+      BlocProvider<AppScrollController>.value(
+        value: widget.dependencies.scrollController,
+      ),
+      BlocProvider<SceneDirector>.value(
+        value: widget.dependencies.sceneDirector,
+      ),
+      BlocProvider<RenderQualityController>.value(
+        value: widget.dependencies.renderQualityController,
+      ),
+    ],
+    child: BlocBuilder<LanguageCubit, LanguageState>(
+      buildWhen: (previous, current) =>
+          previous.languageCode != current.languageCode ||
+          !identical(previous.translations, current.translations),
+      builder: (context, state) {
+        final localization = switch (state.translations['portfolio_content']) {
+          final Map<String, dynamic> value => value,
+          _ => null,
+        };
+        final portfolio = widget.dependencies.portfolio.localized(localization);
+        return RepositoryProvider<PortfolioDocument>.value(
+          value: portfolio,
+          child: RepositoryProvider<NarrativeDocument>.value(
+            value: widget.dependencies.narrative,
             child: BlocListener<RenderQualityController, RenderQualityState>(
               listenWhen: (previous, current) =>
                   previous.quality != current.quality ||
@@ -132,6 +151,8 @@ final class _AppRuntimeState extends State<AppRuntime> {
               child: widget.child,
             ),
           ),
-        ),
-      );
+        );
+      },
+    ),
+  );
 }
