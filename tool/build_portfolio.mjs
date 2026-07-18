@@ -3,9 +3,14 @@ import path from 'node:path';
 import process from 'node:process';
 import { fileURLToPath } from 'node:url';
 
-const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const baseHref = readOption('--base-href');
+import { normalizeBaseHref, resolveExecutable } from './cli_safety.mjs';
 
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const options = parseArguments(process.argv.slice(2));
+const baseHrefOption = options.baseHref;
+const baseHref = baseHrefOption ? normalizeBaseHref(baseHrefOption) : null;
+
+run(process.execPath, ['tool/verify_toolchain.mjs', '--current']);
 run('npm', ['run', 'verify:content']);
 run('npm', ['run', 'portfolio:validate']);
 run('npm', ['run', 'verify:source']);
@@ -20,34 +25,42 @@ const flutterArguments = [
   '--wasm',
   '--no-web-resources-cdn',
 ];
-if (baseHref) flutterArguments.push('--base-href', normalizeBaseHref(baseHref));
+if (baseHref) flutterArguments.push('--base-href', baseHref);
 run('flutter', flutterArguments);
 run('npm', ['run', 'prepare:bundle']);
 run('npm', ['run', 'verify:bundle']);
 
 console.log(`Release ready at ${path.join(root, 'build', 'web')}.`);
 
-function readOption(name) {
-  const index = process.argv.indexOf(name);
-  if (index < 0) return null;
-  const value = process.argv[index + 1];
-  if (!value || value.startsWith('--')) throw new Error(`${name} requires a value.`);
-  return value;
-}
-
-function normalizeBaseHref(value) {
-  const withLeadingSlash = value.startsWith('/') ? value : `/${value}`;
-  return withLeadingSlash.endsWith('/') ? withLeadingSlash : `${withLeadingSlash}/`;
+function parseArguments(values) {
+  const parsed = { baseHref: null };
+  for (let index = 0; index < values.length; index += 1) {
+    const token = values[index];
+    if (token !== '--base-href') {
+      throw new Error(`Unexpected argument: ${token}`);
+    }
+    if (parsed.baseHref !== null) {
+      throw new Error('--base-href may only be provided once.');
+    }
+    const value = values[index + 1];
+    if (!value || value.startsWith('--')) {
+      throw new Error('--base-href requires a value.');
+    }
+    parsed.baseHref = value;
+    index += 1;
+  }
+  return parsed;
 }
 
 function run(command, args) {
-  const result = spawnSync(command, args, {
+  const executable = resolveExecutable(command);
+  const result = spawnSync(executable, args, {
     cwd: root,
     stdio: 'inherit',
-    shell: process.platform === 'win32',
+    shell: false,
   });
   if (result.error) throw result.error;
   if (result.status !== 0) {
-    throw new Error(`${command} ${args.join(' ')} exited with ${result.status}.`);
+    throw new Error(`${executable} ${args.join(' ')} exited with ${result.status}.`);
   }
 }

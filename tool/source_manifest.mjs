@@ -8,7 +8,10 @@ export const portfolioRoot = path.resolve(
   '..',
 );
 
-const sourceDirectories = ['assets', 'lib', 'tool', 'web'];
+// Local path packages are part of the executable source graph just as much as
+// lib/. Omitting them would let a tracked release pass provenance verification
+// after its runtime dependency had changed.
+const sourceDirectories = ['assets', 'lib', 'packages', 'tool', 'web'];
 const sourceFiles = [
   'analysis_options.yaml',
   'package.json',

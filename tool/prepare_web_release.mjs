@@ -1,5 +1,6 @@
 import { createHash } from 'node:crypto';
 import {
+  copyFile,
   mkdir,
   readFile,
   readdir,
@@ -63,6 +64,11 @@ await injectReleasePreloads(releaseId, engineRevision);
 await injectBootstrapShell();
 await writeLegacyServiceWorkerKillSwitch();
 await normalizeNoticeWhitespace();
+await copyStaticHostSidecars();
+await copyFile(
+  path.resolve('tool', 'toolchain.json'),
+  path.join(webRoot, 'release-toolchain.json'),
+);
 
 console.log(
   `Removed ${symbolFiles.length} renderer symbol files (${formatBytes(removedBytes)}) from the public release.`,
@@ -182,47 +188,185 @@ async function injectBootstrapShell() {
     'content_version',
   );
   const displayName = requiredDisplayName(portfolio.profile?.display_name);
-  const namePrimary = displayName.primary;
-  const nameAccent = displayName.accent;
-  const role = requiredString(portfolio.profile?.role, 'profile.role');
-  const location = requiredString(
-    portfolio.profile?.location,
-    'profile.location',
-  );
   const since = requiredString(portfolio.profile?.since, 'profile.since');
-  const headline = requiredString(
-    portfolio.profile?.headline,
-    'profile.headline',
-  );
-  const focus = portfolio.profile?.focus;
-  if (!Array.isArray(focus) || focus.length < 3) {
-    throw new Error('profile.focus must contain at least three values');
-  }
-  const primaryFocus = requiredString(focus[0], 'profile.focus[0]');
-  const translationsPath = path.join(
-    webRoot,
-    'assets',
-    'assets',
-    'i18n',
-    'en.json',
-  );
-  const translations = JSON.parse(await readFile(translationsPath, 'utf8'));
-  const viewWork = requiredString(
-    translations.home_section?.view_work,
-    'i18n.en.home_section.view_work',
-  );
   const email = requiredString(portfolio.profile?.email, 'profile.email');
-  const emailLabel = requiredString(
-    translations.home_section?.email,
-    'i18n.en.home_section.email',
-  );
   const hasWork = Array.isArray(portfolio.systems) && portfolio.systems.length > 0;
   const hasEmail = email.includes('@');
+  const locales = portfolio.site?.locales;
+  if (
+    !Array.isArray(locales) ||
+    locales.length === 0 ||
+    new Set(locales).size !== locales.length ||
+    !locales.includes('en')
+  ) {
+    throw new Error('site.locales must contain unique locale codes including en');
+  }
 
+  const shellLocales = {};
+  for (const localeValue of locales) {
+    const locale = requiredString(localeValue, 'site.locales[]');
+    if (!/^[a-z]{2}(?:-[A-Z]{2})?$/.test(locale)) {
+      throw new Error(`Unsupported bootstrap locale code: ${locale}`);
+    }
+    const localePortfolio = locale === 'en'
+      ? portfolio
+      : JSON.parse(
+          await readFile(
+            path.join(
+              webRoot,
+              'assets',
+              'assets',
+              'content',
+              'locales',
+              `${locale}.json`,
+            ),
+            'utf8',
+          ),
+        );
+    if (locale !== 'en' && localePortfolio.locale !== locale) {
+      throw new Error(`content locale ${locale} does not declare its locale code`);
+    }
+    const translations = JSON.parse(
+      await readFile(
+        path.join(webRoot, 'assets', 'assets', 'i18n', `${locale}.json`),
+        'utf8',
+      ),
+    );
+    shellLocales[locale] = {
+      direction: locale.startsWith('ar') ? 'rtl' : 'ltr',
+      fontHref: bootstrapFontHref(locale),
+      title: requiredString(localePortfolio.site?.title, `${locale}.site.title`),
+      copy: {
+        loadingPortfolio: requiredString(
+          translations.accessibility?.loading_portfolio,
+          `i18n.${locale}.accessibility.loading_portfolio`,
+        ),
+        loadFailure: requiredString(
+          translations.accessibility?.load_failure,
+          `i18n.${locale}.accessibility.load_failure`,
+        ),
+        retry: requiredString(
+          translations.accessibility?.retry,
+          `i18n.${locale}.accessibility.retry`,
+        ),
+      },
+      markup: renderBootstrapShell({
+        contentVersion,
+        displayName,
+        profile: localePortfolio.profile,
+        since,
+        translations,
+        hasWork,
+        hasEmail,
+        locale,
+      }),
+    };
+  }
+
+  const localeBootstrap = `<script id="bootstrap-locale-state">
+      (function selectBootstrapLocale() {
+        'use strict';
+        var locales = ${jsonForInlineScript(shellLocales)};
+        var selected = 'en';
+        try {
+          var stored = window.localStorage.getItem('flutter.selected_language');
+          if (stored !== null) {
+            var decoded = stored;
+            try { decoded = JSON.parse(stored); } catch (_) {}
+            if (typeof decoded === 'string') selected = decoded;
+          }
+        } catch (_) {}
+        if (!Object.prototype.hasOwnProperty.call(locales, selected)) {
+          selected = 'en';
+        }
+        var shell = document.querySelector('#bootstrap-surface .bootstrap-shell');
+        var surface = document.getElementById('bootstrap-surface');
+        document.documentElement.lang = selected;
+        document.documentElement.dir = locales[selected].direction;
+        document.title = locales[selected].title;
+        window.__portfolioBootstrapLocale = locales[selected].copy;
+        if (locales[selected].fontHref) {
+          var fontPreload = document.createElement('link');
+          fontPreload.rel = 'preload';
+          fontPreload.as = 'font';
+          fontPreload.type = 'font/ttf';
+          fontPreload.crossOrigin = 'anonymous';
+          fontPreload.href = locales[selected].fontHref;
+          document.head.appendChild(fontPreload);
+        }
+        if (surface) {
+          surface.setAttribute('aria-label', locales[selected].copy.loadingPortfolio);
+        }
+        if (shell) shell.outerHTML = locales[selected].markup;
+      })();
+    </script>`;
+  const shell = `    <!-- bootstrap-content:start -->
+${shellLocales.en.markup}
+    ${localeBootstrap}
+    <!-- bootstrap-content:end -->`;
+
+  const indexPath = path.join(webRoot, 'index.html');
+  const index = await readFile(indexPath, 'utf8');
+  const marker = /\s*<!-- bootstrap-content:start -->[\s\S]*?<!-- bootstrap-content:end -->/;
+  if (!marker.test(index)) {
+    throw new Error('index.html does not contain the bootstrap content markers');
+  }
+  await writeFile(indexPath, index.replace(marker, `\n${shell}`));
+}
+
+function bootstrapFontHref(locale) {
+  if (locale === 'ar') {
+    return 'assets/assets/fonts/noto_sans_arabic/NotoSansArabic-Variable.ttf';
+  }
+  if (locale === 'hi') {
+    return 'assets/assets/fonts/noto_sans_devanagari/NotoSansDevanagari-Variable.ttf';
+  }
+  return null;
+}
+
+function renderBootstrapShell({
+  contentVersion,
+  displayName,
+  profile,
+  since,
+  translations,
+  hasWork,
+  hasEmail,
+  locale,
+}) {
+  const role = requiredString(profile?.role, `${locale}.profile.role`);
+  const location = requiredString(
+    profile?.location,
+    `${locale}.profile.location`,
+  );
+  const headline = requiredString(
+    profile?.headline,
+    `${locale}.profile.headline`,
+  );
+  const focus = profile?.focus;
+  if (!Array.isArray(focus) || focus.length < 3) {
+    throw new Error(`${locale}.profile.focus must contain at least three values`);
+  }
+  const primaryFocus = requiredString(focus[0], `${locale}.profile.focus[0]`);
+  const home = translations.home_section;
+  const viewWork = requiredString(
+    home?.view_work,
+    `i18n.${locale}.home_section.view_work`,
+  );
+  const emailLabel = requiredString(
+    home?.email,
+    `i18n.${locale}.home_section.email`,
+  );
   const facts = [
-    ['Based in', location],
-    ['Working since', since],
-    ['Focus', primaryFocus],
+    [requiredString(home?.based_in, `i18n.${locale}.home_section.based_in`), location],
+    [
+      requiredString(
+        home?.working_since,
+        `i18n.${locale}.home_section.working_since`,
+      ),
+      since,
+    ],
+    [requiredString(home?.focus, `i18n.${locale}.home_section.focus`), primaryFocus],
   ];
   const factMarkup = facts
     .map(
@@ -245,8 +389,7 @@ async function injectBootstrapShell() {
   const actions = actionMarkup
     ? `\n          <div class="bootstrap-actions">\n${actionMarkup}\n          </div>`
     : '';
-  const shell = `    <!-- bootstrap-content:start -->
-    <div class="bootstrap-shell" aria-hidden="true" data-content-version="${escapeHtml(contentVersion)}">
+  return `    <div class="bootstrap-shell" aria-hidden="true" data-content-version="${escapeHtml(contentVersion)}" data-locale="${escapeHtml(locale)}">
       <div class="bootstrap-rail">
         <span>${escapeHtml(role)}</span>
         <span class="bootstrap-rail-end">
@@ -255,8 +398,8 @@ async function injectBootstrapShell() {
       </div>
       <div class="bootstrap-stage">
         <p class="bootstrap-title">
-        <span>${escapeHtml(namePrimary)}</span>
-        <span class="bootstrap-title-accent">${escapeHtml(nameAccent)}</span>
+        <span>${escapeHtml(displayName.primary)}</span>
+        <span class="bootstrap-title-accent">${escapeHtml(displayName.accent)}</span>
         </p>
       </div>
       <div class="bootstrap-footer">
@@ -267,16 +410,17 @@ async function injectBootstrapShell() {
 ${factMarkup}
         </ul>
       </div>
-    </div>
-    <!-- bootstrap-content:end -->`;
+    </div>`;
+}
 
-  const indexPath = path.join(webRoot, 'index.html');
-  const index = await readFile(indexPath, 'utf8');
-  const marker = /\s*<!-- bootstrap-content:start -->[\s\S]*?<!-- bootstrap-content:end -->/;
-  if (!marker.test(index)) {
-    throw new Error('index.html does not contain the bootstrap content markers');
-  }
-  await writeFile(indexPath, index.replace(marker, `\n${shell}`));
+function jsonForInlineScript(value) {
+  return JSON.stringify(value).replace(/[<>&\u2028\u2029]/g, (character) => ({
+    '<': '\\u003c',
+    '>': '\\u003e',
+    '&': '\\u0026',
+    '\u2028': '\\u2028',
+    '\u2029': '\\u2029',
+  })[character]);
 }
 
 function requiredString(value, path) {
@@ -315,6 +459,12 @@ async function normalizeNoticeWhitespace() {
   const notices = await readFile(noticesPath, 'utf8');
   const normalized = notices.replace(/[\t ]+$/gm, '');
   if (normalized !== notices) await writeFile(noticesPath, normalized);
+}
+
+async function copyStaticHostSidecars() {
+  for (const file of ['_headers', '_redirects']) {
+    await copyFile(path.resolve('web', file), path.join(webRoot, file));
+  }
 }
 
 async function writeLegacyServiceWorkerKillSwitch() {

@@ -1,14 +1,16 @@
 {
   "schema_version": 8,
-  "content_version": "2026.07.16.11",
-  "verified_at": "2026-07-16",
+  "content_version": "2026.07.18.1",
+  "verified_at": "2026-07-18",
   "site": {
+    "template_repository": true,
     "url": "https://developeryusuf.com",
     "title": "Yusuf İhsan Görgel — Software Engineer",
     "description": "Yusuf İhsan Görgel is a software engineer building cross-platform products with Flutter, Dart, Go, PostgreSQL, Redis, and production infrastructure.",
     "social_description": "Cross-platform product engineering, selected professional work, and verified open-source contributions by Yusuf İhsan Görgel.",
-    "social_image": "/assets/og/engineering-showcase.png?v=2026.07.16.2",
+    "social_image": "/assets/og/engineering-showcase.png?v=2026.07.18.1",
     "domain_label": "DEVELOPERYUSUF.COM",
+    "locales": ["en", "tr", "de", "fr", "es", "ar", "hi"],
     "analytics": {
       "script_url": "https://analytics.developeryusuf.com/js/script.js",
       "domain": "developeryusuf.com"
@@ -107,7 +109,7 @@
     {
       "id": "fugasoft",
       "company": "Uzman Adres",
-      "role": "Flutter Developer",
+      "role": "Mid-Level Flutter Developer",
       "domain": "FugaSoft ERP and point-of-sale products",
       "period": "March 2021 — Present",
       "current": true,
@@ -118,22 +120,6 @@
         "SQLite / Drift",
         "Native integrations",
         "Real-time sync"
-      ]
-    },
-    {
-      "id": "juniustech",
-      "company": "JuniusTech",
-      "role": "Full Stack Developer",
-      "domain": "Dorse logistics platform",
-      "period": "June 2023 — January 2025",
-      "current": false,
-      "summary": "Delivered mobile and web product work spanning Flutter and React, REST and WebSocket data flows, live vehicle tracking, Google and Apple Maps integrations, deployment, and QA coordination.",
-      "evidence": [
-        "Flutter",
-        "React / Next.js",
-        "REST",
-        "WebSocket",
-        "Maps"
       ]
     },
     {
@@ -152,19 +138,19 @@
       ]
     },
     {
-      "id": "promob-tr",
-      "company": "Promob TR",
+      "id": "juniustech",
+      "company": "JuniusTech",
       "role": "Full Stack Developer",
-      "domain": "Digital publishing applications",
-      "period": "September 2022 — July 2024",
+      "domain": "Dorse logistics platform",
+      "period": "June 2023 — August 2025",
       "current": false,
-      "summary": "Shipped the Aydınlık E-Gazete and Bilim ve Ütopya E-Dergi applications for Android and iOS, working across Flutter delivery, API integration, localisation, and store-ready release workflows.",
+      "summary": "Delivered mobile and web product work spanning Flutter and React, REST and WebSocket data flows, live vehicle tracking, Google and Apple Maps integrations, deployment, and QA coordination.",
       "evidence": [
         "Flutter",
-        "Dart",
-        "MVVM",
-        "Dio",
-        "App Store / Play Store"
+        "React / Next.js",
+        "REST",
+        "WebSocket",
+        "Maps"
       ]
     },
     {
@@ -179,6 +165,37 @@
         "Software engineering",
         "Team delivery",
         "Production practice"
+      ]
+    },
+    {
+      "id": "promob-tr",
+      "company": "Promob TR",
+      "role": "Full Stack Developer",
+      "domain": "Digital publishing applications",
+      "period": "September 2022 — July 2024",
+      "current": false,
+      "summary": "Contributed to the Aydınlık E-Gazete and Bilim ve Ütopya E-Dergi mobile applications, working across Flutter delivery, API integration, localisation, and release workflows for Android and iOS.",
+      "evidence": [
+        "Flutter",
+        "Dart",
+        "MVVM",
+        "Dio",
+        "App Store releases"
+      ]
+    },
+    {
+      "id": "deyofu",
+      "company": "DEYOFU",
+      "role": "Flutter Developer",
+      "domain": "Mobile application projects",
+      "period": "June 2022 — August 2023",
+      "current": false,
+      "summary": "Contributed to Flutter mobile application projects in a long-running part-time role, working across Dart implementation and product delivery.",
+      "evidence": [
+        "Flutter",
+        "Dart",
+        "Mobile applications",
+        "Part-time delivery"
       ]
     },
     {
@@ -216,7 +233,7 @@
     {
       "id": "operations",
       "label": "Operations",
-      "items": ["Docker", "Kubernetes", "Prometheus", "Grafana", "PostgreSQL operations"]
+      "items": ["Docker", "Docker Swarm", "Prometheus", "Grafana", "PostgreSQL operations"]
     }
   ],
   "contributions": [
@@ -379,21 +396,16 @@
           "kind": "product"
         },
         {
-          "label": "FugaPOS product page",
-          "url": "https://fugasoft.com/tr/anasayfa/fugapos-akilli-ve-hizli-pos-cozumleri/",
-          "kind": "product"
-        },
-        {
-          "label": "FugaERP product page",
-          "url": "https://fugasoft.com/home/vollstaendig-integriertes-unternehmensmanagement-mit-fugaerp/",
+          "label": "FugaSoft product ecosystem",
+          "url": "https://fugasoft.com/#cozumler",
           "kind": "product"
         }
       ],
       "artifact": {
-        "label": "CURRENT PRODUCT",
+        "label": "OFFICIAL PRODUCT LINE",
         "asset": "assets/work/fugasoft-product.jpg",
-        "alt": "FugaSoft's current public website presenting its point-of-sale and business management platform.",
-        "caption": "Current FugaSoft product website · captured from the public company site.",
+        "alt": "FugaSoft's official product ecosystem presenting FugaPOS, FugaERP, FugaCLOUD, FugaKIOSK, and FugaSELF-SERVICE.",
+        "caption": "FugaSoft product ecosystem · official company website.",
         "width": 1600,
         "height": 1000,
         "fit": "contain",
@@ -401,8 +413,8 @@
         "composition": "evidence_stack",
         "compact": {
           "asset": "assets/work/fugasoft-product-compact.jpg",
-          "alt": "Compact FugaSoft evidence board with the current public company website and point-of-sale product surface.",
-          "caption": "FugaSoft company website · compact source-backed view.",
+          "alt": "Compact view of the official FugaSoft product ecosystem and its five product lines.",
+          "caption": "FugaSoft product ecosystem · official company website.",
           "width": 900,
           "height": 1200,
           "fit": "contain",
@@ -437,7 +449,7 @@
         }
       ],
       "artifact": {
-        "label": "PUBLIC PRODUCT",
+        "label": "PRODUCT WORKFLOW",
         "asset": "assets/work/dorse-product.jpg",
         "alt": "Dorse's current public product website showing the logistics mobile application in use.",
         "caption": "Dorse product surface · captured from the public company website.",
@@ -448,8 +460,8 @@
         "composition": "evidence_stack",
         "compact": {
           "asset": "assets/work/dorse-product-compact.jpg",
-          "alt": "Compact Dorse evidence board built around the public vehicle and trailer settings screen.",
-          "caption": "Dorse vehicle workflow · compact first-party product view.",
+          "alt": "Compact Dorse product view built around the public vehicle and trailer settings screen.",
+          "caption": "Dorse vehicle workflow · public company material.",
           "width": 900,
           "height": 1200,
           "fit": "contain",
@@ -480,15 +492,10 @@
           "label": "View App Store release",
           "url": "https://apps.apple.com/tr/app/ayd%C4%B1nl%C4%B1k-e-gazete/id1560103805",
           "kind": "App Store"
-        },
-        {
-          "label": "View Google Play release",
-          "url": "https://play.google.com/store/apps/details?id=com.aydinlikgazetesi.egazete&hl=tr",
-          "kind": "Google Play"
         }
       ],
       "artifact": {
-        "label": "PUBLIC APP STORE RELEASE",
+        "label": "APP STORE RELEASE",
         "asset": "assets/work/aydinlik-release.jpg",
         "alt": "Aydınlık E-Gazete public App Store release shown through an edition and newspaper reader screens.",
         "caption": "Edition and reader surfaces from the public iPhone listing.",
@@ -500,7 +507,7 @@
         "compact": {
           "asset": "assets/work/aydinlik-release-compact.jpg",
           "alt": "Compact Aydınlık E-Gazete release board with a large daily edition screen and audio reader screen.",
-          "caption": "Aydınlık edition and reader · compact public release evidence.",
+          "caption": "Aydınlık edition and reader · public App Store release.",
           "width": 900,
           "height": 1200,
           "fit": "contain",
@@ -531,15 +538,10 @@
           "label": "View App Store release",
           "url": "https://apps.apple.com/tr/app/bilim-ve-%C3%BCtopya-e-dergi/id6478221195",
           "kind": "App Store"
-        },
-        {
-          "label": "View Google Play release",
-          "url": "https://play.google.com/store/apps/details?id=com.aydinlikgazetesi.edergi_v1_bvu",
-          "kind": "Google Play"
         }
       ],
       "artifact": {
-        "label": "PUBLIC APP STORE RELEASE",
+        "label": "APP STORE RELEASE",
         "asset": "assets/work/bilim-utopya-release.jpg",
         "alt": "Bilim ve Ütopya E-Dergi public App Store release shown through issue and archive screens.",
         "caption": "Issue and archive surfaces from the public iPhone listing.",
@@ -551,7 +553,7 @@
         "compact": {
           "asset": "assets/work/bilim-utopya-release-compact.jpg",
           "alt": "Compact Bilim ve Ütopya release board with readable issue and subscriber archive screens.",
-          "caption": "Bilim ve Ütopya issue and archive · compact public release evidence.",
+          "caption": "Bilim ve Ütopya issue and archive · public App Store release.",
           "width": 900,
           "height": 1200,
           "fit": "contain",
@@ -562,65 +564,14 @@
       "technologies": ["Flutter", "Dart", "Dio", "MVVM", "iOS"]
     },
     {
-      "id": "galvapedia",
-      "name": "Galvapedia",
-      "kind": "Industrial reference application",
-      "year": "Public release",
-      "featured": false,
-      "group": "shipped_product",
-      "spotlight": "Galvanizing calculators and industrial reference workflows across a released mobile product.",
-      "summary": "A public industrial reference application with galvanizing calculators and technical workflows for field use.",
-      "ownership": "I built the product with Flutter and a Node.js, Express, and MongoDB service layer.",
-      "decision": "Turn specialist coating calculations into focused mobile tools with inputs and results that remain understandable in the field.",
-      "presentation": {
-        "background": "#F2EFE8",
-        "foreground": "#171512",
-        "accent": "#E87124"
-      },
-      "evidence": [
-        {
-          "label": "View App Store release",
-          "url": "https://apps.apple.com/tr/app/galvapedia/id1592744617",
-          "kind": "App Store"
-        },
-        {
-          "label": "View Google Play release",
-          "url": "https://play.google.com/store/apps/details?id=com.animetal.Galvapedia",
-          "kind": "Google Play"
-        }
-      ],
-      "artifact": {
-        "label": "PUBLIC APP STORE RELEASE",
-        "asset": "assets/work/galvapedia-release.jpg",
-        "alt": "Galvapedia public App Store release shown through its main reference menu and zinc-consumption calculator.",
-        "caption": "Reference and calculator surfaces from the public mobile release.",
-        "width": 1600,
-        "height": 1000,
-        "fit": "contain",
-        "alignment": "center",
-        "composition": "evidence_stack",
-        "compact": {
-          "asset": "assets/work/galvapedia-release-compact.jpg",
-          "alt": "Compact Galvapedia release board with reference modules and zinc calculation screens.",
-          "caption": "Galvapedia reference and calculator · compact public release evidence.",
-          "width": 900,
-          "height": 1200,
-          "fit": "contain",
-          "alignment": "center"
-        }
-      },
-      "url": "https://apps.apple.com/tr/app/galvapedia/id1592744617",
-      "technologies": ["Flutter", "Dart", "Node.js", "Express", "MongoDB"]
-    },
-    {
       "id": "queue-inspector",
       "name": "Queue Inspector MCP",
       "kind": "Operations tooling",
       "year": "2026",
       "featured": false,
       "group": "open_engineering",
-      "spotlight": "Typed inspection and guarded recovery controls for Redis-backed job queues.",
-      "summary": "An MCP server for inspecting and operating Redis-backed Asynq and BullMQ queues without reaching into storage by hand.",
+      "spotlight": "Typed inspection across three queue backends, with six read-only tools and no direct storage editing.",
+      "summary": "An MCP server for read-only inspection of Redis-backed Asynq, BullMQ, and Sidekiq queues through one typed interface.",
       "ownership": "I designed the command surface, typed validation, queue adapters, and conservative state-changing operations.",
       "decision": "Keep observation read-only by default; make retries and destructive operations explicit and narrowly scoped.",
       "presentation": {
@@ -641,19 +592,19 @@
         }
       ],
       "artifact": {
-        "label": "REPOSITORY ARTIFACT",
+        "label": "OPEN-SOURCE PROJECT",
         "asset": "assets/work/queue-inspector.png",
-        "alt": "Queue Inspector MCP repository cover illustrating guarded inspection and recovery of Redis-backed job queues.",
-        "caption": "Published repository cover · queue inspection and guarded recovery.",
+        "alt": "Queue Inspector MCP architecture showing one typed interface across Asynq, BullMQ, and Sidekiq queues.",
+        "caption": "Queue Inspector MCP · three adapters and six read-only tools.",
         "width": 1600,
-        "height": 840,
+        "height": 1000,
         "fit": "contain",
         "alignment": "center",
         "composition": "evidence_stack",
         "compact": {
           "asset": "assets/work/queue-inspector-compact.jpg",
-          "alt": "Compact Queue Inspector MCP evidence board preserving the authored Redis queue architecture diagram.",
-          "caption": "Queue Inspector MCP · compact source-backed architecture view.",
+          "alt": "Compact Queue Inspector MCP architecture showing Asynq, BullMQ, and Sidekiq adapters.",
+          "caption": "Queue Inspector MCP · typed inspection across three backends.",
           "width": 900,
           "height": 1200,
           "fit": "contain",
@@ -661,7 +612,14 @@
         }
       },
       "url": "https://github.com/Yusufihsangorgel/queue-inspector-mcp",
-      "technologies": ["TypeScript", "MCP", "Redis", "Asynq", "BullMQ"]
+      "technologies": [
+        "TypeScript",
+        "MCP",
+        "Redis",
+        "Asynq",
+        "BullMQ",
+        "Sidekiq"
+      ]
     },
     {
       "id": "multitenant-gateway",
@@ -692,10 +650,10 @@
         }
       ],
       "artifact": {
-        "label": "ARCHITECTURE RECORD",
+        "label": "REQUEST PIPELINE",
         "asset": "assets/work/go-multitenant-gateway.jpg",
-        "alt": "Source-derived architecture record for the Go multi-tenant gateway and its explicit request policy chain.",
-        "caption": "Architecture and source path drawn from the public repository.",
+        "alt": "Go multi-tenant gateway request pipeline and its explicit middleware order.",
+        "caption": "Go gateway · request order and middleware boundaries.",
         "width": 1600,
         "height": 1000,
         "fit": "contain",
@@ -703,8 +661,8 @@
         "composition": "evidence_stack",
         "compact": {
           "asset": "assets/work/go-multitenant-gateway-compact.jpg",
-          "alt": "Compact multi-tenant gateway evidence board showing real Go middleware wiring and request order.",
-          "caption": "Go gateway request chain · compact source-backed view.",
+          "alt": "Compact multi-tenant gateway diagram showing tenant, rate-limit, authentication, and module boundaries.",
+          "caption": "Go gateway · ordered request pipeline.",
           "width": 900,
           "height": 1200,
           "fit": "contain",
@@ -738,12 +696,12 @@
         }
       ],
       "artifact": {
-        "label": "REPOSITORY ARTIFACT",
+        "label": "OPEN-SOURCE PACKAGE",
         "asset": "assets/work/redis-task-queue.png",
         "alt": "Redis Task Queue repository cover showing API enqueue, queue, worker, success, and dead-letter paths.",
         "caption": "Published repository cover · queue lifecycle.",
         "width": 1600,
-        "height": 840,
+        "height": 1000,
         "fit": "contain",
         "alignment": "center",
         "composition": "evidence_stack",
@@ -784,18 +742,18 @@
         }
       ],
       "artifact": {
-        "label": "RECORDED DEMO",
+        "label": "RENDERING DEMO",
         "asset": "assets/work/constellation-demo.png",
         "alt": "Constellation Particles demo frame with pointer-reactive particles and local neighbour links.",
         "caption": "Frame from the published Flutter CustomPainter demo.",
-        "width": 680,
-        "height": 425,
+        "width": 1600,
+        "height": 1000,
         "fit": "contain",
         "alignment": "center",
         "composition": "evidence_stack",
         "compact": {
           "asset": "assets/work/constellation-demo-compact.jpg",
-          "alt": "Compact Constellation Particles evidence board framing the actual Flutter rendering demo.",
+          "alt": "Compact Constellation Particles view framing the actual Flutter rendering demo.",
           "caption": "Constellation Particles · compact rendered package demo.",
           "width": 900,
           "height": 1200,
@@ -835,10 +793,10 @@
         }
       ],
       "artifact": {
-        "label": "VERIFIED PREVIEW",
+        "label": "RUNTIME ARCHITECTURE",
         "asset": "assets/work/portfolio-current.jpg",
-        "alt": "The verified Flutter Web portfolio release candidate showing its editorial work index and source-backed product imagery.",
-        "caption": "Release candidate · local Wasm build after desktop, tablet, and mobile browser verification.",
+        "alt": "Flutter Web portfolio runtime architecture from canonical content through localization, Dart Wasm rendering, and browser regression tests.",
+        "caption": "Portfolio runtime · content, localization, Wasm rendering, and browser tests.",
         "width": 1600,
         "height": 1000,
         "fit": "contain",
@@ -846,8 +804,8 @@
         "composition": "evidence_stack",
         "compact": {
           "asset": "assets/work/portfolio-current-compact.jpg",
-          "alt": "Compact Flutter Web Portfolio preview showing the selected-work chapter and current FugaSoft case.",
-          "caption": "Current Flutter Web portfolio · compact verified release view.",
+          "alt": "Compact Flutter Web portfolio runtime architecture from content to localized browser output.",
+          "caption": "Flutter Web portfolio · content-to-browser runtime.",
           "width": 900,
           "height": 1200,
           "fit": "contain",

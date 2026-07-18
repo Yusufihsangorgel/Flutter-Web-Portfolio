@@ -420,6 +420,7 @@ class CompiledApp {
       _1243: x0 => x0.frameCount,
       _1301: (x0,x1,x2) => x0.setAttribute(x1,x2),
       _1302: (x0,x1) => x0.removeAttribute(x1),
+      _1303: (x0,x1) => x0.getAttribute(x1),
       _1307: (x0,x1,x2,x3) => x0.open(x1,x2,x3),
       _1308: (x0,x1) => x0.matchMedia(x1),
       _1316: (x0,x1) => x0.getItem(x1),

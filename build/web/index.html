@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" dir="ltr">
 <head>
   <base href="/">
   <meta charset="UTF-8">
@@ -18,8 +18,8 @@
   <meta property="og:title" content="Yusuf İhsan Görgel — Software Engineer">
   <meta property="og:description" content="Cross-platform product engineering, selected professional work, and verified open-source contributions by Yusuf İhsan Görgel.">
   <meta property="og:site_name" content="Yusuf İhsan Görgel — Software Engineer">
-  <meta property="og:image" content="https://developeryusuf.com/assets/og/engineering-showcase.png?v=2026.07.16.2">
-  <meta property="og:image:secure_url" content="https://developeryusuf.com/assets/og/engineering-showcase.png?v=2026.07.16.2">
+  <meta property="og:image" content="https://developeryusuf.com/assets/og/engineering-showcase.png?v=2026.07.18.1">
+  <meta property="og:image:secure_url" content="https://developeryusuf.com/assets/og/engineering-showcase.png?v=2026.07.18.1">
   <meta property="og:image:type" content="image/png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
@@ -29,7 +29,7 @@
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Yusuf İhsan Görgel — Software Engineer">
   <meta name="twitter:description" content="Cross-platform product engineering, selected professional work, and verified open-source contributions by Yusuf İhsan Görgel.">
-  <meta name="twitter:image" content="https://developeryusuf.com/assets/og/engineering-showcase.png?v=2026.07.16.2">
+  <meta name="twitter:image" content="https://developeryusuf.com/assets/og/engineering-showcase.png?v=2026.07.18.1">
   <meta name="twitter:image:alt" content="Yusuf İhsan Görgel — Software Engineer">
 <!-- portfolio-meta:end -->
 
@@ -74,7 +74,6 @@
 <!-- portfolio-structured-data:end -->
 
   <link rel="preload" href="assets/assets/fonts/space_grotesk/SpaceGrotesk-Variable.ttf" as="font" type="font/ttf" crossorigin>
-  <link rel="preload" href="assets/assets/fonts/jetbrains_mono/JetBrainsMono-Variable.ttf" as="font" type="font/ttf" crossorigin>
   <style>
     @font-face {
       font-family: "Space Grotesk Critical";
@@ -84,13 +83,30 @@
       font-weight: 300 700;
     }
     @font-face {
-      font-family: "JetBrains Mono Critical";
-      src: url("assets/assets/fonts/jetbrains_mono/JetBrainsMono-Variable.ttf") format("truetype");
+      font-family: "Noto Sans Arabic Critical";
+      src: url("assets/assets/fonts/noto_sans_arabic/NotoSansArabic-Variable.ttf") format("truetype");
       font-display: optional;
       font-style: normal;
-      font-weight: 400 700;
+      font-weight: 100 900;
     }
-    :root { color-scheme: light; background: #f2eee5; }
+    @font-face {
+      font-family: "Noto Sans Devanagari Critical";
+      src: url("assets/assets/fonts/noto_sans_devanagari/NotoSansDevanagari-Variable.ttf") format("truetype");
+      font-display: optional;
+      font-style: normal;
+      font-weight: 100 900;
+    }
+    :root {
+      --bootstrap-sans: "Space Grotesk Critical", ui-sans-serif, sans-serif;
+      color-scheme: light;
+      background: #f2eee5;
+    }
+    html[lang="ar"] {
+      --bootstrap-sans: "Noto Sans Arabic Critical", "Space Grotesk Critical", ui-sans-serif, sans-serif;
+    }
+    html[lang="hi"] {
+      --bootstrap-sans: "Noto Sans Devanagari Critical", "Space Grotesk Critical", ui-sans-serif, sans-serif;
+    }
     * { box-sizing: border-box; }
     html, body { height: 100%; }
     body { margin: 0; overflow: hidden; background: #f2eee5; }
@@ -126,7 +142,7 @@
       min-height: 620px;
       padding: 108px 160px 62px;
       color: #12110f;
-      font-family: "Space Grotesk Critical", ui-sans-serif, sans-serif;
+      font-family: var(--bootstrap-sans);
     }
     .bootstrap-rail {
       display: flex;
@@ -136,7 +152,7 @@
       padding-bottom: 14px;
       border-bottom: 1px solid rgba(18, 17, 15, 0.2);
       color: #403c36;
-      font: 600 13px/1.4 "Space Grotesk Critical", ui-sans-serif, sans-serif;
+      font: 600 13px/1.4 var(--bootstrap-sans);
     }
     .bootstrap-rail-end {
       display: flex;
@@ -153,6 +169,8 @@
     .bootstrap-title {
       display: flex;
       flex-flow: row wrap;
+      direction: ltr;
+      unicode-bidi: isolate;
       gap: 0.1em;
       align-items: baseline;
       margin: 0;
@@ -161,6 +179,7 @@
       line-height: 0.82;
       letter-spacing: -0.05em;
       color: #12110f;
+      font-family: "Space Grotesk Critical", ui-sans-serif, sans-serif;
       text-transform: uppercase;
     }
     .bootstrap-title-accent {
@@ -207,7 +226,7 @@
       color: #403c36;
       white-space: nowrap;
       border: 1px solid rgba(18, 17, 15, 0.24);
-      font: 500 14px/1.55 "Space Grotesk Critical", ui-sans-serif, sans-serif;
+      font: 500 14px/1.55 var(--bootstrap-sans);
       letter-spacing: 2px;
     }
     .bootstrap-action--primary {
@@ -228,7 +247,7 @@
       padding-top: 11px;
       border-top: 1px solid rgba(18, 17, 15, 0.24);
       color: #12110f;
-      font: 600 13px/1.35 "Space Grotesk Critical", ui-sans-serif, sans-serif;
+      font: 600 13px/1.35 var(--bootstrap-sans);
     }
     .bootstrap-fact-label {
       display: block;
@@ -243,7 +262,7 @@
       left: 50%;
       width: min(420px, calc(100% - 48px));
       color: #12110f;
-      font: 500 15px/1.6 "JetBrains Mono Critical", ui-monospace, monospace;
+      font: 500 15px/1.6 var(--bootstrap-sans);
       text-align: center;
       transform: translate(-50%, -50%);
     }
@@ -377,15 +396,37 @@
   <script defer src="https://analytics.developeryusuf.com/js/script.js" data-domain="developeryusuf.com"></script>
 <!-- portfolio-analytics:end -->
   <!-- release-preloads:start -->
-  <link rel="preload" href="main.dart.wasm?v=3eda1e1c3b64bbbe" as="fetch" type="application/wasm" crossorigin fetchpriority="high">
-  <link rel="modulepreload" href="main.dart.mjs?v=3eda1e1c3b64bbbe" crossorigin fetchpriority="high">
+  <link rel="preload" href="main.dart.wasm?v=50ce250886f7badd" as="fetch" type="application/wasm" crossorigin fetchpriority="high">
+  <link rel="modulepreload" href="main.dart.mjs?v=50ce250886f7badd" crossorigin fetchpriority="high">
   <link rel="preload" href="canvaskit/83675ed27633283e7fc296c8bca22e841224c096/skwasm.wasm" as="fetch" type="application/wasm" crossorigin fetchpriority="high">
   <!-- release-preloads:end -->
 </head>
 <body>
+  <noscript>
+    <style>
+      body { overflow: auto; }
+      #bootstrap-surface { display: none; }
+      .noscript-recovery {
+        display: grid;
+        min-height: 100%;
+        place-content: center;
+        max-width: 42rem;
+        margin: 0 auto;
+        padding: 2rem;
+        color: #12110f;
+        font: 400 1rem/1.6 ui-sans-serif, system-ui, sans-serif;
+      }
+      .noscript-recovery h1 { margin: 0 0 0.75rem; font-size: 1.75rem; line-height: 1.2; }
+      .noscript-recovery p { margin: 0; }
+    </style>
+    <main class="noscript-recovery">
+      <h1>JavaScript is required</h1>
+      <p>This interactive portfolio runs in Flutter Web. Enable JavaScript in your browser, then reload this page.</p>
+    </main>
+  </noscript>
   <div id="bootstrap-surface" role="status" aria-label="Loading interactive portfolio" aria-busy="true">
     <!-- bootstrap-content:start -->
-    <div class="bootstrap-shell" aria-hidden="true" data-content-version="2026.07.16.11">
+    <div class="bootstrap-shell" aria-hidden="true" data-content-version="2026.07.18.1" data-locale="en">
       <div class="bootstrap-rail">
         <span>Software Engineer</span>
         <span class="bootstrap-rail-end">
@@ -422,6 +463,43 @@
         </ul>
       </div>
     </div>
+    <script id="bootstrap-locale-state">
+      (function selectBootstrapLocale() {
+        'use strict';
+        var locales = {"en":{"direction":"ltr","fontHref":null,"title":"Yusuf İhsan Görgel — Software Engineer","copy":{"loadingPortfolio":"Loading interactive portfolio","loadFailure":"The portfolio could not load. Please try again.","retry":"Retry"},"markup":"    \u003cdiv class=\"bootstrap-shell\" aria-hidden=\"true\" data-content-version=\"2026.07.18.1\" data-locale=\"en\"\u003e\n      \u003cdiv class=\"bootstrap-rail\"\u003e\n        \u003cspan\u003eSoftware Engineer\u003c/span\u003e\n        \u003cspan class=\"bootstrap-rail-end\"\u003e\n          \u003cspan\u003eAntalya, Türkiye\u003c/span\u003e\n        \u003c/span\u003e\n      \u003c/div\u003e\n      \u003cdiv class=\"bootstrap-stage\"\u003e\n        \u003cp class=\"bootstrap-title\"\u003e\n        \u003cspan\u003eYUSUF İHSAN\u003c/span\u003e\n        \u003cspan class=\"bootstrap-title-accent\"\u003eGÖRGEL\u003c/span\u003e\n        \u003c/p\u003e\n      \u003c/div\u003e\n      \u003cdiv class=\"bootstrap-footer\"\u003e\n        \u003cdiv class=\"bootstrap-statement-group\"\u003e\n          \u003cp class=\"bootstrap-statement\"\u003eI’m a software engineer working across Flutter, Dart, Go, and production infrastructure.\u003c/p\u003e\n          \u003cdiv class=\"bootstrap-actions\"\u003e\n            \u003cspan class=\"bootstrap-action bootstrap-action--primary\"\u003eExplore my work\u003c/span\u003e\n            \u003cspan class=\"bootstrap-action\"\u003eEmail me\u003c/span\u003e\n          \u003c/div\u003e\n        \u003c/div\u003e\n        \u003cul class=\"bootstrap-facts\"\u003e\n      \u003cli class=\"bootstrap-fact\"\u003e\n        \u003cspan class=\"bootstrap-fact-label\"\u003eBased in\u003c/span\u003e\n        Antalya, Türkiye\n      \u003c/li\u003e\n      \u003cli class=\"bootstrap-fact\"\u003e\n        \u003cspan class=\"bootstrap-fact-label\"\u003eWorking since\u003c/span\u003e\n        2021\n      \u003c/li\u003e\n      \u003cli class=\"bootstrap-fact\"\u003e\n        \u003cspan class=\"bootstrap-fact-label\"\u003eFocus\u003c/span\u003e\n        Flutter and Dart\n      \u003c/li\u003e\n        \u003c/ul\u003e\n      \u003c/div\u003e\n    \u003c/div\u003e"},"tr":{"direction":"ltr","fontHref":null,"title":"Yusuf İhsan Görgel — Yazılım Mühendisi","copy":{"loadingPortfolio":"Etkileşimli portföy yükleniyor","loadFailure":"Portföy yüklenemedi. Lütfen yeniden deneyin.","retry":"Yeniden dene"},"markup":"    \u003cdiv class=\"bootstrap-shell\" aria-hidden=\"true\" data-content-version=\"2026.07.18.1\" data-locale=\"tr\"\u003e\n      \u003cdiv class=\"bootstrap-rail\"\u003e\n        \u003cspan\u003eYazılım Mühendisi\u003c/span\u003e\n        \u003cspan class=\"bootstrap-rail-end\"\u003e\n          \u003cspan\u003eAntalya, Türkiye\u003c/span\u003e\n        \u003c/span\u003e\n      \u003c/div\u003e\n      \u003cdiv class=\"bootstrap-stage\"\u003e\n        \u003cp class=\"bootstrap-title\"\u003e\n        \u003cspan\u003eYUSUF İHSAN\u003c/span\u003e\n        \u003cspan class=\"bootstrap-title-accent\"\u003eGÖRGEL\u003c/span\u003e\n        \u003c/p\u003e\n      \u003c/div\u003e\n      \u003cdiv class=\"bootstrap-footer\"\u003e\n        \u003cdiv class=\"bootstrap-statement-group\"\u003e\n          \u003cp class=\"bootstrap-statement\"\u003eFlutter, Dart ve Go ile ürünler ve bunları üretimde güvenilir biçimde çalıştıran altyapılar geliştiriyorum.\u003c/p\u003e\n          \u003cdiv class=\"bootstrap-actions\"\u003e\n            \u003cspan class=\"bootstrap-action bootstrap-action--primary\"\u003eÇalışmalarımı incele\u003c/span\u003e\n            \u003cspan class=\"bootstrap-action\"\u003eE-posta gönder\u003c/span\u003e\n          \u003c/div\u003e\n        \u003c/div\u003e\n        \u003cul class=\"bootstrap-facts\"\u003e\n      \u003cli class=\"bootstrap-fact\"\u003e\n        \u003cspan class=\"bootstrap-fact-label\"\u003eKonum\u003c/span\u003e\n        Antalya, Türkiye\n      \u003c/li\u003e\n      \u003cli class=\"bootstrap-fact\"\u003e\n        \u003cspan class=\"bootstrap-fact-label\"\u003eÇalışma başlangıcı\u003c/span\u003e\n        2021\n      \u003c/li\u003e\n      \u003cli class=\"bootstrap-fact\"\u003e\n        \u003cspan class=\"bootstrap-fact-label\"\u003eOdak\u003c/span\u003e\n        Flutter ve Dart\n      \u003c/li\u003e\n        \u003c/ul\u003e\n      \u003c/div\u003e\n    \u003c/div\u003e"},"de":{"direction":"ltr","fontHref":null,"title":"Yusuf İhsan Görgel — Softwareingenieur","copy":{"loadingPortfolio":"Interaktives Portfolio wird geladen","loadFailure":"Das Portfolio konnte nicht geladen werden. Bitte versuchen Sie es erneut.","retry":"Erneut versuchen"},"markup":"    \u003cdiv class=\"bootstrap-shell\" aria-hidden=\"true\" data-content-version=\"2026.07.18.1\" data-locale=\"de\"\u003e\n      \u003cdiv class=\"bootstrap-rail\"\u003e\n        \u003cspan\u003eSoftwareingenieur\u003c/span\u003e\n        \u003cspan class=\"bootstrap-rail-end\"\u003e\n          \u003cspan\u003eAntalya, Türkei\u003c/span\u003e\n        \u003c/span\u003e\n      \u003c/div\u003e\n      \u003cdiv class=\"bootstrap-stage\"\u003e\n        \u003cp class=\"bootstrap-title\"\u003e\n        \u003cspan\u003eYUSUF İHSAN\u003c/span\u003e\n        \u003cspan class=\"bootstrap-title-accent\"\u003eGÖRGEL\u003c/span\u003e\n        \u003c/p\u003e\n      \u003c/div\u003e\n      \u003cdiv class=\"bootstrap-footer\"\u003e\n        \u003cdiv class=\"bootstrap-statement-group\"\u003e\n          \u003cp class=\"bootstrap-statement\"\u003eIch entwickle Software mit Flutter, Dart und Go und betreibe die dazugehörige Produktionsinfrastruktur.\u003c/p\u003e\n          \u003cdiv class=\"bootstrap-actions\"\u003e\n            \u003cspan class=\"bootstrap-action bootstrap-action--primary\"\u003eMeine Arbeit entdecken\u003c/span\u003e\n            \u003cspan class=\"bootstrap-action\"\u003eE-Mail senden\u003c/span\u003e\n          \u003c/div\u003e\n        \u003c/div\u003e\n        \u003cul class=\"bootstrap-facts\"\u003e\n      \u003cli class=\"bootstrap-fact\"\u003e\n        \u003cspan class=\"bootstrap-fact-label\"\u003eStandort\u003c/span\u003e\n        Antalya, Türkei\n      \u003c/li\u003e\n      \u003cli class=\"bootstrap-fact\"\u003e\n        \u003cspan class=\"bootstrap-fact-label\"\u003eBeruflich seit\u003c/span\u003e\n        2021\n      \u003c/li\u003e\n      \u003cli class=\"bootstrap-fact\"\u003e\n        \u003cspan class=\"bootstrap-fact-label\"\u003eSchwerpunkt\u003c/span\u003e\n        Flutter und Dart\n      \u003c/li\u003e\n        \u003c/ul\u003e\n      \u003c/div\u003e\n    \u003c/div\u003e"},"fr":{"direction":"ltr","fontHref":null,"title":"Yusuf İhsan Görgel — Ingénieur logiciel","copy":{"loadingPortfolio":"Chargement du portfolio interactif","loadFailure":"Le portfolio n’a pas pu être chargé. Veuillez réessayer.","retry":"Réessayer"},"markup":"    \u003cdiv class=\"bootstrap-shell\" aria-hidden=\"true\" data-content-version=\"2026.07.18.1\" data-locale=\"fr\"\u003e\n      \u003cdiv class=\"bootstrap-rail\"\u003e\n        \u003cspan\u003eIngénieur logiciel\u003c/span\u003e\n        \u003cspan class=\"bootstrap-rail-end\"\u003e\n          \u003cspan\u003eAntalya, Turquie\u003c/span\u003e\n        \u003c/span\u003e\n      \u003c/div\u003e\n      \u003cdiv class=\"bootstrap-stage\"\u003e\n        \u003cp class=\"bootstrap-title\"\u003e\n        \u003cspan\u003eYUSUF İHSAN\u003c/span\u003e\n        \u003cspan class=\"bootstrap-title-accent\"\u003eGÖRGEL\u003c/span\u003e\n        \u003c/p\u003e\n      \u003c/div\u003e\n      \u003cdiv class=\"bootstrap-footer\"\u003e\n        \u003cdiv class=\"bootstrap-statement-group\"\u003e\n          \u003cp class=\"bootstrap-statement\"\u003eJe conçois des logiciels avec Flutter, Dart et Go, ainsi que l’infrastructure qui les fait fonctionner en production.\u003c/p\u003e\n          \u003cdiv class=\"bootstrap-actions\"\u003e\n            \u003cspan class=\"bootstrap-action bootstrap-action--primary\"\u003eDécouvrir mon travail\u003c/span\u003e\n            \u003cspan class=\"bootstrap-action\"\u003eM’envoyer un e-mail\u003c/span\u003e\n          \u003c/div\u003e\n        \u003c/div\u003e\n        \u003cul class=\"bootstrap-facts\"\u003e\n      \u003cli class=\"bootstrap-fact\"\u003e\n        \u003cspan class=\"bootstrap-fact-label\"\u003eBasé à\u003c/span\u003e\n        Antalya, Turquie\n      \u003c/li\u003e\n      \u003cli class=\"bootstrap-fact\"\u003e\n        \u003cspan class=\"bootstrap-fact-label\"\u003eEn activité depuis\u003c/span\u003e\n        2021\n      \u003c/li\u003e\n      \u003cli class=\"bootstrap-fact\"\u003e\n        \u003cspan class=\"bootstrap-fact-label\"\u003ePriorité\u003c/span\u003e\n        Flutter et Dart\n      \u003c/li\u003e\n        \u003c/ul\u003e\n      \u003c/div\u003e\n    \u003c/div\u003e"},"es":{"direction":"ltr","fontHref":null,"title":"Yusuf İhsan Görgel — Ingeniero de software","copy":{"loadingPortfolio":"Cargando el portafolio interactivo","loadFailure":"No se pudo cargar el portafolio. Inténtalo de nuevo.","retry":"Reintentar"},"markup":"    \u003cdiv class=\"bootstrap-shell\" aria-hidden=\"true\" data-content-version=\"2026.07.18.1\" data-locale=\"es\"\u003e\n      \u003cdiv class=\"bootstrap-rail\"\u003e\n        \u003cspan\u003eIngeniero de software\u003c/span\u003e\n        \u003cspan class=\"bootstrap-rail-end\"\u003e\n          \u003cspan\u003eAntalya, Turquía\u003c/span\u003e\n        \u003c/span\u003e\n      \u003c/div\u003e\n      \u003cdiv class=\"bootstrap-stage\"\u003e\n        \u003cp class=\"bootstrap-title\"\u003e\n        \u003cspan\u003eYUSUF İHSAN\u003c/span\u003e\n        \u003cspan class=\"bootstrap-title-accent\"\u003eGÖRGEL\u003c/span\u003e\n        \u003c/p\u003e\n      \u003c/div\u003e\n      \u003cdiv class=\"bootstrap-footer\"\u003e\n        \u003cdiv class=\"bootstrap-statement-group\"\u003e\n          \u003cp class=\"bootstrap-statement\"\u003eDesarrollo software con Flutter, Dart y Go, además de la infraestructura que lo mantiene fiable en producción.\u003c/p\u003e\n          \u003cdiv class=\"bootstrap-actions\"\u003e\n            \u003cspan class=\"bootstrap-action bootstrap-action--primary\"\u003eExplorar mi trabajo\u003c/span\u003e\n            \u003cspan class=\"bootstrap-action\"\u003eEnvíame un correo\u003c/span\u003e\n          \u003c/div\u003e\n        \u003c/div\u003e\n        \u003cul class=\"bootstrap-facts\"\u003e\n      \u003cli class=\"bootstrap-fact\"\u003e\n        \u003cspan class=\"bootstrap-fact-label\"\u003eUbicación\u003c/span\u003e\n        Antalya, Turquía\n      \u003c/li\u003e\n      \u003cli class=\"bootstrap-fact\"\u003e\n        \u003cspan class=\"bootstrap-fact-label\"\u003eTrabajando desde\u003c/span\u003e\n        2021\n      \u003c/li\u003e\n      \u003cli class=\"bootstrap-fact\"\u003e\n        \u003cspan class=\"bootstrap-fact-label\"\u003eEnfoque\u003c/span\u003e\n        Flutter y Dart\n      \u003c/li\u003e\n        \u003c/ul\u003e\n      \u003c/div\u003e\n    \u003c/div\u003e"},"ar":{"direction":"rtl","fontHref":"assets/assets/fonts/noto_sans_arabic/NotoSansArabic-Variable.ttf","title":"Yusuf İhsan Görgel — مهندس برمجيات","copy":{"loadingPortfolio":"جارٍ تحميل معرض الأعمال التفاعلي","loadFailure":"تعذّر تحميل معرض الأعمال. يُرجى المحاولة مرة أخرى.","retry":"إعادة المحاولة"},"markup":"    \u003cdiv class=\"bootstrap-shell\" aria-hidden=\"true\" data-content-version=\"2026.07.18.1\" data-locale=\"ar\"\u003e\n      \u003cdiv class=\"bootstrap-rail\"\u003e\n        \u003cspan\u003eمهندس برمجيات\u003c/span\u003e\n        \u003cspan class=\"bootstrap-rail-end\"\u003e\n          \u003cspan\u003eأنطاليا، تركيا\u003c/span\u003e\n        \u003c/span\u003e\n      \u003c/div\u003e\n      \u003cdiv class=\"bootstrap-stage\"\u003e\n        \u003cp class=\"bootstrap-title\"\u003e\n        \u003cspan\u003eYUSUF İHSAN\u003c/span\u003e\n        \u003cspan class=\"bootstrap-title-accent\"\u003eGÖRGEL\u003c/span\u003e\n        \u003c/p\u003e\n      \u003c/div\u003e\n      \u003cdiv class=\"bootstrap-footer\"\u003e\n        \u003cdiv class=\"bootstrap-statement-group\"\u003e\n          \u003cp class=\"bootstrap-statement\"\u003eأطور البرمجيات باستخدام Flutter وDart وGo، وأبني البنية التي تحافظ على موثوقيتها في بيئة الإنتاج.\u003c/p\u003e\n          \u003cdiv class=\"bootstrap-actions\"\u003e\n            \u003cspan class=\"bootstrap-action bootstrap-action--primary\"\u003eاستكشف عملي\u003c/span\u003e\n            \u003cspan class=\"bootstrap-action\"\u003eراسلني\u003c/span\u003e\n          \u003c/div\u003e\n        \u003c/div\u003e\n        \u003cul class=\"bootstrap-facts\"\u003e\n      \u003cli class=\"bootstrap-fact\"\u003e\n        \u003cspan class=\"bootstrap-fact-label\"\u003eالموقع\u003c/span\u003e\n        أنطاليا، تركيا\n      \u003c/li\u003e\n      \u003cli class=\"bootstrap-fact\"\u003e\n        \u003cspan class=\"bootstrap-fact-label\"\u003eأعمل منذ\u003c/span\u003e\n        2021\n      \u003c/li\u003e\n      \u003cli class=\"bootstrap-fact\"\u003e\n        \u003cspan class=\"bootstrap-fact-label\"\u003eالتركيز\u003c/span\u003e\n        Flutter وDart\n      \u003c/li\u003e\n        \u003c/ul\u003e\n      \u003c/div\u003e\n    \u003c/div\u003e"},"hi":{"direction":"ltr","fontHref":"assets/assets/fonts/noto_sans_devanagari/NotoSansDevanagari-Variable.ttf","title":"Yusuf İhsan Görgel — सॉफ्टवेयर इंजीनियर","copy":{"loadingPortfolio":"इंटरैक्टिव पोर्टफोलियो लोड हो रहा है","loadFailure":"पोर्टफोलियो लोड नहीं हो सका। कृपया फिर से प्रयास करें।","retry":"फिर से प्रयास करें"},"markup":"    \u003cdiv class=\"bootstrap-shell\" aria-hidden=\"true\" data-content-version=\"2026.07.18.1\" data-locale=\"hi\"\u003e\n      \u003cdiv class=\"bootstrap-rail\"\u003e\n        \u003cspan\u003eसॉफ्टवेयर इंजीनियर\u003c/span\u003e\n        \u003cspan class=\"bootstrap-rail-end\"\u003e\n          \u003cspan\u003eअंताल्या, तुर्किये\u003c/span\u003e\n        \u003c/span\u003e\n      \u003c/div\u003e\n      \u003cdiv class=\"bootstrap-stage\"\u003e\n        \u003cp class=\"bootstrap-title\"\u003e\n        \u003cspan\u003eYUSUF İHSAN\u003c/span\u003e\n        \u003cspan class=\"bootstrap-title-accent\"\u003eGÖRGEL\u003c/span\u003e\n        \u003c/p\u003e\n      \u003c/div\u003e\n      \u003cdiv class=\"bootstrap-footer\"\u003e\n        \u003cdiv class=\"bootstrap-statement-group\"\u003e\n          \u003cp class=\"bootstrap-statement\"\u003eमैं Flutter, Dart और Go के साथ सॉफ्टवेयर तथा उसे प्रोडक्शन में विश्वसनीय रखने वाला इंफ्रास्ट्रक्चर बनाता हूँ।\u003c/p\u003e\n          \u003cdiv class=\"bootstrap-actions\"\u003e\n            \u003cspan class=\"bootstrap-action bootstrap-action--primary\"\u003eमेरा काम देखें\u003c/span\u003e\n            \u003cspan class=\"bootstrap-action\"\u003eईमेल करें\u003c/span\u003e\n          \u003c/div\u003e\n        \u003c/div\u003e\n        \u003cul class=\"bootstrap-facts\"\u003e\n      \u003cli class=\"bootstrap-fact\"\u003e\n        \u003cspan class=\"bootstrap-fact-label\"\u003eस्थान\u003c/span\u003e\n        अंताल्या, तुर्किये\n      \u003c/li\u003e\n      \u003cli class=\"bootstrap-fact\"\u003e\n        \u003cspan class=\"bootstrap-fact-label\"\u003eकाम की शुरुआत\u003c/span\u003e\n        2021\n      \u003c/li\u003e\n      \u003cli class=\"bootstrap-fact\"\u003e\n        \u003cspan class=\"bootstrap-fact-label\"\u003eफ़ोकस\u003c/span\u003e\n        Flutter और Dart\n      \u003c/li\u003e\n        \u003c/ul\u003e\n      \u003c/div\u003e\n    \u003c/div\u003e"}};
+        var selected = 'en';
+        try {
+          var stored = window.localStorage.getItem('flutter.selected_language');
+          if (stored !== null) {
+            var decoded = stored;
+            try { decoded = JSON.parse(stored); } catch (_) {}
+            if (typeof decoded === 'string') selected = decoded;
+          }
+        } catch (_) {}
+        if (!Object.prototype.hasOwnProperty.call(locales, selected)) {
+          selected = 'en';
+        }
+        var shell = document.querySelector('#bootstrap-surface .bootstrap-shell');
+        var surface = document.getElementById('bootstrap-surface');
+        document.documentElement.lang = selected;
+        document.documentElement.dir = locales[selected].direction;
+        document.title = locales[selected].title;
+        window.__portfolioBootstrapLocale = locales[selected].copy;
+        if (locales[selected].fontHref) {
+          var fontPreload = document.createElement('link');
+          fontPreload.rel = 'preload';
+          fontPreload.as = 'font';
+          fontPreload.type = 'font/ttf';
+          fontPreload.crossOrigin = 'anonymous';
+          fontPreload.href = locales[selected].fontHref;
+          document.head.appendChild(fontPreload);
+        }
+        if (surface) {
+          surface.setAttribute('aria-label', locales[selected].copy.loadingPortfolio);
+        }
+        if (shell) shell.outerHTML = locales[selected].markup;
+      })();
+    </script>
     <!-- bootstrap-content:end -->
   </div>
   <script src="flutter_bootstrap.js"></script>

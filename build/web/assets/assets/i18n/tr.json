@@ -9,7 +9,13 @@
   "accessibility": {
     "skip_to_content": "İçeriğe geç",
     "back_to_top": "Başa dön",
-    "language_menu": "Dil menüsü"
+    "go_home": "Ana sayfaya git",
+    "language_menu": "Dil menüsü",
+    "loading_portfolio": "Etkileşimli portföy yükleniyor",
+    "load_failure": "Portföy yüklenemedi. Lütfen yeniden deneyin.",
+    "retry": "Yeniden dene",
+    "language_not_saved": "Dil tercihiniz kaydedilemedi. Bu dil, bu ziyaret boyunca etkin kalacak.",
+    "language_change_failed": "Bu dil yüklenemedi. Mevcut diliniz kullanılmaya devam ediyor."
   },
   "about_section": {
     "title": "Hakkımda",
@@ -20,19 +26,19 @@
   },
   "projects_section": {
     "title": "Seçili Projeler",
-    "subtitle": "Güncel profesyonel ürünler, yayınlanmış uygulamalar ve kaynakla doğrulanan mühendislik çalışmaları.",
-    "selected_cases": "Profesyonel vakalar",
-    "evidence_index": "Kanıt dizini",
-    "evidence_intro": "Yayınlanmış ürünler ve açık mühendislik kayıtları, özgün ürün ve kaynak materyalleriyle birlikte.",
+    "subtitle": "Güncel profesyonel ürünler, yayınlanmış uygulamalar ve açık mühendislik çalışmaları.",
+    "selected_cases": "Vaka çalışmaları",
+    "evidence_index": "Diğer çalışmalar",
+    "evidence_intro": "Yayınlanmış ürünler ve açık kaynak projeleri, özgün arayüzleri ve depolarıyla birlikte.",
     "shipped_products": "Yayınlanan ürünler",
     "open_engineering": "Açık mühendislik",
-    "select_evidence": "Kanıtı seç",
+    "select_evidence": "Proje seç",
     "case_label": "Vaka",
     "index_label": "Dizin",
     "challenge": "Sorun",
     "approach": "Yaklaşım",
     "outcome": "Sonuç",
-    "open_evidence": "Kanıtı aç",
+    "open_evidence": "Projeyi görüntüle",
     "ownership": "Üstlendiğim alan",
     "decision": "Mühendislik odağı"
   },
@@ -48,17 +54,17 @@
   },
   "experience_section": {
     "title": "Deneyim",
-    "present": "Devam Ediyor"
+    "present": "Devam ediyor"
   },
   "proof_section": {
     "title": "Açık Kaynak",
-    "summary": "{merged} değişiklik upstream'e kabul edildi; {review} değişiklik daha incelemede.",
+    "summary": "Ana projelere kabul edilen {merged} değişiklik; incelemede {review} değişiklik daha var.",
     "featured_label": "Öne çıkan katkı",
-    "accepted_title": "Upstream'e kabul edilenler",
+    "accepted_title": "Ana projelere kabul edilenler",
     "review_title": "İncelemede",
     "problem_label": "Hata",
     "change_label": "Yama",
-    "open_pull_request": "Pull request'i görüntüle",
+    "open_pull_request": "Değişiklik isteğini görüntüle",
     "event_lab_label": "Olay sırası laboratuvarı",
     "event_lab_without_patch": "Yama olmadan",
     "event_lab_with_patch": "Yama ile",

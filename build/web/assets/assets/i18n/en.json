@@ -9,7 +9,13 @@
   "accessibility": {
     "skip_to_content": "Skip to content",
     "back_to_top": "Back to top",
-    "language_menu": "Language menu"
+    "go_home": "Go to home",
+    "language_menu": "Language menu",
+    "loading_portfolio": "Loading interactive portfolio",
+    "load_failure": "The portfolio could not load. Please try again.",
+    "retry": "Retry",
+    "language_not_saved": "Your language preference could not be saved. This language will remain active for this visit.",
+    "language_change_failed": "That language could not be loaded. Your current language is still active."
   },
   "about_section": {
     "title": "About",
@@ -20,19 +26,19 @@
   },
   "projects_section": {
     "title": "Selected Work",
-    "subtitle": "Current professional products, shipped releases, and source-backed engineering work.",
-    "selected_cases": "Professional cases",
-    "evidence_index": "Evidence index",
-    "evidence_intro": "Released products and public engineering records, shown through their original product and source material.",
+    "subtitle": "Current professional products, shipped releases, and public engineering work.",
+    "selected_cases": "Case studies",
+    "evidence_index": "More work",
+    "evidence_intro": "Released products and open-source projects, shown through their original interfaces and repositories.",
     "shipped_products": "Shipped products",
     "open_engineering": "Open engineering",
-    "select_evidence": "Select evidence",
+    "select_evidence": "Choose a project",
     "case_label": "Case",
     "index_label": "Index",
     "challenge": "The problem",
     "approach": "The approach",
     "outcome": "The result",
-    "open_evidence": "Open evidence",
+    "open_evidence": "View project",
     "ownership": "What I owned",
     "decision": "Engineering focus"
   },

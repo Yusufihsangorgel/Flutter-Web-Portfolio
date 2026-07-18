@@ -1,11 +1,11 @@
-import { chromium } from '@playwright/test';
-import { copyFile, mkdir, readFile } from 'node:fs/promises';
-import { fileURLToPath } from 'node:url';
-import path from 'node:path';
+import { chromium } from "@playwright/test";
+import { mkdir, readFile } from "node:fs/promises";
+import { fileURLToPath } from "node:url";
+import path from "node:path";
 
-const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const sources = path.join(root, 'tool', 'work_sources');
-const output = path.join(root, 'assets', 'work');
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+const sources = path.join(root, "tool", "work_sources");
+const output = path.join(root, "assets", "work");
 
 const boardWidth = 1600;
 const boardHeight = 1000;
@@ -23,265 +23,533 @@ try {
   });
 
   await renderLiveCapture(page, {
-    source: 'fugasoft-home.png',
-    output: 'fugasoft-product.jpg',
-    accessibleName: 'FugaSoft live product website',
+    source: "fugasoft-solutions.png",
+    output: "fugasoft-product.jpg",
+    accessibleName: "FugaSoft live product website",
   });
   await renderDorseBoard(page);
 
   await renderReleaseBoard(page, {
-    output: 'aydinlik-release.jpg',
-    eyebrow: 'PUBLIC APP STORE RELEASE',
-    title: 'Aydınlık\nE-Gazete',
-    descriptor: 'Daily edition, archive and audio reader',
-    platform: 'iOS · version 3.1.2',
-    icon: 'aydinlik-icon.jpg',
+    output: "aydinlik-release.jpg",
+    eyebrow: "APP STORE RELEASE",
+    title: "Aydınlık\nE-Gazete",
+    descriptor: "Daily edition, archive and audio reader",
+    platform: "iOS · version 3.1.2",
+    icon: "aydinlik-icon.jpg",
     screens: [
       {
-        file: 'aydinlik-edition.png',
-        label: 'DAILY EDITION',
+        file: "aydinlik-edition.png",
+        label: "DAILY EDITION",
       },
       {
-        file: 'aydinlik-reader.jpg',
-        label: 'AUDIO READER',
+        file: "aydinlik-reader.jpg",
+        label: "AUDIO READER",
       },
     ],
     palette: {
-      paper: '#f2efe7',
-      ink: '#151515',
-      accent: '#c80808',
-      stage: '#171717',
-      stageInk: '#f8f5ed',
-      rule: '#aaa69e',
+      paper: "#f2efe7",
+      ink: "#151515",
+      accent: "#c80808",
+      stage: "#171717",
+      stageInk: "#f8f5ed",
+      rule: "#aaa69e",
     },
   });
 
   await renderReleaseBoard(page, {
-    output: 'bilim-utopya-release.jpg',
-    eyebrow: 'PUBLIC APP STORE RELEASE',
-    title: 'Bilim ve\nÜtopya',
-    descriptor: 'Issue reader and subscriber archive',
-    platform: 'iOS · version 1.0.1',
-    icon: 'bilim-icon.jpg',
+    output: "bilim-utopya-release.jpg",
+    eyebrow: "APP STORE RELEASE",
+    title: "Bilim ve\nÜtopya",
+    descriptor: "Issue reader and subscriber archive",
+    platform: "iOS · version 1.0.1",
+    icon: "bilim-icon.jpg",
     screens: [
       {
-        file: 'bilim-cover.jpg',
-        label: 'LISTING ISSUE',
+        file: "bilim-cover.jpg",
+        label: "LISTING ISSUE",
       },
       {
-        file: 'bilim-archive.png',
-        label: 'SUBSCRIBER ARCHIVE',
+        file: "bilim-archive.png",
+        label: "SUBSCRIBER ARCHIVE",
       },
     ],
     palette: {
-      paper: '#f5f0e2',
-      ink: '#171717',
-      accent: '#e6b900',
-      stage: '#ffd83d',
-      stageInk: '#171717',
-      rule: '#a7975e',
-    },
-  });
-
-  await renderReleaseBoard(page, {
-    output: 'galvapedia-release.jpg',
-    eyebrow: 'PUBLIC APP STORE RELEASE',
-    title: 'Galvapedia',
-    descriptor: 'Industrial galvanizing reference and calculators',
-    platform: 'iOS · version 2.0.14',
-    icon: 'galvapedia-icon.jpg',
-    screens: [
-      {
-        file: 'galvapedia-home.png',
-        label: 'REFERENCE MODULES',
-      },
-      {
-        file: 'galvapedia-calculator.png',
-        label: 'ZINC CALCULATOR',
-      },
-    ],
-    palette: {
-      paper: '#eeeae2',
-      ink: '#181818',
-      accent: '#c90000',
-      stage: '#9d0000',
-      stageInk: '#fffaf2',
-      rule: '#a49c91',
+      paper: "#f5f0e2",
+      ink: "#171717",
+      accent: "#e6b900",
+      stage: "#ffd83d",
+      stageInk: "#171717",
+      rule: "#a7975e",
     },
   });
 
   await renderGatewayBoard(page);
 
-  await copyFile(
-    path.join(sources, 'queue-inspector-cover.png'),
-    path.join(output, 'queue-inspector.png'),
-  );
-  process.stdout.write(
-    'Copied assets/work/queue-inspector.png at its authored 1600x840 ratio.\n',
-  );
+  await renderArchitectureBoard(page, {
+    output: "queue-inspector.png",
+    eyebrow: "QUEUE INSPECTION",
+    title: "One interface.\nThree backends.",
+    descriptor:
+      "Six read-only MCP tools inspect Asynq, BullMQ, and Sidekiq without direct Redis editing.",
+    stages: [
+      "MCP CLIENT",
+      "6 READ-ONLY TOOLS",
+      "ASYNQ · BULLMQ · SIDEKIQ",
+      "REDIS",
+    ],
+    footer: "github.com/Yusufihsangorgel/queue-inspector-mcp",
+    footerLeft: "TYPESCRIPT · MCP · REDIS",
+    footerRight: "READ-ONLY BY DEFAULT",
+    palette: { paper: "#dce9ff", ink: "#111820", accent: "#1e51ff" },
+  });
+  await renderArchitectureBoard(page, {
+    output: "redis-task-queue.png",
+    eyebrow: "SERVER-SIDE DART",
+    title: "Weighted work.\nExplicit failures.",
+    descriptor:
+      "A Redis-backed Dart queue with weighted scheduling, retries, and an explicit dead-letter path.",
+    stages: [
+      "ENQUEUE",
+      "WEIGHTED QUEUE",
+      "WORKER",
+      "RETRY POLICY",
+      "DEAD LETTER",
+    ],
+    footer: "github.com/Yusufihsangorgel/redis_task_queue",
+    footerLeft: "DART · REDIS",
+    footerRight: "RETRIES · DEAD LETTERS",
+    palette: { paper: "#f2e6da", ink: "#171311", accent: "#b82418" },
+  });
+  await renderArchitectureBoard(page, {
+    output: "portfolio-current.jpg",
+    eyebrow: "FLUTTER WEB RUNTIME",
+    title: "Canonical data.\nLocalized runtime.",
+    descriptor:
+      "Canonical data, complete locale overlays, accessible Flutter UI, Dart Wasm output, and browser regression tests.",
+    stages: [
+      "CANONICAL CONTENT",
+      "7 LOCALES",
+      "FLUTTER UI",
+      "DART WASM · SKWASM",
+      "PLAYWRIGHT",
+    ],
+    footer: "developeryusuf.com · production architecture",
+    footerLeft: "FLUTTER 3.44.6 · DART WASM",
+    footerRight: "7 LOCALES · PLAYWRIGHT",
+    palette: { paper: "#f2eee5", ink: "#12110f", accent: "#1e51ff" },
+  });
+  await renderConstellationBoard(page);
 
   await renderCompactLandscapeBoard(page, {
-    source: 'fugasoft-home.png',
+    source: "fugasoft-solutions.png",
     sourceDirectory: sources,
-    output: 'fugasoft-product-compact.jpg',
-    eyebrow: 'CURRENT PROFESSIONAL PRODUCT',
-    title: 'FugaSoft',
-    descriptor: 'ERP and point-of-sale product family · fugasoft.com',
+    output: "fugasoft-product-compact.jpg",
+    eyebrow: "OFFICIAL PRODUCT LINE",
+    title: "FugaSoft",
+    descriptor: "ERP and point-of-sale product family · fugasoft.com",
     palette: {
-      paper: '#f2eee7',
-      ink: '#151515',
-      accent: '#ed0051',
-      stage: '#ffffff',
-      stageInk: '#151515',
+      paper: "#f2eee7",
+      ink: "#151515",
+      accent: "#ed0051",
+      stage: "#ffffff",
+      stageInk: "#151515",
     },
-    position: 'center top',
-    fit: 'cover',
+    position: "center top",
+    fit: "cover",
   });
   await renderCompactDorseBoard(page);
   await renderCompactReleaseBoard(page, {
-    output: 'aydinlik-release-compact.jpg',
-    eyebrow: 'PUBLIC APP STORE RELEASE',
-    title: 'Aydınlık E-Gazete',
-    descriptor: 'Daily edition and audio reader',
-    platform: 'iOS · version 3.1.2',
-    icon: 'aydinlik-icon.jpg',
-    screens: ['aydinlik-edition.png', 'aydinlik-reader.jpg'],
+    output: "aydinlik-release-compact.jpg",
+    eyebrow: "APP STORE RELEASE",
+    title: "Aydınlık E-Gazete",
+    descriptor: "Daily edition and audio reader",
+    platform: "iOS · version 3.1.2",
+    icon: "aydinlik-icon.jpg",
+    screens: ["aydinlik-edition.png", "aydinlik-reader.jpg"],
     palette: {
-      paper: '#f2efe7',
-      ink: '#151515',
-      accent: '#c80808',
-      stage: '#171717',
-      stageInk: '#f8f5ed',
+      paper: "#f2efe7",
+      ink: "#151515",
+      accent: "#c80808",
+      stage: "#171717",
+      stageInk: "#f8f5ed",
     },
   });
   await renderCompactReleaseBoard(page, {
-    output: 'bilim-utopya-release-compact.jpg',
-    eyebrow: 'PUBLIC APP STORE RELEASE',
-    title: 'Bilim ve Ütopya',
-    descriptor: 'Issue reader and subscriber archive',
-    platform: 'iOS · version 1.0.1',
-    icon: 'bilim-icon.jpg',
-    screens: ['bilim-cover.jpg', 'bilim-archive.png'],
+    output: "bilim-utopya-release-compact.jpg",
+    eyebrow: "APP STORE RELEASE",
+    title: "Bilim ve Ütopya",
+    descriptor: "Issue reader and subscriber archive",
+    platform: "iOS · version 1.0.1",
+    icon: "bilim-icon.jpg",
+    screens: ["bilim-cover.jpg", "bilim-archive.png"],
     palette: {
-      paper: '#f5f0e2',
-      ink: '#171717',
-      accent: '#e6b900',
-      stage: '#ffd83d',
-      stageInk: '#171717',
+      paper: "#f5f0e2",
+      ink: "#171717",
+      accent: "#e6b900",
+      stage: "#ffd83d",
+      stageInk: "#171717",
     },
   });
-  await renderCompactReleaseBoard(page, {
-    output: 'galvapedia-release-compact.jpg',
-    eyebrow: 'PUBLIC APP STORE RELEASE',
-    title: 'Galvapedia',
-    descriptor: 'Industrial reference and calculators',
-    platform: 'iOS · version 2.0.14',
-    icon: 'galvapedia-icon.jpg',
-    screens: ['galvapedia-home.png', 'galvapedia-calculator.png'],
+  await renderCompactArchitectureBoard(page, {
+    output: "queue-inspector-compact.jpg",
+    eyebrow: "QUEUE INSPECTION",
+    title: "Queue Inspector MCP",
+    descriptor: "Six read-only tools across Asynq, BullMQ, and Sidekiq",
+    stages: ["MCP CLIENT", "READ-ONLY TOOLS", "3 QUEUE ADAPTERS", "REDIS"],
     palette: {
-      paper: '#eeeae2',
-      ink: '#181818',
-      accent: '#c90000',
-      stage: '#9d0000',
-      stageInk: '#fffaf2',
+      paper: "#dce9ff",
+      ink: "#111820",
+      accent: "#1e51ff",
+      stage: "#0d141c",
+      stageInk: "#dce9ff",
     },
   });
-  await renderCompactLandscapeBoard(page, {
-    source: 'queue-inspector.png',
-    sourceDirectory: output,
-    output: 'queue-inspector-compact.jpg',
-    eyebrow: 'OPEN ENGINEERING',
-    title: 'Queue Inspector MCP',
-    descriptor: 'Typed inspection and guarded Redis queue recovery',
+  await renderCompactArchitectureBoard(page, {
+    output: "go-multitenant-gateway-compact.jpg",
+    eyebrow: "REQUEST PIPELINE",
+    title: "Multi-tenant Gateway",
+    descriptor: "Explicit middleware order in one Go binary",
+    stages: [
+      "PUBLIC HEALTH",
+      "TENANT CONTEXT",
+      "RATE LIMIT",
+      "JWT AUTH",
+      "MODULE",
+    ],
     palette: {
-      paper: '#dce9ff',
-      ink: '#111820',
-      accent: '#1e51ff',
-      stage: '#0d141c',
-      stageInk: '#dce9ff',
+      paper: "#dce9ff",
+      ink: "#111820",
+      accent: "#1e51ff",
+      stage: "#0c1218",
+      stageInk: "#dce9ff",
     },
-    position: 'center',
-    fit: 'contain',
   });
-  await renderCompactLandscapeBoard(page, {
-    source: 'go-multitenant-gateway.jpg',
-    sourceDirectory: output,
-    output: 'go-multitenant-gateway-compact.jpg',
-    eyebrow: 'OPEN ENGINEERING',
-    title: 'Multi-tenant Gateway',
-    descriptor: 'Actual Go request wiring and middleware order',
+  await renderCompactArchitectureBoard(page, {
+    output: "redis-task-queue-compact.jpg",
+    eyebrow: "SERVER-SIDE DART",
+    title: "Redis Task Queue",
+    descriptor: "Server-side Dart queue with retries and dead letters",
+    stages: [
+      "ENQUEUE",
+      "WEIGHTED QUEUE",
+      "WORKER",
+      "RETRY POLICY",
+      "DEAD LETTER",
+    ],
     palette: {
-      paper: '#dce9ff',
-      ink: '#111820',
-      accent: '#1e51ff',
-      stage: '#0c1218',
-      stageInk: '#dce9ff',
+      paper: "#dce9ff",
+      ink: "#111820",
+      accent: "#1e51ff",
+      stage: "#0d141c",
+      stageInk: "#dce9ff",
     },
-    position: 'center',
-    fit: 'contain',
-  });
-  await renderCompactLandscapeBoard(page, {
-    source: 'redis-task-queue.png',
-    sourceDirectory: output,
-    output: 'redis-task-queue-compact.jpg',
-    eyebrow: 'OPEN ENGINEERING',
-    title: 'Redis Task Queue',
-    descriptor: 'Server-side Dart queue with retries and dead letters',
-    palette: {
-      paper: '#dce9ff',
-      ink: '#111820',
-      accent: '#1e51ff',
-      stage: '#0d141c',
-      stageInk: '#dce9ff',
-    },
-    position: 'center',
-    fit: 'contain',
   });
   await renderCompactLandscapeBoard(page, {
-    source: 'constellation-demo.png',
+    source: "constellation-demo.png",
     sourceDirectory: output,
-    output: 'constellation-demo-compact.jpg',
-    eyebrow: 'OPEN ENGINEERING',
-    title: 'Constellation Particles',
-    descriptor: 'A reusable Flutter rendering package in motion',
+    output: "constellation-demo-compact.jpg",
+    eyebrow: "OPEN ENGINEERING",
+    title: "Constellation Particles",
+    descriptor: "A reusable Flutter rendering package in motion",
     palette: {
-      paper: '#dff8f2',
-      ink: '#101820',
-      accent: '#1f9d8b',
-      stage: '#07111c',
-      stageInk: '#dff8f2',
+      paper: "#dff8f2",
+      ink: "#101820",
+      accent: "#1f9d8b",
+      stage: "#07111c",
+      stageInk: "#dff8f2",
     },
-    position: 'center',
-    fit: 'cover',
+    position: "center",
+    fit: "cover",
   });
-  await renderCompactLandscapeBoard(page, {
-    source: 'portfolio-current.jpg',
-    sourceDirectory: output,
-    output: 'portfolio-current-compact.jpg',
-    eyebrow: 'VERIFIED PREVIEW',
-    title: 'Flutter Web Portfolio',
-    descriptor: 'The current Wasm release and selected-work document',
+  await renderCompactArchitectureBoard(page, {
+    output: "portfolio-current-compact.jpg",
+    eyebrow: "FLUTTER WEB RUNTIME",
+    title: "Flutter Web Portfolio",
+    descriptor: "Canonical content to localized, tested browser output",
+    stages: ["CONTENT", "7 LOCALES", "FLUTTER UI", "DART WASM", "PLAYWRIGHT"],
     palette: {
-      paper: '#f2eee5',
-      ink: '#12110f',
-      accent: '#1e51ff',
-      stage: '#f2eee5',
-      stageInk: '#12110f',
+      paper: "#f2eee5",
+      ink: "#12110f",
+      accent: "#1e51ff",
+      stage: "#f2eee5",
+      stageInk: "#12110f",
     },
-    position: 'center top',
-    fit: 'cover',
   });
 } finally {
   await browser.close();
 }
 
+async function renderArchitectureBoard(page, config) {
+  const stages = config.stages
+    .map(
+      (stage, index) => `
+        <li>
+          <span>${String(index + 1).padStart(2, "0")}</span>
+          <strong>${escapeHtml(stage)}</strong>
+        </li>`,
+    )
+    .join("");
+  const title = config.title
+    .split("\n")
+    .map((line) => `<span>${escapeHtml(line)}</span>`)
+    .join("");
+  const { paper, ink, accent } = config.palette;
+  const html = documentShell(
+    `
+    <main class="architecture" aria-label="${escapeHtml(config.title.replace("\n", " "))}">
+      <header>
+        <p class="eyebrow">${escapeHtml(config.eyebrow)}</p>
+        <p class="repo">${escapeHtml(config.footer)}</p>
+      </header>
+      <section class="intro">
+        <h1>${title}</h1>
+        <p>${escapeHtml(config.descriptor)}</p>
+      </section>
+      <ol>${stages}</ol>
+      <footer>
+        <span>${escapeHtml(config.footerLeft)}</span>
+        <span>${escapeHtml(config.footerRight)}</span>
+      </footer>
+    </main>
+  `,
+    `
+    :root { --paper: ${paper}; --ink: ${ink}; --accent: ${accent}; }
+    .architecture {
+      position: relative;
+      width: ${boardWidth}px;
+      height: ${boardHeight}px;
+      overflow: hidden;
+      padding: 54px 68px 48px;
+      color: var(--ink);
+      background: var(--paper);
+    }
+    .architecture::before {
+      position: absolute;
+      inset: 0 auto 0 0;
+      width: 12px;
+      content: '';
+      background: var(--accent);
+    }
+    header, footer {
+      display: flex;
+      justify-content: space-between;
+      padding-bottom: 18px;
+      border-bottom: 1px solid color-mix(in srgb, var(--ink) 28%, transparent);
+      font-size: 13px;
+      font-weight: 750;
+      letter-spacing: 0.1em;
+    }
+    header p, footer { margin: 0; }
+    .eyebrow { color: var(--accent); }
+    .repo { color: color-mix(in srgb, var(--ink) 64%, transparent); }
+    .intro {
+      display: grid;
+      grid-template-columns: minmax(0, 1.08fr) minmax(360px, 0.62fr);
+      gap: 90px;
+      align-items: end;
+      margin-top: 74px;
+    }
+    h1 {
+      display: grid;
+      margin: 0;
+      font-size: 76px;
+      font-weight: 820;
+      letter-spacing: -0.06em;
+      line-height: 0.94;
+    }
+    .intro > p {
+      margin: 0 0 8px;
+      color: color-mix(in srgb, var(--ink) 74%, transparent);
+      font-size: 24px;
+      font-weight: 520;
+      line-height: 1.45;
+    }
+    ol {
+      display: grid;
+      grid-template-columns: repeat(${config.stages.length}, minmax(0, 1fr));
+      gap: 12px;
+      padding: 0;
+      margin: 92px 0 0;
+      list-style: none;
+    }
+    li {
+      position: relative;
+      min-height: 220px;
+      padding: 28px 24px;
+      border: 1px solid color-mix(in srgb, var(--ink) 34%, transparent);
+      background: color-mix(in srgb, var(--paper) 90%, white);
+    }
+    li:not(:last-child)::after {
+      position: absolute;
+      top: 50%;
+      right: -17px;
+      z-index: 2;
+      width: 22px;
+      height: 2px;
+      content: '';
+      background: var(--accent);
+    }
+    li span {
+      display: block;
+      color: var(--accent);
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+    }
+    li strong {
+      display: block;
+      margin-top: 92px;
+      font-size: 19px;
+      font-weight: 760;
+      letter-spacing: -0.025em;
+      line-height: 1.15;
+    }
+    footer {
+      position: absolute;
+      right: 68px;
+      bottom: 44px;
+      left: 68px;
+      padding: 18px 0 0;
+      border-top: 1px solid color-mix(in srgb, var(--ink) 28%, transparent);
+      border-bottom: 0;
+      color: color-mix(in srgb, var(--ink) 62%, transparent);
+      font-size: 11px;
+    }
+  `,
+  );
+  await renderPage(page, html, config.output);
+}
+
+async function renderCompactArchitectureBoard(page, config) {
+  const stages = config.stages
+    .map(
+      (stage, index) => `
+        <li>
+          <span>${String(index + 1).padStart(2, "0")}</span>
+          <strong>${escapeHtml(stage)}</strong>
+        </li>`,
+    )
+    .join("");
+  const { paper, ink, accent, stage, stageInk } = config.palette;
+  const html = compactDocumentShell(
+    `
+    <main class="compact-architecture" aria-label="${escapeHtml(config.title)}">
+      <header>
+        <div class="top-rule"></div>
+        <p class="eyebrow">${escapeHtml(config.eyebrow)}</p>
+        <h1>${escapeHtml(config.title)}</h1>
+        <p class="descriptor">${escapeHtml(config.descriptor)}</p>
+      </header>
+      <section>
+        <ol>${stages}</ol>
+      </section>
+    </main>
+  `,
+    `
+    :root {
+      --paper: ${paper}; --ink: ${ink}; --accent: ${accent};
+      --stage: ${stage}; --stage-ink: ${stageInk};
+    }
+    .compact-architecture {
+      width: ${compactWidth}px;
+      height: ${compactHeight}px;
+      overflow: hidden;
+      color: var(--ink);
+      background: var(--paper);
+    }
+    header { height: 370px; padding: 44px 52px 32px; }
+    .top-rule { height: 6px; background: var(--accent); }
+    .eyebrow {
+      margin: 24px 0 0;
+      color: var(--accent);
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0.11em;
+    }
+    h1 {
+      margin: 48px 0 0;
+      font-size: 62px;
+      font-weight: 840;
+      letter-spacing: -0.058em;
+      line-height: 0.94;
+    }
+    .descriptor {
+      max-width: 760px;
+      margin: 20px 0 0;
+      color: color-mix(in srgb, var(--ink) 74%, transparent);
+      font-size: 22px;
+      line-height: 1.35;
+    }
+    section {
+      height: 830px;
+      padding: 46px 52px;
+      color: var(--stage-ink);
+      background: var(--stage);
+    }
+    ol { padding: 0; margin: 0; list-style: none; }
+    li {
+      display: grid;
+      grid-template-columns: 72px 1fr;
+      min-height: ${Math.floor(700 / config.stages.length)}px;
+      align-items: center;
+      border-top: 1px solid color-mix(in srgb, var(--stage-ink) 34%, transparent);
+    }
+    li:last-child { border-bottom: 1px solid color-mix(in srgb, var(--stage-ink) 34%, transparent); }
+    li span { color: var(--accent); font-size: 14px; font-weight: 800; }
+    li strong { font-size: 25px; font-weight: 720; letter-spacing: -0.02em; }
+  `,
+  );
+  await renderCompactPage(page, html, config.output);
+}
+
+async function renderConstellationBoard(page) {
+  const demo = await imageDataUrl("constellation-demo.png");
+  const html = documentShell(
+    `
+    <main class="constellation" aria-label="Constellation Particles rendering demo">
+      <section class="copy">
+        <p class="eyebrow">FLUTTER RENDERING PACKAGE</p>
+        <h1>Local neighbours,<br />not every pair.</h1>
+        <p class="descriptor">A dependency-free CustomPainter field with pointer interaction and spatial-grid lookup.</p>
+        <ul>
+          <li>CustomPainter</li><li>Pointer input</li><li>Spatial grid</li><li>No runtime dependencies</li>
+        </ul>
+      </section>
+      <section class="demo"><img src="${demo}" alt="" /></section>
+    </main>
+  `,
+    `
+    .constellation {
+      display: grid;
+      grid-template-columns: 620px 980px;
+      width: ${boardWidth}px;
+      height: ${boardHeight}px;
+      overflow: hidden;
+      color: #eafbf6;
+      background: #07111c;
+    }
+    .copy { padding: 64px 58px 52px 72px; border-right: 1px solid #28404a; }
+    .eyebrow { margin: 0; color: #58d6bf; font-size: 14px; font-weight: 800; letter-spacing: .1em; }
+    h1 { margin: 92px 0 0; font-size: 68px; line-height: .96; letter-spacing: -.055em; }
+    .descriptor { margin: 34px 0 0; color: #a9c2c4; font-size: 23px; line-height: 1.45; }
+    ul { padding: 0; margin: 94px 0 0; list-style: none; border-top: 1px solid #35505a; }
+    li { padding: 16px 0; border-bottom: 1px solid #35505a; font-size: 14px; font-weight: 700; letter-spacing: .06em; }
+    .demo { display: grid; place-items: center; padding: 70px; background: #0b1825; }
+    .demo img { display: block; width: 840px; height: 525px; object-fit: cover; border: 1px solid #58d6bf; }
+  `,
+  );
+  await renderPage(page, html, "constellation-demo.png");
+}
+
 async function renderLiveCapture(page, config) {
   const source = await imageDataUrl(config.source);
-  const html = documentShell(`
+  const html = documentShell(
+    `
     <main class="live-capture" aria-label="${escapeHtml(config.accessibleName)}">
       <img src="${source}" alt="" />
     </main>
-  `, `
+  `,
+    `
     .live-capture {
       width: ${boardWidth}px;
       height: ${boardHeight}px;
@@ -296,17 +564,19 @@ async function renderLiveCapture(page, config) {
       object-fit: cover;
       object-position: center top;
     }
-  `);
+  `,
+  );
   await renderPage(page, html, config.output);
 }
 
 async function renderDorseBoard(page) {
-  const productScreen = await imageDataUrl('dorse-vehicle-settings.jpeg');
-  const html = documentShell(`
+  const productScreen = await imageDataUrl("dorse-vehicle-settings.jpeg");
+  const html = documentShell(
+    `
     <main class="dorse" aria-label="Dorse public product evidence">
       <section class="copy">
         <div class="top-rule"></div>
-        <p class="eyebrow">PUBLIC PRODUCT SURFACE</p>
+        <p class="eyebrow">PRODUCT WORKFLOW</p>
         <p class="wordmark">dorse</p>
         <h1>Fleet vehicle<br />and trailer<br />management.</h1>
         <p class="descriptor">
@@ -315,7 +585,7 @@ async function renderDorseBoard(page) {
         </p>
         <div class="facts">
           <p>FLUTTER MOBILE CLIENT</p>
-          <p>FIRST-PARTY COMPANY-SITE SCREEN</p>
+          <p>PUBLIC COMPANY MATERIAL</p>
           <p>PUBLIC CAPTURE · 2026</p>
         </div>
       </section>
@@ -337,7 +607,8 @@ async function renderDorseBoard(page) {
         <div class="stage-rule"></div>
       </section>
     </main>
-  `, `
+  `,
+    `
     .dorse {
       display: grid;
       grid-template-columns: 610px 990px;
@@ -486,18 +757,20 @@ async function renderDorseBoard(page) {
       height: 2px;
       background: #f65049;
     }
-  `);
+  `,
+  );
 
-  await renderPage(page, html, 'dorse-product.jpg');
+  await renderPage(page, html, "dorse-product.jpg");
 }
 
 async function renderCompactDorseBoard(page) {
-  const productScreen = await imageDataUrl('dorse-vehicle-settings.jpeg');
-  const html = compactDocumentShell(`
+  const productScreen = await imageDataUrl("dorse-vehicle-settings.jpeg");
+  const html = compactDocumentShell(
+    `
     <main class="compact-dorse" aria-label="Dorse compact product evidence">
       <header>
         <div class="top-rule"></div>
-        <p class="eyebrow">PUBLIC PRODUCT SURFACE</p>
+        <p class="eyebrow">PRODUCT WORKFLOW</p>
         <h1>Dorse</h1>
         <p class="descriptor">Fleet vehicle and trailer management</p>
       </header>
@@ -519,7 +792,8 @@ async function renderCompactDorseBoard(page) {
         </aside>
       </section>
     </main>
-  `, `
+  `,
+    `
     .compact-dorse {
       width: ${compactWidth}px;
       height: ${compactHeight}px;
@@ -578,8 +852,8 @@ async function renderCompactDorseBoard(page) {
       position: absolute;
       top: 40px;
       left: 52px;
-      width: 438px;
-      height: 948px;
+      width: 390px;
+      height: 844px;
       margin: 0;
       overflow: hidden;
       background: #fff;
@@ -628,9 +902,10 @@ async function renderCompactDorseBoard(page) {
     .facts span:last-child {
       border-bottom: 1px solid #5a5651;
     }
-  `);
+  `,
+  );
 
-  await renderCompactPage(page, html, 'dorse-product-compact.jpg');
+  await renderCompactPage(page, html, "dorse-product-compact.jpg");
 }
 
 async function renderCompactReleaseBoard(page, config) {
@@ -640,7 +915,8 @@ async function renderCompactReleaseBoard(page, config) {
     imageDataUrl(config.screens[1]),
   ]);
   const palette = config.palette;
-  const html = compactDocumentShell(`
+  const html = compactDocumentShell(
+    `
     <main class="compact-release" aria-label="${escapeHtml(config.title)} compact release evidence">
       <header>
         <div class="top-rule"></div>
@@ -665,7 +941,8 @@ async function renderCompactReleaseBoard(page, config) {
         <p class="platform">${escapeHtml(config.platform)}</p>
       </section>
     </main>
-  `, `
+  `,
+    `
     :root {
       --paper: ${palette.paper};
       --ink: ${palette.ink};
@@ -783,7 +1060,8 @@ async function renderCompactReleaseBoard(page, config) {
       padding-top: 18px;
       border-top: 2px solid var(--stage-ink);
     }
-  `);
+  `,
+  );
 
   await renderCompactPage(page, html, config.output);
 }
@@ -793,7 +1071,8 @@ async function renderCompactLandscapeBoard(page, config) {
     path.join(config.sourceDirectory, config.source),
   );
   const palette = config.palette;
-  const html = compactDocumentShell(`
+  const html = compactDocumentShell(
+    `
     <main class="compact-landscape" aria-label="${escapeHtml(config.title)} compact evidence">
       <header>
         <div class="top-rule"></div>
@@ -806,12 +1085,13 @@ async function renderCompactLandscapeBoard(page, config) {
           <img src="${source}" alt="" />
         </div>
         <footer>
-          <span>FIRST-PARTY / SOURCE-BACKED</span>
-          <span>COMPACT VIEW</span>
+          <span>${escapeHtml(config.eyebrow)}</span>
+          <span>PROJECT VIEW</span>
         </footer>
       </section>
     </main>
-  `, `
+  `,
+    `
     :root {
       --paper: ${palette.paper};
       --ink: ${palette.ink};
@@ -899,7 +1179,8 @@ async function renderCompactLandscapeBoard(page, config) {
       border-top: 1px solid color-mix(in srgb, var(--stage-ink) 60%, transparent);
       font-size: 11px;
     }
-  `);
+  `,
+  );
 
   await renderCompactPage(page, html, config.output);
 }
@@ -911,15 +1192,16 @@ async function renderReleaseBoard(page, config) {
     imageDataUrl(config.screens[1].file),
   ]);
   const titleLines = config.title
-    .split('\n')
+    .split("\n")
     .map((line) => `<span>${escapeHtml(line)}</span>`)
-    .join('');
+    .join("");
   const palette = config.palette;
 
-  const html = documentShell(`
+  const html = documentShell(
+    `
     <main
       class="release"
-      aria-label="${escapeHtml(config.title.replace('\n', ' '))} release evidence"
+      aria-label="${escapeHtml(config.title.replace("\n", " "))} release evidence"
     >
       <section class="release-copy">
         <div class="top-rule"></div>
@@ -928,9 +1210,9 @@ async function renderReleaseBoard(page, config) {
         <h1>${titleLines}</h1>
         <p class="descriptor">${escapeHtml(config.descriptor)}</p>
         <div class="release-facts">
-          <p>SHIPPED PRODUCT</p>
+          <p>PUBLIC APP STORE LISTING</p>
           <p>${escapeHtml(config.platform)}</p>
-          <p>FIRST-PARTY LISTING EVIDENCE</p>
+          <p>PHONE + TABLET SURFACES</p>
         </div>
       </section>
       <section class="screen-stage">
@@ -950,7 +1232,8 @@ async function renderReleaseBoard(page, config) {
         <div class="stage-rule"></div>
       </section>
     </main>
-  `, `
+  `,
+    `
     :root {
       --paper: ${palette.paper};
       --ink: ${palette.ink};
@@ -1106,7 +1389,8 @@ async function renderReleaseBoard(page, config) {
       height: 2px;
       background: var(--stage-ink);
     }
-  `);
+  `,
+  );
 
   await renderPage(page, html, config.output);
 }
@@ -1114,33 +1398,31 @@ async function renderReleaseBoard(page, config) {
 async function renderGatewayBoard(page) {
   const source = (
     await readFile(
-      path.join(sources, 'go-multitenant-gateway-server.go.txt'),
-      'utf8',
+      path.join(sources, "go-multitenant-gateway-server.go.txt"),
+      "utf8",
     )
   ).trimEnd();
   const code = source
-    .split('\n')
+    .split("\n")
     .map((line, index) => {
       const renderedLine =
-        line.length === 0
-          ? '&nbsp;'
-          : syntaxHighlightGo(escapeHtml(line));
+        line.length === 0 ? "&nbsp;" : syntaxHighlightGo(escapeHtml(line));
       return `
         <div class="code-line">
-          <span class="line-number">${String(index + 1).padStart(2, '0')}</span>
+          <span class="line-number">${String(index + 1).padStart(2, "0")}</span>
           <code>${renderedLine}</code>
         </div>
       `;
     })
-    .join('');
+    .join("");
 
   const steps = [
-    ['01', 'recover.New()', 'panic boundary'],
-    ['02', 'health.New()', 'public before chain'],
-    ['03', 'tenantMW', 'registered tenant context'],
-    ['04', 'limiter', 'per-tenant budget'],
-    ['05', 'mw.Auth(…)', 'bearer verification'],
-    ['06', 'notesModule', 'module handler'],
+    ["01", "recover.New()", "panic boundary"],
+    ["02", "health.New()", "public before chain"],
+    ["03", "tenantMW", "registered tenant context"],
+    ["04", "limiter", "per-tenant budget"],
+    ["05", "mw.Auth(…)", "bearer verification"],
+    ["06", "notesModule", "module handler"],
   ]
     .map(
       ([index, name, note]) => `
@@ -1153,9 +1435,10 @@ async function renderGatewayBoard(page) {
         </li>
       `,
     )
-    .join('');
+    .join("");
 
-  const html = documentShell(`
+  const html = documentShell(
+    `
     <main class="gateway" aria-label="Go multi-tenant gateway source evidence">
       <header>
         <p class="repo">github.com/Yusufihsangorgel/go-multitenant-gateway</p>
@@ -1181,7 +1464,8 @@ async function renderGatewayBoard(page) {
         <span>REFERENCE IMPLEMENTATION · GO / FIBER</span>
       </footer>
     </main>
-  `, `
+  `,
+    `
     .gateway {
       position: relative;
       width: ${boardWidth}px;
@@ -1360,14 +1644,15 @@ async function renderGatewayBoard(page) {
       border-top: 1px solid #34404a;
       font-size: 12px;
     }
-  `);
+  `,
+  );
 
-  await renderPage(page, html, 'go-multitenant-gateway.jpg');
+  await renderPage(page, html, "go-multitenant-gateway.jpg");
 }
 
 async function renderPage(page, html, outputFile) {
   await page.setViewportSize({ width: boardWidth, height: boardHeight });
-  await page.setContent(html, { waitUntil: 'load' });
+  await page.setContent(html, { waitUntil: "load" });
   await page.evaluate(async () => {
     await document.fonts.ready;
     await Promise.all(
@@ -1377,19 +1662,19 @@ async function renderPage(page, html, outputFile) {
     );
   });
   const target = path.join(output, outputFile);
-  const jpeg = path.extname(outputFile).toLowerCase() === '.jpg';
+  const jpeg = path.extname(outputFile).toLowerCase() === ".jpg";
   await page.screenshot({
     path: target,
-    type: jpeg ? 'jpeg' : 'png',
+    type: jpeg ? "jpeg" : "png",
     quality: jpeg ? 86 : undefined,
-    animations: 'disabled',
+    animations: "disabled",
   });
   process.stdout.write(`Rendered assets/work/${outputFile} at 1600x1000.\n`);
 }
 
 async function renderCompactPage(page, html, outputFile) {
   await page.setViewportSize({ width: compactWidth, height: compactHeight });
-  await page.setContent(html, { waitUntil: 'load' });
+  await page.setContent(html, { waitUntil: "load" });
   await page.evaluate(async () => {
     await document.fonts.ready;
     await Promise.all(
@@ -1401,9 +1686,9 @@ async function renderCompactPage(page, html, outputFile) {
   const target = path.join(output, outputFile);
   await page.screenshot({
     path: target,
-    type: 'jpeg',
+    type: "jpeg",
     quality: 88,
-    animations: 'disabled',
+    animations: "disabled",
   });
   process.stdout.write(
     `Rendered assets/work/${outputFile} at ${compactWidth}x${compactHeight}.\n`,
@@ -1480,16 +1765,16 @@ async function imageDataUrlFrom(filePath) {
   const fileName = path.basename(filePath);
   const extension = path.extname(fileName).toLowerCase();
   const mime =
-    extension === '.png'
-      ? 'image/png'
-      : extension === '.jpg' || extension === '.jpeg'
-        ? 'image/jpeg'
+    extension === ".png"
+      ? "image/png"
+      : extension === ".jpg" || extension === ".jpeg"
+        ? "image/jpeg"
         : null;
   if (mime === null) {
     throw new Error(`Unsupported image extension: ${extension}`);
   }
   const data = await readFile(filePath);
-  return `data:${mime};base64,${data.toString('base64')}`;
+  return `data:${mime};base64,${data.toString("base64")}`;
 }
 
 function syntaxHighlightGo(value) {
@@ -1506,9 +1791,9 @@ function syntaxHighlightGo(value) {
 
 function escapeHtml(value) {
   return value
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;')
-    .replaceAll('"', '&quot;')
-    .replaceAll("'", '&#039;');
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
 }
