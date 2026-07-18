@@ -16,11 +16,11 @@ import 'package:flutter_web_portfolio/app/modules/home/sections/proof_section.da
 import 'package:flutter_web_portfolio/app/widgets/back_to_top_button.dart';
 import 'package:flutter_web_portfolio/app/widgets/command_palette.dart';
 import 'package:flutter_web_portfolio/app/widgets/custom_sliver_app_bar.dart';
-import 'package:flutter_web_portfolio/app/widgets/premium_footer.dart';
+import 'package:flutter_web_portfolio/app/widgets/portfolio_footer.dart';
 import 'package:flutter_web_portfolio/app/widgets/narrative_chapter_handoff.dart';
 import 'package:flutter_web_portfolio/app/widgets/narrative_stage.dart';
 import 'package:flutter_web_portfolio/app/utils/motion_preference.dart';
-import 'package:flutter_web_portfolio/app/widgets/background/cinematic_background.dart';
+import 'package:flutter_web_portfolio/app/widgets/background/narrative_background.dart';
 import 'package:flutter_web_portfolio/app/narrative/domain/narrative_document.dart';
 
 /// A single, semantic portfolio document with measured section navigation.
@@ -110,7 +110,7 @@ class _HomeViewState extends State<HomeView> {
   ) => Stack(
     children: [
       const Positioned.fill(
-        child: RepaintBoundary(child: CinematicBackground()),
+        child: RepaintBoundary(child: NarrativeBackground()),
       ),
       // Skip-to-content link (accessibility)
       Positioned(
@@ -166,7 +166,7 @@ class _HomeViewState extends State<HomeView> {
                   child: Column(
                     children: [
                       ..._buildChapters(context, scrollController, narrative),
-                      const PremiumFooter(),
+                      const PortfolioFooter(),
                     ],
                   ),
                 ),

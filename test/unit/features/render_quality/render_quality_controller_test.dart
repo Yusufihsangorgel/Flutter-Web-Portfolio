@@ -48,16 +48,16 @@ void main() {
       expect(controller.state.adaptationCount, 1);
     });
 
-    test('maps a verified upward probe to the cinematic tier', () {
+    test('maps a verified upward probe to the full tier', () {
       timingSource.emitRepeated(_healthyFrame, 4);
 
-      expect(controller.state.quality, RenderQuality.cinematic);
+      expect(controller.state.quality, RenderQuality.full);
       expect(controller.state.reason, RenderQualityReason.sustainedHeadroom);
       expect(controller.state.probing, isTrue);
 
       timingSource.emitRepeated(_healthyFrame, 4);
 
-      expect(controller.state.quality, RenderQuality.cinematic);
+      expect(controller.state.quality, RenderQuality.full);
       expect(controller.state.probing, isFalse);
       expect(controller.state.adaptationCount, 1);
     });
@@ -103,10 +103,10 @@ void main() {
     test('reduce decoration without changing content semantics', () {
       expect(RenderQuality.essential.profile.drawAmbientField, isFalse);
       expect(RenderQuality.balanced.profile.drawAmbientField, isTrue);
-      expect(RenderQuality.cinematic.profile.drawGrain, isTrue);
+      expect(RenderQuality.full.profile.drawGrain, isTrue);
       expect(RenderQuality.essential.profile.trackPointer, isFalse);
       expect(RenderQuality.balanced.profile.trackPointer, isFalse);
-      expect(RenderQuality.cinematic.profile.trackPointer, isTrue);
+      expect(RenderQuality.full.profile.trackPointer, isTrue);
     });
   });
 }

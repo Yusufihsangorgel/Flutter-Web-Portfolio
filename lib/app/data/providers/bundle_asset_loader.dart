@@ -2,10 +2,10 @@ import 'dart:convert';
 import 'dart:developer' as dev;
 
 import 'package:flutter/services.dart';
-import 'package:flutter_web_portfolio/app/domain/providers/i_assets_provider.dart';
+import 'package:flutter_web_portfolio/app/domain/providers/asset_loader.dart';
 
-/// Loads and decodes bundled JSON from assets/.
-final class AssetsProvider implements IAssetsProvider {
+/// Decodes the portfolio, narrative, and locale documents from `rootBundle`.
+final class BundleAssetLoader implements AssetLoader {
   @override
   Future<Map<String, dynamic>> loadNarrative() => _loadObject(
     'assets/presentation/narrative.json',
@@ -41,7 +41,7 @@ final class AssetsProvider implements IAssetsProvider {
     } catch (e) {
       dev.log(
         'Failed to load translations for $languageCode',
-        name: 'AssetsProvider',
+        name: 'BundleAssetLoader',
         error: e,
       );
       return {};

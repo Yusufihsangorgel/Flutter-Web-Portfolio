@@ -7,12 +7,12 @@ import 'package:flutter_web_portfolio/app/core/constants/durations.dart';
 import 'package:flutter_web_portfolio/app/core/theme/app_fonts.dart';
 import 'package:flutter_web_portfolio/app/domain/models/portfolio_document.dart';
 import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
-import 'package:flutter_web_portfolio/app/widgets/cinematic_focusable.dart';
+import 'package:flutter_web_portfolio/app/widgets/accessible_action.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 /// A high-contrast closing section with direct navigation and profile links.
-class PremiumFooter extends StatelessWidget {
-  const PremiumFooter({super.key});
+class PortfolioFooter extends StatelessWidget {
+  const PortfolioFooter({super.key});
 
   @override
   Widget build(BuildContext context) =>
@@ -193,10 +193,10 @@ class _FooterEmail extends StatelessWidget {
   final String email;
 
   @override
-  Widget build(BuildContext context) => CinematicFocusable(
+  Widget build(BuildContext context) => AccessibleAction(
     onTap: () => launchUrl(Uri(scheme: 'mailto', path: email)),
     semanticLabel: email,
-    semanticRole: CinematicControlRole.link,
+    semanticRole: ActionSemanticRole.link,
     focusColor: AppColors.background,
     child: Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
@@ -229,10 +229,10 @@ class _ProfileLink extends StatelessWidget {
   final PortfolioLink link;
 
   @override
-  Widget build(BuildContext context) => CinematicFocusable(
+  Widget build(BuildContext context) => AccessibleAction(
     onTap: () => launchUrl(link.url, webOnlyWindowName: '_blank'),
     semanticLabel: link.label,
-    semanticRole: CinematicControlRole.link,
+    semanticRole: ActionSemanticRole.link,
     focusColor: AppColors.background,
     child: Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
@@ -273,7 +273,7 @@ class _FooterLinkState extends State<_FooterLink> {
   bool _hovered = false;
 
   @override
-  Widget build(BuildContext context) => CinematicFocusable(
+  Widget build(BuildContext context) => AccessibleAction(
     onTap: widget.onTap,
     onHoverChanged: (value) => setState(() => _hovered = value),
     focusColor: AppColors.background,

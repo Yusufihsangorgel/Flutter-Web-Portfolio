@@ -17,11 +17,12 @@ Brief description of what this PR does and why.
 
 ## Checklist
 
-- [ ] `dart format --output=none --set-exit-if-changed lib test` passes
+- [ ] `dart format --output=none --set-exit-if-changed lib test tool` passes
+- [ ] `npm run portfolio:validate` and `npm run test:template` pass
+- [ ] `npm run verify:content` and `npm run verify:source` pass
 - [ ] `flutter analyze --fatal-infos` passes with no issues
 - [ ] `flutter test` passes
-- [ ] `flutter build web --release --wasm --no-web-resources-cdn` passes
-- [ ] `npm run verify:bundle` passes
+- [ ] `npm run build:release` passes
 - [ ] `npm test` passes on desktop and mobile projects
 - [ ] New code includes tests where applicable
 - [ ] Documentation updated if needed

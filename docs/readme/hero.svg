@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="720" viewBox="0 0 1440 720" role="img" aria-labelledby="title description">
+  <title id="title">Flutter Web Portfolio</title>
+  <desc id="description">An editorial poster showing a content document flowing through a measured Flutter Web runtime into a deployable portfolio.</desc>
+  <rect width="1440" height="720" fill="#F2EEE5"/>
+  <path d="M0 0h1440v18H0z" fill="#1E51FF"/>
+  <path d="M0 702h1440v18H0z" fill="#DFFF3F"/>
+
+  <g fill="#12110F" font-family="Inter, Arial, sans-serif">
+    <text x="64" y="76" font-size="18" font-weight="700" letter-spacing="4">FLUTTER WEB / PORTFOLIO SYSTEM</text>
+    <text x="64" y="178" font-size="104" font-weight="900" letter-spacing="-6">YOUR WORK</text>
+    <text x="64" y="278" font-size="104" font-weight="900" letter-spacing="-6" fill="#1E51FF">WITH PROOF.</text>
+    <text x="69" y="330" font-size="25" font-weight="500">One content file. One measured document. Every screen.</text>
+  </g>
+
+  <g transform="translate(66 392)">
+    <rect width="548" height="190" rx="4" fill="#12110F"/>
+    <text x="28" y="38" fill="#DFFF3F" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="15">assets/content/portfolio.json</text>
+    <text x="28" y="82" fill="#F2EEE5" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="17">profile  → identity</text>
+    <text x="28" y="112" fill="#F2EEE5" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="17">evidence → selected work</text>
+    <text x="28" y="142" fill="#F2EEE5" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="17">site     → metadata + deploy</text>
+    <circle cx="500" cy="38" r="10" fill="#F05A35"/>
+  </g>
+
+  <g transform="translate(704 88)">
+    <rect width="660" height="494" rx="4" fill="#DFFF3F" stroke="#12110F" stroke-width="2"/>
+    <text x="34" y="48" fill="#12110F" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="14" font-weight="700">DOCUMENT PIPELINE / LIVE</text>
+
+    <path d="M98 136 C210 88 260 200 364 152 S516 118 568 188 C618 255 528 302 448 278 S290 236 232 314 C174 391 278 430 380 398 S520 346 570 420" fill="none" stroke="#1E51FF" stroke-width="6" stroke-linecap="round"/>
+    <circle cx="98" cy="136" r="17" fill="#12110F"/>
+    <circle cx="364" cy="152" r="17" fill="#F05A35"/>
+    <circle cx="232" cy="314" r="17" fill="#12110F"/>
+    <circle cx="570" cy="420" r="17" fill="#1E51FF"/>
+
+    <g fill="#12110F" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="14" font-weight="700">
+      <text x="58" y="106">CONTENT</text>
+      <text x="330" y="122">LAYOUT</text>
+      <text x="194" y="352">RUNTIME</text>
+      <text x="526" y="458">RELEASE</text>
+    </g>
+
+    <g transform="translate(34 444)" fill="#12110F" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="700" letter-spacing="1.5">
+      <text x="0" y="0">WASM + JS FALLBACK</text>
+      <text x="220" y="0">7 LOCALES</text>
+      <text x="370" y="0">A11Y</text>
+      <text x="472" y="0">TESTED</text>
+    </g>
+  </g>
+
+  <g fill="#12110F" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="15">
+    <text x="66" y="646">01 / PERSONALIZE</text>
+    <text x="322" y="646">02 / VERIFY</text>
+    <text x="534" y="646">03 / SHIP</text>
+    <text x="1100" y="646" font-weight="700">MIT / FORK IT</text>
+  </g>
+</svg>

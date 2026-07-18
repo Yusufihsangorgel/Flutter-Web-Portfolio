@@ -145,7 +145,7 @@ function renderReadmeRecord(data) {
   const review = data.contributions.filter(
     (item) => item.status === 'under_review',
   );
-  const sourceLabels = data.sources.map((source) => source.label).join(' and ');
+  const sourceLabels = naturalList(data.sources.map((source) => source.label));
   const lines = [
     '## Public engineering record',
     '',
@@ -339,6 +339,12 @@ function renderAnalytics(data) {
 
 function table(value) {
   return String(value).replaceAll('|', '\\|').replaceAll('\n', ' ');
+}
+
+function naturalList(values) {
+  if (values.length < 2) return values.join('');
+  if (values.length === 2) return values.join(' and ');
+  return `${values.slice(0, -1).join(', ')}, and ${values.at(-1)}`;
 }
 
 function requiredString(value, path) {

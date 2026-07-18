@@ -5,7 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_web_portfolio/app/controllers/scroll_controller.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
 import 'package:flutter_web_portfolio/app/core/constants/breakpoints.dart';
-import 'package:flutter_web_portfolio/app/core/constants/cinematic_curves.dart';
+import 'package:flutter_web_portfolio/app/core/constants/motion_curves.dart';
 import 'package:flutter_web_portfolio/app/core/constants/durations.dart';
 import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
 import 'package:flutter_web_portfolio/app/utils/motion_preference.dart';
@@ -37,7 +37,7 @@ class _BackToTopButtonState extends State<BackToTopButton>
     );
     _entranceAnimation = CurvedAnimation(
       parent: _entranceController,
-      curve: CinematicCurves.dramaticEntrance,
+      curve: MotionCurves.emphasizedDecelerate,
     );
     _scrollController = context.read<AppScrollController>();
     _scrollController.scrollController.addListener(_onScroll);

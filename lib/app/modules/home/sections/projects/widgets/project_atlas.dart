@@ -5,7 +5,7 @@ import 'package:flutter_web_portfolio/app/core/constants/app_dimensions.dart';
 import 'package:flutter_web_portfolio/app/core/constants/breakpoints.dart';
 import 'package:flutter_web_portfolio/app/core/theme/app_fonts.dart';
 import 'package:flutter_web_portfolio/app/domain/models/portfolio_document.dart';
-import 'package:flutter_web_portfolio/app/widgets/cinematic_focusable.dart';
+import 'package:flutter_web_portfolio/app/widgets/accessible_action.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 @immutable
@@ -905,7 +905,7 @@ final class _EvidenceRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final tablet = MediaQuery.sizeOf(context).width >= Breakpoints.tablet;
-    return CinematicFocusable(
+    return AccessibleAction(
       onTap: onSelect,
       onHoverChanged: (hovered) {
         if (hovered) onSelect();
@@ -1185,10 +1185,10 @@ final class _AtlasLink extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final maxWidth = math.min(360.0, MediaQuery.sizeOf(context).width - 48);
-    return CinematicFocusable(
+    return AccessibleAction(
       onTap: () => launchUrl(url, webOnlyWindowName: '_blank'),
       semanticLabel: semanticLabel,
-      semanticRole: CinematicControlRole.link,
+      semanticRole: ActionSemanticRole.link,
       focusColor: palette.accent,
       child: ConstrainedBox(
         constraints: BoxConstraints(maxWidth: maxWidth),

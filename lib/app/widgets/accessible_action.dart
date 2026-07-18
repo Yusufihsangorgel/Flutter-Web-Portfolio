@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-/// Accessibility role exposed by [CinematicFocusable].
-enum CinematicControlRole { button, link }
+/// Accessibility role exposed by [AccessibleAction].
+enum ActionSemanticRole { button, link }
 
-/// Focusable interaction wrapper — keyboard nav, hover, tap, focus ring.
-/// Replaces raw MouseRegion + GestureDetector with accessibility baked in.
-class CinematicFocusable extends StatefulWidget {
-  const CinematicFocusable({
+/// Reusable action surface for pointer, keyboard, focus, and semantics input.
+class AccessibleAction extends StatefulWidget {
+  const AccessibleAction({
     super.key,
     required this.child,
     required this.onTap,
@@ -18,7 +17,7 @@ class CinematicFocusable extends StatefulWidget {
     this.cursor = SystemMouseCursors.click,
     this.borderRadius = BorderRadius.zero,
     this.semanticLabel,
-    this.semanticRole = CinematicControlRole.button,
+    this.semanticRole = ActionSemanticRole.button,
     this.selected,
     this.expanded,
   });
@@ -32,15 +31,15 @@ class CinematicFocusable extends StatefulWidget {
   final MouseCursor cursor;
   final BorderRadius borderRadius;
   final String? semanticLabel;
-  final CinematicControlRole semanticRole;
+  final ActionSemanticRole semanticRole;
   final bool? selected;
   final bool? expanded;
 
   @override
-  State<CinematicFocusable> createState() => _CinematicFocusableState();
+  State<AccessibleAction> createState() => _AccessibleActionState();
 }
 
-class _CinematicFocusableState extends State<CinematicFocusable> {
+class _AccessibleActionState extends State<AccessibleAction> {
   bool _focused = false;
 
   @override
@@ -84,8 +83,8 @@ class _CinematicFocusableState extends State<CinematicFocusable> {
     if (semanticLabel == null || semanticLabel.isEmpty) return control;
 
     return Semantics(
-      button: widget.semanticRole == CinematicControlRole.button,
-      link: widget.semanticRole == CinematicControlRole.link,
+      button: widget.semanticRole == ActionSemanticRole.button,
+      link: widget.semanticRole == ActionSemanticRole.link,
       selected: widget.selected,
       expanded: widget.expanded,
       focusable: true,

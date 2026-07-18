@@ -134,7 +134,7 @@ class _Period extends StatelessWidget {
           height: 8,
           margin: const EdgeInsets.only(top: 6),
           decoration: const BoxDecoration(
-            color: AppColors.heroAccent,
+            color: AppColors.accent,
             shape: BoxShape.circle,
           ),
         ),
@@ -182,7 +182,7 @@ class _ExperienceContent extends StatelessWidget {
         style: AppFonts.spaceGrotesk(
           fontSize: 16,
           fontWeight: FontWeight.w500,
-          color: AppColors.heroAccent,
+          color: AppColors.accent,
           height: 1.45,
         ),
       ),

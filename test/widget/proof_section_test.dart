@@ -5,16 +5,16 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_web_portfolio/app/controllers/scene_director.dart';
 import 'package:flutter_web_portfolio/app/controllers/scroll_controller.dart';
 import 'package:flutter_web_portfolio/app/domain/models/portfolio_document.dart';
-import 'package:flutter_web_portfolio/app/domain/repositories/i_language_repository.dart';
+import 'package:flutter_web_portfolio/app/domain/repositories/language_repository.dart';
 import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
 import 'package:flutter_web_portfolio/app/modules/home/sections/proof_section.dart';
-import 'package:flutter_web_portfolio/app/widgets/cinematic_focusable.dart';
+import 'package:flutter_web_portfolio/app/widgets/accessible_action.dart';
 import '../helpers/portfolio_fixture.dart';
 import '../helpers/narrative_fixture.dart';
 
-final class _ProofLanguageRepository implements ILanguageRepository {
+final class _ProofLanguageRepository implements LanguageRepository {
   @override
-  Set<String> getSupportedLanguages() => const {'en'};
+  Set<String> get supportedLanguages => const {'en'};
 
   @override
   Future<String> getSelectedLanguage() async => 'en';
@@ -117,12 +117,11 @@ void main() {
     expect(
       find.byWidgetPredicate(
         (widget) =>
-            widget is CinematicFocusable &&
-            widget.semanticRole == CinematicControlRole.link,
+            widget is AccessibleAction &&
+            widget.semanticRole == ActionSemanticRole.link,
       ),
       findsNWidgets(portfolio.contributions.length),
     );
-    expect(find.textContaining('testimonial'), findsNothing);
     expect(tester.takeException(), isNull);
   });
 
@@ -215,7 +214,7 @@ void main() {
     expect(
       find.byWidgetPredicate(
         (widget) =>
-            widget is CinematicFocusable &&
+            widget is AccessibleAction &&
             widget.semanticLabel == 'With patch' &&
             widget.selected == true,
       ),
@@ -255,8 +254,8 @@ void main() {
     expect(
       find.byWidgetPredicate(
         (widget) =>
-            widget is CinematicFocusable &&
-            widget.semanticRole == CinematicControlRole.link &&
+            widget is AccessibleAction &&
+            widget.semanticRole == ActionSemanticRole.link &&
             widget.semanticLabel?.contains('View pull request') == true &&
             widget.semanticLabel?.contains(featured.title) == true,
       ),

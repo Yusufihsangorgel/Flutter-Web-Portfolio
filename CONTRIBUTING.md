@@ -13,6 +13,7 @@ Thanks for your interest in contributing to this project. Here's how to get star
 3. **Install dependencies:**
    ```bash
    flutter pub get
+   npm ci
    ```
 4. **Create a branch** for your change:
    ```bash
@@ -39,20 +40,22 @@ All quality gates must pass:
 
 ```bash
 # Canonical Dart 3.12 formatting
-dart format --output=none --set-exit-if-changed lib test
+dart format --output=none --set-exit-if-changed lib test tool
 
 # Static analysis — zero warnings, zero infos
 flutter analyze --fatal-infos
 
-# All tests pass
+# Content and clean-template contracts
+npm run verify:content
+npm run portfolio:validate
+npm run test:template
+npm run verify:source
+
+# All Dart tests pass
 flutter test
 
-# Dual-runtime release build
-flutter build web --release --wasm --no-web-resources-cdn
-
-# Bundle integrity and browser smoke tests
-npm ci
-npm run verify:bundle
+# Dual-runtime release, bundle integrity, and browser regressions
+npm run build:release
 npm test
 ```
 
@@ -83,12 +86,13 @@ npm test
 
 ```
 lib/app/
-├── controllers/    # Frame-adjacent scroll, scene, cursor, and sound state
+├── controllers/    # Measured scroll and scene coordination
 ├── core/           # Constants and theme definitions
-├── data/           # Models, providers, repository implementations
-├── domain/         # Entities and abstract interfaces
+├── data/           # External-content loading and implementations
+├── domain/         # Strict content contracts and interfaces
 ├── features/       # Vertically sliced application features
 ├── modules/        # Page modules and sections
+├── narrative/      # Position, anchors, and render geometry
 ├── utils/          # Platform-aware utilities
 └── widgets/        # Reusable UI and custom painters
 ```
@@ -100,6 +104,11 @@ When adding a new widget:
 Application features with state, infrastructure, and presentation code belong
 under `lib/app/features/<feature>/`. Keep frame-frequency state out of Cubits;
 use a synchronous `Listenable` when a value can change every rendered frame.
+
+Professional names, claims, work, and links belong only in
+`assets/content/portfolio.json`. Interface translations belong in
+`assets/i18n/`. A presentation-code branch for one person or project is not
+accepted.
 
 ## Reporting Bugs
 

@@ -17,14 +17,14 @@ import 'package:flutter_web_portfolio/app/utils/motion_preference.dart';
 /// This painter owns only atmosphere, vignette, and optional grain. The one
 /// persistent engineering signal is measured from real content by
 /// `NarrativeStage`, avoiding a second disconnected decorative path.
-class CinematicBackground extends StatefulWidget {
-  const CinematicBackground({super.key});
+class NarrativeBackground extends StatefulWidget {
+  const NarrativeBackground({super.key});
 
   @override
-  State<CinematicBackground> createState() => _CinematicBackgroundState();
+  State<NarrativeBackground> createState() => _NarrativeBackgroundState();
 }
 
-class _CinematicBackgroundState extends State<CinematicBackground> {
+class _NarrativeBackgroundState extends State<NarrativeBackground> {
   late final _NarrativeFrame _frame;
   StreamSubscription<SceneState>? _sceneSubscription;
   StreamSubscription<RenderQualityState>? _qualitySubscription;

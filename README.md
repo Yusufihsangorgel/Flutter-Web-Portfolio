@@ -1,12 +1,231 @@
-# Flutter Web Portfolio
+<p align="center">
+  <img src="docs/readme/hero.svg" width="100%" alt="Flutter Web Portfolio — your work with proof">
+</p>
 
-A production Flutter Web engineering record for Yusuf İhsan Görgel, backed by typed external content, measured section navigation, accessible responsive layouts, and a dual-runtime Wasm release.
+<p align="center"><strong>A portfolio that behaves like a measured document and ships like a static file.</strong></p>
 
+<p align="center">
+  <a href=".github/workflows/ci.yml"><img alt="CI-enforced quality gate" src="https://img.shields.io/badge/quality%20gate-CI%20enforced-1E51FF?style=flat-square&amp;logo=githubactions&amp;logoColor=white"></a>
+  <a href="https://flutter.dev"><img alt="Flutter 3.44.6" src="https://img.shields.io/badge/Flutter-3.44.6-1E51FF?style=flat-square&amp;logo=flutter&amp;logoColor=white"></a>
+  <a href="LICENSE"><img alt="MIT license" src="https://img.shields.io/badge/license-MIT-12110F?style=flat-square"></a>
+  <img alt="Dart Wasm and JavaScript fallback" src="https://img.shields.io/badge/runtime-Wasm%20%2B%20JS-DFFF3F?style=flat-square&amp;logoColor=12110F">
+</p>
+
+<p align="center">
+  <a href="https://github.com/Yusufihsangorgel/Flutter-Web-Portfolio/generate"><img alt="Create a repository from this template" src="https://img.shields.io/badge/USE%20THIS%20TEMPLATE-DFFF3F?style=for-the-badge&amp;logo=github&amp;logoColor=12110F"></a>
+</p>
+
+<p align="center">
 <!-- portfolio-demo:start -->
 [Live site](https://developeryusuf.com/) · [Flutter Web first-frame issue](https://github.com/flutter/flutter/issues/189499) · [Engine patch](https://github.com/flutter/flutter/pull/189500)
 <!-- portfolio-demo:end -->
+</p>
 
-The site reads identity, biography, experience, work, links, and contributions from `assets/content/portfolio.json`; presentation code contains no Yusuf- or project-specific branches. The same validated content contract keeps the interface reusable without turning the public site into a generic demo. Interface translations stay in `assets/i18n/*.json`.
+| One source | One reading model | One release contract |
+|---|---|---|
+| Identity, biography, work, evidence, links, and metadata live in one validated JSON document. | Real section geometry drives navigation, URL history, progress, responsive reflow, and the visual narrative. | A dual Wasm/JavaScript build is checked for headers, caching, size, accessibility, and browser regressions. |
+
+## From clone to your first frame
+
+Prerequisites: Git, Node.js 24, and Flutter 3.44.6 (Dart 3.12 or newer).
+Hosted builds use the pinned Flutter revision in `tool/hosted_build.sh`.
+
+```bash
+git clone https://github.com/your-name/your-portfolio.git
+cd your-portfolio
+npm ci
+flutter pub get
+npm run portfolio:init
+flutter run -d chrome
+```
+
+The initializer is a real reset, not a search-and-replace checklist. It asks for
+your public identity, role, contact, canonical domain, headline, and focus;
+removes the original owner’s optional work, experience, and contribution data;
+then synchronizes the README record, SEO, JSON-LD, manifest, sitemap, robots
+file, analytics include, and server policy.
+
+```text
+you answer once
+      │
+      ▼
+assets/content/portfolio.json
+      ├──► Flutter document
+      ├──► search + social metadata
+      ├──► README engineering record
+      ├──► manifest + sitemap + robots
+      └──► hosting policy + social card
+```
+
+[Customization guide](docs/CUSTOMIZE.md) · [Content contract](#the-content-contract) · [Deployment guide](docs/DEPLOY.md)
+
+## Deploy it where you already live
+
+The app is static and has no backend lock-in.
+
+| Host | Shortest path |
+|---|---|
+| GitHub Pages | push `main`; the included workflow builds with the repository-aware base path |
+| Firebase Hosting | `npm run deploy -- firebase --project <id>` |
+| Netlify | connect the repo or run `npm run deploy -- netlify` |
+| Cloudflare Pages | `npm run deploy -- cloudflare --project <name>` |
+| Vercel | import the repo or run `npm run deploy -- vercel` |
+| Docker / VPS | `npm run deploy -- docker --image portfolio:latest` |
+
+Each included configuration preserves SPA navigation and the cross-origin
+isolation headers used by threaded SkWasm. Custom domains require no Dart
+change: edit `site.url`, run `npm run sync:content`, then point DNS at the host.
+
+[Provider-by-provider instructions](docs/DEPLOY.md)
+
+## Why this is not another portfolio grid
+
+Most portfolio templates start with cards and later bolt on data. This one
+starts with a document contract:
+
+- Optional chapters genuinely disappear; there are no empty demo sections.
+- Work artifacts must be local, accessible, dimensioned, and backed by linked evidence.
+- Professional claims remain outside presentation code and translation files.
+- The same measured position controls active navigation, browser history,
+  scene interpolation, and every progress indicator.
+- Reduced motion preserves the entire information architecture instead of
+  serving a diminished page.
+- Decorative painting listens to frame-adjacent state without rebuilding the
+  semantic document or idling at 60 frames per second.
+- The critical HTML shell gives slow Wasm visits meaningful content before
+  Flutter reaches the compositor.
+
+## The content contract
+
+`assets/content/portfolio.json` is parsed into immutable final classes before
+`runApp`. The parser rejects schema drift, duplicate IDs, invalid URLs, reused
+artifacts, incomplete featured cases, malformed colors, and identity/metadata
+disagreement.
+
+```json
+{
+  "schema_version": 8,
+  "site": { "url": "https://example.com" },
+  "profile": { "name": "Your Name", "role": "Software Engineer" },
+  "experience": [],
+  "contributions": [],
+  "systems": []
+}
+```
+
+That excerpt is intentionally incomplete; use the initializer to produce a
+valid clean document, then follow [the field guide](docs/CUSTOMIZE.md) to add
+source-backed experience and selected work.
+
+Translations in `assets/i18n/*.json` own interface language only. Seven locale
+documents share a tested key schema, including an RTL surface; none duplicates
+professional content.
+
+## The runtime, drawn as one path
+
+```text
+assets/content/portfolio.json
+        │ strict parse before runApp
+        ▼
+PortfolioDocument ───────────────┐
+                                │
+assets/presentation/narrative.json
+        │ chapter order + motif  │
+        ▼                        │
+NarrativeDocument               │
+        │                        │
+assets/i18n/{locale}.json        │
+        │ ordered async loading  │
+        ▼                        ▼
+LanguageCubit              semantic sections
+                                │ measured bounds
+                                ▼
+AppScrollController ─────► NarrativePosition
+        │                       │
+        │ browser history       ├────► SceneDirector
+        │ + visible progress    │           │
+        ▼                       ▼           ▼
+chapter navigation      chapter anchors    ambient painter
+                                │
+                                ▼
+                       NarrativeAnchorPath
+```
+
+The document and render loop deliberately have different update paths. Content
+loads once. Frame-frequency scene and pointer changes stay in synchronous
+listenables. Responsive reflow preserves chapter-relative focus instead of a
+stale pixel offset, and one early popstate bridge keeps browser history from
+being consumed twice by Flutter navigation.
+
+## First frame is a measured event
+
+The release does not treat Flutter’s first-frame signal as proof that pixels
+have reached the browser compositor. Its generated HTML shell remains aligned
+for two browser frames, then leaves exactly once. Ordered User Timing marks
+separate entrypoint transfer, engine initialization, Flutter rendering,
+compositor-safe reveal, and shell removal.
+
+```bash
+# Serve build/web, then sample cold starts and a real full-document scroll.
+npm run measure:runtime
+
+# Enforce the checked-in median budget.
+npm run verify:runtime
+```
+
+Software-rendered headless sessions still record every metric; only explicitly
+hardware-bound thresholds are reported rather than misjudged against
+SwiftShader readback latency.
+
+## Quality is executable
+
+```bash
+npm run portfolio:validate
+npm run test:template
+npm run verify:content
+npm run verify:hosting
+npm run audit:sources
+dart format --output=none --set-exit-if-changed lib test tool
+flutter analyze --fatal-infos
+flutter test
+npm run build:release
+npm run test:visual
+npm test
+```
+
+The gates cover:
+
+- canonical-content drift and source status;
+- every reachable Dart source file;
+- immutable renderer assets and same-origin fallbacks;
+- Wasm/JavaScript size budgets and Nginx packaging;
+- keyboard semantics, reduced motion, locale switching, RTL, deep links, and back/forward history;
+- desktop, tablet, and mobile visual baselines;
+- cold-start, layout-shift, long-task, and scroll-frame budgets;
+- a generated clean portfolio with no inherited identity.
+
+## Repository map
+
+| Change this | To change that |
+|---|---|
+| `assets/content/portfolio.json` | professional content and public metadata |
+| `assets/work/` | real project evidence and compact crops |
+| `assets/i18n/` | interface translations |
+| `assets/presentation/narrative.json` | chapter motifs and scene order |
+| `lib/app/domain/` | strict content and narrative contracts |
+| `lib/app/controllers/` | measured scroll, history, scene, and reflow state |
+| `lib/app/widgets/narrative_stage.dart` | the continuous document trace |
+| `tool/` | initialization, synchronization, release, and verification |
+| `tests/e2e/` | browser and visual regression contracts |
+
+## Verified public engineering record
+
+The live demo uses the same template with a real professional record. This block
+is regenerated from the canonical content document; it is evidence for the demo,
+not starter data inherited by `npm run portfolio:init`.
+
+<details>
+<summary><strong>Open the current record</strong></summary>
 
 <!-- portfolio-record:start -->
 ## Public engineering record
@@ -15,7 +234,7 @@ The site reads identity, biography, experience, work, links, and contributions f
 
 Since 2021, I have built and maintained software for mobile devices, tablets, desktop operating systems, and the web. My work includes ERP and point-of-sale products, logistics workflows, digital publishing, backend services, and the release systems around them.
 
-Source status: `2026.07.16.11`, verified 2026-07-16 against GitHub and LinkedIn and FugaSoft and Dorse and Medium.
+Source status: `2026.07.16.11`, verified 2026-07-16 against GitHub, LinkedIn, FugaSoft, Dorse, and Medium.
 
 ### Accepted upstream changes
 
@@ -49,152 +268,15 @@ Source status: `2026.07.16.11`, verified 2026-07-16 against GitHub and LinkedIn 
 - **MCP Kotlin SDK:** [Add SEP-2575 request metadata and discovery types](https://github.com/modelcontextprotocol/kotlin-sdk/pull/893) — Add typed experimental metadata accessors, server discovery types, polymorphic codecs, and malformed-input coverage.
 <!-- portfolio-record:end -->
 
-## Content contract
+</details>
 
-`assets/content/portfolio.json` is the canonical professional record. It contains the profile, contact details, explicit display-name composition, current-role markers, optional experience, capabilities, optional contributions and work, source provenance, and site metadata. Every work record owns a palette and a required, source-backed artifact; featured professional cases additionally carry challenge, approach, outcome, and linked evidence records, while supporting work declares its evidence group and spotlight. `PortfolioDocument` parses the record into immutable final classes and rejects unsupported schemas, duplicate content IDs, invalid URLs, malformed presentation colours, duplicate artifacts, incomplete featured cases, incomplete supporting records, missing featured work, and identity/metadata drift.
+## Contributing
 
-Analytics is opt-in through `site.analytics` in the same document. Remove that object for a tracking-free deployment; the synchronization step removes the script instead of inheriting this site's analytics account.
-
-`assets/i18n/*.json` contains interface language only. All seven locale documents share one tested key schema; none may contain biography, experience, project, or contribution records.
-
-Run the synchronization gate after changing the manifest:
-
-```bash
-npm run sync:content
-npm run verify:content
-```
-
-The synchronization tool owns this README record, search/social metadata, structured data, and the web manifest. The social-card renderer reads the same JSON at render time.
-
-## Rendering architecture
-
-```text
-assets/content/portfolio.json
-        │ strict parse before runApp
-        ▼
-PortfolioDocument ───────────────┐
-                                │
-assets/presentation/narrative.json
-        │ chapter order + motif  │
-        ▼                        │
-NarrativeDocument               │
-        │                        │
-assets/i18n/{locale}.json        │
-        │ ordered async loading  │
-        ▼                        ▼
-LanguageCubit              semantic sections
-                                │ measured chapter bounds
-                                ▼
-AppScrollController ─────► NarrativePosition
-        │                       │
-        │ browser history       ├────► SceneDirector
-        │ + visible progress    │           │
-        ▼                       ▼           ▼
-chapter navigation      chapter anchors    ambient CustomPainter
-                                │
-                                ▼
-                       NarrativeAnchorPath
-```
-
-The document and render loop have deliberately different update paths:
-
-- The composition root loads and validates professional content before `runApp`.
-- BLoC/Cubit owns language, scroll, and scene state through explicit dependencies and immutable snapshots.
-- Ambient painting listens only to scene and pointer changes rather than rebuilding the semantic document or running an idle animation loop.
-- Section positions are measured after layout. One boundary-local reading snapshot drives active navigation, URL state, scene interpolation, and every visible progress indicator.
-- Responsive reflow preserves the reader's chapter-relative focal point instead of retaining a stale raw pixel offset.
-- Browser history represents positions inside one document. An early popstate bridge prevents Flutter's root Navigator from consuming chapter navigation twice while preserving the command palette's normal modal lifecycle.
-- One pointer-transparent narrative stage measures content-authored chapter anchors and paints a continuous path without adding semantic nodes; compact handoff seams retain localized chapter context, mirror in RTL, and remain static under reduced motion.
-- Reduced-motion sessions suppress pointer motion and animated transitions while preserving the complete document and navigation model.
-
-## First meaningful frame
-
-The HTML layer contains a critical shell generated from the canonical portfolio manifest during release preparation. It is not a second content source: role, headline, focus areas, and content version are injected from `assets/content/portfolio.json`, then verified against that record. The shell gives a cold Wasm visit a meaningful first paint while Flutter initializes, and it never forces a service-worker cleanup reload.
-
-The bootstrap treats Flutter's first-frame event as a rendering signal rather than proof that the browser compositor has already presented the pixels. This keeps the release strategy reusable across Flutter engine revisions and browsers instead of coupling the implementation to one upstream issue or patch.
-
-The handoff retains the visually aligned critical shell for two browser frames after Flutter's event. This avoids a blank flash while the Flutter surface reaches the compositor, then removes the HTML layer once.
-
-### Runtime measurement
-
-The bootstrap publishes ordered User Timing marks for entrypoint loading, engine initialization, Flutter's first-frame event, compositor-safe reveal, and final bootstrap removal. A separate cold-context runner samples three launches plus a frame-by-frame full-document scroll, then reports median startup, refresh-cadence-normalized frame misses, long-task time, layout shift, and renderer transfer data. Raw frame intervals remain in the report.
-
-```bash
-# Serve build/web separately, then collect a three-run JSON report.
-npm run measure:runtime
-
-# Apply the checked-in median budget as a local release gate.
-npm run verify:runtime
-
-# On a compatible macOS runner, exercise every threshold on the native GPU.
-PERF_CHROMIUM_ARGS='["--use-angle=metal"]' npm run verify:runtime
-```
-
-Headless Chromium normally reports a software graphics backend such as SwiftShader. The default gate still records every raw metric, but metrics declared in `hardware_only_metrics` are listed under `enforcement_skips` and accompanied by a console warning instead of being judged against software-GPU readback latency. All other thresholds remain enforced. Native-hardware and unknown backends enforce every threshold, so a failed backend diagnostic cannot silently weaken the gate.
-
-The budget and its JSON Schema are deliberately separate from content and presentation. They can evolve from measured hardware baselines without introducing device-specific branches into the Flutter document.
-
-## Release model
-
-The release contains Dart WebAssembly/SkWasm plus Flutter's JavaScript/CanvasKit fallback. Renderer binaries and fallback fonts are same-origin. Entry points receive a content hash; renderer files live below Flutter's exact engine revision so immutable caching cannot pair a new bootstrap with stale binaries.
-
-The included Nginx configuration serves the headers required for threaded SkWasm:
-
-```text
-Cross-Origin-Opener-Policy: same-origin
-Cross-Origin-Embedder-Policy: credentialless
-```
-
-Build the release used by browser tests:
-
-```bash
-flutter pub get
-npm ci
-npx playwright install chromium
-npm run verify:content
-flutter analyze --fatal-infos
-flutter test
-npm run prepare:source
-flutter build web --release --wasm --no-web-resources-cdn
-npm run prepare:bundle
-npm run verify:bundle
-npm run test:visual
-npm test
-```
-
-The source preparation step renders the social card and writes a source manifest into the Flutter asset bundle. The bundle gate rejects stale tracked output, then checks Wasm headers, dual-runtime configuration, versioned entry points, self-hosted renderer assets, local font coverage, first-frame cleanup, service-worker retirement, and explicit size budgets. Playwright exercises desktop and mobile semantics, locale/RTL switching, URL history, security headers, and release assets. Checked-in platform baselines lock the critical shell, personal hero, open-source chapter, and full-width work atlas across desktop, mobile, and tablet viewports with reduced motion enabled.
-
-## Local development
-
-```bash
-flutter pub get
-flutter run -d chrome
-```
-
-Useful controls:
-
-- `Ctrl/Cmd + K` opens the keyboard command surface.
-- Native browser back/forward follows section history.
-- `WASM_DELAY_MS=5000 PORT=4174 node tool/serve_web.mjs` exposes the first-frame handoff under a constrained local load.
-
-## Key implementation files
-
-| Concern | Source |
-|---|---|
-| Canonical professional data | `assets/content/portfolio.json` |
-| Strict content schema | `lib/app/domain/models/portfolio_document.dart` |
-| Deterministic composition root | `lib/app/app_dependencies.dart` |
-| Locale concurrency | `lib/app/features/language/application/language_cubit.dart` |
-| Measured document geometry | `lib/app/controllers/scroll_controller.dart` |
-| Scene interpolation | `lib/app/controllers/scene_director.dart` |
-| Ambient render layer | `lib/app/widgets/background/cinematic_background.dart` |
-| Persistent narrative trace and chapter seams | `lib/app/widgets/narrative_stage.dart`, `lib/app/narrative/rendering/narrative_anchor_path.dart`, `lib/app/widgets/narrative_chapter_handoff.dart` |
-| Full-width selected-work atlas | `lib/app/modules/home/sections/projects/projects_section.dart`, `lib/app/modules/home/sections/projects/widgets/project_atlas.dart` |
-| Content synchronization | `tool/sync_public_content.mjs` |
-| Runtime measurement | `tool/measure_web_runtime.mjs`, `tool/performance_budget.json`, `tool/performance_budget.schema.json` |
-| Responsive visual regression | `tests/e2e/visual.spec.ts`, `tests/e2e/visual.spec.ts-snapshots/` |
-| Release integrity | `tool/prepare_web_release.mjs`, `tool/verify_web_build.mjs` |
+Focused fixes, measured performance improvements, accessibility work, new host
+adapters, and locale corrections are welcome. Start with
+[CONTRIBUTING.md](CONTRIBUTING.md); the pull-request template names the same
+checks CI enforces.
 
 ## License
 
-MIT. See [LICENSE](LICENSE).
+MIT. Keep the license, replace the content, and make the document yours.

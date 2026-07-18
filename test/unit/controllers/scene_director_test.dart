@@ -50,10 +50,6 @@ void main() {
       expect(director.state, const SceneState.initial());
     });
 
-    test('exposes typed scene snapshots through the Cubit stream', () {
-      expect(director.stream, isA<Stream<SceneState>>());
-    });
-
     test('maps a stable shared position to one chapter scene', () {
       final state = SceneDirector.calculateState(
         position: const NarrativePosition(

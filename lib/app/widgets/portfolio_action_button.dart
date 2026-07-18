@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_web_portfolio/app/core/theme/app_fonts.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
-import 'package:flutter_web_portfolio/app/core/constants/cinematic_curves.dart';
+import 'package:flutter_web_portfolio/app/core/constants/motion_curves.dart';
 import 'package:flutter_web_portfolio/app/core/constants/durations.dart';
-import 'package:flutter_web_portfolio/app/widgets/cinematic_focusable.dart';
+import 'package:flutter_web_portfolio/app/widgets/accessible_action.dart';
 
 /// Pointer- and keyboard-accessible outlined call-to-action.
 ///
 /// [isPrimary] toggles between filled accent (primary) and outline (secondary).
-class CinematicButton extends StatefulWidget {
-  const CinematicButton({
+class PortfolioActionButton extends StatefulWidget {
+  const PortfolioActionButton({
     super.key,
     required this.label,
     required this.onTap,
@@ -20,31 +20,30 @@ class CinematicButton extends StatefulWidget {
   final bool isPrimary;
 
   @override
-  State<CinematicButton> createState() => _CinematicButtonState();
+  State<PortfolioActionButton> createState() => _PortfolioActionButtonState();
 }
 
-class _CinematicButtonState extends State<CinematicButton> {
+class _PortfolioActionButtonState extends State<PortfolioActionButton> {
   bool _hovered = false;
   bool _pressed = false;
 
   @override
-  Widget build(BuildContext context) => GestureDetector(
-    onTapDown: (_) => setState(() => _pressed = true),
-    onTapUp: (_) => setState(() => _pressed = false),
-    onTapCancel: () => setState(() => _pressed = false),
+  Widget build(BuildContext context) => Listener(
+    onPointerDown: (_) => setState(() => _pressed = true),
+    onPointerUp: (_) => setState(() => _pressed = false),
+    onPointerCancel: (_) => setState(() => _pressed = false),
     behavior: HitTestBehavior.translucent,
-    excludeFromSemantics: true,
     child: AnimatedScale(
       scale: _pressed ? 0.97 : 1.0,
       duration: AppDurations.microFast,
-      curve: CinematicCurves.hoverLift,
-      child: CinematicFocusable(
+      curve: MotionCurves.quickOut,
+      child: AccessibleAction(
         onTap: widget.onTap,
         semanticLabel: widget.label,
         onHoverChanged: (hovered) => setState(() => _hovered = hovered),
         child: AnimatedContainer(
           duration: AppDurations.buttonHover,
-          curve: CinematicCurves.hoverLift,
+          curve: MotionCurves.quickOut,
           padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
           decoration: widget.isPrimary
               ? BoxDecoration(

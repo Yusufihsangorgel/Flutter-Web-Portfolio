@@ -2,7 +2,7 @@ import 'dart:developer' as dev;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_web_portfolio/app/domain/repositories/i_language_repository.dart';
+import 'package:flutter_web_portfolio/app/domain/repositories/language_repository.dart';
 import 'package:flutter_web_portfolio/app/utils/web_url_strategy.dart'
     as url_strategy;
 
@@ -66,21 +66,20 @@ final class LanguageState {
 /// Locale changes are serialized so a slower request can never overwrite a
 /// newer user choice. This Cubit is the sole localization state source.
 final class LanguageCubit extends Cubit<LanguageState> {
-  factory LanguageCubit({required ILanguageRepository languageRepository}) =>
+  factory LanguageCubit({required LanguageRepository languageRepository}) =>
       LanguageCubit._(languageRepository);
 
   LanguageCubit._(this._languageRepository)
     : super(const LanguageState.initial());
 
-  final ILanguageRepository _languageRepository;
+  final LanguageRepository _languageRepository;
   int _operationId = 0;
 
   String get currentLanguage => state.languageCode;
 
   Locale get currentLocale => state.locale;
 
-  Set<String> get supportedLanguages =>
-      _languageRepository.getSupportedLanguages();
+  Set<String> get supportedLanguages => _languageRepository.supportedLanguages;
 
   String getText(String key, {String defaultValue = ''}) {
     final parts = key.split('.');

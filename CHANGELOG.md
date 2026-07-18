@@ -2,6 +2,27 @@
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- An interactive and scriptable portfolio initializer that produces a valid,
+  identity-clean content document without editing Dart code.
+- A clean-template smoke test that validates generated content through the same
+  strict Dart model used before `runApp`.
+- Reproducible release and deploy commands for GitHub Pages, Firebase Hosting,
+  Netlify, Cloudflare Pages, Vercel, and Docker.
+- Hosting-native SPA routes, cross-origin isolation headers, and cache policies
+  for the supported static providers.
+
+### Changed
+
+- Rebuilt the README as a visual product entrypoint with a four-command first
+  run, one-file customization contract, provider matrix, and collapsible live
+  engineering record.
+- Aligned contributor documentation and CI with template initialization,
+  content validation, source reachability, and the canonical release command.
+
 ## [1.9.0] - 2026-07-16
 
 ### Added
@@ -106,7 +127,7 @@ This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
-- A frame-timing governor that adapts only decorative render work between essential, balanced, and cinematic profiles while preserving identical content and semantics.
+- A frame-timing governor that adapts only decorative render work between essential, balanced, and full profiles while preserving identical content and semantics.
 - Runtime quality attributes and deterministic policy tests for warm-up, sustained pressure, recovery hysteresis, and reduced-motion override.
 - A CI-enforced performance pass that drives the real Flutter scroll view instead of the fixed browser document.
 - Responsive visual regression baselines for the critical shell, hero, open-source work, and selected systems across desktop, mobile, and tablet viewports.
@@ -193,7 +214,7 @@ This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Changed
 
-- Retired experimental template features, fabricated metrics, testimonials, public contact integrations, and dormant source files.
+- Retired legacy showcase modules, public contact integrations, and dormant source files.
 - Reduced the application to one semantic document and one procedural render system with explicit dependencies.
 
 ## [1.0.0] - 2026-03-20

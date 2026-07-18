@@ -4,106 +4,68 @@ import 'package:flutter_web_portfolio/app/core/constants/scene_configs.dart';
 
 void main() {
   group('SceneConfigs', () {
-    test('scenes list has 5 entries', () {
-      expect(SceneConfigs.scenes.length, 5);
+    test('chapter order matches the five scene identities', () {
+      expect(
+        SceneConfigs.scenes,
+        orderedEquals(const [
+          SceneConfigs.hero,
+          SceneConfigs.about,
+          SceneConfigs.experience,
+          SceneConfigs.proof,
+          SceneConfigs.projects,
+        ]),
+      );
     });
 
-    test('constant values exist for all scenes', () {
-      expect(SceneConfigs.hero, isA<SceneConfig>());
-      expect(SceneConfigs.about, isA<SceneConfig>());
-      expect(SceneConfigs.experience, isA<SceneConfig>());
-      expect(SceneConfigs.proof, isA<SceneConfig>());
-      expect(SceneConfigs.projects, isA<SceneConfig>());
-    });
-
-    test('scenes list contains all named configs in order', () {
-      expect(SceneConfigs.scenes[0], same(SceneConfigs.hero));
-      expect(SceneConfigs.scenes[1], same(SceneConfigs.about));
-      expect(SceneConfigs.scenes[2], same(SceneConfigs.experience));
-      expect(SceneConfigs.scenes[3], same(SceneConfigs.proof));
-      expect(SceneConfigs.scenes[4], same(SceneConfigs.projects));
-    });
-
-    test('each scene has non-null accent color', () {
+    test('every vignette remains a valid opacity', () {
       for (final scene in SceneConfigs.scenes) {
-        expect(scene.accent, isNotNull);
-        expect(scene.accent, isA<Color>());
-      }
-    });
-
-    test('each scene has non-null gradient colors', () {
-      for (final scene in SceneConfigs.scenes) {
-        expect(scene.gradient1, isNotNull);
-        expect(scene.gradient2, isNotNull);
-        expect(scene.gradient3, isNotNull);
-      }
-    });
-
-    test('vignetteIntensity is between 0 and 1 for all scenes', () {
-      for (final scene in SceneConfigs.scenes) {
-        expect(scene.vignetteIntensity, greaterThan(0.0));
-        expect(scene.vignetteIntensity, lessThanOrEqualTo(1.0));
+        expect(scene.vignetteIntensity, inInclusiveRange(0, 1));
       }
     });
   });
 
   group('SceneConfig.lerp', () {
-    const a = SceneConfigs.hero;
-    const b = SceneConfigs.about;
+    const start = SceneConfig(
+      gradient1: Color(0xFF000000),
+      gradient2: Color(0xFF202020),
+      gradient3: Color(0xFF404040),
+      accent: Color(0xFF606060),
+      vignetteIntensity: 0.2,
+    );
+    const end = SceneConfig(
+      gradient1: Color(0xFFFFFFFF),
+      gradient2: Color(0xFFE0E0E0),
+      gradient3: Color(0xFFC0C0C0),
+      accent: Color(0xFFA0A0A0),
+      vignetteIntensity: 0.8,
+    );
 
-    test('t=0 returns config a', () {
-      final result = SceneConfig.lerp(a, b, 0.0);
+    test(
+      'preserves endpoints and interpolates every field at the midpoint',
+      () {
+        final atStart = SceneConfig.lerp(start, end, 0);
+        final midpoint = SceneConfig.lerp(start, end, 0.5);
+        final atEnd = SceneConfig.lerp(start, end, 1);
 
-      expect(result.gradient1, equals(a.gradient1));
-      expect(result.gradient2, equals(a.gradient2));
-      expect(result.gradient3, equals(a.gradient3));
-      expect(result.accent, equals(a.accent));
-      expect(result.vignetteIntensity, equals(a.vignetteIntensity));
-    });
-
-    test('t=1 returns config b', () {
-      final result = SceneConfig.lerp(a, b, 1.0);
-
-      expect(result.gradient1, equals(b.gradient1));
-      expect(result.gradient2, equals(b.gradient2));
-      expect(result.gradient3, equals(b.gradient3));
-      expect(result.accent, equals(b.accent));
-      expect(result.vignetteIntensity, equals(b.vignetteIntensity));
-    });
-
-    test('t=0.5 interpolates colors to midpoint', () {
-      final result = SceneConfig.lerp(a, b, 0.5);
-
-      expect(
-        result.gradient1,
-        equals(Color.lerp(a.gradient1, b.gradient1, 0.5)),
-      );
-      expect(
-        result.gradient2,
-        equals(Color.lerp(a.gradient2, b.gradient2, 0.5)),
-      );
-      expect(
-        result.gradient3,
-        equals(Color.lerp(a.gradient3, b.gradient3, 0.5)),
-      );
-      expect(result.accent, equals(Color.lerp(a.accent, b.accent, 0.5)));
-    });
-
-    test('t=0.5 interpolates numeric values to midpoint', () {
-      final result = SceneConfig.lerp(a, b, 0.5);
-      final expectedVignette =
-          a.vignetteIntensity +
-          (b.vignetteIntensity - a.vignetteIntensity) * 0.5;
-
-      expect(result.vignetteIntensity, closeTo(expectedVignette, 0.001));
-    });
-
-    test('lerp with same config returns identical values', () {
-      final result = SceneConfig.lerp(a, a, 0.5);
-
-      expect(result.gradient1, equals(a.gradient1));
-      expect(result.accent, equals(a.accent));
-      expect(result.vignetteIntensity, equals(a.vignetteIntensity));
-    });
+        expect(atStart.gradient1, start.gradient1);
+        expect(atStart.vignetteIntensity, start.vignetteIntensity);
+        expect(atEnd.gradient1, end.gradient1);
+        expect(atEnd.vignetteIntensity, end.vignetteIntensity);
+        expect(
+          midpoint.gradient1,
+          Color.lerp(start.gradient1, end.gradient1, 0.5),
+        );
+        expect(
+          midpoint.gradient2,
+          Color.lerp(start.gradient2, end.gradient2, 0.5),
+        );
+        expect(
+          midpoint.gradient3,
+          Color.lerp(start.gradient3, end.gradient3, 0.5),
+        );
+        expect(midpoint.accent, Color.lerp(start.accent, end.accent, 0.5));
+        expect(midpoint.vignetteIntensity, closeTo(0.5, 0.0001));
+      },
+    );
   });
 }

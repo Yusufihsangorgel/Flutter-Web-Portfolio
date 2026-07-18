@@ -32,7 +32,7 @@ final class _NarrativeStageState extends State<NarrativeStage> {
   AppScrollController? _scrollController;
   SceneDirector? _sceneDirector;
   StreamSubscription<SceneState>? _sceneSubscription;
-  Color _accent = AppColors.heroAccent;
+  Color _accent = AppColors.accent;
   bool _reducedMotion = false;
 
   @override
@@ -273,7 +273,7 @@ final class _NarrativeStageFrame extends ChangeNotifier {
   NarrativeAnchorSnapshot _anchors = const NarrativeAnchorSnapshot.empty();
   double _scrollOffset = 0;
   double _focalPoint = 0;
-  Color _accent = AppColors.heroAccent;
+  Color _accent = AppColors.accent;
   bool _reducedMotion = false;
 
   NarrativeAnchorSnapshot? _pendingAnchors;

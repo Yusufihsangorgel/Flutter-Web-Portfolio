@@ -22,11 +22,20 @@ jobs:
       - run: flutter pub get
       - run: npm ci
       - run: npm run verify:content
+      - run: npm run portfolio:validate
+      - run: npm run test:template
+      - run: npm run verify:hosting
       - run: npm run audit:sources
         env:
           GITHUB_TOKEN: ${{ github.token }}
       - run: npm run verify:bundle
-      - run: dart format --output=none --set-exit-if-changed lib test
+      - run: dart format --output=none --set-exit-if-changed lib test tool
+      - run: bash -n tool/hosted_build.sh
+      - run: node --check tool/init_portfolio.mjs
+      - run: node --check tool/build_portfolio.mjs
+      - run: node --check tool/deploy_portfolio.mjs
+      - run: node --check tool/verify_hosting_configs.mjs
+      - run: node --check tool/test_portfolio_init.mjs
       - run: flutter analyze --fatal-infos
       - run: npm run verify:source
 

@@ -4,15 +4,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_web_portfolio/app/core/theme/app_fonts.dart';
 import 'package:flutter_web_portfolio/app/domain/models/portfolio_document.dart';
 import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
-import 'package:flutter_web_portfolio/app/core/constants/app_config.dart';
 import 'package:flutter_web_portfolio/app/controllers/scroll_controller.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
 import 'package:flutter_web_portfolio/app/core/constants/breakpoints.dart';
-import 'package:flutter_web_portfolio/app/core/constants/cinematic_curves.dart';
+import 'package:flutter_web_portfolio/app/core/constants/motion_curves.dart';
 import 'package:flutter_web_portfolio/app/core/constants/durations.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_dimensions.dart';
-import 'package:flutter_web_portfolio/app/widgets/cinematic_focusable.dart';
-import 'package:flutter_web_portfolio/app/widgets/fullscreen_menu.dart';
+import 'package:flutter_web_portfolio/app/widgets/accessible_action.dart';
+import 'package:flutter_web_portfolio/app/widgets/navigation_overlay.dart';
 import 'package:flutter_web_portfolio/app/widgets/language_switcher.dart';
 import 'package:flutter_web_portfolio/app/widgets/scene_accent_builder.dart';
 import 'package:flutter_web_portfolio/app/narrative/application/narrative_position.dart';
@@ -122,7 +121,7 @@ class _CustomSliverAppBarState extends State<CustomSliverAppBar> {
                 color: AppColors.textPrimary,
                 size: 24 * _scaleFactor,
               ),
-              onPressed: () => FullscreenMenu.show(context),
+              onPressed: () => NavigationOverlay.show(context),
             )
           : null,
       actions: [
@@ -192,16 +191,16 @@ class _LogoTextState extends State<_LogoText> {
   @override
   Widget build(BuildContext context) {
     const baseColor = AppColors.textBright;
-    const hoverColor = AppColors.heroAccent;
+    const hoverColor = AppColors.accent;
 
-    return CinematicFocusable(
+    return AccessibleAction(
       onTap: widget.onTap,
       onHoverChanged: (h) => setState(() => _hovered = h),
       semanticLabel: widget.semanticLabel,
       child: AnimatedContainer(
         duration: AppDurations.buttonHover,
         child: Text(
-          AppConfig.navigationName(context.read<PortfolioDocument>()),
+          context.read<PortfolioDocument>().profile.displayName.navigation,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
           style: AppFonts.spaceGrotesk(
@@ -243,9 +242,9 @@ class _NavItemState extends State<_NavItem> {
   Widget build(BuildContext context) {
     const activeColor = AppColors.textBright;
     const inactiveColor = AppColors.textPrimary;
-    const underlineColor = AppColors.heroAccent;
+    const underlineColor = AppColors.accent;
 
-    return CinematicFocusable(
+    return AccessibleAction(
       onTap: widget.onTap,
       onHoverChanged: (h) => setState(() => _hovered = h),
       semanticLabel: widget.label,
@@ -272,7 +271,7 @@ class _NavItemState extends State<_NavItem> {
               alignment: Alignment.centerLeft,
               child: AnimatedContainer(
                 duration: AppDurations.buttonHover,
-                curve: CinematicCurves.hoverLift,
+                curve: MotionCurves.quickOut,
                 width: widget.isActive || _hovered ? 20 : 0,
                 height: 1,
                 color: underlineColor.withValues(

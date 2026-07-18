@@ -7,7 +7,7 @@ import 'package:flutter_web_portfolio/app/core/theme/app_fonts.dart';
 import 'package:flutter_web_portfolio/app/domain/models/portfolio_document.dart';
 import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
 import 'package:flutter_web_portfolio/app/narrative/domain/narrative_document.dart';
-import 'package:flutter_web_portfolio/app/widgets/cinematic_focusable.dart';
+import 'package:flutter_web_portfolio/app/widgets/accessible_action.dart';
 import 'package:flutter_web_portfolio/app/widgets/numbered_section_heading.dart';
 import 'package:flutter_web_portfolio/app/widgets/scene_accent_builder.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -194,11 +194,11 @@ class _EmailLink extends StatelessWidget {
   final String email;
 
   @override
-  Widget build(BuildContext context) => CinematicFocusable(
+  Widget build(BuildContext context) => AccessibleAction(
     onTap: () => launchUrl(Uri(scheme: 'mailto', path: email)),
     semanticLabel: email,
-    semanticRole: CinematicControlRole.link,
-    focusColor: AppColors.heroAccent,
+    semanticRole: ActionSemanticRole.link,
+    focusColor: AppColors.accent,
     child: Padding(
       padding: const EdgeInsets.symmetric(vertical: 5),
       child: Row(
@@ -216,7 +216,7 @@ class _EmailLink extends StatelessWidget {
           const Icon(
             Icons.arrow_outward_rounded,
             size: 15,
-            color: AppColors.heroAccent,
+            color: AppColors.accent,
           ),
         ],
       ),
@@ -265,11 +265,11 @@ class _ProfileLink extends StatelessWidget {
   final PortfolioLink link;
 
   @override
-  Widget build(BuildContext context) => CinematicFocusable(
+  Widget build(BuildContext context) => AccessibleAction(
     onTap: () => launchUrl(link.url, webOnlyWindowName: '_blank'),
     semanticLabel: link.label,
-    semanticRole: CinematicControlRole.link,
-    focusColor: AppColors.heroAccent,
+    semanticRole: ActionSemanticRole.link,
+    focusColor: AppColors.accent,
     child: Padding(
       padding: const EdgeInsets.symmetric(vertical: 5),
       child: Row(
@@ -287,7 +287,7 @@ class _ProfileLink extends StatelessWidget {
           const Icon(
             Icons.north_east_rounded,
             size: 15,
-            color: AppColors.heroAccent,
+            color: AppColors.accent,
           ),
         ],
       ),
@@ -350,7 +350,7 @@ class _PracticeRow extends StatelessWidget {
           style: AppFonts.spaceGrotesk(
             fontSize: 12,
             fontWeight: FontWeight.w800,
-            color: AppColors.heroAccent,
+            color: AppColors.accent,
             letterSpacing: 0.4,
           ),
         ),

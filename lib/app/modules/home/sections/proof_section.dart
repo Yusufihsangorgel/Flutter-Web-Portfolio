@@ -8,7 +8,7 @@ import 'package:flutter_web_portfolio/app/domain/models/portfolio_document.dart'
 import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
 import 'package:flutter_web_portfolio/app/modules/home/sections/proof/widgets/contribution_event_order_lab.dart';
 import 'package:flutter_web_portfolio/app/narrative/domain/narrative_document.dart';
-import 'package:flutter_web_portfolio/app/widgets/cinematic_focusable.dart';
+import 'package:flutter_web_portfolio/app/widgets/accessible_action.dart';
 import 'package:flutter_web_portfolio/app/widgets/numbered_section_heading.dart';
 import 'package:flutter_web_portfolio/app/widgets/scene_accent_builder.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -493,10 +493,10 @@ class _LedgerRow extends StatelessWidget {
       _dateLabel(contribution.date),
     ].join('. ');
 
-    return CinematicFocusable(
+    return AccessibleAction(
       onTap: () => _openEvidence(contribution.url),
       semanticLabel: semanticLabel,
-      semanticRole: CinematicControlRole.link,
+      semanticRole: ActionSemanticRole.link,
       focusColor: accent,
       child: Container(
         padding: EdgeInsets.symmetric(vertical: compact ? 25 : 27),
@@ -686,11 +686,11 @@ class _OpenPullRequest extends StatelessWidget {
   final Color accent;
 
   @override
-  Widget build(BuildContext context) => CinematicFocusable(
+  Widget build(BuildContext context) => AccessibleAction(
     onTap: () => _openEvidence(contribution.url),
     semanticLabel:
         '$label. ${contribution.title}. ${contribution.project}. $statusLabel.',
-    semanticRole: CinematicControlRole.link,
+    semanticRole: ActionSemanticRole.link,
     focusColor: accent,
     child: Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),

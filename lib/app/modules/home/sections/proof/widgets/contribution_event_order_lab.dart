@@ -5,7 +5,7 @@ import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
 import 'package:flutter_web_portfolio/app/core/theme/app_fonts.dart';
 import 'package:flutter_web_portfolio/app/domain/models/portfolio_document.dart';
 import 'package:flutter_web_portfolio/app/utils/motion_preference.dart';
-import 'package:flutter_web_portfolio/app/widgets/cinematic_focusable.dart';
+import 'package:flutter_web_portfolio/app/widgets/accessible_action.dart';
 
 @immutable
 final class ContributionEventOrderLabLabels {
@@ -245,7 +245,7 @@ class _ScenarioControl extends StatelessWidget {
   final VoidCallback onTap;
 
   @override
-  Widget build(BuildContext context) => CinematicFocusable(
+  Widget build(BuildContext context) => AccessibleAction(
     onTap: onTap,
     semanticLabel: label,
     selected: selected,
@@ -291,7 +291,7 @@ class _ReplayControl extends StatelessWidget {
   final VoidCallback onTap;
 
   @override
-  Widget build(BuildContext context) => CinematicFocusable(
+  Widget build(BuildContext context) => AccessibleAction(
     key: const Key('event-lab-replay'),
     onTap: onTap,
     semanticLabel: label,

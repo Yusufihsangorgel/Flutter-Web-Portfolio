@@ -3,17 +3,17 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_web_portfolio/app/controllers/scene_director.dart';
 import 'package:flutter_web_portfolio/app/controllers/scroll_controller.dart';
-import 'package:flutter_web_portfolio/app/domain/repositories/i_language_repository.dart';
+import 'package:flutter_web_portfolio/app/domain/repositories/language_repository.dart';
 import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
 import 'package:flutter_web_portfolio/app/widgets/language_switcher.dart';
 
 import '../helpers/narrative_fixture.dart';
 
-final class _SwitcherLanguageRepository implements ILanguageRepository {
+final class _SwitcherLanguageRepository implements LanguageRepository {
   String selectedLanguage = 'en';
 
   @override
-  Set<String> getSupportedLanguages() => const {'en', 'tr'};
+  Set<String> get supportedLanguages => const {'en', 'tr'};
 
   @override
   Future<String> getSelectedLanguage() async => selectedLanguage;

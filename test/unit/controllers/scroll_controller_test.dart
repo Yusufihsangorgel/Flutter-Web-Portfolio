@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:flutter_web_portfolio/app/controllers/scroll_controller.dart';
@@ -20,8 +19,7 @@ void main() {
       expect(controller.activeSection, 'home');
     });
 
-    test('owns a Flutter scroll controller', () {
-      expect(controller.scrollController, isA<ScrollController>());
+    test('starts with its scroll position detached', () {
       expect(controller.scrollController.hasClients, isFalse);
     });
 
@@ -40,12 +38,7 @@ void main() {
       expect(controller.activeSection, 'home');
     });
 
-    test('exposes immutable state through a typed stream', () {
-      expect(controller.stream, isA<Stream<AppScrollState>>());
-      expect(controller.state.activeSection, 'home');
-    });
-
-    test('has no fabricated section geometry before layout', () {
+    test('has no measured section geometry before layout', () {
       expect(controller.sectionGeometries, isEmpty);
     });
 

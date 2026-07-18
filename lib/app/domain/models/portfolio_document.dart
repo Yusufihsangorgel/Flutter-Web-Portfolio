@@ -849,7 +849,7 @@ final class PortfolioSystemArtifact {
 /// An optional portrait asset authored for compact project stages.
 ///
 /// It carries its own accessible copy and intrinsic dimensions so the renderer
-/// can switch media without project-specific branches or fabricated crops.
+/// can switch media without project-specific branches or runtime cropping.
 final class PortfolioArtifactVariant {
   const PortfolioArtifactVariant({
     required this.asset,

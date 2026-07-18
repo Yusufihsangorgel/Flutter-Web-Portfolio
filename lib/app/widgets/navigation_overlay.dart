@@ -10,8 +10,8 @@ import 'package:flutter_web_portfolio/app/controllers/scroll_controller.dart';
 import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
 import 'package:flutter_web_portfolio/app/core/constants/breakpoints.dart';
-import 'package:flutter_web_portfolio/app/core/constants/cinematic_curves.dart';
-import 'package:flutter_web_portfolio/app/widgets/cinematic_focusable.dart';
+import 'package:flutter_web_portfolio/app/core/constants/motion_curves.dart';
+import 'package:flutter_web_portfolio/app/widgets/accessible_action.dart';
 import 'package:flutter_web_portfolio/app/utils/motion_preference.dart';
 import 'package:flutter_web_portfolio/app/utils/web_url_strategy.dart'
     as url_strategy;
@@ -20,10 +20,10 @@ import 'package:flutter_web_portfolio/app/utils/web_url_strategy.dart'
 ///
 /// Usage:
 /// ```dart
-/// FullscreenMenu.show(context);
+/// NavigationOverlay.show(context);
 /// ```
-class FullscreenMenu extends StatefulWidget {
-  const FullscreenMenu({super.key});
+class NavigationOverlay extends StatefulWidget {
+  const NavigationOverlay({super.key});
 
   static void show(BuildContext context) {
     final reduceMotion = prefersReducedMotion(context);
@@ -41,7 +41,7 @@ class FullscreenMenu extends StatefulWidget {
               reverseTransitionDuration: reduceMotion
                   ? Duration.zero
                   : const Duration(milliseconds: 280),
-              pageBuilder: (_, _, _) => const FullscreenMenu(),
+              pageBuilder: (_, _, _) => const NavigationOverlay(),
             ),
           )
           .whenComplete(() => url_strategy.setTransientOverlayOpen(false)),
@@ -49,11 +49,11 @@ class FullscreenMenu extends StatefulWidget {
   }
 
   @override
-  State<FullscreenMenu> createState() => _FullscreenMenuState();
+  State<NavigationOverlay> createState() => _NavigationOverlayState();
 }
 
-class _FullscreenMenuState extends State<FullscreenMenu>
-    with TickerProviderStateMixin {
+class _NavigationOverlayState extends State<NavigationOverlay>
+    with SingleTickerProviderStateMixin {
   late AnimationController _masterController;
   late Animation<double> _backdropBlur;
   late Animation<double> _overlayOpacity;
@@ -218,7 +218,7 @@ class _FullscreenMenuState extends State<FullscreenMenu>
                             curve: Interval(
                               itemDelay,
                               itemEnd,
-                              curve: CinematicCurves.dramaticEntrance,
+                              curve: MotionCurves.emphasizedDecelerate,
                             ),
                           ),
                         );
@@ -298,7 +298,7 @@ class _MenuItemWidget extends StatelessWidget {
         ? Duration.zero
         : const Duration(milliseconds: 200);
 
-    return CinematicFocusable(
+    return AccessibleAction(
       onTap: onTap,
       onHoverChanged: onHover,
       semanticLabel: label,

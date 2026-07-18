@@ -20,7 +20,7 @@ enum RenderQuality {
       trackPointer: false,
     ),
   ),
-  cinematic(
+  full(
     RenderQualityProfile(
       drawAmbientField: true,
       drawGrain: true,
@@ -33,15 +33,15 @@ enum RenderQuality {
   final RenderQualityProfile profile;
 
   RenderQuality get lower => switch (this) {
-    RenderQuality.cinematic => RenderQuality.balanced,
+    RenderQuality.full => RenderQuality.balanced,
     RenderQuality.balanced => RenderQuality.essential,
     RenderQuality.essential => RenderQuality.essential,
   };
 
   RenderQuality get higher => switch (this) {
     RenderQuality.essential => RenderQuality.balanced,
-    RenderQuality.balanced => RenderQuality.cinematic,
-    RenderQuality.cinematic => RenderQuality.cinematic,
+    RenderQuality.balanced => RenderQuality.full,
+    RenderQuality.full => RenderQuality.full,
   };
 }
 

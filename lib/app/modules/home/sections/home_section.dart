@@ -8,8 +8,8 @@ import 'package:flutter_web_portfolio/app/core/theme/app_fonts.dart';
 import 'package:flutter_web_portfolio/app/domain/models/portfolio_document.dart';
 import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
 import 'package:flutter_web_portfolio/app/narrative/domain/narrative_document.dart';
-import 'package:flutter_web_portfolio/app/widgets/cinematic_button.dart';
-import 'package:flutter_web_portfolio/app/widgets/cinematic_focusable.dart';
+import 'package:flutter_web_portfolio/app/widgets/portfolio_action_button.dart';
+import 'package:flutter_web_portfolio/app/widgets/accessible_action.dart';
 import 'package:flutter_web_portfolio/app/widgets/scroll_indicator.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -162,7 +162,7 @@ class _IdentityRail extends StatelessWidget {
             style: AppFonts.spaceGrotesk(
               fontSize: 12,
               fontWeight: FontWeight.w600,
-              color: AppColors.heroAccent,
+              color: AppColors.accent,
             ),
           ),
         ],
@@ -300,7 +300,7 @@ class _PersonalTitle extends StatelessWidget {
                 SectionId.home,
               ),
               child: Container(
-                color: AppColors.heroAccent,
+                color: AppColors.accent,
                 padding: EdgeInsets.fromLTRB(
                   titleSize * 0.08,
                   titleSize * 0.15,
@@ -380,7 +380,7 @@ class _HeroNarrative extends StatelessWidget {
           spacing: 10,
           runSpacing: 10,
           children: [
-            CinematicButton(
+            PortfolioActionButton(
               label: language.getText(
                 'home_section.view_work',
                 defaultValue: 'Explore my work',
@@ -390,7 +390,7 @@ class _HeroNarrative extends StatelessWidget {
                 firstChapter,
               ),
             ),
-            CinematicButton(
+            PortfolioActionButton(
               label: language.getText(
                 'home_section.email',
                 defaultValue: 'Email me',
@@ -430,7 +430,7 @@ class _CurrentPractice extends StatelessWidget {
           style: AppFonts.spaceGrotesk(
             fontSize: 12,
             fontWeight: FontWeight.w700,
-            color: AppColors.heroAccent,
+            color: AppColors.accent,
             letterSpacing: 0.2,
           ),
         ),
@@ -541,11 +541,11 @@ class _ProfileLink extends StatelessWidget {
   final PortfolioLink link;
 
   @override
-  Widget build(BuildContext context) => CinematicFocusable(
+  Widget build(BuildContext context) => AccessibleAction(
     onTap: () => launchUrl(link.url, webOnlyWindowName: '_blank'),
     semanticLabel: link.label,
-    semanticRole: CinematicControlRole.link,
-    focusColor: AppColors.heroAccent,
+    semanticRole: ActionSemanticRole.link,
+    focusColor: AppColors.accent,
     child: Padding(
       padding: const EdgeInsets.symmetric(vertical: 5),
       child: Row(
@@ -563,7 +563,7 @@ class _ProfileLink extends StatelessWidget {
           const Icon(
             Icons.north_east_rounded,
             size: 14,
-            color: AppColors.heroAccent,
+            color: AppColors.accent,
           ),
         ],
       ),

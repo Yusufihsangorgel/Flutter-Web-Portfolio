@@ -4,33 +4,56 @@ import 'package:flutter_web_portfolio/app/widgets/scroll_indicator.dart';
 
 void main() {
   group('ScrollIndicator', () {
-    testWidgets('renders widget', (tester) async {
+    testWidgets('honors its entrance delay before completing the fade', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         const MaterialApp(
-          home: Scaffold(body: ScrollIndicator(delay: Duration.zero)),
+          home: Scaffold(
+            body: ScrollIndicator(delay: Duration(milliseconds: 300)),
+          ),
         ),
       );
 
-      expect(find.byType(ScrollIndicator), findsOneWidget);
+      Opacity opacity() => tester.widget<Opacity>(find.byType(Opacity));
+      expect(opacity().opacity, 0);
 
-      // Remove the widget tree so repeating animation controllers are disposed,
-      // then pump to flush any pending timers left by Future.delayed and repeat().
+      await tester.pump(const Duration(milliseconds: 299));
+      expect(opacity().opacity, 0);
+
+      await tester.pump(const Duration(milliseconds: 1));
+      await tester.pump(const Duration(seconds: 2));
+      expect(opacity().opacity, 1);
+
       await tester.pumpWidget(const SizedBox());
-      await tester.pump(const Duration(seconds: 3));
     });
 
-    testWidgets('has Container elements', (tester) async {
+    testWidgets('becomes static and semantic-free for reduced motion', (
+      tester,
+    ) async {
+      final semantics = tester.ensureSemantics();
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(body: ScrollIndicator(delay: Duration.zero)),
+        const MediaQuery(
+          data: MediaQueryData(disableAnimations: true),
+          child: MaterialApp(
+            home: Scaffold(body: ScrollIndicator(delay: Duration.zero)),
+          ),
         ),
       );
+      await tester.pump(const Duration(milliseconds: 1));
 
-      expect(find.byType(Container), findsWidgets);
+      final opacity = tester.widget<Opacity>(find.byType(Opacity));
+      final initialDot = tester.widget<Positioned>(find.byType(Positioned));
+      expect(opacity.opacity, 1);
+      expect(initialDot.top, 20);
+      expect(find.bySemanticsLabel(RegExp('.+')), findsNothing);
 
-      // Dispose the widget tree and flush all pending timers
-      await tester.pumpWidget(const SizedBox());
       await tester.pump(const Duration(seconds: 3));
+      final settledDot = tester.widget<Positioned>(find.byType(Positioned));
+      expect(settledDot.top, initialDot.top);
+
+      await tester.pumpWidget(const SizedBox());
+      semantics.dispose();
     });
   });
 }

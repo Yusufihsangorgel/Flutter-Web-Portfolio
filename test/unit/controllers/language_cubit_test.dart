@@ -1,8 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter_web_portfolio/app/domain/repositories/i_language_repository.dart';
+import 'package:flutter_web_portfolio/app/domain/repositories/language_repository.dart';
 import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
 
-final class _LanguageRepository implements ILanguageRepository {
+final class _LanguageRepository implements LanguageRepository {
   _LanguageRepository({
     this.selectedLanguage = 'en',
     Map<String, Map<String, dynamic>>? documents,
@@ -16,7 +16,7 @@ final class _LanguageRepository implements ILanguageRepository {
   final List<String> savedLanguages = [];
 
   @override
-  Set<String> getSupportedLanguages() => const {'en', 'tr', 'de'};
+  Set<String> get supportedLanguages => const {'en', 'tr', 'de'};
 
   @override
   Future<String> getSelectedLanguage() async => selectedLanguage;

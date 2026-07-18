@@ -11,6 +11,12 @@ final class SceneConfig {
     this.vignetteIntensity = 0.4,
   });
 
+  const SceneConfig.document({this.vignetteIntensity = 0.3})
+    : gradient1 = AppColors.sceneGradientStart,
+      gradient2 = AppColors.sceneGradientMiddle,
+      gradient3 = AppColors.sceneGradientEnd,
+      accent = AppColors.accent;
+
   final Color gradient1;
   final Color gradient2;
   final Color gradient3;
@@ -18,7 +24,7 @@ final class SceneConfig {
 
   final double vignetteIntensity;
 
-  /// Lerp between two scene configs for crossfade
+  /// Interpolates the complete ambient palette between two chapters.
   static SceneConfig lerp(SceneConfig a, SceneConfig b, double t) =>
       SceneConfig(
         gradient1: Color.lerp(a.gradient1, b.gradient1, t)!,
@@ -37,48 +43,9 @@ final class SceneConfigs {
 
   static const scenes = [hero, about, experience, proof, projects];
 
-  // Chapter 0: Hero
-  static const hero = SceneConfig(
-    gradient1: AppColors.heroGradient1,
-    gradient2: AppColors.heroGradient2,
-    gradient3: AppColors.heroGradient3,
-    accent: AppColors.heroAccent,
-    vignetteIntensity: 0.3,
-  );
-
-  // Chapter 1: About
-  static const about = SceneConfig(
-    gradient1: AppColors.aboutGradient1,
-    gradient2: AppColors.aboutGradient2,
-    gradient3: AppColors.aboutGradient3,
-    accent: AppColors.aboutAccent,
-    vignetteIntensity: 0.3,
-  );
-
-  // Chapter 2: Experience
-  static const experience = SceneConfig(
-    gradient1: AppColors.expGradient1,
-    gradient2: AppColors.expGradient2,
-    gradient3: AppColors.expGradient3,
-    accent: AppColors.expAccent,
-    vignetteIntensity: 0.3,
-  );
-
-  // Chapter 3: Open source
-  static const proof = SceneConfig(
-    gradient1: AppColors.projGradient1,
-    gradient2: AppColors.projGradient2,
-    gradient3: AppColors.projGradient3,
-    accent: AppColors.projAccent,
-    vignetteIntensity: 0.25,
-  );
-
-  // Selected work section
-  static const projects = SceneConfig(
-    gradient1: AppColors.contactGradient1,
-    gradient2: AppColors.contactGradient2,
-    gradient3: AppColors.contactGradient3,
-    accent: AppColors.contactAccent,
-    vignetteIntensity: 0.4,
-  );
+  static const hero = SceneConfig.document();
+  static const about = SceneConfig.document();
+  static const experience = SceneConfig.document();
+  static const proof = SceneConfig.document(vignetteIntensity: 0.25);
+  static const projects = SceneConfig.document(vignetteIntensity: 0.4);
 }

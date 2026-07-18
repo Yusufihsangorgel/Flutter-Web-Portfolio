@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter_web_portfolio/app/widgets/cinematic_button.dart';
+import 'package:flutter_web_portfolio/app/widgets/portfolio_action_button.dart';
 
 Widget _buildSubject(Widget child) => MaterialApp(home: Scaffold(body: child));
 
 void main() {
-  group('CinematicButton', () {
+  group('PortfolioActionButton', () {
     testWidgets('renders label text', (tester) async {
       await tester.pumpWidget(
-        _buildSubject(CinematicButton(label: 'Click Me', onTap: () {})),
+        _buildSubject(PortfolioActionButton(label: 'Click Me', onTap: () {})),
       );
 
       expect(find.text('Click Me'), findsOneWidget);
@@ -19,7 +19,7 @@ void main() {
 
       await tester.pumpWidget(
         _buildSubject(
-          CinematicButton(label: 'Tap Here', onTap: () => tapped = true),
+          PortfolioActionButton(label: 'Tap Here', onTap: () => tapped = true),
         ),
       );
 

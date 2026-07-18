@@ -3,15 +3,15 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:flutter_web_portfolio/app/controllers/scroll_controller.dart';
-import 'package:flutter_web_portfolio/app/domain/repositories/i_language_repository.dart';
+import 'package:flutter_web_portfolio/app/domain/repositories/language_repository.dart';
 import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
 import 'package:flutter_web_portfolio/app/widgets/command_palette.dart';
 import '../helpers/portfolio_fixture.dart';
 import '../helpers/narrative_fixture.dart';
 
-final class _PaletteLanguageRepository implements ILanguageRepository {
+final class _PaletteLanguageRepository implements LanguageRepository {
   @override
-  Set<String> getSupportedLanguages() => const {'en'};
+  Set<String> get supportedLanguages => const {'en'};
 
   @override
   Future<String> getSelectedLanguage() async => 'en';

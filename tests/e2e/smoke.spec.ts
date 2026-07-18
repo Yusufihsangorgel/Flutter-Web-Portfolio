@@ -17,7 +17,7 @@ async function openPortfolio(page: Page) {
   await expect(page).toHaveTitle(portfolio.site.title);
   await expect(page.locator('html')).toHaveAttribute(
     'data-render-quality',
-    /^(essential|balanced|cinematic)$/,
+    /^(essential|balanced|full)$/,
   );
 }
 

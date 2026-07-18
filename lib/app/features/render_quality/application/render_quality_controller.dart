@@ -166,7 +166,7 @@ final class RenderQualityController extends Cubit<RenderQualityState> {
   static RenderQuality _qualityFor(RenderBudgetLevel level) => switch (level) {
     RenderBudgetLevel.minimal => RenderQuality.essential,
     RenderBudgetLevel.reduced => RenderQuality.balanced,
-    RenderBudgetLevel.full => RenderQuality.cinematic,
+    RenderBudgetLevel.full => RenderQuality.full,
   };
 
   static RenderQualityReason _reasonFor(RenderBudgetTransitionCause cause) =>

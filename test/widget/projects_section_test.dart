@@ -4,17 +4,17 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_web_portfolio/app/controllers/scene_director.dart';
 import 'package:flutter_web_portfolio/app/controllers/scroll_controller.dart';
 import 'package:flutter_web_portfolio/app/domain/models/portfolio_document.dart';
-import 'package:flutter_web_portfolio/app/domain/repositories/i_language_repository.dart';
+import 'package:flutter_web_portfolio/app/domain/repositories/language_repository.dart';
 import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
 import 'package:flutter_web_portfolio/app/modules/home/sections/projects/projects_section.dart';
-import 'package:flutter_web_portfolio/app/widgets/cinematic_focusable.dart';
+import 'package:flutter_web_portfolio/app/widgets/accessible_action.dart';
 
 import '../helpers/narrative_fixture.dart';
 import '../helpers/portfolio_fixture.dart';
 
-final class _ProjectsLanguageRepository implements ILanguageRepository {
+final class _ProjectsLanguageRepository implements LanguageRepository {
   @override
-  Set<String> getSupportedLanguages() => const {'en'};
+  Set<String> get supportedLanguages => const {'en'};
 
   @override
   Future<String> getSelectedLanguage() async => 'en';
@@ -162,7 +162,7 @@ void main() {
       findsAtLeastNWidgets(portfolio.featuredSystems.length + 1),
     );
     final controls = tester
-        .widgetList<CinematicFocusable>(find.byType(CinematicFocusable))
+        .widgetList<AccessibleAction>(find.byType(AccessibleAction))
         .toList(growable: false);
     final expectedLinks =
         portfolio.featuredSystems.fold<int>(

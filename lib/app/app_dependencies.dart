@@ -5,10 +5,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:flutter_web_portfolio/app/controllers/scene_director.dart';
 import 'package:flutter_web_portfolio/app/controllers/scroll_controller.dart';
-import 'package:flutter_web_portfolio/app/data/providers/assets_provider.dart';
-import 'package:flutter_web_portfolio/app/data/providers/local_storage_provider.dart';
-import 'package:flutter_web_portfolio/app/data/repositories/language_repository_impl.dart';
-import 'package:flutter_web_portfolio/app/data/repositories/portfolio_repository_impl.dart';
+import 'package:flutter_web_portfolio/app/data/providers/bundle_asset_loader.dart';
+import 'package:flutter_web_portfolio/app/data/providers/preference_store.dart';
+import 'package:flutter_web_portfolio/app/data/repositories/persistent_language_repository.dart';
 import 'package:flutter_web_portfolio/app/domain/models/portfolio_document.dart';
 import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
 import 'package:flutter_web_portfolio/app/features/render_quality/application/render_quality_controller.dart';
@@ -37,17 +36,17 @@ final class AppDependencies {
   final RenderQualityController renderQualityController;
 
   static Future<AppDependencies> bootstrap() async {
-    final assetsProvider = AssetsProvider();
-    final portfolio = await PortfolioRepositoryImpl(
-      assetsProvider: assetsProvider,
-    ).load();
+    final assetLoader = BundleAssetLoader();
+    final portfolio = PortfolioDocument.fromJson(
+      await assetLoader.loadPortfolio(),
+    );
     final narrative = NarrativeDocument.fromJson(
-      await assetsProvider.loadNarrative(),
+      await assetLoader.loadNarrative(),
     ).forActiveSections(portfolio.activeSections);
-    final storageProvider = await LocalStorageProvider().init();
-    final languageRepository = LanguageRepositoryImpl(
-      assetsProvider: assetsProvider,
-      localStorageProvider: storageProvider,
+    final preferenceStore = await PreferenceStore.open();
+    final languageRepository = PersistentLanguageRepository(
+      assetLoader: assetLoader,
+      preferenceStore: preferenceStore,
     );
     final languageCubit = LanguageCubit(languageRepository: languageRepository);
     await languageCubit.initialize();

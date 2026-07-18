@@ -9,11 +9,11 @@ import 'package:flutter_web_portfolio/app/core/theme/app_fonts.dart';
 import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
 import 'package:flutter_web_portfolio/app/controllers/scroll_controller.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
-import 'package:flutter_web_portfolio/app/core/constants/cinematic_curves.dart';
+import 'package:flutter_web_portfolio/app/core/constants/motion_curves.dart';
 import 'package:flutter_web_portfolio/app/core/constants/durations.dart';
 import 'package:flutter_web_portfolio/app/utils/web_url_strategy.dart'
     as url_strategy;
-import 'package:flutter_web_portfolio/app/widgets/cinematic_focusable.dart';
+import 'package:flutter_web_portfolio/app/widgets/accessible_action.dart';
 
 /// A command entry that the palette can display and execute.
 class _PaletteCommand {
@@ -54,7 +54,7 @@ class CommandPalette extends StatefulWidget {
         transitionBuilder: (context, animation, _, child) {
           final curved = CurvedAnimation(
             parent: animation,
-            curve: CinematicCurves.dramaticEntrance,
+            curve: MotionCurves.emphasizedDecelerate,
           );
           return FadeTransition(
             opacity: curved,
@@ -399,7 +399,7 @@ class _CommandPaletteState extends State<CommandPalette> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             ?categoryHeader,
-            CinematicFocusable(
+            AccessibleAction(
               onTap: command.onExecute,
               onHoverChanged: (hovered) {
                 if (hovered) setState(() => _selectedIndex = index);
@@ -426,7 +426,7 @@ class _CommandPaletteState extends State<CommandPalette> {
                       command.icon,
                       size: 16,
                       color: isSelected
-                          ? AppColors.heroAccent
+                          ? AppColors.accent
                           : AppColors.textSecondary,
                     ),
                     const SizedBox(width: 12),
