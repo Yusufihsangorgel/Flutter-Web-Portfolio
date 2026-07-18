@@ -1,3 +1,5 @@
+import { spawnSync } from 'node:child_process';
+import { readFileSync } from 'node:fs';
 import { readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import process from 'node:process';
@@ -7,13 +9,36 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const checkOnly = process.argv.includes('--check');
 const sourcePath = path.join(root, 'assets', 'content', 'portfolio.json');
 const document = JSON.parse(await readFile(sourcePath, 'utf8'));
+const githubRepository = detectGithubRepository();
 
 const operations = [
+  () => syncDelimitedFile(
+    path.join(root, 'README.md'),
+    '<!-- portfolio-ci:start -->',
+    '<!-- portfolio-ci:end -->',
+    renderCiBadge(githubRepository),
+  ),
+  () => syncDelimitedFile(
+    path.join(root, 'README.md'),
+    '<!-- portfolio-template:start -->',
+    '<!-- portfolio-template:end -->',
+    renderTemplateCta(document, githubRepository),
+  ),
+  () => syncMarkedFile(
+    path.join(root, 'README.md'),
+    'portfolio-onboarding',
+    renderOnboarding(document),
+  ),
   () => syncDelimitedFile(
     path.join(root, 'README.md'),
     '<!-- portfolio-demo:start -->',
     '<!-- portfolio-demo:end -->',
     renderDemoLinks(document),
+  ),
+  () => syncMarkedFile(
+    path.join(root, 'README.md'),
+    'portfolio-record-intro',
+    renderRecordIntro(document),
   ),
   () => syncMarkedFile(
     path.join(root, 'README.md'),
@@ -58,6 +83,22 @@ const operations = [
     '  # portfolio-csp:start',
     '  # portfolio-csp:end',
     renderNginxCsp(document),
+  ),
+  () => syncDelimitedFile(
+    path.join(root, 'web', '_headers'),
+    '  # portfolio-csp:start',
+    '  # portfolio-csp:end',
+    `  Content-Security-Policy: ${renderContentSecurityPolicy(document)}`,
+  ),
+  () => syncProviderJson(
+    path.join(root, 'firebase.json'),
+    document,
+    'Firebase',
+  ),
+  () => syncProviderJson(
+    path.join(root, 'vercel.json'),
+    document,
+    'Vercel',
   ),
   () => syncPackage(document),
   () => syncManifest(document),
@@ -115,6 +156,12 @@ async function syncPackage(data) {
   const current = await readFile(file, 'utf8');
   const packageDocument = JSON.parse(current);
   packageDocument.homepage = data.site.url;
+  if (githubRepository) {
+    packageDocument.repository = {
+      type: 'git',
+      url: `https://github.com/${githubRepository}.git`,
+    };
+  }
   const next = `${JSON.stringify(packageDocument, null, 2)}\n`;
   if (next === current) return { file, changed: false };
   if (!checkOnly) await writeFile(file, next);
@@ -146,6 +193,31 @@ async function syncManifest(data) {
     return { file, changed: false };
   }
   const next = `${JSON.stringify(manifest, null, 2)}\n`;
+  if (!checkOnly) await writeFile(file, next);
+  return { file, changed: true };
+}
+
+async function syncProviderJson(file, data, provider) {
+  const current = await readFile(file, 'utf8');
+  const configuration = JSON.parse(current);
+  const headerGroups = provider === 'Firebase'
+    ? configuration.hosting?.headers
+    : configuration.headers;
+  if (!Array.isArray(headerGroups) || headerGroups.length === 0) {
+    throw new Error(`${provider} configuration is missing its global header group`);
+  }
+  const global = headerGroups[0];
+  if (!Array.isArray(global.headers)) {
+    throw new Error(`${provider} global header group is malformed`);
+  }
+  const value = renderContentSecurityPolicy(data);
+  const existing = global.headers.find(
+    (header) => header.key === 'Content-Security-Policy',
+  );
+  if (existing) existing.value = value;
+  else global.headers.push({ key: 'Content-Security-Policy', value });
+  const next = `${JSON.stringify(configuration, null, 2)}\n`;
+  if (next === current) return { file, changed: false };
   if (!checkOnly) await writeFile(file, next);
   return { file, changed: true };
 }
@@ -223,13 +295,53 @@ function renderDemoLinks(data) {
         link?.url,
         `site.engineering_links[${index}].url`,
       );
-      return `[${markdownLabel(label)}](${url})`;
+      // This fragment lives inside a raw HTML <p> block in README.md.
+      // GitHub does not parse Markdown links inside that block, so emit real
+      // anchors instead of leaving visible `[label](url)` syntax behind.
+      return `<a href="${html(url)}">${html(label)}</a>`;
     })
     .join(' · ');
 }
 
+function renderCiBadge(repository) {
+  if (!repository) {
+    return '  <a href=".github/workflows/ci.yml"><img alt="CI workflow configuration" src="https://img.shields.io/badge/CI-configured-1E51FF?style=flat-square&amp;logo=githubactions&amp;logoColor=white"></a>';
+  }
+  const workflow = `https://github.com/${repository}/actions/workflows/ci.yml`;
+  return `  <a href="${html(workflow)}"><img alt="CI status" src="${html(`${workflow}/badge.svg?branch=main`)}"></a>`;
+}
+
+function renderTemplateCta(data, repository) {
+  if (data.site.template_repository !== true) {
+    if (!repository) {
+      return '  This repository has been initialized. Enable GitHub’s <strong>Template repository</strong> setting before offering one-click copies.';
+    }
+    const source = `https://github.com/${repository}`;
+    return `  <a href="${html(source)}"><img alt="View repository" src="https://img.shields.io/badge/VIEW%20REPOSITORY-F2EEE5?style=for-the-badge&amp;logo=github&amp;logoColor=12110F"></a>`;
+  }
+  if (!repository) {
+    return '  Use GitHub’s <strong>Use this template</strong> action, then run the initializer below.';
+  }
+  const generate = `https://github.com/${repository}/generate`;
+  return `  <a href="${html(generate)}"><img alt="Create a repository from this template" src="https://img.shields.io/badge/USE%20THIS%20TEMPLATE-DFFF3F?style=for-the-badge&amp;logo=github&amp;logoColor=12110F"></a>`;
+}
+
+function renderOnboarding(data) {
+  if (data.site.template_repository !== true) {
+    return `This repository already contains an initialized portfolio. Clone it directly, then run the commands below to verify the current record. Run \`npm run portfolio:init\` only when you intend to replace that record and remove its optional work, experience, translations, and release artifact.`;
+  }
+  return `Choose **Use this template** above and create your own repository. Do not fork the demo for a personal site: GitHub forks retain the parent history, whereas a repository created from a template starts with one unrelated commit. Forks remain the right path for contributing changes back here. Clone your new repository, then run:`;
+}
+
+function renderRecordIntro(data) {
+  if (data.site.template_repository !== true) {
+    return `This section is regenerated from the repository owner's canonical content document. It describes the current portfolio record rather than reusable starter data.`;
+  }
+  return `The live demo uses the same template with a real professional record. This block is regenerated from the canonical content document; it is evidence for the demo, not starter data inherited by \`npm run portfolio:init\`.`;
+}
+
 function renderRobots(data) {
-  const site = new URL(data.site.url);
+  const site = siteDirectoryUrl(data.site.url);
   return `User-agent: *
 Allow: /
 Sitemap: ${new URL('sitemap.xml', site).toString()}`;
@@ -247,7 +359,7 @@ function renderSitemap(data) {
 </urlset>`;
 }
 
-function renderNginxCsp(data) {
+function renderContentSecurityPolicy(data) {
   const analyticsOrigin = data.site.analytics
     ? new URL(data.site.analytics.script_url).origin
     : '';
@@ -255,12 +367,16 @@ function renderNginxCsp(data) {
     .filter(Boolean)
     .join(' ');
   const connections = ["'self'", analyticsOrigin].filter(Boolean).join(' ');
-  return `  add_header Content-Security-Policy "default-src 'self'; script-src ${scripts}; worker-src 'self' blob:; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: https: blob:; connect-src ${connections}; frame-ancestors 'self';" always;`;
+  return `default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; script-src ${scripts}; worker-src 'self' blob:; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: https: blob:; connect-src ${connections}; frame-ancestors 'self';`;
+}
+
+function renderNginxCsp(data) {
+  return `  add_header Content-Security-Policy "${renderContentSecurityPolicy(data)}" always;`;
 }
 
 function renderHeadMeta(data) {
   const site = data.site;
-  const image = new URL(site.social_image, site.url).toString();
+  const image = siteAssetUrl(site.url, site.social_image);
   const title = html(site.title);
   const description = html(site.description);
   const social = html(site.social_description);
@@ -311,7 +427,7 @@ function renderHeadMeta(data) {
 function renderStructuredData(data) {
   const sameAs = data.profile.links.map((link) => link.url);
   return `  <script type="application/ld+json">
-  ${JSON.stringify(
+  ${jsonForHtmlScript(
     {
       '@context': 'https://schema.org',
       '@graph': [
@@ -332,8 +448,6 @@ function renderStructuredData(data) {
         },
       ],
     },
-    null,
-    2,
   ).replaceAll('\n', '\n  ')}
   </script>`;
 }
@@ -404,6 +518,67 @@ function markdownLabel(value) {
     .replaceAll('\\', '\\\\')
     .replaceAll('[', '\\[')
     .replaceAll(']', '\\]');
+}
+
+function detectGithubRepository() {
+  const configured = process.env.PORTFOLIO_GITHUB_REPOSITORY?.trim();
+  if (configured) return validateGithubRepository(configured);
+  const result = spawnSync('git', ['config', '--get', 'remote.origin.url'], {
+    cwd: root,
+    encoding: 'utf8',
+  });
+  const remote = result.status === 0
+    ? result.stdout.trim()
+    : configuredRepositoryFromPackage();
+  if (!remote) return null;
+  const match = remote.match(
+    /(?:github\.com[/:])([A-Za-z0-9_.-]+)\/([A-Za-z0-9_.-]+?)(?:\.git)?$/,
+  );
+  return match ? `${match[1]}/${match[2]}` : null;
+}
+
+function configuredRepositoryFromPackage() {
+  const packageDocument = JSON.parse(
+    readFileSync(path.join(root, 'package.json'), 'utf8'),
+  );
+  const repository = packageDocument.repository;
+  if (typeof repository === 'string') return repository;
+  return typeof repository?.url === 'string' ? repository.url : null;
+}
+
+function validateGithubRepository(value) {
+  if (!/^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/.test(value)) {
+    throw new Error(
+      'PORTFOLIO_GITHUB_REPOSITORY must use the owner/repository form',
+    );
+  }
+  return value;
+}
+
+function siteDirectoryUrl(value) {
+  const site = new URL(value);
+  if (!site.pathname.endsWith('/')) site.pathname = `${site.pathname}/`;
+  site.search = '';
+  site.hash = '';
+  return site;
+}
+
+function siteAssetUrl(siteUrl, assetPath) {
+  const relative = requiredString(assetPath, 'site.social_image').replace(/^\/+/, '');
+  return new URL(relative, siteDirectoryUrl(siteUrl)).toString();
+}
+
+function jsonForHtmlScript(value) {
+  return JSON.stringify(value, null, 2).replace(
+    /[<>&\u2028\u2029]/g,
+    (character) => ({
+      '<': '\\u003c',
+      '>': '\\u003e',
+      '&': '\\u0026',
+      '\u2028': '\\u2028',
+      '\u2029': '\\u2029',
+    })[character],
+  );
 }
 
 function html(value) {

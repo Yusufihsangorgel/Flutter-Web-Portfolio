@@ -28,7 +28,12 @@ migrate_working_dir/
 .flutter-plugins-dependencies
 .pub-cache/
 .pub/
-/build/
+/build/*
+# The canonical deploy artifact is intentionally versioned because the
+# production Dockerfile serves it without compiling Flutter on the host.
+!/build/web/
+!/build/web/**
+assets/work/.portfolio-test-*
 
 # Symbolication related
 app.*.symbols
@@ -46,8 +51,20 @@ coverage/
 
 # Secrets & signing
 .env
+.env.*
+!.env.example
+*.key
+*.pem
+*.p12
+*.pfx
 *.jks
 *.keystore
+*service-account*.json
+*service_account*.json
+.firebase/
+.netlify/
+.vercel/
+.wrangler/
 
 # Local workspace tooling
 .metadata

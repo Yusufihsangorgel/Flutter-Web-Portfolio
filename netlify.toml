@@ -3,5 +3,4 @@
   publish = "build/web"
 
 [build.environment]
-  NODE_VERSION = "24"
-  FLUTTER_REVISION = "ee80f08bbf97172ec030b8751ceab557177a34a6"
+  NODE_VERSION = "24.18.0"

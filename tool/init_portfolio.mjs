@@ -1,9 +1,22 @@
 import { spawnSync } from 'node:child_process';
-import { mkdir, readFile, readdir, rm, writeFile } from 'node:fs/promises';
+import {
+  cp,
+  lstat,
+  mkdir,
+  mkdtemp,
+  readFile,
+  readdir,
+  rename,
+  rm,
+  writeFile,
+} from 'node:fs/promises';
+import os from 'node:os';
 import path from 'node:path';
 import process from 'node:process';
 import { createInterface } from 'node:readline/promises';
 import { fileURLToPath } from 'node:url';
+
+import { resolveExecutable } from './cli_safety.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const defaultOutput = path.join(root, 'assets', 'content', 'portfolio.json');
@@ -24,22 +37,81 @@ try {
   const output = path.resolve(options.output ?? defaultOutput);
 
   await ensureOverwriteIsAllowed(output, options.force, prompt);
-  await mkdir(path.dirname(output), { recursive: true });
-  await writeFile(output, `${JSON.stringify(document, null, 2)}\n`);
+  const synchronizesRepository = output === defaultOutput;
+  const initializationRepository = synchronizesRepository
+    ? resolveInitializationRepository(options.repository)
+    : null;
+  if (synchronizesRepository) {
+    run(process.execPath, [
+      path.join(root, 'tool', 'render_social_card.mjs'),
+      '--check-browser',
+    ]);
+  }
 
-  console.log(`\nCreated ${path.relative(root, output)}.`);
+  const transaction = synchronizesRepository
+    ? await createRepositoryTransaction()
+    : null;
+  try {
+    await writeAtomically(output, `${JSON.stringify(document, null, 2)}\n`);
+    console.log(`\nCreated ${path.relative(root, output)}.`);
 
-  if (output === defaultOutput && !options.skipSync) {
-    if (!options.keepDemoAssets) {
+    if (synchronizesRepository) {
+      await rm(path.join(root, 'assets', 'content', 'locales'), {
+        recursive: true,
+        force: true,
+      });
+      await mkdir(path.join(root, 'assets', 'content', 'locales'), {
+        recursive: true,
+      });
+      await writeFile(
+        path.join(root, 'assets', 'content', 'locales', '.gitkeep'),
+        '',
+      );
+      console.log('Removed the demo owner’s translated professional copy.');
       await pruneDemoAssets();
       console.log('Removed the demo owner’s work artifacts and source captures.');
+      await removeDemoArtifactRenderer();
+      console.log('Removed the demo owner’s artifact renderer and package command.');
+      await writeStarterChangelog();
+      console.log('Replaced the demo history with an identity-neutral changelog.');
+      await rm(path.join(root, 'build', 'web'), {
+        recursive: true,
+        force: true,
+      });
+      console.log('Removed the inherited public release; a clean build is required.');
+      const syncEnvironment = {
+        ...process.env,
+        PORTFOLIO_GITHUB_REPOSITORY: initializationRepository,
+      };
+      run(
+        process.execPath,
+        [path.join(root, 'tool', 'sync_public_content.mjs')],
+        syncEnvironment,
+      );
+      run(
+        process.execPath,
+        [path.join(root, 'tool', 'render_social_card.mjs')],
+        syncEnvironment,
+      );
+      run(
+        process.execPath,
+        [path.join(root, 'tool', 'write_source_manifest.mjs')],
+        syncEnvironment,
+      );
+      console.log('Synchronized metadata, README record, manifest, and hosting files.');
+    } else if (output !== defaultOutput) {
+      console.log('Skipped repository synchronization for the custom output path.');
     }
-    run(process.execPath, [path.join(root, 'tool', 'sync_public_content.mjs')]);
-    run(process.execPath, [path.join(root, 'tool', 'render_social_card.mjs')]);
-    run(process.execPath, [path.join(root, 'tool', 'write_source_manifest.mjs')]);
-    console.log('Synchronized metadata, README record, manifest, and hosting files.');
-  } else if (output !== defaultOutput) {
-    console.log('Skipped repository synchronization for the custom output path.');
+  } catch (error) {
+    if (transaction) {
+      await transaction.rollback();
+      console.error(
+        'Initialization failed; restored every repository file changed by the initializer.',
+      );
+    }
+    throw error;
+  } finally {
+    await transaction?.dispose();
   }
 
   console.log('\nNext:');
@@ -48,6 +120,9 @@ try {
       ? '  npm run portfolio:validate'
       : `  npm run portfolio:validate -- ${path.relative(root, output)}`,
   );
+  if (output === defaultOutput) {
+    console.log('  npm run build:release');
+  }
   console.log('  flutter run -d chrome');
 } finally {
   prompt?.close();
@@ -77,7 +152,7 @@ async function collectAnswers(args, reader) {
     await requiredAnswer(
       args.site,
       'Canonical site URL',
-      'https://example.com',
+      undefined,
       reader,
     ),
   );
@@ -88,13 +163,13 @@ async function collectAnswers(args, reader) {
     reader,
   );
   const primary = await requiredAnswer(
-    args.primary,
+    args.primaryNameLine ?? args.primary,
     'Primary name line',
     suggestedNames.primary,
     reader,
   );
   const accent = await requiredAnswer(
-    args.accent,
+    args.accentNameLine ?? args.accent,
     'Accent name line',
     suggestedNames.accent,
     reader,
@@ -174,12 +249,14 @@ function createPortfolioDocument(answers) {
     content_version: contentVersion,
     verified_at: today,
     site: {
+      template_repository: false,
       url: answers.site,
       title: `${answers.name} — ${answers.role}`,
       description: `${answers.name} is a ${answers.role.toLowerCase()} focused on ${answers.focus.join(', ')}.`,
       social_description: answers.headline,
       social_image: '/assets/og/engineering-showcase.png',
       domain_label: siteUrl.hostname.toUpperCase(),
+      locales: ['en'],
       engineering_links: [
         { id: 'live-site', label: 'Live site', url: answers.site },
         {
@@ -267,29 +344,58 @@ async function ensureOverwriteIsAllowed(output, force, reader) {
 
 function parseArguments(values) {
   const parsed = {};
+  const valueOptions = new Set([
+    '--accent',
+    '--accent-name-line',
+    '--background',
+    '--email',
+    '--focus',
+    '--github',
+    '--headline',
+    '--location',
+    '--name',
+    '--navigation',
+    '--output',
+    '--primary',
+    '--primary-name-line',
+    '--repository',
+    '--role',
+    '--since',
+    '--site',
+    '--summary',
+  ]);
   for (let index = 0; index < values.length; index += 1) {
     const token = values[index];
     if (token === '--force') {
+      if (parsed.force) throw new Error('--force may only be provided once.');
       parsed.force = true;
       continue;
     }
     if (token === '--skip-sync') {
-      parsed.skipSync = true;
-      continue;
+      throw new Error(
+        '--skip-sync was removed: use --output for an isolated draft; the canonical portfolio must update every public surface transactionally.',
+      );
     }
     if (token === '--keep-demo-assets') {
-      parsed.keepDemoAssets = true;
-      continue;
+      throw new Error(
+        '--keep-demo-assets was removed: initialized repositories must not retain demo-owner artifacts.',
+      );
     }
     if (token === '--help' || token === '-h') {
+      if (parsed.help) throw new Error('--help may only be provided once.');
       parsed.help = true;
       continue;
     }
     if (!token.startsWith('--')) throw new Error(`Unexpected argument: ${token}`);
+    if (!valueOptions.has(token)) throw new Error(`Unexpected argument: ${token}`);
     const key = token.slice(2).replaceAll('-', '_');
+    const parsedKey = camelCase(key);
+    if (Object.hasOwn(parsed, parsedKey)) {
+      throw new Error(`${token} may only be provided once.`);
+    }
     const next = values[index + 1];
     if (!next || next.startsWith('--')) throw new Error(`${token} requires a value.`);
-    parsed[camelCase(key)] = next;
+    parsed[parsedKey] = next;
     index += 1;
   }
   return parsed;
@@ -300,6 +406,37 @@ async function pruneDemoAssets() {
   await pruneDirectory(
     path.join(root, 'tool', 'work_sources'),
     new Set(['README.md']),
+  );
+  await writeFile(
+    path.join(root, 'tool', 'work_sources', 'README.md'),
+    `# Work artifact sources\n\nKeep a source ledger for every project image you add to \`assets/work/\`. Record\nthe original URL or local capture, capture date, permitted use, and any crop or\ncomposition applied. Do not add evidence you cannot publicly substantiate.\n`,
+  );
+}
+
+async function removeDemoArtifactRenderer() {
+  await rm(path.join(root, 'tool', 'render_work_artifacts.mjs'), {
+    force: true,
+  });
+  const packagePath = path.join(root, 'package.json');
+  const packageDocument = JSON.parse(await readFile(packagePath, 'utf8'));
+  delete packageDocument.scripts?.['render:work-artifacts'];
+  await writeAtomically(packagePath, `${JSON.stringify(packageDocument, null, 2)}\n`);
+}
+
+async function writeStarterChangelog() {
+  await writeAtomically(
+    path.join(root, 'CHANGELOG.md'),
+    `# Changelog
+
+This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [Unreleased]
+
+### Changed
+
+- Initialized a clean portfolio record and regenerated every public surface.
+- Removed the template demo's professional history, artifacts, and localized claims.
+`,
   );
 }
 
@@ -348,16 +485,129 @@ function validateEmail(value) {
   return value;
 }
 
-function run(command, args) {
-  const result = spawnSync(command, args, {
+function run(command, args, environment = process.env) {
+  const executable = resolveExecutable(command);
+  const result = spawnSync(executable, args, {
     cwd: root,
     stdio: 'inherit',
-    shell: process.platform === 'win32',
+    shell: false,
+    env: environment,
   });
   if (result.error) throw result.error;
   if (result.status !== 0) {
     throw new Error(`${command} ${args.join(' ')} exited with ${result.status}.`);
   }
+}
+
+function resolveInitializationRepository(explicitRepository) {
+  if (nonEmpty(explicitRepository)) return validateRepository(explicitRepository);
+  const result = spawnSync(resolveExecutable('git'), [
+    'config',
+    '--get',
+    'remote.origin.url',
+  ], {
+    cwd: root,
+    encoding: 'utf8',
+    shell: false,
+  });
+  const remote = result.status === 0 ? result.stdout.trim() : '';
+  const match = remote.match(
+    /(?:github\.com[/:])([A-Za-z0-9_.-]+)\/([A-Za-z0-9_.-]+?)(?:\.git)?$/,
+  );
+  if (match) return `${match[1]}/${match[2]}`;
+  throw new Error(
+    'A GitHub origin was not found. Pass --repository owner/repository so initialization cannot retain the template owner’s repository metadata.',
+  );
+}
+
+async function writeAtomically(output, contents) {
+  await mkdir(path.dirname(output), { recursive: true });
+  const temporary = path.join(
+    path.dirname(output),
+    `.${path.basename(output)}.${process.pid}.${Date.now()}.tmp`,
+  );
+  try {
+    await writeFile(temporary, contents);
+    await rename(temporary, output);
+  } finally {
+    await rm(temporary, { force: true });
+  }
+}
+
+async function createRepositoryTransaction() {
+  const temporary = await mkdtemp(
+    path.join(os.tmpdir(), 'portfolio-init-transaction-'),
+  );
+  const targets = [
+    'README.md',
+    'CHANGELOG.md',
+    'CODE_OF_CONDUCT.md',
+    'SECURITY.md',
+    'package.json',
+    'nginx/default.conf',
+    'firebase.json',
+    'vercel.json',
+    'web/_headers',
+    'web/index.html',
+    'web/manifest.json',
+    'web/robots.txt',
+    'web/sitemap.xml',
+    'assets/content/portfolio.json',
+    'assets/content/locales',
+    'assets/work',
+    'tool/work_sources',
+    'tool/render_work_artifacts.mjs',
+    'web/assets/og/engineering-showcase.png',
+    'web/assets/og/engineering-showcase.png.sha256',
+    'assets/build/source_manifest.sha256',
+    'build/web',
+  ];
+  const snapshots = [];
+  for (const relative of targets) {
+    const target = path.join(root, relative);
+    const backup = path.join(temporary, relative);
+    const existed = await pathExists(target);
+    snapshots.push({ target, backup, existed });
+    if (existed) {
+      await mkdir(path.dirname(backup), { recursive: true });
+      await cp(target, backup, { recursive: true, force: true });
+    }
+  }
+  return {
+    async rollback() {
+      for (const snapshot of snapshots) {
+        await rm(snapshot.target, { recursive: true, force: true });
+        if (snapshot.existed) {
+          await mkdir(path.dirname(snapshot.target), { recursive: true });
+          await cp(snapshot.backup, snapshot.target, {
+            recursive: true,
+            force: true,
+          });
+        }
+      }
+    },
+    async dispose() {
+      await rm(temporary, { recursive: true, force: true });
+    },
+  };
+}
+
+async function pathExists(target) {
+  try {
+    await lstat(target);
+    return true;
+  } catch (error) {
+    if (error?.code === 'ENOENT') return false;
+    throw error;
+  }
+}
+
+function validateRepository(value) {
+  const normalized = value.trim();
+  if (!/^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/.test(normalized)) {
+    throw new Error('--repository must use the GitHub owner/repository form.');
+  }
+  return normalized;
 }
 
 function nonEmpty(value) {
@@ -385,7 +635,9 @@ Non-interactive:
     --force
 
 Optional flags:
-  --github, --primary, --accent, --navigation, --since, --headline,
-  --summary, --background, --output, --skip-sync, --keep-demo-assets, --force
+  --github, --primary-name-line, --accent-name-line, --navigation, --since,
+  --headline,
+  --summary, --background, --repository, --output,
+  --force
 `);
 }

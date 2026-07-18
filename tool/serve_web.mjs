@@ -1,8 +1,15 @@
-import { createReadStream, existsSync, readFileSync, statSync } from 'node:fs';
+import { createReadStream, existsSync, readFileSync } from 'node:fs';
 import { createServer } from 'node:http';
-import { extname, join, normalize, resolve } from 'node:path';
+import { extname, join } from 'node:path';
 
-const root = resolve(process.env.WEB_ROOT ?? 'build/web');
+import {
+  canonicalStaticRoot,
+  resolveStaticFile,
+  StaticPathViolation,
+} from './safe_static_path.mjs';
+import { parseGlobalStaticHeaders } from './static_header_policy.mjs';
+
+const configuredRoot = process.env.WEB_ROOT ?? 'build/web';
 const port = Number(process.env.PORT ?? 4173);
 const wasmDelayMs = Number(process.env.WASM_DELAY_MS ?? 0);
 
@@ -28,68 +35,49 @@ const contentTypes = new Map([
   ['.woff2', 'font/woff2'],
 ]);
 
-if (!existsSync(join(root, 'index.html'))) {
+if (!existsSync(join(configuredRoot, 'index.html'))) {
   throw new Error(
-    'build/web is missing. Run flutter build web --release --wasm --no-web-resources-cdn first.',
+    'build/web is missing. Run npm run build:release first.',
   );
 }
+const root = canonicalStaticRoot(configuredRoot);
 
-const portfolio = JSON.parse(
-  readFileSync(
-    join(root, 'assets', 'assets', 'content', 'portfolio.json'),
-    'utf8',
-  ),
+const globalHeaders = parseGlobalStaticHeaders(
+  readFileSync(join(root, '_headers'), 'utf8'),
 );
-const analyticsOrigin = portfolio.site?.analytics?.script_url
-  ? new URL(portfolio.site.analytics.script_url).origin
-  : '';
-const scriptSources = [
-  "'self'",
-  "'unsafe-inline'",
-  "'unsafe-eval'",
-  analyticsOrigin,
-].filter(Boolean).join(' ');
-const connectSources = [
-  "'self'",
-  'https://api.rss2json.com',
-  'https://api.github.com',
-  analyticsOrigin,
-].filter(Boolean).join(' ');
-const contentSecurityPolicy =
-  `default-src 'self'; script-src ${scriptSources}; ` +
-  "worker-src 'self' blob:; style-src 'self' 'unsafe-inline'; " +
-  "font-src 'self'; img-src 'self' data: https: blob:; " +
-  `connect-src ${connectSources}; frame-ancestors 'self';`;
 
 const server = createServer((request, response) => {
-  const requestUrl = new URL(request.url ?? '/', `http://${request.headers.host}`);
-  const decodedPath = decodeURIComponent(requestUrl.pathname);
-  const relativePath = normalize(decodedPath).replace(/^[/\\]+/, '');
-  let filePath = resolve(root, relativePath);
+  for (const { name, value } of globalHeaders) response.setHeader(name, value);
+  // Preview responses must never be confused with a provider's immutable
+  // production cache policy.
+  response.setHeader('Cache-Control', 'no-store');
 
-  if (!filePath.startsWith(`${root}/`) && filePath !== root) {
+  let decodedPath;
+  try {
+    const requestUrl = new URL(request.url ?? '/', 'http://127.0.0.1');
+    decodedPath = decodeURIComponent(requestUrl.pathname);
+  } catch {
+    response.writeHead(400, { 'Content-Type': 'text/plain; charset=utf-8' });
+    response.end('Bad Request');
+    return;
+  }
+  if (decodedPath.includes('\0')) {
+    response.writeHead(400, { 'Content-Type': 'text/plain; charset=utf-8' });
+    response.end('Bad Request');
+    return;
+  }
+  let filePath;
+  try {
+    filePath = resolveStaticFile(root, decodedPath);
+  } catch (error) {
+    if (!(error instanceof StaticPathViolation)) throw error;
     response.writeHead(403).end('Forbidden');
     return;
   }
-
-  response.setHeader('Cache-Control', 'no-store');
-  response.setHeader('Cross-Origin-Embedder-Policy', 'credentialless');
-  response.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
-  response.setHeader(
-    'Content-Security-Policy',
-    contentSecurityPolicy,
-  );
-
-  if (existsSync(filePath) && statSync(filePath).isDirectory()) {
-    filePath = join(filePath, 'index.html');
-  }
-  if (!existsSync(filePath) || !statSync(filePath).isFile()) {
-    if (extname(relativePath)) {
-      response.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
-      response.end('Not Found');
-      return;
-    }
-    filePath = join(root, 'index.html');
+  if (!filePath) {
+    response.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
+    response.end('Not Found');
+    return;
   }
 
   response.setHeader(

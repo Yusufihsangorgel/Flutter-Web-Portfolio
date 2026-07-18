@@ -14,7 +14,11 @@ Thanks for your interest in contributing to this project. Here's how to get star
    ```bash
    flutter pub get
    npm ci
+   npm run setup:browsers
    ```
+
+   Chromium is used only by the social-card renderer and browser regression
+   gates; the portfolio itself does not ship a Node.js or Playwright runtime.
 4. **Create a branch** for your change:
    ```bash
    git checkout -b feature/your-feature-name
@@ -46,14 +50,18 @@ dart format --output=none --set-exit-if-changed lib test tool
 flutter analyze --fatal-infos
 
 # Content and clean-template contracts
+npm run verify:toolchain
 npm run verify:content
 npm run portfolio:validate
 npm run test:template
 npm run test:clone
+npm run test:release-security
 npm run verify:hosting
 npm run verify:community
 npm run verify:source
+npm run audit:sources
 npm run audit:history
+npm run typecheck
 
 # All Dart tests pass
 flutter test
@@ -61,6 +69,7 @@ flutter test
 # Dual-runtime release, bundle integrity, and browser regressions
 npm run build:release
 npm test
+npm run verify:runtime
 ```
 
 ## Pull Request Process
@@ -109,10 +118,11 @@ Application features with state, infrastructure, and presentation code belong
 under `lib/app/features/<feature>/`. Keep frame-frequency state out of Cubits;
 use a synchronous `Listenable` when a value can change every rendered frame.
 
-Professional names, claims, work, and links belong only in
+Professional facts, names, dates, work, and links belong in
 `assets/content/portfolio.json`. Interface translations belong in
-`assets/i18n/`. A presentation-code branch for one person or project is not
-accepted.
+`assets/i18n/`; complete non-English professional copy belongs in
+`assets/content/locales/<locale>.json` and must preserve the canonical facts.
+A presentation-code branch for one person or project is not accepted.
 
 ## Reporting Bugs
 

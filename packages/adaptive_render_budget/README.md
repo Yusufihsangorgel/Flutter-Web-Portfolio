@@ -115,9 +115,9 @@ The controller accepts custom implementations of:
 This keeps policy tests deterministic without pumping frames or waiting for
 wall-clock time.
 
-Run package checks with the workspace-pinned SDK:
+Run package checks with your active workspace SDK:
 
 ```sh
-/Users/yusufihsan/flutter/flutter-3.44.6/bin/flutter analyze
-/Users/yusufihsan/flutter/flutter-3.44.6/bin/flutter test
+flutter analyze
+flutter test
 ```

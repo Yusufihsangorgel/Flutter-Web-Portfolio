@@ -2,49 +2,75 @@
   <img src="docs/readme/hero.svg" width="100%" alt="Flutter Web Portfolio — your work with proof">
 </h1>
 
-<p align="center"><strong>A portfolio that behaves like a measured document and ships like a static file.</strong></p>
+<p align="center"><strong>A portfolio that reads as one continuous document and deploys as static files.</strong></p>
 
 <p align="center">
-  <a href=".github/workflows/ci.yml"><img alt="CI-enforced quality gate" src="https://img.shields.io/badge/quality%20gate-CI%20enforced-1E51FF?style=flat-square&amp;logo=githubactions&amp;logoColor=white"></a>
+  <!-- portfolio-ci:start -->
+  <a href="https://github.com/Yusufihsangorgel/Flutter-Web-Portfolio/actions/workflows/ci.yml"><img alt="CI status" src="https://github.com/Yusufihsangorgel/Flutter-Web-Portfolio/actions/workflows/ci.yml/badge.svg?branch=main"></a>
+<!-- portfolio-ci:end -->
   <a href="https://flutter.dev"><img alt="Flutter 3.44.6" src="https://img.shields.io/badge/Flutter-3.44.6-1E51FF?style=flat-square&amp;logo=flutter&amp;logoColor=white"></a>
   <a href="LICENSE"><img alt="MIT license" src="https://img.shields.io/badge/license-MIT-12110F?style=flat-square"></a>
   <img alt="Dart Wasm and JavaScript fallback" src="https://img.shields.io/badge/runtime-Wasm%20%2B%20JS-DFFF3F?style=flat-square&amp;logoColor=12110F">
 </p>
 
 <p align="center">
+<!-- portfolio-template:start -->
   <a href="https://github.com/Yusufihsangorgel/Flutter-Web-Portfolio/generate"><img alt="Create a repository from this template" src="https://img.shields.io/badge/USE%20THIS%20TEMPLATE-DFFF3F?style=for-the-badge&amp;logo=github&amp;logoColor=12110F"></a>
+<!-- portfolio-template:end -->
 </p>
 
 <p align="center">
 <!-- portfolio-demo:start -->
-[Live site](https://developeryusuf.com/) · [Flutter Web first-frame issue](https://github.com/flutter/flutter/issues/189499) · [Engine patch](https://github.com/flutter/flutter/pull/189500)
+<a href="https://developeryusuf.com/">Live site</a> · <a href="https://github.com/flutter/flutter/issues/189499">Flutter Web first-frame issue</a> · <a href="https://github.com/flutter/flutter/pull/189500">Engine patch</a>
 <!-- portfolio-demo:end -->
 </p>
 
-| One source | One reading model | One release contract |
+| You edit | Visitors get | CI proves |
 |---|---|---|
-| Identity, biography, work, evidence, links, and metadata live in one validated JSON document. | Real section geometry drives navigation, URL history, progress, responsive reflow, and the visual narrative. | A dual Wasm/JavaScript build is checked for headers, caching, size, accessibility, and browser regressions. |
+| Identity, biography, work, evidence, links, and metadata in one validated JSON document. | One accessible, responsive page with real deep links and reduced-motion support. | The Wasm/JavaScript bundle, hosting headers, clean-template reset, and browser behaviour pass executable checks. |
 
-## From clone to your first frame
+## Your portfolio, from a clean template
 
-Prerequisites: Git, Node.js 24, and Flutter 3.44.6 (Dart 3.12 or newer).
-Hosted builds use the pinned Flutter revision in `tool/hosted_build.sh`.
+Prerequisites: Git, Node.js 24.18.0, and Flutter 3.44.6. The exact framework
+and engine revisions live in `tool/toolchain.json` and are verified before a
+release build.
+The checked-in `.nvmrc` gives Node version managers the same local version;
+`npm run verify:toolchain` reports any mismatch. Hosted builds use the pinned
+Flutter revision in `tool/hosted_build.sh`.
+
+<!-- portfolio-onboarding:start -->
+Choose **Use this template** above and create your own repository. Do not fork the demo for a personal site: GitHub forks retain the parent history, whereas a repository created from a template starts with one unrelated commit. Forks remain the right path for contributing changes back here. Clone your new repository, then run:
+<!-- portfolio-onboarding:end -->
 
 ```bash
 git clone https://github.com/your-name/your-portfolio.git
 cd your-portfolio
 npm ci
+npm run setup:browsers
 flutter pub get
 npm run portfolio:init
-flutter run -d chrome
+npm run build:release
+node tool/serve_web.mjs
 ```
+
+Open `http://127.0.0.1:4173`. The preview serves the exact release directory
+with the security headers and SPA fallback used in production. Press `Ctrl+C`
+to stop it. During normal UI work, `flutter run -d chrome` remains the faster
+hot-reload loop.
+
+[GitHub's template-repository guide](https://docs.github.com/en/repositories/creating-and-managing-repositories/creating-a-repository-from-a-template)
+explains the history and contribution differences.
 
 The initializer is a real reset, not a search-and-replace checklist. It asks for
 your public identity, role, contact, canonical domain, headline, and focus;
 removes the original owner’s optional work, experience, and contribution data;
-deletes the demo work artifacts and their source captures; then regenerates the
-social card, source manifest, README record, SEO, JSON-LD, web manifest,
-sitemap, robots file, analytics include, and server policy.
+deletes the demo work artifacts, source captures, and inherited `build/web`
+release; then regenerates the social card, source manifest, README record, SEO,
+JSON-LD, web manifest,
+sitemap, robots file, analytics include, and server policy. The reset is
+transactional: a failed renderer or synchronization step restores every touched
+file instead of leaving a half-customized repository. When the Git remote is on
+GitHub, the live CI badge is rewritten to that repository as part of the reset.
 
 ```text
 you answer once
@@ -73,9 +99,17 @@ The app is static and has no backend lock-in.
 | Vercel | import the repo or run `npm run deploy -- vercel` |
 | Docker / VPS | `npm run deploy -- docker --image portfolio:latest` |
 
-Each included configuration preserves SPA navigation and the cross-origin
-isolation headers used by threaded SkWasm. Custom domains require no Dart
-change: edit `site.url`, run `npm run sync:content`, then point DNS at the host.
+Firebase, Netlify, Cloudflare Pages, Vercel, and Nginx preserve SPA navigation,
+the generated content-security policy, and the cross-origin isolation headers
+used by threaded SkWasm. GitHub Pages cannot set custom response headers, so its
+build uses the compatible single-threaded/JavaScript fallback.
+Custom domains require no Dart change: edit `site.url`, run
+`npm run sync:content`, then point DNS at the host.
+
+The deployment guide separates Git-connected builds from direct uploads and
+gives custom-domain changes an explicit cutover order. In particular,
+Cloudflare Pages treats Git integration and Direct Upload as different project
+types; choose the one you intend to keep before the first deployment.
 
 [Provider-by-provider instructions](docs/DEPLOY.md)
 
@@ -86,7 +120,8 @@ starts with a document contract:
 
 - Optional chapters genuinely disappear; there are no empty demo sections.
 - Work artifacts must be local, accessible, dimensioned, and backed by linked evidence.
-- Professional claims remain outside presentation code and translation files.
+- Professional claims remain outside presentation code and interface-copy
+  catalogs.
 - The same measured position controls active navigation, browser history,
   scene interpolation, and every progress indicator.
 - Reduced motion preserves the entire information architecture instead of
@@ -114,13 +149,23 @@ disagreement.
 }
 ```
 
-That excerpt is intentionally incomplete; use the initializer to produce a
+That excerpt is incomplete by design; use the initializer to produce a
 valid clean document, then follow [the field guide](docs/CUSTOMIZE.md) to add
-source-backed experience and selected work.
+traceable experience and selected work.
 
-Translations in `assets/i18n/*.json` own interface language only. Seven locale
-documents share a tested key schema, including an RTL surface; none duplicates
-professional content.
+`assets/i18n/<locale>.json` owns interface chrome only. Complete translated
+professional copy belongs in `assets/content/locales/<locale>.json`, whose
+structure must match the canonical document before that locale can be enabled.
+This all-or-nothing contract rejects missing fields instead of silently mixing
+languages. The initializer removes the demo professional overlays and starts a
+new portfolio with English only, so a clone never advertises untranslated
+claims.
+
+Accessibility is content, too: `display_name.accessible` carries the spoken
+name, project `alt` text describes the visible evidence, captions provide
+context, and links name their destination. The field guide shows each of these
+records; keyboard, reduced-motion, RTL, and responsive behaviour are covered by
+the browser suite.
 
 ## The runtime, drawn as one path
 
@@ -139,6 +184,9 @@ assets/i18n/{locale}.json        │
         │ ordered async loading  │
         ▼                        ▼
 LanguageCubit              semantic sections
+        │                        ▲
+assets/content/locales/          │ complete professional overlay
+  {locale}.json ─────────────────┘
                                 │ measured bounds
                                 ▼
 AppScrollController ─────► NarrativePosition
@@ -152,7 +200,7 @@ chapter navigation      chapter anchors    ambient painter
                        NarrativeAnchorPath
 ```
 
-The document and render loop deliberately have different update paths. Content
+The document and render loop use different update paths. Content
 loads once. Frame-frequency scene and pointer changes stay in synchronous
 listenables. Responsive reflow preserves chapter-relative focus instead of a
 stale pixel offset, and one early popstate bridge keeps browser history from
@@ -180,21 +228,36 @@ SwiftShader readback latency.
 
 ## Quality is executable
 
+For a portfolio owner, the release gate is one command:
+
 ```bash
+npm run build:release
+```
+
+It validates content, derived public files, the Dart source graph, host policy,
+the dual runtime, and the final bundle. Repository maintainers run the broader
+suite below before changing the template itself:
+
+```bash
+npm run verify:toolchain
 npm run portfolio:validate
 npm run test:template
 npm run test:clone
+npm run test:release-security
 npm run verify:content
 npm run verify:hosting
 npm run verify:community
+npm run verify:source
 npm run audit:sources
 npm run audit:history
+npm run typecheck
 dart format --output=none --set-exit-if-changed lib test tool
 flutter analyze --fatal-infos
 flutter test
 npm run build:release
 npm run test:visual
 npm test
+npm run verify:runtime
 ```
 
 The gates cover:
@@ -224,9 +287,9 @@ The gates cover:
 
 ## Verified public engineering record
 
-The live demo uses the same template with a real professional record. This block
-is regenerated from the canonical content document; it is evidence for the demo,
-not starter data inherited by `npm run portfolio:init`.
+<!-- portfolio-record-intro:start -->
+The live demo uses the same template with a real professional record. This block is regenerated from the canonical content document; it is evidence for the demo, not starter data inherited by `npm run portfolio:init`.
+<!-- portfolio-record-intro:end -->
 
 <details>
 <summary><strong>Open the current record</strong></summary>
@@ -238,7 +301,7 @@ not starter data inherited by `npm run portfolio:init`.
 
 Since 2021, I have built and maintained software for mobile devices, tablets, desktop operating systems, and the web. My work includes ERP and point-of-sale products, logistics workflows, digital publishing, backend services, and the release systems around them.
 
-Source status: `2026.07.16.11`, verified 2026-07-16 against GitHub, LinkedIn, FugaSoft, Dorse, and Medium.
+Source status: `2026.07.18.1`, verified 2026-07-18 against GitHub, LinkedIn, FugaSoft, Dorse, and Medium.
 
 ### Accepted upstream changes
 
@@ -258,7 +321,6 @@ Source status: `2026.07.16.11`, verified 2026-07-16 against GitHub, LinkedIn, Fu
 | Dorse | I developed the Flutter application and React web surface across live vehicle state, maps, REST and WebSocket flows, deployment, and QA coordination. | [Project](https://dorseapp.com/) |
 | Aydınlık E-Gazete | At Promob TR, I worked on the Flutter client, API-backed issue flow, localisation, and mobile releases. | [Project](https://apps.apple.com/tr/app/ayd%C4%B1nl%C4%B1k-e-gazete/id1560103805) |
 | Bilim ve Ütopya | At Promob TR, I worked on Flutter features, API integration, localisation, and release support. | [Project](https://apps.apple.com/tr/app/bilim-ve-%C3%BCtopya-e-dergi/id6478221195) |
-| Galvapedia | I built the product with Flutter and a Node.js, Express, and MongoDB service layer. | [Project](https://apps.apple.com/tr/app/galvapedia/id1592744617) |
 | Queue Inspector MCP | I designed the command surface, typed validation, queue adapters, and conservative state-changing operations. | [Project](https://github.com/Yusufihsangorgel/queue-inspector-mcp) |
 | Multi-tenant Gateway | I designed and implemented the reference from transport and tenant resolution through policy, persistence, and test coverage. | [Project](https://github.com/Yusufihsangorgel/go-multitenant-gateway) |
 | Redis Task Queue | I designed the public API, queue semantics, failure handling, and runnable examples. | [Project](https://github.com/Yusufihsangorgel/redis_task_queue) |

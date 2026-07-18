@@ -2,8 +2,14 @@
 
 ## Supported versions
 
-Security fixes target the current `main` branch and the most recent tagged
-release. Older snapshots are historical records and are not maintained.
+Security fixes target the `main` branch and the current 2.0 release line.
+Historical tags and pre-2.0 development snapshots are not maintained.
+
+| Version | Supported |
+|---|---|
+| `main` | Yes |
+| `2.0.x` | Yes |
+| `< 2.0` | No |
 
 ## Reporting a vulnerability
 

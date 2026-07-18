@@ -4,6 +4,8 @@ import path from 'node:path';
 import process from 'node:process';
 import { fileURLToPath } from 'node:url';
 
+import { resolveExecutable, validateDeploymentValue } from './cli_safety.mjs';
+
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const arguments_ = process.argv.slice(2);
 
@@ -30,53 +32,105 @@ if (!allowedOptions) throw new Error(`Unsupported provider: ${provider}`);
 validateOptions(values, allowedOptions);
 
 const skipBuild = values.includes('--skip-build');
+const deployment = validateProviderValues();
 
-if (!skipBuild) run(process.execPath, [path.join(root, 'tool', 'build_portfolio.mjs')]);
-await access(path.join(root, 'build', 'web', 'index.html'));
+if (provider === 'vercel' && skipBuild) {
+  throw new Error(
+    'Vercel owns its build from the repository root; --skip-build is not supported.',
+  );
+}
+if (provider !== 'vercel') {
+  if (!skipBuild) {
+    run(process.execPath, [path.join(root, 'tool', 'build_portfolio.mjs')]);
+  }
+  await access(path.join(root, 'build', 'web', 'index.html'));
+  run(process.execPath, [path.join(root, 'tool', 'verify_web_build.mjs')]);
+}
 
 switch (provider) {
   case 'firebase': {
-    const project = requiredOption('--project');
-    run('firebase', ['deploy', '--only', 'hosting', '--project', project]);
+    run('firebase', [
+      'deploy',
+      '--only',
+      'hosting',
+      '--project',
+      deployment.project,
+    ]);
     break;
   }
   case 'netlify': {
-    const site = optionalOption('--site');
     run('netlify', [
       'deploy',
       '--prod',
       '--dir',
       'build/web',
-      ...(site ? ['--site', site] : []),
+      ...(deployment.site ? ['--site', deployment.site] : []),
     ]);
     break;
   }
   case 'cloudflare': {
-    const project = requiredOption('--project');
     run('wrangler', [
       'pages',
       'deploy',
       'build/web',
       '--project-name',
-      project,
+      deployment.project,
     ]);
     break;
   }
   case 'vercel': {
-    run('vercel', ['deploy', 'build/web', '--prod']);
+    // Keep the repository root as Vercel's project root so vercel.json owns the
+    // canonical hosted build, SPA rewrites, and security headers.
+    run('vercel', ['deploy', '--prod']);
     break;
   }
   case 'docker': {
-    const image = optionalOption('--image') ?? 'flutter-web-portfolio:local';
-    run('docker', ['build', '--tag', image, '.']);
-    console.log(`Run with: docker run --rm -p 8080:80 ${image}`);
+    run('docker', ['build', '--tag', deployment.image, '.']);
+    console.log(`Run with: docker run --rm -p 8080:80 ${deployment.image}`);
     break;
   }
 }
 
+function validateProviderValues() {
+  switch (provider) {
+    case 'firebase':
+      return {
+        project: validateDeploymentValue(
+          'firebase-project',
+          requiredOption('--project'),
+        ),
+      };
+    case 'cloudflare':
+      return {
+        project: validateDeploymentValue(
+          'cloudflare-project',
+          requiredOption('--project'),
+        ),
+      };
+    case 'netlify': {
+      const site = optionalOption('--site');
+      return {
+        site: site ? validateDeploymentValue('netlify-site', site) : null,
+      };
+    }
+    case 'docker':
+      return {
+        image: validateDeploymentValue(
+          'docker-image',
+          optionalOption('--image') ?? 'flutter-web-portfolio:local',
+        ),
+      };
+    case 'vercel':
+      return {};
+  }
+}
+
 function validateOptions(options, allowed) {
+  const seen = new Set();
   for (let index = 0; index < options.length; index += 1) {
     const option = options[index];
+    if (seen.has(option)) throw new Error(`Duplicate option: ${option}`);
+    seen.add(option);
     if (option === '--skip-build') continue;
     if (!option.startsWith('--')) {
       throw new Error(`Unexpected positional argument: ${option}`);
@@ -107,19 +161,20 @@ function requiredOption(name) {
 }
 
 function run(command, args) {
-  const result = spawnSync(command, args, {
+  const executable = resolveExecutable(command);
+  const result = spawnSync(executable, args, {
     cwd: root,
     stdio: 'inherit',
-    shell: process.platform === 'win32',
+    shell: false,
   });
   if (result.error?.code === 'ENOENT') {
     throw new Error(
-      `${command} is not installed. See docs/DEPLOY.md for the official CLI setup.`,
+      `${executable} is not installed. See docs/DEPLOY.md for the official CLI setup.`,
     );
   }
   if (result.error) throw result.error;
   if (result.status !== 0) {
-    throw new Error(`${command} ${args.join(' ')} exited with ${result.status}.`);
+    throw new Error(`${executable} ${args.join(' ')} exited with ${result.status}.`);
   }
 }
 
