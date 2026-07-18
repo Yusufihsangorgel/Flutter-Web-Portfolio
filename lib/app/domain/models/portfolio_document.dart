@@ -1165,6 +1165,8 @@ PortfolioSystem _localizedSystem(
   );
   final common = (
     kind: _requiredString(json, 'kind'),
+    year: _requiredString(json, 'year'),
+    technologies: _strings(json, 'technologies'),
     summary: _requiredString(json, 'summary'),
     ownership: _requiredString(json, 'ownership'),
     decision: _requiredString(json, 'decision'),
@@ -1175,7 +1177,7 @@ PortfolioSystem _localizedSystem(
       id: featured.id,
       name: featured.name,
       kind: common.kind,
-      year: featured.year,
+      year: common.year,
       summary: common.summary,
       ownership: common.ownership,
       decision: common.decision,
@@ -1186,13 +1188,13 @@ PortfolioSystem _localizedSystem(
       outcome: _requiredString(json, 'outcome'),
       evidence: evidence,
       url: featured.url,
-      technologies: featured.technologies,
+      technologies: common.technologies,
     ),
     final PortfolioSupportingSystem supporting => PortfolioSupportingSystem(
       id: supporting.id,
       name: supporting.name,
       kind: common.kind,
-      year: supporting.year,
+      year: common.year,
       summary: common.summary,
       ownership: common.ownership,
       decision: common.decision,
@@ -1202,7 +1204,7 @@ PortfolioSystem _localizedSystem(
       group: supporting.group,
       spotlight: _requiredString(json, 'spotlight'),
       url: supporting.url,
-      technologies: supporting.technologies,
+      technologies: common.technologies,
     ),
   };
 }

@@ -5,6 +5,8 @@ type PortfolioSystem = {
   id: string;
   featured: boolean;
   kind: string;
+  year: string;
+  technologies: string[];
   artifact: {
     caption: string;
     compact: { caption: string };
@@ -39,6 +41,8 @@ type ContentCatalog = {
     string,
     {
       kind: string;
+      year: string;
+      technologies: string[];
       artifact: { caption: string; compact_caption: string };
     }
   >;
@@ -70,9 +74,11 @@ const activeSections = [
   ...(portfolio.systems.length > 0 ? ["projects"] : []),
   "about",
 ] as const;
-const preservedChapter = (activeSections.includes("projects")
-  ? "projects"
-  : activeSections.find((section) => section !== "home")) as ContentChapter;
+const preservedChapter = (
+  activeSections.includes("projects")
+    ? "projects"
+    : activeSections.find((section) => section !== "home")
+) as ContentChapter;
 
 const interfaceCatalogs = Object.fromEntries(
   localeCodes.map((locale) => [
@@ -100,6 +106,8 @@ function localizedRecord(locale: LocaleCode) {
       role: portfolio.profile.role as string,
       headline: portfolio.profile.headline as string,
       systemKind: featuredSystem?.kind as string | undefined,
+      systemYear: featuredSystem?.year as string | undefined,
+      systemTechnologies: featuredSystem?.technologies as string[] | undefined,
       artifactCaption: featuredSystem?.artifact.caption as string | undefined,
       compactCaption: featuredSystem?.artifact.compact.caption as
         string | undefined,
@@ -114,6 +122,8 @@ function localizedRecord(locale: LocaleCode) {
     role: localization.profile.role as string,
     headline: localization.profile.headline as string,
     systemKind: system?.kind as string | undefined,
+    systemYear: system?.year as string | undefined,
+    systemTechnologies: system?.technologies as string[] | undefined,
     artifactCaption: system?.artifact.caption as string | undefined,
     compactCaption: system?.artifact.compact_caption as string | undefined,
   };
@@ -150,9 +160,9 @@ async function switchLocale(
     .getByRole("button", { name: new RegExp(`: ${escapedName}$`) })
     .click();
   const targetItem = page.getByRole("menuitem", {
-      name: `${target.toUpperCase()} ${nativeLanguageNames[target]}`,
-      exact: true,
-    });
+    name: `${target.toUpperCase()} ${nativeLanguageNames[target]}`,
+    exact: true,
+  });
   await Promise.all([
     page.waitForNavigation({ waitUntil: "domcontentloaded" }),
     targetItem.click(),
@@ -161,10 +171,7 @@ async function switchLocale(
   await expectDocumentLocale(page, target);
 }
 
-async function navigateToChapter(
-  page: Page,
-  chapter: "home" | ContentChapter,
-) {
+async function navigateToChapter(page: Page, chapter: "home" | ContentChapter) {
   await page.evaluate((target) => {
     const hash = target === "home" ? "#/" : `#/${target}`;
     window.history.pushState(null, "", hash);
@@ -336,6 +343,12 @@ test.describe("complete portfolio localization", () => {
         await expectInViewport(page, projectHeading);
         const kind = await revealText(page, expected.systemKind!);
         await expect(kind).toBeAttached();
+        await expect(
+          await revealText(page, expected.systemYear!),
+        ).toBeAttached();
+        for (const technology of expected.systemTechnologies!) {
+          await expect(await revealText(page, technology)).toBeAttached();
+        }
         const compact = (page.viewportSize()?.width ?? 1440) < 900;
         const caption = compact
           ? expected.compactCaption!
@@ -345,6 +358,18 @@ test.describe("complete portfolio localization", () => {
           await expect(
             page.getByText(portfolio.systems[0].kind, { exact: true }),
           ).toHaveCount(0);
+          if (portfolio.systems[0].year !== expected.systemYear) {
+            await expect(
+              page.getByText(portfolio.systems[0].year, { exact: true }),
+            ).toHaveCount(0);
+          }
+          for (const technology of portfolio.systems[0].technologies) {
+            if (!expected.systemTechnologies!.includes(technology)) {
+              await expect(
+                page.getByText(technology, { exact: true }),
+              ).toHaveCount(0);
+            }
+          }
           await expect(
             page.getByText(portfolio.systems[0].artifact.caption, {
               exact: true,

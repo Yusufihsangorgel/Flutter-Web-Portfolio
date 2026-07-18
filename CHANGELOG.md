@@ -6,6 +6,18 @@ Versions 1.2 through 1.9 below are explicitly recorded as pre-2.0 development
 snapshots; they were not published Git tags. The public `v1.1.0` tag from April
 2026 is documented separately from the later dual-runtime development work.
 
+## [2.0.1] - 2026-07-18
+
+### Fixed
+
+- Localized project periods and human-readable technology labels instead of
+  leaking canonical English copy into Turkish, German, French, Spanish, Arabic,
+  and Hindi work views.
+- Replaced the remaining English job-title phrase in the Turkish professional
+  record with its Turkish equivalent.
+- Extended unit and browser contracts so localized work periods and authored
+  labels cannot silently fall back to the canonical catalog again.
+
 ## [2.0.0] - 2026-07-18
 
 ### Added

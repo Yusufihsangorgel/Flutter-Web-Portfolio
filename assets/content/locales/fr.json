@@ -36,21 +36,38 @@
       "domain": "Produits ERP et point de vente FugaSoft",
       "period": "Mars 2021 — aujourd’hui",
       "summary": "Je collabore sur mission depuis mars 2021 et à temps plein depuis septembre 2025. Je développe et maintiens des applications ERP et point de vente en production sur tablettes Android et iOS ainsi que sur postes Linux, macOS et Windows, avec une attention particulière aux données hors ligne, aux intégrations natives, aux performances, à la fiabilité des versions et à la maintenance durable du produit.",
-      "evidence": ["Flutter", "Dart", "SQLite / Drift", "Intégrations natives", "Synchronisation temps réel"]
+      "evidence": [
+        "Flutter",
+        "Dart",
+        "SQLite / Drift",
+        "Intégrations natives",
+        "Synchronisation temps réel"
+      ]
     },
     "juniustech": {
       "role": "Développeur full stack",
       "domain": "Plateforme logistique Dorse",
       "period": "Juin 2023 — août 2025",
       "summary": "Sur des produits mobiles et web conçus avec Flutter et React, j’ai livré des flux REST et WebSocket, le suivi de véhicules en direct, les intégrations Google Maps et Plans d’Apple, le déploiement et la coordination de l’assurance qualité.",
-      "evidence": ["Flutter", "React / Next.js", "REST", "WebSocket", "Cartographie"]
+      "evidence": [
+        "Flutter",
+        "React / Next.js",
+        "REST",
+        "WebSocket",
+        "Cartographie"
+      ]
     },
     "ivent": {
       "role": "Développeur Flutter",
       "domain": "Développement de produits mobiles",
       "period": "Mai 2022 — novembre 2025",
       "summary": "Dans le cadre d’une collaboration à temps partiel de longue durée, j’ai contribué au développement et à la maintenance d’applications Flutter, de l’implémentation jusqu’au support des mises en production.",
-      "evidence": ["Flutter", "Dart", "Livraison de produits mobiles", "Support des versions"]
+      "evidence": [
+        "Flutter",
+        "Dart",
+        "Livraison de produits mobiles",
+        "Support des versions"
+      ]
     },
     "promob-tr": {
       "role": "Développeur full stack",
@@ -64,28 +81,72 @@
       "domain": "Projets d’applications mobiles",
       "period": "Juin 2022 — août 2023",
       "summary": "Dans le cadre d’une collaboration à temps partiel de longue durée, j’ai contribué à des projets mobiles Flutter, de l’implémentation Dart à la livraison du produit.",
-      "evidence": ["Flutter", "Dart", "Applications mobiles", "Livraison à temps partiel"]
+      "evidence": [
+        "Flutter",
+        "Dart",
+        "Applications mobiles",
+        "Livraison à temps partiel"
+      ]
     },
     "extreme-bs": {
       "role": "Stagiaire en ingénierie logicielle",
       "domain": "Stage en ingénierie logicielle",
       "period": "Juin 2024 — août 2024",
       "summary": "J’ai effectué un stage axé sur les pratiques de développement en production, la livraison en équipe et l’application de bases académiques au sein d’une équipe d’ingénierie opérationnelle.",
-      "evidence": ["Ingénierie logicielle", "Livraison en équipe", "Pratiques de production"]
+      "evidence": [
+        "Ingénierie logicielle",
+        "Livraison en équipe",
+        "Pratiques de production"
+      ]
     },
     "software-engineering-education": {
       "role": "Licence en ingénierie logicielle",
       "domain": "Formation universitaire",
       "period": "2021 — 2025",
       "summary": "Formation structurée aux algorithmes, structures de données, bases de données, conception logicielle et développement de produits en équipe.",
-      "evidence": ["Algorithmes", "Structures de données", "Bases de données", "Conception logicielle"]
+      "evidence": [
+        "Algorithmes",
+        "Structures de données",
+        "Bases de données",
+        "Conception logicielle"
+      ]
     }
   },
   "capabilities": {
-    "client": {"label": "Systèmes clients", "items": ["Flutter", "Dart", "BLoC", "Canaux de plateforme", "Hors ligne par conception"]},
-    "services": {"label": "Services", "items": ["Go", "Fiber", "PostgreSQL", "Redis", "Asynq"]},
-    "web-runtime": {"label": "Runtime web", "items": ["Dart Wasm", "SkWasm", "CanvasKit", "Sémantique", "Cycle du premier rendu"]},
-    "operations": {"label": "Exploitation", "items": ["Docker", "Docker Swarm", "Prometheus", "Grafana", "Exploitation PostgreSQL"]}
+    "client": {
+      "label": "Systèmes clients",
+      "items": [
+        "Flutter",
+        "Dart",
+        "BLoC",
+        "Canaux de plateforme",
+        "Hors ligne par conception"
+      ]
+    },
+    "services": {
+      "label": "Services",
+      "items": ["Go", "Fiber", "PostgreSQL", "Redis", "Asynq"]
+    },
+    "web-runtime": {
+      "label": "Runtime web",
+      "items": [
+        "Dart Wasm",
+        "SkWasm",
+        "CanvasKit",
+        "Sémantique",
+        "Cycle du premier rendu"
+      ]
+    },
+    "operations": {
+      "label": "Exploitation",
+      "items": [
+        "Docker",
+        "Docker Swarm",
+        "Prometheus",
+        "Grafana",
+        "Exploitation PostgreSQL"
+      ]
+    }
   },
   "contributions": {
     "dart-mcp-initialization-lifecycle": {
@@ -144,17 +205,36 @@
   "systems": {
     "fugasoft": {
       "kind": "Plateforme ERP et point de vente",
+      "year": "2021 — aujourd’hui",
+      "technologies": [
+        "Flutter",
+        "Dart",
+        "Drift",
+        "Intégrations natives",
+        "Versions multiplateformes"
+      ],
       "summary": "La famille de produits ERP et point de vente que je continue de développer chez Uzman Adres pour des équipes de commerce travaillant sur tablettes et systèmes de bureau.",
       "ownership": "J’interviens principalement sur les clients Flutter et sur les enjeux de production liés aux données hors ligne, aux intégrations natives, à la synchronisation, aux performances, aux versions et à la maintenance à long terme.",
       "decision": "Traiter la persistance locale, l’intégration des appareils et le comportement des plateformes comme des composantes de l’architecture produit, et non comme de simples détails clients.",
       "challenge": "Un logiciel de commerce doit rester rapide et fiable sur le matériel en magasin, avec une connexion instable, pendant de longues sessions et sur plusieurs systèmes d’exploitation.",
       "approach": "Développer une surface produit Flutter commune tout en rendant explicites les données locales, les frontières de synchronisation, les API natives et le comportement des versions sur chaque plateforme.",
       "outcome": "Livraison continue en production de la plateforme ERP et point de vente FugaSoft sur tablettes Android et iOS ainsi que sur postes Linux, macOS et Windows.",
-      "evidence": ["Site de l’entreprise FugaSoft", "Écosystème de produits FugaSoft"],
-      "artifact": {"label": "GAMME OFFICIELLE", "alt": "Écosystème officiel FugaSoft présentant FugaPOS, FugaERP, FugaCLOUD, FugaKIOSK et FugaSELF-SERVICE.", "caption": "Écosystème de produits FugaSoft · site officiel de l’entreprise.", "compact_alt": "Vue compacte des cinq gammes officielles de FugaSoft.", "compact_caption": "Écosystème de produits FugaSoft · site officiel de l’entreprise."}
+      "evidence": [
+        "Site de l’entreprise FugaSoft",
+        "Écosystème de produits FugaSoft"
+      ],
+      "artifact": {
+        "label": "GAMME OFFICIELLE",
+        "alt": "Écosystème officiel FugaSoft présentant FugaPOS, FugaERP, FugaCLOUD, FugaKIOSK et FugaSELF-SERVICE.",
+        "caption": "Écosystème de produits FugaSoft · site officiel de l’entreprise.",
+        "compact_alt": "Vue compacte des cinq gammes officielles de FugaSoft.",
+        "compact_caption": "Écosystème de produits FugaSoft · site officiel de l’entreprise."
+      }
     },
     "dorse": {
       "kind": "Plateforme logistique numérique",
+      "year": "avril 2024 — janvier 2025",
+      "technologies": ["Flutter", "React", "Next.js", "WebSocket", "Cartes"],
       "summary": "Une plateforme logistique publique reliant chauffeurs, sociétés de flotte et entreprises de pesage au moyen de flux mobiles et web.",
       "ownership": "J’ai développé l’application Flutter et l’interface web React autour de l’état des véhicules en direct, des cartes, des flux REST et WebSocket, du déploiement et de la coordination qualité.",
       "decision": "Maintenir l’état temps réel des véhicules et ponts-bascules explicite du transport jusqu’à l’interface, plutôt que de le masquer derrière des solutions propres à chaque écran.",
@@ -162,70 +242,147 @@
       "approach": "Construire les clients Flutter et React autour de flux REST et WebSocket partagés, d’intégrations cartographiques, du comportement hors ligne et de tests de version coordonnés.",
       "outcome": "Livraison du produit public mobile et web couvrant les flux chauffeur, flotte et pesage pendant la période de projet vérifiée d’avril 2024 à janvier 2025.",
       "evidence": ["Site produit Dorse"],
-      "artifact": {"label": "PARCOURS PRODUIT", "alt": "Site produit public de Dorse montrant l’application mobile logistique en utilisation.", "caption": "Interface produit Dorse · issue du site public de l’entreprise.", "compact_alt": "Vue compacte de Dorse fondée sur l’écran public de réglage du véhicule et de la remorque.", "compact_caption": "Flux véhicule Dorse · contenu public de l’entreprise."}
+      "artifact": {
+        "label": "PARCOURS PRODUIT",
+        "alt": "Site produit public de Dorse montrant l’application mobile logistique en utilisation.",
+        "caption": "Interface produit Dorse · issue du site public de l’entreprise.",
+        "compact_alt": "Vue compacte de Dorse fondée sur l’écran public de réglage du véhicule et de la remorque.",
+        "compact_caption": "Flux véhicule Dorse · contenu public de l’entreprise."
+      }
     },
     "aydinlik-e-gazete": {
       "kind": "Édition mobile",
+      "year": "2022 — 2024",
+      "technologies": ["Flutter", "Dart", "Dio", "MVVM", "iOS"],
       "summary": "Client de presse pour iPhone et iPad avec navigation par numéro, accès aux archives abonnés, contenu alimenté par API et versions mobiles.",
       "ownership": "Chez Promob TR, j’ai travaillé sur le client Flutter, le parcours des numéros alimenté par API, la localisation et les versions mobiles.",
       "decision": "Réunir navigation, lecture et archives abonnés dans un parcours clair commun au téléphone et à la tablette.",
       "spotlight": "Numéros de presse, commandes de lecture et accès aux archives abonnés dans un client Flutter publié.",
       "evidence": ["Voir la version App Store"],
-      "artifact": {"label": "APPLICATION PUBLIÉE SUR L’APP STORE", "alt": "Version App Store d’Aydınlık E-Gazete montrant les écrans de numéro et de lecture du journal.", "caption": "Interfaces de numéro et de lecture issues de la fiche iPhone publique.", "compact_alt": "Planche compacte de la version Aydınlık E-Gazete avec grand numéro quotidien et lecteur audio.", "compact_caption": "Numéro et lecteur Aydınlık · preuve publique compacte de publication."}
+      "artifact": {
+        "label": "APPLICATION PUBLIÉE SUR L’APP STORE",
+        "alt": "Version App Store d’Aydınlık E-Gazete montrant les écrans de numéro et de lecture du journal.",
+        "caption": "Interfaces de numéro et de lecture issues de la fiche iPhone publique.",
+        "compact_alt": "Planche compacte de la version Aydınlık E-Gazete avec grand numéro quotidien et lecteur audio.",
+        "compact_caption": "Numéro et lecteur Aydınlık · preuve publique compacte de publication."
+      }
     },
     "bilim-ve-utopya": {
       "kind": "Édition mobile",
+      "year": "2022 — 2024",
+      "technologies": ["Flutter", "Dart", "Dio", "MVVM", "iOS"],
       "summary": "Client de magazine pour iPhone et iPad réunissant numéro, archives et gestion du compte dans une application Flutter.",
       "ownership": "Chez Promob TR, j’ai travaillé sur les fonctionnalités Flutter, l’intégration d’API, la localisation et le support des versions.",
       "decision": "Conserver numéro, archives et gestion du compte dans un client mobile unique et facile à maintenir.",
       "spotlight": "Parcours de consultation des numéros, d’archives et de compte d’un magazine numérique publié.",
       "evidence": ["Voir la version App Store"],
-      "artifact": {"label": "APPLICATION PUBLIÉE SUR L’APP STORE", "alt": "Version App Store de Bilim ve Ütopya E-Dergi montrant les écrans de numéro et d’archives.", "caption": "Interfaces de numéro et d’archives issues de la fiche iPhone publique.", "compact_alt": "Planche compacte de la version Bilim ve Ütopya avec numéro lisible et archives abonnés.", "compact_caption": "Numéro et archives Bilim ve Ütopya · preuve publique compacte de publication."}
+      "artifact": {
+        "label": "APPLICATION PUBLIÉE SUR L’APP STORE",
+        "alt": "Version App Store de Bilim ve Ütopya E-Dergi montrant les écrans de numéro et d’archives.",
+        "caption": "Interfaces de numéro et d’archives issues de la fiche iPhone publique.",
+        "compact_alt": "Planche compacte de la version Bilim ve Ütopya avec numéro lisible et archives abonnés.",
+        "compact_caption": "Numéro et archives Bilim ve Ütopya · preuve publique compacte de publication."
+      }
     },
     "queue-inspector": {
       "kind": "Outillage d’exploitation",
+      "year": "2026",
+      "technologies": [
+        "TypeScript",
+        "MCP",
+        "Redis",
+        "Asynq",
+        "BullMQ",
+        "Sidekiq"
+      ],
       "summary": "Un serveur MCP pour inspecter en lecture seule les files Redis Asynq, BullMQ et Sidekiq via une interface typée unique.",
       "ownership": "J’ai conçu l’interface de commandes, la validation typée et les trois adaptateurs de files.",
       "decision": "Conserver une inspection en lecture seule et exclure toute modification directe du stockage.",
       "spotlight": "Six outils en lecture seule pour trois moteurs de files via une interface typée.",
       "evidence": ["Voir le dépôt open source", "Lire les notes de conception"],
-      "artifact": {"label": "PROJET OPEN SOURCE", "alt": "Architecture de Queue Inspector MCP réunissant Asynq, BullMQ et Sidekiq dans une interface unique.", "caption": "Queue Inspector MCP · trois adaptateurs et six outils en lecture seule.", "compact_alt": "Architecture de Queue Inspector MCP avec les adaptateurs Asynq, BullMQ et Sidekiq.", "compact_caption": "Queue Inspector MCP · inspection typée de trois moteurs."}
+      "artifact": {
+        "label": "PROJET OPEN SOURCE",
+        "alt": "Architecture de Queue Inspector MCP réunissant Asynq, BullMQ et Sidekiq dans une interface unique.",
+        "caption": "Queue Inspector MCP · trois adaptateurs et six outils en lecture seule.",
+        "compact_alt": "Architecture de Queue Inspector MCP avec les adaptateurs Asynq, BullMQ et Sidekiq.",
+        "compact_caption": "Queue Inspector MCP · inspection typée de trois moteurs."
+      }
     },
     "multitenant-gateway": {
       "kind": "Référence de plateforme Go",
+      "year": "2026",
+      "technologies": ["Go", "JWT", "PostgreSQL", "Redis", "Multitenance"],
       "summary": "Passerelle en binaire unique illustrant la résolution des tenants, l’authentification JWT, les limites de débit par tenant et les frontières de modules.",
       "ownership": "J’ai conçu et implémenté cette référence depuis le transport et la résolution du tenant jusqu’aux politiques, à la persistance et aux tests.",
       "decision": "Faire circuler le contexte du tenant tout au long de la requête au lieu de le masquer derrière un état global.",
       "spotlight": "Résolution du tenant, authentification, politiques et frontières de stockage explicites dans un seul binaire Go.",
-      "evidence": ["Voir le dépôt open source", "Lire le document d’architecture"],
-      "artifact": {"label": "PIPELINE DE REQUÊTE", "alt": "Pipeline de la passerelle Go multitenant et ordre explicite des middlewares.", "caption": "Passerelle Go · ordre des requêtes et frontières des middlewares.", "compact_alt": "Pipeline Go multitenant montrant tenant, limite de débit, authentification et modules.", "compact_caption": "Passerelle Go · pipeline de requête ordonné."}
+      "evidence": [
+        "Voir le dépôt open source",
+        "Lire le document d’architecture"
+      ],
+      "artifact": {
+        "label": "PIPELINE DE REQUÊTE",
+        "alt": "Pipeline de la passerelle Go multitenant et ordre explicite des middlewares.",
+        "caption": "Passerelle Go · ordre des requêtes et frontières des middlewares.",
+        "compact_alt": "Pipeline Go multitenant montrant tenant, limite de débit, authentification et modules.",
+        "compact_caption": "Passerelle Go · pipeline de requête ordonné."
+      }
     },
     "redis-task-queue": {
       "kind": "Bibliothèque Dart côté serveur",
+      "year": "2026",
+      "technologies": [
+        "Dart",
+        "Redis",
+        "Nouvelles tentatives",
+        "Messages en échec"
+      ],
       "summary": "File de tâches Dart adossée à Redis avec nouvelles tentatives, traitement des lettres mortes et files pondérées.",
       "ownership": "J’ai conçu l’API publique, la sémantique des files, la gestion des erreurs et des exemples exécutables.",
       "decision": "Rendre les états d’échec inspectables et la planification déterministe sans ajouter de framework d’exécution.",
       "spotlight": "Nouvelles tentatives, lettres mortes et files pondérées derrière une API Dart compacte.",
       "evidence": ["Voir le dépôt open source"],
-      "artifact": {"label": "PACKAGE OPEN SOURCE", "alt": "Couverture du dépôt Redis Task Queue montrant l’ajout par API, la file, le worker, le succès et les chemins de lettre morte.", "caption": "Couverture publiée du dépôt · cycle de vie de la file.", "compact_alt": "Redis Task Queue montrant l’ajout côté serveur Dart, le worker, les nouvelles tentatives et les lettres mortes.", "compact_caption": "Redis Task Queue · architecture du package."}
+      "artifact": {
+        "label": "PACKAGE OPEN SOURCE",
+        "alt": "Couverture du dépôt Redis Task Queue montrant l’ajout par API, la file, le worker, le succès et les chemins de lettre morte.",
+        "caption": "Couverture publiée du dépôt · cycle de vie de la file.",
+        "compact_alt": "Redis Task Queue montrant l’ajout côté serveur Dart, le worker, les nouvelles tentatives et les lettres mortes.",
+        "compact_caption": "Redis Task Queue · architecture du package."
+      }
     },
     "constellation-particles": {
       "kind": "Package de dessin Flutter",
+      "year": "2026",
+      "technologies": ["Flutter", "Dart", "CustomPainter", "Grille spatiale"],
       "summary": "Champ de particules Flutter sans dépendance, avec interaction au pointeur et recherche des voisins par grille spatiale.",
       "ownership": "J’ai implémenté le painter, l’interaction au pointeur, le partitionnement spatial et les exemples du package sans dépendance à l’exécution.",
       "decision": "Utiliser le partitionnement spatial pour éviter de comparer chaque paire de particules quand la scène grandit.",
       "spotlight": "Champ de particules interactif sans dépendance avec recherche des voisins par grille spatiale.",
       "evidence": ["Voir le dépôt open source"],
-      "artifact": {"label": "DÉMONSTRATION DE RENDU", "alt": "Image de démonstration de Constellation Particles montrant les particules réactives au pointeur et leurs connexions de voisinage.", "caption": "Image issue de la démonstration Flutter CustomPainter publiée.", "compact_alt": "Constellation Particles avec la véritable démonstration de dessin Flutter.", "compact_caption": "Constellation Particles · démonstration du package de rendu."}
+      "artifact": {
+        "label": "DÉMONSTRATION DE RENDU",
+        "alt": "Image de démonstration de Constellation Particles montrant les particules réactives au pointeur et leurs connexions de voisinage.",
+        "caption": "Image issue de la démonstration Flutter CustomPainter publiée.",
+        "compact_alt": "Constellation Particles avec la véritable démonstration de dessin Flutter.",
+        "compact_caption": "Constellation Particles · démonstration du package de rendu."
+      }
     },
     "portfolio": {
       "kind": "Ingénierie web",
+      "year": "2026",
+      "technologies": ["Flutter", "Dart Wasm", "SkWasm", "Playwright"],
       "summary": "Ce site constitue le relevé vivant de mon expérience, de mes produits publiés et de mes contributions open source.",
       "ownership": "J’ai conçu et j’exploite le site Flutter Web, son pipeline de contenu externe, sa couche d’accessibilité, sa suite de régression navigateur et sa version de production.",
       "decision": "Traiter d’abord le portfolio comme un document accessible et maintenir le dessin d’ambiance hors du parcours sémantique.",
       "spotlight": "Document Flutter Web centré sur le contenu, doté d’un runtime narratif sur mesure et de tests de régression navigateur.",
       "evidence": ["Voir le dépôt open source", "Ouvrir le site de production"],
-      "artifact": {"label": "ARCHITECTURE D’EXÉCUTION", "alt": "Architecture du portfolio Flutter Web, du contenu canonique à la localisation, au rendu Dart Wasm et aux tests de régression navigateur.", "caption": "Exécution du portfolio · contenu, localisation, rendu Wasm et tests navigateur.", "compact_alt": "Architecture du portfolio Flutter Web, du contenu à la sortie localisée du navigateur.", "compact_caption": "Portfolio Flutter Web · du contenu au navigateur."}
+      "artifact": {
+        "label": "ARCHITECTURE D’EXÉCUTION",
+        "alt": "Architecture du portfolio Flutter Web, du contenu canonique à la localisation, au rendu Dart Wasm et aux tests de régression navigateur.",
+        "caption": "Exécution du portfolio · contenu, localisation, rendu Wasm et tests navigateur.",
+        "compact_alt": "Architecture du portfolio Flutter Web, du contenu à la sortie localisée du navigateur.",
+        "compact_caption": "Portfolio Flutter Web · du contenu au navigateur."
+      }
     }
   }
 }

@@ -1,6 +1,6 @@
 {
   "name": "flutter-web-portfolio",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "private": true,
   "description": "A JSON-driven Flutter Web portfolio template with measured navigation, accessible editorial layouts, and a dual-runtime Wasm release.",
   "engines": {

@@ -84,6 +84,8 @@ void main() {
           (localization['systems']! as Map<String, dynamic>).keys.toSet(),
           canonical.systems.map((entry) => entry.id).toSet(),
         );
+        final localizedSystemCatalog =
+            localization['systems']! as Map<String, dynamic>;
         expect(localized.activeSections, canonical.activeSections);
         expect(localized.profile.name, canonical.profile.name);
         expect(localized.profile.email, canonical.profile.email);
@@ -109,10 +111,24 @@ void main() {
           );
         }
         for (var index = 0; index < canonical.systems.length; index++) {
+          final expectedSystem =
+              localizedSystemCatalog[canonical.systems[index].id]!
+                  as Map<String, dynamic>;
           expect(
             localized.systems[index].kind,
             isNot(canonical.systems[index].kind),
             reason: '$locale system kind ${canonical.systems[index].id}',
+          );
+          expect(
+            localized.systems[index].year,
+            expectedSystem['year'],
+            reason: '$locale system year ${canonical.systems[index].id}',
+          );
+          expect(
+            localized.systems[index].technologies,
+            (expectedSystem['technologies']! as List<dynamic>).cast<String>(),
+            reason:
+                '$locale system technologies ${canonical.systems[index].id}',
           );
           expect(
             localized.systems[index].artifact.alt,
