@@ -32,7 +32,11 @@ jobs:
       - run: npm run prepare:source
       - run: flutter build web --release --wasm --no-web-resources-cdn
       - run: npm run prepare:bundle
-      - run: npm run test:visual:update
+      # Regenerate against the FULL suite (the same run npm test does), not just
+      # visual.spec.ts, so the baselines match the render the CI check compares
+      # against. Update mode overwrites screenshots, so screenshot mismatches do
+      # not fail the run; a non-screenshot failure still does, on purpose.
+      - run: npx playwright test --update-snapshots
       - name: Commit regenerated baselines
         run: |
           git config user.name "Yusuf İhsan Görgel"
