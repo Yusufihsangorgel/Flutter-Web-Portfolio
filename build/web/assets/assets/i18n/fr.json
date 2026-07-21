@@ -4,7 +4,8 @@
     "about": "À propos",
     "experience": "Expérience",
     "projects": "Projets",
-    "proof": "Open source"
+    "proof": "Open source",
+    "packages": "Paquets"
   },
   "accessibility": {
     "skip_to_content": "Aller au contenu",
@@ -74,6 +75,14 @@
     "event_lab_step": "Étape",
     "status_merged": "Fusionnée",
     "status_under_review": "En révision"
+  },
+  "packages_section": {
+    "title": "Paquets publiés",
+    "subtitle": "{count} paquets publiés sur pub.dev, chacun avec un score parfait de 160/160. Ensemble, ils totalisent environ {downloads} téléchargements par mois.",
+    "pub_points": "points pub",
+    "downloads": "téléchargements / mois",
+    "likes": "mentions J’aime",
+    "open_package": "Ouvrir sur pub.dev"
   },
   "footer": {
     "command_hint_prefix": "Appuyez sur",

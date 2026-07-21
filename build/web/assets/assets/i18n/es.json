@@ -4,7 +4,8 @@
     "about": "Sobre mí",
     "experience": "Experiencia",
     "projects": "Proyectos",
-    "proof": "Código abierto"
+    "proof": "Código abierto",
+    "packages": "Paquetes"
   },
   "accessibility": {
     "skip_to_content": "Saltar al contenido",
@@ -74,6 +75,14 @@
     "event_lab_step": "Paso",
     "status_merged": "Fusionado",
     "status_under_review": "En revisión"
+  },
+  "packages_section": {
+    "title": "Paquetes publicados",
+    "subtitle": "{count} paquetes publicados en pub.dev, todos con una puntuación perfecta de 160/160. Juntos suman unas {downloads} descargas al mes.",
+    "pub_points": "puntos pub",
+    "downloads": "descargas / mes",
+    "likes": "me gusta",
+    "open_package": "Abrir en pub.dev"
   },
   "footer": {
     "command_hint_prefix": "Presione",

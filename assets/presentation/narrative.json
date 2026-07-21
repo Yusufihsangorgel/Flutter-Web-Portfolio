@@ -19,6 +19,10 @@
       "motif": "bracket"
     },
     {
+      "id": "packages",
+      "motif": "bracket"
+    },
+    {
       "id": "about",
       "motif": "thread"
     }

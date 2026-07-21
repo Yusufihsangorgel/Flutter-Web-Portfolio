@@ -14,15 +14,17 @@ final class PortfolioDocument {
     required List<PortfolioCapability> capabilities,
     required List<PortfolioContribution> contributions,
     required List<PortfolioSystem> systems,
+    required List<PortfolioPackage> packages,
   }) : sources = List.unmodifiable(sources),
        experience = List.unmodifiable(experience),
        capabilities = List.unmodifiable(capabilities),
        contributions = List.unmodifiable(contributions),
-       systems = List.unmodifiable(systems);
+       systems = List.unmodifiable(systems),
+       packages = List.unmodifiable(packages);
 
   factory PortfolioDocument.fromJson(Map<String, dynamic> json) {
     final schemaVersion = _requiredInt(json, 'schema_version');
-    if (schemaVersion != 8) {
+    if (schemaVersion != 9) {
       throw FormatException(
         'Unsupported portfolio schema version: $schemaVersion',
       );
@@ -48,6 +50,10 @@ final class PortfolioDocument {
         'contributions',
       ).map(PortfolioContribution.fromJson).toList(),
       systems: _objects(json, 'systems').map(PortfolioSystem.fromJson).toList(),
+      packages: _objects(
+        json,
+        'packages',
+      ).map(PortfolioPackage.fromJson).toList(),
     ).._validate();
   }
 
@@ -61,12 +67,14 @@ final class PortfolioDocument {
   final List<PortfolioCapability> capabilities;
   final List<PortfolioContribution> contributions;
   final List<PortfolioSystem> systems;
+  final List<PortfolioPackage> packages;
 
   List<String> get activeSections => <String>[
     'home',
     if (experience.isNotEmpty) 'experience',
     if (contributions.isNotEmpty) 'proof',
     if (systems.isNotEmpty) 'projects',
+    if (packages.isNotEmpty) 'packages',
     'about',
   ];
 
@@ -126,6 +134,7 @@ final class PortfolioDocument {
         for (final entry in systems)
           _localizedSystem(entry, copy.entry('systems', entry.id)),
       ],
+      packages: packages,
     ).._validate();
     return localizedDocument;
   }
@@ -186,6 +195,7 @@ final class PortfolioDocument {
     _assertUnique('capability', capabilities.map((entry) => entry.id));
     _assertUnique('contribution', contributions.map((entry) => entry.id));
     _assertUnique('system', systems.map((entry) => entry.id));
+    _assertUnique('package', packages.map((entry) => entry.id));
     _assertUnique(
       'work artifact asset',
       systems.expand(
@@ -993,6 +1003,57 @@ enum PortfolioArtifactComposition {
     orElse: () =>
         throw FormatException('Unsupported artifact composition: $value'),
   );
+}
+
+/// A published pub.dev package, presented with its real, verified metrics.
+///
+/// Packages are deliberately not part of the translated localization path:
+/// names, versions, and pub.dev metrics are factual records rather than
+/// authored copy, so every locale renders the same values as English.
+final class PortfolioPackage {
+  PortfolioPackage({
+    required this.id,
+    required this.name,
+    required this.description,
+    required this.url,
+    required this.version,
+    required this.likes,
+    required this.pubPoints,
+    required this.downloads,
+    required this.category,
+    required List<String> topics,
+    this.repository,
+  }) : topics = List.unmodifiable(topics);
+
+  factory PortfolioPackage.fromJson(Map<String, dynamic> json) =>
+      PortfolioPackage(
+        id: _requiredString(json, 'id'),
+        name: _requiredString(json, 'name'),
+        description: _requiredString(json, 'description'),
+        url: _requiredUri(json, 'url'),
+        version: _requiredString(json, 'version'),
+        likes: _requiredInt(json, 'likes'),
+        pubPoints: _requiredInt(json, 'pub_points'),
+        downloads: _requiredInt(json, 'downloads'),
+        category: _requiredString(json, 'category'),
+        topics: switch (json['topics']) {
+          null => const [],
+          _ => _strings(json, 'topics'),
+        },
+        repository: _optionalUri(json, 'repository'),
+      );
+
+  final String id;
+  final String name;
+  final String description;
+  final Uri url;
+  final String version;
+  final int likes;
+  final int pubPoints;
+  final int downloads;
+  final String category;
+  final List<String> topics;
+  final Uri? repository;
 }
 
 final class _PortfolioLocalization {

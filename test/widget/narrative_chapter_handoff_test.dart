@@ -212,10 +212,10 @@ void main() {
 
   test('keeps past boundaries revealed and future boundaries quiet', () {
     final chapters = narrative.chapters;
-    final home = chapters[0];
-    final experience = chapters[1];
-    final projects = chapters[3];
-    final about = chapters[4];
+    final home = narrative.chapterFor(SectionId.home);
+    final experience = narrative.chapterFor(SectionId.experience);
+    final projects = narrative.chapterFor(SectionId.projects);
+    final packages = narrative.chapterFor(SectionId.packages);
 
     const activeBoundary = NarrativePosition(
       activeSectionId: 'home',
@@ -259,7 +259,7 @@ void main() {
         snapshot: laterBoundary,
         chapterOrder: chapters,
         from: projects,
-        to: about,
+        to: packages,
         reducedMotion: false,
       ),
       0,
@@ -271,8 +271,8 @@ void main() {
       NarrativeHandoffReveal.resolve(
         snapshot: const NarrativePosition.initial(),
         chapterOrder: narrative.chapters,
-        from: narrative.chapters[3],
-        to: narrative.chapters[4],
+        from: narrative.chapterFor(SectionId.projects),
+        to: narrative.chapterFor(SectionId.about),
         reducedMotion: true,
       ),
       1,

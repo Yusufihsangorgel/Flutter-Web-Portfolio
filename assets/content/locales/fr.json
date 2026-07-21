@@ -149,6 +149,41 @@
     }
   },
   "contributions": {
+    "retrofit-stream-response-future": {
+      "title": "Conserver le future de la requête dans le pipeline de flux pour ResponseType.stream",
+      "problem": "Pour ResponseType.stream, le future de requête sous-jacent était retiré du pipeline de flux, si bien que les erreurs de requête et l’achèvement n’étaient pas propagés aux appelants.",
+      "change": "Conservé le future de la requête dans le pipeline de flux afin que les réponses en flux signalent correctement les erreurs et l’achèvement."
+    },
+    "retrofit-partmap-nullable-guard": {
+      "title": "Protéger les variables auxiliaires PartMap pour les parties de fichier nullables",
+      "problem": "Le code PartMap généré pour les parties de fichier nullables faisait référence à des variables auxiliaires sans vérification de nullité, ce qui rompait la null-safety dans le client généré.",
+      "change": "Protégé les variables auxiliaires PartMap afin que les parties de fichier nullables compilent sans risque."
+    },
+    "retrofit-content-type-null-safety": {
+      "title": "Rendre contentType null-safe dans newRequestOptions",
+      "problem": "La gestion générée de contentType dans newRequestOptions n’était pas null-safe.",
+      "change": "Rendu contentType null-safe dans le code généré de newRequestOptions."
+    },
+    "dart-mcp-decoded-message-channel": {
+      "title": "Opérer sur des messages décodés plutôt que des chaînes JSON",
+      "problem": "Le transport MCP réencodait et redécodait les messages JSON-RPC en chaînes à l’intérieur du processus, ajoutant un aller-retour de sérialisation supplémentaire et masquant les véritables types de message aux gestionnaires des utilisateurs.",
+      "change": "Changé le type de canal principal en StreamChannel<Map<String, Object?>> afin que le JSON soit encodé et décodé uniquement à la frontière du transport, les transports en chaîne étant adaptés via un jsonRpcChannel séparé."
+    },
+    "shelf-cookie-header-join": {
+      "title": "Joindre les valeurs multiples de l’en-tête Cookie avec le séparateur conforme à la RFC",
+      "problem": "Les valeurs multiples de l’en-tête Cookie étaient jointes par une virgule, produisant une chaîne de cookie qui viole la RFC 6265 et que les serveurs et intergiciels ne peuvent pas analyser.",
+      "change": "Joint les valeurs multiples de l’en-tête Cookie avec '; ' afin que l’en-tête de cookie combiné soit valide et lisible."
+    },
+    "bun-migration-finalizer-errors": {
+      "title": "Révéler les erreurs perdues des finaliseurs de migration SQL",
+      "problem": "Les erreurs des finaliseurs de migration SQL provenant de Commit, Rollback ou Conn.Close étaient silencieusement perdues car elles étaient affectées à une valeur de retour sans nom après que le résultat avait déjà été évalué.",
+      "change": "Remplacé la fermeture de migration par un retour nommé et combiné les erreurs de finalisation avec l’erreur d’exécution afin que les échecs de commit et de rollback soient signalés."
+    },
+    "dart-mcp-request-scoped-dispatch": {
+      "title": "Ajouter la diffusion de messages associée à la requête pour les serveurs MCP",
+      "problem": "Les serveurs MCP n’avaient aucun moyen d’envoyer des messages associés à la requête individuelle qui les avait déclenchés.",
+      "change": "Ajouté la diffusion de messages associée à la requête afin qu’un serveur puisse émettre des messages liés à la requête d’origine."
+    },
     "dart-mcp-initialization-lifecycle": {
       "title": "Dissocier l’enregistrement des fonctionnalités serveur de l’initialisation historique",
       "problem": "L’enregistrement des fonctionnalités dépendait de l’ancien échange d’initialisation, ce qui limitait la réutilisation du cycle de vie serveur avec différents transports et modes d’initialisation.",

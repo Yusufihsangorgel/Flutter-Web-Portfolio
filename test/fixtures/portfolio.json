@@ -1,5 +1,5 @@
 {
-  "schema_version": 8,
+  "schema_version": 9,
   "content_version": "test.1",
   "verified_at": "2026-01-01",
   "site": {
@@ -316,6 +316,32 @@
       },
       "url": "https://example.com/work/queue-inspector",
       "technologies": ["Dart", "Queues", "Observability"]
+    }
+  ],
+  "packages": [
+    {
+      "id": "example_task_queue",
+      "name": "example_task_queue",
+      "description": "A fixture package used to exercise the packages showcase in tests.",
+      "url": "https://pub.dev/packages/example_task_queue",
+      "repository": "https://example.com/source/example_task_queue",
+      "version": "0.1.0",
+      "likes": 1,
+      "pub_points": 160,
+      "downloads": 100,
+      "category": "server"
+    },
+    {
+      "id": "example_ui_kit",
+      "name": "example_ui_kit",
+      "description": "A second fixture package covering a different category.",
+      "url": "https://pub.dev/packages/example_ui_kit",
+      "repository": "https://example.com/source/example_ui_kit",
+      "version": "0.2.0",
+      "likes": 0,
+      "pub_points": 160,
+      "downloads": 50,
+      "category": "flutter-ui"
     }
   ]
 }

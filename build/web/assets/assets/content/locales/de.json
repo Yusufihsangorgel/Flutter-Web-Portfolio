@@ -149,6 +149,41 @@
     }
   },
   "contributions": {
+    "retrofit-stream-response-future": {
+      "title": "Die Anfrage-Future in der Stream-Pipeline für ResponseType.stream behalten",
+      "problem": "Bei ResponseType.stream wurde die zugrunde liegende Anfrage-Future aus der Stream-Pipeline entfernt, sodass Anfragefehler und der Abschluss nicht an die Aufrufer weitergegeben wurden.",
+      "change": "Die Anfrage-Future in der Stream-Pipeline behalten, sodass gestreamte Antworten Fehler und den Abschluss korrekt anzeigen."
+    },
+    "retrofit-partmap-nullable-guard": {
+      "title": "PartMap-Hilfsvariablen für nullable Dateiteile absichern",
+      "problem": "Der generierte PartMap-Code für nullable Dateiteile griff auf Hilfsvariablen ohne Null-Prüfung zu und brach damit die Null-Sicherheit im generierten Client.",
+      "change": "Die PartMap-Hilfsvariablen abgesichert, sodass nullable Dateiteile sicher kompilieren."
+    },
+    "retrofit-content-type-null-safety": {
+      "title": "contentType in newRequestOptions null-sicher machen",
+      "problem": "Die generierte contentType-Behandlung in newRequestOptions war nicht null-sicher.",
+      "change": "contentType im generierten newRequestOptions-Code null-sicher gemacht."
+    },
+    "dart-mcp-decoded-message-channel": {
+      "title": "Mit dekodierten Nachrichten statt JSON-Strings arbeiten",
+      "problem": "Der MCP-Transport kodierte und dekodierte JSON-RPC-Nachrichten innerhalb des Prozesses erneut zu Strings, was einen zusätzlichen Serialisierungsschritt hinzufügte und die tatsächlichen Nachrichtentypen vor den Handlern der Nutzer verbarg.",
+      "change": "Den zentralen Kanaltyp auf StreamChannel<Map<String, Object?>> geändert, sodass JSON nur an der Transportgrenze kodiert und dekodiert wird; string-basierte Transporte werden über einen separaten jsonRpcChannel angepasst."
+    },
+    "shelf-cookie-header-join": {
+      "title": "Mehrere Cookie-Header-Werte mit dem RFC-korrekten Trennzeichen verbinden",
+      "problem": "Mehrere Cookie-Header-Werte wurden mit einem Komma verbunden, was einen Cookie-String erzeugte, der gegen RFC 6265 verstößt und von Servern und Middleware nicht geparst werden kann.",
+      "change": "Mehrere Cookie-Header-Werte mit '; ' verbunden, sodass der zusammengesetzte Cookie-Header gültig und lesbar ist."
+    },
+    "bun-migration-finalizer-errors": {
+      "title": "Verlorene Fehler von SQL-Migrations-Finalizern sichtbar machen",
+      "problem": "Fehler aus Commit, Rollback oder Conn.Close in SQL-Migrations-Finalizern gingen stillschweigend verloren, weil sie einem unbenannten Rückgabewert zugewiesen wurden, nachdem das Ergebnis bereits ausgewertet worden war.",
+      "change": "Die Migrations-Closure auf einen benannten Rückgabewert umgestellt und Finalizer-Fehler mit dem Ausführungsfehler verbunden, sodass Commit- und Rollback-Fehler gemeldet werden."
+    },
+    "dart-mcp-request-scoped-dispatch": {
+      "title": "Anfragebezogenen Nachrichtenversand für MCP-Server hinzufügen",
+      "problem": "MCP-Server hatten keine Möglichkeit, Nachrichten zu senden, die an die einzelne Anfrage gebunden waren, die sie ausgelöst hat.",
+      "change": "Anfragebezogenen Nachrichtenversand hinzugefügt, sodass ein Server Nachrichten senden kann, die an die ursprüngliche Anfrage gebunden sind."
+    },
     "dart-mcp-initialization-lifecycle": {
       "title": "Registrierung von Serverfunktionen von der alten Initialisierung trennen",
       "problem": "Die Registrierung von Funktionen war an den alten Initialisierungs-Handshake gekoppelt und erschwerte die Wiederverwendung des Serverlebenszyklus über verschiedene Transporte und Initialisierungsarten hinweg.",

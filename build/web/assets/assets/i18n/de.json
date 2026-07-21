@@ -4,7 +4,8 @@
     "about": "Über mich",
     "experience": "Erfahrung",
     "projects": "Arbeiten",
-    "proof": "Open Source"
+    "proof": "Open Source",
+    "packages": "Pakete"
   },
   "accessibility": {
     "skip_to_content": "Zum Inhalt springen",
@@ -74,6 +75,14 @@
     "event_lab_step": "Schritt",
     "status_merged": "Zusammengeführt",
     "status_under_review": "In Prüfung"
+  },
+  "packages_section": {
+    "title": "Veröffentlichte Pakete",
+    "subtitle": "{count} Pakete sind auf pub.dev veröffentlicht, jedes mit der perfekten Wertung 160/160. Zusammen kommen sie auf etwa {downloads} Downloads im Monat.",
+    "pub_points": "Pub-Punkte",
+    "downloads": "Downloads / Monat",
+    "likes": "Likes",
+    "open_package": "Auf pub.dev öffnen"
   },
   "footer": {
     "command_hint_prefix": "Drücken Sie",

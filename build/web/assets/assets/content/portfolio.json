@@ -1,7 +1,7 @@
 {
-  "schema_version": 8,
-  "content_version": "2026.07.18.1",
-  "verified_at": "2026-07-18",
+  "schema_version": 9,
+  "content_version": "2026.07.21.1",
+  "verified_at": "2026-07-21",
   "site": {
     "template_repository": true,
     "url": "https://developeryusuf.com",
@@ -10,7 +10,15 @@
     "social_description": "Cross-platform product engineering, selected professional work, and verified open-source contributions by Yusuf İhsan Görgel.",
     "social_image": "/assets/og/engineering-showcase.png?v=2026.07.18.1",
     "domain_label": "DEVELOPERYUSUF.COM",
-    "locales": ["en", "tr", "de", "fr", "es", "ar", "hi"],
+    "locales": [
+      "en",
+      "tr",
+      "de",
+      "fr",
+      "es",
+      "ar",
+      "hi"
+    ],
     "analytics": {
       "script_url": "https://analytics.developeryusuf.com/js/script.js",
       "domain": "developeryusuf.com"
@@ -218,25 +226,126 @@
     {
       "id": "client",
       "label": "Client systems",
-      "items": ["Flutter", "Dart", "BLoC", "Platform channels", "Offline-first"]
+      "items": [
+        "Flutter",
+        "Dart",
+        "BLoC",
+        "Platform channels",
+        "Offline-first"
+      ]
     },
     {
       "id": "services",
       "label": "Services",
-      "items": ["Go", "Fiber", "PostgreSQL", "Redis", "Asynq"]
+      "items": [
+        "Go",
+        "Fiber",
+        "PostgreSQL",
+        "Redis",
+        "Asynq"
+      ]
     },
     {
       "id": "web-runtime",
       "label": "Web runtime",
-      "items": ["Dart Wasm", "SkWasm", "CanvasKit", "Semantics", "First-frame lifecycle"]
+      "items": [
+        "Dart Wasm",
+        "SkWasm",
+        "CanvasKit",
+        "Semantics",
+        "First-frame lifecycle"
+      ]
     },
     {
       "id": "operations",
       "label": "Operations",
-      "items": ["Docker", "Docker Swarm", "Prometheus", "Grafana", "PostgreSQL operations"]
+      "items": [
+        "Docker",
+        "Docker Swarm",
+        "Prometheus",
+        "Grafana",
+        "PostgreSQL operations"
+      ]
     }
   ],
   "contributions": [
+    {
+      "id": "retrofit-stream-response-future",
+      "project": "Retrofit for Dart",
+      "status": "merged",
+      "date": "2026-07-21",
+      "title": "Keep the request future in the stream pipeline for ResponseType.stream",
+      "problem": "For ResponseType.stream the underlying request future was dropped from the stream pipeline, so request errors and completion were not propagated to callers.",
+      "change": "Kept the request future in the stream pipeline so streamed responses surface errors and completion correctly.",
+      "url": "https://github.com/trevorwang/retrofit.dart/pull/921",
+      "featured": false
+    },
+    {
+      "id": "retrofit-partmap-nullable-guard",
+      "project": "Retrofit for Dart",
+      "status": "merged",
+      "date": "2026-07-21",
+      "title": "Guard PartMap helper variables for nullable file parts",
+      "problem": "Generated PartMap code for nullable file parts referenced helper variables without null guards, breaking null-safety in the generated client.",
+      "change": "Guarded the PartMap helper variables so nullable file parts compile safely.",
+      "url": "https://github.com/trevorwang/retrofit.dart/pull/920",
+      "featured": false
+    },
+    {
+      "id": "retrofit-content-type-null-safety",
+      "project": "Retrofit for Dart",
+      "status": "merged",
+      "date": "2026-07-21",
+      "title": "Make contentType null-safe in newRequestOptions",
+      "problem": "The generated contentType handling in newRequestOptions was not null-safe.",
+      "change": "Made contentType null-safe in the generated newRequestOptions code.",
+      "url": "https://github.com/trevorwang/retrofit.dart/pull/919",
+      "featured": false
+    },
+    {
+      "id": "dart-mcp-decoded-message-channel",
+      "project": "Dart MCP",
+      "status": "merged",
+      "date": "2026-07-20",
+      "title": "Operate on decoded messages instead of JSON strings",
+      "problem": "The MCP transport re-encoded and re-decoded JSON-RPC messages to strings inside the process, adding an extra serialization round trip and hiding the real message types from user handlers.",
+      "change": "Changed the core channel type to StreamChannel<Map<String, Object?>> so JSON is encoded and decoded only at the transport edge, with string transports adapted through a separate jsonRpcChannel.",
+      "url": "https://github.com/dart-lang/ai/pull/531",
+      "featured": false
+    },
+    {
+      "id": "shelf-cookie-header-join",
+      "project": "Shelf",
+      "status": "merged",
+      "date": "2026-07-20",
+      "title": "Join multiple Cookie header values with the RFC-correct separator",
+      "problem": "Multiple Cookie header values were joined with a comma, producing a cookie string that violates RFC 6265 and is unparseable by servers and middleware.",
+      "change": "Joined multiple Cookie header values with '; ' so the combined cookie header is valid and readable.",
+      "url": "https://github.com/dart-lang/shelf/pull/536",
+      "featured": false
+    },
+    {
+      "id": "bun-migration-finalizer-errors",
+      "project": "Bun",
+      "status": "merged",
+      "date": "2026-07-17",
+      "title": "Surface lost SQL migration finalizer errors",
+      "problem": "SQL migration finalizer errors from Commit, Rollback, or Conn.Close were silently dropped because they were assigned to an unnamed return value after the result had already been evaluated.",
+      "change": "Switched the migration closure to a named return and joined finalizer errors with the execution error so commit and rollback failures are reported.",
+      "url": "https://github.com/uptrace/bun/pull/1390",
+      "featured": false
+    },
+    {
+      "id": "dart-mcp-request-scoped-dispatch",
+      "project": "Dart MCP",
+      "status": "merged",
+      "date": "2026-07-17",
+      "title": "Add request-scoped message dispatch for MCP servers",
+      "problem": "MCP servers had no way to send messages scoped to the individual request that triggered them.",
+      "change": "Added request-scoped message dispatch so a server can emit messages tied to the originating request.",
+      "url": "https://github.com/dart-lang/ai/pull/528",
+      "featured": false
+    },
     {
       "id": "dart-mcp-initialization-lifecycle",
       "project": "Dart MCP",
@@ -422,7 +531,13 @@
         }
       },
       "url": "https://fugasoft.com/",
-      "technologies": ["Flutter", "Dart", "Drift", "Native integrations", "Cross-platform release"]
+      "technologies": [
+        "Flutter",
+        "Dart",
+        "Drift",
+        "Native integrations",
+        "Cross-platform release"
+      ]
     },
     {
       "id": "dorse",
@@ -469,7 +584,13 @@
         }
       },
       "url": "https://dorseapp.com/",
-      "technologies": ["Flutter", "React", "Next.js", "WebSocket", "Maps"]
+      "technologies": [
+        "Flutter",
+        "React",
+        "Next.js",
+        "WebSocket",
+        "Maps"
+      ]
     },
     {
       "id": "aydinlik-e-gazete",
@@ -515,7 +636,13 @@
         }
       },
       "url": "https://apps.apple.com/tr/app/ayd%C4%B1nl%C4%B1k-e-gazete/id1560103805",
-      "technologies": ["Flutter", "Dart", "Dio", "MVVM", "iOS"]
+      "technologies": [
+        "Flutter",
+        "Dart",
+        "Dio",
+        "MVVM",
+        "iOS"
+      ]
     },
     {
       "id": "bilim-ve-utopya",
@@ -561,7 +688,13 @@
         }
       },
       "url": "https://apps.apple.com/tr/app/bilim-ve-%C3%BCtopya-e-dergi/id6478221195",
-      "technologies": ["Flutter", "Dart", "Dio", "MVVM", "iOS"]
+      "technologies": [
+        "Flutter",
+        "Dart",
+        "Dio",
+        "MVVM",
+        "iOS"
+      ]
     },
     {
       "id": "queue-inspector",
@@ -670,7 +803,13 @@
         }
       },
       "url": "https://github.com/Yusufihsangorgel/go-multitenant-gateway",
-      "technologies": ["Go", "JWT", "PostgreSQL", "Redis", "Multi-tenancy"]
+      "technologies": [
+        "Go",
+        "JWT",
+        "PostgreSQL",
+        "Redis",
+        "Multi-tenancy"
+      ]
     },
     {
       "id": "redis-task-queue",
@@ -716,7 +855,12 @@
         }
       },
       "url": "https://github.com/Yusufihsangorgel/redis_task_queue",
-      "technologies": ["Dart", "Redis", "Retries", "Dead letters"]
+      "technologies": [
+        "Dart",
+        "Redis",
+        "Retries",
+        "Dead letters"
+      ]
     },
     {
       "id": "constellation-particles",
@@ -762,7 +906,12 @@
         }
       },
       "url": "https://github.com/Yusufihsangorgel/constellation_particles",
-      "technologies": ["Flutter", "Dart", "CustomPainter", "Spatial grid"]
+      "technologies": [
+        "Flutter",
+        "Dart",
+        "CustomPainter",
+        "Spatial grid"
+      ]
     },
     {
       "id": "portfolio",
@@ -813,7 +962,278 @@
         }
       },
       "url": "https://developeryusuf.com",
-      "technologies": ["Flutter", "Dart Wasm", "SkWasm", "Playwright"]
+      "technologies": [
+        "Flutter",
+        "Dart Wasm",
+        "SkWasm",
+        "Playwright"
+      ]
+    }
+  ],
+  "packages": [
+    {
+      "id": "redis_task_queue",
+      "name": "redis_task_queue",
+      "description": "Redis-backed task queue for server Dart with retries and scheduling",
+      "url": "https://pub.dev/packages/redis_task_queue",
+      "repository": "https://github.com/Yusufihsangorgel/redis_task_queue",
+      "version": "0.10.0",
+      "likes": 1,
+      "pub_points": 160,
+      "downloads": 298,
+      "category": "server"
+    },
+    {
+      "id": "re2",
+      "name": "re2",
+      "description": "Linear-time regex via Google RE2, immune to ReDoS backtracking",
+      "url": "https://pub.dev/packages/re2",
+      "repository": "https://github.com/Yusufihsangorgel/re2",
+      "version": "0.5.0",
+      "likes": 0,
+      "pub_points": 160,
+      "downloads": 23,
+      "category": "native-ffi"
+    },
+    {
+      "id": "xlsxwriter",
+      "name": "xlsxwriter",
+      "description": "Native low-memory Excel xlsx writer via libxlsxwriter FFI binding",
+      "url": "https://pub.dev/packages/xlsxwriter",
+      "repository": "https://github.com/Yusufihsangorgel/xlsxwriter",
+      "version": "0.7.0",
+      "likes": 0,
+      "pub_points": 160,
+      "downloads": 23,
+      "category": "native-ffi"
+    },
+    {
+      "id": "mcp_probe",
+      "name": "mcp_probe",
+      "description": "Conformance checks and test harness for MCP servers over stdio",
+      "url": "https://pub.dev/packages/mcp_probe",
+      "repository": "https://github.com/Yusufihsangorgel/mcp_probe",
+      "version": "0.5.0",
+      "likes": 0,
+      "pub_points": 160,
+      "downloads": 142,
+      "category": "ai-llm"
+    },
+    {
+      "id": "hf_tokenizers",
+      "name": "hf_tokenizers",
+      "description": "Byte-exact HuggingFace tokenizer encoding for Dart over Rust FFI",
+      "url": "https://pub.dev/packages/hf_tokenizers",
+      "repository": "https://github.com/Yusufihsangorgel/tokenizers",
+      "version": "0.5.0",
+      "likes": 0,
+      "pub_points": 160,
+      "downloads": 25,
+      "category": "native-ffi"
+    },
+    {
+      "id": "simdjson_dart",
+      "name": "simdjson_dart",
+      "description": "Fast JSON parsing via the simdjson C++ library over FFI",
+      "url": "https://pub.dev/packages/simdjson_dart",
+      "repository": "https://github.com/Yusufihsangorgel/simdjson_dart",
+      "version": "0.2.4",
+      "likes": 1,
+      "pub_points": 160,
+      "downloads": 128,
+      "category": "native-ffi"
+    },
+    {
+      "id": "vector_kit",
+      "name": "vector_kit",
+      "description": "SIMD dot product, cosine similarity and top-k for embeddings",
+      "url": "https://pub.dev/packages/vector_kit",
+      "repository": "https://github.com/Yusufihsangorgel/vector_kit",
+      "version": "0.3.0",
+      "likes": 0,
+      "pub_points": 160,
+      "downloads": 115,
+      "category": "native-ffi"
+    },
+    {
+      "id": "instructor_dart",
+      "name": "instructor_dart",
+      "description": "Typed, validated structured outputs from hosted LLM providers",
+      "url": "https://pub.dev/packages/instructor_dart",
+      "repository": "https://github.com/Yusufihsangorgel/instructor_dart",
+      "version": "0.3.0",
+      "likes": 0,
+      "pub_points": 160,
+      "downloads": 144,
+      "category": "ai-llm"
+    },
+    {
+      "id": "rag_kit",
+      "name": "rag_kit",
+      "description": "Pure-Dart RAG chunking, embeddings, vector search and context building",
+      "url": "https://pub.dev/packages/rag_kit",
+      "repository": "https://github.com/Yusufihsangorgel/rag_kit",
+      "version": "0.3.0",
+      "likes": 0,
+      "pub_points": 160,
+      "downloads": 145,
+      "category": "ai-llm"
+    },
+    {
+      "id": "image_ffi",
+      "name": "image_ffi",
+      "description": "Native image resize, thumbnail and JPEG or PNG encode over FFI",
+      "url": "https://pub.dev/packages/image_ffi",
+      "repository": "https://github.com/Yusufihsangorgel/image_ffi",
+      "version": "0.5.0",
+      "likes": 0,
+      "pub_points": 160,
+      "downloads": 23,
+      "category": "native-ffi"
+    },
+    {
+      "id": "blake3_ffi",
+      "name": "blake3_ffi",
+      "description": "BLAKE3 hashing over native FFI, faster than SHA-256",
+      "url": "https://pub.dev/packages/blake3_ffi",
+      "repository": "https://github.com/Yusufihsangorgel/blake3_ffi",
+      "version": "0.3.0",
+      "likes": 0,
+      "pub_points": 160,
+      "downloads": 24,
+      "category": "native-ffi"
+    },
+    {
+      "id": "audio_decode",
+      "name": "audio_decode",
+      "description": "Decodes MP3 and Ogg Vorbis to raw PCM via FFI",
+      "url": "https://pub.dev/packages/audio_decode",
+      "repository": "https://github.com/Yusufihsangorgel/audio_decode",
+      "version": "0.3.0",
+      "likes": 0,
+      "pub_points": 160,
+      "downloads": 25,
+      "category": "native-ffi"
+    },
+    {
+      "id": "resilience",
+      "name": "resilience",
+      "description": "Circuit breaker, retry, bulkhead and timeout policies for async calls",
+      "url": "https://pub.dev/packages/resilience",
+      "repository": "https://github.com/Yusufihsangorgel/resilience",
+      "version": "0.3.0",
+      "likes": 0,
+      "pub_points": 160,
+      "downloads": 114,
+      "category": "server"
+    },
+    {
+      "id": "llm_eval",
+      "name": "llm_eval",
+      "description": "Test harness for LLM evals with LLM-as-judge and caching",
+      "url": "https://pub.dev/packages/llm_eval",
+      "repository": "https://github.com/Yusufihsangorgel/llm_eval",
+      "version": "0.3.0",
+      "likes": 0,
+      "pub_points": 160,
+      "downloads": 115,
+      "category": "ai-llm"
+    },
+    {
+      "id": "stream_struct",
+      "name": "stream_struct",
+      "description": "Streams partial LLM JSON into typed objects token by token",
+      "url": "https://pub.dev/packages/stream_struct",
+      "repository": "https://github.com/Yusufihsangorgel/stream_struct",
+      "version": "0.3.1",
+      "likes": 0,
+      "pub_points": 160,
+      "downloads": 25,
+      "category": "ai-llm"
+    },
+    {
+      "id": "flutter_prerender",
+      "name": "flutter_prerender",
+      "description": "CLI that prerenders Flutter web to crawlable static HTML",
+      "url": "https://pub.dev/packages/flutter_prerender",
+      "repository": "https://github.com/Yusufihsangorgel/flutter_prerender",
+      "version": "0.2.2",
+      "likes": 0,
+      "pub_points": 160,
+      "downloads": 114,
+      "category": "dev-tool"
+    },
+    {
+      "id": "photo_zoom",
+      "name": "photo_zoom",
+      "description": "Pan, zoom, rotate photo gallery, drop-in for photo_view",
+      "url": "https://pub.dev/packages/photo_zoom",
+      "repository": "https://github.com/Yusufihsangorgel/photo_zoom",
+      "version": "0.1.4",
+      "likes": 0,
+      "pub_points": 160,
+      "downloads": 132,
+      "category": "flutter-ui"
+    },
+    {
+      "id": "skeleton_shimmer",
+      "name": "skeleton_shimmer",
+      "description": "Shimmer loading effect and skeleton placeholder widgets for Flutter",
+      "url": "https://pub.dev/packages/skeleton_shimmer",
+      "repository": "https://github.com/Yusufihsangorgel/skeleton_shimmer",
+      "version": "0.2.0",
+      "likes": 0,
+      "pub_points": 160,
+      "downloads": 144,
+      "category": "flutter-ui"
+    },
+    {
+      "id": "find_in_page",
+      "name": "find_in_page",
+      "description": "Ctrl+F find bar that highlights and scrolls to matches",
+      "url": "https://pub.dev/packages/find_in_page",
+      "repository": "https://github.com/Yusufihsangorgel/find_in_page",
+      "version": "0.2.0",
+      "likes": 0,
+      "pub_points": 160,
+      "downloads": 116,
+      "category": "flutter-ui"
+    },
+    {
+      "id": "text_autosize",
+      "name": "text_autosize",
+      "description": "Shrinks the text font until it fits its available bounds",
+      "url": "https://pub.dev/packages/text_autosize",
+      "repository": "https://github.com/Yusufihsangorgel/text_autosize",
+      "version": "0.1.3",
+      "likes": 0,
+      "pub_points": 160,
+      "downloads": 144,
+      "category": "flutter-ui"
+    },
+    {
+      "id": "constellation_particles",
+      "name": "constellation_particles",
+      "description": "Cursor-reactive particle constellation background widget for Flutter apps",
+      "url": "https://pub.dev/packages/constellation_particles",
+      "repository": "https://github.com/Yusufihsangorgel/constellation_particles",
+      "version": "0.2.2",
+      "likes": 1,
+      "pub_points": 160,
+      "downloads": 167,
+      "category": "flutter-ui"
+    },
+    {
+      "id": "expandable_plus",
+      "name": "expandable_plus",
+      "description": "Expandable and collapsible panels with accordion groups for Flutter",
+      "url": "https://pub.dev/packages/expandable_plus",
+      "repository": "https://github.com/Yusufihsangorgel/expandable_plus",
+      "version": "0.2.3",
+      "likes": 0,
+      "pub_points": 160,
+      "downloads": 25,
+      "category": "flutter-ui"
     }
   ]
 }

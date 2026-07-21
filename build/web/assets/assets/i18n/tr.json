@@ -4,7 +4,8 @@
     "about": "Hakkımda",
     "experience": "Deneyim",
     "projects": "Projeler",
-    "proof": "Açık Kaynak"
+    "proof": "Açık Kaynak",
+    "packages": "Paketler"
   },
   "accessibility": {
     "skip_to_content": "İçeriğe geç",
@@ -74,6 +75,14 @@
     "event_lab_step": "Adım",
     "status_merged": "Birleştirildi",
     "status_under_review": "İncelemede"
+  },
+  "packages_section": {
+    "title": "Yayınlanan Paketler",
+    "subtitle": "{count} paket pub.dev'de yayında, hepsi 160/160 tam puanla. Toplamda ayda yaklaşık {downloads} indirme alıyorlar.",
+    "pub_points": "pub puanı",
+    "downloads": "indirme / ay",
+    "likes": "beğeni",
+    "open_package": "pub.dev'de aç"
   },
   "footer": {
     "command_hint_prefix": "Basın",

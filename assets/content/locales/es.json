@@ -149,6 +149,41 @@
     }
   },
   "contributions": {
+    "retrofit-stream-response-future": {
+      "title": "Mantener el future de la solicitud en la canalización de flujo para ResponseType.stream",
+      "problem": "En ResponseType.stream, el future de la solicitud subyacente se eliminaba de la canalización de flujo, por lo que los errores de la solicitud y su finalización no se propagaban a quienes la llamaban.",
+      "change": "Mantuve el future de la solicitud en la canalización de flujo para que las respuestas en streaming muestren correctamente los errores y la finalización."
+    },
+    "retrofit-partmap-nullable-guard": {
+      "title": "Proteger las variables auxiliares de PartMap para partes de archivo anulables",
+      "problem": "El código PartMap generado para partes de archivo anulables hacía referencia a variables auxiliares sin comprobaciones de nulidad, rompiendo la seguridad frente a nulos en el cliente generado.",
+      "change": "Protegí las variables auxiliares de PartMap para que las partes de archivo anulables compilen de forma segura."
+    },
+    "retrofit-content-type-null-safety": {
+      "title": "Hacer que contentType sea seguro frente a nulos en newRequestOptions",
+      "problem": "El manejo generado de contentType en newRequestOptions no era seguro frente a nulos.",
+      "change": "Hice que contentType fuera seguro frente a nulos en el código generado de newRequestOptions."
+    },
+    "dart-mcp-decoded-message-channel": {
+      "title": "Operar sobre mensajes decodificados en lugar de cadenas JSON",
+      "problem": "El transporte de MCP volvía a codificar y decodificar los mensajes JSON-RPC como cadenas dentro del proceso, añadiendo una vuelta de serialización adicional y ocultando los tipos reales de mensaje a los manejadores del usuario.",
+      "change": "Cambié el tipo de canal principal a StreamChannel<Map<String, Object?>> para que el JSON se codifique y decodifique solo en el límite del transporte, adaptando los transportes de cadena mediante un jsonRpcChannel independiente."
+    },
+    "shelf-cookie-header-join": {
+      "title": "Unir varios valores del encabezado Cookie con el separador correcto según la RFC",
+      "problem": "Varios valores del encabezado Cookie se unían con una coma, generando una cadena de cookie que viola la RFC 6265 y que los servidores y middleware no pueden analizar.",
+      "change": "Uní varios valores del encabezado Cookie con '; ' para que el encabezado de cookie combinado sea válido y legible."
+    },
+    "bun-migration-finalizer-errors": {
+      "title": "Revelar los errores perdidos de los finalizadores de migración SQL",
+      "problem": "Los errores de los finalizadores de migración SQL provenientes de Commit, Rollback o Conn.Close se perdían silenciosamente porque se asignaban a un valor de retorno sin nombre después de que el resultado ya se había evaluado.",
+      "change": "Cambié el cierre de la migración a un retorno con nombre y combiné los errores del finalizador con el error de ejecución para que se informen los fallos de commit y rollback."
+    },
+    "dart-mcp-request-scoped-dispatch": {
+      "title": "Añadir el envío de mensajes con ámbito de solicitud para servidores MCP",
+      "problem": "Los servidores MCP no tenían forma de enviar mensajes con ámbito limitado a la solicitud individual que los originó.",
+      "change": "Añadí el envío de mensajes con ámbito de solicitud para que un servidor pueda emitir mensajes vinculados a la solicitud de origen."
+    },
     "dart-mcp-initialization-lifecycle": {
       "title": "Separar el registro de funciones del servidor de la inicialización heredada",
       "problem": "El registro de funciones estaba acoplado al intercambio de inicialización heredado, lo que dificultaba reutilizar el ciclo de vida del servidor entre transportes y modos de inicialización.",

@@ -4,7 +4,8 @@
     "about": "عني",
     "experience": "الخبرة",
     "projects": "الأعمال",
-    "proof": "المصدر المفتوح"
+    "proof": "المصدر المفتوح",
+    "packages": "الحزم"
   },
   "accessibility": {
     "skip_to_content": "تخطي إلى المحتوى",
@@ -74,6 +75,14 @@
     "event_lab_step": "الخطوة",
     "status_merged": "مدمج",
     "status_under_review": "قيد المراجعة"
+  },
+  "packages_section": {
+    "title": "الحزم المنشورة",
+    "subtitle": "{count} حزمة منشورة على pub.dev، وكل واحدة منها تحصل على الدرجة الكاملة 160/160. مجتمعة، تصل تنزيلاتها إلى نحو {downloads} تنزيل شهريًا.",
+    "pub_points": "نقاط pub",
+    "downloads": "تنزيلات / شهريًا",
+    "likes": "إعجاب",
+    "open_package": "فتح على pub.dev"
   },
   "footer": {
     "command_hint_prefix": "اضغط",

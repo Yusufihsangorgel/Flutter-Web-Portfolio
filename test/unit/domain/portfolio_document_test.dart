@@ -14,7 +14,7 @@ void main() {
       final profile = manifest['profile']! as Map<String, dynamic>;
       final displayName = profile['display_name']! as Map<String, dynamic>;
 
-      expect(document.schemaVersion, 8);
+      expect(document.schemaVersion, 9);
       expect(document.contentVersion, manifest['content_version']);
       expect(document.profile.name, profile['name']);
       expect(document.profile.role, profile['role']);
@@ -80,6 +80,7 @@ void main() {
         'experience',
         'proof',
         'projects',
+        'packages',
         'about',
       ]);
       expect(
@@ -247,7 +248,7 @@ void main() {
       json['systems'] = <dynamic>[];
 
       final document = PortfolioDocument.fromJson(json);
-      expect(document.activeSections, ['home', 'about']);
+      expect(document.activeSections, ['home', 'packages', 'about']);
     });
 
     test(
@@ -275,7 +276,12 @@ void main() {
       json['contributions'] = <dynamic>[];
 
       final document = PortfolioDocument.fromJson(json);
-      expect(document.activeSections, ['home', 'projects', 'about']);
+      expect(document.activeSections, [
+        'home',
+        'projects',
+        'packages',
+        'about',
+      ]);
     });
 
     test('keeps event-order labs on the selected contribution only', () {

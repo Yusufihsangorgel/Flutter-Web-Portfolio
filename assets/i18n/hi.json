@@ -4,7 +4,8 @@
     "about": "मेरे बारे में",
     "experience": "अनुभव",
     "projects": "काम",
-    "proof": "ओपन सोर्स"
+    "proof": "ओपन सोर्स",
+    "packages": "पैकेज"
   },
   "accessibility": {
     "skip_to_content": "सामग्री पर जाएँ",
@@ -74,6 +75,14 @@
     "event_lab_step": "चरण",
     "status_merged": "मर्ज किया गया",
     "status_under_review": "समीक्षा में"
+  },
+  "packages_section": {
+    "title": "प्रकाशित पैकेज",
+    "subtitle": "{count} पैकेज pub.dev पर प्रकाशित हैं, हर एक का स्कोर पूरे 160/160 है। मिलाकर इन्हें हर महीने लगभग {downloads} डाउनलोड मिलते हैं।",
+    "pub_points": "pub अंक",
+    "downloads": "डाउनलोड / माह",
+    "likes": "लाइक",
+    "open_package": "pub.dev पर खोलें"
   },
   "footer": {
     "command_hint_prefix": "दबाएँ",

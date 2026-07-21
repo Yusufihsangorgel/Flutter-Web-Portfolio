@@ -63,12 +63,14 @@ void main() {
         'experience',
         'proof',
         'projects',
+        'packages',
         'about',
       ]);
       expect(document.chapters.map((chapter) => chapter.motif), const [
         NarrativeMotif.origin,
         NarrativeMotif.timeline,
         NarrativeMotif.branches,
+        NarrativeMotif.bracket,
         NarrativeMotif.bracket,
         NarrativeMotif.thread,
       ]);

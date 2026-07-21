@@ -245,7 +245,7 @@ function createPortfolioDocument(answers) {
   const primaryLabel = answers.github ? 'GitHub' : 'Website';
 
   return {
-    schema_version: 8,
+    schema_version: 9,
     content_version: contentVersion,
     verified_at: today,
     site: {
@@ -303,6 +303,7 @@ function createPortfolioDocument(answers) {
     ],
     contributions: [],
     systems: [],
+    packages: [],
   };
 }
 

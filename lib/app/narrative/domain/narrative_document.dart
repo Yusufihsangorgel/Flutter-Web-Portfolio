@@ -7,6 +7,7 @@ extension type const SectionId(String value) {
   static const experience = SectionId('experience');
   static const proof = SectionId('proof');
   static const projects = SectionId('projects');
+  static const packages = SectionId('packages');
 
   bool get isHome => this == home;
 }

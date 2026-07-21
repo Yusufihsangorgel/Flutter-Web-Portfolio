@@ -301,12 +301,19 @@ The live demo uses the same template with a real professional record. This block
 
 Since 2021, I have built and maintained software for mobile devices, tablets, desktop operating systems, and the web. My work includes ERP and point-of-sale products, logistics workflows, digital publishing, backend services, and the release systems around them.
 
-Source status: `2026.07.18.1`, verified 2026-07-18 against GitHub, LinkedIn, FugaSoft, Dorse, and Medium.
+Source status: `2026.07.21.1`, verified 2026-07-21 against GitHub, LinkedIn, FugaSoft, Dorse, and Medium.
 
 ### Accepted upstream changes
 
 | Project | Change | Merged | Evidence |
 |---|---|---:|---|
+| Retrofit for Dart | Keep the request future in the stream pipeline for ResponseType.stream | 2026-07-21 | [Pull request](https://github.com/trevorwang/retrofit.dart/pull/921) |
+| Retrofit for Dart | Guard PartMap helper variables for nullable file parts | 2026-07-21 | [Pull request](https://github.com/trevorwang/retrofit.dart/pull/920) |
+| Retrofit for Dart | Make contentType null-safe in newRequestOptions | 2026-07-21 | [Pull request](https://github.com/trevorwang/retrofit.dart/pull/919) |
+| Dart MCP | Operate on decoded messages instead of JSON strings | 2026-07-20 | [Pull request](https://github.com/dart-lang/ai/pull/531) |
+| Shelf | Join multiple Cookie header values with the RFC-correct separator | 2026-07-20 | [Pull request](https://github.com/dart-lang/shelf/pull/536) |
+| Bun | Surface lost SQL migration finalizer errors | 2026-07-17 | [Pull request](https://github.com/uptrace/bun/pull/1390) |
+| Dart MCP | Add request-scoped message dispatch for MCP servers | 2026-07-17 | [Pull request](https://github.com/dart-lang/ai/pull/528) |
 | Dart MCP | Separate server feature registration from legacy initialization | 2026-07-15 | [Pull request](https://github.com/dart-lang/ai/pull/524) |
 | FlutterFire | Make Firebase core loading deterministic on WebKit | 2026-07-15 | [Pull request](https://github.com/firebase/flutterfire/pull/18443) |
 | Flutter Form Builder | Reset unknown dropdown initial values on first build | 2026-07-14 | [Pull request](https://github.com/flutter-form-builder-ecosystem/flutter_form_builder/pull/1512) |

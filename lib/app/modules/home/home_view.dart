@@ -11,6 +11,7 @@ import 'package:flutter_web_portfolio/app/core/constants/breakpoints.dart';
 import 'package:flutter_web_portfolio/app/modules/home/sections/home_section.dart';
 import 'package:flutter_web_portfolio/app/modules/home/sections/about_section.dart';
 import 'package:flutter_web_portfolio/app/modules/home/sections/experience_section.dart';
+import 'package:flutter_web_portfolio/app/modules/home/sections/packages/packages_section.dart';
 import 'package:flutter_web_portfolio/app/modules/home/sections/projects/projects_section.dart';
 import 'package:flutter_web_portfolio/app/modules/home/sections/proof_section.dart';
 import 'package:flutter_web_portfolio/app/widgets/back_to_top_button.dart';
@@ -325,6 +326,7 @@ class _HomeViewState extends State<HomeView> {
     'experience' => const ExperienceSection(),
     'proof' => const ProofSection(),
     'projects' => const ProjectsSection(),
+    'packages' => const PackagesSection(),
     final value => throw StateError(
       'No section widget is registered for narrative chapter "$value".',
     ),

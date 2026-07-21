@@ -4,7 +4,8 @@
     "about": "About",
     "experience": "Experience",
     "projects": "Work",
-    "proof": "Open Source"
+    "proof": "Open Source",
+    "packages": "Packages"
   },
   "accessibility": {
     "skip_to_content": "Skip to content",
@@ -74,6 +75,14 @@
     "event_lab_step": "Step",
     "status_merged": "Merged",
     "status_under_review": "Under review"
+  },
+  "packages_section": {
+    "title": "Published Packages",
+    "subtitle": "{count} packages live on pub.dev, every one at a perfect 160/160 score. Together they see about {downloads} downloads a month.",
+    "pub_points": "pub points",
+    "downloads": "downloads / mo",
+    "likes": "likes",
+    "open_package": "Open on pub.dev"
   },
   "footer": {
     "quick_links": "Quick Links",

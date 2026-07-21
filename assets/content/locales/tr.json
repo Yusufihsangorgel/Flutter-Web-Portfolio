@@ -144,6 +144,41 @@
     }
   },
   "contributions": {
+    "retrofit-stream-response-future": {
+      "title": "ResponseType.stream için istek future'ını akış hattında koru",
+      "problem": "ResponseType.stream için alttaki istek future'ı akış hattından düşüyordu, bu yüzden istek hataları ve tamamlanma çağıranlara iletilmiyordu.",
+      "change": "İstek future'ını akış hattında tuttum; böylece akışa alınan yanıtlar hataları ve tamamlanmayı doğru şekilde bildiriyor."
+    },
+    "retrofit-partmap-nullable-guard": {
+      "title": "Null olabilen dosya parçaları için PartMap yardımcı değişkenlerini koru",
+      "problem": "Null olabilen dosya parçaları için üretilen PartMap kodu, null denetimi olmadan yardımcı değişkenlere referans veriyor ve üretilen istemcide null güvenliğini bozuyordu.",
+      "change": "PartMap yardımcı değişkenlerini korudum; böylece null olabilen dosya parçaları güvenle derleniyor."
+    },
+    "retrofit-content-type-null-safety": {
+      "title": "newRequestOptions içinde contentType'ı null güvenli hale getir",
+      "problem": "newRequestOptions içindeki üretilen contentType işleme null güvenli değildi.",
+      "change": "Üretilen newRequestOptions kodunda contentType'ı null güvenli hale getirdim."
+    },
+    "dart-mcp-decoded-message-channel": {
+      "title": "JSON dizeleri yerine çözümlenmiş iletiler üzerinde çalış",
+      "problem": "MCP taşıma katmanı, JSON-RPC iletilerini işlem içinde dizelere yeniden kodluyor ve yeniden çözümlüyordu; bu da ekstra bir serileştirme turu ekliyor ve kullanıcı işleyicilerinin gördüğü gerçek ileti tiplerini gizliyordu.",
+      "change": "Çekirdek kanal tipini StreamChannel<Map<String, Object?>> olarak değiştirdim; böylece JSON yalnızca taşıma sınırında kodlanıp çözümleniyor, dize tabanlı taşımalar ise ayrı bir jsonRpcChannel ile uyarlanıyor."
+    },
+    "shelf-cookie-header-join": {
+      "title": "Birden fazla Cookie başlık değerini RFC'ye uygun ayraçla birleştir",
+      "problem": "Birden fazla Cookie başlık değeri virgülle birleştiriliyordu; bu da RFC 6265'i ihlal eden ve sunucular ile ara katmanlar tarafından ayrıştırılamayan bir çerez dizesi üretiyordu.",
+      "change": "Birden fazla Cookie başlık değerini '; ' ile birleştirdim; böylece birleşik çerez başlığı geçerli ve okunabilir hale geldi."
+    },
+    "bun-migration-finalizer-errors": {
+      "title": "Kaybolan SQL migration sonlandırıcı hatalarını ortaya çıkar",
+      "problem": "Commit, Rollback veya Conn.Close'dan gelen SQL migration sonlandırıcı hataları, sonuç zaten değerlendirildikten sonra adlandırılmamış bir dönüş değerine atandığı için sessizce kayboluyordu.",
+      "change": "Migration closure'ını adlandırılmış bir dönüşe çevirdim ve sonlandırıcı hatalarını çalıştırma hatasıyla birleştirdim; böylece commit ve rollback hataları bildiriliyor."
+    },
+    "dart-mcp-request-scoped-dispatch": {
+      "title": "MCP sunucuları için istek kapsamlı ileti dağıtımı ekle",
+      "problem": "MCP sunucularının, kendilerini tetikleyen tekil isteğe özgü iletiler gönderme yolu yoktu.",
+      "change": "İstek kapsamlı ileti dağıtımı ekledim; böylece bir sunucu, kaynak isteğe bağlı iletiler yayabiliyor."
+    },
     "dart-mcp-initialization-lifecycle": {
       "title": "Sunucu özellik kaydını eski başlatma sürecinden ayırma",
       "problem": "Özellik kaydı eski başlatma el sıkışmasına bağlıydı; bu durum sunucu yaşam döngüsünün farklı taşıma ve başlatma yöntemlerinde yeniden kullanılmasını zorlaştırıyordu.",
