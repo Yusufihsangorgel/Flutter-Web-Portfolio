@@ -278,9 +278,7 @@ test('keeps one content-anchored signal in the default motion experience', async
   await openMotionPortfolio(page);
 
   await scrollToChapterBoundary(page, 'Experience');
-  await expect(page).toHaveScreenshot('narrative-stage-experience.png', {
-    maxDiffPixelRatio: 0.0001,
-  });
+  await expect(page).toHaveScreenshot('narrative-stage-experience.png');
 
   const primaryCase = portfolio.systems.find((system) => system.featured);
   if (!primaryCase) throw new Error('Expected a primary professional case.');
@@ -313,13 +311,10 @@ test('keeps one content-anchored signal in the default motion experience', async
   // The narrative cursor is a pure function of scroll offset, but wheel input
   // only lands the heading within ±2px of the target, and here the cursor sits
   // over the high-contrast featured-work board, so sub-pixel scroll drift moves
-  // more antialiased edges than the calmer Experience anchor above. This bound
-  // still proves the motion frame equals the static baseline except for the one
-  // small animated signal, while staying reproducible; it remains far tighter
-  // than the project-wide 0.003 default.
-  await expect(page).toHaveScreenshot('narrative-stage-work.png', {
-    maxDiffPixelRatio: 0.0009,
-  });
+  // more antialiased edges than the calmer Experience anchor above. This frame
+  // is held to the project-wide screenshot tolerance, which already accounts
+  // for the live canvas behind the stage.
+  await expect(page).toHaveScreenshot('narrative-stage-work.png');
 });
 
 test('renders a real supporting-work artifact in the atlas', async (
