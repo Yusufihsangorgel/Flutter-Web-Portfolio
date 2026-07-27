@@ -149,6 +149,11 @@
     }
   },
   "contributions": {
+    "code-assets-dylib-architecture-validator": {
+      "title": "Architektur einer dynamischen Bibliothek aus Datei-Headern validieren",
+      "problem": "Eine für das falsche Ziel gebaute, gebündelte dynamische Bibliothek erreichte den Aufrufer und schlug erst später mit einem unklaren Linker- oder Loader-Fehler fehl, statt schon zur Build-Zeit erkannt zu werden.",
+      "change": "Einen Validator hinzugefügt, der die ELF-, Mach-O- oder PE-Header einer gebündelten Bibliothek liest und Container und Architektur mit dem Build-Ziel vergleicht, mit einem einsteckbaren Validator-Erweiterungspunkt und einer Warnung, wenn die Bytes nicht erkannt werden."
+    },
     "retrofit-stream-response-future": {
       "title": "Die Anfrage-Future in der Stream-Pipeline für ResponseType.stream behalten",
       "problem": "Bei ResponseType.stream wurde die zugrunde liegende Anfrage-Future aus der Stream-Pipeline entfernt, sodass Anfragefehler und der Abschluss nicht an die Aufrufer weitergegeben wurden.",

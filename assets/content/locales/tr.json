@@ -144,6 +144,11 @@
     }
   },
   "contributions": {
+    "code-assets-dylib-architecture-validator": {
+      "title": "Dinamik kütüphane mimarisini dosya başlıklarından doğrula",
+      "problem": "Yanlış hedef için derlenmiş, pakete gömülü bir dinamik kütüphane çağırana kadar ulaşıyordu ve derleme zamanında yakalanmak yerine ancak sonradan anlaşılması güç bir bağlayıcı ya da yükleyici hatasıyla başarısız oluyordu.",
+      "change": "Pakete gömülü bir kütüphanenin ELF, Mach-O ya da PE başlıklarını okuyup kapsayıcıyı ve mimariyi derleme hedefiyle karşılaştıran bir doğrulayıcı ekledim; takılabilir bir doğrulayıcı uzantı noktası ve baytlar tanınmadığında bir uyarı da sağladım."
+    },
     "retrofit-stream-response-future": {
       "title": "ResponseType.stream için istek future'ını akış hattında koru",
       "problem": "ResponseType.stream için alttaki istek future'ı akış hattından düşüyordu, bu yüzden istek hataları ve tamamlanma çağıranlara iletilmiyordu.",

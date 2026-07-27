@@ -149,6 +149,11 @@
     }
   },
   "contributions": {
+    "code-assets-dylib-architecture-validator": {
+      "title": "Valider l'architecture d'une bibliothèque dynamique à partir des en-têtes de fichier",
+      "problem": "Une bibliothèque dynamique fournie, compilée pour la mauvaise cible, parvenait à l'appelant et n'échouait que plus tard avec une erreur obscure d'éditeur de liens ou de chargeur, au lieu d'être détectée au moment de la compilation.",
+      "change": "Ajout d'un validateur qui lit les en-têtes ELF, Mach-O ou PE d'une bibliothèque fournie et compare le conteneur et l'architecture à la cible de compilation, avec un point d'extension de validateur enfichable et un avertissement lorsque les octets ne sont pas reconnus."
+    },
     "retrofit-stream-response-future": {
       "title": "Conserver le future de la requête dans le pipeline de flux pour ResponseType.stream",
       "problem": "Pour ResponseType.stream, le future de requête sous-jacent était retiré du pipeline de flux, si bien que les erreurs de requête et l’achèvement n’étaient pas propagés aux appelants.",

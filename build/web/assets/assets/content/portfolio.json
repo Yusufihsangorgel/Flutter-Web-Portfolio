@@ -270,6 +270,17 @@
   ],
   "contributions": [
     {
+      "id": "code-assets-dylib-architecture-validator",
+      "project": "Dart Native Assets",
+      "status": "merged",
+      "date": "2026-07-27",
+      "title": "Validate dynamic library architecture from file headers",
+      "problem": "A bundled dynamic library built for the wrong target reached the invoker and only failed later with an obscure linker or loader error instead of being caught at build time.",
+      "change": "Added a validator that reads a bundled library's ELF, Mach-O, or PE headers and compares the container and architecture against the build target, with a pluggable validator extension point and a warning when the bytes are unrecognized.",
+      "url": "https://github.com/dart-lang/native/pull/3484",
+      "featured": false
+    },
+    {
       "id": "retrofit-stream-response-future",
       "project": "Retrofit for Dart",
       "status": "merged",

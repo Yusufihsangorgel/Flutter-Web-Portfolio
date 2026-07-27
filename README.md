@@ -307,6 +307,7 @@ Source status: `2026.07.21.1`, verified 2026-07-21 against GitHub, LinkedIn, Fug
 
 | Project | Change | Merged | Evidence |
 |---|---|---:|---|
+| Dart Native Assets | Validate dynamic library architecture from file headers | 2026-07-27 | [Pull request](https://github.com/dart-lang/native/pull/3484) |
 | Retrofit for Dart | Keep the request future in the stream pipeline for ResponseType.stream | 2026-07-21 | [Pull request](https://github.com/trevorwang/retrofit.dart/pull/921) |
 | Retrofit for Dart | Guard PartMap helper variables for nullable file parts | 2026-07-21 | [Pull request](https://github.com/trevorwang/retrofit.dart/pull/920) |
 | Retrofit for Dart | Make contentType null-safe in newRequestOptions | 2026-07-21 | [Pull request](https://github.com/trevorwang/retrofit.dart/pull/919) |

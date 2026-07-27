@@ -149,6 +149,11 @@
     }
   },
   "contributions": {
+    "code-assets-dylib-architecture-validator": {
+      "title": "Validar la arquitectura de una biblioteca dinámica desde las cabeceras del archivo",
+      "problem": "Una biblioteca dinámica incluida y compilada para el destino equivocado llegaba al invocador y solo fallaba más tarde con un error oscuro del enlazador o del cargador, en lugar de detectarse en tiempo de compilación.",
+      "change": "Añadí un validador que lee las cabeceras ELF, Mach-O o PE de una biblioteca incluida y compara el contenedor y la arquitectura con el destino de compilación, con un punto de extensión de validador conectable y una advertencia cuando los bytes no se reconocen."
+    },
     "retrofit-stream-response-future": {
       "title": "Mantener el future de la solicitud en la canalización de flujo para ResponseType.stream",
       "problem": "En ResponseType.stream, el future de la solicitud subyacente se eliminaba de la canalización de flujo, por lo que los errores de la solicitud y su finalización no se propagaban a quienes la llamaban.",
