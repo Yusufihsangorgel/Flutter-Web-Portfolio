@@ -301,13 +301,17 @@ The live demo uses the same template with a real professional record. This block
 
 Since 2021, I have built and maintained software for mobile devices, tablets, desktop operating systems, and the web. My work includes ERP and point-of-sale products, logistics workflows, digital publishing, backend services, and the release systems around them.
 
-Source status: `2026.07.21.1`, verified 2026-07-21 against GitHub, LinkedIn, FugaSoft, Dorse, and Medium.
+Source status: `2026.07.29.1`, verified 2026-07-29 against GitHub, LinkedIn, FugaSoft, Dorse, and Medium.
 
 ### Accepted upstream changes
 
 | Project | Change | Merged | Evidence |
 |---|---|---:|---|
+| Flutter Packages | Ignore unrecognized SVG font-weight values | 2026-07-28 | [Pull request](https://github.com/flutter/packages/pull/12199) |
+| simdjson | Treat 20-digit positive overflows as big integers | 2026-07-28 | [Pull request](https://github.com/simdjson/simdjson/pull/2793) |
 | Dart Native Assets | Validate dynamic library architecture from file headers | 2026-07-27 | [Pull request](https://github.com/dart-lang/native/pull/3484) |
+| Dart MCP | Add the caching hints from the 2026-07-28 protocol revision | 2026-07-27 | [Pull request](https://github.com/dart-lang/ai/pull/570) |
+| gRPC-Go | Restore the plan9 build by splitting errno matching out | 2026-07-23 | [Pull request](https://github.com/grpc/grpc-go/pull/9255) |
 | Retrofit for Dart | Keep the request future in the stream pipeline for ResponseType.stream | 2026-07-21 | [Pull request](https://github.com/trevorwang/retrofit.dart/pull/921) |
 | Retrofit for Dart | Guard PartMap helper variables for nullable file parts | 2026-07-21 | [Pull request](https://github.com/trevorwang/retrofit.dart/pull/920) |
 | Retrofit for Dart | Make contentType null-safe in newRequestOptions | 2026-07-21 | [Pull request](https://github.com/trevorwang/retrofit.dart/pull/919) |
@@ -337,8 +341,7 @@ Source status: `2026.07.21.1`, verified 2026-07-21 against GitHub, LinkedIn, Fug
 
 ### Work under review
 
-- **Flutter:** [Wait for web rendering before the first-frame event](https://github.com/flutter/flutter/pull/189500) — Wait for outstanding scene renders and the next browser frame before dispatching the event; the pull request is ready for review with seven Chrome renderer and compiler suites passing.
-- **Flutter Packages:** [Ignore unrecognized SVG font-weight values](https://github.com/flutter/packages/pull/12199) — Treat unrecognized font-weight values as unspecified, preserve supported mappings, and cover the parser behaviour with the existing vector-graphics test suite.
+- **Flutter:** [Wait for web rendering before the first-frame event](https://github.com/flutter/flutter/pull/189500) — Wait for outstanding scene renders and the next browser frame before dispatching the event; the reviewer has since asked for a lighter completer-based shape.
 - **MCP Kotlin SDK:** [Add SEP-2575 request metadata and discovery types](https://github.com/modelcontextprotocol/kotlin-sdk/pull/893) — Add typed experimental metadata accessors, server discovery types, polymorphic codecs, and malformed-input coverage.
 <!-- portfolio-record:end -->
 

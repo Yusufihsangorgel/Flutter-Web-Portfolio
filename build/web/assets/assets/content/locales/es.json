@@ -149,6 +149,21 @@
     }
   },
   "contributions": {
+    "simdjson-twenty-digit-overflow": {
+      "title": "Tratar los desbordamientos positivos de 20 dígitos como enteros grandes",
+      "problem": "Todo entero positivo entre 2^64 y 10^20 se analizaba como malformado, porque la rama de desbordamiento positivo informaba de un número inválido donde la rama negativa informaba de un entero grande.",
+      "change": "Devolví el resultado de entero grande desde la rama positiva para que ambos signos informen del desbordamiento de la misma manera."
+    },
+    "dart-mcp-cacheable-result": {
+      "title": "Añadir las indicaciones de caché de la revisión del protocolo del 2026-07-28",
+      "problem": "El paquete no tenía un modelo para las indicaciones de caché de la revisión del protocolo del 2026-07-28, por lo que un cliente no podía leer un tiempo de vida ni un ámbito de caché de un resultado.",
+      "change": "Añadí el tipo de extensión CacheableResult y la enumeración CacheScope, reduciendo a cero un tiempo de vida ausente o negativo tal como la especificación indica a los clientes."
+    },
+    "grpc-go-plan9-build": {
+      "title": "Restaurar la compilación de plan9 separando la comparación de errno",
+      "problem": "La clasificación de errores de desconexión hacía referencia a syscall.Errno, ECONNRESET y ECONNABORTED, que no existen en plan9, por lo que la compilación llevaba rota allí desde la v1.81.0.",
+      "change": "Moví la clasificación detrás de un par de archivos con etiquetas de compilación, dejando la comparación de errno sin cambios en el resto y conservando las etiquetas portables en plan9."
+    },
     "code-assets-dylib-architecture-validator": {
       "title": "Validar la arquitectura de una biblioteca dinámica desde las cabeceras del archivo",
       "problem": "Una biblioteca dinámica incluida y compilada para el destino equivocado llegaba al invocador y solo fallaba más tarde con un error oscuro del enlazador o del cargador, en lugar de detectarse en tiempo de compilación.",
@@ -217,7 +232,7 @@
     "flutter-first-frame": {
       "title": "Esperar al renderizado web antes de emitir el evento del primer fotograma",
       "problem": "Con SkWasm, flutter-first-frame podía activarse antes de que el compositor presentara contenido Flutter visible y dejar un intervalo vacío medible.",
-      "change": "Esperé a los renderizados de escena pendientes y al siguiente fotograma del navegador antes de emitir el evento. La pull request está lista para revisión tras superar siete suites de Chrome para renderizadores y compilador.",
+      "change": "Esperé a los renderizados de escena pendientes y al siguiente fotograma del navegador antes de emitir el evento. Desde entonces el revisor ha pedido una forma más ligera basada en un completer.",
       "event_order_lab": {
         "title": "Laboratorio del primer fotograma",
         "events": {

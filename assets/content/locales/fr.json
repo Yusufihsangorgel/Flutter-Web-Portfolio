@@ -149,6 +149,21 @@
     }
   },
   "contributions": {
+    "simdjson-twenty-digit-overflow": {
+      "title": "Traiter les débordements positifs à 20 chiffres comme de grands entiers",
+      "problem": "Tout entier positif compris entre 2^64 et 10^20 était analysé comme malformé, car la branche de débordement positif signalait un nombre invalide là où la branche négative signalait un grand entier.",
+      "change": "Renvoyé le résultat grand entier depuis la branche positive afin que les deux signes signalent le débordement de la même manière."
+    },
+    "dart-mcp-cacheable-result": {
+      "title": "Ajouter les indications de cache de la révision de protocole du 2026-07-28",
+      "problem": "Le paquet n’avait aucun modèle pour les indications de cache de la révision de protocole du 2026-07-28, si bien qu’un client ne pouvait lire ni durée de vie ni portée de cache depuis un résultat.",
+      "change": "Ajouté le type d’extension CacheableResult et l’énumération CacheScope, en ramenant à zéro une durée de vie absente ou négative comme la spécification l’indique aux clients."
+    },
+    "grpc-go-plan9-build": {
+      "title": "Rétablir la compilation plan9 en isolant la correspondance errno",
+      "problem": "La classification des erreurs de déconnexion référençait syscall.Errno, ECONNRESET et ECONNABORTED, dont aucun n’existe sur plan9, si bien que la compilation y était cassée depuis la v1.81.0.",
+      "change": "Déplacé la classification derrière une paire de fichiers à balises de build, en laissant la correspondance errno inchangée partout ailleurs et en conservant les libellés portables sur plan9."
+    },
     "code-assets-dylib-architecture-validator": {
       "title": "Valider l'architecture d'une bibliothèque dynamique à partir des en-têtes de fichier",
       "problem": "Une bibliothèque dynamique fournie, compilée pour la mauvaise cible, parvenait à l'appelant et n'échouait que plus tard avec une erreur obscure d'éditeur de liens ou de chargeur, au lieu d'être détectée au moment de la compilation.",
@@ -217,7 +232,7 @@
     "flutter-first-frame": {
       "title": "Attendre la fin du rendu web avant l’événement du premier frame",
       "problem": "Avec SkWasm, flutter-first-frame pouvait être émis avant que le compositeur n’affiche du contenu Flutter visible, laissant une fenêtre vide mesurable.",
-      "change": "J’ai attendu les rendus de scène en attente et le frame navigateur suivant avant d’émettre l’événement. La pull request est prête pour revue après la réussite de sept suites Chrome couvrant moteurs de rendu et compilateur.",
+      "change": "J’ai attendu les rendus de scène en attente et le frame navigateur suivant avant d’émettre l’événement. Le relecteur a depuis demandé une forme plus légère fondée sur un completer.",
       "event_order_lab": {
         "title": "Laboratoire du premier frame",
         "events": {

@@ -149,6 +149,21 @@
     }
   },
   "contributions": {
+    "simdjson-twenty-digit-overflow": {
+      "title": "20-stellige positive Überläufe als große Ganzzahlen behandeln",
+      "problem": "Jede positive Ganzzahl zwischen 2^64 und 10^20 wurde als fehlerhaft geparst, weil der positive Überlaufzweig eine ungültige Zahl meldete, wo der negative Zweig eine große Ganzzahl meldete.",
+      "change": "Das Ergebnis für große Ganzzahlen aus dem positiven Zweig zurückgegeben, sodass beide Vorzeichen den Überlauf gleich melden."
+    },
+    "dart-mcp-cacheable-result": {
+      "title": "Die Caching-Hinweise aus der Protokollfassung vom 2026-07-28 ergänzen",
+      "problem": "Das Paket hatte kein Modell für die Caching-Hinweise der Protokollfassung vom 2026-07-28, sodass ein Client weder eine Lebensdauer noch einen Cache-Geltungsbereich aus einem Ergebnis lesen konnte.",
+      "change": "Den Erweiterungstyp CacheableResult und die Aufzählung CacheScope hinzugefügt und eine fehlende oder negative Lebensdauer auf null zurückgeführt, so wie es die Spezifikation den Clients vorgibt."
+    },
+    "grpc-go-plan9-build": {
+      "title": "Den plan9-Build durch Auslagern des errno-Abgleichs wiederherstellen",
+      "problem": "Die Klassifizierung von Verbindungsfehlern verwies auf syscall.Errno, ECONNRESET und ECONNABORTED, die es auf plan9 alle nicht gibt, sodass der Build dort seit v1.81.0 defekt war.",
+      "change": "Die Klassifizierung hinter ein Dateipaar mit Build-Tags verlegt, den errno-Abgleich überall sonst unverändert gelassen und die portablen Bezeichnungen auf plan9 beibehalten."
+    },
     "code-assets-dylib-architecture-validator": {
       "title": "Architektur einer dynamischen Bibliothek aus Datei-Headern validieren",
       "problem": "Eine für das falsche Ziel gebaute, gebündelte dynamische Bibliothek erreichte den Aufrufer und schlug erst später mit einem unklaren Linker- oder Loader-Fehler fehl, statt schon zur Build-Zeit erkannt zu werden.",
@@ -217,7 +232,7 @@
     "flutter-first-frame": {
       "title": "Vor dem First-Frame-Ereignis auf den Abschluss des Web-Renderings warten",
       "problem": "Unter SkWasm konnte flutter-first-frame ausgelöst werden, bevor der Compositor sichtbaren Flutter-Inhalt präsentierte, wodurch ein messbares leeres Zeitfenster entstand.",
-      "change": "Vor dem Ereignis wartete ich auf ausstehende Szenen-Renderings und den nächsten Browser-Frame. Der Pull Request ist nach sieben bestandenen Chrome-Renderer- und Compiler-Testpaketen zur Begutachtung bereit.",
+      "change": "Vor dem Ereignis wartete ich auf ausstehende Szenen-Renderings und den nächsten Browser-Frame. Der Reviewer hat seither eine leichtere, auf einem Completer basierende Form gewünscht.",
       "event_order_lab": {
         "title": "First-Frame-Labor",
         "events": {

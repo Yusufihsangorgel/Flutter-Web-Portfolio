@@ -1,7 +1,7 @@
 {
   "schema_version": 9,
-  "content_version": "2026.07.21.1",
-  "verified_at": "2026-07-21",
+  "content_version": "2026.07.29.1",
+  "verified_at": "2026-07-29",
   "site": {
     "template_repository": true,
     "url": "https://developeryusuf.com",
@@ -270,6 +270,29 @@
   ],
   "contributions": [
     {
+      "id": "flutter-vector-graphics-font-weight",
+      "project": "Flutter Packages",
+      "status": "merged",
+      "date": "2026-07-28",
+      "title": "Ignore unrecognized SVG font-weight values",
+      "problem": "SVG text parsing could reject documents when a font-weight value was valid CSS syntax but unsupported by the vector graphics parser.",
+      "change": "Treated unrecognized font-weight values as unspecified, preserved supported mappings, and covered the parser behaviour with the existing vector-graphics test suite.",
+      "url": "https://github.com/flutter/packages/pull/12199",
+      "issue_url": "https://github.com/flutter/flutter/issues/186933",
+      "featured": false
+    },
+    {
+      "id": "simdjson-twenty-digit-overflow",
+      "project": "simdjson",
+      "status": "merged",
+      "date": "2026-07-28",
+      "title": "Treat 20-digit positive overflows as big integers",
+      "problem": "Every positive integer between 2^64 and 10^20 parsed as malformed, because the positive overflow arm reported an invalid number where the negative arm reported a big integer.",
+      "change": "Returned the big-integer result from the positive arm so both signs report overflow the same way.",
+      "url": "https://github.com/simdjson/simdjson/pull/2793",
+      "featured": false
+    },
+    {
       "id": "code-assets-dylib-architecture-validator",
       "project": "Dart Native Assets",
       "status": "merged",
@@ -278,6 +301,28 @@
       "problem": "A bundled dynamic library built for the wrong target reached the invoker and only failed later with an obscure linker or loader error instead of being caught at build time.",
       "change": "Added a validator that reads a bundled library's ELF, Mach-O, or PE headers and compares the container and architecture against the build target, with a pluggable validator extension point and a warning when the bytes are unrecognized.",
       "url": "https://github.com/dart-lang/native/pull/3484",
+      "featured": false
+    },
+    {
+      "id": "dart-mcp-cacheable-result",
+      "project": "Dart MCP",
+      "status": "merged",
+      "date": "2026-07-27",
+      "title": "Add the caching hints from the 2026-07-28 protocol revision",
+      "problem": "The package had no model for the caching hints in the 2026-07-28 protocol revision, so a client could not read a time-to-live or a cache scope off a result.",
+      "change": "Added the CacheableResult extension type and the CacheScope enum, folding an absent or negative time-to-live to zero the way the specification tells clients to.",
+      "url": "https://github.com/dart-lang/ai/pull/570",
+      "featured": false
+    },
+    {
+      "id": "grpc-go-plan9-build",
+      "project": "gRPC-Go",
+      "status": "merged",
+      "date": "2026-07-23",
+      "title": "Restore the plan9 build by splitting errno matching out",
+      "problem": "Disconnect-error classification referenced syscall.Errno, ECONNRESET, and ECONNABORTED, none of which exist on plan9, so the build had been broken there since v1.81.0.",
+      "change": "Moved the classification behind a build-tagged file pair, leaving errno matching unchanged everywhere else and keeping the portable labels on plan9.",
+      "url": "https://github.com/grpc/grpc-go/pull/9255",
       "featured": false
     },
     {
@@ -380,46 +425,13 @@
       "featured": false
     },
     {
-      "id": "form-builder-initial-value",
-      "project": "Flutter Form Builder",
-      "status": "merged",
-      "date": "2026-07-14",
-      "title": "Reset unknown dropdown initial values on first build",
-      "problem": "A dropdown could begin with a value that did not exist in its items and fail before normal field reset behaviour ran.",
-      "change": "Normalize the first build and cover the regression with widget tests.",
-      "url": "https://github.com/flutter-form-builder-ecosystem/flutter_form_builder/pull/1512",
-      "featured": false
-    },
-    {
-      "id": "drift-boolean-default",
-      "project": "Drift",
-      "status": "merged",
-      "date": "2026-07-14",
-      "title": "Treat SQLite TRUE and 1 defaults as the same schema",
-      "problem": "Schema verification reported equivalent SQLite boolean defaults as a migration difference.",
-      "change": "Normalize the verifier comparison and add regression coverage for both representations.",
-      "url": "https://github.com/simolus3/drift/pull/3835",
-      "featured": false
-    },
-    {
-      "id": "fiber-asynq-recipe",
-      "project": "Go Fiber Recipes",
-      "status": "merged",
-      "date": "2026-07-12",
-      "title": "Add a Fiber and Asynq background-jobs recipe",
-      "problem": "The recipe collection lacked a production-shaped example for enqueueing and processing Redis-backed work outside request handlers.",
-      "change": "Add a runnable producer, worker, queue configuration, and usage documentation.",
-      "url": "https://github.com/gofiber/recipes/pull/4997",
-      "featured": false
-    },
-    {
       "id": "flutter-first-frame",
       "project": "Flutter",
       "status": "under_review",
       "date": "2026-07-15",
       "title": "Wait for web rendering before the first-frame event",
       "problem": "On SkWasm, flutter-first-frame can fire before the compositor presents visible Flutter content, leaving a measurable blank handoff window.",
-      "change": "Wait for outstanding scene renders and the next browser frame before dispatching the event; the pull request is ready for review with seven Chrome renderer and compiler suites passing.",
+      "change": "Wait for outstanding scene renders and the next browser frame before dispatching the event; the reviewer has since asked for a lighter completer-based shape.",
       "url": "https://github.com/flutter/flutter/pull/189500",
       "issue_url": "https://github.com/flutter/flutter/issues/189499",
       "featured": true,
@@ -468,18 +480,6 @@
       }
     },
     {
-      "id": "flutter-vector-graphics-font-weight",
-      "project": "Flutter Packages",
-      "status": "under_review",
-      "date": "2026-07-14",
-      "title": "Ignore unrecognized SVG font-weight values",
-      "problem": "SVG text parsing could reject documents when a font-weight value was valid CSS syntax but unsupported by the vector graphics parser.",
-      "change": "Treat unrecognized font-weight values as unspecified, preserve supported mappings, and cover the parser behaviour with the existing vector-graphics test suite.",
-      "url": "https://github.com/flutter/packages/pull/12199",
-      "issue_url": "https://github.com/flutter/flutter/issues/186933",
-      "featured": false
-    },
-    {
       "id": "mcp-kotlin-request-metadata",
       "project": "MCP Kotlin SDK",
       "status": "under_review",
@@ -488,6 +488,39 @@
       "problem": "The SDK needed a wire model for request-scoped protocol and client context without breaking legacy request shapes.",
       "change": "Add typed experimental metadata accessors, server discovery types, polymorphic codecs, and malformed-input coverage.",
       "url": "https://github.com/modelcontextprotocol/kotlin-sdk/pull/893",
+      "featured": false
+    },
+    {
+      "id": "form-builder-initial-value",
+      "project": "Flutter Form Builder",
+      "status": "merged",
+      "date": "2026-07-14",
+      "title": "Reset unknown dropdown initial values on first build",
+      "problem": "A dropdown could begin with a value that did not exist in its items and fail before normal field reset behaviour ran.",
+      "change": "Normalize the first build and cover the regression with widget tests.",
+      "url": "https://github.com/flutter-form-builder-ecosystem/flutter_form_builder/pull/1512",
+      "featured": false
+    },
+    {
+      "id": "drift-boolean-default",
+      "project": "Drift",
+      "status": "merged",
+      "date": "2026-07-14",
+      "title": "Treat SQLite TRUE and 1 defaults as the same schema",
+      "problem": "Schema verification reported equivalent SQLite boolean defaults as a migration difference.",
+      "change": "Normalize the verifier comparison and add regression coverage for both representations.",
+      "url": "https://github.com/simolus3/drift/pull/3835",
+      "featured": false
+    },
+    {
+      "id": "fiber-asynq-recipe",
+      "project": "Go Fiber Recipes",
+      "status": "merged",
+      "date": "2026-07-12",
+      "title": "Add a Fiber and Asynq background-jobs recipe",
+      "problem": "The recipe collection lacked a production-shaped example for enqueueing and processing Redis-backed work outside request handlers.",
+      "change": "Add a runnable producer, worker, queue configuration, and usage documentation.",
+      "url": "https://github.com/gofiber/recipes/pull/4997",
       "featured": false
     }
   ],
@@ -988,10 +1021,10 @@
       "description": "Redis-backed task queue for server Dart with retries and scheduling",
       "url": "https://pub.dev/packages/redis_task_queue",
       "repository": "https://github.com/Yusufihsangorgel/redis_task_queue",
-      "version": "0.10.0",
+      "version": "1.0.1",
       "likes": 1,
       "pub_points": 160,
-      "downloads": 298,
+      "downloads": 969,
       "category": "server"
     },
     {
@@ -1000,10 +1033,10 @@
       "description": "Linear-time regex via Google RE2, immune to ReDoS backtracking",
       "url": "https://pub.dev/packages/re2",
       "repository": "https://github.com/Yusufihsangorgel/re2",
-      "version": "0.5.0",
+      "version": "1.0.1",
       "likes": 0,
       "pub_points": 160,
-      "downloads": 23,
+      "downloads": 642,
       "category": "native-ffi"
     },
     {
@@ -1012,10 +1045,10 @@
       "description": "Native low-memory Excel xlsx writer via libxlsxwriter FFI binding",
       "url": "https://pub.dev/packages/xlsxwriter",
       "repository": "https://github.com/Yusufihsangorgel/xlsxwriter",
-      "version": "0.7.0",
+      "version": "1.0.0",
       "likes": 0,
       "pub_points": 160,
-      "downloads": 23,
+      "downloads": 779,
       "category": "native-ffi"
     },
     {
@@ -1024,10 +1057,10 @@
       "description": "Conformance checks and test harness for MCP servers over stdio",
       "url": "https://pub.dev/packages/mcp_probe",
       "repository": "https://github.com/Yusufihsangorgel/mcp_probe",
-      "version": "0.5.0",
+      "version": "0.9.1",
       "likes": 0,
       "pub_points": 160,
-      "downloads": 142,
+      "downloads": 821,
       "category": "ai-llm"
     },
     {
@@ -1036,10 +1069,10 @@
       "description": "Byte-exact HuggingFace tokenizer encoding for Dart over Rust FFI",
       "url": "https://pub.dev/packages/hf_tokenizers",
       "repository": "https://github.com/Yusufihsangorgel/tokenizers",
-      "version": "0.5.0",
+      "version": "1.0.0",
       "likes": 0,
       "pub_points": 160,
-      "downloads": 25,
+      "downloads": 672,
       "category": "native-ffi"
     },
     {
@@ -1048,10 +1081,10 @@
       "description": "Fast JSON parsing via the simdjson C++ library over FFI",
       "url": "https://pub.dev/packages/simdjson_dart",
       "repository": "https://github.com/Yusufihsangorgel/simdjson_dart",
-      "version": "0.2.4",
+      "version": "1.1.2",
       "likes": 1,
       "pub_points": 160,
-      "downloads": 128,
+      "downloads": 727,
       "category": "native-ffi"
     },
     {
@@ -1060,10 +1093,10 @@
       "description": "SIMD dot product, cosine similarity and top-k for embeddings",
       "url": "https://pub.dev/packages/vector_kit",
       "repository": "https://github.com/Yusufihsangorgel/vector_kit",
-      "version": "0.3.0",
+      "version": "1.1.0",
       "likes": 0,
       "pub_points": 160,
-      "downloads": 115,
+      "downloads": 701,
       "category": "native-ffi"
     },
     {
@@ -1072,10 +1105,10 @@
       "description": "Typed, validated structured outputs from hosted LLM providers",
       "url": "https://pub.dev/packages/instructor_dart",
       "repository": "https://github.com/Yusufihsangorgel/instructor_dart",
-      "version": "0.3.0",
+      "version": "1.0.0",
       "likes": 0,
       "pub_points": 160,
-      "downloads": 144,
+      "downloads": 724,
       "category": "ai-llm"
     },
     {
@@ -1084,10 +1117,10 @@
       "description": "Pure-Dart RAG chunking, embeddings, vector search and context building",
       "url": "https://pub.dev/packages/rag_kit",
       "repository": "https://github.com/Yusufihsangorgel/rag_kit",
-      "version": "0.3.0",
+      "version": "1.0.0",
       "likes": 0,
       "pub_points": 160,
-      "downloads": 145,
+      "downloads": 696,
       "category": "ai-llm"
     },
     {
@@ -1096,10 +1129,10 @@
       "description": "Native image resize, thumbnail and JPEG or PNG encode over FFI",
       "url": "https://pub.dev/packages/image_ffi",
       "repository": "https://github.com/Yusufihsangorgel/image_ffi",
-      "version": "0.5.0",
+      "version": "1.0.1",
       "likes": 0,
       "pub_points": 160,
-      "downloads": 23,
+      "downloads": 668,
       "category": "native-ffi"
     },
     {
@@ -1108,10 +1141,10 @@
       "description": "BLAKE3 hashing over native FFI, faster than SHA-256",
       "url": "https://pub.dev/packages/blake3_ffi",
       "repository": "https://github.com/Yusufihsangorgel/blake3_ffi",
-      "version": "0.3.0",
+      "version": "1.0.2",
       "likes": 0,
       "pub_points": 160,
-      "downloads": 24,
+      "downloads": 599,
       "category": "native-ffi"
     },
     {
@@ -1120,10 +1153,10 @@
       "description": "Decodes MP3 and Ogg Vorbis to raw PCM via FFI",
       "url": "https://pub.dev/packages/audio_decode",
       "repository": "https://github.com/Yusufihsangorgel/audio_decode",
-      "version": "0.3.0",
+      "version": "1.0.1",
       "likes": 0,
       "pub_points": 160,
-      "downloads": 25,
+      "downloads": 793,
       "category": "native-ffi"
     },
     {
@@ -1132,10 +1165,10 @@
       "description": "Circuit breaker, retry, bulkhead and timeout policies for async calls",
       "url": "https://pub.dev/packages/resilience",
       "repository": "https://github.com/Yusufihsangorgel/resilience",
-      "version": "0.3.0",
+      "version": "1.0.1",
       "likes": 0,
       "pub_points": 160,
-      "downloads": 114,
+      "downloads": 516,
       "category": "server"
     },
     {
@@ -1144,10 +1177,10 @@
       "description": "Test harness for LLM evals with LLM-as-judge and caching",
       "url": "https://pub.dev/packages/llm_eval",
       "repository": "https://github.com/Yusufihsangorgel/llm_eval",
-      "version": "0.3.0",
+      "version": "1.0.0",
       "likes": 0,
       "pub_points": 160,
-      "downloads": 115,
+      "downloads": 609,
       "category": "ai-llm"
     },
     {
@@ -1156,10 +1189,10 @@
       "description": "Streams partial LLM JSON into typed objects token by token",
       "url": "https://pub.dev/packages/stream_struct",
       "repository": "https://github.com/Yusufihsangorgel/stream_struct",
-      "version": "0.3.1",
+      "version": "1.0.0",
       "likes": 0,
       "pub_points": 160,
-      "downloads": 25,
+      "downloads": 704,
       "category": "ai-llm"
     },
     {
@@ -1168,10 +1201,10 @@
       "description": "CLI that prerenders Flutter web to crawlable static HTML",
       "url": "https://pub.dev/packages/flutter_prerender",
       "repository": "https://github.com/Yusufihsangorgel/flutter_prerender",
-      "version": "0.2.2",
+      "version": "1.1.0",
       "likes": 0,
       "pub_points": 160,
-      "downloads": 114,
+      "downloads": 620,
       "category": "dev-tool"
     },
     {
@@ -1180,10 +1213,10 @@
       "description": "Pan, zoom, rotate photo gallery, drop-in for photo_view",
       "url": "https://pub.dev/packages/photo_zoom",
       "repository": "https://github.com/Yusufihsangorgel/photo_zoom",
-      "version": "0.1.4",
+      "version": "1.0.1",
       "likes": 0,
       "pub_points": 160,
-      "downloads": 132,
+      "downloads": 527,
       "category": "flutter-ui"
     },
     {
@@ -1192,10 +1225,10 @@
       "description": "Shimmer loading effect and skeleton placeholder widgets for Flutter",
       "url": "https://pub.dev/packages/skeleton_shimmer",
       "repository": "https://github.com/Yusufihsangorgel/skeleton_shimmer",
-      "version": "0.2.0",
+      "version": "1.0.1",
       "likes": 0,
       "pub_points": 160,
-      "downloads": 144,
+      "downloads": 472,
       "category": "flutter-ui"
     },
     {
@@ -1204,10 +1237,10 @@
       "description": "Ctrl+F find bar that highlights and scrolls to matches",
       "url": "https://pub.dev/packages/find_in_page",
       "repository": "https://github.com/Yusufihsangorgel/find_in_page",
-      "version": "0.2.0",
-      "likes": 0,
+      "version": "2.0.0",
+      "likes": 2,
       "pub_points": 160,
-      "downloads": 116,
+      "downloads": 632,
       "category": "flutter-ui"
     },
     {
@@ -1216,10 +1249,10 @@
       "description": "Shrinks the text font until it fits its available bounds",
       "url": "https://pub.dev/packages/text_autosize",
       "repository": "https://github.com/Yusufihsangorgel/text_autosize",
-      "version": "0.1.3",
+      "version": "1.0.2",
       "likes": 0,
       "pub_points": 160,
-      "downloads": 144,
+      "downloads": 539,
       "category": "flutter-ui"
     },
     {
@@ -1228,10 +1261,10 @@
       "description": "Cursor-reactive particle constellation background widget for Flutter apps",
       "url": "https://pub.dev/packages/constellation_particles",
       "repository": "https://github.com/Yusufihsangorgel/constellation_particles",
-      "version": "0.2.2",
+      "version": "1.0.0",
       "likes": 1,
       "pub_points": 160,
-      "downloads": 167,
+      "downloads": 598,
       "category": "flutter-ui"
     },
     {
@@ -1240,10 +1273,10 @@
       "description": "Expandable and collapsible panels with accordion groups for Flutter",
       "url": "https://pub.dev/packages/expandable_plus",
       "repository": "https://github.com/Yusufihsangorgel/expandable_plus",
-      "version": "0.2.3",
+      "version": "1.0.0",
       "likes": 0,
       "pub_points": 160,
-      "downloads": 25,
+      "downloads": 465,
       "category": "flutter-ui"
     }
   ]

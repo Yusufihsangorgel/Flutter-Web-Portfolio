@@ -144,6 +144,21 @@
     }
   },
   "contributions": {
+    "simdjson-twenty-digit-overflow": {
+      "title": "20 haneli pozitif taşmaları büyük tamsayı olarak değerlendirme",
+      "problem": "2^64 ile 10^20 arasındaki her pozitif tamsayı hatalı biçimli olarak ayrıştırılıyordu; çünkü pozitif taşma dalı geçersiz sayı bildirirken negatif dal büyük tamsayı bildiriyordu.",
+      "change": "Pozitif daldan büyük tamsayı sonucunu döndürdüm; böylece iki işaret de taşmayı aynı şekilde bildiriyor."
+    },
+    "dart-mcp-cacheable-result": {
+      "title": "2026-07-28 protokol sürümündeki önbellek ipuçlarını ekleme",
+      "problem": "Paketin, 2026-07-28 protokol sürümündeki önbellek ipuçları için bir modeli yoktu; bu yüzden bir istemci sonuçtaki yaşam süresini veya önbellek kapsamını okuyamıyordu.",
+      "change": "CacheableResult extension type'ını ve CacheScope enum'unu ekledim; belirtilmemiş veya negatif yaşam süresini, spesifikasyonun istemcilere söylediği gibi sıfıra indirdim."
+    },
+    "grpc-go-plan9-build": {
+      "title": "errno eşlemesini ayırarak plan9 derlemesini onarma",
+      "problem": "Bağlantı kopması hatalarının sınıflandırması syscall.Errno, ECONNRESET ve ECONNABORTED'e başvuruyordu; bunların hiçbiri plan9'da bulunmadığı için derleme v1.81.0'dan beri orada bozuktu.",
+      "change": "Sınıflandırmayı derleme etiketli bir dosya çiftinin arkasına taşıdım; errno eşlemesini diğer her yerde olduğu gibi bıraktım ve plan9'da taşınabilir etiketleri korudum."
+    },
     "code-assets-dylib-architecture-validator": {
       "title": "Dinamik kütüphane mimarisini dosya başlıklarından doğrula",
       "problem": "Yanlış hedef için derlenmiş, pakete gömülü bir dinamik kütüphane çağırana kadar ulaşıyordu ve derleme zamanında yakalanmak yerine ancak sonradan anlaşılması güç bir bağlayıcı ya da yükleyici hatasıyla başarısız oluyordu.",
@@ -212,7 +227,7 @@
     "flutter-first-frame": {
       "title": "İlk kare olayı için web çiziminin tamamlanmasını bekleme",
       "problem": "SkWasm'da flutter-first-frame olayı, grafik birleştiricisi görünür Flutter içeriğini sunmadan önce tetiklenebiliyor ve ölçülebilir bir boş kare aralığı bırakabiliyordu.",
-      "change": "Olayı göndermeden önce bekleyen sahne çizimlerinin tamamlanmasını ve sonraki tarayıcı karesini bekledim; değişiklik isteği, Chrome'un yedi çizici ve derleyici test paketini geçerek incelemeye hazır hale geldi.",
+      "change": "Olayı göndermeden önce bekleyen sahne çizimlerinin tamamlanmasını ve sonraki tarayıcı karesini bekledim; inceleyen kişi o zamandan beri daha hafif, completer tabanlı bir yapı istedi.",
       "event_order_lab": {
         "title": "İlk Kare Laboratuvarı",
         "events": {
