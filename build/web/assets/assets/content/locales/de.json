@@ -149,6 +149,11 @@
     }
   },
   "contributions": {
+    "flutter-proxy-box-dry-baseline": {
+      "title": "null von RenderProxyBoxMixin.computeDryBaseline zurückgeben, wenn das Kind keine Grundlinie hat",
+      "problem": "RenderProxyBoxMixin.computeDryBaseline delegierte an eine Superklassen-Implementierung, die eine Ausnahme wirft, sodass ein Dry-Layout-Durchlauf über eine Proxy-Box ohne Kind-Grundlinie abstürzte, statt keine Grundlinie zu melden.",
+      "change": "null zurückgegeben, wenn das Kind keine Grundlinie meldet, passend zu dem, was computeDistanceToActualBaseline zur Layout-Zeit bereits tut, mit einem Regressionstest für den Dry-Pfad."
+    },
     "simdjson-twenty-digit-overflow": {
       "title": "20-stellige positive Überläufe als große Ganzzahlen behandeln",
       "problem": "Jede positive Ganzzahl zwischen 2^64 und 10^20 wurde als fehlerhaft geparst, weil der positive Überlaufzweig eine ungültige Zahl meldete, wo der negative Zweig eine große Ganzzahl meldete.",

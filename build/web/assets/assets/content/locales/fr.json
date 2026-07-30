@@ -149,6 +149,11 @@
     }
   },
   "contributions": {
+    "flutter-proxy-box-dry-baseline": {
+      "title": "Renvoyer null depuis RenderProxyBoxMixin.computeDryBaseline quand l'enfant n'a pas de ligne de base",
+      "problem": "RenderProxyBoxMixin.computeDryBaseline déléguait à une implémentation de la superclasse qui lève une exception, si bien qu'une passe de mise en page à sec sur une proxy box sans ligne de base d'enfant plantait au lieu de signaler l'absence de ligne de base.",
+      "change": "Renvoyé null lorsque l'enfant ne signale aucune ligne de base, comme le fait déjà computeDistanceToActualBaseline au moment de la mise en page, avec un test de régression qui exerce le chemin à sec."
+    },
     "simdjson-twenty-digit-overflow": {
       "title": "Traiter les débordements positifs à 20 chiffres comme de grands entiers",
       "problem": "Tout entier positif compris entre 2^64 et 10^20 était analysé comme malformé, car la branche de débordement positif signalait un nombre invalide là où la branche négative signalait un grand entier.",

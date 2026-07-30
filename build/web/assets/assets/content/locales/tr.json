@@ -144,6 +144,11 @@
     }
   },
   "contributions": {
+    "flutter-proxy-box-dry-baseline": {
+      "title": "Alt öğenin taban çizgisi yokken RenderProxyBoxMixin.computeDryBaseline'dan null döndürme",
+      "problem": "RenderProxyBoxMixin.computeDryBaseline, hata fırlatan bir üst sınıf uygulamasına devrediyordu; bu yüzden alt öğesinin taban çizgisi olmayan bir proxy box üzerindeki kuru yerleşim geçişi, taban çizgisi yok bildirmek yerine çöküyordu.",
+      "change": "Alt öğe taban çizgisi bildirmediğinde null döndürdüm; bu, computeDistanceToActualBaseline'ın yerleşim sırasında zaten yaptığı davranışın aynısı. Kuru yolu çalıştıran bir regresyon testi ekledim."
+    },
     "simdjson-twenty-digit-overflow": {
       "title": "20 haneli pozitif taşmaları büyük tamsayı olarak değerlendirme",
       "problem": "2^64 ile 10^20 arasındaki her pozitif tamsayı hatalı biçimli olarak ayrıştırılıyordu; çünkü pozitif taşma dalı geçersiz sayı bildirirken negatif dal büyük tamsayı bildiriyordu.",
