@@ -301,12 +301,13 @@ The live demo uses the same template with a real professional record. This block
 
 Since 2021, I have built and maintained software for mobile devices, tablets, desktop operating systems, and the web. My work includes ERP and point-of-sale products, logistics workflows, digital publishing, backend services, and the release systems around them.
 
-Source status: `2026.07.29.1`, verified 2026-07-29 against GitHub, LinkedIn, FugaSoft, Dorse, and Medium.
+Source status: `2026.07.30.1`, verified 2026-07-30 against GitHub, LinkedIn, FugaSoft, Dorse, and Medium.
 
 ### Accepted upstream changes
 
 | Project | Change | Merged | Evidence |
 |---|---|---:|---|
+| Flutter | Return null from RenderProxyBoxMixin.computeDryBaseline when the child has no baseline | 2026-07-30 | [Pull request](https://github.com/flutter/flutter/pull/189723) |
 | Flutter Packages | Ignore unrecognized SVG font-weight values | 2026-07-28 | [Pull request](https://github.com/flutter/packages/pull/12199) |
 | simdjson | Treat 20-digit positive overflows as big integers | 2026-07-28 | [Pull request](https://github.com/simdjson/simdjson/pull/2793) |
 | Dart Native Assets | Validate dynamic library architecture from file headers | 2026-07-27 | [Pull request](https://github.com/dart-lang/native/pull/3484) |
