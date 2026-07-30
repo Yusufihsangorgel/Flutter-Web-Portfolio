@@ -129,6 +129,11 @@
     }
   },
   "contributions": {
+    "flutter-proxy-box-dry-baseline": {
+      "title": "إرجاع null من RenderProxyBoxMixin.computeDryBaseline عندما لا يكون للعنصر الابن خط أساس",
+      "problem": "كان RenderProxyBoxMixin.computeDryBaseline يفوّض إلى تنفيذ في الصنف الأعلى يطلق استثناءً، لذلك كان مسار التخطيط الجاف على proxy box بلا خط أساس للابن ينهار بدلاً من الإبلاغ عن عدم وجود خط أساس.",
+      "change": "أرجعتُ null عندما لا يبلّغ الابن عن خط أساس، بما يطابق ما يفعله computeDistanceToActualBaseline أصلاً وقت التخطيط، مع اختبار انحدار يمرّ على المسار الجاف."
+    },
     "simdjson-twenty-digit-overflow": {
       "title": "اعتبار الفيضان الموجب المكوَّن من 20 رقمًا عددًا صحيحًا كبيرًا",
       "problem": "كان كل عدد صحيح موجب بين 2^64 و10^20 يُحلَّل على أنه غير صالح، لأن فرع الفيضان الموجب يبلغ عن رقم غير صالح بينما يبلغ الفرع السالب عن عدد صحيح كبير.",

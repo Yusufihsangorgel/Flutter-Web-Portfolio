@@ -149,6 +149,11 @@
     }
   },
   "contributions": {
+    "flutter-proxy-box-dry-baseline": {
+      "title": "Devolver null desde RenderProxyBoxMixin.computeDryBaseline cuando el hijo no tiene línea base",
+      "problem": "RenderProxyBoxMixin.computeDryBaseline delegaba en una implementación de la superclase que lanza una excepción, por lo que una pasada de diseño en seco sobre un proxy box sin línea base del hijo fallaba en lugar de informar que no hay línea base.",
+      "change": "Devolví null cuando el hijo no informa línea base, igual que hace computeDistanceToActualBaseline en tiempo de diseño, con una prueba de regresión que ejercita la ruta en seco."
+    },
     "simdjson-twenty-digit-overflow": {
       "title": "Tratar los desbordamientos positivos de 20 dígitos como enteros grandes",
       "problem": "Todo entero positivo entre 2^64 y 10^20 se analizaba como malformado, porque la rama de desbordamiento positivo informaba de un número inválido donde la rama negativa informaba de un entero grande.",
