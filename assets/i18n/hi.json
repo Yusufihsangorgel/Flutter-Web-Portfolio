@@ -78,11 +78,15 @@
   },
   "packages_section": {
     "title": "प्रकाशित पैकेज",
-    "subtitle": "{count} पैकेज pub.dev पर प्रकाशित हैं, हर एक का स्कोर पूरे 160/160 है। मिलाकर इन्हें हर महीने लगभग {downloads} डाउनलोड मिलते हैं।",
+    "subtitle": "{count} पैकेज pub.dev पर प्रकाशित हैं, जिनमें से {perfect} का स्कोर पूरे 160/160 है। हर पैकेज के साथ एक मापा गया दावा, चलने योग्य उदाहरण और उसका रोडमैप है।",
     "pub_points": "pub अंक",
-    "downloads": "डाउनलोड / माह",
-    "likes": "लाइक",
-    "open_package": "pub.dev पर खोलें"
+    "open_package": "pub.dev पर खोलें",
+    "maturity": "परिपक्वता",
+    "roadmap": "रोडमैप",
+    "status_done": "प्रकाशित",
+    "status_doing": "प्रगति पर",
+    "status_next": "अगला",
+    "status_waiting": "प्रतीक्षा में"
   },
   "footer": {
     "command_hint_prefix": "दबाएँ",

@@ -78,11 +78,15 @@
   },
   "packages_section": {
     "title": "Veröffentlichte Pakete",
-    "subtitle": "{count} Pakete sind auf pub.dev veröffentlicht, jedes mit der perfekten Wertung 160/160. Zusammen kommen sie auf etwa {downloads} Downloads im Monat.",
+    "subtitle": "{count} Pakete sind auf pub.dev veröffentlicht, {perfect} davon mit der perfekten Wertung 160/160. Jedes bringt eine gemessene Aussage, lauffähige Beispiele und seine eigene Roadmap mit.",
     "pub_points": "Pub-Punkte",
-    "downloads": "Downloads / Monat",
-    "likes": "Likes",
-    "open_package": "Auf pub.dev öffnen"
+    "open_package": "Auf pub.dev öffnen",
+    "maturity": "Reifegrad",
+    "roadmap": "Roadmap",
+    "status_done": "veröffentlicht",
+    "status_doing": "in Arbeit",
+    "status_next": "als Nächstes",
+    "status_waiting": "wartet"
   },
   "footer": {
     "command_hint_prefix": "Drücken Sie",

@@ -78,11 +78,15 @@
   },
   "packages_section": {
     "title": "الحزم المنشورة",
-    "subtitle": "{count} حزمة منشورة على pub.dev، وكل واحدة منها تحصل على الدرجة الكاملة 160/160. مجتمعة، تصل تنزيلاتها إلى نحو {downloads} تنزيل شهريًا.",
+    "subtitle": "{count} حزمة منشورة على pub.dev، منها {perfect} بالدرجة الكاملة 160/160. كل حزمة تأتي بادّعاء مُقاس وأمثلة قابلة للتشغيل وخارطة طريق خاصة بها.",
     "pub_points": "نقاط pub",
-    "downloads": "تنزيلات / شهريًا",
-    "likes": "إعجاب",
-    "open_package": "فتح على pub.dev"
+    "open_package": "فتح على pub.dev",
+    "maturity": "النضج",
+    "roadmap": "خارطة الطريق",
+    "status_done": "تم النشر",
+    "status_doing": "قيد التنفيذ",
+    "status_next": "التالي",
+    "status_waiting": "في الانتظار"
   },
   "footer": {
     "command_hint_prefix": "اضغط",

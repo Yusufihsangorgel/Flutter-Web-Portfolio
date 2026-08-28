@@ -301,7 +301,7 @@ The live demo uses the same template with a real professional record. This block
 
 Since 2021, I have built and maintained software for mobile devices, tablets, desktop operating systems, and the web. My work includes ERP and point-of-sale products, logistics workflows, digital publishing, backend services, and the release systems around them.
 
-Source status: `2026.07.30.1`, verified 2026-07-30 against GitHub, LinkedIn, FugaSoft, Dorse, and Medium.
+Source status: `2026.08.28.1`, verified 2026-08-28 against GitHub, LinkedIn, FugaSoft, Dorse, and Medium.
 
 ### Accepted upstream changes
 
@@ -322,6 +322,8 @@ Source status: `2026.07.30.1`, verified 2026-07-30 against GitHub, LinkedIn, Fug
 | Dart MCP | Add request-scoped message dispatch for MCP servers | 2026-07-17 | [Pull request](https://github.com/dart-lang/ai/pull/528) |
 | Dart MCP | Separate server feature registration from legacy initialization | 2026-07-15 | [Pull request](https://github.com/dart-lang/ai/pull/524) |
 | FlutterFire | Make Firebase core loading deterministic on WebKit | 2026-07-15 | [Pull request](https://github.com/firebase/flutterfire/pull/18443) |
+| Flutter | Wait for web rendering before the first-frame event | 2026-08-11 | [Pull request](https://github.com/flutter/flutter/pull/189500) |
+| MCP Kotlin SDK | Add SEP-2575 request metadata and discovery types | 2026-08-05 | [Pull request](https://github.com/modelcontextprotocol/kotlin-sdk/pull/893) |
 | Flutter Form Builder | Reset unknown dropdown initial values on first build | 2026-07-14 | [Pull request](https://github.com/flutter-form-builder-ecosystem/flutter_form_builder/pull/1512) |
 | Drift | Treat SQLite TRUE and 1 defaults as the same schema | 2026-07-14 | [Pull request](https://github.com/simolus3/drift/pull/3835) |
 | Go Fiber Recipes | Add a Fiber and Asynq background-jobs recipe | 2026-07-12 | [Pull request](https://github.com/gofiber/recipes/pull/4997) |
@@ -339,11 +341,6 @@ Source status: `2026.07.30.1`, verified 2026-07-30 against GitHub, LinkedIn, Fug
 | Redis Task Queue | I designed the public API, queue semantics, failure handling, and runnable examples. | [Project](https://github.com/Yusufihsangorgel/redis_task_queue) |
 | Constellation Particles | I implemented the painter, pointer interaction, spatial partitioning, and package examples without runtime dependencies. | [Project](https://github.com/Yusufihsangorgel/constellation_particles) |
 | Flutter Web Portfolio | I built and run the Flutter Web site, its external content pipeline, accessibility layer, browser regression suite, and production release. | [Project](https://developeryusuf.com) |
-
-### Work under review
-
-- **Flutter:** [Wait for web rendering before the first-frame event](https://github.com/flutter/flutter/pull/189500) — Wait for outstanding scene renders and the next browser frame before dispatching the event; the reviewer has since asked for a lighter completer-based shape.
-- **MCP Kotlin SDK:** [Add SEP-2575 request metadata and discovery types](https://github.com/modelcontextprotocol/kotlin-sdk/pull/893) — Add typed experimental metadata accessors, server discovery types, polymorphic codecs, and malformed-input coverage.
 <!-- portfolio-record:end -->
 
 </details>

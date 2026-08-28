@@ -78,11 +78,15 @@
   },
   "packages_section": {
     "title": "Published Packages",
-    "subtitle": "{count} packages live on pub.dev, every one at a perfect 160/160 score. Together they see about {downloads} downloads a month.",
+    "subtitle": "{count} packages live on pub.dev, {perfect} of them at a perfect 160/160 score. Each one ships a measured claim, runnable examples, and the roadmap it is on.",
     "pub_points": "pub points",
-    "downloads": "downloads / mo",
-    "likes": "likes",
-    "open_package": "Open on pub.dev"
+    "open_package": "Open on pub.dev",
+    "maturity": "maturity",
+    "roadmap": "roadmap",
+    "status_done": "shipped",
+    "status_doing": "in progress",
+    "status_next": "next",
+    "status_waiting": "waiting"
   },
   "footer": {
     "quick_links": "Quick Links",

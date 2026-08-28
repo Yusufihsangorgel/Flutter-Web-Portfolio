@@ -78,11 +78,15 @@
   },
   "packages_section": {
     "title": "Paquets publiés",
-    "subtitle": "{count} paquets publiés sur pub.dev, chacun avec un score parfait de 160/160. Ensemble, ils totalisent environ {downloads} téléchargements par mois.",
+    "subtitle": "{count} paquets publiés sur pub.dev, dont {perfect} avec un score parfait de 160/160. Chacun s'accompagne d'une affirmation mesurée, d'exemples exécutables et de sa feuille de route.",
     "pub_points": "points pub",
-    "downloads": "téléchargements / mois",
-    "likes": "mentions J’aime",
-    "open_package": "Ouvrir sur pub.dev"
+    "open_package": "Ouvrir sur pub.dev",
+    "maturity": "maturité",
+    "roadmap": "feuille de route",
+    "status_done": "livré",
+    "status_doing": "en cours",
+    "status_next": "à venir",
+    "status_waiting": "en attente"
   },
   "footer": {
     "command_hint_prefix": "Appuyez sur",

@@ -1022,8 +1022,12 @@ final class PortfolioPackage {
     required this.downloads,
     required this.category,
     required List<String> topics,
+    required List<PackageRoadmapItem> roadmap,
     this.repository,
-  }) : topics = List.unmodifiable(topics);
+    this.maturity,
+    this.proof,
+  }) : topics = List.unmodifiable(topics),
+       roadmap = List.unmodifiable(roadmap);
 
   factory PortfolioPackage.fromJson(Map<String, dynamic> json) =>
       PortfolioPackage(
@@ -1040,7 +1044,22 @@ final class PortfolioPackage {
           null => const [],
           _ => _strings(json, 'topics'),
         },
+        roadmap: switch (json['roadmap']) {
+          null => const [],
+          _ => _objects(
+            json,
+            'roadmap',
+          ).map(PackageRoadmapItem.fromJson).toList(growable: false),
+        },
         repository: _optionalUri(json, 'repository'),
+        maturity: switch (json['maturity']) {
+          null => null,
+          _ => _requiredString(json, 'maturity'),
+        },
+        proof: switch (json['proof']) {
+          null => null,
+          _ => _requiredString(json, 'proof'),
+        },
       );
 
   final String id;
@@ -1053,7 +1072,35 @@ final class PortfolioPackage {
   final int downloads;
   final String category;
   final List<String> topics;
+  final List<PackageRoadmapItem> roadmap;
   final Uri? repository;
+
+  /// Rung on the portfolio's maturity ladder (L1..L5), if declared.
+  final String? maturity;
+
+  /// One measured claim that carries the package's case, if declared.
+  final String? proof;
+}
+
+/// A single roadmap entry on a package card. [status] is one of `done`,
+/// `doing`, `next`, or `waiting` — anything else fails parsing so a typo
+/// in content cannot render as an unlabeled state.
+final class PackageRoadmapItem {
+  PackageRoadmapItem({required this.title, required this.status}) {
+    const allowed = {'done', 'doing', 'next', 'waiting'};
+    if (!allowed.contains(status)) {
+      throw FormatException('Unknown roadmap status "$status".');
+    }
+  }
+
+  factory PackageRoadmapItem.fromJson(Map<String, dynamic> json) =>
+      PackageRoadmapItem(
+        title: _requiredString(json, 'title'),
+        status: _requiredString(json, 'status'),
+      );
+
+  final String title;
+  final String status;
 }
 
 final class _PortfolioLocalization {

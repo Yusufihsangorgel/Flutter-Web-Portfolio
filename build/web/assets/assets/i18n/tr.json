@@ -78,11 +78,15 @@
   },
   "packages_section": {
     "title": "Yayınlanan Paketler",
-    "subtitle": "{count} paket pub.dev'de yayında, hepsi 160/160 tam puanla. Toplamda ayda yaklaşık {downloads} indirme alıyorlar.",
+    "subtitle": "{count} paket pub.dev'de yayında, {perfect} tanesi 160/160 tam puanda. Her biri ölçülmüş bir iddia, çalışan örnekler ve üzerinde olduğu yol haritasıyla geliyor.",
     "pub_points": "pub puanı",
-    "downloads": "indirme / ay",
-    "likes": "beğeni",
-    "open_package": "pub.dev'de aç"
+    "open_package": "pub.dev'de aç",
+    "maturity": "olgunluk",
+    "roadmap": "yol haritası",
+    "status_done": "yayınlandı",
+    "status_doing": "sürüyor",
+    "status_next": "sırada",
+    "status_waiting": "bekliyor"
   },
   "footer": {
     "command_hint_prefix": "Basın",
