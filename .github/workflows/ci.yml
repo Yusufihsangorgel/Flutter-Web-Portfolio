@@ -8,6 +8,8 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+  # The data refresh workflow starts CI this way for the commit it pushes.
+  workflow_dispatch:
 
 jobs:
   analyze:
@@ -32,6 +34,8 @@ jobs:
       - run: npm run portfolio:validate
       - run: npm run test:template
       - run: npm run test:release-security
+      - run: npm run test:refresh
+      - run: npm run test:content
       - run: npm run verify:hosting
       - run: npm run verify:community
       - run: npm run audit:sources

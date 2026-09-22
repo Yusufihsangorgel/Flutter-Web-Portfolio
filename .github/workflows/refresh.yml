@@ -1,0 +1,154 @@
+name: Refresh portfolio data
+
+on:
+  schedule:
+    # Every Monday at 03:17 UTC. Off the hour so it does not compete with
+    # other scheduled jobs that pile onto :00.
+    - cron: '17 3 * * 1'
+  workflow_dispatch:
+
+concurrency:
+  group: refresh-portfolio-data
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    permissions:
+      contents: write
+      # Lets the job start CI for its own commit; see the last step.
+      actions: write
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
+        with:
+          node-version-file: '.nvmrc'
+          cache: npm
+
+      # GitHub disables a public repository's schedules after 60 days without
+      # activity, and a quiet month has no visible change to commit. The first
+      # run of each month therefore also writes counters, so the job keeps the
+      # repository active with a real data refresh.
+      - name: Fetch live pub.dev and GitHub data
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          counters=()
+          if [ "$(date -u +%d)" -le 7 ]; then counters=(--counters); fi
+          node tool/refresh_portfolio_data.mjs --report "${RUNNER_TEMP}/refresh-report.md" "${counters[@]}"
+
+      - name: Publish the refresh report to the job summary
+        if: always()
+        run: |
+          if [ -f "${RUNNER_TEMP}/refresh-report.md" ]; then
+            cat "${RUNNER_TEMP}/refresh-report.md" >> "${GITHUB_STEP_SUMMARY}"
+          fi
+
+      - id: content-diff
+        name: Check whether the canonical content changed
+        run: |
+          if [ -n "$(git status --porcelain -- assets/content/portfolio.json)" ]; then
+            echo "changed=true" >> "${GITHUB_OUTPUT}"
+          else
+            echo "changed=false" >> "${GITHUB_OUTPUT}"
+          fi
+
+      - id: toolchain
+        if: steps.content-diff.outputs.changed == 'true'
+        name: Read the pinned Flutter version
+        run: |
+          flutter_version="$(node -e "console.log(require('./tool/toolchain.json').flutter)")"
+          echo "flutter=${flutter_version}" >> "${GITHUB_OUTPUT}"
+
+      - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
+        if: steps.content-diff.outputs.changed == 'true'
+        with:
+          flutter-version: ${{ steps.toolchain.outputs.flutter }}
+          cache: true
+
+      - name: Install the build toolchain
+        if: steps.content-diff.outputs.changed == 'true'
+        run: |
+          node tool/verify_toolchain.mjs --current
+          flutter pub get
+          npm ci
+          npx playwright install --with-deps chromium
+
+      # Production deploys on every push to main, so the refreshed commit is
+      # held to the same checks CI runs before it is pushed.
+      - name: Verify the refreshed content
+        if: steps.content-diff.outputs.changed == 'true'
+        run: |
+          npm run test:template
+          npm run test:release-security
+          npm run test:refresh
+          npm run test:content
+          npm run audit:sources
+          npm run audit:history
+          npm run typecheck
+          dart format --output=none --set-exit-if-changed lib test tool
+          flutter analyze --fatal-infos
+          flutter test
+
+      - name: Sync derived public content
+        if: steps.content-diff.outputs.changed == 'true'
+        run: npm run sync:content
+
+      - name: Build and test the tracked release
+        if: steps.content-diff.outputs.changed == 'true'
+        run: |
+          npm run build:release
+          sha256sum -c --quiet build/web/assets/assets/build/source_manifest.sha256
+          npm run test:clone
+          npm test
+
+      - name: Stage the refreshed content
+        if: steps.content-diff.outputs.changed == 'true'
+        # The paths sync:content (tool/sync_public_content.mjs) and
+        # build:release can write. If either starts writing a file that is not
+        # listed here, the check below fails the run instead of committing a
+        # release whose sources and manifest disagree.
+        run: |
+          git add -- \
+            assets/content/portfolio.json \
+            README.md \
+            CODE_OF_CONDUCT.md \
+            SECURITY.md \
+            web/index.html \
+            web/robots.txt \
+            web/sitemap.xml \
+            web/llms.txt \
+            web/manifest.json \
+            web/_headers \
+            web/assets/og \
+            nginx/default.conf \
+            firebase.json \
+            vercel.json \
+            package.json \
+            build/web \
+            assets/build/source_manifest.sha256
+          leftover="$(git diff --name-only; git ls-files --others --exclude-standard)"
+          if [ -n "${leftover}" ]; then
+            echo "Unstaged changes after staging the refresh:" >&2
+            echo "${leftover}" >&2
+            exit 1
+          fi
+
+      - name: Commit and push
+        if: steps.content-diff.outputs.changed == 'true'
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'Refresh the portfolio record from pub.dev and GitHub'
+          git push origin HEAD:main
+
+      # A push made with the workflow token starts no other workflow, so CI and
+      # the GitHub Pages deploy that follows it would never see this commit.
+      # A workflow_dispatch event is the exception, so start CI explicitly.
+      - name: Start CI for the refreshed commit
+        if: steps.content-diff.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run ci.yml --ref main

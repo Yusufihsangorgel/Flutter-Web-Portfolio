@@ -5,6 +5,9 @@ runtime: Dart Wasm/SkWasm where the browser and headers allow it, plus the
 JavaScript/CanvasKit fallback. No backend, database, or runtime secret is
 required.
 
+Package metrics and merged pull-request status refresh on a weekly schedule
+and commit straight to `main`; see [`AUTOMATION.md`](AUTOMATION.md).
+
 ## Build once
 
 ```bash
