@@ -8,6 +8,7 @@ extension type const SectionId(String value) {
   static const proof = SectionId('proof');
   static const projects = SectionId('projects');
   static const packages = SectionId('packages');
+  static const writing = SectionId('writing');
 
   bool get isHome => this == home;
 }

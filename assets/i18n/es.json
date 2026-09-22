@@ -5,7 +5,8 @@
     "experience": "Experiencia",
     "projects": "Proyectos",
     "proof": "Código abierto",
-    "packages": "Paquetes"
+    "packages": "Paquetes",
+    "writing": "Escritos"
   },
   "accessibility": {
     "skip_to_content": "Saltar al contenido",
@@ -87,6 +88,12 @@
     "status_doing": "en curso",
     "status_next": "siguiente",
     "status_waiting": "en espera"
+  },
+  "writing_section": {
+    "title": "Escritos",
+    "subtitle": "Artículos recientes de cada lugar donde publico, del más nuevo al más antiguo.",
+    "all_writing": "Todos los escritos",
+    "open_article": "Leer artículo"
   },
   "footer": {
     "command_hint_prefix": "Presione",

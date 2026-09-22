@@ -5,7 +5,8 @@
     "experience": "Deneyim",
     "projects": "Projeler",
     "proof": "Açık Kaynak",
-    "packages": "Paketler"
+    "packages": "Paketler",
+    "writing": "Yazılar"
   },
   "accessibility": {
     "skip_to_content": "İçeriğe geç",
@@ -87,6 +88,12 @@
     "status_doing": "sürüyor",
     "status_next": "sırada",
     "status_waiting": "bekliyor"
+  },
+  "writing_section": {
+    "title": "Yazılar",
+    "subtitle": "Yazdığım her yerden en yeni yazılar, en yeniden en eskiye.",
+    "all_writing": "Tüm yazılar",
+    "open_article": "Yazıyı oku"
   },
   "footer": {
     "command_hint_prefix": "Basın",

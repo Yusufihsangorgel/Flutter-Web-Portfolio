@@ -5,7 +5,8 @@
     "experience": "الخبرة",
     "projects": "الأعمال",
     "proof": "المصدر المفتوح",
-    "packages": "الحزم"
+    "packages": "الحزم",
+    "writing": "الكتابة"
   },
   "accessibility": {
     "skip_to_content": "تخطي إلى المحتوى",
@@ -87,6 +88,12 @@
     "status_doing": "قيد التنفيذ",
     "status_next": "التالي",
     "status_waiting": "في الانتظار"
+  },
+  "writing_section": {
+    "title": "الكتابة",
+    "subtitle": "أحدث المقالات من كل مكان أنشر فيه، الأحدث أولاً.",
+    "all_writing": "كل المقالات",
+    "open_article": "قراءة المقال"
   },
   "footer": {
     "command_hint_prefix": "اضغط",
