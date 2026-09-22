@@ -1,7 +1,8 @@
-// Refreshes the package and contribution records in
-// assets/content/portfolio.json from pub.dev and the GitHub API, without
-// touching any hand-authored copy (roadmap, maturity, proof, contribution
-// prose). See docs/AUTOMATION.md for what this does and does not cover.
+// Refreshes the package, contribution, and writing records in
+// assets/content/portfolio.json from pub.dev, the GitHub API, and the feeds
+// declared in writing_sources, without touching any hand-authored copy
+// (roadmap, maturity, proof, contribution prose). See docs/AUTOMATION.md for
+// what this does and does not cover.
 import { readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import process from 'node:process';
@@ -193,6 +194,172 @@ export function applyContentVersionBump(document, { shouldWrite, hasVisible }, t
   }
 }
 
+export const WRITING_ENTRY_CAP = 12;
+
+/**
+ * Decodes the XML entities a feed title commonly carries. Applied only to
+ * text that was not CDATA-wrapped: CDATA content is literal by definition
+ * and must not be re-decoded.
+ */
+export function decodeFeedEntities(text) {
+  return text
+    .replaceAll('&lt;', '<')
+    .replaceAll('&gt;', '>')
+    .replaceAll('&quot;', '"')
+    .replaceAll('&apos;', "'")
+    .replace(/&#x([0-9a-fA-F]+);/g, (_, hex) => String.fromCodePoint(Number.parseInt(hex, 16)))
+    .replace(/&#(\d+);/g, (_, dec) => String.fromCodePoint(Number(dec)))
+    .replaceAll('&amp;', '&');
+}
+
+/** Reads one tag's text content out of an RSS/Atom fragment, unwrapping a
+ * CDATA section verbatim or decoding entities from plain text. */
+export function extractTagText(fragment, tagName) {
+  const pattern = new RegExp(`<${tagName}(?:\\s[^>]*)?>([\\s\\S]*?)<\\/${tagName}>`, 'i');
+  const match = pattern.exec(fragment);
+  if (!match) return null;
+  const raw = match[1];
+  const cdata = /^\s*<!\[CDATA\[([\s\S]*?)\]\]>\s*$/.exec(raw);
+  const text = cdata ? cdata[1] : decodeFeedEntities(raw);
+  const trimmed = text.trim();
+  return trimmed.length > 0 ? trimmed : null;
+}
+
+/** Reads an Atom entry's canonical link: the `rel="alternate"` link if one
+ * is declared, otherwise the first `href` the entry carries. */
+export function extractAtomLink(entryFragment) {
+  const linkPattern = /<link\b([^>]*)\/?>/gi;
+  let match;
+  let fallback = null;
+  while ((match = linkPattern.exec(entryFragment))) {
+    const attributes = match[1];
+    const hrefMatch = /href\s*=\s*"([^"]*)"|href\s*=\s*'([^']*)'/.exec(attributes);
+    if (!hrefMatch) continue;
+    const href = hrefMatch[1] ?? hrefMatch[2];
+    const relMatch = /rel\s*=\s*"([^"]*)"|rel\s*=\s*'([^']*)'/.exec(attributes);
+    const rel = relMatch ? relMatch[1] ?? relMatch[2] : null;
+    if (rel === 'alternate') return href;
+    if (fallback === null) fallback = href;
+  }
+  return fallback;
+}
+
+function toIsoDate(value) {
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? null : date.toISOString();
+}
+
+/** Parses RSS 2.0 `<item>` entries into `{ title, url, publishedAt }`. */
+export function parseRssItems(xml) {
+  const items = [];
+  const itemPattern = /<item\b[^>]*>([\s\S]*?)<\/item>/gi;
+  let match;
+  while ((match = itemPattern.exec(xml))) {
+    const fragment = match[1];
+    const title = extractTagText(fragment, 'title');
+    const url = extractTagText(fragment, 'link');
+    const publishedAt = toIsoDate(extractTagText(fragment, 'pubDate'));
+    if (!title || !url || !publishedAt) continue;
+    items.push({ title, url, publishedAt });
+  }
+  return items;
+}
+
+/** Parses Atom `<entry>` entries into `{ title, url, publishedAt }`. */
+export function parseAtomItems(xml) {
+  const items = [];
+  const entryPattern = /<entry\b[^>]*>([\s\S]*?)<\/entry>/gi;
+  let match;
+  while ((match = entryPattern.exec(xml))) {
+    const fragment = match[1];
+    const title = extractTagText(fragment, 'title');
+    const url = extractAtomLink(fragment);
+    const publishedAt = toIsoDate(
+      extractTagText(fragment, 'published') ?? extractTagText(fragment, 'updated'),
+    );
+    if (!title || !url || !publishedAt) continue;
+    items.push({ title, url, publishedAt });
+  }
+  return items;
+}
+
+/** Detects RSS 2.0 vs. Atom from the document's root element and parses it. */
+export function parseFeedItems(xml) {
+  const withoutProlog = xml.trimStart().replace(/^<\?xml[^>]*\?>\s*/i, '');
+  if (/^<rss\b/i.test(withoutProlog)) return parseRssItems(xml);
+  if (/^<feed\b/i.test(withoutProlog)) return parseAtomItems(xml);
+  // Root element was not recognized outright (e.g. an unexpected namespace
+  // prefix); try both and keep whichever actually matched entries.
+  const rssItems = parseRssItems(xml);
+  return rssItems.length > 0 ? rssItems : parseAtomItems(xml);
+}
+
+/** Parses a dev.to `/api/articles` response into `{ title, url, publishedAt }`. */
+export function parseDevToArticles(payload) {
+  if (!Array.isArray(payload)) {
+    throw new Error('dev.to articles response is not an array');
+  }
+  const items = [];
+  for (const entry of payload) {
+    const title = typeof entry?.title === 'string' ? entry.title.trim() : '';
+    const url = typeof entry?.url === 'string' ? entry.url : '';
+    const publishedAt = toIsoDate(entry?.published_at);
+    if (!title || !url || !publishedAt) continue;
+    items.push({ title, url, publishedAt });
+  }
+  return items;
+}
+
+/** Case-folds, collapses whitespace, and strips punctuation so the same
+ * article cross-posted under slightly different formatting dedupes. */
+export function normalizeWritingTitle(title) {
+  return title
+    .toLowerCase()
+    .normalize('NFKC')
+    .replace(/[.,!?;:'"“”‘’()[\]{}]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+/**
+ * Merges each source's `{ title, url, publishedAt }` entries into the final
+ * `{ title, url, source, date }` list: one entry per normalized title,
+ * preferring the earliest source in `sourceOrder`, newest first, capped.
+ */
+export function mergeWritingEntries(entriesBySource, sourceOrder, { cap = WRITING_ENTRY_CAP } = {}) {
+  const bestByTitle = new Map();
+  for (const sourceId of sourceOrder) {
+    for (const entry of entriesBySource[sourceId] ?? []) {
+      const key = normalizeWritingTitle(entry.title);
+      if (key.length === 0 || bestByTitle.has(key)) continue;
+      bestByTitle.set(key, { ...entry, source: sourceId });
+    }
+  }
+  return [...bestByTitle.values()]
+    .sort((a, b) => new Date(b.publishedAt) - new Date(a.publishedAt))
+    .slice(0, cap)
+    .map((entry) => ({
+      title: entry.title,
+      url: entry.url,
+      source: entry.source,
+      date: entry.publishedAt.slice(0, 10),
+    }));
+}
+
+/** Whether the rendered `writing` list actually changed (order included). */
+export function isWritingListChanged(previous, next) {
+  const before = Array.isArray(previous) ? previous : [];
+  if (before.length !== next.length) return true;
+  for (let index = 0; index < next.length; index += 1) {
+    const a = before[index];
+    const b = next[index];
+    if (a?.title !== b.title || a?.url !== b.url || a?.source !== b.source || a?.date !== b.date) {
+      return true;
+    }
+  }
+  return false;
+}
+
 export function buildCandidateSearchUrl(login, page = 1) {
   const query = `author:${login} is:pr is:merged is:public -user:${login}`;
   const params = new URLSearchParams({ q: query, per_page: '100', page: String(page) });
@@ -262,6 +429,20 @@ export function buildReport(summary) {
     lines.push('None.');
   } else {
     for (const change of summary.counterChanges) lines.push(`- ${change}`);
+  }
+  lines.push('');
+
+  lines.push('## Writing', '');
+  lines.push(
+    summary.writingChanged
+      ? `Updated: ${summary.writingEntryCount} entries (was ${summary.previousWritingEntryCount}).`
+      : 'No change.',
+  );
+  if ((summary.writingFailures ?? []).length === 0) {
+    lines.push('No source failures.');
+  } else {
+    lines.push('Source failures (previously stored entries retained):');
+    for (const failure of summary.writingFailures) lines.push(`- ${failure}`);
   }
   lines.push('');
 
@@ -374,9 +555,57 @@ async function fetchJson(url, { headers, attempts = 3 } = {}) {
   return { ok: false, status: null, body: null, error: lastError };
 }
 
+async function fetchText(url, { headers, attempts = 3 } = {}) {
+  let lastError = null;
+  for (let attempt = 1; attempt <= attempts; attempt += 1) {
+    try {
+      const response = await fetch(url, { headers });
+      if (response.ok) {
+        return { ok: true, status: response.status, body: await response.text() };
+      }
+      if (response.status >= 500 || response.status === 429) {
+        lastError = new Error(`${url} responded ${response.status}`);
+      } else {
+        return { ok: false, status: response.status, body: null, error: null };
+      }
+    } catch (error) {
+      lastError = error;
+    }
+    if (attempt < attempts) await delay(attempt * 500);
+  }
+  return { ok: false, status: null, body: null, error: lastError };
+}
+
 function describeFetchFailure(result, label) {
   if (result.error) return `${label}: ${result.error.message}`;
   return `${label}: HTTP ${result.status}`;
+}
+
+/** Fetches and parses one writing source, dispatching on its declared kind. */
+async function fetchWritingSourceEntries(source, { feedHeaders, jsonHeaders }) {
+  if (source.kind === 'rss') {
+    const result = await fetchText(source.url, { headers: feedHeaders });
+    if (!result.ok) {
+      return { ok: false, failure: describeFetchFailure(result, `${source.id}: feed fetch`) };
+    }
+    try {
+      return { ok: true, entries: parseFeedItems(result.body) };
+    } catch (error) {
+      return { ok: false, failure: `${source.id}: ${error.message}` };
+    }
+  }
+  if (source.kind === 'devto') {
+    const result = await fetchJson(source.url, { headers: jsonHeaders });
+    if (!result.ok) {
+      return { ok: false, failure: describeFetchFailure(result, `${source.id}: dev.to fetch`) };
+    }
+    try {
+      return { ok: true, entries: parseDevToArticles(result.body) };
+    } catch (error) {
+      return { ok: false, failure: `${source.id}: ${error.message}` };
+    }
+  }
+  return { ok: false, failure: `${source.id}: unsupported writing source kind "${source.kind}"` };
 }
 
 async function main() {
@@ -393,6 +622,11 @@ async function main() {
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
   };
   const pubHeaders = { 'User-Agent': USER_AGENT };
+  const feedHeaders = {
+    'User-Agent': USER_AGENT,
+    Accept:
+      'application/rss+xml, application/atom+xml, application/xml;q=0.9, text/xml;q=0.8, */*;q=0.5',
+  };
 
   const limiter = createLimiter(6);
   const failures = [];
@@ -481,6 +715,50 @@ async function main() {
     }
   }
 
+  // Writing refresh: bounded-concurrency fetch of every declared source. A
+  // source that fails to fetch or parse keeps that source's previously
+  // stored entries (filtered back out of document.writing) instead of
+  // dropping them, is reported, and never sets `anyFailure` — a feed hiccup
+  // must never block the package/contribution refresh above.
+  const writingSources = Array.isArray(document.writing_sources)
+    ? document.writing_sources
+    : [];
+  const previousWriting = Array.isArray(document.writing) ? document.writing : [];
+  const writingFailures = [];
+  const entriesBySource = {};
+  const writingFetches = writingSources.map((source) => ({
+    source,
+    promise: limiter(() =>
+      fetchWritingSourceEntries(source, { feedHeaders, jsonHeaders: pubHeaders }),
+    ),
+  }));
+  for (const { source, promise } of writingFetches) {
+    const result = await promise;
+    if (result.ok) {
+      entriesBySource[source.id] = result.entries;
+      continue;
+    }
+    writingFailures.push(result.failure);
+    entriesBySource[source.id] = previousWriting
+      .filter((entry) => entry.source === source.id)
+      .map((entry) => ({
+        title: entry.title,
+        url: entry.url,
+        publishedAt: `${entry.date}T00:00:00.000Z`,
+      }));
+  }
+  const mergedWriting = mergeWritingEntries(
+    entriesBySource,
+    writingSources.map((source) => source.id),
+  );
+  const writingChanged = isWritingListChanged(previousWriting, mergedWriting);
+  if (writingChanged) {
+    document.writing = mergedWriting;
+    visibleChanges.push(
+      `writing: ${mergedWriting.length} entries (was ${previousWriting.length})`,
+    );
+  }
+
   // Candidate discovery only runs when portfolio.json itself names the
   // GitHub account (via profile.links); it is report-only and never blocks
   // the write, since a search-quota hiccup here should not stop a real,
@@ -542,6 +820,9 @@ async function main() {
     `Pending pub.dev score: ${pendingScorePackages.length}`,
     `Closed without merging: ${closedUnmergedContributions.length}`,
     `Fetch failures: ${failures.length}`,
+    `Writing sources checked: ${writingSources.length}`,
+    `Writing entries: ${writingChanged ? mergedWriting.length : previousWriting.length}${writingChanged ? ' (updated)' : ''}`,
+    `Writing source failures: ${writingFailures.length}`,
     `Candidates: ${candidatesError ? `unavailable (${candidatesError})` : candidateGroups.reduce((total, group) => total + group.items.length, 0)}`,
     shouldWrite
       ? `Wrote ${path.relative(root, filePath)}.`
@@ -561,6 +842,10 @@ async function main() {
       pendingScorePackages,
       closedUnmergedContributions,
       failures,
+      writingChanged,
+      writingEntryCount: mergedWriting.length,
+      previousWritingEntryCount: previousWriting.length,
+      writingFailures,
       candidateGroups,
       candidatesError,
     });

@@ -62,7 +62,7 @@ void main() {
     expect(before.covers(controller.narrative.sectionIds), isTrue);
     expect(
       before.anchors.map((anchor) => anchor.documentCenter.dy),
-      orderedEquals([450, 1350, 2250, 3150, 4050, 4950]),
+      orderedEquals([450, 1350, 2250, 3150, 4050, 4950, 5850]),
     );
 
     controller.scrollController.jumpTo(1250);
@@ -109,6 +109,7 @@ void main() {
       SectionId.proof: 1100,
       SectionId.projects: 2200,
       SectionId.packages: 1000,
+      SectionId.writing: 1000,
       SectionId.about: 1000,
     };
     await tester.pumpWidget(document(initialHeights));
@@ -133,6 +134,7 @@ void main() {
       SectionId.proof: 1100,
       SectionId.projects: 2600,
       SectionId.packages: 1000,
+      SectionId.writing: 1000,
       SectionId.about: 1000,
     };
     await tester.pumpWidget(document(reflowedHeights));
@@ -178,6 +180,7 @@ void main() {
                     SectionId.proof: isCompact ? 1300 : 900,
                     SectionId.projects: isCompact ? 4000 : 1400,
                     SectionId.packages: 1000,
+                    SectionId.writing: 1000,
                     SectionId.about: 1000,
                   };
                   return Column(

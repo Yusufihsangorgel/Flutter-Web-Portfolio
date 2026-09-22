@@ -14,6 +14,7 @@ import 'package:flutter_web_portfolio/app/modules/home/sections/experience_secti
 import 'package:flutter_web_portfolio/app/modules/home/sections/packages/packages_section.dart';
 import 'package:flutter_web_portfolio/app/modules/home/sections/projects/projects_section.dart';
 import 'package:flutter_web_portfolio/app/modules/home/sections/proof_section.dart';
+import 'package:flutter_web_portfolio/app/modules/home/sections/writing/writing_section.dart';
 import 'package:flutter_web_portfolio/app/widgets/back_to_top_button.dart';
 import 'package:flutter_web_portfolio/app/widgets/accessible_action.dart';
 import 'package:flutter_web_portfolio/app/widgets/command_palette.dart';
@@ -327,6 +328,7 @@ class _HomeViewState extends State<HomeView> {
     'proof' => const ProofSection(),
     'projects' => const ProjectsSection(),
     'packages' => const PackagesSection(),
+    'writing' => const WritingSection(),
     final value => throw StateError(
       'No section widget is registered for narrative chapter "$value".',
     ),

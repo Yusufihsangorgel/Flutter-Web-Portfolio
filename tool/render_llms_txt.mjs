@@ -38,6 +38,9 @@ export function renderLlmsTxt(data) {
   const packages = renderPackages(data.packages);
   if (packages.length > 0) lines.push('', '## Packages', ...packages);
 
+  const writing = renderWriting(data.writing);
+  if (writing.length > 0) lines.push('', '## Writing', ...writing);
+
   return lines.join('\n');
 }
 
@@ -93,6 +96,14 @@ function renderPackages(packages) {
     const description = requiredString(pkg.description, `packages[${index}].description`);
     const version = requiredString(pkg.version, `packages[${index}].version`);
     return `- [${markdownLabel(name)}](${url}): ${description} (v${version})`;
+  });
+}
+
+function renderWriting(writing) {
+  return (writing ?? []).map((entry, index) => {
+    const title = requiredString(entry.title, `writing[${index}].title`);
+    const url = requiredHttpsUrl(entry.url, `writing[${index}].url`);
+    return `- [${markdownLabel(title)}](${url})`;
   });
 }
 

@@ -17,15 +17,23 @@ does not depend on someone remembering to update it by hand.
   `under_review`: when a pull request has merged, `status` becomes `merged`
   and `date` becomes the merge date. A pull request closed without merging is
   reported, never changed or removed.
+- **Writing**, from every feed listed in `writing_sources[]` (an RSS/Atom
+  blog feed, or a dev.to `kind`). Entries are merged across sources, one per
+  normalized title (a cross-posted article keeps the URL from whichever
+  source comes first in `writing_sources[]`), sorted newest first, and capped
+  at 12 into `writing[]`. A source that fails to fetch or parse keeps that
+  source's previously stored entries and is reported; it never blocks the
+  package/contribution refresh above and never empties the list.
 
-Both are diffed against the current file. A change to `version` or
-`pub_points` (packages) or to `status`/`date` (contributions) is **visible** —
-it changes what a reader sees — and is what triggers a write and a
-`content_version` bump. A change to `likes`/`downloads` alone is a
-**counter** and is not written by default, so the scheduled job does not
-produce a commit that changes nothing a visitor can see. `verified_at` is
-never changed: the site publishes it as the date every listed source was
-checked, and this tool checks only pub.dev and GitHub.
+All three are diffed against the current file. A change to `version` or
+`pub_points` (packages), to `status`/`date` (contributions), or to the
+rendered `writing[]` list is **visible** — it changes what a reader sees —
+and is what triggers a write and a `content_version` bump. A change to
+`likes`/`downloads` alone is a **counter** and is not written by default, so
+the scheduled job does not produce a commit that changes nothing a visitor
+can see. `verified_at` is never changed: the site publishes it as the date
+every listed source was checked, and this tool checks only pub.dev, GitHub,
+and the declared writing feeds.
 
 pub.dev scores a newly published version asynchronously. If `grantedPoints`
 is not yet available for a package, the tool keeps the previous `pub_points`
@@ -49,6 +57,8 @@ every locale, so adding one is a deliberate, authored decision.
   (`category`, `maturity`, `proof`, `roadmap`) as any other.
 - **`experience`, `systems`, `capabilities`, `site`, `profile`** — none of
   this comes from a live API; it stays hand-maintained.
+- **`writing_sources`** itself — which feeds to check, and their labels and
+  profile links, are authored once and not discovered automatically.
 
 ## Schedule
 
@@ -73,12 +83,15 @@ reuse the old commit.
 ## Enabling it on a clone
 
 Nothing needs editing. The tool reads which packages to check from
-`packages[].name` and which GitHub account to search for candidate pull
-requests from `profile.links` (the entry with `id: "github"`) — both already
-in `assets/content/portfolio.json`. Enable GitHub Actions on the repository
-and the schedule starts running. An authenticated `GITHUB_TOKEN` is provided
-automatically by Actions; running the tool locally without one works too, at
-GitHub's lower unauthenticated rate limit.
+`packages[].name`, which GitHub account to search for candidate pull
+requests from `profile.links` (the entry with `id: "github"`), and which
+feeds to check from `writing_sources[]` — all already in
+`assets/content/portfolio.json`. The initializer writes `writing_sources` as
+an empty list for a clean clone; add entries by hand to turn writing refresh
+on. Enable GitHub Actions on the repository and the schedule starts running.
+An authenticated `GITHUB_TOKEN` is provided automatically by Actions; running
+the tool locally without one works too, at GitHub's lower unauthenticated
+rate limit.
 
 ## Running it locally
 

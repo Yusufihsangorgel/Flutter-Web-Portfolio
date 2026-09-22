@@ -14,7 +14,7 @@ void main() {
       final profile = manifest['profile']! as Map<String, dynamic>;
       final displayName = profile['display_name']! as Map<String, dynamic>;
 
-      expect(document.schemaVersion, 9);
+      expect(document.schemaVersion, 10);
       expect(document.contentVersion, manifest['content_version']);
       expect(document.profile.name, profile['name']);
       expect(document.profile.role, profile['role']);
@@ -282,6 +282,107 @@ void main() {
         'packages',
         'about',
       ]);
+    });
+
+    test(
+      'parses writing sources and entries, and surfaces the writing section',
+      () {
+        final json = _manifest();
+        json['writing_sources'] = _sampleWritingSources();
+        json['writing'] = _sampleWriting();
+
+        final document = PortfolioDocument.fromJson(json);
+        expect(document.writingSources, hasLength(2));
+        expect(document.writingSources.first.id, 'blog');
+        expect(
+          document.writingSources.first.kind,
+          PortfolioWritingSourceKind.rss,
+        );
+        expect(
+          document.writingSources.last.kind,
+          PortfolioWritingSourceKind.devto,
+        );
+        expect(document.writing, hasLength(2));
+        expect(document.writing.first.title, 'A published article');
+        expect(document.writing.first.source, 'blog');
+        expect(document.activeSections, [
+          'home',
+          'experience',
+          'proof',
+          'projects',
+          'packages',
+          'writing',
+          'about',
+        ]);
+        expect(
+          () => document.writing.add(document.writing.first),
+          throwsUnsupportedError,
+        );
+      },
+    );
+
+    test('writing and writing_sources default to empty when absent', () {
+      final document = PortfolioDocument.fromJson(_manifest());
+      expect(document.writing, isEmpty);
+      expect(document.writingSources, isEmpty);
+      expect(document.activeSections, isNot(contains('writing')));
+    });
+
+    test('rejects an unsupported writing source kind', () {
+      final json = _manifest();
+      json['writing_sources'] = _sampleWritingSources()
+        ..first['kind'] = 'newsletter';
+      json['writing'] = _sampleWriting();
+
+      expect(
+        () => PortfolioDocument.fromJson(json),
+        throwsA(isA<FormatException>()),
+      );
+    });
+
+    test('rejects a writing entry that references an undeclared source', () {
+      final json = _manifest();
+      json['writing_sources'] = _sampleWritingSources();
+      final writing = _sampleWriting();
+      writing.first['source'] = 'unknown-source';
+      json['writing'] = writing;
+
+      expect(
+        () => PortfolioDocument.fromJson(json),
+        throwsA(isA<FormatException>()),
+      );
+    });
+
+    test('rejects duplicate writing source ids', () {
+      final json = _manifest();
+      final sources = _sampleWritingSources();
+      sources.add(Map<String, dynamic>.from(sources.first));
+      json['writing_sources'] = sources;
+      json['writing'] = _sampleWriting();
+
+      expect(
+        () => PortfolioDocument.fromJson(json),
+        throwsA(isA<FormatException>()),
+      );
+    });
+
+    test('rejects more than 12 writing entries', () {
+      final json = _manifest();
+      json['writing_sources'] = _sampleWritingSources();
+      json['writing'] = List<Map<String, dynamic>>.generate(
+        13,
+        (index) => {
+          'title': 'Article number $index',
+          'url': 'https://example.com/writing/article-$index',
+          'source': 'blog',
+          'date': '2026-01-01',
+        },
+      );
+
+      expect(
+        () => PortfolioDocument.fromJson(json),
+        throwsA(isA<FormatException>()),
+      );
     });
 
     test('keeps event-order labs on the selected contribution only', () {
@@ -574,3 +675,35 @@ void main() {
 }
 
 Map<String, dynamic> _manifest() => loadPortfolioFixtureJson();
+
+List<Map<String, dynamic>> _sampleWritingSources() => [
+  {
+    'id': 'blog',
+    'label': 'Blog',
+    'kind': 'rss',
+    'url': 'https://example.com/writing/feed.xml',
+    'profile_url': 'https://example.com/writing',
+  },
+  {
+    'id': 'devto',
+    'label': 'dev.to',
+    'kind': 'devto',
+    'url': 'https://dev.to/api/articles?username=example&per_page=100',
+    'profile_url': 'https://dev.to/example',
+  },
+];
+
+List<Map<String, dynamic>> _sampleWriting() => [
+  {
+    'title': 'A published article',
+    'url': 'https://example.com/writing/a-published-article',
+    'source': 'blog',
+    'date': '2026-08-01',
+  },
+  {
+    'title': 'A dev.to article',
+    'url': 'https://dev.to/example/a-dev-to-article',
+    'source': 'devto',
+    'date': '2026-07-20',
+  },
+];

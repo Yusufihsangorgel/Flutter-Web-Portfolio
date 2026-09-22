@@ -23,6 +23,10 @@
       "motif": "bracket"
     },
     {
+      "id": "writing",
+      "motif": "bracket"
+    },
+    {
       "id": "about",
       "motif": "thread"
     }

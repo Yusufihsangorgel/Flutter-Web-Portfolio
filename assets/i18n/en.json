@@ -5,7 +5,8 @@
     "experience": "Experience",
     "projects": "Work",
     "proof": "Open Source",
-    "packages": "Packages"
+    "packages": "Packages",
+    "writing": "Writing"
   },
   "accessibility": {
     "skip_to_content": "Skip to content",
@@ -87,6 +88,12 @@
     "status_doing": "in progress",
     "status_next": "next",
     "status_waiting": "waiting"
+  },
+  "writing_section": {
+    "title": "Writing",
+    "subtitle": "Recent articles from every place I publish, newest first.",
+    "all_writing": "All writing",
+    "open_article": "Read article"
   },
   "footer": {
     "quick_links": "Quick Links",

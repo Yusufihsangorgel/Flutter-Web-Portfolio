@@ -1,6 +1,6 @@
 {
-  "schema_version": 9,
-  "content_version": "2026.09.22.1",
+  "schema_version": 10,
+  "content_version": "2026.09.22.2",
   "verified_at": "2026-08-29",
   "site": {
     "template_repository": true,
@@ -1150,16 +1150,16 @@
           "status": "done"
         },
         {
-          "title": "Spec-revision-aware rules for the 2026-07-28 protocol era",
-          "status": "doing"
+          "title": "Spec-revision-aware rules for the 2026-07-28 protocol era, once the harness can open a session in it",
+          "status": "waiting"
         },
         {
           "title": "1.0.0 once the upstream client ships its next minor",
           "status": "waiting"
         },
         {
-          "title": "CI action wrapper",
-          "status": "next"
+          "title": "CI action, documented for use from another repository (0.10.3)",
+          "status": "done"
         }
       ]
     },
@@ -1220,11 +1220,15 @@
           "status": "done"
         },
         {
-          "title": "Standalone-binary story for dart compile exe (issue #4)",
-          "status": "doing"
+          "title": "Standalone binaries through dart build cli, documented with the real runtime error (1.4.1)",
+          "status": "done"
         },
         {
           "title": "Streaming NDJSON at constant memory",
+          "status": "done"
+        },
+        {
+          "title": "The error contract tested on every exit path (1.6.1)",
           "status": "done"
         }
       ]
@@ -1257,8 +1261,8 @@
           "status": "done"
         },
         {
-          "title": "First-class rag_kit backend integration",
-          "status": "next"
+          "title": "rag_kit backend as an example, honest that it is not a speedup at small corpora (1.4.0)",
+          "status": "done"
         }
       ]
     },
@@ -1286,12 +1290,12 @@
           "status": "done"
         },
         {
-          "title": "Behaviour table: what native structured output misses",
-          "status": "next"
+          "title": "Provider comparison table, each row cited or marked package-only (1.4.0)",
+          "status": "done"
         },
         {
-          "title": "Streaming extraction on top of stream_struct",
-          "status": "next"
+          "title": "Streaming extraction, validated once the object completes (1.4.1)",
+          "status": "done"
         }
       ]
     },
@@ -1352,8 +1356,8 @@
           "status": "done"
         },
         {
-          "title": "Declare and CI-prove the exact platform matrix",
-          "status": "next"
+          "title": "Explicit platform matrix, with Fuchsia explained rather than silently included (1.2.4)",
+          "status": "done"
         },
         {
           "title": "Jank-free thumbnail recipe as the headline",
@@ -1484,8 +1488,8 @@
           "status": "done"
         },
         {
-          "title": "MCP tool-output eval bridge with mcp_probe",
-          "status": "next"
+          "title": "Evaluating an MCP tool response, and why flattening an isError string makes the eval lie (1.3.2)",
+          "status": "done"
         },
         {
           "title": "Watching the Dart AI ecosystem mature",
@@ -1517,11 +1521,15 @@
           "status": "done"
         },
         {
-          "title": "First-class tool-call streaming across all three extractors",
-          "status": "next"
+          "title": "Tool-call streaming across all three extractors (1.4.0)",
+          "status": "done"
         },
         {
           "title": "Close the last 10 pana points",
+          "status": "done"
+        },
+        {
+          "title": "A server-side tool block streamed ahead of the caller's own call no longer takes over the extractor (1.4.2)",
           "status": "done"
         }
       ]
@@ -1550,12 +1558,12 @@
           "status": "done"
         },
         {
-          "title": "Dogfood case: prerender this very site, publish the before and after",
-          "status": "doing"
+          "title": "Measured over HTTP: 0 vs 52 words of crawlable content (1.5.0); the search-index before and after still needs weeks of data",
+          "status": "waiting"
         },
         {
-          "title": "CI recipe: build, prerender, deploy",
-          "status": "next"
+          "title": "Copyable build, prerender and deploy workflow (1.3.6)",
+          "status": "done"
         }
       ]
     },
@@ -1655,6 +1663,10 @@
         {
           "title": "Live demo, deployed from CI on every push",
           "status": "done"
+        },
+        {
+          "title": "First outside request: focus moves into the bar on open, and isOpen, open() and close() drive it from code (2.4.0)",
+          "status": "done"
         }
       ]
     },
@@ -1686,8 +1698,8 @@
           "status": "done"
         },
         {
-          "title": "Migration entry for the deprecation-warning audience",
-          "status": "next"
+          "title": "README meets a reader arriving from a deprecation warning (1.3.1)",
+          "status": "done"
         }
       ]
     },
@@ -1715,8 +1727,8 @@
           "status": "done"
         },
         {
-          "title": "Become this site's own background",
-          "status": "next"
+          "title": "Site background: declined, because the site's own background refuses a second decorative layer",
+          "status": "done"
         },
         {
           "title": "Nothing else — by design",
@@ -1748,8 +1760,8 @@
           "status": "done"
         },
         {
-          "title": "Screen-reader transcript in the README",
-          "status": "next"
+          "title": "Screen-reader transcript in the README, taken from the test that asserts it (1.2.5)",
+          "status": "done"
         },
         {
           "title": "60-day distribution experiment",
@@ -1794,6 +1806,103 @@
           "status": "waiting"
         }
       ]
+    }
+  ],
+  "writing_sources": [
+    {
+      "id": "blog",
+      "label": "Blog",
+      "kind": "rss",
+      "url": "https://yusufihsangorgel.github.io/feed.xml",
+      "profile_url": "https://yusufihsangorgel.github.io"
+    },
+    {
+      "id": "medium",
+      "label": "Medium",
+      "kind": "rss",
+      "url": "https://medium.com/feed/@developeryusufihsan",
+      "profile_url": "https://medium.com/@developeryusufihsan"
+    },
+    {
+      "id": "devto",
+      "label": "dev.to",
+      "kind": "devto",
+      "url": "https://dev.to/api/articles?username=yusufihsangorgel&per_page=100",
+      "profile_url": "https://dev.to/yusufihsangorgel"
+    }
+  ],
+  "writing": [
+    {
+      "title": "Your leak test is probably measuring the test runner",
+      "url": "https://dev.to/yusufihsangorgel/your-leak-test-is-probably-measuring-the-test-runner-1m3m",
+      "source": "devto",
+      "date": "2026-08-03"
+    },
+    {
+      "title": "The Biggest MCP Update Ever, Explained With a Restaurant",
+      "url": "https://medium.com/@developeryusufihsan/the-biggest-mcp-update-ever-explained-with-a-restaurant-7b1f2bcd7d06?source=rss-5943a54dc689------2",
+      "source": "medium",
+      "date": "2026-07-29"
+    },
+    {
+      "title": "The object that falls out of the Set it is still in — mutable hashCode in Dart",
+      "url": "https://dev.to/yusufihsangorgel/the-object-that-falls-out-of-the-set-it-is-still-in-mutable-hashcode-in-dart-2665",
+      "source": "devto",
+      "date": "2026-07-24"
+    },
+    {
+      "title": "My CI ran on three platforms and still could not catch this",
+      "url": "https://dev.to/yusufihsangorgel/my-ci-ran-on-three-platforms-and-still-could-not-catch-this-l04",
+      "source": "devto",
+      "date": "2026-07-24"
+    },
+    {
+      "title": "The 24.8 milliseconds you pay before ffmpeg decodes a single sample",
+      "url": "https://dev.to/yusufihsangorgel/the-248-milliseconds-you-pay-before-ffmpeg-decodes-a-single-sample-3983",
+      "source": "devto",
+      "date": "2026-07-24"
+    },
+    {
+      "title": "Pinning the point you pinch: the one line behind anchored zoom",
+      "url": "https://dev.to/yusufihsangorgel/pinning-the-point-you-pinch-the-one-line-behind-anchored-zoom-m4l",
+      "source": "devto",
+      "date": "2026-07-23"
+    },
+    {
+      "title": "A public const constructor is the back door around your factory's validation",
+      "url": "https://dev.to/yusufihsangorgel/a-public-const-constructor-is-the-back-door-around-your-factorys-validation-2hh8",
+      "source": "devto",
+      "date": "2026-07-23"
+    },
+    {
+      "title": "2.75 seconds or 2 microseconds: the same regex, two engines",
+      "url": "https://dev.to/yusufihsangorgel/275-seconds-or-2-microseconds-the-same-regex-two-engines-k2o",
+      "source": "devto",
+      "date": "2026-07-23"
+    },
+    {
+      "title": "A finite loop in skeleton_shimmer that stopped resuming when the loop count was raised",
+      "url": "https://dev.to/yusufihsangorgel/a-finite-loop-in-skeletonshimmer-that-stopped-resuming-when-the-loop-count-was-raised-44ib",
+      "source": "devto",
+      "date": "2026-07-23"
+    },
+    {
+      "title": "A route could write index.html outside the output directory: a path traversal fix in flutter_prerender 0.3.2",
+      "url": "https://dev.to/yusufihsangorgel/a-route-could-write-indexhtml-outside-the-output-directory-a-path-traversal-fix-in-2o9",
+      "source": "devto",
+      "date": "2026-07-23"
+    },
+    {
+      "title": "A resolved top-level null was dropped from streamPartialJson (stream_struct 0.3.2)",
+      "url": "https://dev.to/yusufihsangorgel/a-resolved-top-level-null-was-dropped-from-streampartialjson-streamstruct-032-4g5g",
+      "source": "devto",
+      "date": "2026-07-23"
+    },
+    {
+      "title": "rag_kit stored the caller's metadata map by reference, then handed it back from search",
+      "url": "https://dev.to/yusufihsangorgel/ragkit-stored-the-callers-metadata-map-by-reference-then-handed-it-back-from-search-4nmg",
+      "source": "devto",
+      "date": "2026-07-23"
     }
   ]
 }

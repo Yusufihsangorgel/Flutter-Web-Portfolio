@@ -64,12 +64,14 @@ void main() {
         'proof',
         'projects',
         'packages',
+        'writing',
         'about',
       ]);
       expect(document.chapters.map((chapter) => chapter.motif), const [
         NarrativeMotif.origin,
         NarrativeMotif.timeline,
         NarrativeMotif.branches,
+        NarrativeMotif.bracket,
         NarrativeMotif.bracket,
         NarrativeMotif.bracket,
         NarrativeMotif.thread,
@@ -112,7 +114,7 @@ void main() {
       final document = NarrativeDocument.fromJson(fixture());
 
       expect(
-        () => document.forActiveSections(const ['home', 'writing']),
+        () => document.forActiveSections(const ['home', 'testimonials']),
         throwsFormatException,
       );
     });

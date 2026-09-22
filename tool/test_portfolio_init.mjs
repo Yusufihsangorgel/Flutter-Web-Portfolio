@@ -64,7 +64,7 @@ try {
   ]);
 
   const generated = JSON.parse(await readFile(output, 'utf8'));
-  assert(generated.schema_version === 9, 'schema version');
+  assert(generated.schema_version === 10, 'schema version');
   assert(
     generated.site.template_repository === false,
     'initialized portfolio is not advertised as a GitHub template',
@@ -79,6 +79,8 @@ try {
   assert(generated.experience.length === 0, 'empty optional experience');
   assert(generated.contributions.length === 0, 'empty optional contributions');
   assert(generated.systems.length === 0, 'empty optional work');
+  assert(generated.writing_sources.length === 0, 'empty optional writing sources');
+  assert(generated.writing.length === 0, 'empty optional writing');
 
   const serialized = JSON.stringify(generated).toLowerCase();
   const residue = findTemplateIdentityResidue(

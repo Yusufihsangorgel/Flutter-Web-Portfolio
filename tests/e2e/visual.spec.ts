@@ -19,6 +19,31 @@ test.skip(
   'demo visual baselines do not apply to an initialized empty portfolio',
 );
 
+// The refresh workflow rewrites `writing` whenever a feed publishes, and a
+// baseline that pictured live titles would fail on the next article. The
+// baselines pin a fixed list instead, with titles of differing lengths.
+const sampleTitles = [
+  'A short sample title',
+  'A sample title long enough to wrap onto a second line at tablet width',
+  'A sample title of middling length for the list',
+  'A sample title that runs long enough to wrap onto a third line on the narrowest phone layout',
+];
+const writingSources = portfolio.writing_sources ?? [];
+const frozenWriting = Array.from({ length: 12 }, (_, index) => ({
+  title: `${sampleTitles[index % sampleTitles.length]} ${index + 1}`,
+  url: `https://example.invalid/writing/${index + 1}`,
+  source: writingSources[index % Math.max(writingSources.length, 1)]?.id ?? 'blog',
+  date: `2026-01-${String(28 - index).padStart(2, '0')}`,
+}));
+
+test.beforeEach(async ({ page }) => {
+  await page.route('**/content/portfolio.json*', async (route) => {
+    const response = await route.fetch();
+    const document = await response.json();
+    await route.fulfill({ response, json: { ...document, writing: frozenWriting } });
+  });
+});
+
 async function settleCompositor(page: Page, frameCount = 3) {
   await page.evaluate(
     (frames) =>

@@ -5,7 +5,8 @@
     "experience": "अनुभव",
     "projects": "काम",
     "proof": "ओपन सोर्स",
-    "packages": "पैकेज"
+    "packages": "पैकेज",
+    "writing": "लेखन"
   },
   "accessibility": {
     "skip_to_content": "सामग्री पर जाएँ",
@@ -87,6 +88,12 @@
     "status_doing": "प्रगति पर",
     "status_next": "अगला",
     "status_waiting": "प्रतीक्षा में"
+  },
+  "writing_section": {
+    "title": "लेखन",
+    "subtitle": "मैं जहां भी प्रकाशित करता हूं, वहां से हाल के लेख, सबसे नए पहले।",
+    "all_writing": "सभी लेखन",
+    "open_article": "लेख पढ़ें"
   },
   "footer": {
     "command_hint_prefix": "दबाएँ",

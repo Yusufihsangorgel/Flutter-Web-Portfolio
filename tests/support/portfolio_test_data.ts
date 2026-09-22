@@ -49,6 +49,7 @@ export type PortfolioTestData = {
   experience: Array<{ company: string }>;
   contributions: PortfolioContribution[];
   systems: PortfolioSystem[];
+  writing_sources?: Array<{ id: string }>;
 };
 
 export type InterfaceTestData = {

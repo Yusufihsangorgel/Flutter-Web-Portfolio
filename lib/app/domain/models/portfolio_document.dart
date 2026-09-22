@@ -15,16 +15,20 @@ final class PortfolioDocument {
     required List<PortfolioContribution> contributions,
     required List<PortfolioSystem> systems,
     required List<PortfolioPackage> packages,
+    required List<PortfolioWritingSource> writingSources,
+    required List<PortfolioWritingEntry> writing,
   }) : sources = List.unmodifiable(sources),
        experience = List.unmodifiable(experience),
        capabilities = List.unmodifiable(capabilities),
        contributions = List.unmodifiable(contributions),
        systems = List.unmodifiable(systems),
-       packages = List.unmodifiable(packages);
+       packages = List.unmodifiable(packages),
+       writingSources = List.unmodifiable(writingSources),
+       writing = List.unmodifiable(writing);
 
   factory PortfolioDocument.fromJson(Map<String, dynamic> json) {
     final schemaVersion = _requiredInt(json, 'schema_version');
-    if (schemaVersion != 9) {
+    if (schemaVersion != 10) {
       throw FormatException(
         'Unsupported portfolio schema version: $schemaVersion',
       );
@@ -54,6 +58,20 @@ final class PortfolioDocument {
         json,
         'packages',
       ).map(PortfolioPackage.fromJson).toList(),
+      writingSources: switch (json['writing_sources']) {
+        null => const [],
+        _ => _objects(
+          json,
+          'writing_sources',
+        ).map(PortfolioWritingSource.fromJson).toList(growable: false),
+      },
+      writing: switch (json['writing']) {
+        null => const [],
+        _ => _objects(
+          json,
+          'writing',
+        ).map(PortfolioWritingEntry.fromJson).toList(growable: false),
+      },
     ).._validate();
   }
 
@@ -69,12 +87,20 @@ final class PortfolioDocument {
   final List<PortfolioSystem> systems;
   final List<PortfolioPackage> packages;
 
+  /// Feeds the owner's writing is fetched from. Factual, not localized.
+  final List<PortfolioWritingSource> writingSources;
+
+  /// The owner's most recent published writing, newest first, capped at 12.
+  /// Factual, not localized.
+  final List<PortfolioWritingEntry> writing;
+
   List<String> get activeSections => <String>[
     'home',
     if (experience.isNotEmpty) 'experience',
     if (contributions.isNotEmpty) 'proof',
     if (systems.isNotEmpty) 'projects',
     if (packages.isNotEmpty) 'packages',
+    if (writing.isNotEmpty) 'writing',
     'about',
   ];
 
@@ -135,6 +161,8 @@ final class PortfolioDocument {
           _localizedSystem(entry, copy.entry('systems', entry.id)),
       ],
       packages: packages,
+      writingSources: writingSources,
+      writing: writing,
     ).._validate();
     return localizedDocument;
   }
@@ -185,6 +213,16 @@ final class PortfolioDocument {
         'An event-order lab may only belong to the featured contribution.',
       );
     }
+    if (writing.length > 12) {
+      throw const FormatException('At most 12 writing entries may be listed.');
+    }
+    if (writing.any(
+      (entry) => !writingSources.any((source) => source.id == entry.source),
+    )) {
+      throw const FormatException(
+        'Every writing entry must reference a declared writing source.',
+      );
+    }
     _assertUnique('source', sources.map((entry) => entry.id));
     _assertUnique(
       'engineering link',
@@ -196,6 +234,7 @@ final class PortfolioDocument {
     _assertUnique('contribution', contributions.map((entry) => entry.id));
     _assertUnique('system', systems.map((entry) => entry.id));
     _assertUnique('package', packages.map((entry) => entry.id));
+    _assertUnique('writing source', writingSources.map((entry) => entry.id));
     _assertUnique(
       'work artifact asset',
       systems.expand(
@@ -1101,6 +1140,73 @@ final class PackageRoadmapItem {
 
   final String title;
   final String status;
+}
+
+enum PortfolioWritingSourceKind {
+  rss('rss'),
+  devto('devto');
+
+  const PortfolioWritingSourceKind(this.wireValue);
+  final String wireValue;
+
+  static PortfolioWritingSourceKind parse(String value) => values.firstWhere(
+    (entry) => entry.wireValue == value,
+    orElse: () =>
+        throw FormatException('Unsupported writing source kind: $value'),
+  );
+}
+
+/// A feed the owner's writing is fetched from: an RSS/Atom blog feed or the
+/// dev.to articles API. Factual, not localized.
+final class PortfolioWritingSource {
+  const PortfolioWritingSource({
+    required this.id,
+    required this.label,
+    required this.kind,
+    required this.url,
+    required this.profileUrl,
+  });
+
+  factory PortfolioWritingSource.fromJson(Map<String, dynamic> json) =>
+      PortfolioWritingSource(
+        id: _requiredString(json, 'id'),
+        label: _requiredString(json, 'label'),
+        kind: PortfolioWritingSourceKind.parse(_requiredString(json, 'kind')),
+        url: _requiredUri(json, 'url'),
+        profileUrl: _requiredUri(json, 'profile_url'),
+      );
+
+  final String id;
+  final String label;
+  final PortfolioWritingSourceKind kind;
+  final Uri url;
+  final Uri profileUrl;
+}
+
+/// One published article, aggregated from a [PortfolioWritingSource].
+/// Factual, not localized.
+final class PortfolioWritingEntry {
+  const PortfolioWritingEntry({
+    required this.title,
+    required this.url,
+    required this.source,
+    required this.date,
+  });
+
+  factory PortfolioWritingEntry.fromJson(Map<String, dynamic> json) =>
+      PortfolioWritingEntry(
+        title: _requiredString(json, 'title'),
+        url: _requiredUri(json, 'url'),
+        source: _requiredString(json, 'source'),
+        date: DateTime.parse(_requiredString(json, 'date')),
+      );
+
+  final String title;
+  final Uri url;
+
+  /// A [PortfolioWritingSource.id] this entry was fetched from.
+  final String source;
+  final DateTime date;
 }
 
 final class _PortfolioLocalization {
