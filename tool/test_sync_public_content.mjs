@@ -30,7 +30,9 @@ assert.equal(
   1,
   'llms.txt must contain exactly one Packages section',
 );
-const packageSection = first.split('## Packages\n')[1] ?? '';
+// Bounded to the next heading: a later section (e.g. Writing) must not be
+// counted as part of the Packages list just because it comes after it.
+const packageSection = (first.split('## Packages\n')[1] ?? '').split(/\n## /)[0];
 assert.equal(
   packageSection.trim().split('\n').filter((line) => line.startsWith('- [')).length,
   sourcePortfolio.packages.length,
@@ -106,6 +108,39 @@ assert.ok(
 assert.ok(
   !systemsOutput.includes('Featured Without URL'),
   'a featured system without a public URL must not be published',
+);
+
+// Every writing entry must be reachable, and the section is omitted
+// entirely when there is nothing to publish.
+for (const entry of sourcePortfolio.writing ?? []) {
+  assert.ok(
+    first.includes(`[${entry.title}](${entry.url})`),
+    `llms.txt is missing the writing link for ${entry.title}`,
+  );
+}
+const noWritingFixture = { ...sourcePortfolio, writing: [] };
+assert.ok(
+  !renderLlmsTxt(noWritingFixture).includes('## Writing'),
+  'an empty writing list must omit the Writing section entirely',
+);
+const writingFixture = {
+  ...sourcePortfolio,
+  writing: [
+    {
+      title: 'A published piece',
+      url: 'https://example.invalid/writing/a-published-piece',
+      source: 'blog',
+      date: '2026-01-01',
+    },
+  ],
+};
+const writingOutput = renderLlmsTxt(writingFixture);
+assert.ok(writingOutput.includes('## Writing'));
+assert.ok(
+  writingOutput.includes(
+    '[A published piece](https://example.invalid/writing/a-published-piece)',
+  ),
+  'a populated writing list must publish its entries as markdown links',
 );
 
 // The document opens with the llms.txt convention: an H1 with the person's
