@@ -553,6 +553,7 @@ async function createRepositoryTransaction() {
     'web/manifest.json',
     'web/robots.txt',
     'web/sitemap.xml',
+    'web/llms.txt',
     'assets/content/portfolio.json',
     'assets/content/locales',
     'assets/work',

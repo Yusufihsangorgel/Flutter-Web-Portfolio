@@ -5,6 +5,8 @@ import path from 'node:path';
 import process from 'node:process';
 import { fileURLToPath } from 'node:url';
 
+import { renderLlmsTxt } from './render_llms_txt.mjs';
+
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const checkOnly = process.argv.includes('--check');
 const sourcePath = path.join(root, 'assets', 'content', 'portfolio.json');
@@ -78,6 +80,10 @@ const operations = [
     path.join(root, 'web', 'sitemap.xml'),
     renderSitemap(document),
   ),
+  () => syncWholeFile(
+    path.join(root, 'web', 'llms.txt'),
+    renderLlmsTxt(document),
+  ),
   () => syncDelimitedFile(
     path.join(root, 'nginx', 'default.conf'),
     '  # portfolio-csp:start',
@@ -144,7 +150,12 @@ async function syncDelimitedFile(file, start, end, body) {
 }
 
 async function syncWholeFile(file, body) {
-  const current = await readFile(file, 'utf8');
+  // A whole-file target may not exist yet the first time a renderer for it
+  // is added; treat that as empty content rather than failing the sync.
+  const current = await readFile(file, 'utf8').catch((error) => {
+    if (error.code === 'ENOENT') return '';
+    throw error;
+  });
   const next = `${body.trimEnd()}\n`;
   if (next === current) return { file, changed: false };
   if (!checkOnly) await writeFile(file, next);
