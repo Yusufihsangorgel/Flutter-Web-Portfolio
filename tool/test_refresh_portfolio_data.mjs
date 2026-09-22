@@ -124,16 +124,16 @@ test('the authored description is never replaced by the pubspec description', ()
   assert.equal(outcome.changedFields.includes('description'), false);
 });
 
-test('a topics-only change refreshes the field but is not a visible change', () => {
+test('pubspec topics are never copied into the record', () => {
   const pkg = samplePackage({ topics: [] });
   const facts = extractPackageFacts(
-    { latest: { version: pkg.version, pubspec: { topics: ['redis', 'queue'] } } },
+    { latest: { version: pkg.version, pubspec: { topics: ['llm', 'queue'] } } },
     { grantedPoints: pkg.pub_points, maxPoints: 160, likeCount: pkg.likes, downloadCount30Days: pkg.downloads },
   );
   const outcome = applyPackageFacts(pkg, facts);
-  assert.deepEqual(pkg.topics, ['redis', 'queue']);
+  assert.deepEqual(pkg.topics, []);
   assert.equal(outcome.visibleChanged, false);
-  assert.equal(outcome.counterChanged, true);
+  assert.equal(outcome.counterChanged, false);
 });
 
 test('counters-only change produces no write by default, and writes with --counters', () => {

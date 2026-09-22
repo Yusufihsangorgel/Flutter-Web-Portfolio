@@ -7,11 +7,12 @@ does not depend on someone remembering to update it by hand.
 ## What refreshes automatically
 
 - **Packages**, from the pub.dev API, for every entry already listed under
-  `packages[]`: `version`, `pub_points`, `topics`, `likes`, and `downloads`.
-  `topics`/`likes`/`downloads` are stored but not rendered by the site today;
-  they refresh anyway so the record stays accurate if that changes. A
-  package's `description` is authored site copy and is never overwritten from
-  its pubspec.
+  `packages[]`: `version`, `pub_points`, `likes`, and `downloads`.
+  `likes`/`downloads` are stored but not rendered by the site today; they
+  refresh anyway so the record stays accurate if that changes. A package's
+  `description` is authored site copy and is never overwritten from its
+  pubspec. `topics` is not refreshed: the site does not render it, and pub.dev
+  topics can name model vendors, which `audit:history` rejects in source.
 - **Contributions**, from the GitHub API, only for entries whose `status` is
   `under_review`: when a pull request has merged, `status` becomes `merged`
   and `date` becomes the merge date. A pull request closed without merging is
@@ -20,7 +21,7 @@ does not depend on someone remembering to update it by hand.
 Both are diffed against the current file. A change to `version` or
 `pub_points` (packages) or to `status`/`date` (contributions) is **visible** —
 it changes what a reader sees — and is what triggers a write and a
-`content_version` bump. A change to `topics`/`likes`/`downloads` alone is a
+`content_version` bump. A change to `likes`/`downloads` alone is a
 **counter** and is not written by default, so the scheduled job does not
 produce a commit that changes nothing a visitor can see. `verified_at` is
 never changed: the site publishes it as the date every listed source was

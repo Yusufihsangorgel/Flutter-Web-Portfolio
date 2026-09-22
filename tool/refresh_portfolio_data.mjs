@@ -87,10 +87,6 @@ export function extractPackageFacts(packageResponse, scoreResponse) {
   if (!latest || typeof latest.version !== 'string' || latest.version.length === 0) {
     throw new Error('pub.dev package response is missing latest.version');
   }
-  const pubspec = latest.pubspec && typeof latest.pubspec === 'object' ? latest.pubspec : {};
-  const topics = Array.isArray(pubspec.topics)
-    ? pubspec.topics.filter((topic) => typeof topic === 'string')
-    : [];
   if (!scoreResponse || typeof scoreResponse !== 'object') {
     throw new Error('pub.dev score response is not an object');
   }
@@ -101,7 +97,6 @@ export function extractPackageFacts(packageResponse, scoreResponse) {
   }
   return {
     version: latest.version,
-    topics,
     // Counters are not rendered, so a missing one keeps the stored value
     // instead of blocking the whole refresh.
     likes: typeof scoreResponse.likeCount === 'number' ? scoreResponse.likeCount : null,
@@ -114,16 +109,7 @@ export function extractPackageFacts(packageResponse, scoreResponse) {
   };
 }
 
-function sameStringArray(a, b) {
-  return (
-    Array.isArray(a) &&
-    Array.isArray(b) &&
-    a.length === b.length &&
-    a.every((value, index) => value === b[index])
-  );
-}
-
-export const COUNTER_FIELDS = new Set(['topics', 'likes', 'downloads']);
+export const COUNTER_FIELDS = new Set(['likes', 'downloads']);
 
 /**
  * Mutates `pkg` in place — never rebuilds the object from a field list — so
@@ -131,8 +117,9 @@ export const COUNTER_FIELDS = new Set(['topics', 'likes', 'downloads']);
  * order emitted by JSON.stringify is exactly the order the file already had.
  *
  * `description` is authored site copy that intentionally differs from the
- * pubspec description, so it is never overwritten. `topics` is stored but not
- * rendered, so it refreshes as a counter.
+ * pubspec description, so it is never overwritten. `topics` is not refreshed:
+ * the site does not render it, and pub.dev topics name model vendors that
+ * `audit:history` rejects in source.
  */
 export function applyPackageFacts(pkg, facts) {
   const changedFields = [];
@@ -143,11 +130,6 @@ export function applyPackageFacts(pkg, facts) {
     pkg.version = facts.version;
     visibleChanged = true;
     changedFields.push('version');
-  }
-  if (!sameStringArray(facts.topics, pkg.topics)) {
-    pkg.topics = facts.topics;
-    counterChanged = true;
-    changedFields.push('topics');
   }
 
   let pendingScore = false;
