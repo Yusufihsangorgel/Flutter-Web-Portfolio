@@ -134,7 +134,7 @@ try {
       "PLAYWRIGHT",
     ],
     footer: "developeryusuf.com · production architecture",
-    footerLeft: "FLUTTER 3.44.6 · DART WASM",
+    footerLeft: "FLUTTER 3.47.5 · DART WASM",
     footerRight: "7 LOCALES · PLAYWRIGHT",
     palette: { paper: "#f2eee5", ink: "#12110f", accent: "#1e51ff" },
   });

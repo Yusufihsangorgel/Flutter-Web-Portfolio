@@ -6,6 +6,23 @@ Versions 1.2 through 1.9 below are explicitly recorded as pre-2.0 development
 snapshots; they were not published Git tags. The public `v1.1.0` tag from April
 2026 is documented separately from the later dual-runtime development work.
 
+## [Unreleased]
+
+### Added
+
+- A weekly workflow that refreshes package versions and scores from pub.dev
+  and the status of under-review contributions from GitHub, commits only when
+  something a visitor sees changed, and reports merged public pull requests
+  that are not yet in the record. See `docs/AUTOMATION.md`.
+- A real `llms.txt`, generated from the portfolio record next to `robots.txt`
+  and `sitemap.xml` and checked by `verify:content`.
+
+### Changed
+
+- Upgraded the application, CI, and deployment toolchain to Flutter 3.47.5
+  and Dart 3.13.4. `flutter pub get` now excludes `build/` and `web/` from
+  analysis on its own; the committed `analysis_options.yaml` carries that.
+
 ## [2.0.1] - 2026-07-18
 
 ### Fixed

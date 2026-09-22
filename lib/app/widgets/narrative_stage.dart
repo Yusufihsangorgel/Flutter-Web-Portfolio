@@ -240,12 +240,13 @@ final class _NarrativeStagePainter extends CustomPainter {
             _trackPaint,
           );
       case NarrativeMotif.thread:
-        canvas.drawLine(
-          center - const Offset(12, 0),
-          center + const Offset(12, 0),
-          _trackPaint,
-        );
-        canvas.drawCircle(center, 3.6, _trackPaint);
+        canvas
+          ..drawLine(
+            center - const Offset(12, 0),
+            center + const Offset(12, 0),
+            _trackPaint,
+          )
+          ..drawCircle(center, 3.6, _trackPaint);
     }
   }
 

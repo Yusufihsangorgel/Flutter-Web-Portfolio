@@ -8,7 +8,7 @@
   <!-- portfolio-ci:start -->
   <a href="https://github.com/Yusufihsangorgel/Flutter-Web-Portfolio/actions/workflows/ci.yml"><img alt="CI status" src="https://github.com/Yusufihsangorgel/Flutter-Web-Portfolio/actions/workflows/ci.yml/badge.svg?branch=main"></a>
 <!-- portfolio-ci:end -->
-  <a href="https://flutter.dev"><img alt="Flutter 3.44.6" src="https://img.shields.io/badge/Flutter-3.44.6-1E51FF?style=flat-square&amp;logo=flutter&amp;logoColor=white"></a>
+  <a href="https://flutter.dev"><img alt="Flutter 3.47.5" src="https://img.shields.io/badge/Flutter-3.47.5-1E51FF?style=flat-square&amp;logo=flutter&amp;logoColor=white"></a>
   <a href="LICENSE"><img alt="MIT license" src="https://img.shields.io/badge/license-MIT-12110F?style=flat-square"></a>
   <img alt="Dart Wasm and JavaScript fallback" src="https://img.shields.io/badge/runtime-Wasm%20%2B%20JS-DFFF3F?style=flat-square&amp;logoColor=12110F">
 </p>
@@ -31,7 +31,7 @@
 
 ## Your portfolio, from a clean template
 
-Prerequisites: Git, Node.js 24.18.0, and Flutter 3.44.6. The exact framework
+Prerequisites: Git, Node.js 24.18.0, and Flutter 3.47.5. The exact framework
 and engine revisions live in `tool/toolchain.json` and are verified before a
 release build.
 The checked-in `.nvmrc` gives Node version managers the same local version;

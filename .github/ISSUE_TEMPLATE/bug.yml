@@ -44,7 +44,7 @@ body:
     attributes:
       label: Environment
       description: Flutter version, browser, operating system, viewport, and host.
-      placeholder: Flutter 3.44.6; Chrome 142; macOS; 1440×900; local Nginx
+      placeholder: Flutter 3.47.5; Chrome 147; macOS; 1440×900; local Nginx
     validations:
       required: true
   - type: textarea
