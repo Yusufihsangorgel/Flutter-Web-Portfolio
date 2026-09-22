@@ -144,11 +144,15 @@ jobs:
           git commit -m 'Refresh the portfolio record from pub.dev and GitHub'
           git push origin HEAD:main
 
-      # A push made with the workflow token starts no other workflow, so CI and
-      # the GitHub Pages deploy that follows it would never see this commit.
-      # A workflow_dispatch event is the exception, so start CI explicitly.
-      - name: Start CI for the refreshed commit
+      # A push made with the workflow token starts no other workflow, and a run
+      # started with that token raises no workflow_run event when it ends, so
+      # the Pages deploy would never follow CI here. workflow_dispatch is the
+      # exception: start CI for the record, and the deploy directly, since this
+      # job already ran every check CI runs.
+      - name: Start CI and the Pages deploy for the refreshed commit
         if: steps.content-diff.outputs.changed == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh workflow run ci.yml --ref main
+        run: |
+          gh workflow run ci.yml --ref main
+          gh workflow run deploy.yml --ref main

@@ -61,9 +61,10 @@ derived files (`npm run sync:content`) and the tracked release
 (`npm run build:release`), run the clone and browser tests against that
 release, and commit everything as `github-actions[bot]`.
 
-A push made with the workflow's own token starts no other workflow, so the job
-then starts CI with a `workflow_dispatch` event; the GitHub Pages deploy
-follows CI as it does for any push. A host that deploys on its own from every
+A push made with the workflow's own token starts no other workflow, and a run
+started with that token raises no `workflow_run` event when it finishes, so the
+job starts both CI and the GitHub Pages deploy itself with `workflow_dispatch`
+events. A host that deploys on its own from every
 push to `main` (a webhook-driven platform, for example) picks up the commit
 directly. If `main` moves while the job runs, the push is rejected and the run
 fails; start a new run rather than re-running the failed one, which would
