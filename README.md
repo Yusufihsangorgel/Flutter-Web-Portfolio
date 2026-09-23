@@ -301,7 +301,7 @@ The live demo uses the same template with a real professional record. This block
 
 Since 2021, I have built and maintained software for mobile devices, tablets, desktop operating systems, and the web. My work includes ERP and point-of-sale products, logistics workflows, digital publishing, backend services, and the release systems around them.
 
-Source status: `2026.09.22.2`, verified 2026-08-29 against GitHub, LinkedIn, FugaSoft, Dorse, and Medium.
+Source status: `2026.09.23.1`, verified 2026-08-29 against GitHub, LinkedIn, FugaSoft, Dorse, and Medium.
 
 ### Accepted upstream changes
 
