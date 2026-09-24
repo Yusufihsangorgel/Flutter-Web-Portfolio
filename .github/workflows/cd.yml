@@ -1,0 +1,44 @@
+name: CD
+
+# Deploy the tracked release (build/web on the repository's nginx image) to the self-hosted production
+# service after CI passed on main. The deploy script belongs to the runner machine, not to this repository.
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      force:
+        description: Deploy even if the release is unchanged since the running revision
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: cd-production
+  cancel-in-progress: false
+
+jobs:
+  cluster:
+    if: >-
+      (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main') ||
+      (github.event.workflow_run.conclusion == 'success' &&
+        github.event.workflow_run.event == 'push' &&
+        github.event.workflow_run.head_repository.full_name == github.repository)
+    runs-on: [self-hosted, macOS, heavy]
+    timeout-minutes: 30
+    environment: production
+    env:
+      REVISION: ${{ github.event.workflow_run.head_sha || github.sha }}
+      FORCE: ${{ inputs.force || false }}
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          ref: ${{ env.REVISION }}
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Build, ship, pin, smoke
+        run: bash "$HOME/actions-runner/_cd/deploy-portfolio.sh"

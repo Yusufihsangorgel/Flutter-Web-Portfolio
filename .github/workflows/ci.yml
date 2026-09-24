@@ -12,8 +12,11 @@ on:
   workflow_dispatch:
 
 jobs:
+  # Jobs run on a self-hosted runner. This repository is public: a fork pull request never reaches it
+  # (job guard below, plus approval required for every outside contributor).
   analyze:
-    runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: [self-hosted, macOS, heavy]
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
@@ -66,7 +69,8 @@ jobs:
       - run: npm run verify:source
 
   test:
-    runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: [self-hosted, macOS, heavy]
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
@@ -83,7 +87,7 @@ jobs:
       - run: flutter test
 
   build:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, macOS, heavy]
     timeout-minutes: 30
     needs: [analyze, test]
     steps:
