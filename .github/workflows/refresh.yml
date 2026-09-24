@@ -13,7 +13,7 @@ concurrency:
 
 jobs:
   refresh:
-    runs-on: [self-hosted, macOS, heavy]
+    runs-on: ubuntu-latest
     timeout-minutes: 45
     permissions:
       contents: write
