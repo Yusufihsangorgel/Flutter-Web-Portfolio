@@ -1,0 +1,45 @@
+name: Architecture gate
+
+# Import-layer rules of docs/ARCHITECTURE-RULES.md, checked by quality/check_architecture.py.
+# Public repository: runs on a GitHub-hosted runner, like ci.yml.
+on:
+  pull_request:
+    paths:
+      - "lib/**"
+      - "quality/**"
+      - "docs/ARCHITECTURE-RULES.md"
+      - ".github/workflows/architecture.yml"
+  push:
+    branches: [main]
+    paths:
+      - "lib/**"
+      - "quality/**"
+      - "docs/ARCHITECTURE-RULES.md"
+      - ".github/workflows/architecture.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: architecture-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  architecture:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+
+      # Blocking: a broken pattern or parser must not pass as a clean tree.
+      - name: Architecture gate calibration
+        run: python3 -m unittest discover -s quality/tests -p 'test_architecture.py'
+
+      # Warning mode while the 5 known violations in
+      # quality/architecture-baseline.json are paid down. A NEW or STALE line
+      # is still a review rejection (docs/ARCHITECTURE-RULES.md §7).
+      - name: Architecture import rules (warning mode)
+        run: python3 quality/check_architecture.py --warn-only
