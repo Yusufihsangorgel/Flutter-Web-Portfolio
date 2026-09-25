@@ -1,0 +1,270 @@
+{
+  "version": 1,
+  "doc": "docs/ARCHITECTURE-RULES.md",
+  "baseline": "quality/architecture-baseline.json",
+  "sources": [
+    {
+      "dir": "lib",
+      "lang": "dart",
+      "dart_package": "flutter_web_portfolio"
+    }
+  ],
+  "exclude": [
+    "**/*.g.dart",
+    "**/*.freezed.dart",
+    "**/*.gr.dart",
+    "**/*.mocks.dart",
+    "**/generated/**",
+    "**/app_localizations*.dart",
+    "**/gen_l10n/**"
+  ],
+  "layers": {
+    "features": [
+      "lib/app/features/**"
+    ],
+    "ui": [
+      "lib/app/modules/**",
+      "lib/app/widgets/**"
+    ],
+    "non-ui": [
+      "lib/app/features/*/providers/**",
+      "lib/app/features/*/provider/**",
+      "lib/app/features/*/state/**",
+      "lib/app/features/*/services/**",
+      "lib/app/features/*/service/**",
+      "lib/app/features/*/domain/**",
+      "lib/app/features/*/data/**",
+      "lib/app/features/*/infrastructure/**",
+      "lib/app/features/*/application/**",
+      "lib/app/features/*/models/**",
+      "lib/app/features/*/model/**",
+      "lib/app/features/*/engine/**",
+      "lib/app/features/*/repositories/**",
+      "lib/app/features/*/controllers/**",
+      "lib/app/features/*/*/providers/**",
+      "lib/app/features/*/*/provider/**",
+      "lib/app/features/*/*/state/**",
+      "lib/app/features/*/*/services/**",
+      "lib/app/features/*/*/service/**",
+      "lib/app/features/*/*/domain/**",
+      "lib/app/features/*/*/data/**",
+      "lib/app/features/*/*/infrastructure/**",
+      "lib/app/features/*/*/application/**",
+      "lib/app/features/*/*/models/**",
+      "lib/app/features/*/*/model/**",
+      "lib/app/features/*/*/engine/**",
+      "lib/app/features/*/*/repositories/**",
+      "lib/app/features/*/*/controllers/**",
+      "lib/app/features/*/*_provider.dart",
+      "lib/app/features/*/*_providers.dart",
+      "lib/app/features/*/*_controller.dart",
+      "lib/app/features/*/*_service.dart"
+    ],
+    "repositories": [
+      "lib/app/data/**"
+    ],
+    "domain": [
+      "lib/app/domain/models/**",
+      "lib/app/features/*/domain/**",
+      "lib/app/narrative/domain/**"
+    ]
+  },
+  "rules": [
+    {
+      "id": "F-ISOLATION",
+      "kind": "isolate",
+      "pattern": "lib/app/features/{feature}/**",
+      "to_except": [],
+      "why": "features do not import each other; a shared part moves to a shared layer"
+    },
+    {
+      "id": "F-UI-NO-IO",
+      "kind": "external-deny",
+      "from": [
+        "@ui"
+      ],
+      "from_except": [
+        "@non-ui"
+      ],
+      "packages": [
+        "package:http/",
+        "package:dio/",
+        "package:drift/",
+        "package:sqflite",
+        "package:hive",
+        "package:shared_preferences/",
+        "package:purchases_flutter/",
+        "package:supabase",
+        "package:firebase",
+        "package:cloud_firestore/"
+      ],
+      "why": "pages and widgets do not use HTTP, database, storage or purchase SDKs directly; they go through a provider or service"
+    },
+    {
+      "id": "F-UI-NO-REPO",
+      "kind": "forbid",
+      "from": [
+        "@ui"
+      ],
+      "from_except": [
+        "@non-ui"
+      ],
+      "to": [
+        "@repositories"
+      ],
+      "to_except": [
+        "**/*provider*.dart"
+      ],
+      "why": "pages and widgets do not call a repository or data source directly; they read and write through a provider"
+    },
+    {
+      "id": "P-DATA-DOWN",
+      "kind": "forbid",
+      "from": [
+        "lib/app/data/**"
+      ],
+      "to": [
+        "lib/app/modules/**",
+        "lib/app/widgets/**",
+        "lib/app/controllers/**",
+        "lib/app/features/**",
+        "lib/app/narrative/**"
+      ],
+      "why": "the data layer depends on the domain only; it does not know pages, widgets, controllers or features"
+    },
+    {
+      "id": "P-WIDGETS-NO-MODULES",
+      "kind": "forbid",
+      "from": [
+        "lib/app/widgets/**"
+      ],
+      "to": [
+        "lib/app/modules/**"
+      ],
+      "why": "shared widgets do not know page modules or sections"
+    },
+    {
+      "id": "F-DOMAIN-PURE",
+      "kind": "external-allow-only",
+      "from": [
+        "@domain"
+      ],
+      "packages": [
+        "dart:core",
+        "dart:async",
+        "dart:collection",
+        "dart:convert",
+        "dart:math",
+        "dart:typed_data",
+        "package:meta/",
+        "package:freezed_annotation/"
+      ],
+      "why": "the domain is plain Dart: no Flutter, HTTP, database or other package imports (use package:meta for annotations)"
+    },
+    {
+      "id": "F-DOMAIN-INWARD",
+      "kind": "forbid",
+      "from": [
+        "@domain"
+      ],
+      "to": [
+        "lib/app/data/**",
+        "lib/app/modules/**",
+        "lib/app/widgets/**",
+        "lib/app/controllers/**",
+        "lib/app/features/*/application/**",
+        "lib/app/narrative/application/**",
+        "lib/app/narrative/rendering/**"
+      ],
+      "why": "the domain does not know outer layers (data, presentation, providers); dependencies point inwards"
+    },
+    {
+      "id": "F-FORBIDDEN-SDK",
+      "kind": "external-deny",
+      "from": [
+        "lib/**"
+      ],
+      "packages": [
+        "package:firebase",
+        "package:cloud_firestore/",
+        "package:sentry",
+        "package:supabase",
+        "package:clerk"
+      ],
+      "why": "no Firebase/Firestore/Crashlytics, Sentry, Supabase or Clerk SDKs"
+    }
+  ],
+  "calibration": [
+    {
+      "file": "lib/app/features/alpha/calibration_probe.dart",
+      "source": "import 'package:flutter_web_portfolio/app/features/beta/calibration_probe.dart';\n",
+      "expect": [
+        "F-ISOLATION"
+      ]
+    },
+    {
+      "file": "lib/app/modules/calibration_probe.dart",
+      "source": "import 'package:http/probe.dart';\n",
+      "expect": [
+        "F-UI-NO-IO"
+      ]
+    },
+    {
+      "file": "lib/app/modules/calibration_probe.dart",
+      "source": "import 'package:flutter_web_portfolio/app/data/calibration_probe.dart';\n",
+      "expect": [
+        "F-UI-NO-REPO"
+      ]
+    },
+    {
+      "file": "lib/app/data/calibration_probe.dart",
+      "source": "import 'package:flutter_web_portfolio/app/modules/calibration_probe.dart';\n",
+      "expect": [
+        "P-DATA-DOWN"
+      ]
+    },
+    {
+      "file": "lib/app/widgets/calibration_probe.dart",
+      "source": "import 'package:flutter_web_portfolio/app/modules/calibration_probe.dart';\n",
+      "expect": [
+        "P-WIDGETS-NO-MODULES"
+      ]
+    },
+    {
+      "file": "lib/app/domain/models/calibration_probe.dart",
+      "source": "import 'package:flutter/material.dart';\n",
+      "expect": [
+        "F-DOMAIN-PURE"
+      ]
+    },
+    {
+      "file": "lib/app/domain/models/calibration_probe.dart",
+      "source": "import 'package:flutter_web_portfolio/app/data/calibration_probe.dart';\n",
+      "expect": [
+        "F-DOMAIN-INWARD"
+      ]
+    },
+    {
+      "file": "lib/calibration_probe.dart",
+      "source": "import 'package:firebase/probe.dart';\n",
+      "expect": [
+        "F-FORBIDDEN-SDK"
+      ]
+    },
+    {
+      "file": "lib/app/features/alpha/calibration_probe.g.dart",
+      "source": "import 'package:http/http.dart';\n",
+      "expect": []
+    },
+    {
+      "file": "lib/app/features/alpha/calibration_probe.dart",
+      "source": "import 'package:flutter_web_portfolio/app/features/alpha/calibration_sibling.dart';\n",
+      "expect": []
+    },
+    {
+      "file": "lib/app/features/alpha/providers/calibration_probe.dart",
+      "source": "import 'package:drift/drift.dart';\n",
+      "expect": []
+    }
+  ]
+}
