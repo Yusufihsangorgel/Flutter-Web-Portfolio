@@ -9,6 +9,7 @@ import {
 } from './safe_public_asset_path.mjs';
 import { assertRasterDimensions, inspectRaster } from './raster_inspector.mjs';
 import { collectFiles } from './release/bundle_helpers.mjs';
+import { verifyStatic404Release } from './release/verify_static_404.mjs';
 import { verifyReleaseDocument } from './release/verify_document.mjs';
 
 const webRoot = path.resolve(process.env.WEB_ROOT ?? 'build/web');
@@ -110,13 +111,11 @@ for (const sidecar of ['_headers', '_redirects']) {
     ) {
       failures.push('the release _headers file is missing isolation or CSP policy');
     }
-    if (sidecar === '_redirects' && !release.includes('/*  /index.html  200')) {
-      failures.push('the release _redirects file is missing the SPA fallback');
-    }
   } catch {
     failures.push(`${sidecar} is missing from the release; run npm run prepare:bundle`);
   }
 }
+failures.push(...await verifyStatic404Release({ sourceRoot: path.resolve(), webRoot }));
 const symbolFiles = releaseFiles.filter((file) => file.endsWith('.symbols'));
 if (symbolFiles.length > 0) {
   failures.push(
