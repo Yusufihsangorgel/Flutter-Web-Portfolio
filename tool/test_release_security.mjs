@@ -286,7 +286,10 @@ for (const pattern of [".env.*", "*.key", "*.pem", ".vercel/"]) {
 for (const pattern of [".env.*", "*.key", "*.pem", ".vercel"]) {
   assert.ok(dockerignore.includes(pattern), `.dockerignore must cover ${pattern}`);
 }
-assert.match(gitignore, /!\/build\/web\/\*\*/);
+assert.match(gitignore, /^\/build\/\*$/m);
+assert.doesNotMatch(gitignore, /^!\/build\/web\//m);
+assert.match(dockerignore, /^!build\/web$/m);
+assert.match(dockerignore, /^!build\/web\/\*\*$/m);
 
 const pubspec = await readFile("pubspec.yaml", "utf8");
 const fontSection = pubspec.split("\n  fonts:\n")[1];

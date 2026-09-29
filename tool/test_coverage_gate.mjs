@@ -8,7 +8,7 @@ import test from 'node:test';
 
 const toolRoot = path.dirname(fileURLToPath(import.meta.url));
 const gate = path.join(toolRoot, 'coverage_gate.mjs');
-const fixtures = path.join(toolRoot, 'fixtures', 'coverage');
+const fixtures = path.join(toolRoot, 'fixtures', 'lcov');
 
 async function withThresholds(values, check) {
   const directory = await mkdtemp(path.join(os.tmpdir(), 'coverage-gate-'));

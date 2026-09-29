@@ -124,7 +124,7 @@ jobs:
           git switch -c "${branch}"
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git commit -m 'Refresh the portfolio record from pub.dev and GitHub'
+          git commit -m 'chore(data): refresh portfolio record from pub.dev and GitHub'
           git push origin "${branch}"
           {
             echo "name=${branch}"

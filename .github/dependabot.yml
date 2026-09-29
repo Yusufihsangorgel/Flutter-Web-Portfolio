@@ -7,7 +7,7 @@ updates:
       day: monday
     open-pull-requests-limit: 5
     groups:
-      github-actions-minor-patch:
+      actions:
         update-types:
           - minor
           - patch
@@ -20,7 +20,7 @@ updates:
       day: monday
     open-pull-requests-limit: 5
     groups:
-      npm-minor-patch:
+      npm:
         update-types:
           - minor
           - patch
@@ -33,7 +33,7 @@ updates:
       day: monday
     open-pull-requests-limit: 5
     groups:
-      pub-minor-patch:
+      pub:
         update-types:
           - minor
           - patch
@@ -46,7 +46,7 @@ updates:
       day: monday
     open-pull-requests-limit: 5
     groups:
-      pub-minor-patch:
+      pub-package:
         update-types:
           - minor
           - patch
