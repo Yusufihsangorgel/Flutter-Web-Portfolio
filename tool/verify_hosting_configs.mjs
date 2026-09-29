@@ -4,6 +4,7 @@ import process from "node:process";
 import { fileURLToPath } from "node:url";
 
 import { resolvePagesBaseHref } from "./resolve_pages_base_href.mjs";
+import { validateHostingSecurity } from "./public-content/hosting_security.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const read = (relativePath) => readFile(path.join(root, relativePath), "utf8");
@@ -26,18 +27,13 @@ const dockerignore = await read(".dockerignore");
 const nodeVersion = (await read(".nvmrc")).trim();
 const packageDocument = JSON.parse(await read("package.json"));
 const toolchain = JSON.parse(await read("tool/toolchain.json"));
+const content = JSON.parse(await read("assets/content/portfolio.json"));
 
 expect(
   firebase.hosting?.public === "build/web",
   "Firebase publishes build/web",
 );
-expect(
-  firebase.hosting?.rewrites?.some(
-    (rewrite) =>
-      rewrite.source === "**" && rewrite.destination === "/index.html",
-  ),
-  "Firebase preserves document routes",
-);
+expect(!firebase.hosting?.ignore?.includes('**/.*'), 'Firebase retains the .well-known directory');
 expect(
   vercel.buildCommand === "bash tool/hosted_build.sh" &&
     vercel.outputDirectory === "build/web",
@@ -48,10 +44,15 @@ expect(
     netlify.includes('publish = "build/web"'),
   "Netlify uses the pinned hosted build",
 );
-expect(
-  redirects.includes("/*  /index.html  200"),
-  "static providers preserve document routes",
-);
+for (const error of validateHostingSecurity(
+  { nginx, staticHeaders: headers, firebase, vercel, netlify, redirects },
+  content,
+)) failures.push(error);
+expect(nginx.includes('gzip_static on;'), 'Nginx serves compressed asset siblings');
+expect(nginx.includes('try_files $uri $uri/ =404;') && nginx.includes('error_page 404 /404.html;'), 'Nginx returns the static 404 page');
+expect(nginx.includes('location = /.well-known/security.txt') && nginx.includes('default_type text/plain;'), 'Nginx serves security.txt as text/plain');
+expect(headers.includes('/.well-known/security.txt\n  Content-Type: text/plain'), 'static hosts serve security.txt as text/plain');
+expect(JSON.stringify(firebase.hosting?.headers).includes('text/plain; charset=utf-8') && JSON.stringify(vercel.headers).includes('text/plain; charset=utf-8'), 'JSON providers serve security.txt as text/plain');
 expect(
   pagesWorkflow.includes("tool/resolve_pages_base_href.mjs") &&
     pagesWorkflow.includes("npm run build:release -- --base-href"),
@@ -101,6 +102,7 @@ for (const [name, value] of [
   ["Referrer-Policy", "strict-origin-when-cross-origin"],
   ["Permissions-Policy", "camera=(), microphone=(), geolocation=()"],
   ["Content-Security-Policy", "default-src 'self'"],
+  ["Strict-Transport-Security", "max-age=31536000"],
 ]) {
   expect(
     headers.includes(`${name}: ${value}`),
@@ -233,6 +235,7 @@ for (const directive of [
   "object-src 'none'",
   "form-action 'self'",
   "frame-ancestors 'self'",
+  "upgrade-insecure-requests",
 ]) {
   expect(cspValues[0]?.includes(`${directive};`), `CSP includes ${directive}`);
 }

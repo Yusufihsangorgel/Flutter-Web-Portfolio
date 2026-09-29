@@ -5,6 +5,7 @@ const allowedGlobalHeaders = new Set([
   "cross-origin-resource-policy",
   "permissions-policy",
   "referrer-policy",
+  "strict-transport-security",
   "x-content-type-options",
   "x-frame-options",
 ]);
@@ -13,10 +14,7 @@ const maximumPolicyBytes = 64 * 1024;
 const maximumHeaderCount = 32;
 const maximumHeaderValueLength = 8 * 1024;
 
-/// Parses the global `/*` block used by Netlify and Cloudflare static hosts.
-///
-/// The preview server intentionally accepts only the response-policy headers
-/// it can apply safely. Routing and cache blocks remain owned by the server.
+// Parse the global response headers shared by static hosts.
 export function parseGlobalStaticHeaders(source) {
   if (typeof source !== "string") {
     throw new TypeError("Static header policy must be text.");

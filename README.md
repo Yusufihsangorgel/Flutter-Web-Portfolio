@@ -307,6 +307,8 @@ Source status: `2026.09.28.1`, verified 2026-08-29 against GitHub, LinkedIn, Fug
 
 | Project | Change | Merged | Evidence |
 |---|---|---:|---|
+| Flutter | Wait for web rendering before the first-frame event | 2026-08-11 | [Pull request](https://github.com/flutter/flutter/pull/189500) |
+| MCP Kotlin SDK | Add SEP-2575 request metadata and discovery types | 2026-08-05 | [Pull request](https://github.com/modelcontextprotocol/kotlin-sdk/pull/893) |
 | Flutter | Return null from RenderProxyBoxMixin.computeDryBaseline when the child has no baseline | 2026-07-30 | [Pull request](https://github.com/flutter/flutter/pull/189723) |
 | Flutter Packages | Ignore unrecognized SVG font-weight values | 2026-07-28 | [Pull request](https://github.com/flutter/packages/pull/12199) |
 | simdjson | Treat 20-digit positive overflows as big integers | 2026-07-28 | [Pull request](https://github.com/simdjson/simdjson/pull/2793) |
@@ -322,8 +324,6 @@ Source status: `2026.09.28.1`, verified 2026-08-29 against GitHub, LinkedIn, Fug
 | Dart MCP | Add request-scoped message dispatch for MCP servers | 2026-07-17 | [Pull request](https://github.com/dart-lang/ai/pull/528) |
 | Dart MCP | Separate server feature registration from legacy initialization | 2026-07-15 | [Pull request](https://github.com/dart-lang/ai/pull/524) |
 | FlutterFire | Make Firebase core loading deterministic on WebKit | 2026-07-15 | [Pull request](https://github.com/firebase/flutterfire/pull/18443) |
-| Flutter | Wait for web rendering before the first-frame event | 2026-08-11 | [Pull request](https://github.com/flutter/flutter/pull/189500) |
-| MCP Kotlin SDK | Add SEP-2575 request metadata and discovery types | 2026-08-05 | [Pull request](https://github.com/modelcontextprotocol/kotlin-sdk/pull/893) |
 | Flutter Form Builder | Reset unknown dropdown initial values on first build | 2026-07-14 | [Pull request](https://github.com/flutter-form-builder-ecosystem/flutter_form_builder/pull/1512) |
 | Drift | Treat SQLite TRUE and 1 defaults as the same schema | 2026-07-14 | [Pull request](https://github.com/simolus3/drift/pull/3835) |
 | Go Fiber Recipes | Add a Fiber and Asynq background-jobs recipe | 2026-07-12 | [Pull request](https://github.com/gofiber/recipes/pull/4997) |

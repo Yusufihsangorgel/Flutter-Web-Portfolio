@@ -1,4 +1,5 @@
 import { createHash } from 'node:crypto';
+import { execFileSync } from 'node:child_process';
 import {
   copyFile,
   mkdir,
@@ -12,16 +13,21 @@ import {
 } from 'node:fs/promises';
 import path from 'node:path';
 import process from 'node:process';
+import { renderStaticDocument } from './render_static_document.mjs';
+import {
+  collectFiles,
+  formatBytes,
+  normalizeNoticeWhitespace,
+  precompressAssets,
+  removeEmptyDirectories,
+  writeLegacyServiceWorkerKillSwitch,
+} from './release/bundle_helpers.mjs';
+import { renderLocaleData, renderReleaseIndex } from './release/render_release_index.mjs';
 
 const webRoot = path.resolve(process.env.WEB_ROOT ?? 'build/web');
 const files = await collectFiles(webRoot);
 const symbolFiles = files.filter((file) => file.endsWith('.symbols'));
 
-// This release can only ever request the skwasm/skwasm_heavy Wasm renderers
-// plus the chromium/full CanvasKit fallbacks. The wimp and
-// experimental_webparagraph variants are reachable solely through engine
-// configuration (`enableWimp`, `canvasKitVariant`) that neither the build
-// config nor index.html sets, so they are unreachable deployment weight.
 const unreachableRendererFiles = files.filter((file) => {
   if (file.endsWith('.symbols')) return false;
   const segments = path.relative(webRoot, file).split(path.sep);
@@ -62,13 +68,17 @@ await writeFile(bootstrapPath, versionedBootstrap);
 await versionRendererDirectory(engineRevision);
 await injectReleasePreloads(releaseId, engineRevision);
 await injectBootstrapShell();
-await writeLegacyServiceWorkerKillSwitch();
-await normalizeNoticeWhitespace();
-await copyStaticHostSidecars();
+await writeLegacyServiceWorkerKillSwitch(webRoot);
+await normalizeNoticeWhitespace(webRoot);
+for (const file of ['_headers', '_redirects']) {
+  await copyFile(path.resolve('web', file), path.join(webRoot, file));
+}
 await copyFile(
   path.resolve('tool', 'toolchain.json'),
   path.join(webRoot, 'release-toolchain.json'),
 );
+await writeReleaseMetadata();
+const compressedAssets = await precompressAssets(webRoot);
 
 console.log(
   `Removed ${symbolFiles.length} renderer symbol files (${formatBytes(removedBytes)}) from the public release.`,
@@ -79,6 +89,7 @@ console.log(
 console.log(
   `Versioned entrypoints as ${releaseId} and renderer assets as ${engineRevision}.`,
 );
+console.log(`Precompressed ${compressedAssets} text assets.`);
 
 async function createReleaseId() {
   const hash = createHash('sha256');
@@ -175,143 +186,65 @@ async function injectReleasePreloads(releaseId, engineRevision) {
 }
 
 async function injectBootstrapShell() {
-  const contentPath = path.join(
-    webRoot,
-    'assets',
-    'assets',
-    'content',
-    'portfolio.json',
-  );
-  const portfolio = JSON.parse(await readFile(contentPath, 'utf8'));
-  const contentVersion = requiredString(
-    portfolio.content_version,
-    'content_version',
-  );
-  const displayName = requiredDisplayName(portfolio.profile?.display_name);
-  const since = requiredString(portfolio.profile?.since, 'profile.since');
-  const email = requiredString(portfolio.profile?.email, 'profile.email');
-  const hasWork = Array.isArray(portfolio.systems) && portfolio.systems.length > 0;
-  const hasEmail = email.includes('@');
+  const portfolio = JSON.parse(await readFile(path.join(
+    webRoot, 'assets', 'assets', 'content', 'portfolio.json'), 'utf8'));
   const locales = portfolio.site?.locales;
-  if (
-    !Array.isArray(locales) ||
-    locales.length === 0 ||
-    new Set(locales).size !== locales.length ||
-    !locales.includes('en')
-  ) {
+  if (!Array.isArray(locales) || !locales.length ||
+    new Set(locales).size !== locales.length || !locales.includes('en')) {
     throw new Error('site.locales must contain unique locale codes including en');
   }
-
+  const context = {
+    portfolio,
+    contentVersion: requiredString(portfolio.content_version, 'content_version'),
+    displayName: requiredDisplayName(portfolio.profile?.display_name),
+    since: requiredString(portfolio.profile?.since, 'profile.since'),
+    hasWork: Boolean(portfolio.systems?.length),
+    hasEmail: requiredString(portfolio.profile?.email, 'profile.email').includes('@'),
+  };
   const shellLocales = {};
-  for (const localeValue of locales) {
-    const locale = requiredString(localeValue, 'site.locales[]');
-    if (!/^[a-z]{2}(?:-[A-Z]{2})?$/.test(locale)) {
-      throw new Error(`Unsupported bootstrap locale code: ${locale}`);
-    }
-    const localePortfolio = locale === 'en'
-      ? portfolio
-      : JSON.parse(
-          await readFile(
-            path.join(
-              webRoot,
-              'assets',
-              'assets',
-              'content',
-              'locales',
-              `${locale}.json`,
-            ),
-            'utf8',
-          ),
-        );
-    if (locale !== 'en' && localePortfolio.locale !== locale) {
-      throw new Error(`content locale ${locale} does not declare its locale code`);
-    }
-    const translations = JSON.parse(
-      await readFile(
-        path.join(webRoot, 'assets', 'assets', 'i18n', `${locale}.json`),
-        'utf8',
-      ),
-    );
-    shellLocales[locale] = {
-      direction: locale.startsWith('ar') ? 'rtl' : 'ltr',
-      fontHref: bootstrapFontHref(locale),
-      title: requiredString(localePortfolio.site?.title, `${locale}.site.title`),
-      copy: {
-        loadingPortfolio: requiredString(
-          translations.accessibility?.loading_portfolio,
-          `i18n.${locale}.accessibility.loading_portfolio`,
-        ),
-        loadFailure: requiredString(
-          translations.accessibility?.load_failure,
-          `i18n.${locale}.accessibility.load_failure`,
-        ),
-        retry: requiredString(
-          translations.accessibility?.retry,
-          `i18n.${locale}.accessibility.retry`,
-        ),
-      },
-      markup: renderBootstrapShell({
-        contentVersion,
-        displayName,
-        profile: localePortfolio.profile,
-        since,
-        translations,
-        hasWork,
-        hasEmail,
-        locale,
-      }),
-    };
+  for (const locale of locales) {
+    shellLocales[locale] = await buildShellLocale(locale, context);
   }
-
-  const localeBootstrap = `<script id="bootstrap-locale-state">
-      (function selectBootstrapLocale() {
-        'use strict';
-        var locales = ${jsonForInlineScript(shellLocales)};
-        var selected = 'en';
-        try {
-          var stored = window.localStorage.getItem('flutter.selected_language');
-          if (stored !== null) {
-            var decoded = stored;
-            try { decoded = JSON.parse(stored); } catch (_) {}
-            if (typeof decoded === 'string') selected = decoded;
-          }
-        } catch (_) {}
-        if (!Object.prototype.hasOwnProperty.call(locales, selected)) {
-          selected = 'en';
-        }
-        var shell = document.querySelector('#bootstrap-surface .bootstrap-shell');
-        var surface = document.getElementById('bootstrap-surface');
-        document.documentElement.lang = selected;
-        document.documentElement.dir = locales[selected].direction;
-        document.title = locales[selected].title;
-        window.__portfolioBootstrapLocale = locales[selected].copy;
-        if (locales[selected].fontHref) {
-          var fontPreload = document.createElement('link');
-          fontPreload.rel = 'preload';
-          fontPreload.as = 'font';
-          fontPreload.type = 'font/ttf';
-          fontPreload.crossOrigin = 'anonymous';
-          fontPreload.href = locales[selected].fontHref;
-          document.head.appendChild(fontPreload);
-        }
-        if (surface) {
-          surface.setAttribute('aria-label', locales[selected].copy.loadingPortfolio);
-        }
-        if (shell) shell.outerHTML = locales[selected].markup;
-      })();
-    </script>`;
-  const shell = `    <!-- bootstrap-content:start -->
-${shellLocales.en.markup}
-    ${localeBootstrap}
-    <!-- bootstrap-content:end -->`;
-
+  await writeFile(path.join(webRoot, 'bootstrap_locales.js'),
+    renderLocaleData(shellLocales));
   const indexPath = path.join(webRoot, 'index.html');
   const index = await readFile(indexPath, 'utf8');
-  const marker = /\s*<!-- bootstrap-content:start -->[\s\S]*?<!-- bootstrap-content:end -->/;
-  if (!marker.test(index)) {
-    throw new Error('index.html does not contain the bootstrap content markers');
+  await writeFile(indexPath, renderReleaseIndex(index,
+    shellLocales.en.markup, renderStaticDocument(portfolio)));
+}
+
+async function buildShellLocale(value, context) {
+  const locale = requiredString(value, 'site.locales[]');
+  if (!/^[a-z]{2}(?:-[A-Z]{2})?$/.test(locale)) {
+    throw new Error(`Unsupported bootstrap locale code: ${locale}`);
   }
-  await writeFile(indexPath, index.replace(marker, `\n${shell}`));
+  const localePortfolio = locale === 'en' ? context.portfolio :
+    JSON.parse(await readFile(path.join(webRoot, 'assets', 'assets', 'content',
+      'locales', `${locale}.json`), 'utf8'));
+  if (locale !== 'en' && localePortfolio.locale !== locale) {
+    throw new Error(`content locale ${locale} does not declare its locale code`);
+  }
+  const translations = JSON.parse(await readFile(path.join(
+    webRoot, 'assets', 'assets', 'i18n', `${locale}.json`), 'utf8'));
+  const accessibility = translations.accessibility;
+  const copy = {};
+  for (const [key, field] of [
+    ['loadingPortfolio', 'loading_portfolio'],
+    ['loadFailure', 'load_failure'],
+    ['retry', 'retry'],
+  ]) {
+    copy[key] = requiredString(accessibility?.[field],
+      `i18n.${locale}.accessibility.${field}`);
+  }
+  return {
+    direction: locale.startsWith('ar') ? 'rtl' : 'ltr',
+    fontHref: bootstrapFontHref(locale),
+    title: requiredString(localePortfolio.site?.title, `${locale}.site.title`),
+    copy,
+    markup: renderBootstrapShell({
+      ...context, profile: localePortfolio.profile, translations, locale,
+    }),
+  };
 }
 
 function bootstrapFontHref(locale) {
@@ -348,47 +281,9 @@ function renderBootstrapShell({
     throw new Error(`${locale}.profile.focus must contain at least three values`);
   }
   const primaryFocus = requiredString(focus[0], `${locale}.profile.focus[0]`);
-  const home = translations.home_section;
-  const viewWork = requiredString(
-    home?.view_work,
-    `i18n.${locale}.home_section.view_work`,
-  );
-  const emailLabel = requiredString(
-    home?.email,
-    `i18n.${locale}.home_section.email`,
-  );
-  const facts = [
-    [requiredString(home?.based_in, `i18n.${locale}.home_section.based_in`), location],
-    [
-      requiredString(
-        home?.working_since,
-        `i18n.${locale}.home_section.working_since`,
-      ),
-      since,
-    ],
-    [requiredString(home?.focus, `i18n.${locale}.home_section.focus`), primaryFocus],
-  ];
-  const factMarkup = facts
-    .map(
-      ([label, value]) => `      <li class="bootstrap-fact">
-        <span class="bootstrap-fact-label">${escapeHtml(label)}</span>
-        ${escapeHtml(value)}
-      </li>`,
-    )
-    .join('\n');
-  const actionMarkup = [
-    hasWork
-      ? `            <span class="bootstrap-action bootstrap-action--primary">${escapeHtml(viewWork)}</span>`
-      : '',
-    hasEmail
-      ? `            <span class="bootstrap-action">${escapeHtml(emailLabel)}</span>`
-      : '',
-  ]
-    .filter(Boolean)
-    .join('\n');
-  const actions = actionMarkup
-    ? `\n          <div class="bootstrap-actions">\n${actionMarkup}\n          </div>`
-    : '';
+  const { factMarkup, actions } = renderShellDetails({
+    translations, location, since, primaryFocus, hasWork, hasEmail, locale,
+  });
   return `    <div class="bootstrap-shell" aria-hidden="true" data-content-version="${escapeHtml(contentVersion)}" data-locale="${escapeHtml(locale)}">
       <div class="bootstrap-rail">
         <span>${escapeHtml(role)}</span>
@@ -413,14 +308,34 @@ ${factMarkup}
     </div>`;
 }
 
-function jsonForInlineScript(value) {
-  return JSON.stringify(value).replace(/[<>&\u2028\u2029]/g, (character) => ({
-    '<': '\\u003c',
-    '>': '\\u003e',
-    '&': '\\u0026',
-    '\u2028': '\\u2028',
-    '\u2029': '\\u2029',
-  })[character]);
+function renderShellDetails({
+  translations, location, since, primaryFocus, hasWork, hasEmail, locale,
+}) {
+  const home = translations.home_section;
+  const viewWork = requiredString(home?.view_work,
+    `i18n.${locale}.home_section.view_work`);
+  const emailLabel = requiredString(home?.email,
+    `i18n.${locale}.home_section.email`);
+  const facts = [
+    [requiredString(home?.based_in, `i18n.${locale}.home_section.based_in`), location],
+    [requiredString(home?.working_since,
+      `i18n.${locale}.home_section.working_since`), since],
+    [requiredString(home?.focus, `i18n.${locale}.home_section.focus`), primaryFocus],
+  ];
+  const factMarkup = facts.map(([label, value]) => `      <li class="bootstrap-fact">
+        <span class="bootstrap-fact-label">${escapeHtml(label)}</span>
+        ${escapeHtml(value)}
+      </li>`).join('\n');
+  const actionMarkup = [
+    hasWork ? `            <span class="bootstrap-action bootstrap-action--primary">${escapeHtml(viewWork)}</span>` : '',
+    hasEmail ? `            <span class="bootstrap-action">${escapeHtml(emailLabel)}</span>` : '',
+  ].filter(Boolean).join('\n');
+  return {
+    factMarkup,
+    actions: actionMarkup
+      ? `\n          <div class="bootstrap-actions">\n${actionMarkup}\n          </div>`
+      : '',
+  };
 }
 
 function requiredString(value, path) {
@@ -454,70 +369,19 @@ function escapeHtml(value) {
   });
 }
 
-async function normalizeNoticeWhitespace() {
-  const noticesPath = path.join(webRoot, 'assets', 'NOTICES');
-  const notices = await readFile(noticesPath, 'utf8');
-  const normalized = notices.replace(/[\t ]+$/gm, '');
-  if (normalized !== notices) await writeFile(noticesPath, normalized);
-}
-
-async function copyStaticHostSidecars() {
-  for (const file of ['_headers', '_redirects']) {
-    await copyFile(path.resolve('web', file), path.join(webRoot, file));
-  }
-}
-
-async function writeLegacyServiceWorkerKillSwitch() {
-  const source = `'use strict';
-
-self.addEventListener('install', (event) => {
-  self.skipWaiting();
-});
-
-self.addEventListener('activate', (event) => {
-  event.waitUntil((async () => {
-    const scope = self.registration.scope;
-    const names = await caches.keys();
-    await Promise.all(names.map(async (name) => {
-      const cache = await caches.open(name);
-      const requests = await cache.keys();
-      if (
-        requests.length > 0 &&
-        requests.every((request) => request.url.startsWith(scope))
-      ) {
-        await caches.delete(name);
-      }
-    }));
-    await self.registration.unregister();
-  })());
-});
-`;
-  await writeFile(path.join(webRoot, 'flutter_service_worker.js'), source);
-}
-
-async function collectFiles(directory) {
-  const entries = await readdir(directory, { withFileTypes: true });
-  const nested = await Promise.all(
-    entries.map(async (entry) => {
-      const entryPath = path.join(directory, entry.name);
-      return entry.isDirectory() ? collectFiles(entryPath) : [entryPath];
-    }),
-  );
-  return nested.flat();
-}
-
-async function removeEmptyDirectories(directory) {
-  const entries = await readdir(directory, { withFileTypes: true });
-  await Promise.all(
-    entries
-      .filter((entry) => entry.isDirectory())
-      .map((entry) => removeEmptyDirectories(path.join(directory, entry.name))),
-  );
-  if ((await readdir(directory)).length === 0) {
-    await rm(directory, { recursive: true, force: true });
-  }
-}
-
-function formatBytes(bytes) {
-  return `${(bytes / 1024 / 1024).toFixed(2)} MiB`;
+async function writeReleaseMetadata() {
+  const file = path.join(webRoot, 'version.json');
+  const version = JSON.parse(await readFile(file, 'utf8'));
+  const portfolio = JSON.parse(await readFile(
+    path.resolve('assets', 'content', 'portfolio.json'), 'utf8'));
+  const commit = process.env.GITHUB_SHA || execFileSync('git',
+    ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim();
+  if (!/^[0-9a-f]{40}$/.test(commit)) throw new Error('Invalid commit hash');
+  const epoch = process.env.SOURCE_DATE_EPOCH;
+  const timestamp = epoch === undefined ? Date.now() : Number(epoch) * 1000;
+  if (!Number.isFinite(timestamp)) throw new Error('Invalid SOURCE_DATE_EPOCH');
+  version.commit = commit;
+  version.content_version = requiredString(portfolio.content_version, 'content_version');
+  version.built_at = new Date(timestamp).toISOString();
+  await writeFile(file, `${JSON.stringify(version)}\n`);
 }

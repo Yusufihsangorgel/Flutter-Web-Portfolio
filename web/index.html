@@ -3,14 +3,12 @@
 <head>
   <base href="$FLUTTER_BASE_HREF">
   <meta charset="UTF-8">
-  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <!-- portfolio-meta:start -->
   <link rel="canonical" href="https://developeryusuf.com">
   <title>Yusuf İhsan Görgel — Software Engineer</title>
   <meta name="description" content="Yusuf İhsan Görgel is a software engineer building cross-platform products with Flutter, Dart, Go, PostgreSQL, Redis, and production infrastructure.">
-  <meta name="keywords" content="Software Engineer, Flutter, Dart, BLoC, Platform channels, Offline-first, Go, Fiber, PostgreSQL, Redis, Asynq, Dart Wasm, SkWasm, CanvasKit">
   <meta name="author" content="Yusuf İhsan Görgel">
 
   <meta property="og:type" content="website">
@@ -50,7 +48,15 @@
     "@context": "https://schema.org",
     "@graph": [
       {
+        "@type": "ProfilePage",
+        "url": "https://developeryusuf.com",
+        "mainEntity": {
+          "@id": "https://developeryusuf.com/#person"
+        }
+      },
+      {
         "@type": "Person",
+        "@id": "https://developeryusuf.com/#person",
         "name": "Yusuf İhsan Görgel",
         "jobTitle": "Software Engineer",
         "email": "developeryusuf@icloud.com",
@@ -60,6 +66,37 @@
           "https://github.com/Yusufihsangorgel",
           "https://www.linkedin.com/in/yusuf-ihsan-g%C3%B6rgel/",
           "https://yusufihsangorgel.github.io"
+        ],
+        "image": "https://developeryusuf.com/assets/og/engineering-showcase.png?v=2026.07.18.1",
+        "worksFor": {
+          "@type": "Organization",
+          "name": "Uzman Adres"
+        },
+        "alumniOf": {
+          "@type": "EducationalOrganization",
+          "name": "Mehmet Akif Ersoy University"
+        },
+        "knowsAbout": [
+          "Flutter",
+          "Dart",
+          "BLoC",
+          "Platform channels",
+          "Offline-first",
+          "Go",
+          "Fiber",
+          "PostgreSQL",
+          "Redis",
+          "Asynq",
+          "Dart Wasm",
+          "SkWasm",
+          "CanvasKit",
+          "Semantics",
+          "First-frame lifecycle",
+          "Docker",
+          "Docker Swarm",
+          "Prometheus",
+          "Grafana",
+          "PostgreSQL operations"
         ]
       },
       {
@@ -110,13 +147,22 @@
     * { box-sizing: border-box; }
     html, body { height: 100%; }
     body { margin: 0; overflow: hidden; background: #f2eee5; }
-
-    /*
-      The release task replaces the empty bootstrap-content block with a
-      critical rendering shell generated from the canonical portfolio JSON.
-      The HTML shell owns pre-frame layout only; professional copy comes from
-      the canonical portfolio document.
-    */
+    html.js #static-document { display: none; }
+    #static-document {
+      max-width: 72rem;
+      margin: 0 auto;
+      padding: 3rem clamp(1.5rem, 5vw, 5rem);
+      color: #12110f;
+      font: 400 1rem/1.6 var(--bootstrap-sans);
+    }
+    #static-document h1 { font-size: clamp(2.5rem, 7vw, 5rem); line-height: 1.05; }
+    #static-document h2 { margin-top: 3rem; font-size: 2rem; }
+    #static-document h3 { margin-bottom: 0.25rem; font-size: 1.2rem; }
+    #static-document nav ul { display: flex; flex-wrap: wrap; gap: 0.75rem 1.5rem; }
+    #static-document ul { padding-left: 1.5rem; }
+    #static-document li { margin: 0.75rem 0; }
+    #static-document a { color: #1646d8; }
+    #static-document footer { margin-top: 4rem; padding-top: 1rem; border-top: 1px solid #bbb; }
     #bootstrap-surface {
       position: fixed;
       inset: 0;
@@ -346,52 +392,9 @@
       #bootstrap-surface { transition: none; }
     }
   </style>
-  <script>
-    // Flutter's Navigator 1.0 normally creates a second, synthetic browser
-    // history entry during bootstrap. This document owns chapter history
-    // itself, so mark the direct-load entry as Flutter-managed before the
-    // engine starts and keep deep links as a single browser entry.
-    if (!history.state || history.state.flutter !== true) {
-      history.replaceState({ flutter: true }, 'flutter', location.href);
-    }
-
-    // This single-page document owns chapter history, while Flutter owns
-    // transient overlay routes. A chapter pop is forwarded only to the document
-    // controller. When an overlay is open, an Escape key event closes it through
-    // Flutter's normal Navigator lifecycle, then the browser history cursor is
-    // restored without consuming a chapter entry.
-    var restoringHistoryAfterModal = false;
-    window.addEventListener('popstate', function (event) {
-      if (restoringHistoryAfterModal) {
-        restoringHistoryAfterModal = false;
-        event.stopImmediatePropagation();
-        return;
-      }
-      var transientOverlayOpen = document.documentElement.getAttribute(
-        'data-portfolio-transient-overlay'
-      ) === 'true';
-      if (transientOverlayOpen) {
-        event.stopImmediatePropagation();
-        restoringHistoryAfterModal = true;
-        window.dispatchEvent(new KeyboardEvent('keydown', {
-          key: 'Escape',
-          code: 'Escape',
-          bubbles: true,
-        }));
-        window.dispatchEvent(new KeyboardEvent('keyup', {
-          key: 'Escape',
-          code: 'Escape',
-          bubbles: true,
-        }));
-        window.setTimeout(function () {
-          window.history.forward();
-        }, 120);
-        return;
-      }
-      event.stopImmediatePropagation();
-      window.dispatchEvent(new Event('portfolio-popstate'));
-    }, true);
-  </script>
+  <script src="history.js"></script>
+  <script src="bootstrap_locales.js"></script>
+  <script src="bootstrap_locale.js"></script>
   <!-- portfolio-analytics:start -->
   <script defer src="https://analytics.developeryusuf.com/js/script.js" data-domain="developeryusuf.com"></script>
 <!-- portfolio-analytics:end -->
@@ -401,73 +404,20 @@
     <style>
       body { overflow: auto; }
       #bootstrap-surface { display: none; }
-      .noscript-recovery {
-        display: grid;
-        min-height: 100%;
-        place-content: center;
-        max-width: 42rem;
-        margin: 0 auto;
-        padding: 2rem;
-        color: #12110f;
-        font: 400 1rem/1.6 ui-sans-serif, system-ui, sans-serif;
-      }
-      .noscript-recovery h1 { margin: 0 0 0.75rem; font-size: 1.75rem; line-height: 1.2; }
-      .noscript-recovery p { margin: 0; }
+      .noscript-recovery { max-width: 62rem; margin: 1rem auto; padding: 0 1.5rem; }
     </style>
-    <main class="noscript-recovery">
-      <h1>JavaScript is required</h1>
-      <p>This interactive portfolio runs in Flutter Web. Enable JavaScript in your browser, then reload this page.</p>
-    </main>
+    <p class="noscript-recovery">The interactive version needs JavaScript.</p>
   </noscript>
+  <!-- static-document:start -->
+  <!-- static-document:end -->
   <div id="bootstrap-surface" role="status" aria-label="Loading interactive portfolio" aria-busy="true">
     <!-- bootstrap-content:start -->
     <div class="bootstrap-shell" aria-hidden="true"></div>
     <!-- bootstrap-content:end -->
   </div>
+  <script src="apply_bootstrap_locale.js"></script>
+  <script src="static_document.js"></script>
   <script src="flutter_bootstrap.js"></script>
-  <script>
-    // Retire legacy Flutter service workers without delaying or reloading the
-    // current document. A prior controlled visit can therefore never create a
-    // visible double-start sequence.
-    window.addEventListener('load', function retireLegacyCacheOwnership() {
-      if (!('serviceWorker' in navigator)) return;
-      var scopeRoot = new URL('.', document.baseURI).href;
-      navigator.serviceWorker.getRegistrations()
-        .then(function(registrations) {
-          return Promise.allSettled(
-            registrations
-              .filter(function(registration) {
-                return registration.scope.startsWith(scopeRoot);
-              })
-              .map(function(registration) {
-                return registration.unregister();
-              }),
-          );
-        })
-        .then(function() {
-          if (!('caches' in window)) return [];
-          return window.caches.keys().then(function(names) {
-            return Promise.allSettled(
-              names.map(function(name) {
-                return window.caches.open(name)
-                  .then(function(cache) { return cache.keys(); })
-                  .then(function(requests) {
-                    var belongsToPortfolio = requests.length > 0 &&
-                      requests.every(function(request) {
-                        return request.url.startsWith(scopeRoot);
-                      });
-                    return belongsToPortfolio
-                      ? window.caches.delete(name)
-                      : false;
-                  });
-              }),
-            );
-          });
-        })
-        .catch(function(error) {
-          console.warn('Legacy cache cleanup was unavailable', error);
-        });
-    }, { once: true });
-  </script>
+  <script src="retire_service_worker.js"></script>
 </body>
 </html>
