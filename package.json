@@ -41,7 +41,9 @@
     "measure:runtime": "node tool/measure_web_runtime.mjs",
     "verify:runtime": "node tool/measure_web_runtime.mjs --enforce",
     "test:release-document": "node --test tool/test_render_static_document.mjs tool/test_verify_release_document.mjs",
-    "test:hosting-security": "node tool/test_verify_hosting_configs.mjs && node tool/test_public_content_security.mjs"
+    "test:hosting-security": "node tool/test_verify_hosting_configs.mjs && node tool/test_public_content_security.mjs",
+    "lighthouse": "lhci autorun",
+    "lighthouse:desktop": "lhci autorun --collect.settings.preset=desktop --upload.outputDir=.lighthouseci/desktop"
   },
   "keywords": [
     "flutter",
