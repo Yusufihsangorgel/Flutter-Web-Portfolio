@@ -2,11 +2,6 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 
-/// Locally bundled typography families.
-///
-/// The variable font files and their OFL licenses live under `assets/fonts`.
-/// Keeping one small typography API makes call sites clear while guaranteeing
-/// that rendering never performs a font network request.
 abstract final class AppFonts {
   static const interFamily = 'Inter';
   static const spaceGroteskFamily = 'Space Grotesk';
@@ -18,178 +13,55 @@ abstract final class AppFonts {
     notoSansDevanagariFamily,
   ];
 
-  static TextStyle inter({
-    TextStyle? textStyle,
-    Color? color,
-    Color? backgroundColor,
-    double? fontSize,
-    FontWeight? fontWeight,
-    FontStyle? fontStyle,
-    double? letterSpacing,
-    double? wordSpacing,
-    TextBaseline? textBaseline,
-    double? height,
-    Locale? locale,
-    Paint? foreground,
-    Paint? background,
-    List<ui.Shadow>? shadows,
-    List<ui.FontFeature>? fontFeatures,
-    TextDecoration? decoration,
-    Color? decorationColor,
-    TextDecorationStyle? decorationStyle,
-    double? decorationThickness,
-  }) => _style(
-    family: interFamily,
-    fallback: const [
-      notoSansArabicFamily,
-      notoSansDevanagariFamily,
-      'Arial',
-      'sans-serif',
-    ],
-    textStyle: textStyle,
-    color: color,
-    backgroundColor: backgroundColor,
-    fontSize: fontSize,
-    fontWeight: fontWeight,
-    fontStyle: fontStyle,
-    letterSpacing: letterSpacing,
-    wordSpacing: wordSpacing,
-    textBaseline: textBaseline,
-    height: height,
-    locale: locale,
-    foreground: foreground,
-    background: background,
-    shadows: shadows,
-    fontFeatures: fontFeatures,
-    decoration: decoration,
-    decorationColor: decorationColor,
-    decorationStyle: decorationStyle,
-    decorationThickness: decorationThickness,
-  );
-
-  static TextStyle spaceGrotesk({
-    TextStyle? textStyle,
-    Color? color,
-    Color? backgroundColor,
-    double? fontSize,
-    FontWeight? fontWeight,
-    FontStyle? fontStyle,
-    double? letterSpacing,
-    double? wordSpacing,
-    TextBaseline? textBaseline,
-    double? height,
-    Locale? locale,
-    Paint? foreground,
-    Paint? background,
-    List<ui.Shadow>? shadows,
-    List<ui.FontFeature>? fontFeatures,
-    TextDecoration? decoration,
-    Color? decorationColor,
-    TextDecorationStyle? decorationStyle,
-    double? decorationThickness,
-  }) => _style(
-    family: spaceGroteskFamily,
-    fallback: const [
-      interFamily,
-      notoSansArabicFamily,
-      notoSansDevanagariFamily,
-      'Arial',
-      'sans-serif',
-    ],
-    textStyle: textStyle,
-    color: color,
-    backgroundColor: backgroundColor,
-    fontSize: fontSize,
-    fontWeight: fontWeight,
-    fontStyle: fontStyle,
-    letterSpacing: letterSpacing,
-    wordSpacing: wordSpacing,
-    textBaseline: textBaseline,
-    height: height,
-    locale: locale,
-    foreground: foreground,
-    background: background,
-    shadows: shadows,
-    fontFeatures: fontFeatures,
-    decoration: decoration,
-    decorationColor: decorationColor,
-    decorationStyle: decorationStyle,
-    decorationThickness: decorationThickness,
-  );
-
-  static TextStyle jetBrainsMono({
-    TextStyle? textStyle,
-    Color? color,
-    Color? backgroundColor,
-    double? fontSize,
-    FontWeight? fontWeight,
-    FontStyle? fontStyle,
-    double? letterSpacing,
-    double? wordSpacing,
-    TextBaseline? textBaseline,
-    double? height,
-    Locale? locale,
-    Paint? foreground,
-    Paint? background,
-    List<ui.Shadow>? shadows,
-    List<ui.FontFeature>? fontFeatures,
-    TextDecoration? decoration,
-    Color? decorationColor,
-    TextDecorationStyle? decorationStyle,
-    double? decorationThickness,
-  }) => _style(
-    family: jetBrainsMonoFamily,
-    fallback: const [
-      notoSansArabicFamily,
-      notoSansDevanagariFamily,
-      'monospace',
-    ],
-    textStyle: textStyle,
-    color: color,
-    backgroundColor: backgroundColor,
-    fontSize: fontSize,
-    fontWeight: fontWeight,
-    fontStyle: fontStyle,
-    letterSpacing: letterSpacing,
-    wordSpacing: wordSpacing,
-    textBaseline: textBaseline,
-    height: height,
-    locale: locale,
-    foreground: foreground,
-    background: background,
-    shadows: shadows,
-    fontFeatures: fontFeatures,
-    decoration: decoration,
-    decorationColor: decorationColor,
-    decorationStyle: decorationStyle,
-    decorationThickness: decorationThickness,
-  );
+  static const inter = _FontStyle(interFamily, [
+    notoSansArabicFamily,
+    notoSansDevanagariFamily,
+    'Arial',
+    'sans-serif',
+  ]);
+  static const spaceGrotesk = _FontStyle(spaceGroteskFamily, [
+    interFamily,
+    notoSansArabicFamily,
+    notoSansDevanagariFamily,
+    'Arial',
+    'sans-serif',
+  ]);
+  static const jetBrainsMono = _FontStyle(jetBrainsMonoFamily, [
+    notoSansArabicFamily,
+    notoSansDevanagariFamily,
+    'monospace',
+  ]);
 
   static TextTheme interTextTheme(TextTheme textTheme) =>
       textTheme.apply(fontFamily: interFamily);
+}
 
-  static TextStyle _style({
-    required String family,
-    required List<String> fallback,
-    required TextStyle? textStyle,
-    required Color? color,
-    required Color? backgroundColor,
-    required double? fontSize,
-    required FontWeight? fontWeight,
-    required FontStyle? fontStyle,
-    required double? letterSpacing,
-    required double? wordSpacing,
-    required TextBaseline? textBaseline,
-    required double? height,
-    required Locale? locale,
-    required Paint? foreground,
-    required Paint? background,
-    required List<ui.Shadow>? shadows,
-    required List<ui.FontFeature>? fontFeatures,
-    required TextDecoration? decoration,
-    required Color? decorationColor,
-    required TextDecorationStyle? decorationStyle,
-    required double? decorationThickness,
+final class _FontStyle {
+  const _FontStyle(this.family, this.fallback);
+
+  final String family;
+  final List<String> fallback;
+
+  TextStyle call({
+    TextStyle? textStyle,
+    Color? color,
+    Color? backgroundColor,
+    double? fontSize,
+    FontWeight? fontWeight,
+    FontStyle? fontStyle,
+    double? letterSpacing,
+    double? wordSpacing,
+    TextBaseline? textBaseline,
+    double? height,
+    Locale? locale,
+    Paint? foreground,
+    Paint? background,
+    List<ui.Shadow>? shadows,
+    List<ui.FontFeature>? fontFeatures,
+    TextDecoration? decoration,
+    Color? decorationColor,
+    TextDecorationStyle? decorationStyle,
+    double? decorationThickness,
   }) => (textStyle ?? const TextStyle()).copyWith(
     fontFamily: family,
     fontFamilyFallback: fallback,

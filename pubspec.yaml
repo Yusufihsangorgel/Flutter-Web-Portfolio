@@ -39,6 +39,8 @@ flutter:
     - assets/build/
     - assets/content/
     - assets/content/locales/
+    - assets/fonts/noto_sans_arabic/NotoSansArabic-Variable.ttf
+    - assets/fonts/noto_sans_devanagari/NotoSansDevanagari-Variable.ttf
     - assets/i18n/
     - assets/presentation/
     - assets/work/
@@ -53,11 +55,5 @@ flutter:
     - family: JetBrains Mono
       fonts:
         - asset: assets/fonts/jetbrains_mono/JetBrainsMono-Variable.ttf
-    - family: Noto Sans Arabic
-      fonts:
-        - asset: assets/fonts/noto_sans_arabic/NotoSansArabic-Variable.ttf
-    - family: Noto Sans Devanagari
-      fonts:
-        - asset: assets/fonts/noto_sans_devanagari/NotoSansDevanagari-Variable.ttf
 
   generate: true
