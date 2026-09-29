@@ -1,23 +1,43 @@
 import 'dart:convert';
-import 'dart:developer' as dev;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_web_portfolio/app/core/logging/app_logger.dart';
 import 'package:flutter_web_portfolio/app/domain/providers/asset_loader.dart';
 
-/// Decodes the portfolio, narrative, and locale documents from `rootBundle`.
 final class BundleAssetLoader implements AssetLoader {
+  BundleAssetLoader({AppLogger? logger})
+    : _logger = logger ?? createAppLogger();
+
+  final AppLogger _logger;
+
   @override
-  Future<Map<String, dynamic>> loadNarrative() => _loadObject(
+  Future<Map<String, dynamic>> loadNarrative() => _loadLoggedObject(
     'assets/presentation/narrative.json',
     description: 'Narrative presentation',
   );
 
   @override
-  Future<Map<String, dynamic>> loadPortfolio() => _loadObject(
+  Future<Map<String, dynamic>> loadPortfolio() => _loadLoggedObject(
     'assets/content/portfolio.json',
     description: 'Portfolio content',
   );
+
+  Future<Map<String, dynamic>> _loadLoggedObject(
+    String path, {
+    required String description,
+  }) async {
+    try {
+      return await _loadObject(path, description: description);
+    } catch (error, stackTrace) {
+      _logger.error(
+        'Failed to load asset $path',
+        error: error,
+        stackTrace: stackTrace,
+      );
+      rethrow;
+    }
+  }
 
   Future<Map<String, dynamic>> _loadObject(
     String path, {
@@ -33,15 +53,17 @@ final class BundleAssetLoader implements AssetLoader {
 
   @override
   Future<Map<String, dynamic>> loadTranslations(String languageCode) async {
+    var path = 'assets/i18n/$languageCode.json';
     try {
       final translations = await _loadObject(
-        'assets/i18n/$languageCode.json',
+        path,
         description: '$languageCode interface catalog',
       );
       if (languageCode == 'en') return translations;
 
+      path = 'assets/content/locales/$languageCode.json';
       final portfolioLocalization = await _loadObject(
-        'assets/content/locales/$languageCode.json',
+        path,
         description: '$languageCode portfolio localization',
       );
       return mergeCatalogs(
@@ -49,11 +71,11 @@ final class BundleAssetLoader implements AssetLoader {
         interfaceCatalog: translations,
         portfolioLocalization: portfolioLocalization,
       );
-    } catch (e) {
-      dev.log(
-        'Failed to load translations for $languageCode',
-        name: 'BundleAssetLoader',
-        error: e,
+    } catch (error, stackTrace) {
+      _logger.error(
+        'Failed to load asset $path',
+        error: error,
+        stackTrace: stackTrace,
       );
       return {};
     }

@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:developer' as dev;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/semantics.dart';
@@ -10,6 +9,8 @@ import 'package:flutter_bloc/flutter_bloc.dart'
     show BlocBuilder, RepositoryProvider;
 
 import 'package:flutter_web_portfolio/app/app_dependencies.dart';
+import 'package:flutter_web_portfolio/app/core/logging/app_error_handlers.dart';
+import 'package:flutter_web_portfolio/app/core/logging/app_logger.dart';
 import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
 import 'package:flutter_web_portfolio/app/core/theme/app_theme.dart';
 import 'package:flutter_web_portfolio/app/domain/models/portfolio_document.dart';
@@ -19,52 +20,46 @@ import 'package:flutter_web_portfolio/app/utils/web_url_strategy.dart'
     as url_strategy;
 
 void main() {
-  runZonedGuarded(
-    () async {
-      WidgetsFlutterBinding.ensureInitialized();
-      // Force the semantics tree to stay populated — screen readers and
-      // Playwright semantics snapshots both rely on this on Flutter Web.
-      SemanticsBinding.instance.ensureSemantics();
+  final logger = createAppLogger();
+  final errorHandlers = AppErrorHandlers(logger);
+  runZonedGuarded(() async {
+    WidgetsFlutterBinding.ensureInitialized();
+    // Expose DOM semantics to assistive technology and crawlers without a placeholder.
+    SemanticsBinding.instance.ensureSemantics();
+    errorHandlers.install();
 
-      FlutterError.onError = (FlutterErrorDetails details) {
-        FlutterError.presentError(details);
-        dev.log('Flutter error', name: 'Main', error: details.exception);
-      };
+    SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: Brightness.dark,
+        statusBarBrightness: Brightness.light,
+      ),
+    );
 
-      SystemChrome.setSystemUIOverlayStyle(
-        const SystemUiOverlayStyle(
-          statusBarColor: Colors.transparent,
-          statusBarIconBrightness: Brightness.dark,
-          statusBarBrightness: Brightness.light,
-        ),
+    try {
+      final dependencies = await AppDependencies.bootstrap(logger: logger);
+      runApp(AppRuntime(dependencies: dependencies, child: const MyApp()));
+    } catch (error, stackTrace) {
+      logger.error(
+        'Application bootstrap failed',
+        error: error,
+        stackTrace: stackTrace,
       );
-
-      try {
-        final dependencies = await AppDependencies.bootstrap();
-        runApp(AppRuntime(dependencies: dependencies, child: const MyApp()));
-      } catch (error, stackTrace) {
-        dev.log(
-          'Application bootstrap failed',
-          name: 'Main',
-          error: error,
-          stackTrace: stackTrace,
-        );
-        final languageCode = url_strategy.getHtmlLanguage();
-        final copy = await _loadBootstrapFailureCopy(languageCode);
-        runApp(_BootstrapFailureApp(languageCode: languageCode, copy: copy));
-      }
-    },
-    (error, stack) {
-      dev.log('Uncaught error', name: 'Main', error: error, stackTrace: stack);
-    },
-  );
+      final languageCode = url_strategy.getHtmlLanguage();
+      final copy = await _loadBootstrapFailureCopy(languageCode, logger);
+      runApp(_BootstrapFailureApp(languageCode: languageCode, copy: copy));
+    }
+  }, errorHandlers.onZoneError);
 }
 
 Future<_BootstrapFailureCopy> _loadBootstrapFailureCopy(
   String languageCode,
+  AppLogger logger,
 ) async {
   try {
-    final catalog = await BundleAssetLoader().loadTranslations(languageCode);
+    final catalog = await BundleAssetLoader(
+      logger: logger,
+    ).loadTranslations(languageCode);
     final accessibility = catalog['accessibility'];
     if (accessibility is Map<String, dynamic>) {
       final title = accessibility['load_failure'];
@@ -77,9 +72,8 @@ Future<_BootstrapFailureCopy> _loadBootstrapFailureCopy(
       }
     }
   } on Object catch (error, stackTrace) {
-    dev.log(
+    logger.error(
       'Failed to localize bootstrap recovery',
-      name: 'Main',
       error: error,
       stackTrace: stackTrace,
     );
@@ -152,7 +146,6 @@ class _BootstrapFailureApp extends StatelessWidget {
   );
 }
 
-/// Root application widget.
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
