@@ -114,7 +114,7 @@ export function renderRecordIntro(data) {
   if (data.site.template_repository !== true) {
     return `This section is regenerated from the repository owner's canonical content document. It describes the current portfolio record rather than reusable starter data.`;
   }
-  return `The live demo uses the same template with a real professional record. This block is regenerated from the canonical content document; it is evidence for the demo, not starter data inherited by \`npm run portfolio:init\`.`;
+  return `The live demo uses this template with the author's own record. This block is regenerated from the canonical content document; it is evidence for the demo, not starter data inherited by \`npm run portfolio:init\`.`;
 }
 
 export function renderRobots(data) {

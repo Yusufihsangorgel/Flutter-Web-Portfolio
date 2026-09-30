@@ -288,7 +288,7 @@ The gates cover:
 ## Verified public engineering record
 
 <!-- portfolio-record-intro:start -->
-The live demo uses the same template with a real professional record. This block is regenerated from the canonical content document; it is evidence for the demo, not starter data inherited by `npm run portfolio:init`.
+The live demo uses this template with the author's own record. This block is regenerated from the canonical content document; it is evidence for the demo, not starter data inherited by `npm run portfolio:init`.
 <!-- portfolio-record-intro:end -->
 
 <details>
