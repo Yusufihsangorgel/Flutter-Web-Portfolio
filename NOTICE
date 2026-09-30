@@ -1,0 +1,7 @@
+Screenshots and product names under `assets/work/` and `tool/work_sources/`
+belong to their respective owners. They are included only to document the
+portfolio author's work on those products and are not covered by the MIT
+License in `LICENSE`.
+
+The bundled fonts under `assets/fonts/` keep their own license, the SIL Open
+Font License 1.1. Each font directory contains its license text in `OFL.txt`.
