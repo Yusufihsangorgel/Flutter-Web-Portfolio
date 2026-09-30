@@ -1,4 +1,4 @@
-import { expect, Locator, Page, test } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
@@ -16,78 +16,105 @@ const portfolio = readJson<{
   profile: { display_name: { accessible: string }; role: string };
 }>("content/portfolio.json");
 
-async function expectHeadingAtTarget(page: Page, heading: Locator) {
-  await expect
-    .poll(
-      async () => {
-        if ((await heading.count()) === 0) return false;
-        const box = await heading.boundingBox();
-        const timing = await page.evaluate(() => ({
-          elapsed:
-            performance.now() -
-            performance.getEntriesByName(
-              "flutter-bootstrap-surface-removed",
-              "mark",
-            )[0].startTime,
-          height: innerHeight,
-        }));
-        return (
-          box !== null &&
-          timing.elapsed <= 1000 &&
-          box.y >= -24 &&
-          box.y < timing.height / 2
-        );
-      },
-      { timeout: 1000 },
-    )
-    .toBe(true);
+const landingBudgetMs = 1000;
+const observationMs = 3000;
+const driftBudgetPx = 24;
+
+// One entry per animation frame on the page's own clock: milliseconds since
+// the reveal mark and the heading's top edge, or null while it is not exposed.
+type HeadingFrame = [elapsedMs: number, top: number | null];
+
+declare global {
+  interface Window {
+    headingFrames: HeadingFrame[];
+  }
 }
 
-async function maximumHeadingDrift(heading: Locator) {
-  return heading.evaluate(
-    (element) =>
-      new Promise<number>((resolve) => {
-        const initial = element.getBoundingClientRect().top;
-        let maximum = 0;
-        const started = performance.now();
-        const sample = () => {
-          maximum = Math.max(
-            maximum,
-            Math.abs(element.getBoundingClientRect().top - initial),
-          );
-          if (performance.now() - started >= 3000) {
-            resolve(maximum);
-          } else {
-            requestAnimationFrame(sample);
-          }
-        };
-        requestAnimationFrame(sample);
-      }),
+// Runs inside the page from its first script, so the measurement does not
+// depend on how quickly the test process can query the browser.
+function recordHeadingFrames(headingName: string) {
+  const frames: HeadingFrame[] = [];
+  window.headingFrames = frames;
+  const nameOf = (element: Element) =>
+    (element.getAttribute("aria-label") ?? element.textContent ?? "")
+      .replace(/\s+/g, " ")
+      .trim();
+  const sample = () => {
+    const [reveal] = performance.getEntriesByName(
+      "flutter-bootstrap-surface-removed",
+      "mark",
+    );
+    if (reveal) {
+      const heading = [
+        ...document.querySelectorAll(
+          "flt-semantics-host h1, flt-semantics-host h2, flt-semantics-host h3",
+        ),
+      ].find((element) => nameOf(element) === headingName);
+      frames.push([
+        performance.now() - reveal.startTime,
+        heading?.getBoundingClientRect().top ?? null,
+      ]);
+    }
+    requestAnimationFrame(sample);
+  };
+  requestAnimationFrame(sample);
+}
+
+function headingNameFor(chapterId: string) {
+  const name =
+    chapterId === "home"
+      ? `${portfolio.profile.display_name.accessible}, ${portfolio.profile.role}`
+      : interfaceCopy[`${chapterId}_section`]?.title;
+  if (!name) throw new Error(`Missing heading for ${chapterId}`);
+  return name;
+}
+
+function measureLanding(frames: HeadingFrame[], viewportHeight: number) {
+  const landing = frames.find(
+    ([, top]) =>
+      top !== null && top >= -driftBudgetPx && top < viewportHeight / 2,
   );
+  const landedTop = landing?.[1];
+  if (!landing || landedTop == null) return null;
+  const landedAtMs = landing[0];
+  const drifts = frames
+    .filter(([at]) => at >= landedAtMs && at <= landedAtMs + observationMs)
+    .map(([, top]) =>
+      top === null ? Number.POSITIVE_INFINITY : Math.abs(top - landedTop),
+    );
+  return { landedAtMs, driftPx: Math.max(...drifts) };
 }
 
 for (const chapter of chapters) {
   test(`cold deep link stays at ${chapter.id}`, async ({ page }) => {
-    const headingName =
-      chapter.id === "home"
-        ? `${portfolio.profile.display_name.accessible}, ${portfolio.profile.role}`
-        : interfaceCopy[`${chapter.id}_section`]?.title;
-    if (!headingName) throw new Error(`Missing heading for ${chapter.id}`);
+    const headingName = headingNameFor(chapter.id);
+    await page.addInitScript(recordHeadingFrames, headingName);
 
     await page.goto(`/#/${chapter.id}`, { waitUntil: "domcontentloaded" });
     await page.waitForFunction(
-      () =>
-        performance.getEntriesByName(
-          "flutter-bootstrap-surface-removed",
-          "mark",
-        ).length > 0,
+      (horizonMs) => (window.headingFrames.at(-1)?.[0] ?? 0) >= horizonMs,
+      landingBudgetMs + observationMs,
+      { timeout: 30000 },
     );
-    const heading = page.getByRole("heading", {
-      name: headingName,
-      exact: true,
-    });
-    await expectHeadingAtTarget(page, heading);
-    const movement = await maximumHeadingDrift(heading);
-    expect(movement).toBeLessThanOrEqual(24);
+    const { frames, viewportHeight } = await page.evaluate(() => ({
+      frames: window.headingFrames,
+      viewportHeight: innerHeight,
+    }));
+
+    expect(
+      frames.some(([, top]) => top !== null),
+      `"${headingName}" was never exposed in the semantics tree`,
+    ).toBe(true);
+    const landing = measureLanding(frames, viewportHeight);
+    expect(
+      landing,
+      `"${headingName}" never reached the upper half of the viewport`,
+    ).not.toBeNull();
+    expect(landing?.landedAtMs, "ms after reveal").toBeLessThanOrEqual(
+      landingBudgetMs,
+    );
+    expect(landing?.driftPx, "px moved after landing").toBeLessThanOrEqual(
+      driftBudgetPx,
+    );
   });
 }
