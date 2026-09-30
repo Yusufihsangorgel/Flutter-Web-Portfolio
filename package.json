@@ -39,7 +39,10 @@
     "prepare:bundle": "node tool/prepare_web_release.mjs",
     "verify:bundle": "node tool/verify_web_build.mjs",
     "measure:runtime": "node tool/measure_web_runtime.mjs",
-    "verify:runtime": "node tool/measure_web_runtime.mjs --enforce"
+    "verify:runtime": "node tool/measure_web_runtime.mjs --enforce",
+    "generate:strings": "node tool/generate_app_strings.mjs",
+    "verify:strings": "node tool/generate_app_strings.mjs --check",
+    "test:strings": "node tool/test_generate_app_strings.mjs"
   },
   "keywords": [
     "flutter",
