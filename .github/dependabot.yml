@@ -1,0 +1,54 @@
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    groups:
+      actions:
+        update-types:
+          - minor
+          - patch
+    commit-message:
+      prefix: "ci(deps)"
+  - package-ecosystem: npm
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    groups:
+      npm:
+        update-types:
+          - minor
+          - patch
+    commit-message:
+      prefix: "build(deps)"
+  - package-ecosystem: pub
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    groups:
+      pub:
+        update-types:
+          - minor
+          - patch
+    commit-message:
+      prefix: "build(deps)"
+  - package-ecosystem: pub
+    directory: "/packages/adaptive_render_budget"
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    groups:
+      pub-package:
+        update-types:
+          - minor
+          - patch
+    commit-message:
+      prefix: "build(deps)"

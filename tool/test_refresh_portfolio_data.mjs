@@ -1,3 +1,4 @@
+import { runIncidentTests } from './refresh/incident.test.mjs';
 import assert from 'node:assert/strict';
 
 import {
@@ -61,10 +62,6 @@ function samplePackage(overrides = {}) {
   };
 }
 
-// ---------------------------------------------------------------------------
-// Score-lag guard
-// ---------------------------------------------------------------------------
-
 test('score-lag guard keeps the previous pub_points when grantedPoints is null', () => {
   const pkg = samplePackage({ pub_points: 160 });
   const facts = extractPackageFacts(
@@ -80,7 +77,6 @@ test('score-lag guard keeps the previous pub_points when grantedPoints is null',
     false,
     'pub_points must not be reported as a changed field while pending',
   );
-  // The version bump itself is still a visible change, independent of score lag.
   assert.equal(outcome.visibleChanged, true);
 });
 
@@ -105,9 +101,7 @@ test('a real grantedPoints value is applied and never treated as pending', () =>
   assert.equal(outcome.changedFields.includes('pub_points'), true);
 });
 
-// ---------------------------------------------------------------------------
-// Counters-only vs visible change, and the --counters flag
-// ---------------------------------------------------------------------------
+runIncidentTests(test, samplePackage);
 
 test('a counters-only package change is classified as counters, not visible', () => {
   const pkg = samplePackage();
@@ -170,10 +164,6 @@ test('--check never writes, and a fetch failure never writes', () => {
   );
 });
 
-// ---------------------------------------------------------------------------
-// content_version bump
-// ---------------------------------------------------------------------------
-
 test('content_version bumps N within the same UTC day', () => {
   assert.equal(bumpContentVersion('2026.08.30.1', '2026-08-30'), '2026.08.30.2');
   assert.equal(bumpContentVersion('2026.08.30.4', '2026-08-30'), '2026.08.30.5');
@@ -215,10 +205,6 @@ test('content_version falls back to N=1 for a missing or malformed value', () =>
   assert.equal(bumpContentVersion(undefined, '2026-09-01'), '2026.09.01.1');
   assert.equal(bumpContentVersion('not-a-version', '2026-09-01'), '2026.09.01.1');
 });
-
-// ---------------------------------------------------------------------------
-// Unknown fields and key order survive a round trip
-// ---------------------------------------------------------------------------
 
 test('unknown fields and key order survive applying a package update', () => {
   const pkg = samplePackage();
@@ -265,10 +251,6 @@ test('a full document round trip keeps top-level key order and untouched section
   assert.deepEqual(Object.keys(roundTripped), originalKeys);
 });
 
-// ---------------------------------------------------------------------------
-// Contribution status/date flips
-// ---------------------------------------------------------------------------
-
 function sampleContribution(overrides = {}) {
   return {
     id: 'example-contribution',
@@ -294,7 +276,6 @@ test('under_review flips to merged and sets the merge date', () => {
   assert.equal(outcome.outcome, 'merged');
   assert.equal(contribution.status, 'merged');
   assert.equal(contribution.date, '2026-09-15');
-  // Hand-authored fields must never move.
   assert.equal(contribution.title, 'Untouched title');
   assert.equal(contribution.problem, 'Untouched problem');
   assert.equal(contribution.change, 'Untouched change');
@@ -339,10 +320,6 @@ test('parseGithubPullUrl accepts a pull URL and rejects everything else', () => 
   assert.equal(parseGithubPullUrl('not a url'), null);
   assert.equal(parseGithubPullUrl(null), null);
 });
-
-// ---------------------------------------------------------------------------
-// Candidate discovery
-// ---------------------------------------------------------------------------
 
 test('candidates exclude URLs already present in contributions', () => {
   const records = [
@@ -415,10 +392,6 @@ test('extractGithubLogin reads the profile.links github entry', () => {
   assert.equal(extractGithubLogin({}), null);
 });
 
-// ---------------------------------------------------------------------------
-// CLI argument parsing
-// ---------------------------------------------------------------------------
-
 test('parseArgs accepts the documented flags', () => {
   const options = parseArgs(['--check', '--counters', '--report', '/tmp/r.md', '--file', '/tmp/p.json']);
   assert.deepEqual(options, {
@@ -434,10 +407,6 @@ test('parseArgs rejects an unknown flag and a flag missing its value', () => {
   assert.throws(() => parseArgs(['--report']), UsageError);
   assert.throws(() => parseArgs(['--file']), UsageError);
 });
-
-// ---------------------------------------------------------------------------
-// Report rendering (smoke coverage; the live run is eyeballed separately)
-// ---------------------------------------------------------------------------
 
 test('buildReport renders every section, including an empty one', () => {
   const report = buildReport({
@@ -458,10 +427,6 @@ test('buildReport renders every section, including an empty one', () => {
   assert.ok(report.includes('### dart-lang/ai'));
   assert.ok(report.endsWith('\n') && !report.endsWith('\n\n'));
 });
-
-// ---------------------------------------------------------------------------
-// Writing feed parsing and merge
-// ---------------------------------------------------------------------------
 
 const sampleRssFeed = `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0">
