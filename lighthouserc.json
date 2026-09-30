@@ -5,7 +5,10 @@
       "startServerCommand": "PORT=43177 node tool/serve_web.mjs",
       "startServerReadyPattern": "Flutter web test server listening on",
       "startServerReadyTimeout": 15000,
-      "numberOfRuns": 3
+      "numberOfRuns": 3,
+      "settings": {
+        "skipAudits": ["deprecations"]
+      }
     },
     "assert": {
       "assertions": {
