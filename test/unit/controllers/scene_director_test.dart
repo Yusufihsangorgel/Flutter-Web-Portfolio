@@ -4,7 +4,6 @@ import 'package:flutter_web_portfolio/app/controllers/scene_director.dart';
 import 'package:flutter_web_portfolio/app/controllers/scroll_controller.dart';
 import 'package:flutter_web_portfolio/app/core/constants/scene_configs.dart';
 import 'package:flutter_web_portfolio/app/narrative/application/narrative_position.dart';
-import 'package:flutter_web_portfolio/app/narrative/domain/narrative_document.dart';
 import '../../helpers/narrative_fixture.dart';
 
 void main() {
@@ -23,30 +22,25 @@ void main() {
   });
 
   group('SceneDirector', () {
-    test('starts in the hero scene with zero progress', () {
+    test('starts in the document scene', () {
       expect(director.state.currentSceneIndex, 0);
-      expect(director.state.globalProgress, 0);
-      expect(director.state.blendFactor, 0);
     });
 
-    test('starts with the complete hero scene configuration', () {
+    test('starts with the complete document scene configuration', () {
       final config = director.state.blendedConfig;
 
-      expect(config.gradient1, SceneConfigs.hero.gradient1);
-      expect(config.gradient2, SceneConfigs.hero.gradient2);
-      expect(config.gradient3, SceneConfigs.hero.gradient3);
-      expect(config.accent, SceneConfigs.hero.accent);
-      expect(config.vignetteIntensity, SceneConfigs.hero.vignetteIntensity);
+      expect(config.gradient1, SceneConfigs.document.gradient1);
+      expect(config.gradient2, SceneConfigs.document.gradient2);
+      expect(config.gradient3, SceneConfigs.document.gradient3);
+      expect(config.accent, SceneConfigs.document.accent);
+      expect(config.vignetteIntensity, SceneConfigs.document.vignetteIntensity);
     });
 
     test('derives the current accent from the immutable scene snapshot', () {
-      expect(director.state.currentAccent, SceneConfigs.hero.accent);
-      expect(director.state.currentMotif, NarrativeMotif.origin);
-      expect(director.state.nextMotif, NarrativeMotif.origin);
+      expect(director.state.currentAccent, SceneConfigs.document.accent);
     });
 
-    test('recalculate is safe before a scroll position is attached', () {
-      expect(director.recalculate, returnsNormally);
+    test('keeps the initial scene before a scroll position is attached', () {
       expect(director.state, const SceneState.initial());
     });
 
@@ -64,11 +58,7 @@ void main() {
       );
 
       expect(state.currentSceneIndex, 2);
-      expect(state.globalProgress, 0.32);
-      expect(state.blendedConfig, SceneConfigs.experience);
-      expect(state.currentMotif, NarrativeMotif.timeline);
-      expect(state.nextMotif, NarrativeMotif.timeline);
-      expect(state.activeMotif, NarrativeMotif.timeline);
+      expect(state.blendedConfig, SceneConfigs.document);
     });
 
     test('smoothly blends only the boundary described by the resolver', () {
@@ -85,19 +75,11 @@ void main() {
       );
 
       expect(state.currentSceneIndex, 3);
-      expect(state.blendFactor, closeTo(0.5, 0.001));
       expect(
         state.blendedConfig.accent,
-        SceneConfig.lerp(
-          SceneConfigs.experience,
-          SceneConfigs.proof,
-          0.5,
-        ).accent,
+        SceneConfig.lerp(SceneConfigs.document, SceneConfigs.proof, 0.5).accent,
       );
       expect(state.currentAccent, SceneConfigs.proof.accent);
-      expect(state.currentMotif, NarrativeMotif.timeline);
-      expect(state.nextMotif, NarrativeMotif.branches);
-      expect(state.activeMotif, NarrativeMotif.branches);
     });
   });
 }

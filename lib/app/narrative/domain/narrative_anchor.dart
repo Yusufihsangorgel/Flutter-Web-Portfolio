@@ -1,14 +1,39 @@
-import 'dart:ui';
-
-import 'package:flutter/foundation.dart';
 import 'package:flutter_web_portfolio/app/narrative/domain/narrative_document.dart';
 
-/// One measured visual attachment point inside the portfolio document.
-///
-/// The vertical coordinate lives in document space so the render layer can
-/// translate the complete path with one scroll offset. The horizontal
-/// coordinate is viewport-relative and is refreshed whenever layout changes.
-@immutable
+/// A framework-free point.
+final class NarrativePoint {
+  const NarrativePoint(this.dx, this.dy);
+
+  final double dx;
+  final double dy;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is NarrativePoint && dx == other.dx && dy == other.dy;
+
+  @override
+  int get hashCode => Object.hash(dx, dy);
+}
+
+/// A framework-free size.
+final class NarrativeSize {
+  const NarrativeSize(this.width, this.height);
+
+  final double width;
+  final double height;
+  bool get isEmpty => width <= 0 || height <= 0;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is NarrativeSize && width == other.width && height == other.height;
+
+  @override
+  int get hashCode => Object.hash(width, height);
+}
+
+/// Locates a chapter attachment point in document space.
 final class NarrativeAnchorGeometry {
   const NarrativeAnchorGeometry({
     required this.sectionId,
@@ -19,8 +44,8 @@ final class NarrativeAnchorGeometry {
 
   final SectionId sectionId;
   final NarrativeMotif motif;
-  final Offset documentCenter;
-  final Size size;
+  final NarrativePoint documentCenter;
+  final NarrativeSize size;
 
   @override
   bool operator ==(Object other) =>
@@ -35,8 +60,7 @@ final class NarrativeAnchorGeometry {
   int get hashCode => Object.hash(sectionId, motif, documentCenter, size);
 }
 
-/// Immutable anchor geometry shared by scroll, rendering, and regression tests.
-@immutable
+/// Anchors for every measured chapter, ordered from top to bottom.
 final class NarrativeAnchorSnapshot {
   NarrativeAnchorSnapshot(Iterable<NarrativeAnchorGeometry> anchors)
     : anchors = List<NarrativeAnchorGeometry>.unmodifiable(anchors) {
@@ -96,8 +120,19 @@ final class NarrativeAnchorSnapshot {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is NarrativeAnchorSnapshot && listEquals(anchors, other.anchors);
+      other is NarrativeAnchorSnapshot && _sameAnchors(anchors, other.anchors);
 
   @override
   int get hashCode => Object.hashAll(anchors);
+
+  static bool _sameAnchors(
+    List<NarrativeAnchorGeometry> a,
+    List<NarrativeAnchorGeometry> b,
+  ) {
+    if (a.length != b.length) return false;
+    for (var index = 0; index < a.length; index += 1) {
+      if (a[index] != b[index]) return false;
+    }
+    return true;
+  }
 }

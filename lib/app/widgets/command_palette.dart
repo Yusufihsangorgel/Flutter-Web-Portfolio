@@ -14,26 +14,25 @@ import 'package:flutter_web_portfolio/app/core/constants/durations.dart';
 import 'package:flutter_web_portfolio/app/utils/web_url_strategy.dart'
     as url_strategy;
 import 'package:flutter_web_portfolio/app/widgets/accessible_action.dart';
+import 'package:flutter_web_portfolio/app/widgets/portfolio_link.dart';
 
-/// A command entry that the palette can display and execute.
 class _PaletteCommand {
   const _PaletteCommand({
     required this.label,
     required this.category,
     required this.icon,
     required this.onExecute,
+    this.uri,
   });
 
   final String label;
   final String category;
   final IconData icon;
   final VoidCallback onExecute;
+  final Uri? uri;
 }
 
 /// Keyboard command palette opened with Ctrl+K or Cmd+K.
-///
-/// Provides fuzzy search across navigation, language, and action commands.
-/// Keyboard navigable with arrow keys, Enter to select, Escape to close.
 class CommandPalette extends StatefulWidget {
   const CommandPalette({super.key});
 
@@ -113,16 +112,20 @@ class _CommandPaletteState extends State<CommandPalette> {
         ? urlSection
         : scrollController.activeSection;
     final languageController = context.read<LanguageCubit>();
-    final active = scrollController.sectionIds;
+    return [
+      ..._buildNavigationCommands(scrollController, languageController),
+      ..._buildLanguageCommands(languageController, sectionToPreserve),
+    ];
+  }
+
+  List<_PaletteCommand> _buildNavigationCommands(
+    AppScrollController scrollController,
+    LanguageCubit languageController,
+  ) {
     final navigateCategory = languageController.getText(
       'command_palette.navigate',
       defaultValue: 'Navigate',
     );
-    final languageCategory = languageController.getText(
-      'command_palette.language',
-      defaultValue: 'Language',
-    );
-
     const sectionIcons = <String, IconData>{
       'home': Icons.home_rounded,
       'about': Icons.person_rounded,
@@ -132,8 +135,7 @@ class _CommandPaletteState extends State<CommandPalette> {
     };
 
     return [
-      // ── Navigation ──────────────────────────────────────────────────────
-      for (final section in active)
+      for (final section in scrollController.sectionIds)
         _PaletteCommand(
           label: languageController
               .getText('command_palette.go_to', defaultValue: 'Go to {section}')
@@ -147,11 +149,22 @@ class _CommandPaletteState extends State<CommandPalette> {
               ),
           category: navigateCategory,
           icon: sectionIcons[section] ?? Icons.arrow_forward_rounded,
+          uri: Uri.parse('#/$section'),
           onExecute: () =>
               _executeAndClose(() => scrollController.scrollToSection(section)),
         ),
+    ];
+  }
 
-      // ── Language ────────────────────────────────────────────────────────
+  List<_PaletteCommand> _buildLanguageCommands(
+    LanguageCubit languageController,
+    String sectionToPreserve,
+  ) {
+    final languageCategory = languageController.getText(
+      'command_palette.language',
+      defaultValue: 'Language',
+    );
+    return [
       for (final languageCode in languageController.supportedLanguages)
         _PaletteCommand(
           label: languageController
@@ -201,7 +214,6 @@ class _CommandPaletteState extends State<CommandPalette> {
     });
   }
 
-  /// Simple fuzzy matching — all query characters appear in order.
   bool _fuzzyMatch(String text, String query) {
     var queryIndex = 0;
     for (var i = 0; i < text.length && queryIndex < query.length; i++) {
@@ -366,7 +378,6 @@ class _CommandPaletteState extends State<CommandPalette> {
       );
     }
 
-    // Group commands by category for display
     String? lastCategory;
 
     return ListView.builder(
@@ -377,83 +388,102 @@ class _CommandPaletteState extends State<CommandPalette> {
         final command = _filteredCommands[index];
         final isSelected = index == _selectedIndex;
 
-        // Show category header when category changes
-        Widget? categoryHeader;
-        if (command.category != lastCategory) {
-          lastCategory = command.category;
-          categoryHeader = Padding(
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
-            child: Text(
-              command.category.toUpperCase(),
-              style: AppFonts.jetBrainsMono(
-                fontSize: 10,
-                fontWeight: FontWeight.w600,
-                color: AppColors.textSecondary,
-                letterSpacing: 1.5,
-              ),
-            ),
-          );
-        }
+        final showCategory = command.category != lastCategory;
+        lastCategory = command.category;
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            ?categoryHeader,
-            AccessibleAction(
-              onTap: command.onExecute,
-              onHoverChanged: (hovered) {
-                if (hovered) setState(() => _selectedIndex = index);
-              },
-              semanticLabel: command.label,
-              selected: isSelected,
-              borderRadius: BorderRadius.circular(8),
-              child: AnimatedContainer(
-                duration: AppDurations.microFast,
-                margin: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 10,
-                ),
-                decoration: BoxDecoration(
-                  color: isSelected
-                      ? Colors.white.withValues(alpha: 0.06)
-                      : Colors.transparent,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Row(
-                  children: [
-                    Icon(
-                      command.icon,
-                      size: 16,
-                      color: isSelected
-                          ? AppColors.accent
-                          : AppColors.textSecondary,
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        command.label,
-                        style: AppFonts.inter(
-                          fontSize: 14,
-                          color: isSelected
-                              ? AppColors.textBright
-                              : AppColors.textPrimary,
-                        ),
-                      ),
-                    ),
-                    if (isSelected)
-                      const Icon(
-                        Icons.keyboard_return_rounded,
-                        size: 14,
-                        color: AppColors.textSecondary,
-                      ),
-                  ],
-                ),
-              ),
-            ),
+            if (showCategory) _buildCategoryHeader(command.category),
+            _buildCommandAction(command, index, isSelected),
           ],
         );
       },
     );
   }
+
+  Widget _buildCategoryHeader(String category) => Padding(
+    padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
+    child: Text(
+      category.toUpperCase(),
+      style: AppFonts.jetBrainsMono(
+        fontSize: 10,
+        fontWeight: FontWeight.w600,
+        color: AppColors.textSecondary,
+        letterSpacing: 1.5,
+      ),
+    ),
+  );
+
+  Widget _buildCommandAction(
+    _PaletteCommand command,
+    int index,
+    bool isSelected,
+  ) {
+    void onHoverChanged(bool hovered) {
+      if (hovered) setState(() => _selectedIndex = index);
+    }
+
+    final content = _buildCommandContent(command, isSelected);
+    final uri = command.uri;
+    if (uri != null) {
+      return PortfolioLink(
+        uri: uri,
+        onActivate: command.onExecute,
+        onHoverChanged: onHoverChanged,
+        semanticLabel: command.label,
+        selected: isSelected,
+        borderRadius: BorderRadius.circular(8),
+        child: content,
+      );
+    }
+    return AccessibleAction(
+      onTap: command.onExecute,
+      onHoverChanged: onHoverChanged,
+      semanticLabel: command.label,
+      selected: isSelected,
+      borderRadius: BorderRadius.circular(8),
+      child: content,
+    );
+  }
+
+  Widget _buildCommandContent(_PaletteCommand command, bool isSelected) =>
+      AnimatedContainer(
+        duration: AppDurations.microFast,
+        margin: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? Colors.white.withValues(alpha: 0.06)
+              : Colors.transparent,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Row(
+          children: [
+            Icon(
+              command.icon,
+              size: 16,
+              color: isSelected ? AppColors.accent : AppColors.textSecondary,
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                command.label,
+                style: AppFonts.inter(
+                  fontSize: 14,
+                  color: isSelected
+                      ? AppColors.textBright
+                      : AppColors.textPrimary,
+                ),
+              ),
+            ),
+            if (isSelected)
+              const Icon(
+                Icons.keyboard_return_rounded,
+                size: 14,
+                color: AppColors.textSecondary,
+              ),
+          ],
+        ),
+      );
 }

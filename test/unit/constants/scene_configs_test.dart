@@ -4,13 +4,13 @@ import 'package:flutter_web_portfolio/app/core/constants/scene_configs.dart';
 
 void main() {
   group('SceneConfigs', () {
-    test('chapter order matches the five scene identities', () {
+    test('chapter slots reuse the document palette', () {
       expect(
         SceneConfigs.scenes,
         orderedEquals(const [
-          SceneConfigs.hero,
-          SceneConfigs.about,
-          SceneConfigs.experience,
+          SceneConfigs.document,
+          SceneConfigs.document,
+          SceneConfigs.document,
           SceneConfigs.proof,
           SceneConfigs.projects,
         ]),
@@ -26,17 +26,21 @@ void main() {
 
   group('SceneConfig.lerp', () {
     const start = SceneConfig(
-      gradient1: Color(0xFF000000),
-      gradient2: Color(0xFF202020),
-      gradient3: Color(0xFF404040),
-      accent: Color(0xFF606060),
+      palette: ScenePalette(
+        gradient1: Color(0xFF000000),
+        gradient2: Color(0xFF202020),
+        gradient3: Color(0xFF404040),
+        accent: Color(0xFF606060),
+      ),
       vignetteIntensity: 0.2,
     );
     const end = SceneConfig(
-      gradient1: Color(0xFFFFFFFF),
-      gradient2: Color(0xFFE0E0E0),
-      gradient3: Color(0xFFC0C0C0),
-      accent: Color(0xFFA0A0A0),
+      palette: ScenePalette(
+        gradient1: Color(0xFFFFFFFF),
+        gradient2: Color(0xFFE0E0E0),
+        gradient3: Color(0xFFC0C0C0),
+        accent: Color(0xFFA0A0A0),
+      ),
       vignetteIntensity: 0.8,
     );
 

@@ -2,7 +2,8 @@ import 'package:flutter/foundation.dart' show ValueListenable;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_web_portfolio/app/core/theme/app_fonts.dart';
-import 'package:flutter_web_portfolio/app/domain/models/portfolio_document.dart';
+import 'package:flutter_web_portfolio/app/domain/models/portfolio_document.dart'
+    show PortfolioDocument;
 import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
 import 'package:flutter_web_portfolio/app/controllers/scroll_controller.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
@@ -12,12 +13,12 @@ import 'package:flutter_web_portfolio/app/core/constants/durations.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_dimensions.dart';
 import 'package:flutter_web_portfolio/app/widgets/accessible_action.dart';
 import 'package:flutter_web_portfolio/app/widgets/navigation_overlay.dart';
+import 'package:flutter_web_portfolio/app/widgets/portfolio_link.dart';
 import 'package:flutter_web_portfolio/app/widgets/language_switcher.dart';
 import 'package:flutter_web_portfolio/app/widgets/scene_accent_builder.dart';
 import 'package:flutter_web_portfolio/app/narrative/application/narrative_position.dart';
 
 /// Compact navigation for the single-page document.
-/// Shrinks from 80px to 60px as the user scrolls down (200px threshold).
 class CustomSliverAppBar extends StatefulWidget {
   const CustomSliverAppBar({
     super.key,
@@ -30,7 +31,6 @@ class CustomSliverAppBar extends StatefulWidget {
   final AppScrollController scrollController;
   final List<Widget>? actions;
 
-  /// Nav sections derived at build-time from active sections (excludes 'home').
   static List<String> navSections(AppScrollController scrollController) =>
       scrollController.sectionIds
           .where((section) => section != 'home')
@@ -43,7 +43,6 @@ class CustomSliverAppBar extends StatefulWidget {
 class _CustomSliverAppBarState extends State<CustomSliverAppBar> {
   double _toolbarHeight = AppDimensions.appBarHeight;
 
-  /// Scale factor for logo and nav items: 1.0 at top, smaller when collapsed.
   double get _scaleFactor => _toolbarHeight / AppDimensions.appBarHeight;
 
   @override
@@ -91,9 +90,6 @@ class _CustomSliverAppBarState extends State<CustomSliverAppBar> {
           Expanded(
             child: Container(
               decoration: const BoxDecoration(
-                // Pinned chapter navigation is deliberately opaque. Long
-                // interlude headlines must never ghost through the toolbar
-                // while anchor navigation settles.
                 color: AppColors.background,
                 border: Border(
                   bottom: BorderSide(color: Color(0x2412110F), width: 1),
@@ -113,23 +109,32 @@ class _CustomSliverAppBarState extends State<CustomSliverAppBar> {
           defaultValue: 'Go to home',
         ),
       ),
-      leading: isMobile
-          ? IconButton(
-              tooltip: MaterialLocalizations.of(context).openAppDrawerTooltip,
-              icon: Icon(
-                Icons.menu_rounded,
-                color: AppColors.textPrimary,
-                size: 24 * _scaleFactor,
-              ),
-              onPressed: () => NavigationOverlay.show(context),
-            )
-          : null,
+      leading: isMobile ? _buildMenuButton(context) : null,
       actions: [
         if (!isMobile) _buildNavItems(),
         const LanguageSwitcher(),
         ...?widget.actions,
         const SizedBox(width: 16),
       ],
+    );
+  }
+
+  Widget _buildMenuButton(BuildContext context) {
+    final label = MaterialLocalizations.of(context).openAppDrawerTooltip;
+    return Tooltip(
+      message: label,
+      child: SizedBox(
+        width: 56,
+        child: AccessibleAction(
+          onTap: () => NavigationOverlay.show(context),
+          semanticLabel: label,
+          child: Icon(
+            Icons.menu_rounded,
+            color: AppColors.textPrimary,
+            size: 24 * _scaleFactor,
+          ),
+        ),
+      ),
     );
   }
 
@@ -150,6 +155,7 @@ class _CustomSliverAppBarState extends State<CustomSliverAppBar> {
               children: [
                 for (final section in sections)
                   _NavItem(
+                    sectionId: section,
                     label: widget.languageController.getText(
                       'nav.$section',
                       defaultValue: section.toUpperCase(),
@@ -166,9 +172,6 @@ class _CustomSliverAppBarState extends State<CustomSliverAppBar> {
   );
 }
 
-// ---------------------------------------------------------------------------
-// Personal wordmark derived from canonical profile data.
-// ---------------------------------------------------------------------------
 class _LogoText extends StatefulWidget {
   const _LogoText({
     required this.onTap,
@@ -193,8 +196,9 @@ class _LogoTextState extends State<_LogoText> {
     const baseColor = AppColors.textBright;
     const hoverColor = AppColors.accent;
 
-    return AccessibleAction(
-      onTap: widget.onTap,
+    return PortfolioLink(
+      uri: Uri.parse('#/'),
+      onActivate: widget.onTap,
       onHoverChanged: (h) => setState(() => _hovered = h),
       semanticLabel: widget.semanticLabel,
       child: AnimatedContainer(
@@ -215,17 +219,16 @@ class _LogoTextState extends State<_LogoText> {
   }
 }
 
-// ---------------------------------------------------------------------------
-// Nav item: readable case with a restrained active underline.
-// ---------------------------------------------------------------------------
 class _NavItem extends StatefulWidget {
   const _NavItem({
+    required this.sectionId,
     required this.label,
     required this.isActive,
     required this.onTap,
     this.scaleFactor = 1.0,
   });
 
+  final String sectionId;
   final String label;
   final bool isActive;
   final VoidCallback onTap;
@@ -244,8 +247,9 @@ class _NavItemState extends State<_NavItem> {
     const inactiveColor = AppColors.textPrimary;
     const underlineColor = AppColors.accent;
 
-    return AccessibleAction(
-      onTap: widget.onTap,
+    return PortfolioLink(
+      uri: Uri.parse('#/${widget.sectionId}'),
+      onActivate: widget.onTap,
       onHoverChanged: (h) => setState(() => _hovered = h),
       semanticLabel: widget.label,
       selected: widget.isActive,
@@ -266,7 +270,6 @@ class _NavItemState extends State<_NavItem> {
               ),
             ),
             const SizedBox(height: 4),
-            // Underline — animates from left
             Align(
               alignment: Alignment.centerLeft,
               child: AnimatedContainer(
@@ -286,9 +289,6 @@ class _NavItemState extends State<_NavItem> {
   }
 }
 
-// ---------------------------------------------------------------------------
-// Scene-aware scroll progress bar (1px, gradient with scene accent)
-// ---------------------------------------------------------------------------
 class _SceneProgressBar extends StatelessWidget {
   const _SceneProgressBar({required this.scrollController});
   final AppScrollController scrollController;
@@ -354,7 +354,6 @@ final class _SceneProgressPainter extends CustomPainter {
       textDirection != oldDelegate.textDirection;
 }
 
-/// Physical bounds of the reading-progress fill in either writing direction.
 abstract final class SceneProgressGeometry {
   static Rect bounds({
     required Size size,

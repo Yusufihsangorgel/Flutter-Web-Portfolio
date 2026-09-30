@@ -5,41 +5,23 @@ import 'package:flutter_web_portfolio/app/controllers/scroll_controller.dart';
 import 'package:flutter_web_portfolio/app/core/constants/scene_configs.dart';
 import 'package:flutter_web_portfolio/app/narrative/application/narrative_position.dart';
 import 'package:flutter_web_portfolio/app/narrative/domain/narrative_document.dart';
+import 'package:flutter_web_portfolio/app/narrative/domain/smooth_step.dart';
 
 @immutable
 final class SceneState {
   const SceneState({
     required this.currentSceneIndex,
-    required this.globalProgress,
-    required this.blendFactor,
     required this.blendedConfig,
-    required this.currentMotif,
-    required this.nextMotif,
-    required this.activeMotif,
   });
 
   const SceneState.initial()
     : currentSceneIndex = 0,
-      globalProgress = 0,
-      blendFactor = 0,
-      blendedConfig = SceneConfigs.hero,
-      currentMotif = NarrativeMotif.origin,
-      nextMotif = NarrativeMotif.origin,
-      activeMotif = NarrativeMotif.origin;
+      blendedConfig = SceneConfigs.document;
 
   final int currentSceneIndex;
-  final double globalProgress;
-  final double blendFactor;
   final SceneConfig blendedConfig;
-  final NarrativeMotif currentMotif;
-  final NarrativeMotif nextMotif;
-  final NarrativeMotif activeMotif;
 
-  /// Stable chapter accent for content widgets.
-  ///
-  /// The painter consumes [blendedConfig] continuously, while headings and
-  /// content changes accent only when the active chapter changes. This prevents
-  /// scroll-frequency content rebuilds during palette crossfades.
+  /// Keeps content accents steady between chapter changes.
   Color get currentAccent => SceneConfigs.scenes[currentSceneIndex].accent;
 
   @override
@@ -47,30 +29,13 @@ final class SceneState {
       identical(this, other) ||
       other is SceneState &&
           currentSceneIndex == other.currentSceneIndex &&
-          globalProgress == other.globalProgress &&
-          blendFactor == other.blendFactor &&
-          blendedConfig == other.blendedConfig &&
-          currentMotif == other.currentMotif &&
-          nextMotif == other.nextMotif &&
-          activeMotif == other.activeMotif;
+          blendedConfig == other.blendedConfig;
 
   @override
-  int get hashCode => Object.hash(
-    currentSceneIndex,
-    globalProgress,
-    blendFactor,
-    blendedConfig,
-    currentMotif,
-    nextMotif,
-    activeMotif,
-  );
+  int get hashCode => Object.hash(currentSceneIndex, blendedConfig);
 }
 
-/// Scroll-driven scene state machine.
-///
-/// A single immutable snapshot is emitted per scroll tick. Consumers select
-/// only the accent or progress field they paint, preventing unrelated widgets
-/// from rebuilding while the background changes.
+/// Publishes the scene selected by the reading position.
 final class SceneDirector extends Cubit<SceneState> {
   SceneDirector({required AppScrollController scrollController})
     : _scrollController = scrollController,
@@ -98,8 +63,6 @@ final class SceneDirector extends Cubit<SceneState> {
     );
   }
 
-  /// Maps the shared reading position to one boundary-local scene blend.
-  @visibleForTesting
   static SceneState calculateState({
     required NarrativePosition position,
     required NarrativeDocument narrative,
@@ -116,12 +79,10 @@ final class SceneDirector extends Cubit<SceneState> {
     final activeSceneIndex = _sceneIndexFor(activeChapter);
     final transition = currentChapter.id == nextChapter.id
         ? 0.0
-        : _smoothStep(position.boundaryProgress);
+        : smoothStep(position.boundaryProgress);
 
     return SceneState(
       currentSceneIndex: activeSceneIndex,
-      globalProgress: position.documentProgress,
-      blendFactor: transition,
       blendedConfig: transition == 0
           ? SceneConfigs.scenes[currentSceneIndex]
           : SceneConfig.lerp(
@@ -129,9 +90,6 @@ final class SceneDirector extends Cubit<SceneState> {
               SceneConfigs.scenes[nextSceneIndex],
               transition,
             ),
-      currentMotif: currentChapter.motif,
-      nextMotif: nextChapter.motif,
-      activeMotif: activeChapter.motif,
     );
   }
 
@@ -143,10 +101,6 @@ final class SceneDirector extends Cubit<SceneState> {
         NarrativeMotif.branches => 3,
         NarrativeMotif.bracket => 4,
       };
-
-  static double _smoothStep(double value) => value * value * (3 - 2 * value);
-
-  void recalculate() => _emitCurrentState();
 
   @override
   Future<void> close() {

@@ -22,8 +22,10 @@ void main() {
     required double width,
     TextDirection textDirection = TextDirection.ltr,
     bool reducedMotion = false,
-    Locale locale = const Locale('en'),
-    String label = 'Experience',
+    ({Locale locale, String label}) translation = (
+      locale: const Locale('en'),
+      label: 'Experience',
+    ),
   }) => MediaQuery(
     data: MediaQueryData(
       size: Size(width, 800),
@@ -32,7 +34,7 @@ void main() {
     child: RepositoryProvider<NarrativeDocument>.value(
       value: narrative,
       child: Localizations(
-        locale: locale,
+        locale: translation.locale,
         delegates: const <LocalizationsDelegate<dynamic>>[
           GlobalWidgetsLocalizations.delegate,
         ],
@@ -51,7 +53,7 @@ void main() {
               ),
               position: position,
               chapterNumber: '01',
-              label: label,
+              label: translation.label,
             ),
           ),
         ),
@@ -104,34 +106,11 @@ void main() {
     }
   });
 
-  test('measures full translated labels at narrow seam widths', () {
-    for (final width in [280.0, 320.0]) {
-      final turkish = NarrativeHandoffTypography.resolve(
-        size: Size(width, 72),
-        chapterNumber: '01',
-        label: 'Deneyim',
-        locale: const Locale('tr'),
-        textDirection: TextDirection.ltr,
-      );
-      expect(turkish.normalizedLabel, 'DENEYİM');
-      expect(turkish.railSize.width, lessThanOrEqualTo(turkish.maxRailWidth));
-
-      final rtl = NarrativeHandoffTypography.resolve(
-        size: Size(width, 72),
-        chapterNumber: '01',
-        label: 'الخبرة المهنية',
-        locale: const Locale('ar'),
-        textDirection: TextDirection.rtl,
-      );
-      expect(rtl.normalizedLabel, 'الخبرة المهنية');
-      expect(rtl.railSize.width, lessThanOrEqualTo(rtl.maxRailWidth));
-      expect(rtl.titleSize.width, lessThan(width - 40));
-    }
-  });
-
   testWidgets('renders Turkish and RTL labels without paint exceptions', (
     tester,
   ) async {
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+    await tester.binding.setSurfaceSize(const Size(280, 800));
     for (final variant in [
       (
         locale: const Locale('tr'),
@@ -147,12 +126,15 @@ void main() {
       await tester.pumpWidget(
         subject(
           width: 280,
-          locale: variant.locale,
           textDirection: variant.direction,
-          label: variant.label,
+          translation: (locale: variant.locale, label: variant.label),
         ),
       );
       await tester.pump();
+      expect(
+        tester.getSize(find.byKey(const ValueKey('handoff-home-experience'))),
+        const Size(280, 72),
+      );
       expect(tester.takeException(), isNull);
     }
   });
@@ -226,13 +208,13 @@ void main() {
       documentProgress: 0.18,
     );
     expect(
-      NarrativeHandoffReveal.resolve(
+      NarrativeHandoffReveal.resolve((
         snapshot: activeBoundary,
         chapterOrder: chapters,
         from: home,
         to: experience,
         reducedMotion: false,
-      ),
+      )),
       0.4,
     );
 
@@ -245,36 +227,36 @@ void main() {
       documentProgress: 0.68,
     );
     expect(
-      NarrativeHandoffReveal.resolve(
+      NarrativeHandoffReveal.resolve((
         snapshot: laterBoundary,
         chapterOrder: chapters,
         from: home,
         to: experience,
         reducedMotion: false,
-      ),
+      )),
       1,
     );
     expect(
-      NarrativeHandoffReveal.resolve(
+      NarrativeHandoffReveal.resolve((
         snapshot: laterBoundary,
         chapterOrder: chapters,
         from: projects,
         to: packages,
         reducedMotion: false,
-      ),
+      )),
       0,
     );
   });
 
   test('reduced motion exposes the complete static handoff', () {
     expect(
-      NarrativeHandoffReveal.resolve(
+      NarrativeHandoffReveal.resolve((
         snapshot: const NarrativePosition.initial(),
         chapterOrder: narrative.chapters,
         from: narrative.chapterFor(SectionId.projects),
         to: narrative.chapterFor(SectionId.about),
         reducedMotion: true,
-      ),
+      )),
       1,
     );
   });

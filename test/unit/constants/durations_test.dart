@@ -7,7 +7,6 @@ void main() {
     expect(AppDurations.fast, lessThan(AppDurations.buttonHover));
     expect(AppDurations.buttonHover, lessThan(AppDurations.medium));
     expect(AppDurations.medium, lessThan(AppDurations.sectionScroll));
-    expect(AppDurations.heroDebounce, lessThan(AppDurations.sectionScroll));
     expect(AppDurations.fadeIn, AppDurations.sectionScroll);
   });
 }

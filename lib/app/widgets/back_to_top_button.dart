@@ -9,7 +9,7 @@ import 'package:flutter_web_portfolio/app/core/constants/motion_curves.dart';
 import 'package:flutter_web_portfolio/app/core/constants/durations.dart';
 import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
 import 'package:flutter_web_portfolio/app/utils/motion_preference.dart';
-import 'package:flutter_web_portfolio/app/widgets/accessible_action.dart';
+import 'package:flutter_web_portfolio/app/widgets/portfolio_link.dart';
 
 /// Floating back-to-top control with a live document-scroll progress arc.
 class BackToTopButton extends StatefulWidget {
@@ -119,9 +119,10 @@ class _BackToTopButtonState extends State<BackToTopButton>
                     excluding: !_visible,
                     child: IgnorePointer(
                       ignoring: !_visible,
-                      child: AccessibleAction(
+                      child: PortfolioLink(
+                        uri: Uri.parse('#/'),
                         key: const ValueKey('back-to-top-action'),
-                        onTap: _scrollToTop,
+                        onActivate: _scrollToTop,
                         focusNode: widget.focusNode,
                         onHoverChanged: (hovered) {
                           if (_hovered != hovered) {
@@ -133,7 +134,6 @@ class _BackToTopButtonState extends State<BackToTopButton>
                           defaultValue: 'Back to top',
                         ),
                         borderRadius: BorderRadius.circular(buttonSize / 2),
-                        focusColor: AppColors.accent,
                         child: SizedBox.square(
                           dimension: buttonSize,
                           child: CustomPaint(
