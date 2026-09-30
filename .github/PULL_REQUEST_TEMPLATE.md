@@ -1,43 +1,38 @@
 ## Summary
 
-Brief description of what this PR does and why.
+Describe the change and why it is needed.
 
 ## Changes
 
 -
 
-## Type
+## Checks
 
-- [ ] Bug fix
-- [ ] New feature
-- [ ] Refactoring
-- [ ] Documentation
-- [ ] CI/CD
-- [ ] Other
+Follow the [architecture rules](../blob/main/docs/ARCHITECTURE-RULES.md) and
+[CONTRIBUTING.md](../blob/main/CONTRIBUTING.md). CI uses Flutter 3.47.5 from
+[`tool/toolchain.json`](../blob/main/tool/toolchain.json), its bundled Dart
+3.13.4, and Node.js 24.18.0.
 
-## Checklist
+These workflows run on the pull request:
 
-- [ ] `dart format --output=none --set-exit-if-changed lib test tool` passes
-- [ ] `npm run verify:toolchain` confirms the pinned Node and Flutter versions
-- [ ] `npm run portfolio:validate`, `npm run test:template`, and `npm run test:clone` pass
-- [ ] `npm run test:release-security` passes
-- [ ] `npm run verify:content`, `npm run verify:hosting`, and `npm run verify:source` pass
-- [ ] `npm run verify:community` passes
-- [ ] `npm run audit:sources` passes
-- [ ] `npm run audit:history` finds no attribution or unresolved development markers
-- [ ] `npm run typecheck` passes with strict Playwright types
-- [ ] `flutter analyze --fatal-infos` passes with no issues
-- [ ] `flutter test` passes
-- [ ] `npm run build:release` passes
-- [ ] `npm test` passes on desktop, tablet, and mobile projects
-- [ ] `npm run verify:runtime` passes
-- [ ] New code includes tests where applicable
-- [ ] Documentation updated if needed
+- [ ] `ci.yml` — toolchain, content, source, analysis, test, build, clean clone, browser, and runtime checks
+- [ ] `architecture.yml` — architecture calibration and import rules when its path filter matches
+- [ ] `codeql.yml` — code scanning
+- [ ] `dependency-review.yml` — dependency review
+- [ ] `pr-title.yml` — Conventional Commits title
+
+The title must follow [Conventional Commits](https://www.conventionalcommits.org/),
+for example `fix(web): wait for the first rendered frame`.
+
+Checks that CI cannot make:
+
+- [ ] Behavior changes include focused tests
+- [ ] Documentation is updated where it changed
 
 ## Screenshots
 
-If this PR includes visual changes, add before/after screenshots.
+Add before and after screenshots for visual changes.
 
-## Related Issues
+## Related issues
 
 Closes #
