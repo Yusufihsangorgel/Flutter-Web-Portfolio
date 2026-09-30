@@ -1,6 +1,7 @@
 name: adaptive_render_budget
 description: Adaptive rendering tiers based on Flutter frame timings and a configurable frame budget.
 version: 0.1.0
+homepage: https://github.com/Yusufihsangorgel/Flutter-Web-Portfolio/tree/main/packages/adaptive_render_budget
 repository: https://github.com/Yusufihsangorgel/Flutter-Web-Portfolio/tree/main/packages/adaptive_render_budget
 
 environment:
