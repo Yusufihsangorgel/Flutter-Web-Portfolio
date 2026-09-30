@@ -1,4 +1,4 @@
-# Flutter Web Portfolio (portfolio) — Architecture Rules (binding)
+# Flutter Web Portfolio — Architecture Rules (binding)
 
 Version 2 · 2026-09-29 · Scope: every contributor changing code, tests, CI, or UI in this repository.
 
