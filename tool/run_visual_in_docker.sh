@@ -20,6 +20,7 @@ fi
 
 version=$(python3 - <<'PY'
 import json
+import sys
 from pathlib import Path
 
 manifest = json.loads(Path('package.json').read_text())
@@ -30,7 +31,7 @@ locked_request = lock['packages']['']['devDependencies']['@playwright/test']
 locked_version = lock['packages']['node_modules/@playwright/test']['version']
 if requested != locked_request or installed['version'] != locked_version:
     raise SystemExit('Playwright package, lockfile, and installation disagree.')
-print(locked_version)
+sys.stdout.write(f'{locked_version}\n')
 PY
 )
 
@@ -38,8 +39,9 @@ module_mount=()
 if [[ -L node_modules ]]; then
   container_modules=$(python3 - <<'PY'
 import os
+import sys
 
-print(os.path.normpath(os.path.join('/workspace', os.readlink('node_modules'))))
+sys.stdout.write(os.path.normpath(os.path.join('/workspace', os.readlink('node_modules'))) + '\n')
 PY
 )
   module_mount=(--mount "type=bind,source=$(realpath node_modules),target=$container_modules,readonly")
