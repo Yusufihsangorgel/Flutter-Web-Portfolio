@@ -12,7 +12,7 @@ does not depend on someone remembering to update it by hand.
   refresh anyway so the record stays accurate if that changes. A package's
   `description` is authored site copy and is never overwritten from its
   pubspec. `topics` is not refreshed: the site does not render it, and pub.dev
-  topics can name model vendors, which `audit:history` rejects in source.
+  topics can contain names that `audit:history` rejects in source.
 - **Contributions**, from the GitHub API, only for entries whose `status` is
   `under_review`: when a pull request has merged, `status` becomes `merged`
   and `date` becomes the merge date. A pull request closed without merging is
@@ -63,22 +63,26 @@ every locale, so adding one is a deliberate, authored decision.
 ## Schedule
 
 `.github/workflows/refresh.yml` runs weekly (`workflow_dispatch` also works
-on demand). The first run of each month also writes counters, which keeps the
-repository active: GitHub disables a public repository's schedules after 60
-days without activity. Only if `assets/content/portfolio.json` changed does
-it install the Flutter toolchain, run the checks CI runs, regenerate the
-derived files (`npm run sync:content`) and the tracked release
-(`npm run build:release`), run the clone and browser tests against that
-release, and commit everything as `github-actions[bot]`.
+on demand). The first run of each month also refreshes download counters.
+Only if `assets/content/portfolio.json` changed does the job install Flutter,
+run the content and template checks, regenerate derived files with
+`npm run sync:content`, and re-render the social card and source manifest with
+`npm run prepare:source`, because hosted builds verify the committed card
+instead of rendering it. It commits the refreshed sources to a short-lived
+`bot/refresh-<UTC date>-<run id>` branch and opens a pull request containing
+the refresh report. The workflow token's pull request does not trigger CI, so
+the job dispatches `ci.yml` on that branch and waits for it. Successful CI
+allows a squash merge and branch deletion; failed or timed-out CI leaves the
+pull request open and fails the refresh job. If `main` advances during CI, the
+job also leaves the pull request open for a new check. After a merge, the job
+dispatches CI on `main` for the merge commit.
 
-A push made with the workflow's own token starts no other workflow, and a run
-started with that token raises no `workflow_run` event when it finishes, so the
-job starts both CI and the GitHub Pages deploy itself with `workflow_dispatch`
-events. A host that deploys on its own from every
-push to `main` (a webhook-driven platform, for example) picks up the commit
-directly. If `main` moves while the job runs, the push is rejected and the run
-fails; start a new run rather than re-running the failed one, which would
-reuse the old commit.
+CI builds once, tests that build, and attests `web-release.tar.gz` on `main`.
+The maintainer's production host pulls the attested artifact and deploys its
+image by digest. CI has no production deploy credentials, and this public
+repository has no self-hosted runner. Template users run
+`npm run build:release` and deploy the resulting `build/web` to their host;
+see [`DEPLOY.md`](DEPLOY.md) for host-specific instructions.
 
 ## Enabling it on a clone
 
@@ -88,7 +92,8 @@ requests from `profile.links` (the entry with `id: "github"`), and which
 feeds to check from `writing_sources[]` — all already in
 `assets/content/portfolio.json`. The initializer writes `writing_sources` as
 an empty list for a clean clone; add entries by hand to turn writing refresh
-on. Enable GitHub Actions on the repository and the schedule starts running.
+on. Enable GitHub Actions and allow workflows to create pull requests in the
+repository's Actions settings. The schedule then starts running.
 An authenticated `GITHUB_TOKEN` is provided automatically by Actions; running
 the tool locally without one works too, at GitHub's lower unauthenticated
 rate limit.

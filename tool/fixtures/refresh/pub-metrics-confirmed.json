@@ -1,0 +1,28 @@
+{
+  "score": {
+    "grantedPoints": 140,
+    "maxPoints": 160,
+    "likeCount": 2,
+    "downloadCount30Days": 600,
+    "tags": []
+  },
+  "scorecard": {
+    "packageName": "re2",
+    "packageVersion": "1.0.0",
+    "runtimeVersion": "3.5.0",
+    "updated": "2026-09-29T00:00:00Z",
+    "taskStatus": "completed",
+    "panaReport": {
+      "reportStatus": "success",
+      "timestamp": "2026-09-29T00:00:00Z",
+      "derivedTags": [],
+      "report": {
+        "sections": [
+          { "id": "follow-dart-file-conventions", "title": "Follow Dart file conventions", "grantedPoints": 20, "maxPoints": 30, "status": "success", "summary": "Conventions are followed." },
+          { "id": "provide-documentation", "title": "Provide documentation", "grantedPoints": 50, "maxPoints": 50, "status": "success", "summary": "Documentation is available." },
+          { "id": "support-platforms", "title": "Support platforms", "grantedPoints": 70, "maxPoints": 80, "status": "success", "summary": "Supported platforms are listed." }
+        ]
+      }
+    }
+  }
+}
