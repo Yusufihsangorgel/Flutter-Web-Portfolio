@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
-import { spawnSync } from "node:child_process";
+import { spawn, spawnSync } from "node:child_process";
 import { mkdir, mkdtemp, readFile, rm, symlink, writeFile } from "node:fs/promises";
+import { createServer } from "node:net";
 import os from "node:os";
 import path from "node:path";
 
@@ -71,19 +72,28 @@ const staticFixture = await mkdtemp(path.join(os.tmpdir(), "portfolio-static-roo
 const staticRoot = path.join(staticFixture, "web");
 const outsideFile = path.join(staticFixture, "private.txt");
 try {
-  await mkdir(staticRoot);
+  await mkdir(path.join(staticRoot, ".well-known"), { recursive: true });
   await writeFile(path.join(staticRoot, "index.html"), "safe");
+  await writeFile(path.join(staticRoot, "404.html"), "missing page");
+  await writeFile(path.join(staticRoot, "_headers"), "/*\n  X-Content-Type-Options: nosniff\n");
+  await writeFile(
+    path.join(staticRoot, ".well-known", "security.txt"),
+    "Contact: mailto:security@example.com\n",
+  );
   await writeFile(outsideFile, "private");
   await symlink(outsideFile, path.join(staticRoot, "leak.txt"));
   const canonicalRoot = canonicalStaticRoot(staticRoot);
+  assert.equal(resolveStaticFile(canonicalRoot, "/missing-route"), null);
+  assert.equal(resolveStaticFile(canonicalRoot, "/.well-known"), null);
   assert.equal(
-    resolveStaticFile(canonicalRoot, "/missing-route"),
+    resolveStaticFile(canonicalRoot, "/"),
     path.join(canonicalRoot, "index.html"),
   );
   assert.throws(
     () => resolveStaticFile(canonicalRoot, "/leak.txt"),
     StaticPathViolation,
   );
+  await assertPreviewStaticContract(staticRoot);
 } finally {
   await rm(staticFixture, { recursive: true, force: true });
 }
@@ -351,3 +361,43 @@ for (const [script, arguments_, message] of [
 }
 
 process.stdout.write("Release security contracts passed.\n");
+
+async function assertPreviewStaticContract(webRoot) {
+  const probe = createServer();
+  await new Promise((resolve) => probe.listen(0, "127.0.0.1", resolve));
+  const { port } = probe.address();
+  await new Promise((resolve) => probe.close(resolve));
+
+  const preview = spawn(process.execPath, ["tool/serve_web.mjs"], {
+    env: { ...process.env, WEB_ROOT: webRoot, PORT: String(port) },
+    stdio: ["ignore", "pipe", "inherit"],
+  });
+  try {
+    await new Promise((resolve, reject) => {
+      preview.once("error", reject);
+      preview.once("exit", (code) => reject(new Error(`preview exited with ${code}`)));
+      preview.stdout.on("data", (chunk) => {
+        if (String(chunk).includes("listening")) resolve();
+      });
+    });
+    const origin = `http://127.0.0.1:${port}`;
+
+    const home = await fetch(`${origin}/`);
+    assert.equal(home.status, 200);
+    assert.equal(await home.text(), "safe");
+
+    const missing = await fetch(`${origin}/missing-route`);
+    assert.equal(missing.status, 404);
+    assert.match(missing.headers.get("content-type"), /^text\/html/);
+    assert.equal(missing.headers.get("x-content-type-options"), "nosniff");
+    assert.equal(await missing.text(), "missing page");
+
+    const security = await fetch(`${origin}/.well-known/security.txt`);
+    assert.equal(security.status, 200);
+    assert.match(security.headers.get("content-type"), /^text\/plain; charset=utf-8$/);
+    assert.match(await security.text(), /^Contact: /m);
+  } finally {
+    preview.removeAllListeners("exit");
+    preview.kill();
+  }
+}
