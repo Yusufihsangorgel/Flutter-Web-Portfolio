@@ -1,5 +1,6 @@
 FROM nginx:1.29.5-alpine@sha256:1eff5a5f3fcf8431a0abb7eddf5471fec24e5e1905a2581aeacdb07a4479b92b AS source-check
 
+# Build context needs build/web from npm run build:release; CI publishes web-release.tar.gz.
 WORKDIR /workspace
 COPY analysis_options.yaml package.json package-lock.json pubspec.yaml pubspec.lock ./
 COPY assets assets

@@ -2,8 +2,6 @@ name: Refresh portfolio data
 
 on:
   schedule:
-    # Every Monday at 03:17 UTC. Off the hour so it does not compete with
-    # other scheduled jobs that pile onto :00.
     - cron: '17 3 * * 1'
   workflow_dispatch:
 
@@ -14,10 +12,10 @@ concurrency:
 jobs:
   refresh:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 90
     permissions:
       contents: write
-      # Lets the job start CI for its own commit; see the last step.
+      pull-requests: write
       actions: write
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
@@ -27,10 +25,7 @@ jobs:
           node-version-file: '.nvmrc'
           cache: npm
 
-      # GitHub disables a public repository's schedules after 60 days without
-      # activity, and a quiet month has no visible change to commit. The first
-      # run of each month therefore also writes counters, so the job keeps the
-      # repository active with a real data refresh.
+      # The first run of each month also refreshes download counters.
       - name: Fetch live pub.dev and GitHub data
         env:
           GITHUB_TOKEN: ${{ github.token }}
@@ -76,8 +71,6 @@ jobs:
           npm ci
           npx playwright install --with-deps chromium
 
-      # Production deploys on every push to main, so the refreshed commit is
-      # held to the same checks CI runs before it is pushed.
       - name: Verify the refreshed content
         if: steps.content-diff.outputs.changed == 'true'
         run: |
@@ -96,20 +89,14 @@ jobs:
         if: steps.content-diff.outputs.changed == 'true'
         run: npm run sync:content
 
-      - name: Build and test the tracked release
+      # Hosted builds verify the committed social card instead of rendering it.
+      - name: Render the social card and source manifest
         if: steps.content-diff.outputs.changed == 'true'
-        run: |
-          npm run build:release
-          sha256sum -c --quiet build/web/assets/assets/build/source_manifest.sha256
-          npm run test:clone
-          npm test
+        run: npm run prepare:source
 
       - name: Stage the refreshed content
         if: steps.content-diff.outputs.changed == 'true'
-        # The paths sync:content (tool/sync_public_content.mjs) and
-        # build:release can write. If either starts writing a file that is not
-        # listed here, the check below fails the run instead of committing a
-        # release whose sources and manifest disagree.
+        # Reject changes outside the refreshed source and derived content.
         run: |
           git add -- \
             assets/content/portfolio.json \
@@ -127,7 +114,6 @@ jobs:
             firebase.json \
             vercel.json \
             package.json \
-            build/web \
             assets/build/source_manifest.sha256
           leftover="$(git diff --name-only; git ls-files --others --exclude-standard)"
           if [ -n "${leftover}" ]; then
@@ -136,23 +122,62 @@ jobs:
             exit 1
           fi
 
-      - name: Commit and push
+      - id: branch
+        name: Commit and push the refresh branch
         if: steps.content-diff.outputs.changed == 'true'
         run: |
+          branch="bot/refresh-$(date -u +%Y-%m-%d)-${GITHUB_RUN_ID}"
+          git switch -c "${branch}"
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git commit -m 'Refresh the portfolio record from pub.dev and GitHub'
-          git push origin HEAD:main
+          git commit -m 'chore(data): refresh portfolio record from pub.dev and GitHub'
+          git push origin "${branch}"
+          {
+            echo "name=${branch}"
+            echo "head_sha=$(git rev-parse HEAD)"
+            echo "base_sha=$(git rev-parse HEAD^)"
+          } >> "${GITHUB_OUTPUT}"
 
-      # A push made with the workflow token starts no other workflow, and a run
-      # started with that token raises no workflow_run event when it ends, so
-      # the Pages deploy would never follow CI here. workflow_dispatch is the
-      # exception: start CI for the record, and the deploy directly, since this
-      # job already ran every check CI runs.
-      - name: Start CI and the Pages deploy for the refreshed commit
+      - name: Open a pull request and verify its branch
         if: steps.content-diff.outputs.changed == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
+          BRANCH: ${{ steps.branch.outputs.name }}
+          HEAD_SHA: ${{ steps.branch.outputs.head_sha }}
+          BASE_SHA: ${{ steps.branch.outputs.base_sha }}
         run: |
+          pr_url="$(gh pr create \
+            --base main \
+            --head "${BRANCH}" \
+            --title 'chore(data): refresh portfolio record from pub.dev and GitHub' \
+            --body-file "${RUNNER_TEMP}/refresh-report.md")"
+          gh workflow run ci.yml --ref "${BRANCH}"
+
+          run_id=''
+          for attempt in {1..30}; do
+            run_id="$(gh run list \
+              --workflow ci.yml \
+              --branch "${BRANCH}" \
+              --event workflow_dispatch \
+              --json databaseId,headSha \
+              --limit 20 \
+              --jq ".[] | select(.headSha == \"${HEAD_SHA}\") | .databaseId" | head -n 1)"
+            if [ -n "${run_id}" ]; then break; fi
+            sleep 10
+          done
+          if [ -z "${run_id}" ]; then
+            echo "CI run did not appear after ${attempt} checks for ${BRANCH}; leaving ${pr_url} open." >&2
+            exit 1
+          fi
+          if ! timeout 3600 gh run watch "${run_id}" --exit-status --interval 15; then
+            echo "CI failed or timed out for ${BRANCH}; leaving ${pr_url} open." >&2
+            exit 1
+          fi
+
+          main_sha="$(git ls-remote origin refs/heads/main | cut -f 1)"
+          if [ "${main_sha}" != "${BASE_SHA}" ]; then
+            echo "Main advanced during CI; leaving ${pr_url} open for a new run." >&2
+            exit 1
+          fi
+          gh pr merge "${pr_url}" --squash --delete-branch --match-head-commit "${HEAD_SHA}"
           gh workflow run ci.yml --ref main
-          gh workflow run deploy.yml --ref main
