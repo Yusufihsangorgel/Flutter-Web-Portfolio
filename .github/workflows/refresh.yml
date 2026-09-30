@@ -69,6 +69,7 @@ jobs:
           node tool/verify_toolchain.mjs --current
           flutter pub get
           npm ci
+          npx playwright install --with-deps chromium
 
       - name: Verify the refreshed content
         if: steps.content-diff.outputs.changed == 'true'
@@ -87,6 +88,11 @@ jobs:
       - name: Sync derived public content
         if: steps.content-diff.outputs.changed == 'true'
         run: npm run sync:content
+
+      # Hosted builds verify the committed social card instead of rendering it.
+      - name: Render the social card and source manifest
+        if: steps.content-diff.outputs.changed == 'true'
+        run: npm run prepare:source
 
       - name: Stage the refreshed content
         if: steps.content-diff.outputs.changed == 'true'

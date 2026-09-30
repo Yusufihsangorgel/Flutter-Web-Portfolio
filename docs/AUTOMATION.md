@@ -65,8 +65,10 @@ every locale, so adding one is a deliberate, authored decision.
 `.github/workflows/refresh.yml` runs weekly (`workflow_dispatch` also works
 on demand). The first run of each month also refreshes download counters.
 Only if `assets/content/portfolio.json` changed does the job install Flutter,
-run the content and template checks, and regenerate derived files with
-`npm run sync:content`. It commits the refreshed sources to a short-lived
+run the content and template checks, regenerate derived files with
+`npm run sync:content`, and re-render the social card and source manifest with
+`npm run prepare:source`, because hosted builds verify the committed card
+instead of rendering it. It commits the refreshed sources to a short-lived
 `bot/refresh-<UTC date>-<run id>` branch and opens a pull request containing
 the refresh report. The workflow token's pull request does not trigger CI, so
 the job dispatches `ci.yml` on that branch and waits for it. Successful CI
