@@ -23,3 +23,6 @@ coverage
 .netlify
 .vercel
 .wrangler
+build/*
+!build/web
+!build/web/**
