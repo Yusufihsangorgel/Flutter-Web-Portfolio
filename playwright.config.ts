@@ -10,29 +10,22 @@ const previewUrl = `http://127.0.0.1:${previewPort}`;
 export default defineConfig({
   testDir: './tests/e2e',
   snapshotPathTemplate:
-    '{testDir}/{testFilePath}-snapshots/{arg}{-projectName}-{platform}{ext}',
+    '{testDir}/{testFilePath}-snapshots/{arg}{-projectName}-linux{ext}',
   timeout: 60000,
   expect: {
     timeout: 10000,
     toHaveScreenshot: {
       animations: 'disabled',
       caret: 'hide',
-      // The narrative stage renders a live Wasm canvas behind every section.
-      // On the GPU-less CI runner that canvas rasterises a hair differently
-      // from run to run, so a sub-two-percent pixel delta is background noise,
-      // not a regression. Real layout or content changes move far more than
-      // this. `animations: 'disabled'` only freezes CSS, not the canvas.
-      maxDiffPixelRatio: 0.02,
+      maxDiffPixelRatio: 0.005,
       scale: 'css',
       threshold: 0.2,
     },
   },
   fullyParallel: true,
-  // Each worker boots and compiles an isolated Wasm renderer. Serial execution
-  // keeps cold-cache CI runs deterministic on constrained hosts.
   workers: 1,
   forbidOnly: !!process.env.CI,
-  retries: process.env.CI ? 1 : 0,
+  retries: 0,
   reporter: process.env.CI ? [['github'], ['html', { open: 'never' }]] : 'list',
   use: {
     baseURL: externalBaseUrl ?? previewUrl,

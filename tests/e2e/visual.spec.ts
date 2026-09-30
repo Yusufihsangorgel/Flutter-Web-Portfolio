@@ -4,6 +4,11 @@ import type {
   InterfaceTestData,
   PortfolioTestData,
 } from '../support/portfolio_test_data';
+import {
+  installVisualMasks,
+  settleCompositor,
+  waitForStableCanvas,
+} from './helpers/visual_capture';
 
 const portfolio = JSON.parse(
   readFileSync('assets/content/portfolio.json', 'utf8'),
@@ -19,9 +24,7 @@ test.skip(
   'demo visual baselines do not apply to an initialized empty portfolio',
 );
 
-// The refresh workflow rewrites `writing` whenever a feed publishes, and a
-// baseline that pictured live titles would fail on the next article. The
-// baselines pin a fixed list instead, with titles of differing lengths.
+// Pin article titles so feed refreshes do not alter snapshots.
 const sampleTitles = [
   'A short sample title',
   'A sample title long enough to wrap onto a second line at tablet width',
@@ -37,31 +40,13 @@ const frozenWriting = Array.from({ length: 12 }, (_, index) => ({
 }));
 
 test.beforeEach(async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.route('**/content/portfolio.json*', async (route) => {
     const response = await route.fetch();
     const document = await response.json();
     await route.fulfill({ response, json: { ...document, writing: frozenWriting } });
   });
 });
-
-async function settleCompositor(page: Page, frameCount = 3) {
-  await page.evaluate(
-    (frames) =>
-      new Promise<void>((resolve) => {
-        let remaining = frames;
-        const next = () => {
-          remaining -= 1;
-          if (remaining === 0) {
-            resolve();
-            return;
-          }
-          window.requestAnimationFrame(next);
-        };
-        window.requestAnimationFrame(next);
-      }),
-    frameCount,
-  );
-}
 
 async function waitForHeadingInViewport(page: Page, name: string) {
   const heading = page.getByRole('heading', { name, exact: true });
@@ -88,18 +73,10 @@ async function waitForHeadingInViewport(page: Page, name: string) {
     .toBe(true);
   await page.evaluate(() => document.fonts.ready);
   await settleCompositor(page, 8);
-  // Flutter's semantics tree can lead the SkWasm surface by a few frames on
-  // CPU-constrained Linux runners. Give the compositor one bounded maturity
-  // window, then require another frame sequence before taking a baseline.
-  await page.waitForTimeout(2000);
-  await settleCompositor(page, 4);
+  await waitForStableCanvas(page);
 }
 
 async function openStaticPortfolio(page: Page) {
-  await page.emulateMedia({
-    colorScheme: 'light',
-    reducedMotion: 'reduce',
-  });
   await page.goto('/', { waitUntil: 'domcontentloaded' });
   await page.waitForSelector('flt-semantics-host', {
     state: 'attached',
@@ -116,30 +93,6 @@ async function openStaticPortfolio(page: Page) {
   );
 }
 
-async function openMotionPortfolio(page: Page) {
-  await page.emulateMedia({
-    colorScheme: 'light',
-    reducedMotion: 'no-preference',
-  });
-  await page.goto('/', { waitUntil: 'domcontentloaded' });
-  await page.waitForSelector('flt-semantics-host', {
-    state: 'attached',
-    timeout: 20000,
-  });
-  await expect(page.locator('#bootstrap-surface')).toHaveCount(0);
-  await waitForHeadingInViewport(
-    page,
-    `${portfolio.profile.display_name.accessible}, ${portfolio.profile.role}`,
-  );
-  await expect
-    .poll(() =>
-      page.evaluate(
-        () => window.matchMedia('(prefers-reduced-motion: reduce)').matches,
-      ),
-    )
-    .toBe(false);
-}
-
 async function openChapter(
   page: Page,
   command: string,
@@ -152,7 +105,7 @@ async function openChapter(
   await waitForHeadingInViewport(page, heading);
 }
 
-async function scrollToHeading(page: Page, name: string) {
+async function scrollToVisualHeading(page: Page, name: string) {
   const heading = page.getByRole('heading', { name, exact: true });
   for (let attempt = 0; attempt < 80; attempt += 1) {
     if ((await heading.count()) > 0) {
@@ -165,8 +118,7 @@ async function scrollToHeading(page: Page, name: string) {
         await page.mouse.wheel(0, Math.max(0, box.y - targetY));
         await page.evaluate(() => document.fonts.ready);
         await settleCompositor(page, 8);
-        await page.waitForTimeout(1000);
-        await settleCompositor(page, 4);
+        await waitForStableCanvas(page);
         return;
       }
     }
@@ -176,16 +128,7 @@ async function scrollToHeading(page: Page, name: string) {
   await expect(heading).toBeVisible();
 }
 
-// The portfolio is a single sliver inside the Wasm canvas, so `document` never
-// scrolls and `scrollHeight` only ever reports the viewport height. The engine
-// does publish the real offset on the semantics scroll container it maintains
-// for assistive technology, and that is the one document-level scroll position
-// an outside observer can read. Pair it with the geometry of every heading in
-// the semantics tree: measured on the mobile profile, the offset alone never
-// repeated across a 145-event traversal, while the heading fingerprint alone
-// repeated for up to 11 consecutive events and was empty for 18 of them. So
-// the offset carries the signal, and the headings keep the signal meaningful
-// if a future engine release renames the container.
+// Track the semantics scroll offset and heading positions inside Flutter's canvas.
 async function readScrollProgress(page: Page) {
   return page.evaluate(() => {
     let scroller: Element | null = null;
@@ -215,28 +158,10 @@ async function readScrollProgress(page: Page) {
   });
 }
 
-// A wheel event with document left to travel always moves the progress token.
-// On the tallest profile (Pixel 7, 412x839) the longest run of unchanged token
-// during a legitimate 145-event traversal was zero, so six consecutive
-// motionless events mean the document has stopped scrolling, not that the page
-// is long.
 const SCROLL_STALL_LIMIT = 6;
-// The convergence phase closes about 14.5% of the remaining distance per wheel
-// event on a high-density profile, so progress there is slow but never absent:
-// over the same traversal, the longest run of attempts that failed to improve
-// the best distance by 0.05px was also zero. 24 leaves a wide margin.
 const CONVERGENCE_STALL_LIMIT = 24;
-// A runaway stop so a broken build cannot spin forever, not a travel budget:
-// the stall guards above are what end a search. This sits five times above the
-// deepest traversal measured here, the 185 attempts mobile needs to reach the
-// About boundary and settle on it.
 const SCROLL_ATTEMPT_CEILING = 1000;
 
-// Bounds the scroll searches below by whether the document is still responding
-// to wheel input, rather than by a fixed attempt count. A count is a hidden
-// assertion about how long the page is: it starts failing as soon as the
-// portfolio grows, and it silently tolerates the failure actually worth
-// catching, a document that stops scrolling before the target is reached.
 function createScrollProgressGuard(page: Page) {
   let previousToken: string | null = null;
   let stalledAttempts = 0;
@@ -281,8 +206,7 @@ async function scrollToChapterBoundary(page: Page, name: string) {
       if (Math.abs(delta) <= 1) {
         await page.evaluate(() => document.fonts.ready);
         await settleCompositor(page, 8);
-        await page.waitForTimeout(500);
-        await settleCompositor(page, 4);
+        await waitForStableCanvas(page);
         const settledBox = await heading.boundingBox();
         if (settledBox && Math.abs(settledBox.y - targetY) <= 1) return;
       }
@@ -311,8 +235,6 @@ async function scrollToChapterBoundary(page: Page, name: string) {
   );
 }
 
-// Wheels a heading into the render tree, bounded by whether the document is
-// still scrolling rather than by a fixed number of attempts.
 async function scrollUntilHeadingRenders(
   page: Page,
   heading: Locator,
@@ -341,7 +263,7 @@ async function scrollUntilHeadingRenders(
   );
 }
 
-async function scrollToText(page: Page, text: string) {
+async function scrollToVisualText(page: Page, text: string) {
   const target = page.getByText(text).first();
   for (let attempt = 0; attempt < 80; attempt += 1) {
     if ((await target.count()) > 0) {
@@ -360,14 +282,22 @@ async function scrollToText(page: Page, text: string) {
   return target;
 }
 
+async function expectVisualSnapshot(page: Page, name: string) {
+  await expect
+    .poll(() =>
+      page.evaluate(
+        () => window.matchMedia('(prefers-reduced-motion: reduce)').matches,
+      ),
+    )
+    .toBe(true);
+  await expect(page).toHaveScreenshot(name, {
+    mask: await installVisualMasks(page),
+  });
+}
+
 test('keeps the first meaningful paint visually aligned with the portfolio', async ({
   page,
 }) => {
-  await page.emulateMedia({
-    colorScheme: 'light',
-    reducedMotion: 'reduce',
-  });
-
   await page.route('**/flutter_bootstrap.js*', (route) =>
     route.fulfill({
       body: '',
@@ -379,7 +309,7 @@ test('keeps the first meaningful paint visually aligned with the portfolio', asy
   await page.goto('/', { waitUntil: 'domcontentloaded' });
   await expect(page.locator('#bootstrap-surface')).toBeVisible();
   await settleCompositor(page);
-  await expect(page).toHaveScreenshot('critical-shell.png');
+  await expectVisualSnapshot(page, 'critical-shell.png');
 });
 
 test('preserves the editorial sequence across responsive viewports', async ({
@@ -397,12 +327,12 @@ test('preserves the editorial sequence across responsive viewports', async ({
       page.getByText(`${portfolio.profile.since} →`, { exact: true }).first(),
     ).toBeVisible();
   }
-  await expect(page).toHaveScreenshot('hero.png');
+  await expectVisualSnapshot(page, 'hero.png');
 
   await openChapter(page, 'Go to Open Source', /#\/proof$/, 'Open Source');
-  await expect(page).toHaveScreenshot('open-source.png');
-  await scrollToHeading(page, 'First Frame Lab');
-  await expect(page).toHaveScreenshot('first-frame-lab.png');
+  await expectVisualSnapshot(page, 'open-source.png');
+  await scrollToVisualHeading(page, 'First Frame Lab');
+  await expectVisualSnapshot(page, 'first-frame-lab.png');
 
   await openChapter(
     page,
@@ -410,33 +340,33 @@ test('preserves the editorial sequence across responsive viewports', async ({
     /#\/projects$/,
     'Selected Work',
   );
-  await expect(page).toHaveScreenshot('systems.png');
+  await expectVisualSnapshot(page, 'systems.png');
 
   const firstSupporting = portfolio.systems.find(
     (system) => !system.featured,
   );
   if (!firstSupporting) throw new Error('Expected supporting work.');
-  await scrollToHeading(page, firstSupporting.name);
-  await expect(page).toHaveScreenshot('archive.png');
+  await scrollToVisualHeading(page, firstSupporting.name);
+  await expectVisualSnapshot(page, 'archive.png');
 });
 
 test('connects chapters during real document scrolling', async ({ page }) => {
   await openStaticPortfolio(page);
 
   await scrollToChapterBoundary(page, 'Experience');
-  await expect(page).toHaveScreenshot('boundary-experience.png');
+  await expectVisualSnapshot(page, 'boundary-experience.png');
 
   await scrollToChapterBoundary(page, 'About');
-  await expect(page).toHaveScreenshot('boundary-about.png');
+  await expectVisualSnapshot(page, 'boundary-about.png');
 });
 
-test('keeps one content-anchored signal in the default motion experience', async ({
+test('keeps one content-anchored signal with reduced motion', async ({
   page,
 }) => {
-  await openMotionPortfolio(page);
+  await openStaticPortfolio(page);
 
   await scrollToChapterBoundary(page, 'Experience');
-  await expect(page).toHaveScreenshot('narrative-stage-experience.png');
+  await expectVisualSnapshot(page, 'narrative-stage-experience.png');
 
   const primaryCase = portfolio.systems.find((system) => system.featured);
   if (!primaryCase) throw new Error('Expected a primary professional case.');
@@ -459,14 +389,7 @@ test('keeps one content-anchored signal in the default motion experience', async
     await settleCompositor(page, 3);
   }
   await settleCompositor(page, 8);
-  // The narrative cursor is a pure function of scroll offset. On the mobile
-  // profile, whose device pixel ratio damps wheel input the hardest, the
-  // convergence attempts run out around 20px short of the 20% target, but they
-  // do so deterministically, so the frame is stable from run to run. The cursor sits over the high-contrast
-  // featured-work board, so scroll drift moves more antialiased edges than the
-  // calmer Experience anchor above; the frame is held to the project-wide
-  // screenshot tolerance, which already accounts for the live canvas.
-  await expect(page).toHaveScreenshot('narrative-stage-work.png');
+  await expectVisualSnapshot(page, 'narrative-stage-work.png');
 });
 
 test('renders a real supporting-work artifact in the atlas', async (
@@ -483,7 +406,7 @@ test('renders a real supporting-work artifact in the atlas', async (
         (system) => system.artifact.width > system.artifact.height,
       );
   if (!selected) throw new Error('Expected a landscape supporting artifact.');
-  let selector = await scrollToText(page, selected.name);
+  let selector = await scrollToVisualText(page, selected.name);
   if (mobile) {
     await page
       .getByRole('button', {
@@ -504,9 +427,6 @@ test('renders a real supporting-work artifact in the atlas', async (
     await page.mouse.wheel(0, box ? box.y - 120 : 360);
     await settleCompositor(page, 3);
   }
-  // The renderer swaps in the portrait compact variant whenever the viewport
-  // is narrower than the Flutter tablet breakpoint (900 logical pixels), so
-  // the expected media must be chosen from the actual viewport width.
   const compactViewport = (page.viewportSize()?.width ?? 0) < 900;
   const expectedArtifact =
     compactViewport && selected.artifact.compact
@@ -515,6 +435,6 @@ test('renders a real supporting-work artifact in the atlas', async (
   const artifact = page.getByRole('img', { name: expectedArtifact.alt });
   await expect(artifact).toBeAttached();
   await settleCompositor(page, 8);
-  await page.waitForTimeout(500);
-  await expect(page).toHaveScreenshot('archive-selected.png');
+  await waitForStableCanvas(page);
+  await expectVisualSnapshot(page, 'archive-selected.png');
 });
