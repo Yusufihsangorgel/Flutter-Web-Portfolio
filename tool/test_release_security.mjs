@@ -288,8 +288,11 @@ for (const pattern of [".env.*", "*.key", "*.pem", ".vercel"]) {
 }
 assert.match(gitignore, /^\/build\/\*$/m);
 assert.doesNotMatch(gitignore, /^!\/build\/web\//m);
-assert.match(dockerignore, /^!build\/web$/m);
-assert.match(dockerignore, /^!build\/web\/\*\*$/m);
+assert.match(
+  dockerignore,
+  /^build\/\*\n!build\/web\n!build\/web\/\*\*$/m,
+  "the Docker context must exclude build output except build/web",
+);
 
 const pubspec = await readFile("pubspec.yaml", "utf8");
 const fontSection = pubspec.split("\n  fonts:\n")[1];
