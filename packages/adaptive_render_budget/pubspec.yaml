@@ -1,7 +1,7 @@
 name: adaptive_render_budget
-description: A repository-local adaptive rendering budget controller for Flutter.
-publish_to: none
+description: Adaptive rendering tiers based on Flutter frame timings and a configurable frame budget.
 version: 0.1.0
+repository: https://github.com/Yusufihsangorgel/Flutter-Web-Portfolio/tree/main/packages/adaptive_render_budget
 
 environment:
   sdk: '>=3.12.0 <4.0.0'

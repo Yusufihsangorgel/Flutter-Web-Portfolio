@@ -9,6 +9,7 @@ import 'package:flutter/foundation.dart';
 /// stage instead of adding both stages together.
 @immutable
 final class RenderFrameTiming {
+  /// Creates a sample from non-negative build and raster durations.
   factory RenderFrameTiming({
     required Duration buildDuration,
     required Duration rasterDuration,
@@ -39,12 +40,11 @@ final class RenderFrameTiming {
   });
 
   /// Creates a package timing sample from an engine [FrameTiming].
-  factory RenderFrameTiming.fromFlutter(FrameTiming timing) {
-    return RenderFrameTiming(
-      buildDuration: timing.buildDuration,
-      rasterDuration: timing.rasterDuration,
-    );
-  }
+  factory RenderFrameTiming.fromFlutter(FrameTiming timing) =>
+      RenderFrameTiming(
+        buildDuration: timing.buildDuration,
+        rasterDuration: timing.rasterDuration,
+      );
 
   /// Time spent producing the layer tree on the UI thread.
   final Duration buildDuration;
@@ -53,29 +53,25 @@ final class RenderFrameTiming {
   final Duration rasterDuration;
 
   /// The stage that determines whether this frame fits the display cadence.
-  Duration get criticalDuration {
-    return Duration(
-      microseconds: math.max(
-        buildDuration.inMicroseconds,
-        rasterDuration.inMicroseconds,
-      ),
-    );
-  }
+  Duration get criticalDuration => Duration(
+    microseconds: math.max(
+      buildDuration.inMicroseconds,
+      rasterDuration.inMicroseconds,
+    ),
+  );
 
   @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        other is RenderFrameTiming &&
-            buildDuration == other.buildDuration &&
-            rasterDuration == other.rasterDuration;
-  }
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is RenderFrameTiming &&
+          buildDuration == other.buildDuration &&
+          rasterDuration == other.rasterDuration;
 
   @override
   int get hashCode => Object.hash(buildDuration, rasterDuration);
 
   @override
-  String toString() {
-    return 'RenderFrameTiming('
-        'build: $buildDuration, raster: $rasterDuration)';
-  }
+  String toString() =>
+      'RenderFrameTiming('
+      'build: $buildDuration, raster: $rasterDuration)';
 }

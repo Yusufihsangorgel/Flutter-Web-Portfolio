@@ -81,9 +81,9 @@ void main() {
         clock: clock,
         initialLevel: RenderBudgetLevel.reduced,
       );
-      timingSource.emitRepeated(_healthyFrame, 4);
-
-      timingSource.emitRepeated(_slowFrame, 2);
+      timingSource
+        ..emitRepeated(_healthyFrame, 4)
+        ..emitRepeated(_slowFrame, 2);
 
       expect(controller.value.level, RenderBudgetLevel.reduced);
       expect(controller.value.phase, AdaptiveRenderBudgetPhase.steady);
@@ -100,9 +100,9 @@ void main() {
         clock: clock,
         initialLevel: RenderBudgetLevel.reduced,
       );
-      timingSource.emitRepeated(_healthyFrame, 4);
-
-      timingSource.emitRepeated(_middlingFrame, 4);
+      timingSource
+        ..emitRepeated(_healthyFrame, 4)
+        ..emitRepeated(_middlingFrame, 4);
 
       expect(controller.value.level, RenderBudgetLevel.reduced);
       expect(
@@ -116,9 +116,7 @@ void main() {
         timingSource: timingSource,
         refreshRateSource: refreshRateSource,
         clock: clock,
-      );
-
-      controller.setCeiling(RenderBudgetLevel.reduced);
+      )..setCeiling(RenderBudgetLevel.reduced);
       expect(controller.value.level, RenderBudgetLevel.reduced);
       expect(controller.value.ceiling, RenderBudgetLevel.reduced);
       expect(
@@ -206,9 +204,7 @@ void main() {
         timingSource: timingSource,
         refreshRateSource: refreshRateSource,
         clock: clock,
-      );
-
-      controller.dispose();
+      )..dispose();
 
       expect(timingSource.listenerCount, 0);
       expect(refreshRateSource.listenerCount, 0);
@@ -230,27 +226,35 @@ AdaptiveRenderBudgetController _controller({
   required _FakeRefreshRateSource refreshRateSource,
   required _FakeClock clock,
   RenderBudgetLevel initialLevel = RenderBudgetLevel.full,
-}) {
-  return AdaptiveRenderBudgetController(
-    timingSource: timingSource,
-    refreshRateSource: refreshRateSource,
-    clock: clock,
-    initialLevel: initialLevel,
-    policy: AdaptiveRenderBudgetPolicy(
-      windowCapacity: 8,
-      minimumSamples: 4,
-      evaluationIntervalFrames: 1,
-      downgradeP95Threshold: 1.1,
-      downgradeOverloadedFraction: 0.5,
-      recoveryP95Threshold: 0.7,
-      recoveryOverloadedFraction: 0,
-      probeSampleCount: 4,
-      rollbackMinimumSamples: 2,
-      rollbackOverloadedFraction: 0.5,
-      cooldown: const Duration(seconds: 10),
+}) => AdaptiveRenderBudgetController(
+  timingSource: timingSource,
+  refreshRateSource: refreshRateSource,
+  clock: clock,
+  initialLevel: initialLevel,
+  policy: AdaptiveRenderBudgetPolicy(
+    config: const AdaptiveRenderBudgetConfig(
+      sampling: RenderBudgetSampling(
+        windowCapacity: 8,
+        minimumSamples: 4,
+        evaluationIntervalFrames: 1,
+      ),
+      thresholds: RenderBudgetThresholds(
+        downgradeP95Threshold: 1.1,
+        downgradeOverloadedFraction: 0.5,
+        recoveryP95Threshold: 0.7,
+        recoveryOverloadedFraction: 0,
+      ),
+      probe: RenderBudgetProbe(
+        probeSampleCount: 4,
+        rollbackMinimumSamples: 2,
+        rollbackOverloadedFraction: 0.5,
+      ),
+      transition: RenderBudgetTransitionSettings(
+        cooldown: Duration(seconds: 10),
+      ),
     ),
-  );
-}
+  ),
+);
 
 final _healthyFrame = RenderFrameTiming(
   buildDuration: const Duration(milliseconds: 5),
