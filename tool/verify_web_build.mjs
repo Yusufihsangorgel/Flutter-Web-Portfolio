@@ -137,9 +137,12 @@ if (unreachableRendererFiles.length > 0) {
   );
 }
 
+// Precompressed siblings only duplicate counted files; verifyReleaseDocument checks their bytes.
 const releaseBytes = (
   await Promise.all(
-    releaseFiles.map(async (file) => (await stat(file)).size),
+    releaseFiles
+      .filter((file) => !file.endsWith('.gz'))
+      .map(async (file) => (await stat(file)).size),
   )
 ).reduce((total, size) => total + size, 0);
 if (releaseBytes > releaseBudget) {
