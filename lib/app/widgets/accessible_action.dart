@@ -21,9 +21,13 @@ class AccessibleAction extends StatefulWidget {
     this.borderRadius = BorderRadius.zero,
     this.semanticLabel,
     this.semanticRole = ActionSemanticRole.button,
+    this.linkUrl,
     this.selected,
     this.expanded,
-  });
+  }) : assert(
+         linkUrl == null || semanticRole == ActionSemanticRole.link,
+         'linkUrl requires the link role',
+       );
 
   final Widget child;
   final VoidCallback onTap;
@@ -37,6 +41,7 @@ class AccessibleAction extends StatefulWidget {
   final BorderRadius borderRadius;
   final String? semanticLabel;
   final ActionSemanticRole semanticRole;
+  final Uri? linkUrl;
   final bool? selected;
   final bool? expanded;
 
@@ -107,15 +112,18 @@ class _AccessibleActionState extends State<AccessibleAction> {
     );
 
     final semanticLabel = widget.semanticLabel?.trim();
-    if (semanticLabel != null && semanticLabel.isNotEmpty) {
+    final hasLabel = semanticLabel != null && semanticLabel.isNotEmpty;
+    if (hasLabel || widget.linkUrl != null) {
+      // Inside Focus, so its focusable and focused flags merge into this node.
       action = Semantics(
         button: widget.semanticRole == ActionSemanticRole.button,
         link: widget.semanticRole == ActionSemanticRole.link,
+        linkUrl: widget.linkUrl,
         selected: widget.selected,
         expanded: widget.expanded,
-        label: semanticLabel,
+        label: hasLabel ? semanticLabel : null,
         onTap: widget.onTap,
-        excludeSemantics: true,
+        excludeSemantics: hasLabel,
         child: action,
       );
     }

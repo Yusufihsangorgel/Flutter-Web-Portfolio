@@ -34,6 +34,87 @@ void main() {
       }
     });
 
+    testWidgets('stays focusable and reports keyboard focus to semantics', (
+      tester,
+    ) async {
+      final semantics = tester.ensureSemantics();
+      final focusNode = FocusNode();
+      addTearDown(focusNode.dispose);
+      try {
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: PortfolioLink(
+                uri: Uri.parse('https://example.invalid/profile'),
+                semanticLabel: 'Open profile',
+                focusNode: focusNode,
+                child: const Text('Profile'),
+              ),
+            ),
+          ),
+        );
+        final node = find.bySemanticsLabel('Open profile');
+
+        expect(
+          tester.getSemantics(node),
+          matchesSemantics(
+            label: 'Open profile',
+            isLink: true,
+            isFocusable: true,
+            hasFocusAction: true,
+            hasTapAction: true,
+          ),
+        );
+
+        focusNode.requestFocus();
+        await tester.pump();
+        expect(
+          tester.getSemantics(node),
+          matchesSemantics(
+            label: 'Open profile',
+            isLink: true,
+            isFocusable: true,
+            isFocused: true,
+            hasFocusAction: true,
+            hasTapAction: true,
+          ),
+        );
+      } finally {
+        semantics.dispose();
+      }
+    });
+
+    testWidgets('takes its name from its content when unlabeled', (
+      tester,
+    ) async {
+      final semantics = tester.ensureSemantics();
+      try {
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: PortfolioLink(
+                uri: Uri.parse('https://example.invalid/profile'),
+                child: const Text('Profile'),
+              ),
+            ),
+          ),
+        );
+
+        expect(
+          tester.getSemantics(find.bySemanticsLabel('Profile')),
+          matchesSemantics(
+            label: 'Profile',
+            isLink: true,
+            isFocusable: true,
+            hasFocusAction: true,
+            hasTapAction: true,
+          ),
+        );
+      } finally {
+        semantics.dispose();
+      }
+    });
+
     testWidgets('external URLs request a new browsing context', (tester) async {
       final uri = Uri.parse('https://example.invalid/profile');
       await tester.pumpWidget(

@@ -68,35 +68,30 @@ class _PortfolioLinkState extends State<PortfolioLink> {
         : LinkTarget.self;
   }
 
-  Widget _semanticLink(VoidCallback onTap) => Semantics(
-    link: true,
-    linkUrl: widget.uri,
-    label: widget.semanticLabel,
-    selected: widget.selected,
+  Widget _action(VoidCallback onTap) => AccessibleAction(
     onTap: onTap,
-    excludeSemantics: widget.semanticLabel?.trim().isNotEmpty ?? false,
-    child: AccessibleAction(
-      onTap: onTap,
-      onHoverChanged: widget.onHoverChanged,
-      onFocusChanged: widget.onFocusChanged,
-      focusNode: widget.focusNode,
-      focusColor: widget.focusColor,
-      showFocusRing: widget.showFocusRing,
-      excludeFromSemantics: true,
-      semanticRole: ActionSemanticRole.link,
-      borderRadius: widget.borderRadius,
-      child: widget.child,
-    ),
+    onHoverChanged: widget.onHoverChanged,
+    onFocusChanged: widget.onFocusChanged,
+    focusNode: widget.focusNode,
+    focusColor: widget.focusColor,
+    showFocusRing: widget.showFocusRing,
+    excludeFromSemantics: true,
+    semanticLabel: widget.semanticLabel,
+    semanticRole: ActionSemanticRole.link,
+    linkUrl: widget.uri,
+    selected: widget.selected,
+    borderRadius: widget.borderRadius,
+    child: widget.child,
   );
 
   @override
   Widget build(BuildContext context) {
-    if (_chapter != null) return _semanticLink(_scrollToChapter);
+    if (_chapter != null) return _action(_scrollToChapter);
     return Link(
       uri: widget.uri,
       target: _target,
       builder: (context, followLink) =>
-          _semanticLink(widget.onActivate ?? followLink!),
+          _action(widget.onActivate ?? followLink!),
     );
   }
 }
