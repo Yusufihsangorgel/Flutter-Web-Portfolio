@@ -258,7 +258,7 @@ application exists.
 | Startup failure screen | `lib/main.dart` | fallback background and action color |
 | Installed web-app chrome | `tool/sync_public_content.mjs` in `syncManifest` | manifest background and theme colors; `web/manifest.json` is generated |
 | Social sharing card | `tool/social_card.html` | background, text, accent, and signal colors |
-| Repository poster and badges | `docs/readme/hero.svg` and the badge renderers in `tool/sync_public_content.mjs` | optional repository branding; these do not affect the site |
+| Repository badges | the badge renderers in `tool/sync_public_content.mjs` | optional repository branding; these do not affect the site |
 | Individual case studies | each `systems[*].presentation` record in `assets/content/portfolio.json` | project-specific background, foreground, and accent; keep real product branding independent of the site theme |
 
 Several section borders and the project atlas use alpha variants of the default
@@ -268,7 +268,7 @@ from the old palette:
 ```bash
 git grep -n -i -E \
   'f2eee5|faf7ef|d4cec1|12110f|403c36|756e64|fffcf4|1e51ff|e6ff57|d9e1ff' \
-  -- lib web tool docs/readme
+  -- lib web tool
 ```
 
 Classify each match instead of blind replacement: UI chrome should follow the
