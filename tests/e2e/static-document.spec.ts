@@ -62,6 +62,11 @@ test("serves the semantic document when JavaScript is disabled", async (
 
   try {
     await page.goto("/", { waitUntil: "domcontentloaded" });
+    // Playwright's text engine skips <noscript>, so query the note by class.
+    const note = page.locator(".noscript-recovery");
+    await expect(note).toBeVisible();
+    await expect(note).toHaveText("The interactive version needs JavaScript.");
+    await expect(page.locator("#bootstrap-surface")).toBeHidden();
     const heading = page.locator("h1");
     await expect(heading).toHaveCount(1);
     await expect(heading).toBeVisible();
