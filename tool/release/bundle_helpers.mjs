@@ -1,8 +1,28 @@
+import { execFileSync } from 'node:child_process';
 import { readFile, readdir, rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { gzipSync } from 'node:zlib';
 
 const compressible = new Set(['.js', '.mjs', '.wasm', '.json', '.html', '.txt', '.xml', '.svg', '.ttf', '.otf']);
+// Hosted build sandboxes may ship no .git directory but export the built commit.
+const commitVariables = ['GITHUB_SHA', 'VERCEL_GIT_COMMIT_SHA', 'COMMIT_REF', 'CF_PAGES_COMMIT_SHA'];
+
+export function resolveReleaseCommit(env = process.env, readGitCommit = readCheckoutCommit) {
+  const provided = commitVariables.map((name) => env[name]).find(Boolean);
+  if (provided) return provided;
+  try {
+    return readGitCommit();
+  } catch {
+    throw new Error(`version.json needs the built commit: set ${commitVariables.join(', ')} or build in a git checkout`);
+  }
+}
+
+function readCheckoutCommit() {
+  return execFileSync('git', ['rev-parse', 'HEAD'], {
+    encoding: 'utf8',
+    stdio: ['ignore', 'pipe', 'ignore'],
+  }).trim();
+}
 
 export async function precompressAssets(root) {
   let count = 0;

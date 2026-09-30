@@ -5,7 +5,7 @@ import path from 'node:path';
 import test from 'node:test';
 import { gzipSync } from 'node:zlib';
 
-import { precompressAssets } from './release/bundle_helpers.mjs';
+import { precompressAssets, resolveReleaseCommit } from './release/bundle_helpers.mjs';
 import { renderReleaseIndex, renderLocaleData } from './release/render_release_index.mjs';
 import { checkCompression, checkDocument, checkMetadata } from './release/verify_document.mjs';
 import { verifyStatic404Release } from './release/verify_static_404.mjs';
@@ -56,6 +56,18 @@ test('checks release metadata fields', () => {
   assert.deepEqual(checkMetadata(valid, portfolio), []);
   assert(checkMetadata({ ...valid, content_version: 'old' }, portfolio).length > 0);
   assert(checkMetadata({ ...valid, commit: '' }, portfolio).length > 0);
+});
+
+test('resolves the built commit from a provider variable before git', () => {
+  const first = 'a'.repeat(40);
+  const second = 'b'.repeat(40);
+  const noGit = () => { throw new Error('not a git checkout'); };
+  assert.equal(resolveReleaseCommit({ GITHUB_SHA: first, COMMIT_REF: second }, noGit), first);
+  for (const name of ['VERCEL_GIT_COMMIT_SHA', 'COMMIT_REF', 'CF_PAGES_COMMIT_SHA']) {
+    assert.equal(resolveReleaseCommit({ [name]: second }, noGit), second);
+  }
+  assert.equal(resolveReleaseCommit({}, () => first), first);
+  assert.throws(() => resolveReleaseCommit({}, noGit), /needs the built commit/);
 });
 
 test('inserts the document and shell at source markers without duplicate ids', () => {

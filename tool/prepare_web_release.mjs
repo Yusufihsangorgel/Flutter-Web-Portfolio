@@ -1,5 +1,4 @@
 import { createHash } from 'node:crypto';
-import { execFileSync } from 'node:child_process';
 import {
   copyFile,
   mkdir,
@@ -20,6 +19,7 @@ import {
   normalizeNoticeWhitespace,
   precompressAssets,
   removeEmptyDirectories,
+  resolveReleaseCommit,
   writeLegacyServiceWorkerKillSwitch,
 } from './release/bundle_helpers.mjs';
 import { renderLocaleData, renderReleaseIndex } from './release/render_release_index.mjs';
@@ -374,8 +374,7 @@ async function writeReleaseMetadata() {
   const version = JSON.parse(await readFile(file, 'utf8'));
   const portfolio = JSON.parse(await readFile(
     path.resolve('assets', 'content', 'portfolio.json'), 'utf8'));
-  const commit = process.env.GITHUB_SHA || execFileSync('git',
-    ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim();
+  const commit = resolveReleaseCommit();
   if (!/^[0-9a-f]{40}$/.test(commit)) throw new Error('Invalid commit hash');
   const epoch = process.env.SOURCE_DATE_EPOCH;
   const timestamp = epoch === undefined ? Date.now() : Number(epoch) * 1000;
