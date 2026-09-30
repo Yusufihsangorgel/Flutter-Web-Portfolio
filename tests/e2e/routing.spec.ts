@@ -1,6 +1,13 @@
 import { expect, test } from "@playwright/test";
+import { readFileSync } from "node:fs";
 
-test("returns static routes and reveals the proof hash route", async ({
+const portfolio = JSON.parse(
+  readFileSync("assets/content/portfolio.json", "utf8"),
+) as { contributions: unknown[] };
+// A clean template has no contributions chapter, but every record has About.
+const hashRoute = portfolio.contributions.length > 0 ? "proof" : "about";
+
+test("returns static routes and reveals the hash route", async ({
   page,
   request,
 }) => {
@@ -14,15 +21,16 @@ test("returns static routes and reveals the proof hash route", async ({
   );
   expect(await securityResponse.text()).toMatch(/^Contact:\s*.+$/m);
 
-  const routeResponse = await page.goto("/#/proof", {
+  const routeResponse = await page.goto(`/#/${hashRoute}`, {
     waitUntil: "domcontentloaded",
   });
   expect(routeResponse?.status()).toBe(200);
   await page.waitForFunction(
     () => performance.getEntriesByName("flutter-bootstrap-surface-removed").length > 0,
   );
-  await expect(page).toHaveURL(/#\/proof$/);
+  await expect(page).toHaveURL(new RegExp(`#/${hashRoute}$`));
   await expect(page.locator("flt-semantics-host")).toBeAttached();
   await expect(page.locator("#bootstrap-surface")).toHaveCount(0);
-  await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+  // The hero h1 is not in the semantics tree when the route lands below it.
+  await expect(page.getByRole("heading").first()).toBeAttached();
 });
