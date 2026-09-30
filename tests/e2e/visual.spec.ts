@@ -4,6 +4,11 @@ import type {
   InterfaceTestData,
   PortfolioTestData,
 } from '../support/portfolio_test_data';
+import {
+  installVisualMasks,
+  settleCompositor,
+  waitForStableCanvas,
+} from './helpers/visual_capture';
 
 const portfolio = JSON.parse(
   readFileSync('assets/content/portfolio.json', 'utf8'),
@@ -43,25 +48,6 @@ test.beforeEach(async ({ page }) => {
   });
 });
 
-async function settleCompositor(page: Page, frameCount = 3) {
-  await page.evaluate(
-    (frames) =>
-      new Promise<void>((resolve) => {
-        let remaining = frames;
-        const next = () => {
-          remaining -= 1;
-          if (remaining === 0) {
-            resolve();
-            return;
-          }
-          window.requestAnimationFrame(next);
-        };
-        window.requestAnimationFrame(next);
-      }),
-    frameCount,
-  );
-}
-
 async function waitForHeadingInViewport(page: Page, name: string) {
   const heading = page.getByRole('heading', { name, exact: true });
   await expect(heading).toBeVisible();
@@ -87,9 +73,7 @@ async function waitForHeadingInViewport(page: Page, name: string) {
     .toBe(true);
   await page.evaluate(() => document.fonts.ready);
   await settleCompositor(page, 8);
-  // Allow the canvas to catch up with the semantics tree.
-  await page.waitForTimeout(2000);
-  await settleCompositor(page, 4);
+  await waitForStableCanvas(page);
 }
 
 async function openStaticPortfolio(page: Page) {
@@ -121,7 +105,7 @@ async function openChapter(
   await waitForHeadingInViewport(page, heading);
 }
 
-async function scrollToHeading(page: Page, name: string) {
+async function scrollToVisualHeading(page: Page, name: string) {
   const heading = page.getByRole('heading', { name, exact: true });
   for (let attempt = 0; attempt < 80; attempt += 1) {
     if ((await heading.count()) > 0) {
@@ -134,8 +118,7 @@ async function scrollToHeading(page: Page, name: string) {
         await page.mouse.wheel(0, Math.max(0, box.y - targetY));
         await page.evaluate(() => document.fonts.ready);
         await settleCompositor(page, 8);
-        await page.waitForTimeout(1000);
-        await settleCompositor(page, 4);
+        await waitForStableCanvas(page);
         return;
       }
     }
@@ -223,8 +206,7 @@ async function scrollToChapterBoundary(page: Page, name: string) {
       if (Math.abs(delta) <= 1) {
         await page.evaluate(() => document.fonts.ready);
         await settleCompositor(page, 8);
-        await page.waitForTimeout(500);
-        await settleCompositor(page, 4);
+        await waitForStableCanvas(page);
         const settledBox = await heading.boundingBox();
         if (settledBox && Math.abs(settledBox.y - targetY) <= 1) return;
       }
@@ -281,7 +263,7 @@ async function scrollUntilHeadingRenders(
   );
 }
 
-async function scrollToText(page: Page, text: string) {
+async function scrollToVisualText(page: Page, text: string) {
   const target = page.getByText(text).first();
   for (let attempt = 0; attempt < 80; attempt += 1) {
     if ((await target.count()) > 0) {
@@ -308,25 +290,8 @@ async function expectVisualSnapshot(page: Page, name: string) {
       ),
     )
     .toBe(true);
-  await page.evaluate(() => {
-    const regions = [
-      ['narrative-rail', 'left:0;top:0;width:48px;height:100vh'],
-      ['scrollbar', 'right:0;top:0;width:16px;height:100vh'],
-    ];
-    for (const [name, bounds] of regions) {
-      if (document.querySelector(`[data-visual-mask="${name}"]`)) continue;
-      const element = document.createElement('div');
-      element.dataset.visualMask = name;
-      element.setAttribute('aria-hidden', 'true');
-      element.style.cssText = `position:fixed;${bounds};opacity:0;pointer-events:none`;
-      document.body.append(element);
-    }
-  });
   await expect(page).toHaveScreenshot(name, {
-    mask: [
-      page.locator('[data-visual-mask="narrative-rail"]'),
-      page.locator('[data-visual-mask="scrollbar"]'),
-    ],
+    mask: await installVisualMasks(page),
   });
 }
 
@@ -366,7 +331,7 @@ test('preserves the editorial sequence across responsive viewports', async ({
 
   await openChapter(page, 'Go to Open Source', /#\/proof$/, 'Open Source');
   await expectVisualSnapshot(page, 'open-source.png');
-  await scrollToHeading(page, 'First Frame Lab');
+  await scrollToVisualHeading(page, 'First Frame Lab');
   await expectVisualSnapshot(page, 'first-frame-lab.png');
 
   await openChapter(
@@ -381,7 +346,7 @@ test('preserves the editorial sequence across responsive viewports', async ({
     (system) => !system.featured,
   );
   if (!firstSupporting) throw new Error('Expected supporting work.');
-  await scrollToHeading(page, firstSupporting.name);
+  await scrollToVisualHeading(page, firstSupporting.name);
   await expectVisualSnapshot(page, 'archive.png');
 });
 
@@ -441,7 +406,7 @@ test('renders a real supporting-work artifact in the atlas', async (
         (system) => system.artifact.width > system.artifact.height,
       );
   if (!selected) throw new Error('Expected a landscape supporting artifact.');
-  let selector = await scrollToText(page, selected.name);
+  let selector = await scrollToVisualText(page, selected.name);
   if (mobile) {
     await page
       .getByRole('button', {
@@ -470,6 +435,6 @@ test('renders a real supporting-work artifact in the atlas', async (
   const artifact = page.getByRole('img', { name: expectedArtifact.alt });
   await expect(artifact).toBeAttached();
   await settleCompositor(page, 8);
-  await page.waitForTimeout(500);
+  await waitForStableCanvas(page);
   await expectVisualSnapshot(page, 'archive-selected.png');
 });
