@@ -19,6 +19,9 @@ export 'package:flutter_web_portfolio/app/domain/models/site.dart';
 export 'package:flutter_web_portfolio/app/domain/models/system.dart';
 export 'package:flutter_web_portfolio/app/domain/models/writing.dart';
 
+/// Schema version of the canonical content document that this model reads.
+const portfolioSchemaVersion = 11;
+
 typedef PortfolioDocumentContent = ({
   int schemaVersion,
   String contentVersion,
@@ -108,6 +111,10 @@ final class PortfolioDocument {
     'writing': [for (final value in writing) value.toJson()],
   };
 
+  static const maxFeaturedPackages = 5;
+  static const maxFeaturedWriting = 3;
+  static const maxWritingEntries = 12;
+
   final PortfolioLocalizationStrategy _localizer;
 
   final int schemaVersion;
@@ -172,12 +179,13 @@ final class PortfolioDocument {
   void _validate() {
     _validateStructure();
     _validateContributions();
+    _validatePackages();
     _validateWriting();
     _validateUnique();
   }
 
   void _validateStructure() {
-    if (schemaVersion != 10) {
+    if (schemaVersion != portfolioSchemaVersion) {
       throw FormatException(
         'Unsupported portfolio schema version: $schemaVersion',
       );
@@ -232,9 +240,25 @@ final class PortfolioDocument {
     }
   }
 
+  void _validatePackages() {
+    if (packages.where((entry) => entry.featured).length >
+        maxFeaturedPackages) {
+      throw const FormatException(
+        'At most $maxFeaturedPackages packages may be featured.',
+      );
+    }
+  }
+
   void _validateWriting() {
-    if (writing.length > 12) {
-      throw const FormatException('At most 12 writing entries may be listed.');
+    if (writing.length > maxWritingEntries) {
+      throw const FormatException(
+        'At most $maxWritingEntries writing entries may be listed.',
+      );
+    }
+    if (writing.where((entry) => entry.featured).length > maxFeaturedWriting) {
+      throw const FormatException(
+        'At most $maxFeaturedWriting writing entries may be featured.',
+      );
     }
     if (writing.any(
       (entry) => !writingSources.any((source) => source.id == entry.source),

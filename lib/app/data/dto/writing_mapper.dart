@@ -16,4 +16,8 @@ PortfolioWritingEntry parsePortfolioWritingEntry(Map<String, dynamic> json) =>
       url: requiredUri(json, 'url'),
       source: requiredString(json, 'source'),
       date: DateTime.parse(requiredString(json, 'date')),
+      featured: switch (json['featured']) {
+        null => false,
+        _ => requiredBool(json, 'featured'),
+      },
     );

@@ -6,6 +6,7 @@ import 'package:flutter_web_portfolio/app/data/dto/portfolio_document_mapper.dar
 
 void main() {
   _registerSelfOverlayTest();
+  _registerFactualPassThroughTest();
   _registerLocaleCatalogTest();
   _registerOverlayFailureTests();
   _registerFieldCoverageTest();
@@ -24,6 +25,31 @@ void _registerSelfOverlayTest() {
       document.localized(_normalize(_selfOverlay(raw))).toJson(),
       document.toJson(),
     );
+  });
+}
+
+void _registerFactualPassThroughTest() {
+  test('packages and writing pass through a locale unchanged', () {
+    final raw = _canonicalJson();
+    final document = parsePortfolioDocument(raw);
+    final localized = document.localized(_normalize(_selfOverlay(raw)));
+
+    expect(localized.packages, hasLength(document.packages.length));
+    for (var index = 0; index < document.packages.length; index++) {
+      expect(
+        identical(localized.packages[index], document.packages[index]),
+        isTrue,
+        reason: document.packages[index].id,
+      );
+    }
+    expect(localized.writing, hasLength(document.writing.length));
+    for (var index = 0; index < document.writing.length; index++) {
+      expect(
+        identical(localized.writing[index], document.writing[index]),
+        isTrue,
+        reason: document.writing[index].url.toString(),
+      );
+    }
   });
 }
 

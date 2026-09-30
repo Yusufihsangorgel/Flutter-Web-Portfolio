@@ -13,7 +13,7 @@ import 'package:flutter_web_portfolio/app/domain/models/portfolio_document.dart'
 /// Parses and validates the canonical portfolio document.
 PortfolioDocument parsePortfolioDocument(Map<String, dynamic> json) {
   final schemaVersion = requiredInt(json, 'schema_version');
-  if (schemaVersion != 10) {
+  if (schemaVersion != portfolioSchemaVersion) {
     throw FormatException(
       'Unsupported portfolio schema version: $schemaVersion',
     );

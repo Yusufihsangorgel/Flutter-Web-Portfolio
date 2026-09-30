@@ -11,7 +11,7 @@ void main() {
       final valid = parsePortfolioDocument(_manifest());
       expect(
         () => PortfolioDocument(
-          _contentFrom(valid, schemaVersion: 11),
+          _contentFrom(valid, schemaVersion: 10),
           const PortfolioLocalizer(),
         ),
         throwsA(isA<FormatException>()),
@@ -31,7 +31,7 @@ void main() {
       final profile = manifest['profile']! as Map<String, dynamic>;
       final displayName = profile['display_name']! as Map<String, dynamic>;
 
-      expect(document.schemaVersion, 10);
+      expect(document.schemaVersion, 11);
       expect(document.contentVersion, manifest['content_version']);
       expect(document.profile.name, profile['name']);
       expect(document.profile.role, profile['role']);

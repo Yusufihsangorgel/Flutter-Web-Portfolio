@@ -1,3 +1,20 @@
+/// Group a package belongs to. The declaration order is the reading order.
+enum PortfolioPackageCategory {
+  nativeFfi('native-ffi'),
+  aiLlm('ai-llm'),
+  server('server'),
+  flutterUi('flutter-ui'),
+  devTool('dev-tool');
+
+  const PortfolioPackageCategory(this.wireValue);
+  final String wireValue;
+
+  static PortfolioPackageCategory parse(String value) => values.firstWhere(
+    (entry) => entry.wireValue == value,
+    orElse: () => throw FormatException('Unsupported package category: $value'),
+  );
+}
+
 typedef PortfolioPackageFields = ({
   String id,
   String name,
@@ -7,11 +24,12 @@ typedef PortfolioPackageFields = ({
   int likes,
   int pubPoints,
   int downloads,
-  String category,
+  PortfolioPackageCategory category,
+  bool featured,
   List<String> topics,
   List<PackageRoadmapItem> roadmap,
   Uri? repository,
-  String? maturity,
+  int? maturityLevel,
   String? proof,
 });
 
@@ -27,11 +45,23 @@ final class PortfolioPackage {
       pubPoints = fields.pubPoints,
       downloads = fields.downloads,
       category = fields.category,
+      featured = fields.featured,
       topics = List.unmodifiable(fields.topics),
       roadmap = List.unmodifiable(fields.roadmap),
       repository = fields.repository,
-      maturity = fields.maturity,
-      proof = fields.proof;
+      maturityLevel = fields.maturityLevel,
+      proof = fields.proof {
+    if (maturityLevel case final level?
+        when level < minMaturityLevel || level > maxMaturityLevel) {
+      throw FormatException(
+        'Package "$id" maturity level must be from $minMaturityLevel to '
+        '$maxMaturityLevel, got $level.',
+      );
+    }
+  }
+
+  static const minMaturityLevel = 1;
+  static const maxMaturityLevel = 5;
 
   Map<String, Object?> toJson() => {
     'id': id,
@@ -42,11 +72,12 @@ final class PortfolioPackage {
     'likes': likes,
     'pub_points': pubPoints,
     'downloads': downloads,
-    'category': category,
+    'category': category.wireValue,
+    'featured': featured,
     'topics': topics,
     'roadmap': [for (final value in roadmap) value.toJson()],
     'repository': repository?.toString(),
-    'maturity': maturity,
+    'maturity_level': maturityLevel,
     'proof': proof,
   };
 
@@ -58,13 +89,17 @@ final class PortfolioPackage {
   final int likes;
   final int pubPoints;
   final int downloads;
-  final String category;
+  final PortfolioPackageCategory category;
+
+  /// Selected for the summary shown first; the document caps how many.
+  final bool featured;
   final List<String> topics;
   final List<PackageRoadmapItem> roadmap;
   final Uri? repository;
 
-  /// Rung on the portfolio's maturity ladder (L1..L5), if declared.
-  final String? maturity;
+  /// Maturity from [minMaturityLevel] to [maxMaturityLevel], if declared.
+  /// The top level means a real external user drives the package.
+  final int? maturityLevel;
 
   /// One measured claim that carries the package's case, if declared.
   final String? proof;

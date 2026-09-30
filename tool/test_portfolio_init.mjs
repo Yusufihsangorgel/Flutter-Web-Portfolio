@@ -64,7 +64,7 @@ try {
   ]);
 
   const generated = JSON.parse(await readFile(output, 'utf8'));
-  assert(generated.schema_version === 10, 'schema version');
+  assert(generated.schema_version === 11, 'schema version');
   assert(
     generated.site.template_repository === false,
     'initialized portfolio is not advertised as a GitHub template',

@@ -53,6 +53,7 @@ final class PortfolioWritingEntry {
     required this.url,
     required this.source,
     required this.date,
+    required this.featured,
   });
 
   Map<String, Object?> toJson() => {
@@ -60,6 +61,7 @@ final class PortfolioWritingEntry {
     'url': url.toString(),
     'source': source,
     'date': date.toIso8601String(),
+    'featured': featured,
   };
 
   final String title;
@@ -68,4 +70,7 @@ final class PortfolioWritingEntry {
   /// The [PortfolioWritingSource.id] this entry was fetched from.
   final String source;
   final DateTime date;
+
+  /// Selected for the summary shown first; the document caps how many.
+  final bool featured;
 }

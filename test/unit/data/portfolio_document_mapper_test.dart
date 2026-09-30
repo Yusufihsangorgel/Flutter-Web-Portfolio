@@ -17,7 +17,7 @@ void main() {
 void _registerDocumentTests() {
   test('maps the complete portfolio document', () {
     final document = parsePortfolioDocument(fixture());
-    expect(document.schemaVersion, 10);
+    expect(document.schemaVersion, 11);
     expect(document.profile.focus, hasLength(greaterThanOrEqualTo(3)));
     expect(document.systems, isNotEmpty);
   });

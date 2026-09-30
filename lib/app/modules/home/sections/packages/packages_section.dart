@@ -12,22 +12,12 @@ import 'package:flutter_web_portfolio/app/widgets/numbered_section_heading.dart'
 import 'package:flutter_web_portfolio/app/widgets/scene_accent_builder.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-/// Reading order for package categories. Deliberately fixed rather than
-/// derived from content order so the section groups the same way every time.
-const _categoryOrder = [
-  'native-ffi',
-  'ai-llm',
-  'server',
-  'flutter-ui',
-  'dev-tool',
-];
-
-const _categoryLabels = <String, String>{
-  'native-ffi': 'Native & FFI',
-  'ai-llm': 'AI & LLM',
-  'server': 'Server-side Dart',
-  'flutter-ui': 'Flutter UI',
-  'dev-tool': 'Developer tools',
+String _categoryLabel(PortfolioPackageCategory category) => switch (category) {
+  PortfolioPackageCategory.nativeFfi => 'Native & FFI',
+  PortfolioPackageCategory.aiLlm => 'AI & LLM',
+  PortfolioPackageCategory.server => 'Server-side Dart',
+  PortfolioPackageCategory.flutterUi => 'Flutter UI',
+  PortfolioPackageCategory.devTool => 'Developer tools',
 };
 
 /// Localized copy shared by every package row.
@@ -35,18 +25,24 @@ final class _PackageLabels {
   const _PackageLabels({
     required this.pubPoints,
     required this.open,
-    required this.maturity,
+    required this.maturityFormat,
     required this.roadmap,
     required this.statusNames,
   });
 
   final String pubPoints;
   final String open;
-  final String maturity;
+
+  /// Pattern with `{level}` and `{max}` placeholders.
+  final String maturityFormat;
   final String roadmap;
 
   /// Status keyword (`done`/`doing`/`next`/`waiting`) to localized word.
   final Map<String, String> statusNames;
+
+  String maturityText(int level) => maturityFormat
+      .replaceAll('{level}', '$level')
+      .replaceAll('{max}', '${PortfolioPackage.maxMaturityLevel}');
 }
 
 /// Every published pub.dev package, grouped by category, each card carrying
@@ -86,9 +82,9 @@ class PackagesSection extends StatelessWidget {
               'packages_section.open_package',
               defaultValue: 'Open on pub.dev',
             ),
-            maturity: language.getText(
-              'packages_section.maturity',
-              defaultValue: 'maturity',
+            maturityFormat: language.getText(
+              'packages_section.maturity_level',
+              defaultValue: 'Maturity {level} of {max}',
             ),
             roadmap: language.getText(
               'packages_section.roadmap',
@@ -114,14 +110,14 @@ class PackagesSection extends StatelessWidget {
             },
           );
 
-          final grouped = <String, List<PortfolioPackage>>{};
+          final grouped = <PortfolioPackageCategory, List<PortfolioPackage>>{};
           for (final package in packages) {
             grouped.putIfAbsent(package.category, () => []).add(package);
           }
           final groups = [
-            for (final category in _categoryOrder)
+            for (final category in PortfolioPackageCategory.values)
               if (grouped[category] case final entries? when entries.isNotEmpty)
-                (label: _categoryLabels[category]!, packages: entries),
+                (label: _categoryLabel(category), packages: entries),
           ];
 
           return ConstrainedBox(
@@ -262,7 +258,7 @@ class _PackageRow extends StatelessWidget {
       ?package.proof,
       'v${package.version}, ${package.pubPoints} out of 160 '
           '${labels.pubPoints}',
-      if (package.maturity case final maturity?) '${labels.maturity} $maturity',
+      if (package.maturityLevel case final level?) labels.maturityText(level),
       if (package.roadmap.isNotEmpty)
         '${labels.roadmap}: ${package.roadmap.map((item) => '${item.title} '
             '(${labels.statusNames[item.status]})').join(', ')}',
@@ -403,8 +399,8 @@ class _CompactPackageContent extends StatelessWidget {
 }
 
 /// Package name with its version/score line and, when declared, the maturity
-/// rung as a small outlined chip. L5 — the only rung that means "a real
-/// external user drives this package" — is the only one drawn in accent.
+/// level as a small outlined chip. The top level, which means a real external
+/// user drives the package, is the only one drawn in accent.
 class _PackageTitleLine extends StatelessWidget {
   const _PackageTitleLine({
     required this.package,
@@ -418,8 +414,8 @@ class _PackageTitleLine extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final maturity = package.maturity;
-    final chipColor = package.maturity == 'L5'
+    final level = package.maturityLevel;
+    final chipColor = level == PortfolioPackage.maxMaturityLevel
         ? accent
         : AppColors.textSecondary;
     return Wrap(
@@ -443,7 +439,7 @@ class _PackageTitleLine extends StatelessWidget {
             letterSpacing: 0.2,
           ),
         ),
-        if (maturity != null)
+        if (level != null)
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1.5),
             decoration: BoxDecoration(
@@ -451,7 +447,7 @@ class _PackageTitleLine extends StatelessWidget {
               borderRadius: BorderRadius.circular(3),
             ),
             child: Text(
-              maturity,
+              labels.maturityText(level),
               style: AppFonts.jetBrainsMono(
                 fontSize: 10,
                 fontWeight: FontWeight.w700,
