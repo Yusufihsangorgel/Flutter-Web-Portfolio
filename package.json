@@ -58,8 +58,11 @@
   "type": "commonjs",
   "homepage": "https://developeryusuf.com",
   "devDependencies": {
+    "@axe-core/playwright": "4.13.0",
+    "@lhci/cli": "0.15.1",
     "@playwright/test": "^1.59.1",
     "@types/node": "24.13.3",
+    "subset-font": "2.9.0",
     "typescript": "7.0.2"
   },
   "repository": {
