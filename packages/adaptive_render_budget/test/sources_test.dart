@@ -55,8 +55,59 @@ void main() {
     ]);
     expect(received, hasLength(1));
 
-    source.dispose();
-    source.dispose();
+    source
+      ..dispose()
+      ..dispose();
     expect(() => source.addListener(listener), throwsStateError);
+  });
+
+  test('DisplayRefreshRateSource follows test display metrics', () {
+    final binding = TestWidgetsFlutterBinding.instance;
+    final view = binding.platformDispatcher.views.first;
+    final display = view.display;
+    addTearDown(display.resetRefreshRate);
+    display.refreshRate = 120;
+    final source = DisplayRefreshRateSource(view: view, binding: binding);
+    addTearDown(source.dispose);
+    var notifications = 0;
+    source.addListener(() => notifications += 1);
+
+    expect(source.refreshRateHz, 120);
+    display.refreshRate = 120;
+    expect(notifications, 0);
+    display.refreshRate = 90;
+    expect(source.refreshRateHz, 90);
+    expect(notifications, 1);
+    display.refreshRate = double.nan;
+    expect(source.refreshRateHz, 60);
+    expect(notifications, 2);
+    source.dispose();
+    display.refreshRate = 75;
+    expect(notifications, 2);
+  });
+
+  test('DisplayRefreshRateSource falls back when no rate is reported', () {
+    final binding = TestWidgetsFlutterBinding.instance;
+    final view = binding.platformDispatcher.views.first;
+    final display = view.display;
+    addTearDown(display.resetRefreshRate);
+    display.refreshRate = 0;
+
+    final source = DisplayRefreshRateSource(
+      view: view,
+      binding: binding,
+      fallbackRefreshRateHz: 90,
+    );
+    addTearDown(source.dispose);
+
+    expect(source.refreshRateHz, 90);
+    expect(
+      () => DisplayRefreshRateSource(
+        view: view,
+        binding: binding,
+        fallbackRefreshRateHz: 0,
+      ),
+      throwsArgumentError,
+    );
   });
 }

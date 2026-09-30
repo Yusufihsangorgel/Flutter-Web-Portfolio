@@ -1,5 +1,5 @@
 import 'package:adaptive_render_budget/adaptive_render_budget.dart';
-import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:flutter_web_portfolio/app/features/render_quality/domain/render_quality.dart';
@@ -49,9 +49,11 @@ final class RenderQualityState {
 
 /// Maps the reusable render-budget core into portfolio visual tiers.
 ///
-/// Frame load is normalized to the active display refresh rate. The wrapper
-/// preserves the app's BLoC boundary and reduced-motion contract while the
-/// package owns sustained-load decisions, cooldowns, and upward probes.
+/// Frame load is normalized to the refresh rate supplied by the source; the
+/// default source follows the view's display, which the web engine fixes at
+/// 60 Hz. The wrapper preserves the app's BLoC boundary and reduced-motion
+/// contract while the package owns sustained-load decisions, cooldowns, and
+/// upward probes.
 final class RenderQualityController extends Cubit<RenderQualityState> {
   factory RenderQualityController({
     RenderFrameTimingSource? timingSource,
@@ -69,7 +71,7 @@ final class RenderQualityController extends Cubit<RenderQualityState> {
     final RenderFrameTimingSource resolvedTiming;
     final RefreshRateSource resolvedRefreshRate;
     if (timingSource == null) {
-      final views = PlatformDispatcher.instance.views;
+      final views = WidgetsBinding.instance.platformDispatcher.views;
       if (views.isEmpty) {
         throw StateError('A FlutterView is required for render budgeting.');
       }

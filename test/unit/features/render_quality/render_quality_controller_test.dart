@@ -33,6 +33,24 @@ void main() {
   });
 
   group('RenderQualityController', () {
+    test(
+      'default wiring observes display metrics and closes cleanly',
+      () async {
+        final binding = TestWidgetsFlutterBinding.instance;
+        final display = binding.platformDispatcher.views.first.display;
+        addTearDown(display.resetRefreshRate);
+        display.refreshRate = 120;
+        final defaultController = RenderQualityController();
+
+        expect(defaultController.state.refreshRateHz, 120);
+        display.refreshRate = 90;
+        expect(defaultController.state.refreshRateHz, 90);
+        await defaultController.close();
+        display.refreshRate = 60;
+        expect(defaultController.state.refreshRateHz, 90);
+      },
+    );
+
     test('starts in the balanced tier for every display', () {
       expect(controller.state.quality, RenderQuality.balanced);
       expect(controller.state.reason, RenderQualityReason.startup);
@@ -112,17 +130,25 @@ void main() {
 }
 
 final _testPolicy = AdaptiveRenderBudgetPolicy(
-  windowCapacity: 8,
-  minimumSamples: 4,
-  evaluationIntervalFrames: 1,
-  downgradeP95Threshold: 1.1,
-  downgradeOverloadedFraction: 0.5,
-  recoveryP95Threshold: 0.7,
-  recoveryOverloadedFraction: 0,
-  probeSampleCount: 4,
-  rollbackMinimumSamples: 2,
-  rollbackOverloadedFraction: 0.5,
-  cooldown: Duration.zero,
+  config: const AdaptiveRenderBudgetConfig(
+    sampling: RenderBudgetSampling(
+      windowCapacity: 8,
+      minimumSamples: 4,
+      evaluationIntervalFrames: 1,
+    ),
+    thresholds: RenderBudgetThresholds(
+      downgradeP95Threshold: 1.1,
+      downgradeOverloadedFraction: 0.5,
+      recoveryP95Threshold: 0.7,
+      recoveryOverloadedFraction: 0,
+    ),
+    probe: RenderBudgetProbe(
+      probeSampleCount: 4,
+      rollbackMinimumSamples: 2,
+      rollbackOverloadedFraction: 0.5,
+    ),
+    transition: RenderBudgetTransitionSettings(cooldown: Duration.zero),
+  ),
 );
 
 final _healthyFrame = RenderFrameTiming(

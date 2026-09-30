@@ -12,6 +12,7 @@ import 'package:flutter_bloc/flutter_bloc.dart'
 import 'package:flutter_web_portfolio/app/app_dependencies.dart';
 import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
 import 'package:flutter_web_portfolio/app/core/theme/app_theme.dart';
+import 'package:flutter_web_portfolio/app/core/theme/locale_font_loader.dart';
 import 'package:flutter_web_portfolio/app/domain/models/portfolio_document.dart';
 import 'package:flutter_web_portfolio/app/data/providers/bundle_asset_loader.dart';
 import 'package:flutter_web_portfolio/app/modules/home/home_view.dart';
@@ -41,6 +42,7 @@ void main() {
 
       try {
         final dependencies = await AppDependencies.bootstrap();
+        await LocaleFontLoader.loadForLanguage(url_strategy.getHtmlLanguage());
         runApp(AppRuntime(dependencies: dependencies, child: const MyApp()));
       } catch (error, stackTrace) {
         dev.log(
