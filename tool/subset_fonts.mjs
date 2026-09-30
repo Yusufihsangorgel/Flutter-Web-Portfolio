@@ -125,6 +125,7 @@ async function processFont(name, coverage, check) {
   const text = String.fromCodePoint(...requested);
   const output = Buffer.from(await subsetFont(source, text, {
     targetFormat: 'truetype',
+    // Only these layout features survive: add a tag here before the UI uses a FontFeature for it.
     keepFeatures: [
       'ccmp', 'locl', 'rlig', 'liga', 'clig', 'calt',
       'kern', 'mark', 'mkmk',

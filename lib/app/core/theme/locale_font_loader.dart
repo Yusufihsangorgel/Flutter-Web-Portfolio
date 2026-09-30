@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_web_portfolio/app/core/theme/app_fonts.dart';
 
@@ -18,8 +19,15 @@ abstract final class LocaleFontLoader {
 
     try {
       await (FontLoader(family)..addFont(rootBundle.load(path))).load();
-    } on Object {
-      // The system font stack remains available when a locale font fails.
+    } on Object catch (error, stackTrace) {
+      FlutterError.reportError(
+        FlutterErrorDetails(
+          exception: error,
+          stack: stackTrace,
+          library: 'locale font loader',
+          context: ErrorDescription('while loading the $family font'),
+        ),
+      );
     }
   }
 }
