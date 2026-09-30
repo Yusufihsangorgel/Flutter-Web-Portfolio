@@ -1,0 +1,16 @@
+{
+  "content_version": "2026.09.29.1",
+  "packages": [
+    {
+      "name": "re2",
+      "version": "1.0.0",
+      "pub_points": 160,
+      "likes": 2,
+      "downloads": 600,
+      "featured": true
+    }
+  ],
+  "contributions": [],
+  "writing_sources": [],
+  "writing": []
+}

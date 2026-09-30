@@ -4,14 +4,8 @@ on:
   workflow_run:
     workflows: [CI]
     types: [completed]
-  # The data refresh workflow deploys its own commit this way: a CI run it
-  # starts with the workflow token raises no workflow_run event.
+  # Allow the data refresh workflow to trigger deployment.
   workflow_dispatch:
-
-permissions:
-  contents: read
-  pages: write
-  id-token: write
 
 concurrency:
   group: pages
@@ -19,6 +13,8 @@ concurrency:
 
 jobs:
   build:
+    permissions:
+      contents: read
     if: >-
       (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main') ||
       (github.event.workflow_run.conclusion == 'success' &&
@@ -67,6 +63,10 @@ jobs:
           path: build/web
 
   deploy:
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
     needs: build
     runs-on: ubuntu-latest
     environment:
