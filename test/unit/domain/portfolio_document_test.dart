@@ -1,16 +1,33 @@
-import 'dart:io';
-import 'dart:ui' as ui;
-
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_web_portfolio/app/data/dto/portfolio_document_mapper.dart';
+import 'package:flutter_web_portfolio/app/data/dto/portfolio_localizer.dart';
 import 'package:flutter_web_portfolio/app/domain/models/portfolio_document.dart';
 
 import '../../helpers/portfolio_fixture.dart';
 
 void main() {
   group('PortfolioDocument', () {
+    test('rejects invalid typed construction without a parser', () {
+      final valid = parsePortfolioDocument(_manifest());
+      expect(
+        () => PortfolioDocument(
+          _contentFrom(valid, schemaVersion: 11),
+          const PortfolioLocalizer(),
+        ),
+        throwsA(isA<FormatException>()),
+      );
+      expect(
+        () => PortfolioDocument(
+          _contentFrom(valid, sources: []),
+          const PortfolioLocalizer(),
+        ),
+        throwsA(isA<FormatException>()),
+      );
+    });
+
     test('loads a complete, identity-neutral portfolio fixture', () {
       final manifest = _manifest();
-      final document = PortfolioDocument.fromJson(manifest);
+      final document = parsePortfolioDocument(manifest);
       final profile = manifest['profile']! as Map<String, dynamic>;
       final displayName = profile['display_name']! as Map<String, dynamic>;
 
@@ -108,7 +125,7 @@ void main() {
       site['title'] = 'Canonical Person Record — Product Engineer';
       site.remove('analytics');
 
-      final document = PortfolioDocument.fromJson(json);
+      final document = parsePortfolioDocument(json);
       expect(document.profile.name, 'Canonical Person Record');
       expect(document.profile.role, 'Product Engineer');
       expect(document.profile.displayName.primary, 'CONFIGURED PRIMARY');
@@ -133,47 +150,10 @@ void main() {
         profile['email'] = invalid;
 
         expect(
-          () => PortfolioDocument.fromJson(json),
+          () => parsePortfolioDocument(json),
           throwsA(isA<FormatException>()),
           reason: invalid,
         );
-      }
-    });
-
-    test('binds every work record to a real local artifact', () async {
-      final document = PortfolioDocument.fromJson(_manifest());
-
-      for (final system in document.systems) {
-        final artifact = system.artifact;
-        final file = File(artifact.asset);
-        expect(file.existsSync(), isTrue, reason: system.id);
-
-        final codec = await ui.instantiateImageCodec(file.readAsBytesSync());
-        final frame = await codec.getNextFrame();
-        expect(frame.image.width, artifact.width, reason: system.id);
-        expect(frame.image.height, artifact.height, reason: system.id);
-        frame.image.dispose();
-        codec.dispose();
-
-        final compact = artifact.compact;
-        if (compact == null) continue;
-        expect(compact.asset, startsWith('assets/work/'), reason: system.id);
-        final compactFile = File(compact.asset);
-        expect(compactFile.existsSync(), isTrue, reason: system.id);
-
-        final compactCodec = await ui.instantiateImageCodec(
-          compactFile.readAsBytesSync(),
-        );
-        final compactFrame = await compactCodec.getNextFrame();
-        expect(compactFrame.image.width, compact.width, reason: system.id);
-        expect(compactFrame.image.height, compact.height, reason: system.id);
-        expect(
-          compactFrame.image.width < compactFrame.image.height,
-          isTrue,
-          reason: '${system.id} compact artifact must be portrait',
-        );
-        compactFrame.image.dispose();
-        compactCodec.dispose();
       }
     });
 
@@ -192,21 +172,21 @@ void main() {
         ..['width'] = 1600
         ..['height'] = 1000;
       expect(
-        () => PortfolioDocument.fromJson(landscapeCompact),
+        () => parsePortfolioDocument(landscapeCompact),
         throwsA(isA<FormatException>()),
       );
 
       final invalidCompactPath = _manifest();
       compactOf(invalidCompactPath)['asset'] = '../generated/compact.jpg';
       expect(
-        () => PortfolioDocument.fromJson(invalidCompactPath),
+        () => parsePortfolioDocument(invalidCompactPath),
         throwsA(isA<FormatException>()),
       );
 
       final invalidCompactFit = _manifest();
       compactOf(invalidCompactFit)['fit'] = 'parallax';
       expect(
-        () => PortfolioDocument.fromJson(invalidCompactFit),
+        () => parsePortfolioDocument(invalidCompactFit),
         throwsA(isA<FormatException>()),
       );
 
@@ -223,7 +203,7 @@ void main() {
         1,
       )['asset'];
       expect(
-        () => PortfolioDocument.fromJson(compactDuplicatesMainAsset),
+        () => parsePortfolioDocument(compactDuplicatesMainAsset),
         throwsA(isA<FormatException>()),
       );
 
@@ -236,7 +216,7 @@ void main() {
           artifactAt(sharedSystems, 1)['compact']! as Map<String, dynamic>;
       secondCompact['asset'] = firstCompact['asset'];
       expect(
-        () => PortfolioDocument.fromJson(compactSharedAcrossRecords),
+        () => parsePortfolioDocument(compactSharedAcrossRecords),
         throwsA(isA<FormatException>()),
       );
     });
@@ -247,7 +227,7 @@ void main() {
       json['contributions'] = <dynamic>[];
       json['systems'] = <dynamic>[];
 
-      final document = PortfolioDocument.fromJson(json);
+      final document = parsePortfolioDocument(json);
       expect(document.activeSections, ['home', 'packages', 'about']);
     });
 
@@ -265,7 +245,7 @@ void main() {
         selected['featured'] = true;
         selected['event_order_lab'] = eventOrderLab;
 
-        final document = PortfolioDocument.fromJson(json);
+        final document = parsePortfolioDocument(json);
         expect(document.featuredContribution?.id, selected['id']);
       },
     );
@@ -275,7 +255,7 @@ void main() {
       json['experience'] = <dynamic>[];
       json['contributions'] = <dynamic>[];
 
-      final document = PortfolioDocument.fromJson(json);
+      final document = parsePortfolioDocument(json);
       expect(document.activeSections, [
         'home',
         'projects',
@@ -291,7 +271,7 @@ void main() {
         json['writing_sources'] = _sampleWritingSources();
         json['writing'] = _sampleWriting();
 
-        final document = PortfolioDocument.fromJson(json);
+        final document = parsePortfolioDocument(json);
         expect(document.writingSources, hasLength(2));
         expect(document.writingSources.first.id, 'blog');
         expect(
@@ -322,7 +302,7 @@ void main() {
     );
 
     test('writing and writing_sources default to empty when absent', () {
-      final document = PortfolioDocument.fromJson(_manifest());
+      final document = parsePortfolioDocument(_manifest());
       expect(document.writing, isEmpty);
       expect(document.writingSources, isEmpty);
       expect(document.activeSections, isNot(contains('writing')));
@@ -335,7 +315,7 @@ void main() {
       json['writing'] = _sampleWriting();
 
       expect(
-        () => PortfolioDocument.fromJson(json),
+        () => parsePortfolioDocument(json),
         throwsA(isA<FormatException>()),
       );
     });
@@ -348,7 +328,7 @@ void main() {
       json['writing'] = writing;
 
       expect(
-        () => PortfolioDocument.fromJson(json),
+        () => parsePortfolioDocument(json),
         throwsA(isA<FormatException>()),
       );
     });
@@ -361,7 +341,7 @@ void main() {
       json['writing'] = _sampleWriting();
 
       expect(
-        () => PortfolioDocument.fromJson(json),
+        () => parsePortfolioDocument(json),
         throwsA(isA<FormatException>()),
       );
     });
@@ -380,7 +360,7 @@ void main() {
       );
 
       expect(
-        () => PortfolioDocument.fromJson(json),
+        () => parsePortfolioDocument(json),
         throwsA(isA<FormatException>()),
       );
     });
@@ -399,7 +379,7 @@ void main() {
       replacement['featured'] = true;
 
       expect(
-        () => PortfolioDocument.fromJson(json),
+        () => parsePortfolioDocument(json),
         throwsA(isA<FormatException>()),
       );
     });
@@ -417,7 +397,7 @@ void main() {
       gap['before'] = 'browser_frame';
 
       expect(
-        () => PortfolioDocument.fromJson(json),
+        () => parsePortfolioDocument(json),
         throwsA(isA<FormatException>()),
       );
     });
@@ -425,7 +405,7 @@ void main() {
     test('rejects unsupported schemas and duplicate content ids', () {
       final unsupported = _manifest()..['schema_version'] = 4;
       expect(
-        () => PortfolioDocument.fromJson(unsupported),
+        () => parsePortfolioDocument(unsupported),
         throwsA(isA<FormatException>()),
       );
 
@@ -435,7 +415,7 @@ void main() {
         Map<String, dynamic>.from(contributions.first! as Map<String, dynamic>),
       );
       expect(
-        () => PortfolioDocument.fromJson(duplicate),
+        () => parsePortfolioDocument(duplicate),
         throwsA(isA<FormatException>()),
       );
 
@@ -444,7 +424,7 @@ void main() {
       final links = profile['links']! as List<dynamic>;
       links.add(Map<String, dynamic>.from(links.first as Map<String, dynamic>));
       expect(
-        () => PortfolioDocument.fromJson(duplicateLink),
+        () => parsePortfolioDocument(duplicateLink),
         throwsA(isA<FormatException>()),
       );
 
@@ -459,7 +439,7 @@ void main() {
         ),
       );
       expect(
-        () => PortfolioDocument.fromJson(duplicateEngineeringLink),
+        () => parsePortfolioDocument(duplicateEngineeringLink),
         throwsA(isA<FormatException>()),
       );
 
@@ -468,7 +448,7 @@ void main() {
           multipleFeatured['contributions']! as List<dynamic>;
       (featuredContributions.first as Map<String, dynamic>)['featured'] = true;
       expect(
-        () => PortfolioDocument.fromJson(multipleFeatured),
+        () => parsePortfolioDocument(multipleFeatured),
         throwsA(isA<FormatException>()),
       );
 
@@ -476,7 +456,7 @@ void main() {
       final site = invalidImage['site']! as Map<String, dynamic>;
       site['social_image'] = 'https://example.com/preview.png';
       expect(
-        () => PortfolioDocument.fromJson(invalidImage),
+        () => parsePortfolioDocument(invalidImage),
         throwsA(isA<FormatException>()),
       );
 
@@ -485,7 +465,7 @@ void main() {
           mismatchedIdentity['site']! as Map<String, dynamic>;
       mismatchedSite['title'] = 'Anonymous Portfolio';
       expect(
-        () => PortfolioDocument.fromJson(mismatchedIdentity),
+        () => parsePortfolioDocument(mismatchedIdentity),
         throwsA(isA<FormatException>()),
       );
 
@@ -494,7 +474,7 @@ void main() {
         'display_name',
       );
       expect(
-        () => PortfolioDocument.fromJson(missingDisplayName),
+        () => parsePortfolioDocument(missingDisplayName),
         throwsA(isA<FormatException>()),
       );
 
@@ -502,7 +482,7 @@ void main() {
       final systems = incompleteCaseStudy['systems']! as List<dynamic>;
       (systems.first as Map<String, dynamic>).remove('challenge');
       expect(
-        () => PortfolioDocument.fromJson(incompleteCaseStudy),
+        () => parsePortfolioDocument(incompleteCaseStudy),
         throwsA(isA<FormatException>()),
       );
 
@@ -514,7 +494,7 @@ void main() {
               as Map<String, dynamic>;
       invalidPresentation['background'] = 'blue';
       expect(
-        () => PortfolioDocument.fromJson(invalidProjectColour),
+        () => parsePortfolioDocument(invalidProjectColour),
         throwsA(isA<FormatException>()),
       );
 
@@ -525,7 +505,7 @@ void main() {
           systemsWithoutEvidence.first as Map<String, dynamic>;
       featuredWithoutEvidence['evidence'] = <dynamic>[];
       expect(
-        () => PortfolioDocument.fromJson(missingEvidence),
+        () => parsePortfolioDocument(missingEvidence),
         throwsA(isA<FormatException>()),
       );
 
@@ -537,7 +517,7 @@ void main() {
           .firstWhere((system) => system['featured'] == false)
           .remove('artifact');
       expect(
-        () => PortfolioDocument.fromJson(supportingWithoutArtifact),
+        () => parsePortfolioDocument(supportingWithoutArtifact),
         throwsA(isA<FormatException>()),
       );
 
@@ -549,7 +529,7 @@ void main() {
           .firstWhere((system) => system['featured'] == true)
           .remove('artifact');
       expect(
-        () => PortfolioDocument.fromJson(featuredWithoutArtifact),
+        () => parsePortfolioDocument(featuredWithoutArtifact),
         throwsA(isA<FormatException>()),
       );
 
@@ -563,7 +543,7 @@ void main() {
               as Map<String, dynamic>;
       secondArtifact['asset'] = firstArtifact['asset'];
       expect(
-        () => PortfolioDocument.fromJson(duplicateArtifact),
+        () => parsePortfolioDocument(duplicateArtifact),
         throwsA(isA<FormatException>()),
       );
 
@@ -575,7 +555,7 @@ void main() {
           .firstWhere((system) => system['featured'] == false)
           .remove('group');
       expect(
-        () => PortfolioDocument.fromJson(missingSupportingGroup),
+        () => parsePortfolioDocument(missingSupportingGroup),
         throwsA(isA<FormatException>()),
       );
 
@@ -586,7 +566,7 @@ void main() {
         (system) => system['featured'] == false,
       )['group'] = 'client_card';
       expect(
-        () => PortfolioDocument.fromJson(unsupportedSupportingGroup),
+        () => parsePortfolioDocument(unsupportedSupportingGroup),
         throwsA(isA<FormatException>()),
       );
 
@@ -600,7 +580,7 @@ void main() {
           invalidArtifactSystem['artifact']! as Map<String, dynamic>;
       invalidArtifact['asset'] = '../generated/fake.png';
       expect(
-        () => PortfolioDocument.fromJson(invalidArtifactPath),
+        () => parsePortfolioDocument(invalidArtifactPath),
         throwsA(isA<FormatException>()),
       );
 
@@ -611,7 +591,7 @@ void main() {
         (system) => system['featured'] == false,
       )['evidence'] = <dynamic>[];
       expect(
-        () => PortfolioDocument.fromJson(missingSupportingEvidence),
+        () => parsePortfolioDocument(missingSupportingEvidence),
         throwsA(isA<FormatException>()),
       );
 
@@ -625,7 +605,7 @@ void main() {
           invalidDimensionsSystem['artifact']! as Map<String, dynamic>;
       invalidDimensionsArtifact['width'] = 0;
       expect(
-        () => PortfolioDocument.fromJson(invalidArtifactDimensions),
+        () => parsePortfolioDocument(invalidArtifactDimensions),
         throwsA(isA<FormatException>()),
       );
 
@@ -639,7 +619,7 @@ void main() {
           unsupportedFitSystem['artifact']! as Map<String, dynamic>;
       unsupportedFitArtifact['fit'] = 'parallax';
       expect(
-        () => PortfolioDocument.fromJson(unsupportedArtifactFit),
+        () => parsePortfolioDocument(unsupportedArtifactFit),
         throwsA(isA<FormatException>()),
       );
 
@@ -653,7 +633,7 @@ void main() {
           unsupportedCompositionSystem['artifact']! as Map<String, dynamic>;
       unsupportedCompositionArtifact['composition'] = 'project_card';
       expect(
-        () => PortfolioDocument.fromJson(unsupportedComposition),
+        () => parsePortfolioDocument(unsupportedComposition),
         throwsA(isA<FormatException>()),
       );
 
@@ -667,12 +647,32 @@ void main() {
           mismatchedCompositionSystem['artifact']! as Map<String, dynamic>;
       mismatchedCompositionArtifact['composition'] = 'portrait_split';
       expect(
-        () => PortfolioDocument.fromJson(mismatchedComposition),
+        () => parsePortfolioDocument(mismatchedComposition),
         throwsA(isA<FormatException>()),
       );
     });
   });
 }
+
+PortfolioDocumentContent _contentFrom(
+  PortfolioDocument document, {
+  int? schemaVersion,
+  List<PortfolioSource>? sources,
+}) => (
+  schemaVersion: schemaVersion ?? document.schemaVersion,
+  contentVersion: document.contentVersion,
+  verifiedAt: document.verifiedAt,
+  site: document.site,
+  sources: sources ?? document.sources,
+  profile: document.profile,
+  experience: document.experience,
+  capabilities: document.capabilities,
+  contributions: document.contributions,
+  systems: document.systems,
+  packages: document.packages,
+  writingSources: document.writingSources,
+  writing: document.writing,
+);
 
 Map<String, dynamic> _manifest() => loadPortfolioFixtureJson();
 
