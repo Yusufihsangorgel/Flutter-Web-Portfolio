@@ -50,7 +50,10 @@ for (const error of validateHostingSecurity(
 )) failures.push(error);
 expect(nginx.includes('gzip_static on;'), 'Nginx serves compressed asset siblings');
 expect(nginx.includes('try_files $uri $uri/ =404;') && nginx.includes('error_page 404 /404.html;'), 'Nginx returns the static 404 page');
-expect(nginx.includes('location = /.well-known/security.txt') && nginx.includes('default_type text/plain;'), 'Nginx serves security.txt as text/plain');
+expect(
+  /location = \/\.well-known\/security\.txt \{[^}]*default_type text\/plain;[^}]*charset utf-8;[^}]*\}/.test(nginx),
+  'Nginx serves security.txt as text/plain; charset=utf-8',
+);
 expect(headers.includes('/.well-known/security.txt\n  Content-Type: text/plain'), 'static hosts serve security.txt as text/plain');
 expect(JSON.stringify(firebase.hosting?.headers).includes('text/plain; charset=utf-8') && JSON.stringify(vercel.headers).includes('text/plain; charset=utf-8'), 'JSON providers serve security.txt as text/plain');
 expect(
