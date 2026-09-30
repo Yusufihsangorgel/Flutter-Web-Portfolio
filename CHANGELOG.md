@@ -24,6 +24,9 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 - Eight architecture decision records for the document-first application,
   routing, rendering runtimes, artifact promotion, content contracts, locales,
   render budgets, and repository tooling. Commit: `5e2ca05`.
+- A template guide with the setup, content, and hosting steps that were in the
+  README, and a `NOTICE` that excludes third-party screenshots and product names
+  from the MIT license. Commits: `56475b2`, `6b3c259`.
 
 ### Changed
 
@@ -33,6 +36,13 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
   topics. Commit: `328ed4a`.
 - Aligned architecture rules and technical-debt records with the repository.
   Commit: `5e2ca05`.
+- Rewrote the README to lead with the author, a screenshot, engineering
+  highlights, an architecture diagram, and the CI quality gates. The
+  contributor guide and pull request template list the pinned toolchain, the CI
+  checks, and the Conventional Commits title rule. Commits: `56475b2`,
+  `adea33f`.
+- The history audit finds attribution trailers and instruction files without
+  naming any tool. Commit: `e0ecd79`.
 
 ### Fixed
 
@@ -45,6 +55,8 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
   baselines, and tolerances for live-canvas variation; removed the
   snapshot-update workflow. Commits: `c24406b`, `90c0ee2`, `c8acf37`,
   `b41fda7`, `f03257e`.
+- The history audit missed an attribution trailer on a later line of an
+  annotated tag message. Commit: `e0ecd79`.
 
 ### Security
 
