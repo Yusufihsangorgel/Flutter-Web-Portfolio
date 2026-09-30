@@ -1,0 +1,21 @@
+{
+  "score": {
+    "grantedPoints": 140,
+    "maxPoints": 160,
+    "likeCount": 2,
+    "downloadCount30Days": 600,
+    "tags": []
+  },
+  "scorecard": {
+    "packageName": "re2",
+    "packageVersion": "1.0.0",
+    "runtimeVersion": "3.5.0",
+    "updated": "2026-09-29T00:00:00Z",
+    "taskStatus": "completed",
+    "panaReport": {
+      "reportStatus": "success",
+      "timestamp": "2026-09-29T00:00:00Z",
+      "derivedTags": []
+    }
+  }
+}

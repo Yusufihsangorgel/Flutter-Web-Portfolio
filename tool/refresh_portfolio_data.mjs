@@ -1,864 +1,232 @@
-// Refreshes the package, contribution, and writing records in
-// assets/content/portfolio.json from pub.dev, the GitHub API, and the feeds
-// declared in writing_sources, without touching any hand-authored copy
-// (roadmap, maturity, proof, contribution prose). See docs/AUTOMATION.md for
-// what this does and does not cover.
 import { readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import process from 'node:process';
 import { fileURLToPath } from 'node:url';
+import { parseArgs, UsageError } from './refresh/args.mjs';
+import { extractGithubLogin, parseGithubPullUrl, applyContributionFacts, buildCandidateSearchUrl, extractCandidateRecord, filterNewCandidates, groupCandidatesByRepo } from './refresh/github.mjs';
+import { extractPackageFacts, applyPackageFacts, COUNTER_FIELDS } from './refresh/pub.mjs';
+import { mergeWritingEntries, isWritingListChanged, decideWrite, applyContentVersionBump } from './refresh/merge.mjs';
+import { fetchWritingSourceEntries } from './refresh/feeds.mjs';
+import { buildReport } from './refresh/report.mjs';
+import { createLimiter, fetchJson, describeFetchFailure } from './refresh/http.mjs';
+
+export * from './refresh/args.mjs';
+export * from './refresh/github.mjs';
+export * from './refresh/pub.mjs';
+export * from './refresh/feeds.mjs';
+export * from './refresh/merge.mjs';
+export * from './refresh/report.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const DEFAULT_FILE = path.join(root, 'assets', 'content', 'portfolio.json');
 const USER_AGENT = 'flutter-web-portfolio-refresh';
-const GITHUB_PULL_PATTERN =
-  /^https:\/\/github\.com\/([A-Za-z0-9_.-]+)\/([A-Za-z0-9_.-]+)\/pull\/(\d+)\/?$/;
 
-export class UsageError extends Error {}
-
-// ---------------------------------------------------------------------------
-// Pure logic: no network, no filesystem. Every function here is exported so
-// tool/test_refresh_portfolio_data.mjs can exercise it against fixtures.
-// ---------------------------------------------------------------------------
-
-export function parseArgs(argv) {
-  const options = { check: false, counters: false, report: null, file: null };
-  for (let index = 0; index < argv.length; index += 1) {
-    const arg = argv[index];
-    switch (arg) {
-      case '--check':
-        options.check = true;
-        break;
-      case '--counters':
-        options.counters = true;
-        break;
-      case '--report': {
-        const value = argv[index + 1];
-        if (!value) throw new UsageError('--report requires a path');
-        options.report = value;
-        index += 1;
-        break;
-      }
-      case '--file': {
-        const value = argv[index + 1];
-        if (!value) throw new UsageError('--file requires a path');
-        options.file = value;
-        index += 1;
-        break;
-      }
-      default:
-        throw new UsageError(`Unknown argument: ${arg}`);
-    }
-  }
-  return options;
-}
-
-export function parseGithubPullUrl(url) {
-  const match = typeof url === 'string' ? GITHUB_PULL_PATTERN.exec(url) : null;
-  if (!match) return null;
-  return { owner: match[1], repo: match[2], number: Number(match[3]) };
-}
-
-export function extractGithubLogin(document) {
-  const links = document?.profile?.links;
-  const link = Array.isArray(links) ? links.find((entry) => entry?.id === 'github') : null;
-  if (!link || typeof link.url !== 'string') return null;
-  let url;
-  try {
-    url = new URL(link.url);
-  } catch {
-    return null;
-  }
-  if (url.hostname !== 'github.com') return null;
-  const segments = url.pathname.split('/').filter(Boolean);
-  return segments.length === 1 ? segments[0] : null;
-}
-
-/**
- * pub.dev's public score response (`VersionScore` in pub-dev's own
- * pkg/_pub_shared/lib/data/package_api.dart) carries only grantedPoints,
- * maxPoints, likeCount, downloadCount30Days, and tags. It names neither the
- * analysed version nor a lastUpdated timestamp, so grantedPoints being
- * null/absent is the only signal the public API exposes for "the pana run
- * for the latest version has not landed yet" — verified against a live
- * response and against that source file before writing this guard.
- */
-export function extractPackageFacts(packageResponse, scoreResponse) {
-  const latest = packageResponse?.latest;
-  if (!latest || typeof latest.version !== 'string' || latest.version.length === 0) {
-    throw new Error('pub.dev package response is missing latest.version');
-  }
-  if (!scoreResponse || typeof scoreResponse !== 'object') {
-    throw new Error('pub.dev score response is not an object');
-  }
-  const grantedPoints = scoreResponse.grantedPoints;
-  const scorePending = grantedPoints === null || grantedPoints === undefined;
-  if (!scorePending && typeof grantedPoints !== 'number') {
-    throw new Error('pub.dev score response has a non-numeric grantedPoints');
-  }
-  return {
-    version: latest.version,
-    // Counters are not rendered, so a missing one keeps the stored value
-    // instead of blocking the whole refresh.
-    likes: typeof scoreResponse.likeCount === 'number' ? scoreResponse.likeCount : null,
-    downloads:
-      typeof scoreResponse.downloadCount30Days === 'number'
-        ? scoreResponse.downloadCount30Days
-        : null,
-    pubPoints: scorePending ? null : grantedPoints,
-    scorePending,
-  };
-}
-
-export const COUNTER_FIELDS = new Set(['likes', 'downloads']);
-
-/**
- * Mutates `pkg` in place — never rebuilds the object from a field list — so
- * any field the schema does not know about survives untouched, and the key
- * order emitted by JSON.stringify is exactly the order the file already had.
- *
- * `description` is authored site copy that intentionally differs from the
- * pubspec description, so it is never overwritten. `topics` is not refreshed:
- * the site does not render it, and pub.dev topics name model vendors that
- * `audit:history` rejects in source.
- */
-export function applyPackageFacts(pkg, facts) {
-  const changedFields = [];
-  let visibleChanged = false;
-  let counterChanged = false;
-
-  if (facts.version !== pkg.version) {
-    pkg.version = facts.version;
-    visibleChanged = true;
-    changedFields.push('version');
-  }
-
-  let pendingScore = false;
-  if (facts.scorePending) {
-    pendingScore = true;
-  } else if (facts.pubPoints !== pkg.pub_points) {
-    pkg.pub_points = facts.pubPoints;
-    visibleChanged = true;
-    changedFields.push('pub_points');
-  }
-
-  if (facts.likes !== null && facts.likes !== pkg.likes) {
-    pkg.likes = facts.likes;
-    counterChanged = true;
-    changedFields.push('likes');
-  }
-  if (facts.downloads !== null && facts.downloads !== pkg.downloads) {
-    pkg.downloads = facts.downloads;
-    counterChanged = true;
-    changedFields.push('downloads');
-  }
-
-  return { visibleChanged, counterChanged, pendingScore, changedFields };
-}
-
-/** Only entries already marked `under_review` can change: a `merged` entry
- * has nothing left to learn from this check, and the schema gives closed
- * work no third status to move to. */
-export function applyContributionFacts(contribution, pullRequest) {
-  if (contribution.status !== 'under_review') {
-    return { changed: false, outcome: 'not_applicable' };
-  }
-  if (pullRequest.merged_at) {
-    const mergedDate = String(pullRequest.merged_at).slice(0, 10);
-    contribution.status = 'merged';
-    contribution.date = mergedDate;
-    return { changed: true, outcome: 'merged', mergedDate };
-  }
-  if (pullRequest.state === 'closed') {
-    return { changed: false, outcome: 'closed_unmerged' };
-  }
-  return { changed: false, outcome: 'still_open' };
-}
-
-export function bumpContentVersion(current, todayIso) {
-  const todayKey = todayIso.replaceAll('-', '.');
-  const match = /^(\d{4}\.\d{2}\.\d{2})\.(\d+)$/.exec(typeof current === 'string' ? current : '');
-  if (match && match[1] === todayKey) {
-    return `${todayKey}.${Number(match[2]) + 1}`;
-  }
-  return `${todayKey}.1`;
-}
-
-/**
- * `verified_at` is published as the date every listed source was checked by
- * hand; this tool checks only pub.dev and GitHub, so it never touches it.
- */
-export function applyContentVersionBump(document, { shouldWrite, hasVisible }, todayIso) {
-  if (shouldWrite && hasVisible) {
-    document.content_version = bumpContentVersion(document.content_version, todayIso);
-  }
-}
-
-export const WRITING_ENTRY_CAP = 12;
-
-/**
- * Decodes the XML entities a feed title commonly carries. Applied only to
- * text that was not CDATA-wrapped: CDATA content is literal by definition
- * and must not be re-decoded.
- */
-export function decodeFeedEntities(text) {
-  return text
-    .replaceAll('&lt;', '<')
-    .replaceAll('&gt;', '>')
-    .replaceAll('&quot;', '"')
-    .replaceAll('&apos;', "'")
-    .replace(/&#x([0-9a-fA-F]+);/g, (_, hex) => String.fromCodePoint(Number.parseInt(hex, 16)))
-    .replace(/&#(\d+);/g, (_, dec) => String.fromCodePoint(Number(dec)))
-    .replaceAll('&amp;', '&');
-}
-
-/** Reads one tag's text content out of an RSS/Atom fragment, unwrapping a
- * CDATA section verbatim or decoding entities from plain text. */
-export function extractTagText(fragment, tagName) {
-  const pattern = new RegExp(`<${tagName}(?:\\s[^>]*)?>([\\s\\S]*?)<\\/${tagName}>`, 'i');
-  const match = pattern.exec(fragment);
-  if (!match) return null;
-  const raw = match[1];
-  const cdata = /^\s*<!\[CDATA\[([\s\S]*?)\]\]>\s*$/.exec(raw);
-  const text = cdata ? cdata[1] : decodeFeedEntities(raw);
-  const trimmed = text.trim();
-  return trimmed.length > 0 ? trimmed : null;
-}
-
-/** Reads an Atom entry's canonical link: the `rel="alternate"` link if one
- * is declared, otherwise the first `href` the entry carries. */
-export function extractAtomLink(entryFragment) {
-  const linkPattern = /<link\b([^>]*)\/?>/gi;
-  let match;
-  let fallback = null;
-  while ((match = linkPattern.exec(entryFragment))) {
-    const attributes = match[1];
-    const hrefMatch = /href\s*=\s*"([^"]*)"|href\s*=\s*'([^']*)'/.exec(attributes);
-    if (!hrefMatch) continue;
-    const href = hrefMatch[1] ?? hrefMatch[2];
-    const relMatch = /rel\s*=\s*"([^"]*)"|rel\s*=\s*'([^']*)'/.exec(attributes);
-    const rel = relMatch ? relMatch[1] ?? relMatch[2] : null;
-    if (rel === 'alternate') return href;
-    if (fallback === null) fallback = href;
-  }
-  return fallback;
-}
-
-function toIsoDate(value) {
-  const date = new Date(value);
-  return Number.isNaN(date.getTime()) ? null : date.toISOString();
-}
-
-/** Parses RSS 2.0 `<item>` entries into `{ title, url, publishedAt }`. */
-export function parseRssItems(xml) {
-  const items = [];
-  const itemPattern = /<item\b[^>]*>([\s\S]*?)<\/item>/gi;
-  let match;
-  while ((match = itemPattern.exec(xml))) {
-    const fragment = match[1];
-    const title = extractTagText(fragment, 'title');
-    const url = extractTagText(fragment, 'link');
-    const publishedAt = toIsoDate(extractTagText(fragment, 'pubDate'));
-    if (!title || !url || !publishedAt) continue;
-    items.push({ title, url, publishedAt });
-  }
-  return items;
-}
-
-/** Parses Atom `<entry>` entries into `{ title, url, publishedAt }`. */
-export function parseAtomItems(xml) {
-  const items = [];
-  const entryPattern = /<entry\b[^>]*>([\s\S]*?)<\/entry>/gi;
-  let match;
-  while ((match = entryPattern.exec(xml))) {
-    const fragment = match[1];
-    const title = extractTagText(fragment, 'title');
-    const url = extractAtomLink(fragment);
-    const publishedAt = toIsoDate(
-      extractTagText(fragment, 'published') ?? extractTagText(fragment, 'updated'),
-    );
-    if (!title || !url || !publishedAt) continue;
-    items.push({ title, url, publishedAt });
-  }
-  return items;
-}
-
-/** Detects RSS 2.0 vs. Atom from the document's root element and parses it. */
-export function parseFeedItems(xml) {
-  const withoutProlog = xml.trimStart().replace(/^<\?xml[^>]*\?>\s*/i, '');
-  if (/^<rss\b/i.test(withoutProlog)) return parseRssItems(xml);
-  if (/^<feed\b/i.test(withoutProlog)) return parseAtomItems(xml);
-  // Root element was not recognized outright (e.g. an unexpected namespace
-  // prefix); try both and keep whichever actually matched entries.
-  const rssItems = parseRssItems(xml);
-  return rssItems.length > 0 ? rssItems : parseAtomItems(xml);
-}
-
-/** Parses a dev.to `/api/articles` response into `{ title, url, publishedAt }`. */
-export function parseDevToArticles(payload) {
-  if (!Array.isArray(payload)) {
-    throw new Error('dev.to articles response is not an array');
-  }
-  const items = [];
-  for (const entry of payload) {
-    const title = typeof entry?.title === 'string' ? entry.title.trim() : '';
-    const url = typeof entry?.url === 'string' ? entry.url : '';
-    const publishedAt = toIsoDate(entry?.published_at);
-    if (!title || !url || !publishedAt) continue;
-    items.push({ title, url, publishedAt });
-  }
-  return items;
-}
-
-/** Case-folds, collapses whitespace, and strips punctuation so the same
- * article cross-posted under slightly different formatting dedupes. */
-export function normalizeWritingTitle(title) {
-  return title
-    .toLowerCase()
-    .normalize('NFKC')
-    .replace(/[.,!?;:'"“”‘’()[\]{}]/g, '')
-    .replace(/\s+/g, ' ')
-    .trim();
-}
-
-/**
- * Merges each source's `{ title, url, publishedAt }` entries into the final
- * `{ title, url, source, date }` list: one entry per normalized title,
- * preferring the earliest source in `sourceOrder`, newest first, capped.
- */
-export function mergeWritingEntries(entriesBySource, sourceOrder, { cap = WRITING_ENTRY_CAP } = {}) {
-  const bestByTitle = new Map();
-  for (const sourceId of sourceOrder) {
-    for (const entry of entriesBySource[sourceId] ?? []) {
-      const key = normalizeWritingTitle(entry.title);
-      if (key.length === 0 || bestByTitle.has(key)) continue;
-      bestByTitle.set(key, { ...entry, source: sourceId });
-    }
-  }
-  return [...bestByTitle.values()]
-    .sort((a, b) => new Date(b.publishedAt) - new Date(a.publishedAt))
-    .slice(0, cap)
-    .map((entry) => ({
-      title: entry.title,
-      url: entry.url,
-      source: entry.source,
-      date: entry.publishedAt.slice(0, 10),
-    }));
-}
-
-/** Whether the rendered `writing` list actually changed (order included). */
-export function isWritingListChanged(previous, next) {
-  const before = Array.isArray(previous) ? previous : [];
-  if (before.length !== next.length) return true;
-  for (let index = 0; index < next.length; index += 1) {
-    const a = before[index];
-    const b = next[index];
-    if (a?.title !== b.title || a?.url !== b.url || a?.source !== b.source || a?.date !== b.date) {
-      return true;
-    }
-  }
-  return false;
-}
-
-export function buildCandidateSearchUrl(login, page = 1) {
-  const query = `author:${login} is:pr is:merged is:public -user:${login}`;
-  const params = new URLSearchParams({ q: query, per_page: '100', page: String(page) });
-  return `https://api.github.com/search/issues?${params.toString()}`;
-}
-
-export function extractCandidateRecord(item) {
-  const match = /^https:\/\/api\.github\.com\/repos\/([^/]+)\/([^/]+)$/.exec(
-    item?.repository_url ?? '',
-  );
-  const mergedAt = item?.pull_request?.merged_at ?? item?.closed_at ?? null;
-  return {
-    url: item?.html_url ?? null,
-    title: item?.title ?? null,
-    owner: match ? match[1] : null,
-    repo: match ? match[2] : null,
-    mergedDate: mergedAt ? String(mergedAt).slice(0, 10) : null,
-  };
-}
-
-function normalizeUrl(url) {
-  return typeof url === 'string' ? url.replace(/\/+$/, '').toLowerCase() : null;
-}
-
-export function filterNewCandidates(records, existingUrls) {
-  const existing = new Set(existingUrls.map(normalizeUrl).filter(Boolean));
-  const seen = new Set();
-  const result = [];
-  for (const record of records) {
-    const key = normalizeUrl(record.url);
-    if (!key || existing.has(key) || seen.has(key)) continue;
-    seen.add(key);
-    result.push(record);
-  }
-  return result;
-}
-
-export function groupCandidatesByRepo(records) {
-  const groups = new Map();
-  for (const record of records) {
-    const key = record.owner && record.repo ? `${record.owner}/${record.repo}` : 'unknown';
-    if (!groups.has(key)) groups.set(key, []);
-    groups.get(key).push(record);
-  }
-  return [...groups.entries()]
-    .sort((a, b) => a[0].localeCompare(b[0]))
-    .map(([repo, items]) => ({ repo, items }));
-}
-
-export function decideWrite({ anyFailure, check, hasVisible, hasCounters, includeCounters }) {
-  return !anyFailure && !check && (hasVisible || (hasCounters && includeCounters));
-}
-
-export function buildReport(summary) {
-  const lines = [`# Portfolio data refresh — ${summary.generatedAt}`, ''];
-
-  lines.push('## Visible changes', '');
-  if (summary.visibleChanges.length === 0) {
-    lines.push('None.');
-  } else {
-    for (const change of summary.visibleChanges) lines.push(`- ${change}`);
-  }
-  lines.push('');
-
-  lines.push('## Counter-only changes', '');
-  if (summary.counterChanges.length === 0) {
-    lines.push('None.');
-  } else {
-    for (const change of summary.counterChanges) lines.push(`- ${change}`);
-  }
-  lines.push('');
-
-  lines.push('## Writing', '');
-  lines.push(
-    summary.writingChanged
-      ? `Updated: ${summary.writingEntryCount} entries (was ${summary.previousWritingEntryCount}).`
-      : 'No change.',
-  );
-  if ((summary.writingFailures ?? []).length === 0) {
-    lines.push('No source failures.');
-  } else {
-    lines.push('Source failures (previously stored entries retained):');
-    for (const failure of summary.writingFailures) lines.push(`- ${failure}`);
-  }
-  lines.push('');
-
-  lines.push('## Pending pub.dev score', '');
-  if (summary.pendingScorePackages.length === 0) {
-    lines.push('None.');
-  } else {
-    for (const name of summary.pendingScorePackages) {
-      lines.push(`- \`${name}\`: pub.dev has not published a score for the latest version yet.`);
-    }
-  }
-  lines.push('');
-
-  lines.push('## Closed without merging', '');
-  if (summary.closedUnmergedContributions.length === 0) {
-    lines.push('None.');
-  } else {
-    for (const item of summary.closedUnmergedContributions) {
-      lines.push(`- \`${item.id}\`: ${item.url} closed without merging; entry left unchanged.`);
-    }
-  }
-  lines.push('');
-
-  lines.push('## Fetch failures', '');
-  if (summary.failures.length === 0) {
-    lines.push('None.');
-  } else {
-    for (const failure of summary.failures) lines.push(`- ${failure}`);
-  }
-  lines.push('');
-
-  lines.push('## Candidate pull requests not yet in contributions', '');
-  if (summary.candidatesError) {
-    lines.push(`Could not be determined: ${summary.candidatesError}`);
-  } else if (summary.candidateGroups.length === 0) {
-    lines.push('None.');
-  } else {
-    for (const group of summary.candidateGroups) {
-      lines.push(`### ${group.repo}`, '');
-      for (const item of group.items) {
-        lines.push(`- [${item.title}](${item.url})${item.mergedDate ? ` — merged ${item.mergedDate}` : ''}`);
-      }
-      lines.push('');
-    }
-  }
-
-  return `${lines.join('\n').trimEnd()}\n`;
-}
-
-// ---------------------------------------------------------------------------
-// Thin I/O layer.
-// ---------------------------------------------------------------------------
-
-function delay(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
-function createLimiter(limit) {
-  let active = 0;
-  const queue = [];
-  const runNext = () => {
-    if (active >= limit || queue.length === 0) return;
-    active += 1;
-    const { fn, resolve, reject } = queue.shift();
-    fn().then(
-      (value) => {
-        active -= 1;
-        resolve(value);
-        runNext();
-      },
-      (error) => {
-        active -= 1;
-        reject(error);
-        runNext();
-      },
-    );
-  };
-  return function run(fn) {
-    return new Promise((resolve, reject) => {
-      queue.push({ fn, resolve, reject });
-      runNext();
-    });
-  };
-}
-
-async function fetchJson(url, { headers, attempts = 3 } = {}) {
-  let lastError = null;
-  for (let attempt = 1; attempt <= attempts; attempt += 1) {
-    try {
-      const response = await fetch(url, { headers });
-      if (response.ok) {
-        return { ok: true, status: response.status, body: await response.json() };
-      }
-      if (response.status >= 500 || response.status === 429) {
-        lastError = new Error(`${url} responded ${response.status}`);
-      } else {
-        let body = null;
-        try {
-          body = await response.json();
-        } catch {
-          // Non-JSON error body; keep body null.
-        }
-        return { ok: false, status: response.status, body, error: null };
-      }
-    } catch (error) {
-      lastError = error;
-    }
-    if (attempt < attempts) await delay(attempt * 500);
-  }
-  return { ok: false, status: null, body: null, error: lastError };
-}
-
-async function fetchText(url, { headers, attempts = 3 } = {}) {
-  let lastError = null;
-  for (let attempt = 1; attempt <= attempts; attempt += 1) {
-    try {
-      const response = await fetch(url, { headers });
-      if (response.ok) {
-        return { ok: true, status: response.status, body: await response.text() };
-      }
-      if (response.status >= 500 || response.status === 429) {
-        lastError = new Error(`${url} responded ${response.status}`);
-      } else {
-        return { ok: false, status: response.status, body: null, error: null };
-      }
-    } catch (error) {
-      lastError = error;
-    }
-    if (attempt < attempts) await delay(attempt * 500);
-  }
-  return { ok: false, status: null, body: null, error: lastError };
-}
-
-function describeFetchFailure(result, label) {
-  if (result.error) return `${label}: ${result.error.message}`;
-  return `${label}: HTTP ${result.status}`;
-}
-
-/** Fetches and parses one writing source, dispatching on its declared kind. */
-async function fetchWritingSourceEntries(source, { feedHeaders, jsonHeaders }) {
-  if (source.kind === 'rss') {
-    const result = await fetchText(source.url, { headers: feedHeaders });
-    if (!result.ok) {
-      return { ok: false, failure: describeFetchFailure(result, `${source.id}: feed fetch`) };
-    }
-    try {
-      return { ok: true, entries: parseFeedItems(result.body) };
-    } catch (error) {
-      return { ok: false, failure: `${source.id}: ${error.message}` };
-    }
-  }
-  if (source.kind === 'devto') {
-    const result = await fetchJson(source.url, { headers: jsonHeaders });
-    if (!result.ok) {
-      return { ok: false, failure: describeFetchFailure(result, `${source.id}: dev.to fetch`) };
-    }
-    try {
-      return { ok: true, entries: parseDevToArticles(result.body) };
-    } catch (error) {
-      return { ok: false, failure: `${source.id}: ${error.message}` };
-    }
-  }
-  return { ok: false, failure: `${source.id}: unsupported writing source kind "${source.kind}"` };
-}
-
-async function main() {
-  const options = parseArgs(process.argv.slice(2));
-  const filePath = options.file ? path.resolve(options.file) : DEFAULT_FILE;
-  const raw = await readFile(filePath, 'utf8');
-  const document = JSON.parse(raw);
-
+function createHeaders() {
   const token = process.env.GITHUB_TOKEN?.trim() || null;
-  const githubHeaders = {
+  const github = {
     Accept: 'application/vnd.github+json',
     'User-Agent': USER_AGENT,
     'X-GitHub-Api-Version': '2022-11-28',
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
   };
-  const pubHeaders = { 'User-Agent': USER_AGENT };
-  const feedHeaders = {
+  const pub = { 'User-Agent': USER_AGENT };
+  const feed = {
     'User-Agent': USER_AGENT,
-    Accept:
-      'application/rss+xml, application/atom+xml, application/xml;q=0.9, text/xml;q=0.8, */*;q=0.5',
+    Accept: 'application/rss+xml, application/atom+xml, application/xml;q=0.9, text/xml;q=0.8, */*;q=0.5',
   };
+  return { github, pub, feed };
+}
 
-  const limiter = createLimiter(6);
-  const failures = [];
+async function refreshPackages(ctx) {
+  const fetches = ctx.packages.map((pkg) => {
+    const base = `https://pub.dev/api/packages/${encodeURIComponent(pkg.name)}`;
+    return {
+      pkg,
+      base,
+      info: ctx.limiter(() => fetchJson(base, { headers: ctx.headers.pub })),
+      score: ctx.limiter(() => fetchJson(`${base}/score`, { headers: ctx.headers.pub })),
+    };
+  });
+  for (const { pkg, base, info, score } of fetches) {
+    const [infoResult, scoreResult] = await Promise.all([info, score]);
+    if (!infoResult.ok) {
+      ctx.failures.push(describeFetchFailure(infoResult, `${pkg.name}: pub.dev package lookup`));
+      ctx.anyFailure = true;
+      continue;
+    }
+    const scoreBody = scoreResult.ok ? scoreResult.body : null;
+    let metricsBody = null;
+    if (Number.isFinite(scoreBody?.grantedPoints) && scoreBody.grantedPoints < pkg.pub_points) {
+      const metricsResult = await ctx.limiter(() => fetchJson(`${base}/metrics`, { headers: ctx.headers.pub }));
+      if (metricsResult.ok) metricsBody = metricsResult.body;
+    }
+    let facts;
+    try {
+      facts = extractPackageFacts(infoResult.body, scoreBody, metricsBody, pkg.pub_points);
+    } catch (error) {
+      ctx.failures.push(`${pkg.name}: ${error.message}`);
+      ctx.anyFailure = true;
+      continue;
+    }
+    const outcome = applyPackageFacts(pkg, facts);
+    if (outcome.pendingScore) {
+      ctx.pendingScorePackages.push(pkg.name);
+      const max = Number.isFinite(facts.maxPoints) && facts.maxPoints > 0 ? facts.maxPoints : 160;
+      ctx.scoreUnavailable.push(`${pkg.name}: score unavailable, kept ${pkg.pub_points}/${max}`);
+    }
+    if (outcome.visibleChanged) {
+      ctx.visibleChanges.push(`${pkg.name}: ${outcome.changedFields.filter((f) => !COUNTER_FIELDS.has(f)).join(', ')}`);
+    }
+    if (outcome.counterChanged) {
+      ctx.counterChanges.push(`${pkg.name}: ${outcome.changedFields.filter((f) => COUNTER_FIELDS.has(f)).join(', ')}`);
+    }
+  }
+}
 
-  const packages = Array.isArray(document.packages) ? document.packages : [];
-  const packageFetches = packages.map((pkg) => ({
-    pkg,
-    infoPromise: limiter(() =>
-      fetchJson(`https://pub.dev/api/packages/${encodeURIComponent(pkg.name)}`, {
-        headers: pubHeaders,
-      }),
-    ),
-    scorePromise: limiter(() =>
-      fetchJson(`https://pub.dev/api/packages/${encodeURIComponent(pkg.name)}/score`, {
-        headers: pubHeaders,
-      }),
-    ),
-  }));
-
-  const contributions = Array.isArray(document.contributions) ? document.contributions : [];
-  const contributionFetches = contributions
+async function refreshContributions(ctx) {
+  const fetches = ctx.contributions
     .filter((contribution) => contribution.status === 'under_review')
     .map((contribution) => {
       const parsed = parseGithubPullUrl(contribution.url);
       if (!parsed) return null;
-      return {
-        contribution,
-        promise: limiter(() =>
-          fetchJson(
-            `https://api.github.com/repos/${parsed.owner}/${parsed.repo}/pulls/${parsed.number}`,
-            { headers: githubHeaders },
-          ),
-        ),
-      };
-    })
-    .filter(Boolean);
-
-  const visibleChanges = [];
-  const counterChanges = [];
-  const pendingScorePackages = [];
-  let anyFailure = false;
-
-  for (const { pkg, infoPromise, scorePromise } of packageFetches) {
-    const [infoResult, scoreResult] = await Promise.all([infoPromise, scorePromise]);
-    if (!infoResult.ok) {
-      failures.push(describeFetchFailure(infoResult, `${pkg.name}: pub.dev package lookup`));
-      anyFailure = true;
-      continue;
-    }
-    if (!scoreResult.ok) {
-      failures.push(describeFetchFailure(scoreResult, `${pkg.name}: pub.dev score lookup`));
-      anyFailure = true;
-      continue;
-    }
-    let facts;
-    try {
-      facts = extractPackageFacts(infoResult.body, scoreResult.body);
-    } catch (error) {
-      failures.push(`${pkg.name}: ${error.message}`);
-      anyFailure = true;
-      continue;
-    }
-    const outcome = applyPackageFacts(pkg, facts);
-    if (outcome.pendingScore) pendingScorePackages.push(pkg.name);
-    if (outcome.visibleChanged) {
-      visibleChanges.push(`${pkg.name}: ${outcome.changedFields.filter((f) => !COUNTER_FIELDS.has(f)).join(', ')}`);
-    }
-    if (outcome.counterChanged) {
-      counterChanges.push(`${pkg.name}: ${outcome.changedFields.filter((f) => COUNTER_FIELDS.has(f)).join(', ')}`);
-    }
-  }
-
-  const closedUnmergedContributions = [];
-  for (const { contribution, promise } of contributionFetches) {
+      const url = `https://api.github.com/repos/${parsed.owner}/${parsed.repo}/pulls/${parsed.number}`;
+      return { contribution, promise: ctx.limiter(() => fetchJson(url, { headers: ctx.headers.github })) };
+    }).filter(Boolean);
+  ctx.contributionsChecked = fetches.length;
+  for (const { contribution, promise } of fetches) {
     const result = await promise;
     if (!result.ok) {
-      failures.push(describeFetchFailure(result, `${contribution.id}: GitHub pull request lookup`));
-      anyFailure = true;
+      ctx.failures.push(describeFetchFailure(result, `${contribution.id}: GitHub pull request lookup`));
+      ctx.anyFailure = true;
       continue;
     }
     const outcome = applyContributionFacts(contribution, result.body);
     if (outcome.changed) {
-      visibleChanges.push(`${contribution.id}: status -> merged (${outcome.mergedDate})`);
+      ctx.visibleChanges.push(`${contribution.id}: status -> merged (${outcome.mergedDate})`);
     } else if (outcome.outcome === 'closed_unmerged') {
-      closedUnmergedContributions.push({ id: contribution.id, url: contribution.url });
+      ctx.closedUnmergedContributions.push({ id: contribution.id, url: contribution.url });
     }
   }
+}
 
-  // Writing refresh: bounded-concurrency fetch of every declared source. A
-  // source that fails to fetch or parse keeps that source's previously
-  // stored entries (filtered back out of document.writing) instead of
-  // dropping them, is reported, and never sets `anyFailure` — a feed hiccup
-  // must never block the package/contribution refresh above.
-  const writingSources = Array.isArray(document.writing_sources)
-    ? document.writing_sources
-    : [];
-  const previousWriting = Array.isArray(document.writing) ? document.writing : [];
-  const writingFailures = [];
+async function refreshWriting(ctx) {
+  const sources = Array.isArray(ctx.document.writing_sources) ? ctx.document.writing_sources : [];
+  const previous = Array.isArray(ctx.document.writing) ? ctx.document.writing : [];
   const entriesBySource = {};
-  const writingFetches = writingSources.map((source) => ({
+  const fetches = sources.map((source) => ({
     source,
-    promise: limiter(() =>
-      fetchWritingSourceEntries(source, { feedHeaders, jsonHeaders: pubHeaders }),
-    ),
+    promise: ctx.limiter(() => fetchWritingSourceEntries(source, {
+      feedHeaders: ctx.headers.feed, jsonHeaders: ctx.headers.pub,
+    })),
   }));
-  for (const { source, promise } of writingFetches) {
+  for (const { source, promise } of fetches) {
     const result = await promise;
     if (result.ok) {
       entriesBySource[source.id] = result.entries;
       continue;
     }
-    writingFailures.push(result.failure);
-    entriesBySource[source.id] = previousWriting
-      .filter((entry) => entry.source === source.id)
-      .map((entry) => ({
-        title: entry.title,
-        url: entry.url,
-        publishedAt: `${entry.date}T00:00:00.000Z`,
-      }));
+    ctx.writingFailures.push(result.failure);
+    entriesBySource[source.id] = previous.filter((entry) => entry.source === source.id)
+      .map((entry) => ({ ...entry, publishedAt: `${entry.date}T00:00:00.000Z` }));
   }
-  const mergedWriting = mergeWritingEntries(
-    entriesBySource,
-    writingSources.map((source) => source.id),
-  );
-  const writingChanged = isWritingListChanged(previousWriting, mergedWriting);
-  if (writingChanged) {
-    document.writing = mergedWriting;
-    visibleChanges.push(
-      `writing: ${mergedWriting.length} entries (was ${previousWriting.length})`,
-    );
+  const merged = mergeWritingEntries(entriesBySource, sources.map((source) => source.id), { previous });
+  ctx.writingChanged = isWritingListChanged(previous, merged);
+  ctx.writingEntryCount = merged.length;
+  ctx.previousWritingEntryCount = previous.length;
+  ctx.writingSourceCount = sources.length;
+  if (ctx.writingChanged) {
+    ctx.document.writing = merged;
+    ctx.visibleChanges.push(`writing: ${merged.length} entries (was ${previous.length})`);
   }
+}
 
-  // Candidate discovery only runs when portfolio.json itself names the
-  // GitHub account (via profile.links); it is report-only and never blocks
-  // the write, since a search-quota hiccup here should not stop a real,
-  // successfully fetched package/contribution refresh from being written.
-  let candidateGroups = [];
-  let candidatesError = null;
-  const login = extractGithubLogin(document);
-  if (login) {
-    try {
-      const existingUrls = contributions.map((c) => c.url).filter((u) => typeof u === 'string');
-      const records = [];
-      let page = 1;
-      let total = Infinity;
-      while ((page - 1) * 100 < total) {
-        const result = await limiter(() =>
-          fetchJson(buildCandidateSearchUrl(login, page), { headers: githubHeaders }),
-        );
-        if (!result.ok) {
-          candidatesError = describeFetchFailure(result, 'GitHub search');
-          break;
-        }
-        total = typeof result.body.total_count === 'number' ? result.body.total_count : 0;
-        const items = Array.isArray(result.body.items) ? result.body.items : [];
-        for (const item of items) records.push(extractCandidateRecord(item));
-        if (items.length === 0) break;
-        page += 1;
+async function discoverCandidates(ctx) {
+  const login = extractGithubLogin(ctx.document);
+  if (!login) {
+    ctx.candidatesError = 'portfolio.json has no profile.links entry with id "github"';
+    return;
+  }
+  try {
+    const existingUrls = ctx.contributions.map((c) => c.url).filter((u) => typeof u === 'string');
+    const records = [];
+    let page = 1;
+    let total = Infinity;
+    while ((page - 1) * 100 < total) {
+      const url = buildCandidateSearchUrl(login, page);
+      const result = await ctx.limiter(() => fetchJson(url, { headers: ctx.headers.github }));
+      if (!result.ok) {
+        ctx.candidatesError = describeFetchFailure(result, 'GitHub search');
+        break;
       }
-      if (!candidatesError) {
-        candidateGroups = groupCandidatesByRepo(filterNewCandidates(records, existingUrls));
-      }
-    } catch (error) {
-      candidatesError = error.message;
+      total = typeof result.body.total_count === 'number' ? result.body.total_count : 0;
+      const items = Array.isArray(result.body.items) ? result.body.items : [];
+      for (const item of items) records.push(extractCandidateRecord(item));
+      if (items.length === 0) break;
+      page += 1;
     }
-  } else {
-    candidatesError = 'portfolio.json has no profile.links entry with id "github"';
+    if (!ctx.candidatesError) {
+      ctx.candidateGroups = groupCandidatesByRepo(filterNewCandidates(records, existingUrls));
+    }
+  } catch (error) {
+    ctx.candidatesError = error.message;
   }
+}
 
-  const todayIso = new Date().toISOString().slice(0, 10);
-  const hasVisible = visibleChanges.length > 0;
-  const hasCounters = counterChanges.length > 0;
+function buildConsoleSummary(ctx, shouldWrite) {
+  const candidateCount = ctx.candidateGroups.reduce((total, group) => total + group.items.length, 0);
+  return [
+    `Packages checked: ${ctx.packages.length}`,
+    `Contributions checked: ${ctx.contributionsChecked} (of ${ctx.contributions.length} total, only under_review entries)`,
+    `Visible changes: ${ctx.visibleChanges.length}`,
+    `Counter-only changes: ${ctx.counterChanges.length}`,
+    `Pending pub.dev score: ${ctx.pendingScorePackages.length}`,
+    `Closed without merging: ${ctx.closedUnmergedContributions.length}`,
+    `Fetch failures: ${ctx.failures.length}`,
+    `Writing sources checked: ${ctx.writingSourceCount}`,
+    `Writing entries: ${ctx.writingEntryCount}${ctx.writingChanged ? ' (updated)' : ''}`,
+    `Writing source failures: ${ctx.writingFailures.length}`,
+    `Candidates: ${ctx.candidatesError ? `unavailable (${ctx.candidatesError})` : candidateCount}`,
+    shouldWrite ? `Wrote ${path.relative(root, ctx.filePath)}.` :
+      ctx.anyFailure ? 'Did not write: a fetch failed (all-or-nothing).' :
+        ctx.options.check ? 'Did not write: --check.' :
+          'Did not write: no visible change (counter-only changes need --counters).',
+  ].join('\n');
+}
+
+async function finishRefresh(ctx) {
+  const hasVisible = ctx.visibleChanges.length > 0;
   const shouldWrite = decideWrite({
-    anyFailure,
-    check: options.check,
-    hasVisible,
-    hasCounters,
-    includeCounters: options.counters,
+    anyFailure: ctx.anyFailure, check: ctx.options.check, hasVisible,
+    hasCounters: ctx.counterChanges.length > 0, includeCounters: ctx.options.counters,
   });
-
-  applyContentVersionBump(document, { shouldWrite, hasVisible }, todayIso);
-  if (shouldWrite) {
-    await writeFile(filePath, `${JSON.stringify(document, null, 2)}\n`);
+  applyContentVersionBump(ctx.document, { shouldWrite, hasVisible }, new Date().toISOString().slice(0, 10));
+  if (shouldWrite) await writeFile(ctx.filePath, `${JSON.stringify(ctx.document, null, 2)}\n`);
+  console.log(buildConsoleSummary(ctx, shouldWrite));
+  for (const line of ctx.scoreUnavailable) console.log(line);
+  if (ctx.options.report) {
+    const report = buildReport({ ...ctx, generatedAt: new Date().toISOString() });
+    await writeFile(path.resolve(ctx.options.report), report);
   }
+  process.exitCode = ctx.anyFailure ? 2 : ctx.options.check && hasVisible ? 1 : 0;
+}
 
-  const summaryLines = [
-    `Packages checked: ${packages.length}`,
-    `Contributions checked: ${contributionFetches.length} (of ${contributions.length} total, only under_review entries)`,
-    `Visible changes: ${visibleChanges.length}`,
-    `Counter-only changes: ${counterChanges.length}`,
-    `Pending pub.dev score: ${pendingScorePackages.length}`,
-    `Closed without merging: ${closedUnmergedContributions.length}`,
-    `Fetch failures: ${failures.length}`,
-    `Writing sources checked: ${writingSources.length}`,
-    `Writing entries: ${writingChanged ? mergedWriting.length : previousWriting.length}${writingChanged ? ' (updated)' : ''}`,
-    `Writing source failures: ${writingFailures.length}`,
-    `Candidates: ${candidatesError ? `unavailable (${candidatesError})` : candidateGroups.reduce((total, group) => total + group.items.length, 0)}`,
-    shouldWrite
-      ? `Wrote ${path.relative(root, filePath)}.`
-      : anyFailure
-        ? 'Did not write: a fetch failed (all-or-nothing).'
-        : options.check
-          ? 'Did not write: --check.'
-          : 'Did not write: no visible change (counter-only changes need --counters).',
-  ];
-  console.log(summaryLines.join('\n'));
-
-  if (options.report) {
-    const report = buildReport({
-      generatedAt: new Date().toISOString(),
-      visibleChanges,
-      counterChanges,
-      pendingScorePackages,
-      closedUnmergedContributions,
-      failures,
-      writingChanged,
-      writingEntryCount: mergedWriting.length,
-      previousWritingEntryCount: previousWriting.length,
-      writingFailures,
-      candidateGroups,
-      candidatesError,
-    });
-    await writeFile(path.resolve(options.report), report);
-  }
-
-  if (anyFailure) {
-    process.exitCode = 2;
-  } else if (options.check) {
-    process.exitCode = hasVisible ? 1 : 0;
-  } else {
-    process.exitCode = 0;
-  }
+async function main() {
+  const options = parseArgs(process.argv.slice(2));
+  const filePath = options.file ? path.resolve(options.file) : DEFAULT_FILE;
+  const document = JSON.parse(await readFile(filePath, 'utf8'));
+  const ctx = {
+    options, filePath, document, headers: createHeaders(), limiter: createLimiter(6),
+    packages: Array.isArray(document.packages) ? document.packages : [],
+    contributions: Array.isArray(document.contributions) ? document.contributions : [],
+    failures: [], visibleChanges: [], counterChanges: [], pendingScorePackages: [],
+    scoreUnavailable: [], closedUnmergedContributions: [], writingFailures: [],
+    candidateGroups: [], candidatesError: null, anyFailure: false,
+  };
+  await refreshPackages(ctx);
+  await refreshContributions(ctx);
+  await refreshWriting(ctx);
+  await discoverCandidates(ctx);
+  await finishRefresh(ctx);
 }
 
 const isMain = (() => {

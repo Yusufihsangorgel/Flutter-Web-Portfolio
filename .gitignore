@@ -29,10 +29,6 @@ migrate_working_dir/
 .pub-cache/
 .pub/
 /build/*
-# The canonical deploy artifact is intentionally versioned because the
-# production Dockerfile serves it without compiling Flutter on the host.
-!/build/web/
-!/build/web/**
 assets/work/.portfolio-test-*
 
 # Symbolication related
