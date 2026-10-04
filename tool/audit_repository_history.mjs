@@ -224,10 +224,9 @@ function git(args) {
 
 // GitHub apps such as dependabot sign and co-author their own update commits.
 function withoutBotTrailers(metadata) {
-  return metadata.replace(
-    /^(?:co-authored-by|signed-off-by): (?:dependabot|github-actions)\[bot\] <[^>\n]+>$/gim,
-    '',
-  );
+  const trailer = `(?:${attributionTokens[0]}|signed-off-by)`;
+  const bot = String.raw`(?:dependabot|github-actions)\[bot\] <[^>\n]+>`;
+  return metadata.replace(new RegExp(`^${trailer}: ${bot}$`, 'gim'), '');
 }
 
 function escapeRegExp(value) {
