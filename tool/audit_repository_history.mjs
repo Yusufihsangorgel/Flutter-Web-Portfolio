@@ -53,7 +53,7 @@ for (const commit of commits) {
     '--format=%an <%ae>%n%cn <%ce>%n%B',
     commit,
   ]);
-  if (new RegExp(attributionPattern, 'i').test(metadata)) {
+  if (new RegExp(attributionPattern, 'i').test(withoutBotTrailers(metadata))) {
     failures.push(`${commit.slice(0, 8)} metadata contains an attribution marker`);
   }
 
@@ -220,6 +220,14 @@ function git(args) {
     throw result.error ?? new Error(result.stderr || `git ${args.join(' ')} failed`);
   }
   return result.stdout;
+}
+
+// GitHub apps such as dependabot sign and co-author their own update commits.
+function withoutBotTrailers(metadata) {
+  return metadata.replace(
+    /^(?:co-authored-by|signed-off-by): (?:dependabot|github-actions)\[bot\] <[^>\n]+>$/gim,
+    '',
+  );
 }
 
 function escapeRegExp(value) {
