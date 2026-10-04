@@ -2,14 +2,14 @@ import 'dart:developer' as dev;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_web_portfolio/app/core/l10n/app_strings.g.dart';
 import 'package:flutter_web_portfolio/app/domain/repositories/language_repository.dart';
-import 'package:flutter_web_portfolio/app/utils/web_url_strategy.dart'
-    as url_strategy;
+import 'package:flutter_web_portfolio/app/utils/language_browser.dart';
 
 enum LanguageStatus { initial, loading, ready, failure }
 
 typedef TranslationDocumentValidator =
-    void Function(Map<String, dynamic> translations);
+    void Function(Map<String, Object?> translations);
 
 @immutable
 final class LanguageState {
@@ -23,12 +23,12 @@ final class LanguageState {
   const LanguageState.initial()
     : status = LanguageStatus.initial,
       languageCode = 'en',
-      translations = const <String, dynamic>{},
+      translations = const <String, Object?>{},
       errorMessage = null;
 
   final LanguageStatus status;
   final String languageCode;
-  final Map<String, dynamic> translations;
+  final Map<String, Object?> translations;
   final String? errorMessage;
 
   Locale get locale => Locale(languageCode);
@@ -36,14 +36,13 @@ final class LanguageState {
   LanguageState copyWith({
     LanguageStatus? status,
     String? languageCode,
-    Map<String, dynamic>? translations,
+    Map<String, Object?>? translations,
     String? errorMessage,
-    bool clearError = false,
   }) => LanguageState(
     status: status ?? this.status,
     languageCode: languageCode ?? this.languageCode,
     translations: translations ?? this.translations,
-    errorMessage: clearError ? null : errorMessage ?? this.errorMessage,
+    errorMessage: errorMessage ?? this.errorMessage,
   );
 
   @override
@@ -64,21 +63,22 @@ final class LanguageState {
   );
 }
 
-/// Owns locale selection and the currently loaded translation document.
-///
-/// Locale changes are serialized so a slower request can never overwrite a
-/// newer user choice. This Cubit is the sole localization state source.
 final class LanguageCubit extends Cubit<LanguageState> {
   factory LanguageCubit({
     required LanguageRepository languageRepository,
     TranslationDocumentValidator? validateTranslations,
-  }) => LanguageCubit._(languageRepository, validateTranslations);
+    LanguageBrowser browser = const WebLanguageBrowser(),
+  }) => LanguageCubit._(languageRepository, validateTranslations, browser);
 
-  LanguageCubit._(this._languageRepository, this._validateTranslations)
-    : super(const LanguageState.initial());
+  LanguageCubit._(
+    this._languageRepository,
+    this._validateTranslations,
+    this._browser,
+  ) : super(const LanguageState.initial());
 
   final LanguageRepository _languageRepository;
   final TranslationDocumentValidator? _validateTranslations;
+  final LanguageBrowser _browser;
   int _operationId = 0;
   Future<void> _persistenceQueue = Future<void>.value();
 
@@ -86,20 +86,12 @@ final class LanguageCubit extends Cubit<LanguageState> {
 
   Locale get currentLocale => state.locale;
 
+  AppStrings get strings => AppStrings(state.translations);
+
   Set<String> get supportedLanguages => _languageRepository.supportedLanguages;
 
-  String getText(String key, {String defaultValue = ''}) {
-    final parts = key.split('.');
-    dynamic current = state.translations;
-    for (final part in parts) {
-      if (current is Map<String, dynamic> && current.containsKey(part)) {
-        current = current[part];
-      } else {
-        return defaultValue;
-      }
-    }
-    return current?.toString() ?? defaultValue;
-  }
+  String getText(String key, {String defaultValue = ''}) =>
+      strings.lookup(key, defaultValue: defaultValue);
 
   Future<void> initialize() => loadSavedLanguage();
 
@@ -122,12 +114,7 @@ final class LanguageCubit extends Cubit<LanguageState> {
     }
   }
 
-  /// Applies an explicit user language choice.
-  ///
-  /// Flutter Web's SkWasm renderer can lose its scene while rebuilding the
-  /// complete text tree across writing directions. The browser path therefore
-  /// validates and persists the requested catalog, then performs one clean
-  /// document reload. Native targets keep the in-process locale transition.
+  /// Reload web after selection to preserve the renderer across direction changes.
   Future<void> selectLanguage(String languageCode, {String? preserveSection}) =>
       changeLanguage(
         languageCode,
@@ -148,7 +135,11 @@ final class LanguageCubit extends Cubit<LanguageState> {
 
     final operationId = ++_operationId;
     _emitState(
-      state.copyWith(status: LanguageStatus.loading, clearError: true),
+      LanguageState(
+        status: LanguageStatus.loading,
+        languageCode: state.languageCode,
+        translations: state.translations,
+      ),
     );
 
     try {
@@ -165,39 +156,46 @@ final class LanguageCubit extends Cubit<LanguageState> {
       if (isClosed || operationId != _operationId) return;
       if (reloadOnWeb &&
           persistenceError == null &&
-          url_strategy.reloadPageForLanguageChange(
-            preserveSection: preserveSection,
-          )) {
+          _browser.reloadForLanguageChange(preserveSection: preserveSection)) {
         return;
       }
-      url_strategy.setHtmlLang(languageCode);
+      _browser.setDocumentLanguage(languageCode);
       _emitState(
         LanguageState(
           status: LanguageStatus.ready,
           languageCode: languageCode,
-          translations: Map<String, dynamic>.unmodifiable(translations),
+          translations: Map<String, Object?>.unmodifiable(translations),
           errorMessage: persistenceError == null
               ? null
               : _persistenceWarning(translations),
         ),
       );
     } catch (error, stackTrace) {
-      if (isClosed || operationId != _operationId) return;
-      dev.log(
-        'Failed to change language to $languageCode',
-        name: 'LanguageCubit',
-        error: error,
-        stackTrace: stackTrace,
-      );
-      _emitState(
-        state.copyWith(
-          status: state.translations.isEmpty
-              ? LanguageStatus.failure
-              : LanguageStatus.ready,
-          errorMessage: _languageChangeWarning(state.translations),
-        ),
-      );
+      _handleLanguageFailure(languageCode, operationId, error, stackTrace);
     }
+  }
+
+  void _handleLanguageFailure(
+    String languageCode,
+    int operationId,
+    Object error,
+    StackTrace stackTrace,
+  ) {
+    if (isClosed || operationId != _operationId) return;
+    dev.log(
+      'Failed to change language to $languageCode',
+      name: 'LanguageCubit',
+      error: error,
+      stackTrace: stackTrace,
+    );
+    _emitState(
+      state.copyWith(
+        status: state.translations.isEmpty
+            ? LanguageStatus.failure
+            : LanguageStatus.ready,
+        errorMessage: _languageChangeWarning(state.translations),
+      ),
+    );
   }
 
   void _emitState(LanguageState nextState) {
@@ -205,8 +203,7 @@ final class LanguageCubit extends Cubit<LanguageState> {
     emit(nextState);
   }
 
-  /// Serializes browser-storage writes so a stale, slower request can never
-  /// overwrite the user's latest selection after that newer choice persists.
+  /// Serialize writes to preserve the latest selection.
   Future<Object?> _persistLanguage(String languageCode) async {
     Object? persistenceError;
     _persistenceQueue = _persistenceQueue.then((_) async {
@@ -226,9 +223,9 @@ final class LanguageCubit extends Cubit<LanguageState> {
     return persistenceError;
   }
 
-  String _persistenceWarning(Map<String, dynamic> translations) {
+  String _persistenceWarning(Map<String, Object?> translations) {
     final accessibility = translations['accessibility'];
-    if (accessibility is Map<String, dynamic>) {
+    if (accessibility is Map<String, Object?>) {
       final localized = accessibility['language_not_saved'];
       if (localized is String && localized.trim().isNotEmpty) {
         return localized.trim();
@@ -238,9 +235,9 @@ final class LanguageCubit extends Cubit<LanguageState> {
         'This language will remain active for this visit.';
   }
 
-  String _languageChangeWarning(Map<String, dynamic> translations) {
+  String _languageChangeWarning(Map<String, Object?> translations) {
     final accessibility = translations['accessibility'];
-    if (accessibility is Map<String, dynamic>) {
+    if (accessibility is Map<String, Object?>) {
       final localized = accessibility['language_change_failed'];
       if (localized is String && localized.trim().isNotEmpty) {
         return localized.trim();

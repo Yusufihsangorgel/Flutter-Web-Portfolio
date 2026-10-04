@@ -37,9 +37,12 @@ jobs:
       - run: npm run verify:content
       - run: npm run portfolio:validate
       - run: npm run test:template
+      - run: npm run test:starter
       - run: npm run test:release-security
       - run: npm run test:refresh
       - run: npm run test:content
+      - run: npm run test:strings
+      - run: npm run verify:strings
       - run: npm run verify:hosting
       - run: npm run verify:community
       - run: npm run audit:sources
@@ -105,6 +108,12 @@ jobs:
       - run: flutter build web --release --wasm --no-web-resources-cdn
       - run: npm run prepare:bundle
       - run: npm run verify:bundle
+      # The image build runs this check in the exact git tree, not in this workspace.
+      - name: Verify the release manifest against the exact git tree
+        run: |
+          tree="$(mktemp -d)"
+          git archive HEAD | tar -x -C "${tree}"
+          (cd "${tree}" && sha256sum -c --quiet "${GITHUB_WORKSPACE}/build/web/assets/assets/build/source_manifest.sha256")
       - run: docker build --tag flutter-web-portfolio:ci .
       - run: npm run test:clone
       - run: npm test

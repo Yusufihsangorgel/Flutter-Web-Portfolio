@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:flutter_web_portfolio/app/controllers/scene_director.dart';
 import 'package:flutter_web_portfolio/app/controllers/scroll_controller.dart';
+import 'package:flutter_web_portfolio/app/core/logging/app_logger.dart';
 import 'package:flutter_web_portfolio/app/data/providers/bundle_asset_loader.dart';
 import 'package:flutter_web_portfolio/app/data/providers/preference_store.dart';
 import 'package:flutter_web_portfolio/app/data/repositories/persistent_language_repository.dart';
@@ -14,10 +15,6 @@ import 'package:flutter_web_portfolio/app/features/render_quality/application/re
 import 'package:flutter_web_portfolio/app/narrative/domain/narrative_document.dart';
 import 'package:flutter_web_portfolio/app/utils/render_quality_sync.dart';
 
-/// Explicit, application-owned dependency graph.
-///
-/// Construction order and disposal order are visible here. No global service
-/// locator or hidden registration lifecycle is involved.
 final class AppDependencies {
   AppDependencies._({
     required this.languageCubit,
@@ -35,8 +32,8 @@ final class AppDependencies {
   final SceneDirector sceneDirector;
   final RenderQualityController renderQualityController;
 
-  static Future<AppDependencies> bootstrap() async {
-    final assetLoader = BundleAssetLoader();
+  static Future<AppDependencies> bootstrap({required AppLogger logger}) async {
+    final assetLoader = BundleAssetLoader(logger: logger);
     final portfolio = PortfolioDocument.fromJson(
       await assetLoader.loadPortfolio(),
     );
@@ -87,7 +84,6 @@ final class AppDependencies {
   }
 }
 
-/// Owns the dependency graph and exposes explicit providers to the widget tree.
 final class AppRuntime extends StatefulWidget {
   const AppRuntime({
     super.key,

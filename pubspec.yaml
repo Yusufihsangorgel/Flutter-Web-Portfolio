@@ -15,7 +15,6 @@ dependencies:
     sdk: flutter
   flutter_localizations:
     sdk: flutter
-  cupertino_icons: ^1.0.8
 
   # State management & navigation
   flutter_bloc: ^9.1.1
@@ -55,5 +54,3 @@ flutter:
     - family: JetBrains Mono
       fonts:
         - asset: assets/fonts/jetbrains_mono/JetBrainsMono-Variable.ttf
-
-  generate: true
