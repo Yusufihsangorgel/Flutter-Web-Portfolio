@@ -25,7 +25,7 @@ final class _PackageLabels {
   const _PackageLabels({
     required this.pubPoints,
     required this.open,
-    required this.maturityFormat,
+    required this.maturityText,
     required this.roadmap,
     required this.statusNames,
   });
@@ -33,16 +33,11 @@ final class _PackageLabels {
   final String pubPoints;
   final String open;
 
-  /// Pattern with `{level}` and `{max}` placeholders.
-  final String maturityFormat;
+  final String Function(int level) maturityText;
   final String roadmap;
 
   /// Status keyword (`done`/`doing`/`next`/`waiting`) to localized word.
   final Map<String, String> statusNames;
-
-  String maturityText(int level) => maturityFormat
-      .replaceAll('{level}', '$level')
-      .replaceAll('{max}', '${PortfolioPackage.maxMaturityLevel}');
 }
 
 /// Every published pub.dev package, grouped by category, each card carrying
@@ -82,10 +77,11 @@ class PackagesSection extends StatelessWidget {
               'packages_section.open_package',
               defaultValue: 'Open on pub.dev',
             ),
-            maturityFormat: language.getText(
-              'packages_section.maturity_level',
-              defaultValue: 'Maturity {level} of {max}',
-            ),
+            maturityText: (level) =>
+                language.strings.packagesSectionMaturityLevel(
+                  level: '$level',
+                  max: '${PortfolioPackage.maxMaturityLevel}',
+                ),
             roadmap: language.getText(
               'packages_section.roadmap',
               defaultValue: 'roadmap',

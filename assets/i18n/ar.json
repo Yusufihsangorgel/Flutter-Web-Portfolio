@@ -82,7 +82,7 @@
     "subtitle": "{count} حزمة منشورة على pub.dev، منها {perfect} بالدرجة الكاملة 160/160. كل حزمة تأتي بادّعاء مُقاس وأمثلة قابلة للتشغيل وخارطة طريق خاصة بها.",
     "pub_points": "نقاط pub",
     "open_package": "فتح على pub.dev",
-    "maturity": "النضج",
+    "maturity_level": "النضج {level} من {max}",
     "roadmap": "خارطة الطريق",
     "status_done": "تم النشر",
     "status_doing": "قيد التنفيذ",
