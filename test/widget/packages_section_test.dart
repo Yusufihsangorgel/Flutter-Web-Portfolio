@@ -34,9 +34,21 @@ final class _PackagesLanguageRepository implements LanguageRepository {
 }
 
 void main() {
+  late LanguageCubit language;
+
+  Future<void> useLanguage([Map<String, String> copy = const {}]) async {
+    language = LanguageCubit(
+      languageRepository: _PackagesLanguageRepository(copy),
+    );
+    await language.initialize();
+    addTearDown(language.close);
+  }
+
   group('PackagesSection maturity', () {
+    setUp(useLanguage);
+
     testWidgets('shows each level as "Maturity n of 5"', (tester) async {
-      await _pumpSection(tester);
+      await _pumpSection(tester, language);
 
       expect(find.text('Maturity 3 of 5'), findsOneWidget);
       expect(find.text('Maturity 5 of 5'), findsOneWidget);
@@ -45,7 +57,7 @@ void main() {
     });
 
     testWidgets('never renders a letter level', (tester) async {
-      await _pumpSection(tester);
+      await _pumpSection(tester, language);
 
       final letterLevel = RegExp(r'\bL[1-5]\b');
       final visibleText = tester
@@ -63,21 +75,12 @@ void main() {
       );
     });
 
-    testWidgets('takes the wording from the language catalog', (tester) async {
-      await _pumpSection(
-        tester,
-        copy: {'maturity_level': 'Reife {level} von {max}'},
-      );
-
-      expect(find.text('Reife 3 von 5'), findsOneWidget);
-      expect(find.text('Maturity 3 of 5'), findsNothing);
-    });
-
     testWidgets('omits the label for a package without a level', (
       tester,
     ) async {
       await _pumpSection(
         tester,
+        language,
         mutate: (json) {
           final packages = json['packages']! as List<dynamic>;
           (packages[1] as Map<String, dynamic>).remove('maturity_level');
@@ -89,11 +92,26 @@ void main() {
     });
   });
 
+  group('PackagesSection localized wording', () {
+    setUp(() => useLanguage({'maturity_level': 'Reife {level} von {max}'}));
+
+    testWidgets('takes the maturity wording from the language catalog', (
+      tester,
+    ) async {
+      await _pumpSection(tester, language);
+
+      expect(find.text('Reife 3 von 5'), findsOneWidget);
+      expect(find.text('Maturity 3 of 5'), findsNothing);
+    });
+  });
+
   group('PackagesSection groups', () {
+    setUp(useLanguage);
+
     testWidgets('renders every package under its category heading', (
       tester,
     ) async {
-      await _pumpSection(tester);
+      await _pumpSection(tester, language);
 
       expect(find.text('Server-side Dart'), findsOneWidget);
       expect(find.text('Flutter UI'), findsOneWidget);
@@ -111,14 +129,10 @@ Finder _rowLabelContaining(String text) => find.byWidgetPredicate(
 );
 
 Future<void> _pumpSection(
-  WidgetTester tester, {
-  Map<String, String> copy = const {},
+  WidgetTester tester,
+  LanguageCubit language, {
   void Function(Map<String, dynamic> json)? mutate,
 }) async {
-  final language = LanguageCubit(
-    languageRepository: _PackagesLanguageRepository(copy),
-  );
-  await tester.runAsync(language.initialize);
   final portfolio = loadPortfolioFixture(mutate: mutate);
   final scroll = AppScrollController(
     narrative: loadNarrativeFixture(activeSections: portfolio.activeSections),
@@ -127,7 +141,6 @@ Future<void> _pumpSection(
   addTearDown(() async {
     await scene.close();
     await scroll.close();
-    await language.close();
   });
 
   await tester.pumpWidget(
