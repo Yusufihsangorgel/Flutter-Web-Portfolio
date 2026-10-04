@@ -6,7 +6,14 @@ JavaScript/CanvasKit fallback. No backend, database, or runtime secret is
 required.
 
 Package metrics and merged pull-request status refresh on a weekly schedule
-and commit straight to `main`; see [`AUTOMATION.md`](AUTOMATION.md).
+through a checked pull request; see [`AUTOMATION.md`](AUTOMATION.md).
+
+CI builds the release once, tests that build, and publishes the attested
+`web-release.tar.gz` artifact from `main`. The maintainer's production host
+pulls the attested artifact and deploys the image by digest. CI holds no
+production deploy credentials, and this public repository uses no self-hosted
+runner. Template users build locally with `npm run build:release` and deploy
+`build/web` to their chosen host using the instructions below.
 
 ## Build once
 

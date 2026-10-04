@@ -3,12 +3,16 @@ name: CI
 permissions:
   contents: read
 
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 on:
   push:
     branches: [main]
   pull_request:
     branches: [main]
-  # The data refresh workflow starts CI this way for the commit it pushes.
+  # Allow the data refresh workflow to start CI.
   workflow_dispatch:
 
 jobs:
@@ -33,9 +37,12 @@ jobs:
       - run: npm run verify:content
       - run: npm run portfolio:validate
       - run: npm run test:template
+      - run: npm run test:starter
       - run: npm run test:release-security
       - run: npm run test:refresh
       - run: npm run test:content
+      - run: npm run test:strings
+      - run: npm run verify:strings
       - run: npm run verify:hosting
       - run: npm run verify:community
       - run: npm run audit:sources
@@ -43,25 +50,15 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
       - run: npm run audit:history
       - run: npm run typecheck
-      - name: Verify tracked release when present
-        run: |
-          if [[ -d build/web ]]; then
-            npm run verify:bundle
-          else
-            echo "No tracked build/web after template initialization; build job will create and verify it."
-          fi
       - run: dart format --output=none --set-exit-if-changed lib test tool
       - run: bash -n tool/hosted_build.sh
-      - run: node --check tool/init_portfolio.mjs
-      - run: node --check tool/build_portfolio.mjs
-      - run: node --check tool/deploy_portfolio.mjs
-      - run: node --check tool/verify_hosting_configs.mjs
-      - run: node --check tool/resolve_pages_base_href.mjs
-      - run: node --check tool/verify_community_files.mjs
-      - run: node --check tool/test_portfolio_init.mjs
-      - run: node --check tool/test_template_clone.mjs
-      - run: node --check tool/smoke_clean_template.mjs
-      - run: node --check tool/audit_repository_history.mjs
+      - name: Check tool syntax
+        run: |
+          find tool -type f -name '*.mjs' -print0 |
+            while IFS= read -r -d '' file; do
+              node --check "$file" || exit 1
+            done
+      - run: node tool/test_coverage_gate.mjs
       - run: flutter analyze --fatal-infos
       - run: npm run verify:source
 
@@ -80,7 +77,12 @@ jobs:
           cache: true
       - run: node tool/verify_toolchain.mjs --current
       - run: flutter pub get
+      - run: flutter test --coverage
+      - run: node tool/coverage_gate.mjs
+      - run: flutter pub get
+        working-directory: packages/adaptive_render_budget
       - run: flutter test
+        working-directory: packages/adaptive_render_budget
 
   build:
     runs-on: ubuntu-latest
@@ -106,12 +108,45 @@ jobs:
       - run: flutter build web --release --wasm --no-web-resources-cdn
       - run: npm run prepare:bundle
       - run: npm run verify:bundle
+      # The image build runs this check in the exact git tree, not in this workspace.
+      - name: Verify the release manifest against the exact git tree
+        run: |
+          tree="$(mktemp -d)"
+          git archive HEAD | tar -x -C "${tree}"
+          (cd "${tree}" && sha256sum -c --quiet "${GITHUB_WORKSPACE}/build/web/assets/assets/build/source_manifest.sha256")
       - run: docker build --tag flutter-web-portfolio:ci .
       - run: npm run test:clone
       - run: npm test
       - run: npm run verify:runtime
+      - name: Package verified release
+        run: |
+          tar --sort=name --mtime='UTC 2000-01-01' --owner=0 --group=0 --numeric-owner -C build -cf - web | gzip -n -9 > web-release.tar.gz
+          sha256sum web-release.tar.gz > web-release.sha256
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: web-build
-          path: build/web
-          retention-days: 7
+          name: web-release
+          path: |
+            web-release.tar.gz
+            web-release.sha256
+          if-no-files-found: error
+          retention-days: 30
+
+  attest:
+    if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: build
+    permissions:
+      actions: read
+      contents: read
+      id-token: write
+      attestations: write
+    steps:
+      - name: Download verified release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh run download "${GITHUB_RUN_ID}" --repo "${GITHUB_REPOSITORY}" --name web-release --dir .
+      - run: sha256sum --check web-release.sha256
+      - uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
+        with:
+          subject-path: web-release.tar.gz

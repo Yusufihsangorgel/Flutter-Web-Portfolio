@@ -3,6 +3,8 @@ import { readFile, readdir } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { resolveSafePublicPngPath } from './safe_public_asset_path.mjs';
+
 export const portfolioRoot = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
   '..',
@@ -23,6 +25,7 @@ const generatedManifest = 'assets/build/source_manifest.sha256';
 const generatedDirectoryNames = new Set(['.dart_tool', 'build', 'node_modules']);
 
 export async function renderSourceManifest(root = portfolioRoot) {
+  const regenerated = new Set(await regeneratedOutputs(root));
   const files = [
     ...sourceFiles,
     ...(
@@ -33,7 +36,7 @@ export async function renderSourceManifest(root = portfolioRoot) {
       )
     ).flat(),
   ]
-    .filter((file) => file !== generatedManifest)
+    .filter((file) => !regenerated.has(file))
     .sort((left, right) => left.localeCompare(right));
 
   const lines = await Promise.all(
@@ -44,6 +47,18 @@ export async function renderSourceManifest(root = portfolioRoot) {
     }),
   );
   return `${lines.join('\n')}\n`;
+}
+
+// prepare:source rewrites these first, so committed copies may differ; their inputs stay listed.
+async function regeneratedOutputs(root) {
+  const portfolio = JSON.parse(
+    await readFile(
+      path.join(root, 'assets', 'content', 'portfolio.json'),
+      'utf8',
+    ),
+  );
+  const socialCard = `web/${resolveSafePublicPngPath(portfolio.site?.social_image)}`;
+  return [generatedManifest, socialCard, `${socialCard}.sha256`];
 }
 
 async function collectFiles(directory, root) {
