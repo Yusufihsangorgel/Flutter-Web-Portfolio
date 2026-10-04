@@ -3,6 +3,7 @@ import 'dart:developer' as dev;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_web_portfolio/app/core/l10n/app_strings.g.dart';
+import 'package:flutter_web_portfolio/app/core/theme/locale_font_loader.dart';
 import 'package:flutter_web_portfolio/app/domain/repositories/language_repository.dart';
 import 'package:flutter_web_portfolio/app/utils/language_browser.dart';
 
@@ -68,17 +69,29 @@ final class LanguageCubit extends Cubit<LanguageState> {
     required LanguageRepository languageRepository,
     TranslationDocumentValidator? validateTranslations,
     LanguageBrowser browser = const WebLanguageBrowser(),
-  }) => LanguageCubit._(languageRepository, validateTranslations, browser);
+    LocaleFontLoader fontLoader = const NoopLocaleFontLoader(),
+    Duration fontLoadTimeout = const Duration(seconds: 3),
+  }) => LanguageCubit._(
+    languageRepository,
+    validateTranslations,
+    browser,
+    fontLoader,
+    fontLoadTimeout,
+  );
 
   LanguageCubit._(
     this._languageRepository,
     this._validateTranslations,
     this._browser,
+    this._fontLoader,
+    this._fontLoadTimeout,
   ) : super(const LanguageState.initial());
 
   final LanguageRepository _languageRepository;
   final TranslationDocumentValidator? _validateTranslations;
   final LanguageBrowser _browser;
+  final LocaleFontLoader _fontLoader;
+  final Duration _fontLoadTimeout;
   int _operationId = 0;
   Future<void> _persistenceQueue = Future<void>.value();
 
@@ -159,6 +172,8 @@ final class LanguageCubit extends Cubit<LanguageState> {
           _browser.reloadForLanguageChange(preserveSection: preserveSection)) {
         return;
       }
+      await _loadLocaleFont(languageCode);
+      if (isClosed || operationId != _operationId) return;
       _browser.setDocumentLanguage(languageCode);
       _emitState(
         LanguageState(
@@ -172,6 +187,21 @@ final class LanguageCubit extends Cubit<LanguageState> {
       );
     } catch (error, stackTrace) {
       _handleLanguageFailure(languageCode, operationId, error, stackTrace);
+    }
+  }
+
+  /// Waits for the language's font so the switch does not flash missing glyphs.
+  /// A slow or failed fetch is logged and never blocks the switch.
+  Future<void> _loadLocaleFont(String languageCode) async {
+    try {
+      await _fontLoader.loadForLanguage(languageCode).timeout(_fontLoadTimeout);
+    } on Object catch (error, stackTrace) {
+      dev.log(
+        'Locale font for $languageCode was not ready; continuing without it',
+        name: 'LanguageCubit',
+        error: error,
+        stackTrace: stackTrace,
+      );
     }
   }
 

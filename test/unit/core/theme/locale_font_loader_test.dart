@@ -1,10 +1,25 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:flutter_web_portfolio/app/core/logging/app_logger.dart';
 import 'package:flutter_web_portfolio/app/core/theme/locale_font_loader.dart';
+
+final class _Logger implements AppLogger {
+  final List<String> errors = <String>[];
+
+  @override
+  void info(String message, {Object? error, StackTrace? stackTrace}) {}
+
+  @override
+  void warning(String message, {Object? error, StackTrace? stackTrace}) {}
+
+  @override
+  void error(String message, {Object? error, StackTrace? stackTrace}) =>
+      errors.add(message);
+}
 
 const _arabicAsset =
     'assets/fonts/noto_sans_arabic/NotoSansArabic-Variable.ttf';
@@ -15,15 +30,14 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   late List<String> requestedAssets;
-  late List<FlutterErrorDetails> reportedErrors;
+  late _Logger logger;
+  late AssetLocaleFontLoader loader;
 
   setUp(() {
     requestedAssets = <String>[];
-    reportedErrors = <FlutterErrorDetails>[];
-    final previousHandler = FlutterError.onError;
-    FlutterError.onError = reportedErrors.add;
+    logger = _Logger();
+    loader = AssetLocaleFontLoader(logger: logger);
     addTearDown(() {
-      FlutterError.onError = previousHandler;
       _messenger.setMockMessageHandler('flutter/assets', null);
     });
   });
@@ -46,44 +60,55 @@ void main() {
       serveAssets(found: true);
 
       for (final languageCode in ['en', 'tr', 'de', 'fr', 'es', '']) {
-        await LocaleFontLoader.loadForLanguage(languageCode);
+        await loader.loadForLanguage(languageCode);
       }
 
       expect(requestedAssets, isEmpty);
-      expect(reportedErrors, isEmpty);
+      expect(logger.errors, isEmpty);
     });
 
     test('loads the Arabic font for ar only', () async {
       serveAssets(found: true);
 
-      await LocaleFontLoader.loadForLanguage('ar');
+      await loader.loadForLanguage('ar');
 
       expect(requestedAssets, [_arabicAsset]);
-      expect(reportedErrors, isEmpty);
+      expect(logger.errors, isEmpty);
     });
 
     test('loads the Devanagari font for hi only', () async {
       serveAssets(found: true);
 
-      await LocaleFontLoader.loadForLanguage('hi');
+      await loader.loadForLanguage('hi');
 
       expect(requestedAssets, [_devanagariAsset]);
-      expect(reportedErrors, isEmpty);
+      expect(logger.errors, isEmpty);
     });
 
-    test('reports a failed load and still completes', () async {
+    test('loads each family once', () async {
+      serveAssets(found: true);
+
+      await loader.loadForLanguage('ar');
+      await loader.loadForLanguage('ar');
+      await Future.wait([
+        loader.loadForLanguage('hi'),
+        loader.loadForLanguage('hi'),
+      ]);
+
+      expect(requestedAssets, [_arabicAsset, _devanagariAsset]);
+    });
+
+    test('logs a failed load, completes and retries next time', () async {
       serveAssets(found: false);
 
-      await LocaleFontLoader.loadForLanguage('ar');
+      await loader.loadForLanguage('ar');
+      await loader.loadForLanguage('ar');
 
-      expect(requestedAssets, [_arabicAsset]);
-      expect(reportedErrors, hasLength(1));
-      expect(reportedErrors.single.library, 'locale font loader');
-      expect(reportedErrors.single.exception, isA<FlutterError>());
-      expect(
-        reportedErrors.single.context.toString(),
-        'while loading the Noto Sans Arabic font',
-      );
+      expect(requestedAssets, [_arabicAsset, _arabicAsset]);
+      expect(logger.errors, [
+        'Failed to load the Noto Sans Arabic font',
+        'Failed to load the Noto Sans Arabic font',
+      ]);
     });
   });
 }
