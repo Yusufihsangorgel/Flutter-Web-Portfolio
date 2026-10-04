@@ -24,6 +24,11 @@ test.skip(
   'demo visual baselines do not apply to an initialized empty portfolio',
 );
 
+test.skip(
+  process.platform !== 'linux',
+  'baselines are Linux-only; run `npm run test:visual:docker` on other hosts',
+);
+
 // Pin article titles so feed refreshes do not alter snapshots.
 const sampleTitles = [
   'A short sample title',
