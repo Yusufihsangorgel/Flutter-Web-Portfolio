@@ -37,6 +37,7 @@ jobs:
       - run: npm run verify:content
       - run: npm run portfolio:validate
       - run: npm run test:template
+      - run: npm run test:starter
       - run: npm run test:release-security
       - run: npm run test:refresh
       - run: npm run test:content

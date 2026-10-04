@@ -11,6 +11,7 @@
     "portfolio:init": "node tool/init_portfolio.mjs",
     "portfolio:validate": "dart run tool/validate_portfolio.dart",
     "test:template": "node tool/test_portfolio_init.mjs",
+    "test:starter": "node --test tool/test_starter_readme.mjs tool/test_package_links.mjs",
     "test:clone": "node tool/test_template_clone.mjs",
     "test:release-security": "node tool/test_release_security.mjs",
     "test:refresh": "node tool/test_refresh_portfolio_data.mjs",
