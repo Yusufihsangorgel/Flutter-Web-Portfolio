@@ -129,7 +129,8 @@ async function resolveGitHubToken() {
   // A stale keychain credential makes every authenticated request fail even
   // though anonymous access would succeed, so each candidate token must prove
   // itself before the audit relies on it. The probe must be an endpoint that
-  // actually validates credentials; /rate_limit accepts broken tokens.
+  // actually validates credentials; /rate_limit accepts broken tokens. Only 401
+  // means bad credentials: a workflow token is valid but gets 403 on /user.
   for (const candidate of candidates) {
     const probe = await fetch('https://api.github.com/user', {
       headers: {
@@ -139,7 +140,7 @@ async function resolveGitHubToken() {
         Authorization: `Bearer ${candidate}`,
       },
     });
-    if (probe.ok) return candidate;
+    if (probe.status !== 401) return candidate;
   }
   return null;
 }
