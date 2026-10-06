@@ -75,16 +75,22 @@ async function scrollThroughAtlas(page: Page) {
     name: english.projects_section.evidence_index,
     exact: true,
   });
-  const viewportHeight = await page.evaluate(() => window.innerHeight);
-  for (let attempt = 0; attempt < 120; attempt += 1) {
-    const box = (await heading.count()) > 0 ? await heading.first().boundingBox() : null;
+  const { viewportHeight, pixelRatio } = await page.evaluate(() => ({
+    viewportHeight: window.innerHeight,
+    pixelRatio: window.devicePixelRatio,
+  }));
+  // Flutter divides wheel deltas by the device pixel ratio.
+  const step = viewportHeight * 0.5 * pixelRatio;
+  for (let attempt = 0; attempt < 200; attempt += 1) {
+    const box =
+      (await heading.count()) > 0 ? await heading.first().boundingBox() : null;
     if (box && box.y < viewportHeight * 0.25) break;
-    await page.mouse.wheel(0, 480);
+    await page.mouse.wheel(0, step);
     await page.waitForTimeout(60);
   }
   await expect(heading.first()).toBeAttached();
-  for (let step = 0; step < 3; step += 1) {
-    await page.mouse.wheel(0, viewportHeight / 3);
+  for (let index = 0; index < 2; index += 1) {
+    await page.mouse.wheel(0, step);
     await page.waitForTimeout(120);
   }
   await page.waitForTimeout(1000);
