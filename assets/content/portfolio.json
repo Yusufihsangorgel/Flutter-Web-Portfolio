@@ -568,7 +568,7 @@
       ],
       "artifact": {
         "label": "OFFICIAL PRODUCT LINE",
-        "asset": "assets/work/fugasoft-product.jpg",
+        "asset": "assets/work/fugasoft-product.webp",
         "alt": "FugaSoft's official product ecosystem presenting FugaPOS, FugaERP, FugaCLOUD, FugaKIOSK, and FugaSELF-SERVICE.",
         "caption": "FugaSoft product ecosystem · official company website.",
         "width": 1600,
@@ -577,7 +577,7 @@
         "alignment": "center",
         "composition": "evidence_stack",
         "compact": {
-          "asset": "assets/work/fugasoft-product-compact.jpg",
+          "asset": "assets/work/fugasoft-product-compact.webp",
           "alt": "Compact view of the official FugaSoft product ecosystem and its five product lines.",
           "caption": "FugaSoft product ecosystem · official company website.",
           "width": 900,
@@ -621,7 +621,7 @@
       ],
       "artifact": {
         "label": "PRODUCT WORKFLOW",
-        "asset": "assets/work/dorse-product.jpg",
+        "asset": "assets/work/dorse-product.webp",
         "alt": "Dorse's current public product website showing the logistics mobile application in use.",
         "caption": "Dorse product surface · captured from the public company website.",
         "width": 1600,
@@ -630,7 +630,7 @@
         "alignment": "center",
         "composition": "evidence_stack",
         "compact": {
-          "asset": "assets/work/dorse-product-compact.jpg",
+          "asset": "assets/work/dorse-product-compact.webp",
           "alt": "Compact Dorse product view built around the public vehicle and trailer settings screen.",
           "caption": "Dorse vehicle workflow · public company material.",
           "width": 900,
@@ -673,7 +673,7 @@
       ],
       "artifact": {
         "label": "APP STORE RELEASE",
-        "asset": "assets/work/aydinlik-release.jpg",
+        "asset": "assets/work/aydinlik-release.webp",
         "alt": "Aydınlık E-Gazete public App Store release shown through an edition and newspaper reader screens.",
         "caption": "Edition and reader surfaces from the public iPhone listing.",
         "width": 1600,
@@ -682,7 +682,7 @@
         "alignment": "center",
         "composition": "evidence_stack",
         "compact": {
-          "asset": "assets/work/aydinlik-release-compact.jpg",
+          "asset": "assets/work/aydinlik-release-compact.webp",
           "alt": "Compact Aydınlık E-Gazete release board with a large daily edition screen and audio reader screen.",
           "caption": "Aydınlık edition and reader · public App Store release.",
           "width": 900,
@@ -725,7 +725,7 @@
       ],
       "artifact": {
         "label": "APP STORE RELEASE",
-        "asset": "assets/work/bilim-utopya-release.jpg",
+        "asset": "assets/work/bilim-utopya-release.webp",
         "alt": "Bilim ve Ütopya E-Dergi public App Store release shown through issue and archive screens.",
         "caption": "Issue and archive surfaces from the public iPhone listing.",
         "width": 1600,
@@ -734,7 +734,7 @@
         "alignment": "center",
         "composition": "evidence_stack",
         "compact": {
-          "asset": "assets/work/bilim-utopya-release-compact.jpg",
+          "asset": "assets/work/bilim-utopya-release-compact.webp",
           "alt": "Compact Bilim ve Ütopya release board with readable issue and subscriber archive screens.",
           "caption": "Bilim ve Ütopya issue and archive · public App Store release.",
           "width": 900,
@@ -782,7 +782,7 @@
       ],
       "artifact": {
         "label": "OPEN-SOURCE PROJECT",
-        "asset": "assets/work/queue-inspector.png",
+        "asset": "assets/work/queue-inspector.webp",
         "alt": "Queue Inspector MCP architecture showing one typed interface across Asynq, BullMQ, and Sidekiq queues.",
         "caption": "Queue Inspector MCP · three adapters and six read-only tools.",
         "width": 1600,
@@ -791,7 +791,7 @@
         "alignment": "center",
         "composition": "evidence_stack",
         "compact": {
-          "asset": "assets/work/queue-inspector-compact.jpg",
+          "asset": "assets/work/queue-inspector-compact.webp",
           "alt": "Compact Queue Inspector MCP architecture showing Asynq, BullMQ, and Sidekiq adapters.",
           "caption": "Queue Inspector MCP · typed inspection across three backends.",
           "width": 900,
@@ -840,7 +840,7 @@
       ],
       "artifact": {
         "label": "REQUEST PIPELINE",
-        "asset": "assets/work/go-multitenant-gateway.jpg",
+        "asset": "assets/work/go-multitenant-gateway.webp",
         "alt": "Go multi-tenant gateway request pipeline and its explicit middleware order.",
         "caption": "Go gateway · request order and middleware boundaries.",
         "width": 1600,
@@ -849,7 +849,7 @@
         "alignment": "center",
         "composition": "evidence_stack",
         "compact": {
-          "asset": "assets/work/go-multitenant-gateway-compact.jpg",
+          "asset": "assets/work/go-multitenant-gateway-compact.webp",
           "alt": "Compact multi-tenant gateway diagram showing tenant, rate-limit, authentication, and module boundaries.",
           "caption": "Go gateway · ordered request pipeline.",
           "width": 900,
@@ -892,7 +892,7 @@
       ],
       "artifact": {
         "label": "OPEN-SOURCE PACKAGE",
-        "asset": "assets/work/redis-task-queue.png",
+        "asset": "assets/work/redis-task-queue.webp",
         "alt": "Redis Task Queue repository cover showing API enqueue, queue, worker, success, and dead-letter paths.",
         "caption": "Published repository cover · queue lifecycle.",
         "width": 1600,
@@ -901,7 +901,7 @@
         "alignment": "center",
         "composition": "evidence_stack",
         "compact": {
-          "asset": "assets/work/redis-task-queue-compact.jpg",
+          "asset": "assets/work/redis-task-queue-compact.webp",
           "alt": "Compact Redis Task Queue board showing the server-side Dart enqueue, worker, retry, and dead-letter flow.",
           "caption": "Redis Task Queue · compact package architecture view.",
           "width": 900,
@@ -943,7 +943,7 @@
       ],
       "artifact": {
         "label": "RENDERING DEMO",
-        "asset": "assets/work/constellation-demo.png",
+        "asset": "assets/work/constellation-demo.webp",
         "alt": "Constellation Particles demo frame with pointer-reactive particles and local neighbour links.",
         "caption": "Frame from the published Flutter CustomPainter demo.",
         "width": 1600,
@@ -952,7 +952,7 @@
         "alignment": "center",
         "composition": "evidence_stack",
         "compact": {
-          "asset": "assets/work/constellation-demo-compact.jpg",
+          "asset": "assets/work/constellation-demo-compact.webp",
           "alt": "Compact Constellation Particles view framing the actual Flutter rendering demo.",
           "caption": "Constellation Particles · compact rendered package demo.",
           "width": 900,
@@ -999,7 +999,7 @@
       ],
       "artifact": {
         "label": "RUNTIME ARCHITECTURE",
-        "asset": "assets/work/portfolio-current.jpg",
+        "asset": "assets/work/portfolio-current.webp",
         "alt": "Flutter Web portfolio runtime architecture from canonical content through localization, Dart Wasm rendering, and browser regression tests.",
         "caption": "Portfolio runtime · content, localization, Wasm rendering, and browser tests.",
         "width": 1600,
@@ -1008,7 +1008,7 @@
         "alignment": "center",
         "composition": "evidence_stack",
         "compact": {
-          "asset": "assets/work/portfolio-current-compact.jpg",
+          "asset": "assets/work/portfolio-current-compact.webp",
           "alt": "Compact Flutter Web portfolio runtime architecture from content to localized browser output.",
           "caption": "Flutter Web portfolio · content-to-browser runtime.",
           "width": 900,
