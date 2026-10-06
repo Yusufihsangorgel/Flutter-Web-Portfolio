@@ -138,7 +138,10 @@ async function waitForPortfolio(page: Page) {
     state: "attached",
     timeout: 20000,
   });
-  await expect(page.locator("#bootstrap-surface")).toHaveCount(0);
+  // The surface leaves after the first frame, so it shares the boot budget.
+  await expect(page.locator("#bootstrap-surface")).toHaveCount(0, {
+    timeout: 20000,
+  });
   await expect(page.getByRole("heading").first()).toBeAttached();
 }
 

@@ -51,7 +51,10 @@ export async function openPortfolio(
     state: "attached",
     timeout: options.timeout ?? 20000,
   });
-  await expect(page.locator("#bootstrap-surface")).toHaveCount(0);
+  // The surface leaves after the first frame, so it shares the boot budget.
+  await expect(page.locator("#bootstrap-surface")).toHaveCount(0, {
+    timeout: options.timeout ?? 20000,
+  });
   await expect(page.getByRole("heading").first()).toBeAttached();
   await expect(page).toHaveTitle(portfolio.site.title);
   await expect(page.locator("html")).toHaveAttribute(
