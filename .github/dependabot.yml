@@ -24,6 +24,10 @@ updates:
         update-types:
           - minor
           - patch
+    # Node type definitions follow the pinned runtime major in .nvmrc.
+    ignore:
+      - dependency-name: "@types/node"
+        update-types: ["version-update:semver-major"]
     commit-message:
       prefix: "build(deps)"
   - package-ecosystem: pub
