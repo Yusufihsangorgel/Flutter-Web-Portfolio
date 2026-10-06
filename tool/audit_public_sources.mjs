@@ -43,12 +43,23 @@ async function fetchWithRetry(endpoint, attempts = 4) {
   let response = null;
   for (let attempt = 1; attempt <= attempts; attempt += 1) {
     response = await fetch(endpoint, { headers });
-    if (response.ok || response.status < 500) return response;
+    const waitMs = rateLimitWaitMs(response);
+    if (response.ok || (response.status < 500 && waitMs === null)) return response;
     if (attempt < attempts) {
-      await new Promise((resolve) => setTimeout(resolve, attempt * 2000));
+      await new Promise((resolve) => setTimeout(resolve, waitMs ?? attempt * 2000));
     }
   }
   return response;
+}
+
+// Parallel CI runs share the token's quota; wait out a short rate-limit window instead of failing.
+function rateLimitWaitMs(response) {
+  if (response.status !== 403 && response.status !== 429) return null;
+  const retryAfter = Number(response.headers.get('retry-after'));
+  const reset = Number(response.headers.get('x-ratelimit-reset')) * 1000 - Date.now();
+  const limited = response.headers.get('x-ratelimit-remaining') === '0';
+  const waitMs = retryAfter > 0 ? retryAfter * 1000 : limited ? reset : null;
+  return waitMs !== null && waitMs > 0 && waitMs <= 90_000 ? waitMs + 1000 : null;
 }
 
 const results = [];
