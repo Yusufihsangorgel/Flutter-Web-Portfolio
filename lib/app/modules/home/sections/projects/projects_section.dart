@@ -2,11 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_web_portfolio/app/controllers/scroll_controller.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
-import 'package:flutter_web_portfolio/app/core/constants/app_dimensions.dart';
-import 'package:flutter_web_portfolio/app/core/constants/breakpoints.dart';
 import 'package:flutter_web_portfolio/app/core/theme/app_fonts.dart';
 import 'package:flutter_web_portfolio/app/domain/models/portfolio_document.dart';
 import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
+import 'package:flutter_web_portfolio/app/modules/home/sections/projects/widgets/atlas_style.dart';
 import 'package:flutter_web_portfolio/app/modules/home/sections/projects/widgets/project_atlas.dart';
 import 'package:flutter_web_portfolio/app/narrative/domain/narrative_document.dart';
 import 'package:flutter_web_portfolio/app/widgets/numbered_section_heading.dart';
@@ -102,13 +101,9 @@ final class _ProjectsIntroduction extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final width = MediaQuery.sizeOf(context).width;
-    final tablet = width >= Breakpoints.tablet;
-    final horizontal = width > AppDimensions.maxContentWidth
-        ? AppDimensions.sectionPaddingDesktop
-        : tablet
-        ? AppDimensions.sectionPaddingTablet
-        : AppDimensions.sectionPaddingMobile;
+    final layout = AtlasLayout.of(context);
+    final tablet = layout.tablet;
+    final horizontal = layout.horizontalPadding;
 
     return Padding(
       padding: EdgeInsets.fromLTRB(
