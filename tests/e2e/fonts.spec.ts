@@ -1,4 +1,5 @@
 import { expect, test, type Response } from "@playwright/test";
+import { readFileSync } from "node:fs";
 import { gzipSync } from "node:zlib";
 
 const arabicPath = "noto_sans_arabic/NotoSansArabic-Variable.ttf";
@@ -11,6 +12,9 @@ const latinPaths = [
 const fontFile = /\.(?:ttf|otf|woff2?)(?:\?|$)/;
 const budgetBytes = 350 * 1024;
 const surface = "#bootstrap-surface";
+const locales: string[] = JSON.parse(
+  readFileSync("assets/content/portfolio.json", "utf8"),
+).site.locales;
 
 test("English load stays within the font transfer budget", async ({ page }) => {
   const fontUrls: string[] = [];
@@ -45,6 +49,7 @@ test("English load stays within the font transfer budget", async ({ page }) => {
 });
 
 test("Arabic selection loads its font", async ({ page }) => {
+  test.skip(!locales.includes("ar"), "The content record does not publish Arabic.");
   const runtimeFontResponses: Response[] = [];
   page.on("response", (response) => {
     if (!response.url().includes(arabicPath)) return;
