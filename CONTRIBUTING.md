@@ -1,137 +1,57 @@
 # Contributing
 
-Thanks for your interest in contributing to this project. Here's how to get started.
+Keep changes focused and follow the [architecture rules](docs/ARCHITECTURE-RULES.md).
+They define the layers, the import rules, the size limits, and how technical
+debt is handled. Put portfolio facts in `assets/content/portfolio.json` and
+interface text in `assets/i18n/`.
 
-## Getting Started
+## Toolchain
 
-1. **Fork** the repository
-2. **Clone** your fork:
-   ```bash
-   git clone <your-fork-url>
-   cd Flutter-Web-Portfolio
-   ```
-3. **Install dependencies:**
-   ```bash
-   flutter pub get
-   npm ci
-   npm run setup:browsers
-   ```
+The repository pins Flutter 3.47.5 in [`tool/toolchain.json`](tool/toolchain.json).
+Use its bundled Dart 3.13.4 and Node.js 24.18.0 (see `.nvmrc`).
+`npm run verify:toolchain` reports a mismatch.
 
-   Chromium is used only by the social-card renderer and browser regression
-   gates; the portfolio itself does not ship a Node.js or Playwright runtime.
-4. **Create a branch** for your change:
-   ```bash
-   git checkout -b feature/your-feature-name
-   ```
+## Before you open a pull request
 
-## Development Workflow
-
-### Before You Code
-
-- Check the repository issue tracker to avoid duplicate work
-- For large changes, open an issue first to discuss the approach
-
-### While You Code
-
-- Follow the existing code style and architecture patterns
-- Use `final class` / `abstract interface class` where appropriate (Dart 3.x)
-- Keep widgets small and composable — see `lib/app/widgets/` for examples
-- Add tests for new controllers, models, and widgets
-
-### Before You Submit
-
-All quality gates must pass:
+Install dependencies with `flutter pub get`, `npm ci`, and
+`npm run setup:browsers`. Then run the checks that match your change:
 
 ```bash
-# Canonical Dart 3.12 formatting
 dart format --output=none --set-exit-if-changed lib test tool
-
-# Static analysis — zero warnings, zero infos
 flutter analyze --fatal-infos
-
-# Content and clean-template contracts
-npm run verify:toolchain
-npm run verify:content
-npm run portfolio:validate
-npm run test:template
-npm run test:clone
-npm run test:release-security
-npm run verify:hosting
-npm run verify:community
-npm run verify:source
-npm run audit:sources
-npm run audit:history
-npm run typecheck
-
-# All Dart tests pass
 flutter test
-
-# Dual-runtime release, bundle integrity, and browser regressions
-npm run build:release
-npm test
-npm run verify:runtime
+npm run verify:content
+python3 quality/check_architecture.py
 ```
 
-## Pull Request Process
+The full command list is under [Quality gates](README.md#quality-gates) in the
+README, and the release and hosting steps are in the
+[template guide](docs/TEMPLATE.md). Add or update focused tests for behavior
+changes. For changes to application structure, state, or rendering, read the
+architecture rules before you edit.
 
-1. **Push** your branch to your fork
-2. **Open a PR** against the `main` branch
-3. **Fill out the PR template** — describe what changed and why
-4. **Wait for CI** — the GitHub Actions pipeline runs analyze, test, and build
-5. **Address review feedback** if any
+## Pull request checks
 
-### PR Guidelines
+The workflows are in `.github/workflows/`. A pull request has to pass:
 
-- Keep PRs focused — one feature or fix per PR
-- Write a clear title and description
-- Include screenshots for visual changes
-- Reference related issues with `Closes #123`
+| Workflow | Checks |
+|---|---|
+| `ci.yml` | Toolchain, content, template, release, source, history, type, formatting, analysis, Flutter tests, web build, bundle, clean clone, browser, and runtime checks |
+| `architecture.yml` | Architecture gate calibration and import rules; runs when `lib/`, `quality/`, or the architecture rules change |
+| `codeql.yml` | Code scanning |
+| `dependency-review.yml` | Dependency review |
+| `pr-title.yml` | Pull request title format |
 
-## Code Style
+## Pull request titles
 
-- Use `flutter analyze --fatal-infos` as the style authority
-- Prefer `const` constructors wherever possible
-- Use `switch` expressions over `if/else` chains for type matching
-- Document public APIs with `///` doc comments
-- Name files with `snake_case`, classes with `PascalCase`
+Titles use [Conventional Commits](https://www.conventionalcommits.org/):
+`type(scope): subject`. The types are `build`, `chore`, `ci`, `docs`, `feat`,
+`fix`, `perf`, `refactor`, `revert`, `style`, and `test`. The scope is optional
+and lowercase, and the subject has at most 72 characters. For example:
+`fix(web): wait for the first rendered frame`.
 
-## Project Structure
+Describe the change and its effect in the description. Include screenshots for
+visual changes and link related issues.
 
-```
-lib/app/
-├── controllers/    # Measured scroll and scene coordination
-├── core/           # Constants and theme definitions
-├── data/           # External-content loading and implementations
-├── domain/         # Strict content contracts and interfaces
-├── features/       # Vertically sliced application features
-├── modules/        # Page modules and sections
-├── narrative/      # Position, anchors, and render geometry
-├── utils/          # Platform-aware utilities
-└── widgets/        # Reusable UI and custom painters
-```
-
-When adding a new widget:
-1. Create it in `lib/app/widgets/`
-2. Add a corresponding test in `test/widget/`
-
-Application features with state, infrastructure, and presentation code belong
-under `lib/app/features/<feature>/`. Keep frame-frequency state out of Cubits;
-use a synchronous `Listenable` when a value can change every rendered frame.
-
-Professional facts, names, dates, work, and links belong in
-`assets/content/portfolio.json`. Interface translations belong in
-`assets/i18n/`; complete non-English professional copy belongs in
-`assets/content/locales/<locale>.json` and must preserve the canonical facts.
-A presentation-code branch for one person or project is not accepted.
-
-## Reporting Bugs
-
-Use the repository bug report template and include:
-- Flutter version (`flutter --version`)
-- Browser and OS
-- Steps to reproduce
-- Expected vs actual behavior
-
-## License
-
-By contributing, you agree that your contributions will be licensed under the [MIT License](LICENSE).
+By contributing, you agree that your contributions will be licensed under the
+[MIT License](LICENSE).

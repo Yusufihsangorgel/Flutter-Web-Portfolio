@@ -1,10 +1,11 @@
-# Flutter Web Portfolio (portfolio) — Architecture Rules (binding)
+# Flutter Web Portfolio — Architecture Rules (binding)
 
-Version 1 · 2026-09-24 · Scope: every contributor changing code, tests, CI, or UI in this repository.
+Version 2 · 2026-09-29 · Scope: every contributor changing code, tests, CI, or UI in this repository.
 
-This document defines the repository’s binding code-structure rules. The mechanical rules are mirrored in
-`quality/architecture-rules.json`. For architecture, these rules take precedence over general repository documentation.
-Update this document and the rule configuration together.
+This document defines the repository's binding code-structure rules. The current import gate is
+[`quality/architecture-rules.json`](../quality/architecture-rules.json). For architecture, these rules take precedence
+over general repository documentation. The gate still contains legacy package deny entries and a provider-named UI
+exception; synchronize that configuration in the same release before claiming full mechanical coverage of this version.
 
 ## 1. This repository’s architecture
 
@@ -22,13 +23,19 @@ Update this document and the rule configuration together.
 `AppDependencies.bootstrap()` assembles data adapters, domain objects, and controllers; `AppRuntime` provides state to
 the widget tree.
 
-`lib/app/modules/home/` composes the portfolio page from sections. `lib/app/widgets/` contains reusable UI.
-`lib/app/features/` contains feature-scoped behavior, including language state. `lib/app/controllers/` owns shared
-scroll and scene behavior. `lib/app/core/` holds shared constants and theme values.
+`lib/app/modules/home/` and `lib/app/widgets/` are presentation. Presentation may use application-layer Cubits and
+controllers, including `lib/app/features/*/application/`, `lib/app/controllers/`, and
+`lib/app/narrative/application/`; it must not access data adapters or I/O directly. `lib/app/core/` holds shared
+constants and theme values. Feature code does not import other features.
 
-`lib/app/domain/` contains application models and contracts. `lib/app/data/providers/` reads bundled assets and
-preferences; `lib/app/data/repositories/` implements persistence-facing behavior. `lib/app/narrative/` separates
-narrative domain, application, and rendering code. `lib/app/utils/` contains platform-specific helpers.
+`lib/app/domain/`, `lib/app/features/*/domain/`, and `lib/app/narrative/domain/` hold domain models and contracts.
+Domain code is plain Dart: no Flutter, `dart:ui`, data, presentation, or application imports. Data adapters in
+`lib/app/data/providers/` and `lib/app/data/repositories/` implement domain contracts for assets and preferences.
+`lib/app/narrative/rendering/` is presentation support; `lib/app/utils/` contains platform helpers.
+
+The direction is presentation → application → domain ← data. `AppDependencies.bootstrap()` is the explicit
+composition root that supplies adapters and controllers. The five existing domain purity violations are listed in
+[`docs/TECH-DEBT.md`](TECH-DEBT.md) and the architecture baseline; they are not new-code precedents.
 
 The browser application is Flutter Web; there is no separate HTML/TypeScript page hierarchy. The deployed site is
 static output under `build/web/`. Node tooling may access external sources, but that does not create a runtime HTTP
@@ -36,15 +43,15 @@ layer in the Flutter application.
 
 ### 1.2 Import direction
 
-The “Must not import” column lists mechanically enforced restrictions. Other dependencies should follow the intended
-direction shown in “May import”; the checker does not enforce every design choice.
+The “Must not import” column is the intended rule. The checker currently enforces import patterns only, with the
+configuration drift noted above; it does not inspect runtime calls or architectural intent.
 
 | Layer | May import | Must not import |
 |---|---|---|
-| `modules/**` pages and sections | Flutter UI, `core/`, `controllers/`, `features/`, `narrative/`, shared widgets | Direct HTTP/database/storage/purchase SDKs; repositories or data sources, except configured provider-named targets |
-| `widgets/**` shared UI | Flutter UI, `core/`, `controllers/`, domain types, shared widgets | `modules/**`; direct HTTP/database/storage/purchase SDKs; repositories or data sources, except configured provider-named targets |
-| `features/<a>/**` | Its own feature and shared application layers | `features/<b>/**` for `b != a` |
-| `domain/**` | `dart:core`, `dart:async`, `dart:collection`, `dart:convert`, `dart:math`, `dart:typed_data`, `package:meta`, `package:freezed_annotation` | Other packages, Flutter, and outer data, UI, controller, application, or rendering layers |
+| `modules/**` pages and sections | Flutter UI, `core/`, application Cubits/controllers, domain types, shared widgets | `data/**`, repository implementations, direct asset/preference I/O |
+| `widgets/**` shared UI | Flutter UI, `core/`, application Cubits/controllers, domain types, shared widgets | `modules/**`, `data/**`, repository implementations, direct asset/preference I/O |
+| `features/<a>/**` | Its own feature and shared application/domain layers | `features/<b>/**` for `b != a` |
+| `domain/**` | Dart core libraries only | Flutter, `dart:ui`, third-party packages, data, presentation, application, or rendering layers |
 | `data/**` | Domain contracts and data dependencies | `modules/**`, `widgets/**`, `controllers/**`, `features/**`, `narrative/**` |
 | Composition root | Wiring of domain contracts, data adapters, features, and controllers | Hidden global registration or service-locator wiring |
 
@@ -53,13 +60,15 @@ direction shown in “May import”; the checker does not enforce every design c
 | Rule | Enforced restriction |
 |---|---|
 | `F-ISOLATION` | A feature cannot import another feature. Shared code belongs in an appropriate shared layer. |
-| `F-UI-NO-IO` | UI groups cannot directly import `http`, `dio`, `drift`, `sqflite`, `hive`, `shared_preferences`, `purchases_flutter`, Supabase, Firebase, or Cloud Firestore SDKs. |
-| `F-UI-NO-REPO` | UI groups cannot directly import repositories or data sources, except configured provider-named targets. |
+| `F-UI-NO-IO` | UI groups cannot import the preference adapter's `shared_preferences` package; direct asset/preference I/O is also prohibited by review. The present config lists unused package patterns pending synchronization. |
+| `F-UI-NO-REPO` | UI groups cannot import `data/**`. The current checker has a provider-named exception pending removal. |
 | `P-DATA-DOWN` | `data/**` cannot import modules, widgets, controllers, features, or narrative code. |
 | `P-WIDGETS-NO-MODULES` | Shared widgets cannot import page modules. |
-| `F-DOMAIN-PURE` | Domain imports are limited to the allow-list in §1.2. |
+| `F-DOMAIN-PURE` | Domain may import Dart core libraries only; the current config also allows unused annotation package patterns pending synchronization. |
 | `F-DOMAIN-INWARD` | Domain cannot import data, UI, controllers, feature application, or narrative application/rendering layers. |
-| `F-FORBIDDEN-SDK` | No file under `lib/**` may import Firebase, Cloud Firestore, Sentry, Supabase, or Clerk SDKs. |
+
+The legacy `F-FORBIDDEN-SDK` rule still exists in the current JSON gate. Its unused-package list is not part of this
+repository-specific policy; removing it requires a coordinated configuration and calibration change.
 
 ## 2. When adding new code
 
@@ -93,9 +102,9 @@ existing platform-helper structure under `lib/app/utils/`; do not create a paral
 
 - Do not grow oversized UI files as the default extension point. `project_atlas.dart` is already 1,356 lines and
   `proof_section.dart` is 741 lines; extract focused widgets or state when changing these areas.
-- Do not make a page or widget read repositories, data sources, preferences, or the listed I/O SDKs directly.
+- Do not make a page or widget read repositories, data sources, or preferences directly.
 - Do not make data code depend on presentation, controllers, features, or narrative layers.
-- Do not add Flutter or other package imports to domain code. The current five `F-DOMAIN-PURE` violations are
+- Do not add Flutter or `dart:ui` imports to domain code. The current five `F-DOMAIN-PURE` violations are
   recorded in `docs/TECH-DEBT.md`.
 - Keep nested translation lookup and JSON handling out of unrelated widgets. `language_cubit.dart:93` currently uses
   a `dynamic` traversal value; treat this as a manual review point, not a configured architecture violation.
@@ -127,8 +136,11 @@ existing platform-helper structure under `lib/app/utils/`; do not create a paral
   same change using `check_architecture.py --shrink-baseline`.
 - Close debt in a separate change. A bug fix in a file over 500 lines may add at most 10 lines; split a feature before
   adding it to such a file.
-- Limits: file 500 lines · function 60 · `build()` 100 · cyclomatic complexity 15 · parameters 4 · nesting depth 4.
-  These are review limits; no size-checking gate is currently listed in CI.
+- Limits: production file 500 lines, test file 800 lines, function/member 60 lines, `build()` 100 lines,
+  parameters 4, nesting depth 4, cyclomatic complexity 15. The architecture gate currently enforces import
+  direction only. File, function, `build()`, parameter, nesting, and complexity limits are manual review criteria;
+  automated metric enforcement is planned for a later release. Existing breaches and planned fixes are recorded in
+  [`docs/TECH-DEBT.md`](TECH-DEBT.md).
 
 ## 6. Quality gates
 
@@ -156,7 +168,7 @@ Reject a change if any of the following is true:
 1. The architecture checker reports a `NEW` or `STALE` entry.
 2. A required §6 gate fails or its result is not recorded with relevant counts.
 3. The change violates any §1.3 rule or adds a direct UI I/O or repository dependency.
-4. A new file exceeds 500 lines, a function exceeds 60, `build()` exceeds 100, complexity exceeds 15, a function has
+4. A new production file exceeds 500 lines, a new test file exceeds 800 lines, a function exceeds 60, `build()` exceeds 100, complexity exceeds 15, a function has
    more than 4 parameters, or nesting exceeds 4.
 5. It adds a package, state-management library, HTTP client, or architectural layer without an architecture decision.
 6. A UI change bypasses the existing theme, content, accessibility, or state boundaries.
