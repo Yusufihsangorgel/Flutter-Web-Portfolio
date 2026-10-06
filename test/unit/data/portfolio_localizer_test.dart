@@ -16,6 +16,11 @@ Map<String, dynamic> _canonicalJson() =>
     jsonDecode(File('assets/content/portfolio.json').readAsStringSync())
         as Map<String, dynamic>;
 
+// Failure cases need systems and experience, which a fresh template record may not have.
+Map<String, dynamic> _fixtureJson() =>
+    jsonDecode(File('test/fixtures/portfolio.json').readAsStringSync())
+        as Map<String, dynamic>;
+
 void _registerSelfOverlayTest() {
   test('a complete self overlay preserves every model field', () {
     final raw = _canonicalJson();
@@ -100,7 +105,7 @@ void _registerOverlayFailureTests() {
     });
 
     test('rejects an evidence list of a different length', () {
-      final systemId = (_canonicalJson()['systems']! as List<dynamic>)
+      final systemId = (_fixtureJson()['systems']! as List<dynamic>)
           .cast<Map<String, dynamic>>()
           .first['id']!;
       _expectOverlayFailure(
@@ -114,7 +119,7 @@ void _registerOverlayFailureTests() {
     });
 
     test('rejects an overlay that omits a declared entry', () {
-      final experienceId = (_canonicalJson()['experience']! as List<dynamic>)
+      final experienceId = (_fixtureJson()['experience']! as List<dynamic>)
           .cast<Map<String, dynamic>>()
           .first['id']!;
       _expectOverlayFailure(
@@ -131,7 +136,7 @@ void _expectOverlayFailure(
   void Function(Map<String, dynamic> overlay) mutate,
   String message,
 ) {
-  final raw = _canonicalJson();
+  final raw = _fixtureJson();
   final document = parsePortfolioDocument(raw);
   final overlay = _normalize(_selfOverlay(raw));
   mutate(overlay);
