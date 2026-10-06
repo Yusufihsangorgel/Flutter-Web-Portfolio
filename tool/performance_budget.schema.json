@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "Flutter Web runtime performance budget",
-  "description": "Release thresholds and the explicit hardware-only enforcement contract.",
+  "description": "Release thresholds for unthrottled and optional throttled runtime profiles.",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -10,7 +10,8 @@
     "startup_timeout_ms",
     "scroll_sample_ms",
     "maximum_median",
-    "hardware_only_metrics"
+    "hardware_only_metrics",
+    "throttled"
   ],
   "properties": {
     "$schema": {
@@ -74,6 +75,10 @@
         "largest_contentful_paint_ms": {
           "type": "number",
           "minimum": 0
+        },
+        "total_transferred_bytes": {
+          "type": "number",
+          "minimum": 0
         }
       }
     },
@@ -86,6 +91,77 @@
         "enum": [
           "scroll_frames_over_50_ms"
         ]
+      }
+    },
+    "throttled": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "enforce",
+        "maximum_median",
+        "maximum_transferred_bytes_by_resource_type"
+      ],
+      "properties": {
+        "enforce": {
+          "type": "boolean"
+        },
+        "maximum_median": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "navigation_to_first_frame_ms",
+            "bootstrap_to_first_frame_ms",
+            "first_frame_to_reveal_frame_intervals",
+            "scroll_frame_p95_over_median_ratio",
+            "scroll_frames_over_50_ms",
+            "long_task_total_ms",
+            "cumulative_layout_shift",
+            "largest_contentful_paint_ms",
+            "first_frame_to_reveal_ms",
+            "total_transferred_bytes"
+          ],
+          "properties": {
+            "navigation_to_first_frame_ms": { "type": "number", "minimum": 0 },
+            "bootstrap_to_first_frame_ms": { "type": "number", "minimum": 0 },
+            "first_frame_to_reveal_frame_intervals": { "type": "number", "minimum": 0 },
+            "scroll_frame_p95_over_median_ratio": { "type": "number", "minimum": 0 },
+            "scroll_frames_over_50_ms": { "type": "number", "minimum": 0 },
+            "long_task_total_ms": { "type": "number", "minimum": 0 },
+            "cumulative_layout_shift": { "type": "number", "minimum": 0 },
+            "largest_contentful_paint_ms": { "type": "number", "minimum": 0 },
+            "first_frame_to_reveal_ms": { "type": "number", "minimum": 0 },
+            "total_transferred_bytes": { "type": "number", "minimum": 0 }
+          }
+        },
+        "maximum_transferred_bytes_by_resource_type": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "Document", "Stylesheet", "Image", "Media", "Font", "Script",
+            "TextTrack", "XHR", "Fetch", "Prefetch", "EventSource", "WebSocket",
+            "Manifest", "SignedExchange", "Ping", "CSPViolationReport", "Preflight", "Other"
+          ],
+          "properties": {
+            "Document": { "type": "integer", "minimum": 0 },
+            "Stylesheet": { "type": "integer", "minimum": 0 },
+            "Image": { "type": "integer", "minimum": 0 },
+            "Media": { "type": "integer", "minimum": 0 },
+            "Font": { "type": "integer", "minimum": 0 },
+            "Script": { "type": "integer", "minimum": 0 },
+            "TextTrack": { "type": "integer", "minimum": 0 },
+            "XHR": { "type": "integer", "minimum": 0 },
+            "Fetch": { "type": "integer", "minimum": 0 },
+            "Prefetch": { "type": "integer", "minimum": 0 },
+            "EventSource": { "type": "integer", "minimum": 0 },
+            "WebSocket": { "type": "integer", "minimum": 0 },
+            "Manifest": { "type": "integer", "minimum": 0 },
+            "SignedExchange": { "type": "integer", "minimum": 0 },
+            "Ping": { "type": "integer", "minimum": 0 },
+            "CSPViolationReport": { "type": "integer", "minimum": 0 },
+            "Preflight": { "type": "integer", "minimum": 0 },
+            "Other": { "type": "integer", "minimum": 0 }
+          }
+        }
       }
     }
   }
