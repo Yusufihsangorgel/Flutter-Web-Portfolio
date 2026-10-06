@@ -297,6 +297,9 @@ docker run --rm --ipc=host \
   bash -lc 'npm run test:visual:update && npm run test:visual'
 ```
 
+Alternatively, run the manual "Visual baselines" workflow and commit the
+`visual-baselines` artifact into `tests/e2e/visual.spec.ts-snapshots/`.
+
 Review both `*-darwin.png` and `*-linux.png` changes before committing them.
 
 Review every changed visual baseline, keyboard focus ring, and text/background
