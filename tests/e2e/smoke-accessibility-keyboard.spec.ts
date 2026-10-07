@@ -181,7 +181,7 @@ test("publishes a clean heading and control hierarchy", async ({
   await assertProjectHierarchy(page, isMobile, accessibility);
 });
 
-test("skip link moves keyboard focus into the main document", async ({
+test("the first Tab reveals the skip link, which enters the main document", async ({
   page,
   isMobile,
 }) => {
@@ -189,11 +189,30 @@ test("skip link moves keyboard focus into the main document", async ({
     isMobile,
     "hardware-keyboard traversal is covered by the desktop browser project",
   );
+  // Still chrome, so only the skip link can change the pixels below.
+  await page.emulateMedia({ reducedMotion: "reduce" });
   await openPortfolio(page);
-  await focusActionWithKeyboard(
-    page,
-    englishInterface.accessibility.skip_to_content,
+  const skipLink = page.getByRole("button", {
+    name: englishInterface.accessibility.skip_to_content,
+    exact: true,
+  });
+  await expect(skipLink).toBeAttached();
+  const area = required(
+    (await skipLink.boundingBox()) ?? undefined,
+    "skip link geometry",
   );
+  const hiddenPixels = await page.screenshot({ clip: area });
+
+  await page.keyboard.press("Tab");
+
+  await expect(skipLink).toBeFocused();
+  // The pixels under the link change only if it is painted above the chrome.
+  await expect
+    .poll(async () => {
+      const pixels = await page.screenshot({ clip: area });
+      return !pixels.equals(hiddenPixels);
+    })
+    .toBe(true);
   await page.keyboard.press("Enter");
 
   if (firstContentSection !== "about") {

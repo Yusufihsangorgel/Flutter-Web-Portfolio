@@ -6,7 +6,6 @@ import 'package:flutter_web_portfolio/app/features/language/application/language
 import 'package:flutter_web_portfolio/app/controllers/scroll_controller.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_dimensions.dart';
-import 'package:flutter_web_portfolio/app/core/constants/durations.dart';
 import 'package:flutter_web_portfolio/app/core/constants/breakpoints.dart';
 import 'package:flutter_web_portfolio/app/modules/home/sections/home_section.dart';
 import 'package:flutter_web_portfolio/app/modules/home/sections/about_section.dart';
@@ -16,10 +15,10 @@ import 'package:flutter_web_portfolio/app/modules/home/sections/projects/project
 import 'package:flutter_web_portfolio/app/modules/home/sections/proof_section.dart';
 import 'package:flutter_web_portfolio/app/modules/home/sections/writing/writing_section.dart';
 import 'package:flutter_web_portfolio/app/widgets/back_to_top_button.dart';
-import 'package:flutter_web_portfolio/app/widgets/accessible_action.dart';
 import 'package:flutter_web_portfolio/app/widgets/command_palette.dart';
 import 'package:flutter_web_portfolio/app/widgets/custom_sliver_app_bar.dart';
 import 'package:flutter_web_portfolio/app/widgets/portfolio_footer.dart';
+import 'package:flutter_web_portfolio/app/widgets/skip_to_content_link.dart';
 import 'package:flutter_web_portfolio/app/widgets/narrative_chapter_handoff.dart';
 import 'package:flutter_web_portfolio/app/widgets/narrative_stage.dart';
 import 'package:flutter_web_portfolio/app/utils/motion_preference.dart';
@@ -35,13 +34,12 @@ class HomeView extends StatefulWidget {
 }
 
 class _HomeViewState extends State<HomeView> {
-  final FocusNode _focusNode = FocusNode();
+  final FocusNode _focusNode = FocusNode(skipTraversal: true);
   final FocusNode _skipLinkFocusNode = FocusNode();
   final FocusNode _mainContentFocusNode = FocusNode(
     debugLabel: 'portfolio-main-content',
     skipTraversal: true,
   );
-  bool _skipLinkVisible = false;
   String? _lastAnnouncedLanguageWarning;
   AppScrollController? _scheduledScrollController;
 
@@ -84,6 +82,14 @@ class _HomeViewState extends State<HomeView> {
         (HardwareKeyboard.instance.isControlPressed ||
             HardwareKeyboard.instance.isMetaPressed)) {
       CommandPalette.show(context);
+      return KeyEventResult.handled;
+    }
+
+    // The page holds the initial focus; the first Tab enters at the skip link.
+    if (event.logicalKey == LogicalKeyboardKey.tab &&
+        !HardwareKeyboard.instance.isShiftPressed &&
+        _focusNode.hasPrimaryFocus) {
+      _skipLinkFocusNode.requestFocus();
       return KeyEventResult.handled;
     }
 
@@ -156,82 +162,98 @@ class _HomeViewState extends State<HomeView> {
     AppScrollController scrollController,
     LanguageCubit languageController,
     NarrativeDocument narrative,
-  ) => Stack(
-    children: [
-      const Positioned.fill(
-        child: RepaintBoundary(child: NarrativeBackground()),
-      ),
-      // Skip-to-content link (accessibility)
-      Positioned(
-        top: 0,
-        left: 0,
-        right: 0,
-        child: _SkipToContentLink(
+  ) => FocusTraversalGroup(
+    // The skip link leads; every other control keeps reading order.
+    policy: OrderedTraversalPolicy(),
+    child: Stack(
+      children: [
+        const Positioned.fill(
+          child: RepaintBoundary(child: NarrativeBackground()),
+        ),
+        // Layer 3: one continuous, immediately interactive document.
+        ScrollConfiguration(
+          behavior: ScrollConfiguration.of(context).copyWith(
+            dragDevices: {
+              PointerDeviceKind.touch,
+              PointerDeviceKind.mouse,
+              PointerDeviceKind.trackpad,
+            },
+          ),
+          child: CustomScrollView(
+            controller: scrollController.scrollController,
+            physics: const ClampingScrollPhysics(),
+            slivers: [
+              CustomSliverAppBar(
+                scrollController: scrollController,
+                languageController: languageController,
+              ),
+              // One document box deliberately lays out this short portfolio as
+              // a whole. Every chapter therefore has measured geometry for
+              // deep links and keyboard navigation without a giant cacheExtent.
+              SliverToBoxAdapter(
+                child: NotificationListener<SizeChangedLayoutNotification>(
+                  onNotification: (_) {
+                    scrollController.markGeometryDirty();
+                    return false;
+                  },
+                  child: SizeChangedLayoutNotifier(
+                    child: Column(
+                      children: [
+                        ..._buildChapters(context, scrollController, narrative),
+                        const PortfolioFooter(),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        // Layer 4: one measured signal connects real content anchors across
+        // otherwise independent chapter surfaces.
+        const NarrativeStage(),
+        // Layer 5: Back-to-top button with scroll progress
+        const BackToTopButton(),
+        // Above the app bar, so the focused bypass link is never covered.
+        _buildSkipLink(scrollController, languageController, narrative),
+      ],
+    ),
+  );
+
+  Widget _buildSkipLink(
+    AppScrollController scrollController,
+    LanguageCubit languageController,
+    NarrativeDocument narrative,
+  ) => Positioned(
+    top: 0,
+    left: 0,
+    right: 0,
+    child: Center(
+      child: FocusTraversalOrder(
+        order: const NumericFocusOrder(0),
+        child: SkipToContentLink(
           label: languageController.getText(
             'accessibility.skip_to_content',
             defaultValue: 'Skip to content',
           ),
-          visible: _skipLinkVisible,
           focusNode: _skipLinkFocusNode,
-          onFocusChanged: (focused) {
-            setState(() => _skipLinkVisible = focused);
-          },
-          onActivate: () {
-            final firstContentChapter = narrative.chapters.firstWhere(
-              (chapter) => !chapter.id.isHome,
-              orElse: () => narrative.chapters.first,
-            );
-            scrollController.scrollToSection(firstContentChapter.id.value);
-            _mainContentFocusNode.requestFocus();
-          },
+          onActivate: () => _skipToContent(scrollController, narrative),
         ),
       ),
-      // Layer 3: one continuous, immediately interactive document.
-      ScrollConfiguration(
-        behavior: ScrollConfiguration.of(context).copyWith(
-          dragDevices: {
-            PointerDeviceKind.touch,
-            PointerDeviceKind.mouse,
-            PointerDeviceKind.trackpad,
-          },
-        ),
-        child: CustomScrollView(
-          controller: scrollController.scrollController,
-          physics: const ClampingScrollPhysics(),
-          slivers: [
-            CustomSliverAppBar(
-              scrollController: scrollController,
-              languageController: languageController,
-            ),
-            // One document box deliberately lays out this short portfolio as
-            // a whole. Every chapter therefore has measured geometry for
-            // deep links and keyboard navigation without a giant cacheExtent.
-            SliverToBoxAdapter(
-              child: NotificationListener<SizeChangedLayoutNotification>(
-                onNotification: (_) {
-                  scrollController.markGeometryDirty();
-                  return false;
-                },
-                child: SizeChangedLayoutNotifier(
-                  child: Column(
-                    children: [
-                      ..._buildChapters(context, scrollController, narrative),
-                      const PortfolioFooter(),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-      // Layer 4: one measured signal connects real content anchors across
-      // otherwise independent chapter surfaces.
-      const NarrativeStage(),
-      // Layer 5: Back-to-top button with scroll progress
-      const BackToTopButton(),
-    ],
+    ),
   );
+
+  void _skipToContent(
+    AppScrollController scrollController,
+    NarrativeDocument narrative,
+  ) {
+    final firstContentChapter = narrative.chapters.firstWhere(
+      (chapter) => !chapter.id.isHome,
+      orElse: () => narrative.chapters.first,
+    );
+    scrollController.scrollToSection(firstContentChapter.id.value);
+    _mainContentFocusNode.requestFocus();
+  }
 
   List<Widget> _buildChapters(
     BuildContext context,
@@ -333,58 +355,4 @@ class _HomeViewState extends State<HomeView> {
       'No section widget is registered for narrative chapter "$value".',
     ),
   };
-}
-
-/// Hidden skip-to-content link for keyboard and screen reader users.
-///
-/// Invisible by default; becomes visible when focused via Tab key.
-class _SkipToContentLink extends StatelessWidget {
-  const _SkipToContentLink({
-    required this.label,
-    required this.visible,
-    required this.focusNode,
-    required this.onFocusChanged,
-    required this.onActivate,
-  });
-
-  final String label;
-  final bool visible;
-  final FocusNode focusNode;
-  final ValueChanged<bool> onFocusChanged;
-  final VoidCallback onActivate;
-
-  @override
-  Widget build(BuildContext context) => AccessibleAction(
-    focusNode: focusNode,
-    onFocusChanged: onFocusChanged,
-    onTap: onActivate,
-    semanticLabel: label,
-    showFocusRing: false,
-    child: AnimatedOpacity(
-      opacity: visible ? 1.0 : 0.0,
-      duration: AppDurations.fast,
-      child: AnimatedContainer(
-        duration: AppDurations.fast,
-        transform: Matrix4.translationValues(0, visible ? 0 : -48, 0),
-        child: Center(
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-            decoration: BoxDecoration(
-              color: AppColors.accent,
-              borderRadius: BorderRadius.circular(4),
-            ),
-            child: Text(
-              label,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                decoration: TextDecoration.none,
-              ),
-            ),
-          ),
-        ),
-      ),
-    ),
-  );
 }
