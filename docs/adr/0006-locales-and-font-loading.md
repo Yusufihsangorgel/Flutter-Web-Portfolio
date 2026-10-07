@@ -2,19 +2,19 @@
 
 ## Status
 
-Proposed.
+Accepted.
 
 ## Context
 
-The [content contract](../../assets/content/portfolio.json) and [interface catalogs](../../assets/i18n/) cover `en`, `tr`, `de`, `fr`, `es`, `ar`, and `hi`. [AppFonts](../../lib/app/core/theme/app_fonts.dart) uses bundled Inter, Space Grotesk, JetBrains Mono, Arabic, and Devanagari families. The current [font manifest](../../pubspec.yaml) bundles full font files, while the [release shell](../../tool/release/prepare_web_release.mjs) conditionally preloads Arabic or Devanagari for the selected locale. That preload is not proof that unused font bytes are excluded from the release.
+The [content contract](../../assets/content/portfolio.json) and [interface catalogs](../../assets/i18n/) cover `en`, `tr`, `de`, `fr`, `es`, `ar`, and `hi`. [AppFonts](../../lib/app/core/theme/app_fonts.dart) uses Inter, Space Grotesk, JetBrains Mono, Arabic, and Devanagari families. The [font manifest](../../pubspec.yaml) eagerly registers subset Latin families and small Arabic/Devanagari `-Shared` subsets for script glyphs in language names. Full Arabic and Devanagari files remain bundled as assets but [LocaleFontLoader](../../lib/app/core/theme/locale_font_loader.dart) registers them only for `ar` and `hi`. The shell preloads the selected script font only when needed.
 
 ## Decision
 
-Keep seven supported locales. Subset the Latin families for glyphs used by the content contract, retain coverage needed by Arabic and Hindi, and load script-specific fonts only when their locale needs them. Preserve local, same-origin font delivery and the shell's locale-specific first-frame typography.
+Keep seven supported locales. Generate Latin and shared-script subsets through [subset_fonts.mjs](../../tool/fonts/subset_fonts.mjs), preserving variation axes and required shaping features. Demand-load full script fonts for their locales. Preserve local, same-origin delivery and the shell's locale-specific first-frame typography.
 
 ## Consequences
 
-Font generation must be deterministic and checked against all seven catalogs, the static shell, and browser snapshots. Missing glyphs or premature font swaps would be user-visible failures. The current full font assets and manifest need implementation changes before this proposal can be marked Accepted.
+`npm run verify:fonts` regenerates the five subsets in check mode, compares their bytes and verifies every locale's paintable text against the fonts actually available to that locale. Shared script glyphs are covered even on an English visit. `npm run test:fonts` calibrates subsetting and coverage; browser font tests bound the English font transfer and reject full Arabic/Devanagari requests on that visit. Full script fonts still occupy release bytes, but unused locales do not fetch them. Content refreshes must regenerate subsets before release checks; missing glyphs or stale subset bytes fail CI.
 
 ## Alternatives considered
 

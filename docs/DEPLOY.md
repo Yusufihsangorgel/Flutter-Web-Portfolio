@@ -1,18 +1,24 @@
 # Deploy the portfolio
 
 The output is a static `build/web` directory containing a dual Flutter Web
-runtime: Dart Wasm/SkWasm where the browser and headers allow it, plus the
+runtime: single-threaded Dart Wasm/SkWasm where the browser supports it, plus the
 JavaScript/CanvasKit fallback. No backend, database, or runtime secret is
 required.
 
-Package metrics and merged pull-request status refresh on a weekly schedule
-through a checked pull request; see [`AUTOMATION.md`](AUTOMATION.md).
+The weekly refresh workflow is configured to update package metrics and merged
+pull-request status through a checked pull request. Its successful scheduled
+PR/merge path still needs confirmation; see [`AUTOMATION.md`](AUTOMATION.md).
 
-CI builds the release once, tests that build, and publishes the attested
-`web-release.tar.gz` artifact from `main`. The maintainer's production host
-pulls the attested artifact and deploys the image by digest. CI holds no
-production deploy credentials, and this public repository uses no self-hosted
-runner. Template users build locally with `npm run build:release` and deploy
+CI builds the release once, tests that build, and publishes deterministic
+`web-release.tar.gz` with `web-release.sha256`. Successful `main` push or manual
+CI runs attest the tarball in the `attest` job. The production delivery contract
+uses an independent host pull process: verify checksum and provenance for the
+expected revision, package the verified static release, and promote the image
+by digest. Its live configuration is outside this repository's checks. CI holds
+no production deploy credentials, and all repository jobs use hosted runners.
+The artifact is retained for 30 days; generated `build/web` is not tracked.
+Pages builds a separate base-path variant after CI instead of downloading the
+production artifact. Template users build locally with `npm run build:release` and deploy
 `build/web` to their chosen host using the instructions below.
 
 ## Build once
@@ -40,7 +46,9 @@ renders derived assets, verifies every provider contract, builds with
 same-origin renderer resources, removes development-only files, and verifies
 the final bundle.
 Hosted providers verify the committed social-card fingerprint instead of
-installing a browser in their restricted build images. If that gate is stale,
+rendering the card again. They still need Chromium to generate the résumé PDF;
+the provider build image must supply the Playwright browser and its system
+dependencies because the hosted-build script does not install them. If the card gate is stale,
 run `npm run render:social-card` locally and commit both the PNG and its
 `.sha256` sidecar.
 
@@ -71,7 +79,10 @@ therefore rejected for Vercel.
 
 In the new repository, open **Settings → Pages** and select **GitHub Actions** as
 the source, then push `main`. Deployment starts only after CI succeeds for that
-exact commit. The workflow chooses the base path automatically:
+exact commit. It also requires that revision to remain current `main` before rebuilding.
+This workflow publishes its own `build/web`, not CI's attested tarball. Manual
+dispatch is allowed on `main` and still checks the current revision.
+The workflow chooses the base path automatically:
 
 - `owner.github.io` repositories and configured custom domains use `/`;
 - project sites use `/<repository>/`;
@@ -109,8 +120,9 @@ Official references:
 
 ## Netlify
 
-The repository includes a pinned hosted-build script. Connecting the repository
-in Netlify is enough; `netlify.toml` builds and publishes `build/web`. For a
+The repository includes a pinned hosted-build script. Connect the repository
+in Netlify and provide Chromium and its system dependencies for the résumé step;
+`netlify.toml` builds and publishes `build/web`. For a
 local CLI deployment:
 
 ```bash
@@ -228,11 +240,13 @@ Cross-Origin-Opener-Policy: same-origin
 Cross-Origin-Embedder-Policy: credentialless
 ```
 
-Without them the site remains usable through its fallback runtime, but the
-threaded SkWasm path cannot be selected. Preserve `nosniff` and serve `.mjs`,
+The current single-threaded SkWasm path does not require isolation. These headers
+are retained for the threaded path once its workaround is removed. Preserve
+the checked content security policy, HSTS and `nosniff`, and serve `.mjs`,
 `.wasm`, and font MIME types correctly as shown in `nginx/default.conf`.
 
 GitHub Pages does not expose custom response-header configuration. Its workflow
-still verifies and publishes the dual-runtime artifact, but browsers select the
-compatible non-isolated path there. Use one of the other included providers when
-threaded SkWasm is a hard requirement.
+still verifies and publishes a dual-runtime release, and compatible browsers
+use single-threaded SkWasm there. Threaded rendering remains disabled on every
+host until the pinned Flutter release contains the glyph-cache fix; see
+[ADR 0003](adr/0003-dual-wasm-javascript-runtime.md).

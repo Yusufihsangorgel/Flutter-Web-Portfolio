@@ -24,7 +24,7 @@ bug-bounty program or guaranteed response window.
 ## In scope
 
 - The portfolio source, build and deployment scripts, hosting headers, and
-  checked-in release bundle.
+  generated static release and its artifact provenance.
 - A reproducible path that changes public content, executes unintended code,
   bypasses browser isolation, or exposes information not present in the source
   document.

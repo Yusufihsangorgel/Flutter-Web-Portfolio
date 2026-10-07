@@ -2,19 +2,19 @@
 
 ## Status
 
-Proposed.
+Accepted.
 
 ## Context
 
-[CI](../../.github/workflows/ci.yml) builds and uploads `web-build`. [Pages deployment](../../.github/workflows/deploy.yml) builds again, while [production CD](../../.github/workflows/cd.yml) checks out the revision on a self-hosted runner and delegates building and deployment to a runner-local script. `build/web` is [currently tracked](../../build/web/index.html). These paths do not yet establish one artifact promoted unchanged to every target. The Pages mirror is served from a repository sub-path, so it builds its own variant with a different base path instead of reusing the production files. The repository is public, so running untrusted pull-request code on a production-capable self-hosted runner would expose that runner.
+[CI](../../.github/workflows/ci.yml) builds once, runs bundle, browser, runtime and container checks against that release, and uploads deterministic `web-release.tar.gz` with a SHA-256 sidecar. Its `attest` job checks the digest and records build provenance for `main` push or manual runs. Generated `build/web` output is untracked. Production delivery uses an independent pull process; the repository has no production CD workflow or self-hosted runner. [Pages deployment](../../.github/workflows/deploy.yml) checks the successful CI revision against current `main` and builds its own variant because its base path may differ.
 
 ## Decision
 
-Build and verify one release artifact on a hosted, isolated CI runner; publish its digest and provenance with the artifact. After CI succeeds for the exact source revision, an independent production pull process downloads that artifact, verifies its digest and provenance, and promotes the bytes without rebuilding. The GitHub Pages mirror stays a separate build of the same revision because it needs a different base path. Remove the self-hosted runner registered to this public repository. Stop versioning generated `build/web` output once consumers use the attested artifact.
+Build and verify one production release on a GitHub-hosted runner; publish its digest and provenance with the artifact. The independent production pull process verifies the attested artifact and promotes the image by digest without rebuilding the Flutter release. Keep deploy credentials outside CI and generated output outside Git. The GitHub Pages mirror stays a separate build of the checked source revision with its own base path.
 
 ## Consequences
 
-The release pipeline needs retention and retrieval rules, a digest verification step, and a promotion path for each deployment target. The runner-local production build, runner registration, tracked output, and checks that assume tracked output must be migrated together. The Pages variant keeps its own build. This record does not claim the current pipeline already performs those steps.
+CI retains the release artifact for 30 days and failure reports for 7 days. Only successful `main` builds receive provenance; PR builds are checked but not production-attested. The external pull process owns retrieval, provenance verification and image-digest promotion. Its live state is outside the repository's checks. The Pages variant rebuilds, so its bytes are not the attested production artifact. Exact-tree source-manifest verification guards the production image input.
 
 ## Alternatives considered
 

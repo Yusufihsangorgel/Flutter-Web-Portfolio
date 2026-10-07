@@ -22,7 +22,19 @@ This repository is the source of my portfolio at [developeryusuf.com](https://de
 
 ## Architecture
 
-One content document drives the page. The Flutter app loads it through data adapters, parses it into a strict domain model before `runApp`, and renders semantic sections from Cubit and controller state. Node tools generate the metadata, sitemap, and first-frame shell from the same document. The release is a set of static files with a Wasm build and a JavaScript fallback.
+One content document drives the page. The Flutter app loads it through data adapters, parses it into a strict domain model before `runApp`, and renders semantic sections from Cubit and controller state. Node tools generate the metadata, sitemap, first-frame shell, static semantic document, and résumé from the same document. The release is a set of static files with a Wasm build and a JavaScript fallback.
+
+The current contract is schema 11. This fragment shows the package and writing fields added in that version; it is not a complete document:
+
+```json
+{
+  "schema_version": 11,
+  "packages": [{ "featured": true, "maturity_level": 3, "category": "server" }],
+  "writing": [{ "featured": false }]
+}
+```
+
+`maturity_level` is an integer from 1 to 5. At most five packages and three writing entries may be featured. See [the content guide](docs/CUSTOMIZE.md#the-content-contract) for the remaining required fields.
 
 ```mermaid
 flowchart LR
@@ -47,22 +59,32 @@ CI runs these checks on every pull request and every push to `main`. [`ci.yml`](
 
 | Gate | Commands |
 |---|---|
-| Toolchain | `node tool/quality/verify_toolchain.mjs --current` |
+| Setup (analyze, test, build) | Checkout, pinned Node/Flutter actions, `node tool/quality/verify_toolchain.mjs --current`, `flutter pub get`; analyze/build also run `npm ci`; build runs `flutter clean` and `npx playwright install --with-deps chromium` |
 | Content and generated files | `npm run verify:content`, `npm run portfolio:validate` |
-| Tooling tests | `npm run test:template`, `npm run test:release-security`, `npm run test:release-document`, `npm run test:hosting-security`, `npm run test:refresh`, `npm run test:content` |
+| Tooling tests | `npm run test:template`, `npm run test:starter`, `npm run test:release-security`, `npm run test:release-document`, `npm run test:hosting-security`, `npm run test:refresh`, `npm run test:content`, `npm run test:resume`, `npm run test:audit`, `npm run test:tooling` |
+| Typed strings and fonts | `npm run test:strings`, `npm run verify:strings`, `npm run verify:fonts`, `npm run test:fonts` |
+| Demo work artifacts (when the renderer exists) | `npm run test:work-artifacts`, `npm run verify:work-artifacts` |
 | Hosting, community files, sources, history | `npm run verify:hosting`, `npm run verify:community`, `npm run audit:sources`, `npm run audit:history` |
-| Static checks | `npm run typecheck`, `npm run verify:source`, `dart format --output=none --set-exit-if-changed lib test tool`, `flutter analyze --fatal-infos` |
+| Static checks | `npm run typecheck`, `npm run lint`, `npm run format:check`, `npm run verify:source`, `dart format --output=none --set-exit-if-changed lib test tool`, `flutter analyze --fatal-infos` |
+| Local package checks | In `packages/adaptive_render_budget`: `flutter pub get`, `dart format --output=none --set-exit-if-changed lib test example/lib`, `flutter analyze --no-pub --fatal-infos`, `flutter test` |
+| Dart callable metrics (`Enforce shrink-only Dart metrics`) | `dart run tool/quality/dart_metrics_test.dart`, `dart run tool/quality/dart_metrics.dart --base-ref <base-sha>`; without a base revision, CI checks the current baseline |
 | Tool syntax | `bash -n tool/release/hosted_build.sh`, `node --check` on the Node tools |
-| Flutter tests | `flutter test` |
-| Release build and bundle | `npm run prepare:source`, `flutter build web --release --wasm --no-web-resources-cdn`, `npm run prepare:bundle`, `npm run verify:bundle` |
+| Flutter tests and layer coverage | `node tool/quality/test_coverage_gate.mjs`, `flutter test --coverage`, `node tool/quality/coverage_gate.mjs` (domain 99%, application 92%) |
+| Release build and bundle | `npm run verify:content`, `npm run prepare:source`, `flutter build web --release --wasm --no-web-resources-cdn`, `npm run resume:build`, `node tool/resume/check_browser_pdf.mjs`, `npm run prepare:bundle`, `npm run verify:bundle` |
+| Exact source tree (`Verify the release manifest against the exact git tree`) | `git archive HEAD` extraction and `sha256sum -c --quiet` against the release source manifest |
 | Container | `docker build --tag flutter-web-portfolio:ci .` |
 | Clean template | `npm run test:clone` |
 | Browser tests | `npm test` |
 | Runtime budgets | `npm run verify:runtime` |
 | Lighthouse (accessibility, best practices, and SEO at 0.95 or higher; performance reported) | `npm run lighthouse` |
-| Architecture layers, when `lib/` or `quality/` change | `python3 -m unittest discover -s quality/tests -p 'test_architecture.py'`, `python3 quality/check_architecture.py --warn-only` |
+| Failure reports | `Upload Playwright results` and `Upload Lighthouse reports` retain reports for 7 days |
+| Verified release (`Package verified release`) | Deterministic `tar` + `gzip -n -9`, SHA-256 sidecar, `web-release` artifact upload with 30-day retention |
+| Main-only provenance (`attest` job) | `Download verified release`, `sha256sum --check web-release.sha256`, `actions/attest-build-provenance` for `web-release.tar.gz` |
+| Architecture layers (path-filtered workflow) | `Architecture gate calibration`: `python3 -m unittest discover -s quality/tests -p 'test_architecture.py'`; `Architecture import rules`: `python3 quality/check_architecture.py` (blocking, empty baseline) |
 
 Pull requests also run code scanning, dependency review, and a Conventional Commits check on the title.
+
+The architecture workflow matches changes under `lib/`, `quality/`, its own workflow, or the architecture rules. CI's release artifact is the production pull-process input; [Pages builds a separate base-path variant](docs/DEPLOY.md#github-pages).
 
 <!-- portfolio-record:start -->
 ## Public engineering record
