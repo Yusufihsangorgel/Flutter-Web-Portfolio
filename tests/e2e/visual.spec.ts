@@ -5,7 +5,6 @@ import type {
   PortfolioTestData,
 } from '../support/portfolio_test_data';
 import {
-  installVisualMasks,
   settleCompositor,
   waitForStableCanvas,
   waitForWorkImagesPainted,
@@ -17,18 +16,6 @@ const portfolio = JSON.parse(
 const english = JSON.parse(
   readFileSync('assets/i18n/en.json', 'utf8'),
 ) as InterfaceTestData;
-
-test.skip(
-  portfolio.experience.length === 0 &&
-    portfolio.contributions.length === 0 &&
-    portfolio.systems.length === 0,
-  'demo visual baselines do not apply to an initialized empty portfolio',
-);
-
-test.skip(
-  process.platform !== 'linux',
-  'baselines are Linux-only; run `npm run test:visual:docker` on other hosts',
-);
 
 // Pin article titles so feed refreshes do not alter snapshots.
 const sampleTitles = [
@@ -44,15 +31,6 @@ const frozenWriting = Array.from({ length: 12 }, (_, index) => ({
   source: writingSources[index % Math.max(writingSources.length, 1)]?.id ?? 'blog',
   date: `2026-01-${String(28 - index).padStart(2, '0')}`,
 }));
-
-test.beforeEach(async ({ page }) => {
-  await page.emulateMedia({ reducedMotion: 'reduce' });
-  await page.route('**/content/portfolio.json*', async (route) => {
-    const response = await route.fetch();
-    const document = await response.json();
-    await route.fulfill({ response, json: { ...document, writing: frozenWriting } });
-  });
-});
 
 async function waitForHeadingInViewport(page: Page, name: string) {
   const heading = page.getByRole('heading', { name, exact: true });
@@ -298,151 +276,215 @@ async function expectVisualSnapshot(page: Page, name: string) {
     .toBe(true);
   await waitForWorkImagesPainted(page);
   await settleCompositor(page, 2);
-  await expect(page).toHaveScreenshot(name, {
-    mask: await installVisualMasks(page),
-  });
+  await waitForStableCanvas(page);
+  await expect(page).toHaveScreenshot(name);
 }
 
-test('keeps the first meaningful paint visually aligned with the portfolio', async ({
-  page,
-}) => {
-  await page.route('**/flutter_bootstrap.js*', (route) =>
-    route.fulfill({
-      body: '',
-      contentType: 'application/javascript',
-      status: 200,
-    }),
-  );
+function capturePage(screenshot: Page['screenshot']): Page {
+  return {
+    evaluate: async () => undefined,
+    screenshot,
+  } as unknown as Page;
+}
 
-  await page.goto('/', { waitUntil: 'domcontentloaded' });
-  await expect(page.locator('#bootstrap-surface')).toBeVisible();
-  await settleCompositor(page);
-  await expectVisualSnapshot(page, 'critical-shell.png');
-});
-
-test('preserves the editorial sequence across responsive viewports', async ({
-  page,
-}) => {
-  await openStaticPortfolio(page);
-  await expect(
-    page.getByRole('button', {
-      name: english.home_section.view_work,
-      exact: true,
-    }),
-  ).toBeVisible();
-  if ((page.viewportSize()?.width ?? 0) >= 900) {
-    await expect(
-      page.getByText(`${portfolio.profile.since} →`, { exact: true }).first(),
-    ).toBeVisible();
-  }
-  await expectVisualSnapshot(page, 'hero.png');
-
-  await openChapter(page, 'Go to Open Source', /#\/proof$/, 'Open Source');
-  await expectVisualSnapshot(page, 'open-source.png');
-  await scrollToVisualHeading(page, 'First Frame Lab');
-  await expectVisualSnapshot(page, 'first-frame-lab.png');
-
-  await openChapter(
-    page,
-    'Go to Work',
-    /#\/projects$/,
-    'Selected Work',
-  );
-  await expectVisualSnapshot(page, 'systems.png');
-
-  const firstSupporting = portfolio.systems.find(
-    (system) => !system.featured,
-  );
-  if (!firstSupporting) throw new Error('Expected supporting work.');
-  await scrollToVisualHeading(page, firstSupporting.name);
-  await expectVisualSnapshot(page, 'archive.png');
-});
-
-test('connects chapters during real document scrolling', async ({ page }) => {
-  await openStaticPortfolio(page);
-
-  await scrollToChapterBoundary(page, 'Experience');
-  await expectVisualSnapshot(page, 'boundary-experience.png');
-
-  await scrollToChapterBoundary(page, 'About');
-  await expectVisualSnapshot(page, 'boundary-about.png');
-});
-
-test('keeps one content-anchored signal with reduced motion', async ({
-  page,
-}) => {
-  await openStaticPortfolio(page);
-
-  await scrollToChapterBoundary(page, 'Experience');
-  await expectVisualSnapshot(page, 'narrative-stage-experience.png');
-
-  const primaryCase = portfolio.systems.find((system) => system.featured);
-  if (!primaryCase) throw new Error('Expected a primary professional case.');
-  const heading = page.getByRole('heading', {
-    name: primaryCase.name,
-    exact: true,
-  });
-  await scrollUntilHeadingRenders(page, heading, primaryCase.name, 600);
-  await expect(heading).toBeVisible();
-  for (let attempt = 0; attempt < 24; attempt += 1) {
-    const [box, viewportHeight] = await Promise.all([
-      heading.boundingBox(),
-      page.evaluate(() => window.innerHeight),
-    ]);
-    if (box && Math.abs(box.y - viewportHeight * 0.2) <= 2) break;
-    await page.mouse.wheel(
-      0,
-      box ? box.y - viewportHeight * 0.2 : viewportHeight * 0.5,
-    );
-    await settleCompositor(page, 3);
-  }
-  await settleCompositor(page, 8);
-  await expectVisualSnapshot(page, 'narrative-stage-work.png');
-});
-
-test('renders a real supporting-work artifact in the atlas', async (
-  { page },
-  testInfo,
-) => {
-  await openStaticPortfolio(page);
-  await openChapter(page, 'Go to Work', /#\/projects$/, 'Selected Work');
-  const supporting = portfolio.systems.filter((system) => !system.featured);
-  const mobile = testInfo.project.name === 'mobile';
-  const selected = mobile
-    ? supporting[0]
-    : supporting.find(
-        (system) => system.artifact.width > system.artifact.height,
-      );
-  if (!selected) throw new Error('Expected a landscape supporting artifact.');
-  let selector = await scrollToVisualText(page, selected.name);
-  if (mobile) {
-    await page
-      .getByRole('button', {
-        name: `${english.projects_section.select_evidence}: ${selected.name}`,
-        exact: true,
-      })
-      .click();
-    const selectedHeading = page.getByRole('heading', {
-      name: selected.name,
-      exact: true,
-      level: 4,
+test.describe('capture stability', () => {
+  test('observes changes at both viewport edges', async () => {
+    const frames = ['left edge', 'left edge', 'right edge'];
+    let captures = 0;
+    const page = capturePage(async (options) => {
+      const frame = frames[captures] ?? 'right edge';
+      captures += 1;
+      return Buffer.from(options?.mask?.length ? 'hidden edges' : frame);
     });
-    selector = selectedHeading;
-  }
-  for (let attempt = 0; attempt < 24; attempt += 1) {
-    const box = await selector.boundingBox();
-    if (box && Math.abs(box.y - 120) <= 1) break;
-    await page.mouse.wheel(0, box ? box.y - 120 : 360);
-    await settleCompositor(page, 3);
-  }
-  const compactViewport = (page.viewportSize()?.width ?? 0) < 900;
-  const expectedArtifact =
-    compactViewport && selected.artifact.compact
-      ? selected.artifact.compact
-      : selected.artifact;
-  const artifact = page.getByRole('img', { name: expectedArtifact.alt });
-  await expect(artifact).toBeAttached();
-  await settleCompositor(page, 8);
-  await waitForStableCanvas(page);
-  await expectVisualSnapshot(page, 'archive-selected.png');
+
+    await waitForStableCanvas(page);
+
+    expect(captures).toBe(6);
+  });
+
+  test('observes the complete viewport beyond the scrollbar fade window', async () => {
+    const timestamps: number[] = [];
+    const captures: Array<Parameters<Page['screenshot']>[0]> = [];
+    const page = capturePage(async (options) => {
+      captures.push(options);
+      timestamps.push(performance.now());
+      return Buffer.from('stable viewport');
+    });
+
+    await waitForStableCanvas(page);
+
+    for (const options of captures) {
+      expect(options?.mask).toBeUndefined();
+      expect(options?.clip).toBeUndefined();
+      expect(options?.fullPage).toBeUndefined();
+    }
+    expect(timestamps).toHaveLength(4);
+    expect(timestamps[3] - timestamps[0]).toBeGreaterThanOrEqual(1000);
+  });
+});
+
+test.describe('portfolio visual snapshots', () => {
+  test.skip(
+    portfolio.experience.length === 0 &&
+      portfolio.contributions.length === 0 &&
+      portfolio.systems.length === 0,
+    'demo visual baselines do not apply to an initialized empty portfolio',
+  );
+
+  test.skip(
+    process.platform !== 'linux',
+    'baselines are Linux-only; run `npm run test:visual:docker` on other hosts',
+  );
+
+  test.beforeEach(async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.route('**/content/portfolio.json*', async (route) => {
+      const response = await route.fetch();
+      const document = await response.json();
+      await route.fulfill({ response, json: { ...document, writing: frozenWriting } });
+    });
+  });
+
+  test('keeps the first meaningful paint visually aligned with the portfolio', async ({
+    page,
+  }) => {
+    await page.route('**/flutter_bootstrap.js*', (route) =>
+      route.fulfill({
+        body: '',
+        contentType: 'application/javascript',
+        status: 200,
+      }),
+    );
+
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
+    await expect(page.locator('#bootstrap-surface')).toBeVisible();
+    await settleCompositor(page);
+    await expectVisualSnapshot(page, 'critical-shell.png');
+  });
+
+  test('preserves the editorial sequence across responsive viewports', async ({
+    page,
+  }) => {
+    await openStaticPortfolio(page);
+    await expect(
+      page.getByRole('button', {
+        name: english.home_section.view_work,
+        exact: true,
+      }),
+    ).toBeVisible();
+    if ((page.viewportSize()?.width ?? 0) >= 900) {
+      await expect(
+        page.getByText(`${portfolio.profile.since} →`, { exact: true }).first(),
+      ).toBeVisible();
+    }
+    await expectVisualSnapshot(page, 'hero.png');
+
+    await openChapter(page, 'Go to Open Source', /#\/proof$/, 'Open Source');
+    await expectVisualSnapshot(page, 'open-source.png');
+    await scrollToVisualHeading(page, 'First Frame Lab');
+    await expectVisualSnapshot(page, 'first-frame-lab.png');
+
+    await openChapter(
+      page,
+      'Go to Work',
+      /#\/projects$/,
+      'Selected Work',
+    );
+    await expectVisualSnapshot(page, 'systems.png');
+
+    const firstSupporting = portfolio.systems.find(
+      (system) => !system.featured,
+    );
+    if (!firstSupporting) throw new Error('Expected supporting work.');
+    await scrollToVisualHeading(page, firstSupporting.name);
+    await expectVisualSnapshot(page, 'archive.png');
+  });
+
+  test('connects chapters during real document scrolling', async ({ page }) => {
+    await openStaticPortfolio(page);
+
+    await scrollToChapterBoundary(page, 'Experience');
+    await expectVisualSnapshot(page, 'boundary-experience.png');
+
+    await scrollToChapterBoundary(page, 'About');
+    await expectVisualSnapshot(page, 'boundary-about.png');
+  });
+
+  test('keeps one content-anchored signal with reduced motion', async ({
+    page,
+  }) => {
+    await openStaticPortfolio(page);
+
+    await scrollToChapterBoundary(page, 'Experience');
+    await expectVisualSnapshot(page, 'narrative-stage-experience.png');
+
+    const primaryCase = portfolio.systems.find((system) => system.featured);
+    if (!primaryCase) throw new Error('Expected a primary professional case.');
+    const heading = page.getByRole('heading', {
+      name: primaryCase.name,
+      exact: true,
+    });
+    await scrollUntilHeadingRenders(page, heading, primaryCase.name, 600);
+    await expect(heading).toBeVisible();
+    for (let attempt = 0; attempt < 24; attempt += 1) {
+      const [box, viewportHeight] = await Promise.all([
+        heading.boundingBox(),
+        page.evaluate(() => window.innerHeight),
+      ]);
+      if (box && Math.abs(box.y - viewportHeight * 0.2) <= 2) break;
+      await page.mouse.wheel(
+        0,
+        box ? box.y - viewportHeight * 0.2 : viewportHeight * 0.5,
+      );
+      await settleCompositor(page, 3);
+    }
+    await settleCompositor(page, 8);
+    await expectVisualSnapshot(page, 'narrative-stage-work.png');
+  });
+
+  test('renders a real supporting-work artifact in the atlas', async (
+    { page },
+    testInfo,
+  ) => {
+    await openStaticPortfolio(page);
+    await openChapter(page, 'Go to Work', /#\/projects$/, 'Selected Work');
+    const supporting = portfolio.systems.filter((system) => !system.featured);
+    const mobile = testInfo.project.name === 'mobile';
+    const selected = mobile
+      ? supporting[0]
+      : supporting.find(
+          (system) => system.artifact.width > system.artifact.height,
+        );
+    if (!selected) throw new Error('Expected a landscape supporting artifact.');
+    let selector = await scrollToVisualText(page, selected.name);
+    if (mobile) {
+      await page
+        .getByRole('button', {
+          name: `${english.projects_section.select_evidence}: ${selected.name}`,
+          exact: true,
+        })
+        .click();
+      const selectedHeading = page.getByRole('heading', {
+        name: selected.name,
+        exact: true,
+        level: 4,
+      });
+      selector = selectedHeading;
+    }
+    for (let attempt = 0; attempt < 24; attempt += 1) {
+      const box = await selector.boundingBox();
+      if (box && Math.abs(box.y - 120) <= 1) break;
+      await page.mouse.wheel(0, box ? box.y - 120 : 360);
+      await settleCompositor(page, 3);
+    }
+    const compactViewport = (page.viewportSize()?.width ?? 0) < 900;
+    const expectedArtifact =
+      compactViewport && selected.artifact.compact
+        ? selected.artifact.compact
+        : selected.artifact;
+    const artifact = page.getByRole('img', { name: expectedArtifact.alt });
+    await expect(artifact).toBeAttached();
+    await settleCompositor(page, 8);
+    await expectVisualSnapshot(page, 'archive-selected.png');
+  });
 });
