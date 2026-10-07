@@ -113,24 +113,22 @@ async function verifyCriticalShell(root, index, portfolio) {
   const issues = [];
   issues.push(...checkShellStructure(index));
   const bootstrap = await readFile(path.join(root, 'flutter_bootstrap.js'), 'utf8');
-  const releaseId = bootstrap.match(/"mainWasmPath":"main\.dart\.wasm\?v=([0-9a-f]{16})"/)?.[1];
-  const engine = bootstrap.match(/"engineRevision":"([0-9a-f]{40})"/)?.[1];
-  for (const hint of [
-    `href="main.dart.wasm?v=${releaseId}"`,
-    `href="main.dart.mjs?v=${releaseId}"`,
-    `href="canvaskit/${engine}/skwasm.wasm"`,
-  ])
-    if (!index.includes(hint)) issues.push(`critical preload is missing: ${hint}`);
-  if ((index.match(/<!-- release-preloads:start -->/g) ?? []).length !== 1) {
-    issues.push('release preload markers are missing');
-  }
-  issues.push(...checkShellCopy(index, portfolio));
+  issues.push(...verifyCriticalPreloads(index, bootstrap));
+  const shell =
+    index.match(/<!-- bootstrap-content:start -->([\s\S]*?)<!-- bootstrap-content:end -->/)?.[1] ??
+    '';
+  issues.push(...checkShellCopy(shell, portfolio));
   const localeScript = await readFile(path.join(root, 'bootstrap_locale.js'), 'utf8');
   const data = await readFile(path.join(root, 'bootstrap_locales.js'), 'utf8');
   const locales = JSON.parse(
     data.match(/^window\.__portfolioBootstrapLocales = ([\s\S]*);\s*$/)?.[1] ?? 'null',
   );
-  if (!locales || !localeScript.includes("localStorage.getItem('flutter.selected_language')")) {
+  const localeSteps = [
+    "localStorage.getItem('flutter.selected_language')",
+    'decoded = JSON.parse(stored)',
+    'document.documentElement.dir = locale.direction',
+  ];
+  if (!locales || !localeSteps.every((step) => localeScript.includes(step))) {
     issues.push('critical shell locale selection is missing');
     return issues;
   }
@@ -142,36 +140,150 @@ async function verifyCriticalShell(root, index, portfolio) {
   return issues;
 }
 
+function verifyCriticalPreloads(index, bootstrap) {
+  const issues = [];
+  const releaseId = bootstrap.match(/"mainWasmPath":"main\.dart\.wasm\?v=([0-9a-f]{16})"/)?.[1];
+  const engine = bootstrap.match(/"engineRevision":"([0-9a-f]{40})"/)?.[1];
+  if (!releaseId || !engine) issues.push('critical preload identifiers cannot be derived');
+  else {
+    const hints = [
+      `rel="preload" href="main.dart.wasm?v=${releaseId}" as="fetch" type="application/wasm" crossorigin fetchpriority="high"`,
+      `rel="modulepreload" href="main.dart.mjs?v=${releaseId}" crossorigin fetchpriority="high"`,
+      `rel="preload" href="canvaskit/${engine}/skwasm.wasm" as="fetch" type="application/wasm" crossorigin fetchpriority="high"`,
+    ];
+    for (const hint of hints) {
+      if (!index.includes(hint)) issues.push(`critical preload is missing: ${hint}`);
+    }
+  }
+  if ((index.match(/<!-- release-preloads:start -->/g) ?? []).length !== 1) {
+    issues.push('release preload markers are missing');
+  }
+  return issues;
+}
+
 async function verifyLocale(root, locale, english, generated) {
-  const portfolio =
-    english ??
-    JSON.parse(
-      await readFile(
-        path.join(root, 'assets', 'assets', 'content', 'locales', `${locale}.json`),
-        'utf8',
-      ),
-    );
-  const translations = JSON.parse(
-    await readFile(path.join(root, 'assets', 'assets', 'i18n', `${locale}.json`), 'utf8'),
-  );
-  const expected = [
-    portfolio.profile?.role,
-    portfolio.profile?.location,
-    portfolio.profile?.headline,
-    translations.accessibility?.loading_portfolio,
-    translations.accessibility?.load_failure,
-    translations.accessibility?.retry,
-  ];
+  const portfolio = await loadLocalePortfolio(root, locale, english);
+  const translations = await loadLocaleTranslations(root, locale);
+  const expected = collectExpectedCopy(portfolio, translations);
   if (
-    !generated ||
-    expected.some(
-      (value) =>
-        typeof value !== 'string' || !JSON.stringify(generated).includes(escapeHtml(value)),
-    )
+    !isValidTitle(portfolio, generated) ||
+    !isValidCopy(translations, generated) ||
+    !hasValidMarkup(expected, generated)
   ) {
     return [`critical shell is missing ${locale} locale content`];
   }
   return [];
+}
+
+/**
+ * @param {string} root
+ * @param {string} locale
+ * @param {any} english
+ * @returns {Promise<any>}
+ */
+async function loadLocalePortfolio(root, locale, english) {
+  if (english) return english;
+  return JSON.parse(
+    await readFile(
+      path.join(root, 'assets', 'assets', 'content', 'locales', `${locale}.json`),
+      'utf8',
+    ),
+  );
+}
+
+/**
+ * @param {string} root
+ * @param {string} locale
+ * @returns {Promise<any>}
+ */
+async function loadLocaleTranslations(root, locale) {
+  return JSON.parse(
+    await readFile(path.join(root, 'assets', 'assets', 'i18n', `${locale}.json`), 'utf8'),
+  );
+}
+
+/**
+ * @param {any} portfolio
+ * @param {any} translations
+ * @returns {Array<string | undefined>}
+ */
+function collectExpectedCopy(portfolio, translations) {
+  const home = translations.home_section;
+  const expected = [
+    portfolio.profile?.role,
+    portfolio.profile?.location,
+    portfolio.profile?.headline,
+    portfolio.profile?.focus?.[0],
+    home?.based_in,
+    home?.working_since,
+    home?.focus,
+  ];
+  pushConditionalCopy(portfolio, home, expected);
+  return expected;
+}
+
+/**
+ * @param {any} portfolio
+ * @param {any} home
+ * @param {Array<string | undefined>} expected
+ * @returns {void}
+ */
+function pushConditionalCopy(portfolio, home, expected) {
+  if (hasWorkSystems(portfolio)) expected.push(home?.view_work);
+  if (hasContactEmail(portfolio)) expected.push(home?.email);
+}
+
+/**
+ * @param {any} portfolio
+ * @returns {boolean}
+ */
+function hasWorkSystems(portfolio) {
+  return (portfolio.systems?.length ?? 0) > 0;
+}
+
+/**
+ * @param {any} portfolio
+ * @returns {boolean}
+ */
+function hasContactEmail(portfolio) {
+  return typeof portfolio.profile?.email === 'string' && portfolio.profile.email.includes('@');
+}
+
+/**
+ * @param {any} translations
+ * @param {any} generated
+ * @returns {boolean}
+ */
+function isValidCopy(translations, generated) {
+  const copyFields = [
+    ['loadingPortfolio', 'loading_portfolio'],
+    ['loadFailure', 'load_failure'],
+    ['retry', 'retry'],
+  ];
+  return copyFields.every(([key, field]) => {
+    const value = translations.accessibility?.[field];
+    return typeof value === 'string' && generated?.copy?.[key] === value;
+  });
+}
+
+/**
+ * @param {any} portfolio
+ * @param {any} generated
+ * @returns {boolean}
+ */
+function isValidTitle(portfolio, generated) {
+  return typeof portfolio.site?.title === 'string' && generated?.title === portfolio.site.title;
+}
+
+/**
+ * @param {Array<string | undefined>} expected
+ * @param {any} generated
+ * @returns {boolean}
+ */
+function hasValidMarkup(expected, generated) {
+  return expected.every(
+    (value) => typeof value === 'string' && generated?.markup?.includes(escapeHtml(value)),
+  );
 }
 
 function decodeAttribute(value) {
@@ -235,16 +347,19 @@ function checkShellStructure(index) {
   return issues;
 }
 
-function checkShellCopy(index, portfolio) {
+function checkShellCopy(shell, portfolio) {
   const issues = [];
   for (const value of [
     portfolio.content_version,
-    portfolio.profile?.name,
     portfolio.profile?.role,
     portfolio.profile?.headline,
     portfolio.profile?.location,
+    portfolio.profile?.since,
+    portfolio.profile?.focus?.[0],
+    portfolio.profile?.display_name?.primary,
+    portfolio.profile?.display_name?.accent,
   ]) {
-    if (typeof value !== 'string' || !index.includes(escapeHtml(value))) {
+    if (typeof value !== 'string' || !shell.includes(escapeHtml(value))) {
       issues.push('critical shell is stale');
       break;
     }
