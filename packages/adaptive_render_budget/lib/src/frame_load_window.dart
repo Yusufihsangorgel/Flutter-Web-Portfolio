@@ -1,12 +1,12 @@
 import 'dart:math' as math;
 
+import 'package:adaptive_render_budget/src/frame_timing_sample.dart';
 import 'package:flutter/foundation.dart';
-
-import 'frame_timing_sample.dart';
 
 /// A read-only summary of normalized load samples.
 @immutable
 final class FrameLoadStatistics {
+  /// Creates a summary of the samples in a frame-load window.
   const FrameLoadStatistics({
     required this.sampleCount,
     required this.mean,
@@ -40,27 +40,24 @@ final class FrameLoadStatistics {
   final double overloadedFraction;
 
   @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        other is FrameLoadStatistics &&
-            sampleCount == other.sampleCount &&
-            mean == other.mean &&
-            p95 == other.p95 &&
-            maximum == other.maximum &&
-            overloadedFraction == other.overloadedFraction;
-  }
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is FrameLoadStatistics &&
+          sampleCount == other.sampleCount &&
+          mean == other.mean &&
+          p95 == other.p95 &&
+          maximum == other.maximum &&
+          overloadedFraction == other.overloadedFraction;
 
   @override
-  int get hashCode {
-    return Object.hash(sampleCount, mean, p95, maximum, overloadedFraction);
-  }
+  int get hashCode =>
+      Object.hash(sampleCount, mean, p95, maximum, overloadedFraction);
 
   @override
-  String toString() {
-    return 'FrameLoadStatistics('
-        'samples: $sampleCount, mean: $mean, p95: $p95, '
-        'maximum: $maximum, overloaded: $overloadedFraction)';
-  }
+  String toString() =>
+      'FrameLoadStatistics('
+      'samples: $sampleCount, mean: $mean, p95: $p95, '
+      'maximum: $maximum, overloaded: $overloadedFraction)';
 }
 
 /// A fixed-capacity rolling window of refresh-rate-normalized frame load.
@@ -69,6 +66,7 @@ final class FrameLoadStatistics {
 /// one full display interval. The same 8 ms frame therefore has a load near
 /// `0.48` at 60 Hz and `0.96` at 120 Hz.
 final class FrameLoadWindow {
+  /// Creates a rolling sample window with [capacity] slots.
   FrameLoadWindow({required int capacity})
     : capacity = _validatedCapacity(capacity),
       _loads = Float64List(_validatedCapacity(capacity));

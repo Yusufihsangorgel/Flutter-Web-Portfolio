@@ -6,6 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_web_portfolio/app/controllers/scene_director.dart';
 import 'package:flutter_web_portfolio/app/controllers/scroll_controller.dart';
 import 'package:flutter_web_portfolio/app/core/logging/app_logger.dart';
+import 'package:flutter_web_portfolio/app/core/theme/locale_font_loader.dart';
 import 'package:flutter_web_portfolio/app/data/dto/portfolio_document_mapper.dart';
 import 'package:flutter_web_portfolio/app/data/providers/bundle_asset_loader.dart';
 import 'package:flutter_web_portfolio/app/data/providers/preference_store.dart';
@@ -24,6 +25,7 @@ final class AppDependencies {
     required this.scrollController,
     required this.sceneDirector,
     required this.renderQualityController,
+    required this.localeFontLoader,
   });
 
   final LanguageCubit languageCubit;
@@ -32,6 +34,7 @@ final class AppDependencies {
   final AppScrollController scrollController;
   final SceneDirector sceneDirector;
   final RenderQualityController renderQualityController;
+  final LocaleFontLoader localeFontLoader;
 
   static Future<AppDependencies> bootstrap({required AppLogger logger}) async {
     final assetLoader = BundleAssetLoader(logger: logger);
@@ -45,8 +48,10 @@ final class AppDependencies {
       preferenceStore: preferenceStore,
       supportedLanguages: portfolio.supportedLocales,
     );
+    final localeFontLoader = AssetLocaleFontLoader(logger: logger);
     final languageCubit = LanguageCubit(
       languageRepository: languageRepository,
+      fontLoader: localeFontLoader,
       validateTranslations: (translations) {
         final localization = switch (translations['portfolio_content']) {
           final Map<String, dynamic> value => value,
@@ -72,6 +77,7 @@ final class AppDependencies {
       scrollController: scrollController,
       sceneDirector: sceneDirector,
       renderQualityController: renderQualityController,
+      localeFontLoader: localeFontLoader,
     );
   }
 

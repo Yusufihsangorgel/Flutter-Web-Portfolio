@@ -1,6 +1,7 @@
 /// Adaptive render-quality control driven by normalized Flutter frame timings.
 library;
 
+export 'src/adaptive_render_budget_config.dart';
 export 'src/adaptive_render_budget_controller.dart';
 export 'src/adaptive_render_budget_policy.dart';
 export 'src/adaptive_render_budget_state.dart';
