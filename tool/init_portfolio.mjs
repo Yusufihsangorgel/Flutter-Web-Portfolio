@@ -255,7 +255,7 @@ function createPortfolioDocument(answers) {
   const primaryLabel = answers.github ? 'GitHub' : 'Website';
 
   return {
-    schema_version: 10,
+    schema_version: 11,
     content_version: contentVersion,
     verified_at: today,
     site: {
