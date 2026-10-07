@@ -217,6 +217,15 @@ expect(
     ),
   "Nginx merges security headers with stable-asset revalidation and immutable revisioned renderer caching",
 );
+const nginxImageRules = [...nginx.matchAll(/location ~\* (\^\/assets\/\.\*)?\\\.\(([^)]*)\)\$ \{\s*([^}]*)\}/g)]
+  .filter(([, , extensions]) => extensions.split("|").includes("png"));
+expect(
+  nginxImageRules.length === 2 &&
+    nginxImageRules.every(([, , extensions]) => extensions.split("|").includes("webp")) &&
+    nginxImageRules.some(([, assets, , body]) => assets && body.includes("must-revalidate")) &&
+    nginxImageRules.some(([, assets, , body]) => !assets && body.includes("expires 1y;")),
+  "Nginx treats WebP like the other images: revalidated under /assets/ and cached for a year elsewhere",
+);
 
 const cspValues = [
   headers.match(/^  Content-Security-Policy: (.+)$/m)?.[1],
