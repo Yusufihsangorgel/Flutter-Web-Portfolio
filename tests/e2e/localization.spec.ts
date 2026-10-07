@@ -1,4 +1,4 @@
-import { expect, Locator, Page, test } from "@playwright/test";
+import { expect, Locator, Page, test } from "./helpers/test_setup";
 import { readFileSync } from "node:fs";
 import {
   scrollAndSettle,

@@ -132,6 +132,10 @@ const engineConfig = {
     'assets/fallback_fonts/',
     document.baseURI,
   ).toString(),
+  // Multi-threaded Skwasm in this Flutter release shares its glyph cache
+  // between the page and the raster worker; concurrent text layout and raster
+  // can wedge both threads and freeze the page behind the loading surface.
+  forceSingleThreadedSkwasm: true,
 };
 
 _flutter.loader.load({

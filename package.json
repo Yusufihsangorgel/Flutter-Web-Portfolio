@@ -21,7 +21,7 @@
     "refresh:data": "node tool/refresh/refresh_portfolio_data.mjs",
     "build:release": "node tool/release/build_portfolio.mjs",
     "deploy": "node tool/release/deploy_portfolio.mjs",
-    "test": "playwright test",
+    "test": "node --experimental-vm-modules --test tests/support/semantics_scroll.test.mjs && playwright test",
     "test:e2e": "playwright test",
     "test:e2e:prod": "playwright test --config playwright.prod.config.ts",
     "typecheck": "tsc --noEmit && tsc --project tsconfig.tools.json",

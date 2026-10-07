@@ -28,6 +28,7 @@ jobs:
       - run: npm run verify:content
       - run: npm run prepare:source
       - run: flutter build web --release --wasm --no-web-resources-cdn
+      - run: npm run resume:build
       - run: npm run prepare:bundle
       - run: npm run verify:bundle
       - run: npx playwright test tests/e2e/visual.spec.ts --update-snapshots=all

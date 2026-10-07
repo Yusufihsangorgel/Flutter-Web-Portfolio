@@ -33,6 +33,7 @@ callables and shrink the matching entries in its next focused refactor.
 |---|---|---|
 | [Artifact promotion](adr/0004-build-once-promote-artifact.md) | `build/web` is tracked; CI, Pages, and production do not promote one attested artifact; production CD uses a repository-registered self-hosted runner. | Verify one hosted build, publish digest/provenance, move production to an independent pull process, remove runner registration, then stop tracking generated output. |
 | [Locale fonts](adr/0006-locales-and-font-loading.md) | Full Latin and script font files are bundled; shell preloads selected script fonts. | Subset Latin fonts and demand-load locale fonts with glyph and visual coverage. |
+| [Single-threaded Skwasm](adr/0003-dual-wasm-javascript-runtime.md) | `forceSingleThreadedSkwasm: true` in `web/flutter_bootstrap.js` avoids the Flutter 3.47.5 glyph-cache freeze (flutter/flutter#190039, 4 of 22 CI runs); measured cost is 81 ms reveal on Metal GPU and 3363 ms long tasks with 34.37 reveal intervals on software GL, with budgets at 42, 7.8 and 7300 ms (CI runner). | Remove the flag, restore intervals 3, ratio 2.25 and long 500 ms, and rerun the reload spec 50 times once the pinned stable includes flutter/flutter#190048. |
 
 ## Tooling consolidation
 

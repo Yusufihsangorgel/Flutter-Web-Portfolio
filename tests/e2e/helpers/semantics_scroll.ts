@@ -1,86 +1,28 @@
-import { expect, Locator, Page } from "@playwright/test";
+import type { Locator, Page } from "@playwright/test";
+import { waitForSemanticsSettled } from "./frame_waits";
 
-const SETTLED_FRAMES = 6;
-const MAX_FRAMES_FOR_CHANGE = 60;
-const SETTLE_TIMEOUT_MS = 15000;
-const MAX_SCROLL_ATTEMPTS = 80;
+export { waitForFrames, waitForSemanticsSettled } from "./frame_waits";
 
-export async function waitForFrames(page: Page, count = 1) {
-  return page.evaluate(
-    (frames) =>
-      new Promise<number>((resolve) => {
-        let remaining = frames;
-        const next = (timestamp: number) => {
-          remaining -= 1;
-          if (remaining <= 0) resolve(timestamp);
-          else requestAnimationFrame(next);
-        };
-        requestAnimationFrame(next);
-      }),
-    count,
-  );
-}
-
-// Wait for stable semantics geometry after a possible scroll change.
-export async function waitForSemanticsSettled(page: Page, changedFrom = "") {
-  return page.evaluate(
-    ({ changedFrom, stableFrames, maxFramesForChange, timeoutMs }) =>
-      new Promise<string>((resolve, reject) => {
-        const geometry = () => {
-          const nodes = document.querySelectorAll("flt-semantics-host *");
-          if (nodes.length === 0) return "";
-          let hash = nodes.length;
-          for (const node of nodes) {
-            hash =
-              (hash * 31 + Math.round(node.getBoundingClientRect().top)) | 0;
-          }
-          return String(hash);
-        };
-        const started = performance.now();
-        let frames = 0;
-        let previous = "";
-        let stable = 0;
-        const tick = () => {
-          frames += 1;
-          const current = geometry();
-          const waitingForChange =
-            current === changedFrom && frames < maxFramesForChange;
-          stable =
-            current !== "" && current === previous && !waitingForChange
-              ? stable + 1
-              : 0;
-          previous = current;
-          if (stable >= stableFrames) return resolve(current);
-          if (performance.now() - started > timeoutMs) {
-            return reject(new Error("The semantics tree did not settle."));
-          }
-          requestAnimationFrame(tick);
-        };
-        requestAnimationFrame(tick);
-      }),
-    {
-      changedFrom,
-      stableFrames: SETTLED_FRAMES,
-      maxFramesForChange: MAX_FRAMES_FOR_CHANGE,
-      timeoutMs: SETTLE_TIMEOUT_MS,
-    },
-  );
-}
+const MAX_SCROLL_ATTEMPTS = 48;
+const MAX_POSITION_ATTEMPTS = 8;
 
 export async function scrollAndSettle(page: Page, distance: number) {
   const before = await waitForSemanticsSettled(page);
-  await page.mouse.wheel(0, distance);
+  const pixelRatio = await page.evaluate(() => window.devicePixelRatio);
+  // Emulated Chromium divides wheel deltas by the pixel ratio and Flutter divides them again.
+  await page.mouse.wheel(0, distance * pixelRatio * pixelRatio);
   const after = await waitForSemanticsSettled(page, before);
   return after !== before;
 }
 
-async function isInViewport(page: Page, locator: Locator) {
-  if ((await locator.count()) === 0) return false;
+async function readGeometry(page: Page, locator: Locator) {
   const [box, viewportHeight] = await Promise.all([
-    locator.first().boundingBox(),
+    (await locator.count()) > 0
+      ? locator.first().boundingBox({ timeout: 1000 })
+      : null,
     page.evaluate(() => window.innerHeight),
   ]);
-  return Boolean(box && box.y < viewportHeight && box.y + box.height > 0);
+  return { box, viewportHeight };
 }
 
 export async function scrollToLocator(
@@ -89,12 +31,46 @@ export async function scrollToLocator(
   step = 420,
 ) {
   await waitForSemanticsSettled(page);
-  for (let attempt = 0; attempt < MAX_SCROLL_ATTEMPTS; attempt += 1) {
-    if (await isInViewport(page, locator)) return locator.first();
-    await scrollAndSettle(page, step);
+  let geometry: Awaited<ReturnType<typeof readGeometry>> | undefined;
+  for (let attempt = 0; attempt <= MAX_SCROLL_ATTEMPTS; attempt += 1) {
+    geometry = await readGeometry(page, locator);
+    const { box, viewportHeight } = geometry;
+    if (box && box.height > 0 && box.y < viewportHeight && box.y + box.height > 0) {
+      return locator.first();
+    }
+    if (attempt === MAX_SCROLL_ATTEMPTS) break;
+    const discovery = Math.min(
+      Math.max(step, viewportHeight * 0.8), viewportHeight * 0.9,
+    );
+    const distance = box && box.height > 0 ? box.y - viewportHeight / 2 : discovery;
+    await scrollAndSettle(page, distance).catch((cause: unknown) => {
+      throw new Error(`Wheel ${attempt + 1} failed for ${locator}; ` +
+        `last geometry: ${JSON.stringify(geometry)}.`, { cause });
+    });
   }
-  await expect(locator.first()).toBeVisible();
-  return locator.first();
+  throw new Error(`Target did not enter the viewport after ${MAX_SCROLL_ATTEMPTS} wheels: ` +
+    `${locator}; last geometry: ${JSON.stringify(geometry)}.`);
+}
+
+export async function scrollToPosition(
+  page: Page,
+  locator: Locator,
+  options: { targetY: number; tolerance?: number },
+) {
+  await scrollToLocator(page, locator);
+  let geometry: Awaited<ReturnType<typeof readGeometry>> | undefined;
+  for (let attempt = 0; attempt <= MAX_POSITION_ATTEMPTS; attempt += 1) {
+    geometry = await readGeometry(page, locator);
+    const delta = geometry.box ? geometry.box.y - options.targetY : null;
+    if (delta !== null && Math.abs(delta) <= (options.tolerance ?? 1)) return;
+    if (attempt === MAX_POSITION_ATTEMPTS || delta === null) break;
+    await scrollAndSettle(page, delta).catch((cause: unknown) => {
+      throw new Error(`Correction ${attempt + 1} failed for ${locator} at y=${options.targetY}; ` +
+        `remaining=${delta}; last geometry: ${JSON.stringify(geometry)}.`, { cause });
+    });
+  }
+  throw new Error(`Target did not reach y=${options.targetY} after ${MAX_POSITION_ATTEMPTS} corrections: ` +
+    `${locator}; last geometry: ${JSON.stringify(geometry)}.`);
 }
 
 export async function scrollToHeading(page: Page, name: string) {
