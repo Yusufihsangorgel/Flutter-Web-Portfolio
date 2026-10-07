@@ -1,10 +1,7 @@
-import 'package:flutter/foundation.dart';
-
 /// Visual fidelity tiers for the restrained ambient background.
 ///
-/// Every tier preserves the same content, section geometry, and semantics. Only
-/// decorative work changes, so adaptation never changes the information
-/// architecture of the portfolio.
+/// Every tier preserves the same content, section geometry, and semantics;
+/// only decorative work changes.
 enum RenderQuality {
   essential(
     RenderQualityProfile(
@@ -45,7 +42,6 @@ enum RenderQuality {
   };
 }
 
-@immutable
 final class RenderQualityProfile {
   const RenderQualityProfile({
     required this.drawAmbientField,
@@ -56,4 +52,15 @@ final class RenderQualityProfile {
   final bool drawAmbientField;
   final bool drawGrain;
   final bool trackPointer;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is RenderQualityProfile &&
+          drawAmbientField == other.drawAmbientField &&
+          drawGrain == other.drawGrain &&
+          trackPointer == other.trackPointer;
+
+  @override
+  int get hashCode => Object.hash(drawAmbientField, drawGrain, trackPointer);
 }

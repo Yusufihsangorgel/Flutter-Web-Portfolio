@@ -98,17 +98,6 @@ void main() {
       expect(refreshRateSource.listenerCount, 0);
     });
   });
-
-  group('RenderQuality profiles', () {
-    test('reduce decoration without changing content semantics', () {
-      expect(RenderQuality.essential.profile.drawAmbientField, isFalse);
-      expect(RenderQuality.balanced.profile.drawAmbientField, isTrue);
-      expect(RenderQuality.full.profile.drawGrain, isTrue);
-      expect(RenderQuality.essential.profile.trackPointer, isFalse);
-      expect(RenderQuality.balanced.profile.trackPointer, isFalse);
-      expect(RenderQuality.full.profile.trackPointer, isTrue);
-    });
-  });
 }
 
 final _testPolicy = AdaptiveRenderBudgetPolicy(

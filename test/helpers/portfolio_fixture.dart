@@ -5,6 +5,7 @@ import 'dart:typed_data';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_web_portfolio/app/data/dto/portfolio_document_mapper.dart';
 import 'package:flutter_web_portfolio/app/domain/models/portfolio_document.dart';
 
 const _fixtureSpecs = <String, ({int width, int height})>{
@@ -17,46 +18,60 @@ const _fixtureSpecs = <String, ({int width, int height})>{
 };
 final _encodedPngs = <(int, int), Uint8List>{};
 final _fixtureBytes = <String, Uint8List>{};
+final _fixtureFiles = <String, File>{};
+var _fixtureSequence = 0;
 
 PortfolioDocument loadPortfolioFixture({
   void Function(Map<String, dynamic> json)? mutate,
 }) {
   final json = loadPortfolioFixtureJson();
   mutate?.call(json);
-  return PortfolioDocument.fromJson(json);
+  return parsePortfolioDocument(json);
 }
 
 Map<String, dynamic> loadPortfolioFixtureJson() {
   final json =
       jsonDecode(File('test/fixtures/portfolio.json').readAsStringSync())
           as Map<String, dynamic>;
+  final fixtureId = '$pid-${_fixtureSequence++}';
   final systems = (json['systems']! as List<dynamic>)
       .cast<Map<String, dynamic>>();
   for (final system in systems) {
     final artifact = system['artifact']! as Map<String, dynamic>;
-    _isolateArtifact(artifact);
+    _isolateArtifact(artifact, fixtureId);
     if (artifact['compact'] case final Map<String, dynamic> compact) {
-      _isolateArtifact(compact);
+      _isolateArtifact(compact, fixtureId);
     }
   }
   final fixturePaths = _fixturePaths(json);
-  for (final path in fixturePaths) {
-    final bytes = _fixtureBytes[path]!;
-    File(path)
-      ..parent.createSync(recursive: true)
-      ..writeAsBytesSync(bytes, flush: true);
-  }
+  final temporaryDirectory = Directory.systemTemp.createTempSync(
+    'portfolio-fixture-',
+  );
   addTearDown(() {
     for (final path in fixturePaths) {
       _fixtureBytes.remove(path);
-      final file = File(path);
-      if (file.existsSync()) file.deleteSync();
+      _fixtureFiles.remove(path);
+    }
+    if (temporaryDirectory.existsSync()) {
+      temporaryDirectory.deleteSync(recursive: true);
     }
   });
+  for (final path in fixturePaths) {
+    final bytes = _fixtureBytes[path]!;
+    final fileName = path.substring(path.lastIndexOf('/') + 1);
+    _fixtureFiles[path] = File('${temporaryDirectory.path}/$fileName')
+      ..writeAsBytesSync(bytes, flush: true);
+  }
   return json;
 }
 
-void _isolateArtifact(Map<String, dynamic> artifact) {
+File portfolioFixtureFile(String asset) {
+  final file = _fixtureFiles[asset];
+  if (file == null) throw StateError('Unknown fixture asset: $asset');
+  return file;
+}
+
+void _isolateArtifact(Map<String, dynamic> artifact, String fixtureId) {
   final configuredPath = artifact['asset']! as String;
   final extension = configuredPath.lastIndexOf('.');
   if (extension <= configuredPath.lastIndexOf('/')) {
@@ -67,7 +82,7 @@ void _isolateArtifact(Map<String, dynamic> artifact) {
     );
   }
   final isolatedPath =
-      '${configuredPath.substring(0, extension)}-$pid${configuredPath.substring(extension)}';
+      '${configuredPath.substring(0, extension)}-$fixtureId${configuredPath.substring(extension)}';
   final spec = _fixtureSpecs[configuredPath];
   if (spec == null) {
     throw StateError('Unknown fixture asset: $configuredPath');

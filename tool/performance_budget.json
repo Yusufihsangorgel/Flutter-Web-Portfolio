@@ -15,5 +15,40 @@
   },
   "hardware_only_metrics": [
     "scroll_frames_over_50_ms"
-  ]
+  ],
+  "throttled": {
+    "enforce": false,
+    "maximum_median": {
+      "navigation_to_first_frame_ms": 30000,
+      "bootstrap_to_first_frame_ms": 30000,
+      "first_frame_to_reveal_frame_intervals": 100,
+      "scroll_frame_p95_over_median_ratio": 8,
+      "scroll_frames_over_50_ms": 1000,
+      "long_task_total_ms": 60000,
+      "cumulative_layout_shift": 0.1,
+      "largest_contentful_paint_ms": 30000,
+      "first_frame_to_reveal_ms": 10000,
+      "total_transferred_bytes": 20000000
+    },
+    "maximum_transferred_bytes_by_resource_type": {
+      "Document": 20000000,
+      "Stylesheet": 20000000,
+      "Image": 20000000,
+      "Media": 20000000,
+      "Font": 20000000,
+      "Script": 20000000,
+      "TextTrack": 20000000,
+      "XHR": 20000000,
+      "Fetch": 20000000,
+      "Prefetch": 20000000,
+      "EventSource": 20000000,
+      "WebSocket": 20000000,
+      "Manifest": 20000000,
+      "SignedExchange": 20000000,
+      "Ping": 20000000,
+      "CSPViolationReport": 20000000,
+      "Preflight": 20000000,
+      "Other": 20000000
+    }
+  }
 }

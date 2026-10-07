@@ -1,5 +1,9 @@
 import { expect, Locator, Page, test } from "@playwright/test";
 import { readFileSync } from "node:fs";
+import {
+  scrollAndSettle,
+  waitForSemanticsSettled,
+} from "./helpers/semantics_scroll";
 
 type PortfolioSystem = {
   id: string;
@@ -134,7 +138,10 @@ async function waitForPortfolio(page: Page) {
     state: "attached",
     timeout: 20000,
   });
-  await expect(page.locator("#bootstrap-surface")).toHaveCount(0);
+  // The surface leaves after the first frame, so it shares the boot budget.
+  await expect(page.locator("#bootstrap-surface")).toHaveCount(0, {
+    timeout: 20000,
+  });
   await expect(page.getByRole("heading").first()).toBeAttached();
 }
 
@@ -235,6 +242,7 @@ async function pageSize(page: Page) {
 }
 
 async function revealText(page: Page, text: string) {
+  await waitForSemanticsSettled(page);
   for (let attempt = 0; attempt < 80; attempt += 1) {
     const semanticGroup = page.getByRole("group", {
       name: new RegExp(text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i"),
@@ -244,13 +252,110 @@ async function revealText(page: Page, text: string) {
     if ((await semanticGroup.count()) > 0) return semanticGroup.first();
     if ((await authored.count()) > 0) return authored.first();
     if ((await upper.count()) > 0) return upper.first();
-    // Flutter's accessibility tree can lag the painted SkWasm frame while a
-    // newly routed chapter is materializing. Let that bounded handoff finish
-    // before scrolling, otherwise the test can race past the first case.
-    if (attempt >= 8) await page.mouse.wheel(0, 360);
-    await page.waitForTimeout(80);
+    await scrollAndSettle(page, 360);
   }
   throw new Error(`Localized text never entered the semantics tree: ${text}`);
+}
+
+type LocalizedRecord = ReturnType<typeof localizedRecord>;
+
+function collectRuntimeErrors(page: Page) {
+  const errors: string[] = [];
+  page.on("pageerror", (error) => errors.push(`pageerror: ${error.message}`));
+  page.on("console", (message) => {
+    if (message.type() === "error") errors.push(`console: ${message.text()}`);
+  });
+  page.on("response", (response) => {
+    if (response.status() >= 400) {
+      errors.push(`HTTP ${response.status()} ${response.url()}`);
+    }
+  });
+  return errors;
+}
+async function assertLocalizedHome(
+  page: Page,
+  locale: LocaleCode,
+  expected: LocalizedRecord,
+) {
+  await navigateToChapter(page, "home");
+  const heading = page.getByRole("heading", {
+    name: `${portfolio.profile.display_name.accessible}, ${expected.role}`,
+    exact: true,
+  });
+  await expectInViewport(page, heading);
+  await expect(page.getByText(expected.headline, { exact: true })).toBeAttached();
+  if (locale !== "en") {
+    await expect(
+      page.getByText(portfolio.profile.headline, { exact: true }),
+    ).toHaveCount(0);
+    await expect(
+      page.getByText(portfolio.profile.role, { exact: true }),
+    ).toHaveCount(0);
+  }
+  await expectNoHorizontalOverflow(page);
+}
+
+async function assertNoEnglishProjectCopy(page: Page, expected: LocalizedRecord) {
+  await expect(
+    page.getByText(portfolio.systems[0].kind, { exact: true }),
+  ).toHaveCount(0);
+  if (portfolio.systems[0].year !== expected.systemYear) {
+    await expect(
+      page.getByText(portfolio.systems[0].year, { exact: true }),
+    ).toHaveCount(0);
+  }
+  for (const technology of portfolio.systems[0].technologies) {
+    if (!expected.systemTechnologies!.includes(technology)) {
+      await expect(page.getByText(technology, { exact: true })).toHaveCount(0);
+    }
+  }
+  await expect(
+    page.getByText(portfolio.systems[0].artifact.caption, { exact: true }),
+  ).toHaveCount(0);
+}
+
+async function assertLocalizedProjects(
+  page: Page,
+  locale: LocaleCode,
+  expected: LocalizedRecord,
+  interfaceCopy: InterfaceCatalog,
+) {
+  if (portfolio.systems.length === 0) return;
+  await navigateToChapter(page, "projects");
+  const heading = page.getByRole("heading", {
+    name: interfaceCopy.projects_section.title,
+    exact: true,
+  });
+  await expectInViewport(page, heading);
+  await expect(await revealText(page, expected.systemKind!)).toBeAttached();
+  await expect(await revealText(page, expected.systemYear!)).toBeAttached();
+  for (const technology of expected.systemTechnologies!) {
+    await expect(await revealText(page, technology)).toBeAttached();
+  }
+  const compact = (page.viewportSize()?.width ?? 1440) < 900;
+  const caption = compact ? expected.compactCaption! : expected.artifactCaption!;
+  await expect(await revealText(page, caption)).toBeAttached();
+  if (locale !== "en") await assertNoEnglishProjectCopy(page, expected);
+  await expectNoHorizontalOverflow(page);
+}
+
+async function assertReloadAndHistory(page: Page, locale: LocaleCode) {
+  await page.reload({ waitUntil: "domcontentloaded" });
+  await waitForPortfolio(page);
+  await expectDocumentLocale(page, locale);
+  if (portfolio.systems.length > 0) {
+    await expect(page).toHaveURL(/#\/projects$/);
+    await page.goBack();
+    await expect(page).toHaveURL(/#\/$/);
+    await expectDocumentLocale(page, locale);
+    await page.goForward();
+    await expect(page).toHaveURL(/#\/projects$/);
+    await expectDocumentLocale(page, locale);
+    return;
+  }
+  await expect
+    .poll(() => page.evaluate(() => window.location.hash))
+    .toMatch(/^(?:|#\/)$/);
 }
 
 test.describe("complete portfolio localization", () => {
@@ -288,120 +393,22 @@ test.describe("complete portfolio localization", () => {
   });
 
   for (const locale of localeCodes) {
-    test(`keeps ${locale} complete across reload and history`, async ({
-      page,
-    }) => {
-      const errors: string[] = [];
-      page.on("pageerror", (error) =>
-        errors.push(`pageerror: ${error.message}`),
-      );
-      page.on("console", (message) => {
-        if (message.type() === "error") {
-          errors.push(`console: ${message.text()}`);
-        }
-      });
-      page.on("response", (response) => {
-        if (response.status() >= 400) {
-          errors.push(`HTTP ${response.status()} ${response.url()}`);
-        }
-      });
-
+    test(`keeps ${locale} complete across reload and history`, async ({ page }) => {
+      const errors = collectRuntimeErrors(page);
       await page.emulateMedia({ reducedMotion: "reduce" });
       await page.goto("/#/", { waitUntil: "domcontentloaded" });
       await waitForPortfolio(page);
       if (locale !== "en") await switchLocale(page, "en", locale);
-
       const expected = localizedRecord(locale);
-      const interfaceCopy = interfaceCatalogs[locale];
       await expectDocumentLocale(page, locale);
-
-      await navigateToChapter(page, "home");
-      const heroHeading = page.getByRole("heading", {
-        name: `${portfolio.profile.display_name.accessible}, ${expected.role}`,
-        exact: true,
-      });
-      await expectInViewport(page, heroHeading);
-      await expect(
-        page.getByText(expected.headline, { exact: true }),
-      ).toBeAttached();
-      if (locale !== "en") {
-        await expect(
-          page.getByText(portfolio.profile.headline, { exact: true }),
-        ).toHaveCount(0);
-        await expect(
-          page.getByText(portfolio.profile.role, { exact: true }),
-        ).toHaveCount(0);
-      }
-      await expectNoHorizontalOverflow(page);
-
-      if (portfolio.systems.length > 0) {
-        await navigateToChapter(page, "projects");
-        const projectHeading = page.getByRole("heading", {
-          name: interfaceCopy.projects_section.title,
-          exact: true,
-        });
-        await expectInViewport(page, projectHeading);
-        const kind = await revealText(page, expected.systemKind!);
-        await expect(kind).toBeAttached();
-        await expect(
-          await revealText(page, expected.systemYear!),
-        ).toBeAttached();
-        for (const technology of expected.systemTechnologies!) {
-          await expect(await revealText(page, technology)).toBeAttached();
-        }
-        const compact = (page.viewportSize()?.width ?? 1440) < 900;
-        const caption = compact
-          ? expected.compactCaption!
-          : expected.artifactCaption!;
-        await expect(await revealText(page, caption)).toBeAttached();
-        if (locale !== "en") {
-          await expect(
-            page.getByText(portfolio.systems[0].kind, { exact: true }),
-          ).toHaveCount(0);
-          if (portfolio.systems[0].year !== expected.systemYear) {
-            await expect(
-              page.getByText(portfolio.systems[0].year, { exact: true }),
-            ).toHaveCount(0);
-          }
-          for (const technology of portfolio.systems[0].technologies) {
-            if (!expected.systemTechnologies!.includes(technology)) {
-              await expect(
-                page.getByText(technology, { exact: true }),
-              ).toHaveCount(0);
-            }
-          }
-          await expect(
-            page.getByText(portfolio.systems[0].artifact.caption, {
-              exact: true,
-            }),
-          ).toHaveCount(0);
-        }
-        await expectNoHorizontalOverflow(page);
-      }
-
-      await page.reload({ waitUntil: "domcontentloaded" });
-      await waitForPortfolio(page);
-      await expectDocumentLocale(page, locale);
-      if (portfolio.systems.length > 0) {
-        await expect(page).toHaveURL(/#\/projects$/);
-      } else {
-        // A minimal initialized portfolio can fit entirely in the viewport.
-        // In that case passive section synchronization keeps the document at
-        // the canonical root instead of manufacturing a redundant home hash.
-        await expect
-          .poll(() => page.evaluate(() => window.location.hash))
-          .toMatch(/^(?:|#\/)$/);
-      }
-
-      if (portfolio.systems.length > 0) {
-        await page.goBack();
-        await expect(page).toHaveURL(/#\/$/);
-        await expectDocumentLocale(page, locale);
-        await page.goForward();
-        await expect(page).toHaveURL(/#\/projects$/);
-        await expectDocumentLocale(page, locale);
-      }
-
+      await assertLocalizedHome(page, locale, expected);
+      await assertLocalizedProjects(
+        page,
+        locale,
+        expected,
+        interfaceCatalogs[locale],
+      );
+      await assertReloadAndHistory(page, locale);
       expect(errors).toEqual([]);
     });
   }

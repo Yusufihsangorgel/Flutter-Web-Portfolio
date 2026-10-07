@@ -82,7 +82,7 @@
     "subtitle": "{count} Pakete sind auf pub.dev veröffentlicht, {perfect} davon mit der perfekten Wertung 160/160. Jedes bringt eine gemessene Aussage, lauffähige Beispiele und seine eigene Roadmap mit.",
     "pub_points": "Pub-Punkte",
     "open_package": "Auf pub.dev öffnen",
-    "maturity": "Reifegrad",
+    "maturity_level": "Reifegrad {level} von {max}",
     "roadmap": "Roadmap",
     "status_done": "veröffentlicht",
     "status_doing": "in Arbeit",

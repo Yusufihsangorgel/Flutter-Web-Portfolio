@@ -17,6 +17,8 @@ import { createInterface } from 'node:readline/promises';
 import { fileURLToPath } from 'node:url';
 
 import { resolveExecutable } from './cli_safety.mjs';
+import { findTemplateRepository, rewritePackageLinks } from './package_links.mjs';
+import { renderStarterReadme } from './starter_readme.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const defaultOutput = path.join(root, 'assets', 'content', 'portfolio.json');
@@ -40,6 +42,9 @@ try {
   const synchronizesRepository = output === defaultOutput;
   const initializationRepository = synchronizesRepository
     ? resolveInitializationRepository(options.repository)
+    : null;
+  const originalRepository = synchronizesRepository
+    ? findTemplateRepository(JSON.parse(await readFile(path.join(root, 'package.json'), 'utf8')))
     : null;
   if (synchronizesRepository) {
     run(process.execPath, [
@@ -73,6 +78,11 @@ try {
       await removeDemoArtifactRenderer();
       console.log('Removed the demo owner’s artifact renderer and package command.');
       await writeStarterChangelog();
+      await writeAtomically(path.join(root, 'README.md'), renderStarterReadme({
+        name: answers.name, site: answers.site, repository: initializationRepository,
+      }));
+      await rm(path.join(root, 'docs', 'readme', 'home-desktop.jpg'), { force: true });
+      await rewritePackageLinks(root, originalRepository, initializationRepository);
       console.log('Replaced the demo history with an identity-neutral changelog.');
       await rm(path.join(root, 'build', 'web'), {
         recursive: true,
@@ -245,7 +255,7 @@ function createPortfolioDocument(answers) {
   const primaryLabel = answers.github ? 'GitHub' : 'Website';
 
   return {
-    schema_version: 10,
+    schema_version: 11,
     content_version: contentVersion,
     verified_at: today,
     site: {
@@ -565,6 +575,8 @@ async function createRepositoryTransaction() {
     'web/assets/og/engineering-showcase.png.sha256',
     'assets/build/source_manifest.sha256',
     'build/web',
+    'packages',
+    'docs/readme/home-desktop.jpg',
   ];
   const snapshots = [];
   for (const relative of targets) {

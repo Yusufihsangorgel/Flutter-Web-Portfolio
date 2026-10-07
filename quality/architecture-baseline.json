@@ -1,6 +1,4 @@
 {
   "note": "Known architecture violations at introduction. This list only shrinks: fix an entry, then remove it here in the same commit. Never add entries.",
-  "violations": [
-    "F-DOMAIN-PURE|lib/app/features/render_quality/domain/render_quality.dart|package:flutter/foundation.dart"
-  ]
+  "violations": []
 }

@@ -15,7 +15,6 @@ dependencies:
     sdk: flutter
   flutter_localizations:
     sdk: flutter
-  cupertino_icons: ^1.0.8
 
   # State management & navigation
   flutter_bloc: ^9.1.1
@@ -59,5 +58,3 @@ flutter:
     - family: Noto Sans Devanagari
       fonts:
         - asset: assets/fonts/noto_sans_devanagari/NotoSansDevanagari-Variable.ttf
-
-  generate: true
