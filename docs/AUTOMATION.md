@@ -38,23 +38,26 @@ and the declared writing feeds.
 pub.dev scores a newly published version asynchronously. If `grantedPoints`
 is not yet available for a package, the tool keeps the previous `pub_points`
 value, reports the package as `pending-score`, and never writes `0` or
-`null`.
+`null` for a pending score. A score decrease also keeps the stored value until
+the metrics response has a successful Pana report, a completed or successful
+task, and section totals equal to the proposed score. A confirmed score may be
+zero; an unsettled response cannot replace the stored points.
 
 The tool also looks for merged, **public** pull requests by the account named
 in `profile.links` that are not yet listed in `contributions[]`, and reports
 them as candidates. Candidates are never written automatically — a
 contribution's `title`/`problem`/`change` is hand-written and translated into
-every locale, so adding one is a deliberate, authored decision.
+every locale, so adding one requires authored content.
 
-## What is deliberately not automated
+## What remains authored
 
 - **Contribution prose** (`title`, `problem`, `change`) — hand-written and
   translated into every locale; automation cannot produce accepted copy.
-- **`roadmap`, `maturity`, `proof`** on each package — an authored claim
+- **`roadmap`, `maturity_level` (integer 1–5), `featured`, `proof`** on each package — an authored claim
   about the package's state and evidence, not a fact pub.dev reports.
 - **Adding or removing a package** — the tool only refreshes packages that
-  are already listed; a new package needs the same authored fields
-  (`category`, `maturity`, `proof`, `roadmap`) as any other.
+  are already listed; a new package must declare `category` and `featured`.
+  Optional `maturity_level`, `proof` and roadmap entries remain authored.
 - **`experience`, `systems`, `capabilities`, `site`, `profile`** — none of
   this comes from a live API; it stays hand-maintained.
 - **`writing_sources`** itself — which feeds to check, and their labels and
@@ -66,21 +69,29 @@ every locale, so adding one is a deliberate, authored decision.
 on demand). The first run of each month also refreshes download counters.
 Only if `assets/content/portfolio.json` changed does the job install Flutter,
 run the content and template checks, regenerate derived files with
-`npm run sync:content`, and re-render the social card and source manifest with
+`npm run sync:content` (including security.txt renewal when due), regenerate
+Latin and shared-script font subsets with `npm run fonts:subset` and
+`npm run verify:fonts`, and re-render the social card and source manifest with
 `npm run prepare:source`, because hosted builds verify the committed card
-instead of rendering it. It commits the refreshed sources to a short-lived
+instead of rendering it. It commits the refreshed sources, fonts and derived files to a short-lived
 `bot/refresh-<UTC date>-<run id>` branch and opens a pull request containing
 the refresh report. The workflow token's pull request does not trigger CI, so
 the job dispatches `ci.yml` on that branch and waits for it. Successful CI
 allows a squash merge and branch deletion; failed or timed-out CI leaves the
 pull request open and fails the refresh job. If `main` advances during CI, the
 job also leaves the pull request open for a new check. After a merge, the job
-dispatches CI on `main` for the merge commit.
+dispatches CI on `main` for the merge commit. This is the workflow's configured
+PR-and-auto-merge path, not evidence of a successful scheduled run. The audit
+for this revision found one scheduled run: it failed at `gh pr create` because
+Actions was not allowed to open pull requests. That setting has since been
+enabled; a successful end-to-end scheduled run remains to be confirmed.
 
 CI builds once, tests that build, and attests `web-release.tar.gz` on `main`.
-The maintainer's production host pulls the attested artifact and deploys its
-image by digest. CI has no production deploy credentials, and this public
-repository has no self-hosted runner. Template users run
+The production delivery contract uses an independent host pull process that
+verifies the artifact and deploys its image by digest; its live state is outside
+repository checks. CI has no production deploy credentials or self-hosted job.
+The Pages workflow separately rebuilds the checked revision for its base path.
+Template users run
 `npm run build:release` and deploy the resulting `build/web` to their host;
 see [`DEPLOY.md`](DEPLOY.md) for host-specific instructions.
 
@@ -91,6 +102,8 @@ see [`DEPLOY.md`](DEPLOY.md) for host-specific instructions.
 one year after the file is generated. `npm run sync:content` rewrites the file
 when its fields drift or when fewer than 30 days remain before `Expires`, and
 the refresh workflow stages the result with the other derived files.
+That workflow reaches sync only when canonical content changed; an unchanged
+record skips renewal, so the schedule alone does not guarantee renewal.
 `npm run verify:content` ignores the date until fewer than 7 days remain, so CI
 stays green while the next content refresh or any local sync renews it. In the
 last week, or after expiry, `verify:content` reports
@@ -107,6 +120,11 @@ feeds to check from `writing_sources[]` — all already in
 an empty list for a clean clone; add entries by hand to turn writing refresh
 on. Enable GitHub Actions and allow workflows to create pull requests in the
 repository's Actions settings. The schedule then starts running.
+The workflow needs `contents: write`, `pull-requests: write` and `actions: write`,
+and **Settings → Actions → General → Allow GitHub Actions to create and approve
+pull requests** must be enabled. Repository rules must permit the workflow's
+squash merge; this flow explicitly merges after CI rather than using
+`gh pr merge --auto`. Confirm a successful run before relying on it unattended.
 An authenticated `GITHUB_TOKEN` is provided automatically by Actions; running
 the tool locally without one works too, at GitHub's lower unauthenticated
 rate limit.

@@ -43,8 +43,8 @@ layer in the Flutter application.
 
 ### 1.2 Import direction
 
-The “Must not import” column is the intended rule. The checker currently enforces import patterns only, with the
-configuration drift noted above; it does not inspect runtime calls or architectural intent.
+The “Must not import” column is enforced through the configured import patterns. The checker does not inspect runtime
+calls or architectural intent; review must also enforce direct-I/O and dependency-construction rules.
 
 | Layer | May import | Must not import |
 |---|---|---|
@@ -148,6 +148,17 @@ on GitHub-hosted runners. The CI analyze job also runs the Dart metric check and
 as well and record gate results with relevant counts. Root and package analysis share the strict settings and lints in
 `analysis_options.yaml`; the package includes that file and adds its public API documentation rules.
 
+| Limit or boundary | Enforcement location |
+|---|---|
+| Import direction and plain-Dart domain | `architecture.yml` → `Architecture import rules`; `Architecture gate calibration` tests accepted and rejected imports |
+| Dart callables 60 lines, `build()` 100, parameters 4, nesting 4, complexity 15 | `ci.yml` → `analyze` → `Enforce shrink-only Dart metrics`; the preceding `dart_metrics_test.dart` step calibrates counts |
+| Node files 500 lines, functions 60, parameters 4, nesting 4, complexity 15 | `ci.yml` → `analyze` → `npm run lint`, configured in `eslint.config.mjs` |
+| Dart production files 500 lines and test files 800 lines | Manual changed-file review and line inventory; the import and callable gates do not enforce file size |
+| Strict types, shared application/package lints | `ci.yml` → `analyze` → root `flutter analyze --fatal-infos` and package `flutter analyze --no-pub --fatal-infos` |
+
+The complete CI step inventory, including string/font checks, résumé verification, coverage, reports, artifact packaging,
+and provenance, is in [README.md](../README.md#quality-gates). The commands below group the main local checks.
+
 | Command | Purpose | Mode |
 |---|---|---|
 | `python3 quality/check_architecture.py` | §1.3 import rules | Blocking · baseline empty · `NEW`/`STALE` = reject |
@@ -157,7 +168,7 @@ as well and record gate results with relevant counts. Root and package analysis 
 | `npm run verify:content && npm run portfolio:validate` | Content synchronization and schema validation | Blocking · CI |
 | `npm run test:template && npm run test:release-security && npm run test:refresh && npm run test:content` | Template, release-security, refresh, and content checks | Blocking · CI |
 | `npm run verify:hosting && npm run verify:community && npm run audit:sources && npm run audit:history` | Hosting, community, source, and history checks | Blocking · CI |
-| `npm run typecheck && npm run verify:source` | TypeScript and reachable Dart-source checks | Blocking · CI |
+| `npm run typecheck && npm run lint && npm run format:check && npm run verify:source` | Tool type/size/style and reachable Dart-source checks | Blocking · CI |
 | `dart format --output=none --set-exit-if-changed lib test tool && flutter analyze --fatal-infos && flutter test` | Formatting, analysis, and Flutter tests | Blocking · CI |
 | `npm run test:clone && npm test` | Clone and Playwright checks | Blocking · CI |
 | `npm run prepare:source && flutter build web --release --wasm --no-web-resources-cdn && npm run prepare:bundle && npm run verify:bundle` | Release source preparation, Wasm build, and bundle verification | Blocking · CI |

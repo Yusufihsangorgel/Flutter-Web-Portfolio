@@ -14,7 +14,7 @@ Keep frame-budget policy in the reusable local package and portfolio-specific vi
 
 ## Consequences
 
-Frame timing can lower or cautiously restore visual complexity without changing content. Reduced-motion users avoid adaptive effects. Visual regression tests run with reduced motion, which pauses adaptation, and mask regions whose rendering varies between runs. This keeps screenshots deterministic; motion behavior is covered by functional tests instead. The source reads [`FlutterView.display.refreshRate`](../../packages/adaptive_render_budget/lib/src/sources.dart); with the pinned web engine's fixed 60 Hz report, the policy cannot infer the monitor's actual rate. Browser-frame observations would be needed to claim physical refresh-rate detection.
+Frame timing can lower or cautiously restore visual complexity without changing content. Reduced-motion users avoid adaptive effects. Visual regression tests run with reduced motion and a fixed seed, and wait for stable captures. The rail and scrollbar are no longer masked, so their text and controls remain visible to regression checks. Motion behavior is covered by functional tests. The source reads [`FlutterView.display.refreshRate`](../../packages/adaptive_render_budget/lib/src/sources.dart); with the pinned web engine's fixed 60 Hz report, the policy cannot infer the monitor's actual rate. Browser-frame observations would be needed to claim physical refresh-rate detection.
 
 ## Alternatives considered
 

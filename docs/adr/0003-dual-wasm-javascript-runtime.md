@@ -14,7 +14,7 @@ Publish Flutter's Dart Wasm/SkWasm runtime alongside its JavaScript/CanvasKit fa
 
 ## Consequences
 
-The artifact contains multiple runtime variants, increasing release size even though a browser selects one. Threaded SkWasm needs cross-origin isolation; a host that cannot provide the headers can still serve the JavaScript fallback, subject to browser support. A release check must verify both variants and header policy, while browser checks verify actual startup.
+The artifact contains multiple runtime variants, increasing release size even though a browser selects one. The current single-threaded SkWasm path does not require cross-origin isolation, so a compatible browser can use Wasm even on hosts without custom headers. Threaded SkWasm will require isolation after the workaround below is removed. Release checks verify both variants and header policy; browser checks verify startup under the content security policy.
 
 ## Alternatives considered
 

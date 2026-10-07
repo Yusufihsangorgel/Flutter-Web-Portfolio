@@ -39,7 +39,7 @@ domain if you own it, or the real provider URL you intend to publish first;
 that value is emitted into canonical tags, sharing metadata, sitemap, robots,
 manifest, and package metadata.
 
-Chromium is used only to render the deterministic 1200×630 social card. The
+During initialization, Chromium renders the deterministic 1200×630 social card; release builds also use it for the résumé PDF. The
 initializer checks it before touching content and rolls back the complete reset
 if any later synchronization step fails. A normal GitHub clone also lets the
 initializer detect `owner/repository` and replace the README badge with that
@@ -96,13 +96,21 @@ content sync would replace those manual edits.
 
 | Key | Owns | Required |
 |---|---|---:|
+| `schema_version`, `content_version`, `verified_at` | schema 11, authored revision and source-verification date | yes |
 | `site` | canonical URL, search/social copy, sharing image, analytics, and template CTA state | yes |
 | `profile` | identity, public contact, headline, biography, links | yes |
 | `sources` | provenance for public claims | yes |
 | `capabilities` | grouped skills and tools | yes |
-| `experience` | professional timeline | no |
-| `contributions` | merged or in-review upstream work | no |
-| `systems` | featured case studies and supporting work | no |
+| `experience` | professional timeline | yes (may be empty) |
+| `contributions` | merged or in-review upstream work | yes (may be empty) |
+| `systems` | featured case studies and supporting work | yes (may be empty) |
+| `packages` | published packages, category, featured selection, maturity and proof | yes (may be empty) |
+| `writing_sources`, `writing` | declared feeds and refreshed article records | no |
+
+Schema 11 uses `maturity_level` (an optional integer from 1 to 5), not a maturity letter.
+Every package and writing entry declares `featured`; at most five packages and three writing entries may be featured.
+Package categories are `native-ffi`, `ai-llm`, `server`, `flutter-ui`, or `dev-tool`.
+These fields are factual and shared across locales; the UI translates their labels.
 
 The Dart parser rejects unsupported schema versions, malformed HTTPS URLs,
 duplicate IDs, identity/metadata drift, incomplete cases, reused artifacts,

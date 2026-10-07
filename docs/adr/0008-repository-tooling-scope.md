@@ -10,7 +10,7 @@ The repository is both a portfolio and a reusable template. Its [`tool/`](../../
 
 ## Decision
 
-Keep content, template, release, and verification tooling beside the application so a template user can build and check the same static output. Consolidate duplicated source parsing, release-file traversal, and host-policy checks into focused shared helpers as those oversized scripts are split. Keep external-source requests in tools, not Flutter UI.
+Keep content, template, release, and verification tooling beside the application so a template user can build and check the same static output. Group tools by purpose with thin entry points and focused modules; share helpers where multiple tool areas need them. The renderer, initializer and release verifier have been split to meet the file limits. Keep external-source requests in tools, not Flutter UI.
 
 ## Consequences
 

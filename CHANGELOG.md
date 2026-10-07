@@ -8,60 +8,48 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ### Added
 
-- A published Packages section with localized package details, documented
-  claims, live roadmaps, and contribution evidence. The record also reflects
-  later package and contribution updates. Commits: `ec64edb`, `30a9ca0`,
-  `42eca5c`, `27f00a8`, `a4102b6`, `2a5310c`, `f7cab7f`, `3e13390`,
-  `618bb2e`, `645a938`, `661902c`, `028e548`, `1f3d12a`.
-- A Writing section populated from the declared feeds. Commit: `e486135`.
-- A generated `llms.txt` based on the canonical portfolio record, including in
-  initialized projects. Commits: `1a5762b`, `d47315e`.
-- A scheduled workflow that refreshes package metrics and contribution status
-  from pub.dev and GitHub, commits visitor-facing changes, and reports merged
-  contributions missing from the record. Commit: `9d5c417`.
-- Automatic Pages deployment of refreshed content and a main-branch deployment
-  workflow that runs after successful CI. Commits: `72beb21`, `000d9f2`.
-- Eight architecture decision records for the document-first application,
-  routing, rendering runtimes, artifact promotion, content contracts, locales,
-  render budgets, and repository tooling. Commit: `5e2ca05`.
-- A template guide with the setup, content, and hosting steps that were in the
-  README, and a `NOTICE` that excludes third-party screenshots and product names
-  from the MIT license. Commits: `56475b2`, `6b3c259`.
+- Published package details, proof and roadmaps, a feed-backed Writing section, and generated `llms.txt` from the content record.
+- Added weekly package/contribution/writing refreshes and reports for unlisted merged contributions.
+- Added uncaught-error logging, generated typed interface strings and import-rule calibration (#22).
+- Added eight ADRs, the template/contributor guides, a README leading with shipped work and third-party asset notices (#26).
+- Added manual Linux visual-baseline generation and artifact upload (#28).
+- Added a JavaScript-free semantic document, real 404s, version metadata, precompressed assets and Lighthouse checks (#35).
+- Added content-derived résumé HTML and an ATS-readable, tagged PDF with text and determinism checks (#38).
+- Added accessibility, Lighthouse and font-subsetting development dependencies (#15).
 
 ### Changed
 
-- Upgraded the application, CI, and deployment toolchain to Flutter 3.47.5 and
-  Dart 3.13.4. Commit: `90b1a1c`.
-- Kept package records to declared information instead of copying pub.dev
-  topics. Commit: `328ed4a`.
-- Aligned architecture rules and technical-debt records with the repository.
-  Commit: `5e2ca05`.
-- Rewrote the README to lead with the author, a screenshot, engineering
-  highlights, an architecture diagram, and the CI quality gates. The
-  contributor guide and pull request template list the pinned toolchain, the CI
-  checks, and the Conventional Commits title rule. Commits: `56475b2`,
-  `adea33f`.
-- The history audit finds attribution trailers and instruction files without
-  naming any tool. Commit: `e0ecd79`.
+- Updated the pinned toolchain to Flutter 3.47.5 and Dart 3.13.4; kept package topics authored instead of copying pub.dev labels.
+- Replaced tracked builds and production CD with a tested, checksummed, attested CI artifact and independent pull delivery; refreshes use checked PRs (#16).
+- Updated the pinned checkout and Pages deployment actions (#19).
+- Updated `actions/setup-node` to 7.0.0 (#20).
+- Split the smoke suite, replaced fixed sleeps, added accessibility checks and scheduled production browser checks (#23).
+- Subset Latin/shared-script fonts, load full script fonts per locale, and documented the rendering-budget package's public API and web refresh-rate limit (#24).
+- Kept Node type definitions on the pinned runtime major (#27).
+- Split domain entities and data mappers; schema 11 adds featured entries, integer maturity levels and category validation (#30).
+- Updated `url_launcher` to 6.3.3 (#32).
+- Converted work images to WebP, load them near the viewport, and split the project atlas (#34).
+- Grouped and split tooling by purpose; CI type-checks, lints and formats it (#39).
+- Switched sections to real links, showed featured packages and writing first, and typed every locale's text (#41).
+- Enabled shared strict analysis, shrink-only callable metrics and a blocking architecture gate with an empty import baseline (#42).
+- Removed rail/scrollbar capture masks and set coverage floors to domain 99% and application 92% (#45).
 
 ### Fixed
 
-- Corrected portfolio entries that marked finished work as pending and
-  regenerated the synchronized README and release content. Commits:
-  `dfd834a`, `c9df785`, `d7a6bc7`.
-- Filled gaps in authored work descriptions across the translated locale
-  catalogs. Commit: `05f20c1`.
-- Stabilized browser visual checks with progress-based scroll waits, refreshed
-  baselines, and tolerances for live-canvas variation; removed the
-  snapshot-update workflow. Commits: `c24406b`, `90c0ee2`, `c8acf37`,
-  `b41fda7`, `f03257e`.
-- The history audit missed an attribution trailer on a later line of an
-  annotated tag message. Commit: `e0ecd79`.
+- Corrected finished-work status and translated work descriptions in the authored record.
+- Excluded regenerated social-card outputs from the source manifest and checked that manifest against the exact Git tree (#21).
+- Initialized clones now have a neutral README and package links to their own repository, with rollback coverage (#25).
+- Accepted history trailers only for the declared GitHub update bots (#29).
+- Authenticated source audits with the workflow token and honored bounded API retry delays (#33).
+- Disabled threaded Skwasm to avoid the pinned glyph-cache freeze, bounded scroll/frame waits and kept browser analytics requests local (#40).
+- Served résumé files with explicit MIME types, revalidation and inherited security headers on the configured hosts (#43).
+- Landed deep links on the first frame, exposed real navigation anchors, fixed keyboard focus and the skip link, and removed narrative domain imports (#44).
 
 ### Security
 
-- Added a CI architecture gate for layer boundaries and prohibited SDK imports.
-  Commit: `f920149`.
+- Added import boundaries and prohibited-SDK checks (#14), now blocking through #42.
+- Added supply-chain scanning, dependency review, SHA-pinned actions and main-only artifact provenance (#16).
+- Tightened CSP and image sources, added HSTS and synchronized RFC 9116 security.txt with expiry checks (#35).
 
 ## [2.0.0] - 2026-07-18
 
