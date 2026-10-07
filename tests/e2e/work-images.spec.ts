@@ -1,4 +1,4 @@
-import { expect, Page, test } from "@playwright/test";
+import { expect, Page, test } from "./helpers/test_setup";
 import { readFileSync } from "node:fs";
 import {
   expectedArtifact,
@@ -76,12 +76,8 @@ function workAssets(transfers: ImageTransfer[]) {
 // Brings the evidence index heading into view, then scrolls far enough for
 // its selected preview to be on screen.
 async function scrollThroughAtlas(page: Page) {
-  const { viewportHeight, pixelRatio } = await page.evaluate(() => ({
-    viewportHeight: window.innerHeight,
-    pixelRatio: window.devicePixelRatio,
-  }));
-  // Flutter divides wheel deltas by the device pixel ratio.
-  const step = viewportHeight * 0.5 * pixelRatio;
+  const viewportHeight = await page.evaluate(() => window.innerHeight);
+  const step = viewportHeight * 0.5;
   const heading = page.getByRole("heading", {
     name: evidenceIndexHeading,
     exact: true,

@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from '../e2e/helpers/test_setup';
 import type {
   APIRequestContext,
   CDPSession,

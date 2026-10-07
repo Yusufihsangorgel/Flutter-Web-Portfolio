@@ -1,4 +1,5 @@
-import { expect, Locator, Page, test } from "@playwright/test";
+import { expect, Locator, Page, test } from "./helpers/test_setup";
+import { waitForStableBounds as stableBounds } from "./helpers/frame_waits";
 import {
   englishInterface,
   openChapterFromPalette,
@@ -46,29 +47,6 @@ function selectTrackedSystems(systems: PortfolioSystem[]) {
   };
 }
 
-async function stableBounds(locator: Locator): Promise<RowBounds> {
-  return locator.evaluate(async (element) => {
-    const read = () => {
-      const rect = element.getBoundingClientRect();
-      return { x: rect.x, y: rect.y, width: rect.width, height: rect.height };
-    };
-    let previous = read();
-    let stableFrames = 0;
-    for (let frame = 0; frame < 120; frame += 1) {
-      await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
-      const current = read();
-      const stable =
-        Math.abs(current.x - previous.x) < 0.1 &&
-        Math.abs(current.y - previous.y) < 0.1 &&
-        Math.abs(current.width - previous.width) < 0.1 &&
-        Math.abs(current.height - previous.height) < 0.1;
-      stableFrames = stable ? stableFrames + 1 : 0;
-      previous = current;
-      if (stableFrames >= 2) return current;
-    }
-    throw new Error("Project row geometry did not settle.");
-  });
-}
 
 async function captureBaseline(rows: TrackedRow[]) {
   const baseline = new Map<string, RowBounds>();

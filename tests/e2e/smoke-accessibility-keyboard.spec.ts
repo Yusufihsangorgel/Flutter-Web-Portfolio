@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test } from "./helpers/test_setup";
 import type { CDPSession, Page } from "@playwright/test";
 import {
   englishInterface,
@@ -12,7 +12,7 @@ import {
   readAccessibilityTree,
   required,
 } from "./helpers/portfolio_test_helpers";
-import { scrollToSemanticLink } from "./helpers/semantics_scroll";
+import { scrollToSemanticLink, waitForFrames } from "./helpers/semantics_scroll";
 
 async function assertInitialHierarchy(
   page: Page,
@@ -196,16 +196,11 @@ test("skip link moves keyboard focus into the main document", async ({
   if (firstContentSection !== "about") {
     await expect(page).toHaveURL(new RegExp(`#/${firstContentSection}$`));
   }
-  await expect
-    .poll(() =>
-      page.evaluate(
-        () =>
-          document.activeElement !== document.body &&
-          document.activeElement?.getAttribute("aria-label") !==
-            "Skip to content",
-      ),
-    )
-    .toBe(true);
+  const target = page.locator('[flt-semantics-identifier="main-content"]');
+  await expect(target).toBeInViewport();
+  await expect(target).toBeFocused();
+  await waitForFrames(page, 2);
+  await expect(target).toBeFocused();
 });
 
 test("back-to-top is keyboard focusable and activates with Space", async ({
