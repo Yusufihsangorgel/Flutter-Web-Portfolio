@@ -29,7 +29,28 @@ export function renderSecurityTxt(data, generatedAt = new Date()) {
   site.hash = '';
   const expires = new Date(generatedAt);
   expires.setUTCDate(expires.getUTCDate() + 365);
-  return `Contact: mailto:${email}\nExpires: ${expires.toISOString()}\nPreferred-Languages: en, tr\nCanonical: ${new URL('.well-known/security.txt', site).toString()}\n`;
+  return `Contact: mailto:${email}\nExpires: ${expires.toISOString()}\nPreferred-Languages: ${preferredLanguages(data).join(', ')}\nCanonical: ${new URL('.well-known/security.txt', site).toString()}\n`;
+}
+
+// sync:content renews a month ahead; verify:content fails only in the last week.
+export const securityTxtRenewDays = 30;
+export const securityTxtCheckDays = 7;
+
+export function securityTxtNeedsUpdate(current, expected, { now = Date.now(), checkOnly = false } = {}) {
+  const withoutExpiry = (text) => text.replace(/^Expires: .+$/m, '');
+  if (withoutExpiry(current) !== withoutExpiry(expected)) return true;
+  const expires = Date.parse(current.match(/^Expires: (.+)$/m)?.[1] ?? '');
+  const days = checkOnly ? securityTxtCheckDays : securityTxtRenewDays;
+  return !(expires - now > days * 24 * 60 * 60 * 1000);
+}
+
+function preferredLanguages(data) {
+  const locales = data.site.locales;
+  if (!Array.isArray(locales) || locales.length === 0 ||
+    !locales.every((locale) => typeof locale === 'string' && /^[a-z]{2}(?:-[A-Z]{2})?$/.test(locale))) {
+    throw new Error('site.locales must list the published language tags');
+  }
+  return locales;
 }
 
 function imageOrigins(data) {

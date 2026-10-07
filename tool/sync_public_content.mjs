@@ -10,6 +10,7 @@ import {
   renderContentSecurityPolicy,
   renderSecurityTxt,
   securityHeaders,
+  securityTxtNeedsUpdate,
 } from './public-content/security.mjs';
 import {
   renderAnalytics,
@@ -199,10 +200,7 @@ async function syncSecurityTxt(file) {
     throw error;
   });
   const expected = renderSecurityTxt(document);
-  const expires = current.match(/^Expires: (.+)$/m)?.[1];
-  const remaining = expires ? Date.parse(expires) - Date.now() : 0;
-  const matches = current.replace(/^Expires: .+$/m, '') === expected.replace(/^Expires: .+$/m, '');
-  if (matches && remaining > 30 * 24 * 60 * 60 * 1000) return { file, changed: false };
+  if (!securityTxtNeedsUpdate(current, expected, { checkOnly })) return { file, changed: false };
   if (!checkOnly) {
     await mkdir(path.dirname(file), { recursive: true });
     await writeFile(file, expected);

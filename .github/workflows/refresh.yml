@@ -109,8 +109,10 @@ jobs:
             web/llms.txt \
             web/manifest.json \
             web/_headers \
+            web/.well-known/security.txt \
             web/assets/og \
             nginx/default.conf \
+            netlify.toml \
             firebase.json \
             vercel.json \
             package.json \

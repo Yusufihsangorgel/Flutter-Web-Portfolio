@@ -1,7 +1,11 @@
 import assert from 'node:assert/strict';
 
 import { renderHeadMeta, renderReadmeRecord, renderStructuredData } from './public-content/renderers.mjs';
-import { renderContentSecurityPolicy, renderSecurityTxt } from './public-content/security.mjs';
+import {
+  renderContentSecurityPolicy,
+  renderSecurityTxt,
+  securityTxtNeedsUpdate,
+} from './public-content/security.mjs';
 
 const analyticsOrigin = 'https://stats.example.com';
 const content = {
@@ -13,6 +17,7 @@ const content = {
     description: 'A software engineer building reliable products.',
     social_description: 'Selected work and verified contributions.',
     social_image: 'assets/og/card.png',
+    locales: ['en', 'de', 'ar'],
     analytics: { script_url: `${analyticsOrigin}/js/script.js`, domain: 'portfolio.example.com' },
   },
   sources: [{ label: 'GitHub' }, { label: 'LinkedIn' }],
@@ -76,7 +81,34 @@ assert.deepEqual(dates, ['2026-03-04', '2026-02-03', '2026-01-02']);
 const generated = renderSecurityTxt(content, new Date('2026-09-29T00:00:00.000Z'));
 assert.ok(generated.includes('Contact: mailto:engineer@example.com\n'));
 assert.ok(generated.includes('Expires: 2027-09-29T00:00:00.000Z\n'));
-assert.ok(generated.includes('Preferred-Languages: en, tr\n'));
+assert.ok(generated.includes('Preferred-Languages: en, de, ar\n'));
+for (const locales of [undefined, [], ['en', 'EN-us'], ['en', '']]) {
+  assert.throws(
+    () => renderSecurityTxt({ ...content, site: { ...content.site, locales } }),
+    /site\.locales/,
+    `locales ${JSON.stringify(locales)} must be rejected`,
+  );
+}
+
+const expiresAt = Date.parse('2027-09-29T00:00:00.000Z');
+const daysBefore = (days) => expiresAt - days * 24 * 60 * 60 * 1000;
+// [days before expiry, check mode, needs update]
+for (const [days, checkOnly, expected] of [
+  [40, true, false], [40, false, false],
+  [20, true, false], [20, false, true],
+  [5, true, true], [5, false, true],
+  [-1, true, true],
+]) {
+  assert.equal(
+    securityTxtNeedsUpdate(generated, generated, { now: daysBefore(days), checkOnly }),
+    expected,
+    `${days} days before expiry, checkOnly=${checkOnly}`,
+  );
+}
+const otherLanguages = generated.replace('en, de, ar', 'en, tr');
+assert.ok(securityTxtNeedsUpdate(otherLanguages, generated, { now: daysBefore(200), checkOnly: true }));
+assert.ok(securityTxtNeedsUpdate(generated.replace(/^Expires: .+$/m, 'Expires: soon'), generated, { now: daysBefore(200), checkOnly: true }));
+assert.ok(securityTxtNeedsUpdate('', generated, { now: daysBefore(200), checkOnly: true }));
 assert.ok(generated.includes('Canonical: https://portfolio.example.com/.well-known/security.txt\n'));
 const projectSite = { ...content, site: { ...content.site, url: 'https://example.invalid/portfolio' } };
 assert.ok(renderSecurityTxt(projectSite, new Date('2026-09-29T00:00:00.000Z')).includes('Canonical: https://example.invalid/portfolio/.well-known/security.txt\n'));
