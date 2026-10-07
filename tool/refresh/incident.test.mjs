@@ -2,7 +2,12 @@ import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import { applyPackageFacts, buildReport, extractPackageFacts, mergeWritingEntries } from '../refresh_portfolio_data.mjs';
+import {
+  applyPackageFacts,
+  buildReport,
+  extractPackageFacts,
+  mergeWritingEntries,
+} from './refresh_portfolio_data.mjs';
 
 export function runIncidentTests(test, samplePackage) {
   scoreValidityTests(test, samplePackage);
@@ -11,6 +16,7 @@ export function runIncidentTests(test, samplePackage) {
   scoreFailureTests(test, samplePackage);
   cliTests(test);
   writingTests(test);
+  writingSourceTests(test);
 }
 
 function scoreValidityTests(test, samplePackage) {
@@ -121,22 +127,35 @@ function taskStatusTests(test) {
 }
 
 function refreshFixture(name) {
-  return JSON.parse(readFileSync(new URL(`../fixtures/refresh/${name}.json`, import.meta.url), 'utf8'));
+  return JSON.parse(
+    readFileSync(new URL(`../fixtures/refresh/${name}.json`, import.meta.url), 'utf8'),
+  );
 }
 
 function scoreFailureTests(test, samplePackage) {
   test('a failed score request keeps stored points and renders the required report line', () => {
     const pkg = samplePackage({ featured: true, maturity_level: 'L3' });
-    const facts = extractPackageFacts({ latest: { version: pkg.version } }, null, null, pkg.pub_points);
+    const facts = extractPackageFacts(
+      { latest: { version: pkg.version } },
+      null,
+      null,
+      pkg.pub_points,
+    );
     const outcome = applyPackageFacts(pkg, facts);
     assert.equal(outcome.pendingScore, true);
     assert.equal(pkg.pub_points, 160);
     assert.equal(pkg.featured, true);
     assert.equal(pkg.maturity_level, 'L3');
     const report = buildReport({
-      generatedAt: '2026-09-29T00:00:00Z', visibleChanges: [], counterChanges: [],
-      pendingScorePackages: [pkg.name], scoreUnavailable: [`${pkg.name}: score unavailable, kept 160/160`],
-      closedUnmergedContributions: [], failures: [], candidateGroups: [], candidatesError: null,
+      generatedAt: '2026-09-29T00:00:00Z',
+      visibleChanges: [],
+      counterChanges: [],
+      pendingScorePackages: [pkg.name],
+      scoreUnavailable: [`${pkg.name}: score unavailable, kept 160/160`],
+      closedUnmergedContributions: [],
+      failures: [],
+      candidateGroups: [],
+      candidatesError: null,
     });
     assert.ok(report.includes(`${pkg.name}: score unavailable, kept 160/160`));
   });
@@ -144,36 +163,56 @@ function scoreFailureTests(test, samplePackage) {
 
 function cliTests(test) {
   test('the CLI keeps a transient score and prints the unavailable line', () => {
-    const script = fileURLToPath(new URL('../refresh_portfolio_data.mjs', import.meta.url));
+    const script = fileURLToPath(new URL('./refresh_portfolio_data.mjs', import.meta.url));
     const mock = fileURLToPath(new URL('../fixtures/refresh/mock-fetch.mjs', import.meta.url));
-    const document = fileURLToPath(new URL('../fixtures/refresh/cli-document.json', import.meta.url));
-    const run = spawnSync(process.execPath, ['--import', mock, script, '--check', '--file', document], {
-      encoding: 'utf8',
-    });
+    const document = fileURLToPath(
+      new URL('../fixtures/refresh/cli-document.json', import.meta.url),
+    );
+    const run = spawnSync(
+      process.execPath,
+      ['--import', mock, script, '--check', '--file', document],
+      {
+        encoding: 'utf8',
+      },
+    );
     assert.equal(run.status, 0, run.stderr);
     assert.ok(run.stdout.includes('re2: score unavailable, kept 160/160'));
     assert.equal(JSON.parse(readFileSync(document, 'utf8')).packages[0].pub_points, 160);
   });
 
   test('the CLI keeps stored points when the score request fails', () => {
-    const script = fileURLToPath(new URL('../refresh_portfolio_data.mjs', import.meta.url));
+    const script = fileURLToPath(new URL('./refresh_portfolio_data.mjs', import.meta.url));
     const mock = fileURLToPath(new URL('../fixtures/refresh/mock-fetch.mjs', import.meta.url));
-    const document = fileURLToPath(new URL('../fixtures/refresh/cli-document.json', import.meta.url));
-    const run = spawnSync(process.execPath, ['--import', mock, script, '--check', '--file', document], {
-      encoding: 'utf8', env: { ...process.env, REFRESH_TEST_SCORE_FAILURE: '1' },
-    });
+    const document = fileURLToPath(
+      new URL('../fixtures/refresh/cli-document.json', import.meta.url),
+    );
+    const run = spawnSync(
+      process.execPath,
+      ['--import', mock, script, '--check', '--file', document],
+      {
+        encoding: 'utf8',
+        env: { ...process.env, REFRESH_TEST_SCORE_FAILURE: '1' },
+      },
+    );
     assert.equal(run.status, 0, run.stderr);
     assert.ok(run.stdout.includes('re2: score unavailable, kept 160/160'));
     assert.equal(JSON.parse(readFileSync(document, 'utf8')).packages[0].pub_points, 160);
   });
 
   test('the CLI recognizes a score drop confirmed by metrics sections', () => {
-    const script = fileURLToPath(new URL('../refresh_portfolio_data.mjs', import.meta.url));
+    const script = fileURLToPath(new URL('./refresh_portfolio_data.mjs', import.meta.url));
     const mock = fileURLToPath(new URL('../fixtures/refresh/mock-fetch.mjs', import.meta.url));
-    const document = fileURLToPath(new URL('../fixtures/refresh/cli-document.json', import.meta.url));
-    const run = spawnSync(process.execPath, ['--import', mock, script, '--check', '--file', document], {
-      encoding: 'utf8', env: { ...process.env, REFRESH_TEST_CONFIRMED_DROP: '1' },
-    });
+    const document = fileURLToPath(
+      new URL('../fixtures/refresh/cli-document.json', import.meta.url),
+    );
+    const run = spawnSync(
+      process.execPath,
+      ['--import', mock, script, '--check', '--file', document],
+      {
+        encoding: 'utf8',
+        env: { ...process.env, REFRESH_TEST_CONFIRMED_DROP: '1' },
+      },
+    );
     assert.equal(run.status, 1, run.stderr);
     assert.ok(run.stdout.includes('Visible changes: 1'));
     assert.ok(!run.stdout.includes('score unavailable'));
@@ -183,10 +222,17 @@ function cliTests(test) {
 
 function writingTests(test) {
   test('writing merge retains unmanaged fields on an existing entry', () => {
-    const previous = [{
-      title: 'Dated', url: 'https://example.com/dated', source: 'feed', date: '2026-07-28',
-      featured: true, maturity_level: 'L3', future_field: { keep: true },
-    }];
+    const previous = [
+      {
+        title: 'Dated',
+        url: 'https://example.com/dated',
+        source: 'feed',
+        date: '2026-07-28',
+        featured: true,
+        maturity_level: 'L3',
+        future_field: { keep: true },
+      },
+    ];
     const merged = mergeWritingEntries(
       { feed: [{ title: 'Dated', url: previous[0].url, publishedAt: '2026-07-29T06:41:58.000Z' }] },
       ['feed'],
@@ -197,28 +243,58 @@ function writingTests(test) {
     assert.equal(merged[0].maturity_level, 'L3');
     assert.deepEqual(merged[0].future_field, { keep: true });
   });
+}
 
+function writingSourceTests(test) {
   test('writing merge retains unmanaged fields when a source changes its article URL', () => {
-    const previous = [{
-      title: 'Dated', url: 'https://example.com/old', source: 'feed', date: '2026-07-28',
-      featured: true,
-    }];
+    const previous = [
+      {
+        title: 'Dated',
+        url: 'https://example.com/old',
+        source: 'feed',
+        date: '2026-07-28',
+        featured: true,
+      },
+    ];
     const merged = mergeWritingEntries(
-      { feed: [{ title: 'Dated', url: 'https://example.com/new', publishedAt: '2026-07-29T06:41:58.000Z' }] },
-      ['feed'], { previous },
+      {
+        feed: [
+          {
+            title: 'Dated',
+            url: 'https://example.com/new',
+            publishedAt: '2026-07-29T06:41:58.000Z',
+          },
+        ],
+      },
+      ['feed'],
+      { previous },
     );
     assert.equal(merged[0].url, 'https://example.com/new');
     assert.equal(merged[0].featured, true);
   });
 
   test('writing merge retains unmanaged fields when a preferred source changes', () => {
-    const previous = [{
-      title: 'Dated', url: 'https://example.com/old', source: 'old', date: '2026-07-28',
-      featured: true,
-    }];
+    const previous = [
+      {
+        title: 'Dated',
+        url: 'https://example.com/old',
+        source: 'old',
+        date: '2026-07-28',
+        featured: true,
+      },
+    ];
     const merged = mergeWritingEntries(
-      { new: [{ title: 'Dated', url: 'https://example.com/new', publishedAt: '2026-07-29T06:41:58.000Z' }] },
-      ['new'], { previous },
+      {
+        new: [
+          {
+            title: 'Dated',
+            url: 'https://example.com/new',
+            publishedAt: '2026-07-29T06:41:58.000Z',
+          },
+        ],
+      },
+      ['new'],
+      { previous },
     );
     assert.equal(merged[0].source, 'new');
     assert.equal(merged[0].featured, true);

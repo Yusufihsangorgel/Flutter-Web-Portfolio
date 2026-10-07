@@ -5,15 +5,34 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import test from 'node:test';
 
-import { inspectRaster } from '../raster_inspector.mjs';
+import { inspectRaster } from '../assets/raster_inspector.mjs';
 import { selectSmallest } from './encoder.mjs';
 import {
+  renderInputDigest,
   verifyArtifacts,
   verifyFormatChoice,
   workArtifactPaths,
 } from './manifest.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
+
+async function copyFixture(t) {
+  const copy = await mkdtemp(path.join(tmpdir(), 'work-artifacts-'));
+  t.after(() => rm(copy, { recursive: true, force: true }));
+  for (const relative of [
+    'assets/work',
+    'assets/content/portfolio.json',
+    'tool/work_artifacts',
+    'tool/work_sources',
+  ]) {
+    await cp(path.join(root, relative), path.join(copy, relative), { recursive: true });
+  }
+  const paths = workArtifactPaths(copy);
+  const manifest = JSON.parse(await readFile(paths.manifest, 'utf8'));
+  manifest.input_sha256 = await renderInputDigest(paths);
+  await writeFile(paths.manifest, `${JSON.stringify(manifest, null, 2)}\n`);
+  return paths;
+}
 
 function riff(chunks) {
   const body = Buffer.concat([Buffer.from('WEBP', 'latin1'), ...chunks]);
@@ -96,22 +115,11 @@ test('flags a recorded format that is not the smallest candidate', () => {
 });
 
 test('check mode detects stale inputs, edited assets, and orphans', async (t) => {
-  const copy = await mkdtemp(path.join(tmpdir(), 'work-artifacts-'));
-  t.after(() => rm(copy, { recursive: true, force: true }));
-  for (const relative of [
-    'assets/work',
-    'assets/content/portfolio.json',
-    'tool/render_work_artifacts.mjs',
-    'tool/work_artifacts',
-    'tool/work_sources',
-  ]) {
-    await cp(path.join(root, relative), path.join(copy, relative), { recursive: true });
-  }
-  const paths = workArtifactPaths(copy);
+  const paths = await copyFixture(t);
   assert.deepEqual(await verifyArtifacts(paths), []);
 
   const manifest = JSON.parse(await readFile(paths.manifest, 'utf8'));
-  const first = path.join(copy, manifest.artifacts[0].asset);
+  const first = path.join(paths.root, manifest.artifacts[0].asset);
   const original = await readFile(first);
   await writeFile(first, Buffer.concat([original, Buffer.alloc(1)]));
   assert.match((await verifyArtifacts(paths)).join('\n'), /differs from its recorded digest/);
@@ -122,5 +130,15 @@ test('check mode detects stale inputs, edited assets, and orphans', async (t) =>
   await rm(path.join(paths.output, 'stray.png'));
 
   await writeFile(path.join(paths.sources, 'README.md'), 'changed\n');
+  assert.match((await verifyArtifacts(paths)).join('\n'), /renderer inputs changed/);
+});
+
+test('check mode detects a changed split renderer helper', async (t) => {
+  const paths = await copyFixture(t);
+  assert.deepEqual(await verifyArtifacts(paths), []);
+
+  const helper = path.join(paths.modules, 'template.mjs');
+  await writeFile(helper, `${await readFile(helper, 'utf8')}\n// changed\n`);
+
   assert.match((await verifyArtifacts(paths)).join('\n'), /renderer inputs changed/);
 });
