@@ -1,5 +1,6 @@
-import { expect, test, type ConsoleMessage, type Page } from "@playwright/test";
+import { expect, test, type ConsoleMessage, type Page } from "./helpers/test_setup";
 import { readFileSync } from "node:fs";
+import { waitForFrames } from './helpers/semantics_scroll';
 
 declare global {
   interface Window {
@@ -83,9 +84,7 @@ for (const runtime of runtimes) {
         performance.getEntriesByName("flutter-bootstrap-surface-removed").length > 0,
     );
     await page.keyboard.press("Tab");
-    await page.evaluate(
-      () => new Promise<void>((resolve) => requestAnimationFrame(() => resolve())),
-    );
+    await waitForFrames(page);
 
     expect(await page.evaluate(() => window.policyViolations)).toEqual([]);
     expect(policyErrors).toEqual([]);

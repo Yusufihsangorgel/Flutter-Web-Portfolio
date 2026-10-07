@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -41,9 +43,11 @@ class _HomeViewState extends State<HomeView> {
     debugLabel: 'portfolio-main-content',
     skipTraversal: true,
   );
-  bool _skipLinkVisible = false;
   String? _lastAnnouncedLanguageWarning;
   AppScrollController? _scheduledScrollController;
+  VoidCallback? _endSkipWait;
+
+  static final _skipScrollBound = AppDurations.sectionScroll * 2;
 
   @override
   void didChangeDependencies() {
@@ -70,6 +74,7 @@ class _HomeViewState extends State<HomeView> {
 
   @override
   void dispose() {
+    _endSkipWait?.call();
     _focusNode.dispose();
     _skipLinkFocusNode.dispose();
     _mainContentFocusNode.dispose();
@@ -79,7 +84,6 @@ class _HomeViewState extends State<HomeView> {
   KeyEventResult _handleKeyEvent(FocusNode _, KeyEvent event) {
     if (event is! KeyDownEvent) return KeyEventResult.ignored;
 
-    // Ctrl+K / Cmd+K -> open command palette
     if (event.logicalKey == LogicalKeyboardKey.keyK &&
         (HardwareKeyboard.instance.isControlPressed ||
             HardwareKeyboard.instance.isMetaPressed)) {
@@ -109,6 +113,57 @@ class _HomeViewState extends State<HomeView> {
         );
     });
   }
+
+  Future<void> _skipToContent() async {
+    if (_endSkipWait != null) return;
+    final controller = context.read<AppScrollController>();
+    controller.scrollToSection(_mainContentId(controller.narrative).value);
+    if (controller.scrollController.hasClients) {
+      await _waitForScrollEnd(controller.scrollController.position);
+    }
+    if (mounted && _isFocusUnclaimed()) _mainContentFocusNode.requestFocus();
+  }
+
+  // Ends on scroll stop or interruption, on unmount, or at the time bound.
+  Future<void> _waitForScrollEnd(ScrollPosition position) {
+    final scrolling = position.isScrollingNotifier;
+    if (!scrolling.value) return Future<void>.value();
+    final ended = Completer<void>();
+    late final Timer bound;
+    late final VoidCallback onScrollChanged;
+    void end() {
+      if (ended.isCompleted) return;
+      _endSkipWait = null;
+      bound.cancel();
+      scrolling.removeListener(onScrollChanged);
+      ended.complete();
+    }
+
+    onScrollChanged = () {
+      if (!scrolling.value) end();
+    };
+    bound = Timer(_skipScrollBound, end);
+    scrolling.addListener(onScrollChanged);
+    _endSkipWait = end;
+    return ended.future;
+  }
+
+  // Skip focus yields to any control the reader chose in the meantime.
+  bool _isFocusUnclaimed() {
+    final focus = FocusManager.instance.primaryFocus;
+    return focus == null ||
+        focus == _skipLinkFocusNode ||
+        focus == _focusNode ||
+        focus is FocusScopeNode;
+  }
+
+  static SectionId _mainContentId(NarrativeDocument narrative) => narrative
+      .chapters
+      .firstWhere(
+        (chapter) => !chapter.id.isHome,
+        orElse: () => narrative.chapters.first,
+      )
+      .id;
 
   @override
   Widget build(BuildContext context) {
@@ -161,32 +216,7 @@ class _HomeViewState extends State<HomeView> {
       const Positioned.fill(
         child: RepaintBoundary(child: NarrativeBackground()),
       ),
-      // Skip-to-content link (accessibility)
-      Positioned(
-        top: 0,
-        left: 0,
-        right: 0,
-        child: _SkipToContentLink(
-          label: languageController.getText(
-            'accessibility.skip_to_content',
-            defaultValue: 'Skip to content',
-          ),
-          visible: _skipLinkVisible,
-          focusNode: _skipLinkFocusNode,
-          onFocusChanged: (focused) {
-            setState(() => _skipLinkVisible = focused);
-          },
-          onActivate: () {
-            final firstContentChapter = narrative.chapters.firstWhere(
-              (chapter) => !chapter.id.isHome,
-              orElse: () => narrative.chapters.first,
-            );
-            scrollController.scrollToSection(firstContentChapter.id.value);
-            _mainContentFocusNode.requestFocus();
-          },
-        ),
-      ),
-      // Layer 3: one continuous, immediately interactive document.
+      _buildSkipLink(languageController),
       ScrollConfiguration(
         behavior: ScrollConfiguration.of(context).copyWith(
           dragDevices: {
@@ -203,9 +233,7 @@ class _HomeViewState extends State<HomeView> {
               scrollController: scrollController,
               languageController: languageController,
             ),
-            // One document box deliberately lays out this short portfolio as
-            // a whole. Every chapter therefore has measured geometry for
-            // deep links and keyboard navigation without a giant cacheExtent.
+            // Lay out every chapter to measure navigation targets.
             SliverToBoxAdapter(
               child: NotificationListener<SizeChangedLayoutNotification>(
                 onNotification: (_) {
@@ -225,12 +253,23 @@ class _HomeViewState extends State<HomeView> {
           ],
         ),
       ),
-      // Layer 4: one measured signal connects real content anchors across
-      // otherwise independent chapter surfaces.
       const NarrativeStage(),
-      // Layer 5: Back-to-top button with scroll progress
       const BackToTopButton(),
     ],
+  );
+
+  Widget _buildSkipLink(LanguageCubit languageController) => Positioned(
+    top: 0,
+    left: 0,
+    right: 0,
+    child: _SkipToContentLink(
+      label: languageController.getText(
+        'accessibility.skip_to_content',
+        defaultValue: 'Skip to content',
+      ),
+      focusNode: _skipLinkFocusNode,
+      onActivate: () => unawaited(_skipToContent()),
+    ),
   );
 
   List<Widget> _buildChapters(
@@ -239,22 +278,14 @@ class _HomeViewState extends State<HomeView> {
     NarrativeDocument narrative,
   ) {
     final chapters = <Widget>[];
-    final mainContentId = narrative.chapters
-        .firstWhere(
-          (chapter) => !chapter.id.isHome,
-          orElse: () => narrative.chapters.first,
-        )
-        .id;
+    final mainContentId = _mainContentId(narrative);
     for (var index = 0; index < narrative.chapters.length; index += 1) {
       final chapter = narrative.chapters[index];
       final isLast = index == narrative.chapters.length - 1;
       chapters.add(
         _buildSection(
-          scrollController.keyFor(chapter.id),
-          _widgetFor(chapter.id),
           context,
-          isHero: chapter.id.isHome,
-          fullBleed: chapter.id == SectionId.projects,
+          chapter,
           isLast: isLast,
           isMainContent: chapter.id == mainContentId,
         ),
@@ -295,23 +326,22 @@ class _HomeViewState extends State<HomeView> {
   }
 
   Widget _buildSection(
-    GlobalKey key,
-    Widget child,
-    BuildContext context, {
-    bool isHero = false,
-    bool fullBleed = false,
-    bool isLast = false,
-    bool isMainContent = false,
+    BuildContext context,
+    NarrativeChapter chapter, {
+    required bool isLast,
+    required bool isMainContent,
   }) {
+    final edgeToEdge = chapter.id.isHome || chapter.id == SectionId.projects;
     final section = Container(
-      key: key,
-      padding: isHero || fullBleed
+      key: context.read<AppScrollController>().keyFor(chapter.id),
+      padding: edgeToEdge
           ? EdgeInsets.zero
           : _sectionPadding(context, isLast: isLast),
-      child: child,
+      child: _widgetFor(chapter.id),
     );
     if (!isMainContent) return section;
     return Semantics(
+      identifier: 'main-content',
       container: true,
       child: Focus(
         key: const ValueKey('main-content-focus-target'),
@@ -335,37 +365,37 @@ class _HomeViewState extends State<HomeView> {
   };
 }
 
-/// Hidden skip-to-content link for keyboard and screen reader users.
-///
-/// Invisible by default; becomes visible when focused via Tab key.
-class _SkipToContentLink extends StatelessWidget {
+class _SkipToContentLink extends StatefulWidget {
   const _SkipToContentLink({
     required this.label,
-    required this.visible,
     required this.focusNode,
-    required this.onFocusChanged,
     required this.onActivate,
   });
 
   final String label;
-  final bool visible;
   final FocusNode focusNode;
-  final ValueChanged<bool> onFocusChanged;
   final VoidCallback onActivate;
 
   @override
+  State<_SkipToContentLink> createState() => _SkipToContentLinkState();
+}
+
+class _SkipToContentLinkState extends State<_SkipToContentLink> {
+  bool _visible = false;
+
+  @override
   Widget build(BuildContext context) => AccessibleAction(
-    focusNode: focusNode,
-    onFocusChanged: onFocusChanged,
-    onTap: onActivate,
-    semanticLabel: label,
+    focusNode: widget.focusNode,
+    onFocusChanged: (focused) => setState(() => _visible = focused),
+    onTap: widget.onActivate,
+    semanticLabel: widget.label,
     showFocusRing: false,
     child: AnimatedOpacity(
-      opacity: visible ? 1.0 : 0.0,
+      opacity: _visible ? 1.0 : 0.0,
       duration: AppDurations.fast,
       child: AnimatedContainer(
         duration: AppDurations.fast,
-        transform: Matrix4.translationValues(0, visible ? 0 : -48, 0),
+        transform: Matrix4.translationValues(0, _visible ? 0 : -48, 0),
         child: Center(
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
@@ -374,7 +404,7 @@ class _SkipToContentLink extends StatelessWidget {
               borderRadius: BorderRadius.circular(4),
             ),
             child: Text(
-              label,
+              widget.label,
               style: const TextStyle(
                 color: Colors.white,
                 fontSize: 14,

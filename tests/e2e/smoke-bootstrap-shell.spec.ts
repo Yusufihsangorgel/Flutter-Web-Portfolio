@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test } from "./helpers/test_setup";
 import type { Locator, Page } from "@playwright/test";
 import {
   bootstrapLocaleCases,
