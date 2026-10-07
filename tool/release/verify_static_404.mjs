@@ -1,6 +1,8 @@
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 
+import { releaseBaseHref, renderNotFoundPage } from './not_found_page.mjs';
+
 const releaseFiles = ['404.html', '.well-known/security.txt'];
 const nginxFailure = 'Nginx must return 404 for unknown paths using /404.html without an index fallback';
 const nginxPackaging = /^COPY\s+nginx\/default\.conf\s+\/etc\/nginx\/conf\.d\/default\.conf\s*$/m;
@@ -28,9 +30,23 @@ async function releaseFileIssues(sourceRoot, webRoot) {
     const release = await readText(path.join(webRoot, relative));
     if (!source?.trim()) issues.push(`source ${relative} is missing or empty`);
     if (!release?.trim()) issues.push(`${relative} is missing or empty in the release`);
-    else if (source && release !== source) issues.push(`${relative} is stale in the release`);
+    else if (source) {
+      const expected = await expectedReleaseFile(relative, source, webRoot);
+      if (expected.issue) issues.push(expected.issue);
+      else if (release !== expected.text) issues.push(`${relative} is stale in the release`);
+    }
   }
   return issues;
+}
+
+async function expectedReleaseFile(relative, source, webRoot) {
+  if (relative !== '404.html') return { text: source };
+  try {
+    const index = await readText(path.join(webRoot, 'index.html'));
+    return { text: renderNotFoundPage(source, releaseBaseHref(index ?? '')) };
+  } catch (error) {
+    return { issue: `404.html cannot be checked: ${error.message}` };
+  }
 }
 
 // Locations other than `location /` may keep narrow rewrites; only the root

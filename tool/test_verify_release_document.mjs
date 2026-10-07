@@ -6,6 +6,7 @@ import test from 'node:test';
 import { gzipSync } from 'node:zlib';
 
 import { precompressAssets, resolveReleaseCommit } from './release/bundle_helpers.mjs';
+import { renderNotFoundPage } from './release/not_found_page.mjs';
 import { renderReleaseIndex, renderLocaleData } from './release/render_release_index.mjs';
 import { checkCompression, checkDocument, checkMetadata } from './release/verify_document.mjs';
 import { verifyStatic404Release } from './release/verify_static_404.mjs';
@@ -93,16 +94,30 @@ const validSource = {
   'nginx/default.conf': nginx,
   Dockerfile: 'COPY nginx/default.conf /etc/nginx/conf.d/default.conf\nCOPY build/web /usr/share/nginx/html\n',
   'web/_redirects': "# Unknown paths use each host's 404 response.\n",
-  'web/404.html': '<h1>Not Found</h1>',
+  'web/404.html': notFoundPage('/'),
   'web/.well-known/security.txt': securityText,
 };
-const validRelease = { '404.html': '<h1>Not Found</h1>', '.well-known/security.txt': securityText };
+const validRelease = {
+  'index.html': '<base href="/">',
+  '404.html': notFoundPage('/'),
+  '.well-known/security.txt': securityText,
+};
+const projectSiteRelease = { 'index.html': '<base href="/portfolio/">', '404.html': notFoundPage('/portfolio/') };
 const nginxFailure = 'Nginx must return 404';
+
+function notFoundPage(base) {
+  return `<base href="${base}"><h1>Not Found</h1><a href="./">Home</a>`;
+}
 
 // [name, source overrides, release overrides, expected issue fragment or null]; a null file is not written.
 const static404Cases = [
   ['accepts the static 404 contract', {}, {}, null],
   ['requires 404.html in the release', {}, { '404.html': null }, '404.html is missing'],
+  ['accepts a 404 page on a project site base', {}, projectSiteRelease, null],
+  ['rejects a root base on a project site', {}, { 'index.html': projectSiteRelease['index.html'] }, '404.html is stale'],
+  ['requires the source 404 base', { 'web/404.html': '<h1>Not Found</h1>' }, {}, '404.html cannot be checked'],
+  ['requires a release base href', {}, { 'index.html': '<title>No base</title>' }, '404.html cannot be checked'],
+  ['rejects an unsafe release base href', {}, { 'index.html': '<base href="/a/../b/">' }, '404.html cannot be checked'],
   ['requires security.txt in the release', {}, { '.well-known/security.txt': null }, 'security.txt is missing'],
   ['rejects a stale security.txt', {}, { '.well-known/security.txt': 'stale' }, 'security.txt is stale'],
   ['rejects an index fallback in try_files', { 'nginx/default.conf': nginx.replace('=404', '/index.html') }, {}, nginxFailure],
@@ -144,3 +159,15 @@ for (const [name, sourceOverrides, releaseOverrides, expected] of static404Cases
     }
   });
 }
+
+test('the 404 home link resolves to the site root at a domain root and on a project site', async () => {
+  const source = await readFile('web/404.html', 'utf8');
+  for (const base of ['/', '/portfolio/']) {
+    const page = renderNotFoundPage(source, base);
+    const declared = page.match(/<base href="([^"]*)">/)?.[1];
+    const link = page.match(/<a href="([^"]*)">Return to the home page<\/a>/)?.[1];
+    assert.ok(declared && link, '404.html must keep its base and home link');
+    const missing = new URL(`${base}deep/missing/path`, 'https://example.com');
+    assert.equal(new URL(link, new URL(declared, missing)).href, `https://example.com${base}`);
+  }
+});

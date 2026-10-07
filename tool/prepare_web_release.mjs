@@ -22,6 +22,7 @@ import {
   resolveReleaseCommit,
   writeLegacyServiceWorkerKillSwitch,
 } from './release/bundle_helpers.mjs';
+import { releaseBaseHref, renderNotFoundPage } from './release/not_found_page.mjs';
 import { renderLocaleData, renderReleaseIndex } from './release/render_release_index.mjs';
 
 const webRoot = path.resolve(process.env.WEB_ROOT ?? 'build/web');
@@ -68,6 +69,7 @@ await writeFile(bootstrapPath, versionedBootstrap);
 await versionRendererDirectory(engineRevision);
 await injectReleasePreloads(releaseId, engineRevision);
 await injectBootstrapShell();
+await writeNotFoundPage();
 await writeLegacyServiceWorkerKillSwitch(webRoot);
 await normalizeNoticeWhitespace(webRoot);
 for (const file of ['_headers', '_redirects']) {
@@ -211,6 +213,15 @@ async function injectBootstrapShell() {
   const index = await readFile(indexPath, 'utf8');
   await writeFile(indexPath, renderReleaseIndex(index,
     shellLocales.en.markup, renderStaticDocument(portfolio)));
+}
+
+async function writeNotFoundPage() {
+  const [index, source] = await Promise.all([
+    readFile(path.join(webRoot, 'index.html'), 'utf8'),
+    readFile(path.resolve('web', '404.html'), 'utf8'),
+  ]);
+  await writeFile(path.join(webRoot, '404.html'),
+    renderNotFoundPage(source, releaseBaseHref(index)));
 }
 
 async function buildShellLocale(value, context) {

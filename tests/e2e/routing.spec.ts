@@ -14,6 +14,12 @@ test("returns static routes and reveals the hash route", async ({
   const missingResponse = await request.get("/does-not-exist");
   expect(missingResponse.status()).toBe(404);
 
+  const nestedMissing = await page.goto("/deep/missing/path");
+  expect(nestedMissing?.status()).toBe(404);
+  await expect(
+    page.getByRole("link", { name: "Return to the home page" }),
+  ).toHaveJSProperty("href", new URL("/", page.url()).href);
+
   const securityResponse = await request.get("/.well-known/security.txt");
   expect(securityResponse.status()).toBe(200);
   expect(securityResponse.headers()["content-type"]).toMatch(
