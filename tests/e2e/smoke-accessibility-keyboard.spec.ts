@@ -12,7 +12,10 @@ import {
   readAccessibilityTree,
   required,
 } from "./helpers/portfolio_test_helpers";
-import { scrollToSemanticLink } from "./helpers/semantics_scroll";
+import {
+  scrollToSemanticLink,
+  waitForSemanticsSettled,
+} from "./helpers/semantics_scroll";
 
 async function assertInitialHierarchy(
   page: Page,
@@ -166,7 +169,7 @@ test("publishes a clean heading and control hierarchy", async ({
       .getByRole("button", { name: "Open navigation menu", exact: true })
       .click();
   }
-  const aboutControl = page.getByRole("button", {
+  const aboutControl = page.getByRole("link", {
     name: "About",
     exact: true,
   });
@@ -208,7 +211,7 @@ test("skip link moves keyboard focus into the main document", async ({
     .toBe(true);
 });
 
-test("back-to-top is keyboard focusable and activates with Space", async ({
+test("back-to-top is a keyboard link that follows on Enter only", async ({
   page,
   isMobile,
 }) => {
@@ -221,7 +224,7 @@ test("back-to-top is keyboard focusable and activates with Space", async ({
     "the authored navigation path requires experience and work chapters",
   );
   await openPortfolio(page);
-  const backToTop = page.getByRole("button", {
+  const backToTop = page.getByRole("link", {
     name: englishInterface.accessibility.back_to_top,
     exact: true,
   });
@@ -237,8 +240,16 @@ test("back-to-top is keyboard focusable and activates with Space", async ({
     page,
     englishInterface.accessibility.back_to_top,
   );
-  await page.keyboard.press("Space");
 
+  // Space is not a link activation key, so the document must not move.
+  const settled = await waitForSemanticsSettled(page);
+  const hashBeforeSpace = await page.evaluate(() => location.hash);
+  await page.keyboard.press("Space");
+  expect(await waitForSemanticsSettled(page, settled)).toBe(settled);
+  expect(await page.evaluate(() => location.hash)).toBe(hashBeforeSpace);
+  await expect(backToTop).toBeVisible();
+
+  await page.keyboard.press("Enter");
   await expect(page).toHaveURL(/#\/$/);
   await expect(backToTop).toHaveCount(0);
   await expectHeadingInViewport(
@@ -259,7 +270,7 @@ test("back-to-top activates from the compact touch layout", async ({
     hash: /#\/projects$/,
     heading: "Selected Work",
   });
-  const backToTop = page.getByRole("button", {
+  const backToTop = page.getByRole("link", {
     name: englishInterface.accessibility.back_to_top,
     exact: true,
   });
