@@ -102,8 +102,13 @@ export async function scrollToHeading(page: Page, name: string) {
   return scrollToLocator(page, heading, 500);
 }
 
+// The hidden static document repeats the record, so text queries stay in Flutter's tree.
+export function semanticsTree(page: Page): Locator {
+  return page.locator("flt-semantics-host");
+}
+
 export async function scrollToText(page: Page, text: string) {
-  return scrollToLocator(page, page.getByText(text).first());
+  return scrollToLocator(page, semanticsTree(page).getByText(text).first());
 }
 
 export async function scrollToSemanticLink(page: Page, title: string) {

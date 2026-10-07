@@ -1,0 +1,4 @@
+Contact: mailto:developeryusuf@icloud.com
+Expires: 2027-10-07T00:12:04.314Z
+Preferred-Languages: en, tr, de, fr, es, ar, hi
+Canonical: https://developeryusuf.com/.well-known/security.txt

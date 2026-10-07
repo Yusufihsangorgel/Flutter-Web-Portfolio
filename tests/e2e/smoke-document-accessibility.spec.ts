@@ -5,7 +5,7 @@ import {
   openPortfolio,
   portfolio,
 } from "./helpers/portfolio_test_helpers";
-import { scrollToLocator } from "./helpers/semantics_scroll";
+import { scrollToLocator, semanticsTree } from "./helpers/semantics_scroll";
 
 test("keeps every professional chapter in one accessible document", async ({
   page,
@@ -35,7 +35,7 @@ test("keeps every professional chapter in one accessible document", async ({
     "Experience",
   );
   await expect(
-    page.getByText(portfolio.experience[0].company).first(),
+    semanticsTree(page).getByText(portfolio.experience[0].company).first(),
   ).toBeAttached();
 });
 

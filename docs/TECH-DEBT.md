@@ -53,7 +53,6 @@ These are verified examples, not a complete metric baseline. Add a calibrated me
 
 | Area | Current state | Planned fix |
 |---|---|---|
-| [Routing and semantic document](adr/0002-hash-routing-static-semantic-document.md) | Catch-all SPA rewrite and JavaScript-only portfolio body remain. | Generate semantic HTML, remove host rewrites, and test unknown-path 404 behavior on each supported host. |
 | [Artifact promotion](adr/0004-build-once-promote-artifact.md) | `build/web` is tracked; CI, Pages, and production do not promote one attested artifact; production CD uses a repository-registered self-hosted runner. | Verify one hosted build, publish digest/provenance, move production to an independent pull process, remove runner registration, then stop tracking generated output. |
 | [Locale fonts](adr/0006-locales-and-font-loading.md) | Full Latin and script font files are bundled; shell preloads selected script fonts. | Subset Latin fonts and demand-load locale fonts with glyph and visual coverage. |
 | [`architecture-rules.json`](../quality/architecture-rules.json) | The import gate still lists unused package bans, permits annotation package patterns in domain, and exempts provider-named UI imports. | Align rule JSON and calibration with [architecture rules](ARCHITECTURE-RULES.md) in the coordinator-owned configuration change; keep `NEW` and `STALE` detection and the five-entry baseline. |

@@ -1,5 +1,5 @@
 import { existsSync, realpathSync, statSync } from 'node:fs';
-import { extname, isAbsolute, join, normalize, relative, resolve, sep } from 'node:path';
+import { isAbsolute, join, normalize, relative, resolve, sep } from 'node:path';
 
 export class StaticPathViolation extends Error {}
 
@@ -7,21 +7,17 @@ export function canonicalStaticRoot(value) {
   return realpathSync(resolve(value));
 }
 
-export function resolveStaticFile(root, requestPath, fallback = 'index.html') {
+// Mirrors `try_files $uri $uri/ =404`: unknown paths never fall back to the shell.
+export function resolveStaticFile(root, requestPath, indexFile = 'index.html') {
   const relativePath = normalize(requestPath).replace(/^[/\\]+/, '');
-  const candidate = resolve(root, relativePath || fallback);
+  const candidate = resolve(root, relativePath || indexFile);
   assertContained(root, candidate);
 
   let filePath = resolveExistingPath(root, candidate);
   if (filePath && statSync(filePath).isDirectory()) {
     filePath = resolveExistingPath(root, join(filePath, 'index.html'));
   }
-  if (filePath && statSync(filePath).isFile()) return filePath;
-  if (extname(relativePath)) return null;
-
-  const fallbackPath = resolveExistingPath(root, resolve(root, fallback));
-  if (!fallbackPath || !statSync(fallbackPath).isFile()) return null;
-  return fallbackPath;
+  return filePath && statSync(filePath).isFile() ? filePath : null;
 }
 
 function resolveExistingPath(root, candidate) {

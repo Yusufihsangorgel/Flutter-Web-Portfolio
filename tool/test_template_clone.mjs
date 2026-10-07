@@ -22,6 +22,13 @@ import {
 import { resolveExecutable } from './cli_safety.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const templateReadme = await readFile(path.join(root, 'README.md'), 'utf8');
+assert(
+  templateReadme.includes(
+    "The live demo uses this template with the author's own record. This block is regenerated from the canonical content document; it is evidence for the demo, not starter data inherited by `npm run portfolio:init`.",
+  ),
+  'template README describes the demo record with the canonical wording',
+);
 const temporaryDirectory = await mkdtemp(
   path.join(os.tmpdir(), 'portfolio-template-clone-'),
 );
@@ -150,7 +157,8 @@ try {
   );
   assert(
     readme.includes("repository owner's canonical content document") &&
-      !readme.includes('evidence for the demo'),
+      !readme.includes('evidence for the demo') &&
+      !readme.includes("author's own record"),
     'initialized record copy describes the current owner instead of the demo',
   );
   assert(
@@ -298,7 +306,7 @@ async function collectRepositoryText(directory) {
           ...decoded.split('\n').map((line) => `${relative}:${line}`),
         );
       } catch {
-        // Binary assets are covered by their path; only valid UTF-8 is scanned.
+        continue;
       }
     }
   }

@@ -39,6 +39,8 @@ jobs:
       - run: npm run test:template
       - run: npm run test:starter
       - run: npm run test:release-security
+      - run: npm run test:release-document
+      - run: npm run test:hosting-security
       - run: npm run test:refresh
       - run: npm run test:content
       - run: npm run test:resume
@@ -138,6 +140,17 @@ jobs:
             playwright-report/
           retention-days: 7
       - run: npm run verify:runtime
+      # lighthouserc.json serves build/web and fails below 0.95 for accessibility,
+      # best practices and SEO; performance only warns on shared runners.
+      - name: Audit the release with Lighthouse
+        run: npm run lighthouse
+      - name: Upload Lighthouse reports
+        if: failure()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: lighthouse-reports
+          path: .lighthouseci/
+          retention-days: 7
       - name: Package verified release
         run: |
           tar --sort=name --mtime='UTC 2000-01-01' --owner=0 --group=0 --numeric-owner -C build -cf - web | gzip -n -9 > web-release.tar.gz

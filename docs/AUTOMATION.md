@@ -84,6 +84,19 @@ repository has no self-hosted runner. Template users run
 `npm run build:release` and deploy the resulting `build/web` to their host;
 see [`DEPLOY.md`](DEPLOY.md) for host-specific instructions.
 
+## security.txt expiry
+
+`web/.well-known/security.txt` follows RFC 9116: `Contact` comes from
+`profile.email`, `Preferred-Languages` from `site.locales`, and `Expires` is set
+one year after the file is generated. `npm run sync:content` rewrites the file
+when its fields drift or when fewer than 30 days remain before `Expires`, and
+the refresh workflow stages the result with the other derived files.
+`npm run verify:content` ignores the date until fewer than 7 days remain, so CI
+stays green while the next content refresh or any local sync renews it. In the
+last week, or after expiry, `verify:content` reports
+`web/.well-known/security.txt` as drift; run `npm run sync:content` and commit
+the file.
+
 ## Enabling it on a clone
 
 Nothing needs editing. The tool reads which packages to check from
