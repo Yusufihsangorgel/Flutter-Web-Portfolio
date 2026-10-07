@@ -117,6 +117,15 @@ test("a modified click on a navigation link opens a new tab", async ({
   const links = await navigationLinks(page, isMobile);
   const expectedHash = hashOf(page, await links.first().getAttribute("href"));
   const hashBefore = await page.evaluate(() => location.hash);
+  // Only the new tab's URL matters; answer its document without booting a second app.
+  const origin = new URL(page.url()).origin;
+  await page.context().route(
+    (url) => url.origin === origin && url.pathname === "/",
+    (route) =>
+      route.request().resourceType() === "document"
+        ? route.fulfill({ contentType: "text/html", body: "<title>tab</title>" })
+        : route.fallback(),
+  );
 
   const [opened] = await Promise.all([
     page.context().waitForEvent("page"),
@@ -129,7 +138,6 @@ test("a modified click on a navigation link opens a new tab", async ({
   });
   expect(new URL(opened.url()).hash).toBe(expectedHash);
   expect(await page.evaluate(() => location.hash)).toBe(hashBefore);
-  // Only the opened URL matters; close the second app instance before teardown.
   await opened.close();
 });
 
