@@ -6,6 +6,8 @@ import 'package:flutter_web_portfolio/app/controllers/scroll_controller.dart';
 import 'package:flutter_web_portfolio/app/domain/repositories/language_repository.dart';
 import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
 import 'package:flutter_web_portfolio/app/modules/home/sections/home_section.dart';
+import 'package:flutter_web_portfolio/app/modules/home/sections/about_section.dart';
+import 'package:flutter_web_portfolio/app/widgets/portfolio_link.dart';
 import '../helpers/portfolio_fixture.dart';
 import '../helpers/narrative_fixture.dart';
 
@@ -34,10 +36,20 @@ final class _HomeLanguageRepository implements LanguageRepository {
 }
 
 void main() {
+  final subject = _HomeSubject();
+  setUp(subject.initialize);
+  _registerHeroLinks(subject);
+  _registerAboutLinks(subject);
+  _registerHeroWithoutProjects(subject);
+  _registerUnavailableProfileLinks(subject);
+  _registerConfiguredIdentity(subject);
+}
+
+class _HomeSubject {
   late LanguageCubit language;
   late AppScrollController scroll;
 
-  setUp(() async {
+  Future<void> initialize() async {
     language = LanguageCubit(languageRepository: _HomeLanguageRepository());
     scroll = AppScrollController(narrative: loadNarrativeFixture());
     await language.initialize();
@@ -45,12 +57,13 @@ void main() {
       await language.close();
       await scroll.close();
     });
-  });
+  }
 
   Widget buildSubject({
     required bool includeWork,
     required bool includeGithub,
     void Function(Map<String, dynamic> json)? mutate,
+    Widget section = const HomeSection(),
   }) {
     final portfolio = loadPortfolioFixture(
       mutate: (json) {
@@ -73,19 +86,61 @@ void main() {
             BlocProvider.value(value: language),
             BlocProvider.value(value: scroll),
           ],
-          child: const MaterialApp(
-            home: Scaffold(body: SingleChildScrollView(child: HomeSection())),
+          child: MaterialApp(
+            home: Scaffold(body: SingleChildScrollView(child: section)),
           ),
         ),
       ),
     );
   }
+}
 
+void _registerHeroLinks(_HomeSubject subject) {
+  testWidgets('exposes hero actions and profiles as browser links', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      subject.buildSubject(includeWork: true, includeGithub: true),
+    );
+    final links = tester.widgetList<PortfolioLink>(find.byType(PortfolioLink));
+    expect(links.any((link) => link.uri.toString() == '#/projects'), isTrue);
+    expect(links.any((link) => link.uri.scheme == 'mailto'), isTrue);
+    expect(links.any((link) => link.uri.scheme == 'https'), isTrue);
+    await tester.pumpWidget(const SizedBox.shrink());
+  });
+}
+
+void _registerAboutLinks(_HomeSubject subject) {
+  testWidgets('exposes about contact and profiles as browser links', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      subject.buildSubject(
+        includeWork: true,
+        includeGithub: true,
+        section: const AboutSection(),
+      ),
+    );
+    final links = tester.widgetList<PortfolioLink>(find.byType(PortfolioLink));
+    final profile = loadPortfolioFixture().profile;
+    expect(
+      links.map((link) => link.uri),
+      containsAll([
+        Uri(scheme: 'mailto', path: profile.email),
+        ...profile.links.map((link) => link.url),
+      ]),
+    );
+    expect(tester.takeException(), isNull);
+    await tester.pumpWidget(const SizedBox.shrink());
+  });
+}
+
+void _registerHeroWithoutProjects(_HomeSubject subject) {
   testWidgets('keeps the narrative action when project records are absent', (
     tester,
   ) async {
     await tester.pumpWidget(
-      buildSubject(includeWork: false, includeGithub: true),
+      subject.buildSubject(includeWork: false, includeGithub: true),
     );
     await tester.pump(const Duration(milliseconds: 1));
 
@@ -98,10 +153,12 @@ void main() {
     await tester.pumpWidget(const SizedBox.shrink());
     await tester.pump();
   });
+}
 
+void _registerUnavailableProfileLinks(_HomeSubject subject) {
   testWidgets('removes only unavailable external hero actions', (tester) async {
     await tester.pumpWidget(
-      buildSubject(includeWork: false, includeGithub: false),
+      subject.buildSubject(includeWork: false, includeGithub: false),
     );
     await tester.pump(const Duration(milliseconds: 1));
 
@@ -111,12 +168,14 @@ void main() {
     await tester.pumpWidget(const SizedBox.shrink());
     await tester.pump();
   });
+}
 
+void _registerConfiguredIdentity(_HomeSubject subject) {
   testWidgets(
     'renders configured display-name parts without parsing identity',
     (tester) async {
       await tester.pumpWidget(
-        buildSubject(
+        subject.buildSubject(
           includeWork: true,
           includeGithub: true,
           mutate: (json) {

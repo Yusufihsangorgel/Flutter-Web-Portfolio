@@ -75,7 +75,9 @@
     "event_lab_risk": "Risk",
     "event_lab_step": "Step",
     "status_merged": "Merged",
-    "status_under_review": "Under review"
+    "status_under_review": "Under review",
+    "summary_accepted": "{merged} changes accepted upstream.",
+    "summary_review": "{review} changes under review."
   },
   "packages_section": {
     "title": "Published Packages",
@@ -87,13 +89,23 @@
     "status_done": "shipped",
     "status_doing": "in progress",
     "status_next": "next",
-    "status_waiting": "waiting"
+    "status_waiting": "waiting",
+    "category_native_ffi": "Native & FFI",
+    "category_ai_llm": "AI & LLM",
+    "category_server": "Server-side Dart",
+    "category_flutter_ui": "Flutter UI",
+    "category_dev_tool": "Developer tools",
+    "show_all": "Show all {count}",
+    "show_less": "Show fewer",
+    "subtitle_no_perfect": "{count} packages live on pub.dev. Each one ships a measured claim, runnable examples, and the roadmap it is on."
   },
   "writing_section": {
     "title": "Writing",
     "subtitle": "Recent articles from every place I publish, newest first.",
     "all_writing": "All writing",
-    "open_article": "Read article"
+    "open_article": "Read article",
+    "show_all": "Show all {count}",
+    "show_less": "Show fewer"
   },
   "footer": {
     "quick_links": "Quick Links",

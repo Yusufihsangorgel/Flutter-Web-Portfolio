@@ -65,7 +65,7 @@ test("keeps the personal hero readable at 280 CSS pixels", async ({
   expect(headingBox!.x + headingBox!.width).toBeLessThanOrEqual(280);
 
   for (const label of ["Explore my work", "Email me"]) {
-    const action = page.getByRole("button", { name: label, exact: true });
+    const action = page.getByRole("link", { name: label, exact: true });
     await scrollToLocator(page, action, 160);
     await expect(action).toBeVisible();
     const actionBox = await action.boundingBox();

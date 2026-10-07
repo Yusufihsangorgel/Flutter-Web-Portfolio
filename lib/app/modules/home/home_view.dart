@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
+import 'package:flutter_web_portfolio/app/features/language/application/language_context.dart';
 import 'package:flutter_web_portfolio/app/controllers/scroll_controller.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_dimensions.dart';
@@ -24,6 +25,8 @@ import 'package:flutter_web_portfolio/app/widgets/narrative_stage.dart';
 import 'package:flutter_web_portfolio/app/utils/motion_preference.dart';
 import 'package:flutter_web_portfolio/app/widgets/background/narrative_background.dart';
 import 'package:flutter_web_portfolio/app/narrative/domain/narrative_document.dart';
+
+part 'home_view_sections.dart';
 
 /// A single, semantic portfolio document with measured section navigation.
 class HomeView extends StatefulWidget {
@@ -171,43 +174,11 @@ class _HomeViewState extends State<HomeView> {
           child: RepaintBoundary(child: NarrativeBackground()),
         ),
         // Layer 3: one continuous, immediately interactive document.
-        ScrollConfiguration(
-          behavior: ScrollConfiguration.of(context).copyWith(
-            dragDevices: {
-              PointerDeviceKind.touch,
-              PointerDeviceKind.mouse,
-              PointerDeviceKind.trackpad,
-            },
-          ),
-          child: CustomScrollView(
-            controller: scrollController.scrollController,
-            physics: const ClampingScrollPhysics(),
-            slivers: [
-              CustomSliverAppBar(
-                scrollController: scrollController,
-                languageController: languageController,
-              ),
-              // One document box deliberately lays out this short portfolio as
-              // a whole. Every chapter therefore has measured geometry for
-              // deep links and keyboard navigation without a giant cacheExtent.
-              SliverToBoxAdapter(
-                child: NotificationListener<SizeChangedLayoutNotification>(
-                  onNotification: (_) {
-                    scrollController.markGeometryDirty();
-                    return false;
-                  },
-                  child: SizeChangedLayoutNotifier(
-                    child: Column(
-                      children: [
-                        ..._buildChapters(context, scrollController, narrative),
-                        const PortfolioFooter(),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
+        _scrollDocument(
+          context,
+          scrollController,
+          languageController,
+          narrative,
         ),
         // Layer 4: one measured signal connects real content anchors across
         // otherwise independent chapter surfaces.
@@ -215,14 +186,55 @@ class _HomeViewState extends State<HomeView> {
         // Layer 5: Back-to-top button with scroll progress
         const BackToTopButton(),
         // Above the app bar, so the focused bypass link is never covered.
-        _buildSkipLink(scrollController, languageController, narrative),
+        _buildSkipLink(scrollController, narrative),
+      ],
+    ),
+  );
+
+  Widget _scrollDocument(
+    BuildContext context,
+    AppScrollController scrollController,
+    LanguageCubit languageController,
+    NarrativeDocument narrative,
+  ) => ScrollConfiguration(
+    behavior: ScrollConfiguration.of(context).copyWith(
+      dragDevices: {
+        PointerDeviceKind.touch,
+        PointerDeviceKind.mouse,
+        PointerDeviceKind.trackpad,
+      },
+    ),
+    child: CustomScrollView(
+      controller: scrollController.scrollController,
+      physics: const ClampingScrollPhysics(),
+      slivers: [
+        CustomSliverAppBar(
+          scrollController: scrollController,
+          languageController: languageController,
+        ),
+        // Lay out each chapter so deep links use measured geometry.
+        SliverToBoxAdapter(
+          child: NotificationListener<SizeChangedLayoutNotification>(
+            onNotification: (_) {
+              scrollController.markGeometryDirty();
+              return false;
+            },
+            child: SizeChangedLayoutNotifier(
+              child: Column(
+                children: [
+                  ..._buildChapters(context, scrollController, narrative),
+                  const PortfolioFooter(),
+                ],
+              ),
+            ),
+          ),
+        ),
       ],
     ),
   );
 
   Widget _buildSkipLink(
     AppScrollController scrollController,
-    LanguageCubit languageController,
     NarrativeDocument narrative,
   ) => Positioned(
     top: 0,
@@ -232,10 +244,7 @@ class _HomeViewState extends State<HomeView> {
       child: FocusTraversalOrder(
         order: const NumericFocusOrder(0),
         child: SkipToContentLink(
-          label: languageController.getText(
-            'accessibility.skip_to_content',
-            defaultValue: 'Skip to content',
-          ),
+          label: context.strings.accessibilitySkipToContent,
           focusNode: _skipLinkFocusNode,
           onActivate: () => _skipToContent(scrollController, narrative),
         ),
@@ -271,29 +280,24 @@ class _HomeViewState extends State<HomeView> {
       final chapter = narrative.chapters[index];
       final isLast = index == narrative.chapters.length - 1;
       chapters.add(
-        _buildSection(
-          scrollController.keyFor(chapter.id),
-          _widgetFor(chapter.id),
-          context,
+        _buildSection(context, (
+          key: scrollController.keyFor(chapter.id),
+          child: _widgetFor(chapter.id),
           isHero: chapter.id.isHome,
           fullBleed: chapter.id == SectionId.projects,
           isLast: isLast,
           isMainContent: chapter.id == mainContentId,
-        ),
+        )),
       );
       if (!isLast) {
         final nextChapter = narrative.chapters[index + 1];
-        final language = context.read<LanguageCubit>();
         chapters.add(
           NarrativeChapterHandoff(
             from: chapter,
             to: nextChapter,
             position: scrollController.narrativePosition,
             chapterNumber: narrative.sectionNumber(nextChapter.id),
-            label: language.getText(
-              'nav.${nextChapter.id.value}',
-              defaultValue: nextChapter.id.value,
-            ),
+            label: _chapterLabel(context, nextChapter.id),
           ),
         );
       }
@@ -317,22 +321,25 @@ class _HomeViewState extends State<HomeView> {
   }
 
   Widget _buildSection(
-    GlobalKey key,
-    Widget child,
-    BuildContext context, {
-    bool isHero = false,
-    bool fullBleed = false,
-    bool isLast = false,
-    bool isMainContent = false,
-  }) {
+    BuildContext context,
+    ({
+      GlobalKey key,
+      Widget child,
+      bool isHero,
+      bool fullBleed,
+      bool isLast,
+      bool isMainContent,
+    })
+    layout,
+  ) {
     final section = Container(
-      key: key,
-      padding: isHero || fullBleed
+      key: layout.key,
+      padding: layout.isHero || layout.fullBleed
           ? EdgeInsets.zero
-          : _sectionPadding(context, isLast: isLast),
-      child: child,
+          : _sectionPadding(context, isLast: layout.isLast),
+      child: layout.child,
     );
-    if (!isMainContent) return section;
+    if (!layout.isMainContent) return section;
     return Semantics(
       container: true,
       child: Focus(
@@ -342,17 +349,4 @@ class _HomeViewState extends State<HomeView> {
       ),
     );
   }
-
-  Widget _widgetFor(SectionId sectionId) => switch (sectionId.value) {
-    'home' => const HomeSection(),
-    'about' => const AboutSection(),
-    'experience' => const ExperienceSection(),
-    'proof' => const ProofSection(),
-    'projects' => const ProjectsSection(),
-    'packages' => const PackagesSection(),
-    'writing' => const WritingSection(),
-    final value => throw StateError(
-      'No section widget is registered for narrative chapter "$value".',
-    ),
-  };
 }

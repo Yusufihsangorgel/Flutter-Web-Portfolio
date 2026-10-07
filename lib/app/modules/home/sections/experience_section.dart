@@ -6,6 +6,8 @@ import 'package:flutter_web_portfolio/app/core/constants/breakpoints.dart';
 import 'package:flutter_web_portfolio/app/core/theme/app_fonts.dart';
 import 'package:flutter_web_portfolio/app/domain/models/portfolio_document.dart';
 import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
+import 'package:flutter_web_portfolio/app/features/language/application/language_context.dart';
+import 'package:flutter_web_portfolio/app/modules/home/sections/section_style.dart';
 import 'package:flutter_web_portfolio/app/narrative/domain/narrative_document.dart';
 import 'package:flutter_web_portfolio/app/widgets/numbered_section_heading.dart';
 import 'package:flutter_web_portfolio/app/widgets/scene_accent_builder.dart';
@@ -18,7 +20,6 @@ class ExperienceSection extends StatelessWidget {
   Widget build(BuildContext context) =>
       BlocBuilder<LanguageCubit, LanguageState>(
         builder: (context, _) {
-          final language = context.read<LanguageCubit>();
           final portfolio = context.read<PortfolioDocument>();
           final experiences = portfolio.experience;
 
@@ -32,10 +33,7 @@ class ExperienceSection extends StatelessWidget {
                     number: context.read<NarrativeDocument>().sectionNumber(
                       SectionId.experience,
                     ),
-                    title: language.getText(
-                      'experience_section.title',
-                      defaultValue: 'Experience',
-                    ),
+                    title: context.strings.experienceSectionTitle,
                     accent: accent,
                   ),
                 ),
@@ -82,9 +80,9 @@ class _ExperienceEntry extends StatelessWidget {
           padding: EdgeInsets.symmetric(vertical: compact ? 36 : 48),
           decoration: BoxDecoration(
             border: Border(
-              top: const BorderSide(color: Color(0x3D1E51FF)),
+              top: const BorderSide(color: SectionStyle.accentBorder),
               bottom: isLast
-                  ? const BorderSide(color: Color(0x3D1E51FF))
+                  ? const BorderSide(color: SectionStyle.accentBorder)
                   : BorderSide.none,
             ),
           ),
@@ -203,7 +201,7 @@ class _ExperienceContent extends StatelessWidget {
         constraints: const BoxConstraints(maxWidth: 740),
         padding: const EdgeInsets.only(top: 16),
         decoration: const BoxDecoration(
-          border: Border(top: BorderSide(color: Color(0x3D1E51FF))),
+          border: Border(top: BorderSide(color: SectionStyle.accentBorder)),
         ),
         child: Text(
           experience.evidence.take(4).join('  /  '),

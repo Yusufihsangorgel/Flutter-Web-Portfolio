@@ -4,13 +4,18 @@ import 'package:flutter_web_portfolio/app/controllers/scroll_controller.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
 import 'package:flutter_web_portfolio/app/core/constants/breakpoints.dart';
 import 'package:flutter_web_portfolio/app/core/theme/app_fonts.dart';
-import 'package:flutter_web_portfolio/app/domain/models/portfolio_document.dart';
+import 'package:flutter_web_portfolio/app/domain/models/portfolio_document.dart'
+    hide PortfolioLink;
+import 'package:flutter_web_portfolio/app/domain/models/portfolio_document.dart'
+    as content
+    show PortfolioLink;
 import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
+import 'package:flutter_web_portfolio/app/features/language/application/language_context.dart';
+import 'package:flutter_web_portfolio/app/modules/home/sections/section_style.dart';
 import 'package:flutter_web_portfolio/app/narrative/domain/narrative_document.dart';
-import 'package:flutter_web_portfolio/app/widgets/accessible_action.dart';
+import 'package:flutter_web_portfolio/app/widgets/portfolio_link.dart';
 import 'package:flutter_web_portfolio/app/widgets/numbered_section_heading.dart';
 import 'package:flutter_web_portfolio/app/widgets/scene_accent_builder.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 /// Personal context and engineering practice, sourced from the portfolio JSON.
 class AboutSection extends StatelessWidget {
@@ -20,7 +25,6 @@ class AboutSection extends StatelessWidget {
   Widget build(BuildContext context) =>
       BlocBuilder<LanguageCubit, LanguageState>(
         builder: (context, _) {
-          final language = context.read<LanguageCubit>();
           final portfolio = context.read<PortfolioDocument>();
           final compact =
               MediaQuery.sizeOf(context).width < Breakpoints.desktop;
@@ -35,10 +39,7 @@ class AboutSection extends StatelessWidget {
                     number: context.read<NarrativeDocument>().sectionNumber(
                       SectionId.about,
                     ),
-                    title: language.getText(
-                      'about_section.title',
-                      defaultValue: 'About',
-                    ),
+                    title: context.strings.aboutSectionTitle,
                     accent: accent,
                     anchorKey: context.read<AppScrollController>().anchorKeyFor(
                       SectionId.about,
@@ -46,41 +47,10 @@ class AboutSection extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: compact ? 54 : 82),
-                compact
-                    ? Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          _AboutLead(profile: portfolio.profile),
-                          const SizedBox(height: 34),
-                          _AboutDetail(
-                            language: language,
-                            profile: portfolio.profile,
-                          ),
-                        ],
-                      )
-                    : Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Expanded(
-                            flex: 6,
-                            child: _AboutLead(profile: portfolio.profile),
-                          ),
-                          const SizedBox(width: 96),
-                          Expanded(
-                            flex: 4,
-                            child: _AboutDetail(
-                              language: language,
-                              profile: portfolio.profile,
-                            ),
-                          ),
-                        ],
-                      ),
+                _profileContext(context, portfolio.profile),
                 SizedBox(height: compact ? 72 : 112),
                 Text(
-                  language.getText(
-                    'about_section.practice_title',
-                    defaultValue: 'What I work across',
-                  ),
+                  context.strings.aboutSectionPracticeTitle,
                   style: AppFonts.spaceGrotesk(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
@@ -94,6 +64,26 @@ class AboutSection extends StatelessWidget {
           );
         },
       );
+  Widget _profileContext(BuildContext context, PortfolioProfile profile) {
+    final compact = MediaQuery.sizeOf(context).width < Breakpoints.desktop;
+    return compact
+        ? Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _AboutLead(profile: profile),
+              const SizedBox(height: 34),
+              _AboutDetail(profile: profile),
+            ],
+          )
+        : Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(flex: 6, child: _AboutLead(profile: profile)),
+              const SizedBox(width: 96),
+              Expanded(flex: 4, child: _AboutDetail(profile: profile)),
+            ],
+          );
+  }
 }
 
 class _AboutLead extends StatelessWidget {
@@ -121,9 +111,8 @@ class _AboutLead extends StatelessWidget {
 }
 
 class _AboutDetail extends StatelessWidget {
-  const _AboutDetail({required this.language, required this.profile});
+  const _AboutDetail({required this.profile});
 
-  final LanguageCubit language;
   final PortfolioProfile profile;
 
   @override
@@ -143,33 +132,24 @@ class _AboutDetail extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 22),
         decoration: const BoxDecoration(
           border: Border(
-            top: BorderSide(color: Color(0x361E51FF)),
-            bottom: BorderSide(color: Color(0x2412110F)),
+            top: BorderSide(color: SectionStyle.detailAccentBorder),
+            bottom: BorderSide(color: SectionStyle.detailBorder),
           ),
         ),
         child: Column(
           children: [
             _FactLine(
-              label: language.getText(
-                'about_section.location',
-                defaultValue: 'Based in',
-              ),
+              label: context.strings.aboutSectionLocation,
               value: profile.location,
             ),
             const SizedBox(height: 14),
             _FactLine(
-              label: language.getText(
-                'about_section.experience',
-                defaultValue: 'Professional work since',
-              ),
+              label: context.strings.aboutSectionExperience,
               value: profile.since,
             ),
             const SizedBox(height: 14),
             _FactLine(
-              label: language.getText(
-                'about_section.email',
-                defaultValue: 'Email',
-              ),
+              label: context.strings.aboutSectionEmail,
               value: profile.email,
             ),
           ],
@@ -194,10 +174,9 @@ class _EmailLink extends StatelessWidget {
   final String email;
 
   @override
-  Widget build(BuildContext context) => AccessibleAction(
-    onTap: () => launchUrl(Uri(scheme: 'mailto', path: email)),
+  Widget build(BuildContext context) => PortfolioLink(
+    uri: Uri(scheme: 'mailto', path: email),
     semanticLabel: email,
-    semanticRole: ActionSemanticRole.link,
     focusColor: AppColors.accent,
     child: Padding(
       padding: const EdgeInsets.symmetric(vertical: 5),
@@ -262,13 +241,12 @@ class _FactLine extends StatelessWidget {
 class _ProfileLink extends StatelessWidget {
   const _ProfileLink({required this.link});
 
-  final PortfolioLink link;
+  final content.PortfolioLink link;
 
   @override
-  Widget build(BuildContext context) => AccessibleAction(
-    onTap: () => launchUrl(link.url, webOnlyWindowName: '_blank'),
+  Widget build(BuildContext context) => PortfolioLink(
+    uri: link.url,
     semanticLabel: link.label,
-    semanticRole: ActionSemanticRole.link,
     focusColor: AppColors.accent,
     child: Padding(
       padding: const EdgeInsets.symmetric(vertical: 5),
@@ -340,7 +318,7 @@ class _PracticeRow extends StatelessWidget {
   Widget build(BuildContext context) => Container(
     padding: const EdgeInsets.symmetric(vertical: 24),
     decoration: const BoxDecoration(
-      border: Border(top: BorderSide(color: Color(0x3D1E51FF))),
+      border: Border(top: BorderSide(color: SectionStyle.accentBorder)),
     ),
     child: Row(
       crossAxisAlignment: CrossAxisAlignment.start,

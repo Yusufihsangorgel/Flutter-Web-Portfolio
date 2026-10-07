@@ -75,7 +75,9 @@
     "event_lab_risk": "Risiko",
     "event_lab_step": "Schritt",
     "status_merged": "Zusammengeführt",
-    "status_under_review": "In Prüfung"
+    "status_under_review": "In Prüfung",
+    "summary_accepted": "{merged} Änderungen wurden in den Ursprungsprojekten angenommen.",
+    "summary_review": "{review} Änderungen werden geprüft."
   },
   "packages_section": {
     "title": "Veröffentlichte Pakete",
@@ -87,13 +89,23 @@
     "status_done": "veröffentlicht",
     "status_doing": "in Arbeit",
     "status_next": "als Nächstes",
-    "status_waiting": "wartet"
+    "status_waiting": "wartet",
+    "category_native_ffi": "Nativer Code und FFI",
+    "category_ai_llm": "KI und große Sprachmodelle",
+    "category_server": "Dart auf dem Server",
+    "category_flutter_ui": "Flutter-Oberfläche",
+    "category_dev_tool": "Entwicklerwerkzeuge",
+    "show_all": "Alle {count} anzeigen",
+    "show_less": "Weniger anzeigen",
+    "subtitle_no_perfect": "{count} Pakete sind auf pub.dev veröffentlicht. Jedes enthält messbare Ergebnisse, ausführbare Beispiele und seine Roadmap."
   },
   "writing_section": {
     "title": "Texte",
     "subtitle": "Aktuelle Artikel von jedem Ort, an dem ich veröffentliche, neueste zuerst.",
     "all_writing": "Alle Artikel",
-    "open_article": "Artikel lesen"
+    "open_article": "Artikel lesen",
+    "show_all": "Alle {count} anzeigen",
+    "show_less": "Weniger anzeigen"
   },
   "footer": {
     "command_hint_prefix": "Drücken Sie",

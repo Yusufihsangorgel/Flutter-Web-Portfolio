@@ -75,7 +75,9 @@
     "event_lab_risk": "जोखिम",
     "event_lab_step": "चरण",
     "status_merged": "मर्ज किया गया",
-    "status_under_review": "समीक्षा में"
+    "status_under_review": "समीक्षा में",
+    "summary_accepted": "मूल परियोजनाओं में {merged} बदलाव स्वीकार किए गए।",
+    "summary_review": "{review} बदलावों की समीक्षा चल रही है।"
   },
   "packages_section": {
     "title": "प्रकाशित पैकेज",
@@ -87,13 +89,23 @@
     "status_done": "प्रकाशित",
     "status_doing": "प्रगति पर",
     "status_next": "अगला",
-    "status_waiting": "प्रतीक्षा में"
+    "status_waiting": "प्रतीक्षा में",
+    "category_native_ffi": "नेटिव कोड और FFI",
+    "category_ai_llm": "एआई और बड़े भाषा मॉडल",
+    "category_server": "सर्वर पर Dart",
+    "category_flutter_ui": "Flutter इंटरफ़ेस",
+    "category_dev_tool": "डेवलपर टूल",
+    "show_all": "सभी {count} दिखाएँ",
+    "show_less": "कम दिखाएँ",
+    "subtitle_no_perfect": "pub.dev पर {count} पैकेज प्रकाशित हैं। प्रत्येक में मापे गए परिणाम, चलाने योग्य उदाहरण और उसकी विकास योजना शामिल है।"
   },
   "writing_section": {
     "title": "लेखन",
     "subtitle": "मैं जहां भी प्रकाशित करता हूं, वहां से हाल के लेख, सबसे नए पहले।",
     "all_writing": "सभी लेखन",
-    "open_article": "लेख पढ़ें"
+    "open_article": "लेख पढ़ें",
+    "show_all": "सभी {count} दिखाएँ",
+    "show_less": "कम दिखाएँ"
   },
   "footer": {
     "command_hint_prefix": "दबाएँ",

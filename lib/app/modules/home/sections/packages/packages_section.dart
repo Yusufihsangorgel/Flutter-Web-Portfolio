@@ -2,171 +2,72 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_web_portfolio/app/controllers/scroll_controller.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
-import 'package:flutter_web_portfolio/app/core/constants/breakpoints.dart';
 import 'package:flutter_web_portfolio/app/core/theme/app_fonts.dart';
-import 'package:flutter_web_portfolio/app/domain/models/portfolio_document.dart';
+import 'package:flutter_web_portfolio/app/domain/models/portfolio_document.dart'
+    hide PortfolioLink;
+import 'package:flutter_web_portfolio/app/features/language/application/language_context.dart';
 import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
+import 'package:flutter_web_portfolio/app/modules/home/sections/packages/package_list.dart';
 import 'package:flutter_web_portfolio/app/narrative/domain/narrative_document.dart';
 import 'package:flutter_web_portfolio/app/widgets/accessible_action.dart';
 import 'package:flutter_web_portfolio/app/widgets/numbered_section_heading.dart';
 import 'package:flutter_web_portfolio/app/widgets/scene_accent_builder.dart';
-import 'package:url_launcher/url_launcher.dart';
 
-String _categoryLabel(PortfolioPackageCategory category) => switch (category) {
-  PortfolioPackageCategory.nativeFfi => 'Native & FFI',
-  PortfolioPackageCategory.aiLlm => 'AI & LLM',
-  PortfolioPackageCategory.server => 'Server-side Dart',
-  PortfolioPackageCategory.flutterUi => 'Flutter UI',
-  PortfolioPackageCategory.devTool => 'Developer tools',
-};
+/// Curated packages with an accessible catalog disclosure.
+class PackagesSection extends StatefulWidget {
+  const PackagesSection({super.key});
 
-/// Localized copy shared by every package row.
-final class _PackageLabels {
-  const _PackageLabels({
-    required this.pubPoints,
-    required this.open,
-    required this.maturityText,
-    required this.roadmap,
-    required this.statusNames,
-  });
-
-  final String pubPoints;
-  final String open;
-
-  final String Function(int level) maturityText;
-  final String roadmap;
-
-  /// Status keyword (`done`/`doing`/`next`/`waiting`) to localized word.
-  final Map<String, String> statusNames;
+  @override
+  State<PackagesSection> createState() => _PackagesSectionState();
 }
 
-/// Every published pub.dev package, grouped by category, each card carrying
-/// its one measured proof line and a live roadmap with per-item status.
-/// Bot-shaped vanity metrics (raw download counts) are deliberately absent.
-class PackagesSection extends StatelessWidget {
-  const PackagesSection({super.key});
+class _PackagesSectionState extends State<PackagesSection> {
+  bool _expanded = false;
 
   @override
   Widget build(BuildContext context) =>
       BlocBuilder<LanguageCubit, LanguageState>(
         builder: (context, _) {
-          final language = context.read<LanguageCubit>();
-          final portfolio = context.read<PortfolioDocument>();
-          final packages = portfolio.packages;
+          final packages = context.read<PortfolioDocument>().packages;
           if (packages.isEmpty) return const SizedBox.shrink();
 
-          final perfect = packages
-              .where((package) => package.pubPoints == 160)
-              .length;
-          final subtitle = language
-              .getText(
-                'packages_section.subtitle',
-                defaultValue:
-                    '{count} packages live on pub.dev, {perfect} of them at '
-                    'a perfect 160/160 score. Each one ships a measured '
-                    'claim, runnable examples, and the roadmap it is on.',
-              )
-              .replaceAll('{count}', '${packages.length}')
-              .replaceAll('{perfect}', '$perfect');
-          final labels = _PackageLabels(
-            pubPoints: language.getText(
-              'packages_section.pub_points',
-              defaultValue: 'pub points',
-            ),
-            open: language.getText(
-              'packages_section.open_package',
-              defaultValue: 'Open on pub.dev',
-            ),
-            maturityText: (level) =>
-                language.strings.packagesSectionMaturityLevel(
-                  level: '$level',
-                  max: '${PortfolioPackage.maxMaturityLevel}',
-                ),
-            roadmap: language.getText(
-              'packages_section.roadmap',
-              defaultValue: 'roadmap',
-            ),
-            statusNames: {
-              'done': language.getText(
-                'packages_section.status_done',
-                defaultValue: 'shipped',
-              ),
-              'doing': language.getText(
-                'packages_section.status_doing',
-                defaultValue: 'in progress',
-              ),
-              'next': language.getText(
-                'packages_section.status_next',
-                defaultValue: 'next',
-              ),
-              'waiting': language.getText(
-                'packages_section.status_waiting',
-                defaultValue: 'waiting',
-              ),
-            },
-          );
-
-          final grouped = <PortfolioPackageCategory, List<PortfolioPackage>>{};
-          for (final package in packages) {
-            grouped.putIfAbsent(package.category, () => []).add(package);
-          }
-          final groups = [
-            for (final category in PortfolioPackageCategory.values)
-              if (grouped[category] case final entries? when entries.isNotEmpty)
-                (label: _categoryLabel(category), packages: entries),
-          ];
+          final featured = packages.where((entry) => entry.featured).toList();
+          final remainder = packages.where((entry) => !entry.featured).toList();
+          final primary = featured.isEmpty ? packages : featured;
+          final canExpand = featured.isNotEmpty && remainder.isNotEmpty;
 
           return ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 1160),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SceneAccentBuilder(
-                  builder: (context, accent) => NumberedSectionHeading(
-                    number: context.read<NarrativeDocument>().sectionNumber(
-                      SectionId.packages,
-                    ),
-                    title: language.getText(
-                      'packages_section.title',
-                      defaultValue: 'Published Packages',
-                    ),
-                    accent: accent,
-                    anchorKey: context.read<AppScrollController>().anchorKeyFor(
-                      SectionId.packages,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 30),
-                ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 700),
-                  child: Text(
-                    subtitle,
-                    style: AppFonts.spaceGrotesk(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w400,
-                      color: AppColors.textPrimary,
-                      height: 1.55,
-                    ),
-                  ),
-                ),
+                _PackagesHeader(packages: packages),
                 const SizedBox(height: 60),
                 SceneAccentBuilder(
-                  builder: (context, accent) => Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      for (var index = 0; index < groups.length; index++)
-                        Padding(
-                          padding: EdgeInsets.only(top: index == 0 ? 0 : 48),
-                          child: _PackageCategoryGroup(
-                            label: groups[index].label,
-                            packages: groups[index].packages,
-                            accent: accent,
-                            labels: labels,
-                          ),
-                        ),
-                    ],
+                  builder: (context, accent) => PackageCategoryList(
+                    packages: primary,
+                    accent: accent,
+                    compact: false,
                   ),
                 ),
+                if (canExpand) ...[
+                  const SizedBox(height: 28),
+                  _PackageDisclosure(
+                    count: packages.length,
+                    expanded: _expanded,
+                    onToggle: () => setState(() => _expanded = !_expanded),
+                  ),
+                  if (_expanded) ...[
+                    const SizedBox(height: 36),
+                    SceneAccentBuilder(
+                      builder: (context, accent) => PackageCategoryList(
+                        packages: remainder,
+                        accent: accent,
+                        compact: true,
+                      ),
+                    ),
+                  ],
+                ],
               ],
             ),
           );
@@ -174,439 +75,100 @@ class PackagesSection extends StatelessWidget {
       );
 }
 
-class _PackageCategoryGroup extends StatelessWidget {
-  const _PackageCategoryGroup({
-    required this.label,
-    required this.packages,
-    required this.accent,
-    required this.labels,
-  });
+class _PackagesHeader extends StatelessWidget {
+  const _PackagesHeader({required this.packages});
 
-  final String label;
   final List<PortfolioPackage> packages;
-  final Color accent;
-  final _PackageLabels labels;
-
-  @override
-  Widget build(BuildContext context) => Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Semantics(
-        header: true,
-        headingLevel: 3,
-        child: Wrap(
-          crossAxisAlignment: WrapCrossAlignment.center,
-          spacing: 12,
-          children: [
-            Text(
-              label,
-              style: AppFonts.spaceGrotesk(
-                fontSize: 20,
-                fontWeight: FontWeight.w600,
-                color: AppColors.textBright,
-                letterSpacing: -0.4,
-              ),
-            ),
-            Text(
-              packages.length.toString().padLeft(2, '0'),
-              style: AppFonts.spaceGrotesk(
-                fontSize: 12,
-                fontWeight: FontWeight.w800,
-                color: accent,
-                letterSpacing: 0.4,
-              ),
-            ),
-          ],
-        ),
-      ),
-      const SizedBox(height: 18),
-      for (var index = 0; index < packages.length; index++)
-        _PackageRow(
-          package: packages[index],
-          accent: accent,
-          labels: labels,
-          isLast: index == packages.length - 1,
-        ),
-    ],
-  );
-}
-
-class _PackageRow extends StatelessWidget {
-  const _PackageRow({
-    required this.package,
-    required this.accent,
-    required this.labels,
-    required this.isLast,
-  });
-
-  final PortfolioPackage package;
-  final Color accent;
-  final _PackageLabels labels;
-  final bool isLast;
 
   @override
   Widget build(BuildContext context) {
-    final compact = MediaQuery.sizeOf(context).width < Breakpoints.tablet;
-    final semanticLabel = [
-      labels.open,
-      package.name,
-      package.description,
-      ?package.proof,
-      'v${package.version}, ${package.pubPoints} out of 160 '
-          '${labels.pubPoints}',
-      if (package.maturityLevel case final level?) labels.maturityText(level),
-      if (package.roadmap.isNotEmpty)
-        '${labels.roadmap}: ${package.roadmap.map((item) => '${item.title} '
-            '(${labels.statusNames[item.status]})').join(', ')}',
-    ].join('. ');
-
-    return AccessibleAction(
-      onTap: () => _openPackage(package.url),
-      semanticLabel: semanticLabel,
-      semanticRole: ActionSemanticRole.link,
-      focusColor: accent,
-      child: Container(
-        padding: EdgeInsets.symmetric(vertical: compact ? 20 : 22),
-        decoration: BoxDecoration(
-          border: Border(
-            top: BorderSide(
-              color: AppColors.textSecondary.withValues(alpha: 0.3),
-            ),
-            bottom: isLast
-                ? BorderSide(
-                    color: AppColors.textSecondary.withValues(alpha: 0.3),
-                  )
-                : BorderSide.none,
-          ),
-        ),
-        child: compact
-            ? _CompactPackageContent(
-                package: package,
-                accent: accent,
-                labels: labels,
-              )
-            : _WidePackageContent(
-                package: package,
-                accent: accent,
-                labels: labels,
-              ),
-      ),
-    );
-  }
-}
-
-class _WidePackageContent extends StatelessWidget {
-  const _WidePackageContent({
-    required this.package,
-    required this.accent,
-    required this.labels,
-  });
-
-  final PortfolioPackage package;
-  final Color accent;
-  final _PackageLabels labels;
-
-  @override
-  Widget build(BuildContext context) => Row(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Expanded(
-        flex: 3,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _PackageTitleLine(package: package, accent: accent, labels: labels),
-            const SizedBox(height: 6),
-            Text(
-              package.description,
-              style: AppFonts.inter(
-                fontSize: 14,
-                color: AppColors.textPrimary,
-                height: 1.55,
-              ),
-            ),
-            if (package.proof != null) ...[
-              const SizedBox(height: 10),
-              _ProofLine(proof: package.proof!, accent: accent),
-            ],
-          ],
-        ),
-      ),
-      const SizedBox(width: 24),
-      Expanded(
-        flex: 2,
-        child: _PackageRoadmap(
-          package: package,
-          accent: accent,
-          labels: labels,
-        ),
-      ),
-      const SizedBox(width: 18),
-      Icon(Icons.north_east_rounded, size: 16, color: accent),
-    ],
-  );
-}
-
-class _CompactPackageContent extends StatelessWidget {
-  const _CompactPackageContent({
-    required this.package,
-    required this.accent,
-    required this.labels,
-  });
-
-  final PortfolioPackage package;
-  final Color accent;
-  final _PackageLabels labels;
-
-  @override
-  Widget build(BuildContext context) => Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Row(
-        children: [
-          Expanded(
-            child: _PackageTitleLine(
-              package: package,
-              accent: accent,
-              labels: labels,
-            ),
-          ),
-          const SizedBox(width: 12),
-          Icon(Icons.north_east_rounded, size: 16, color: accent),
-        ],
-      ),
-      const SizedBox(height: 8),
-      Text(
-        package.description,
-        style: AppFonts.inter(
-          fontSize: 14,
-          color: AppColors.textPrimary,
-          height: 1.55,
-        ),
-      ),
-      if (package.proof != null) ...[
-        const SizedBox(height: 10),
-        _ProofLine(proof: package.proof!, accent: accent),
-      ],
-      const SizedBox(height: 12),
-      _PackageRoadmap(package: package, accent: accent, labels: labels),
-    ],
-  );
-}
-
-/// Package name with its version/score line and, when declared, the maturity
-/// level as a small outlined chip. The top level, which means a real external
-/// user drives the package, is the only one drawn in accent.
-class _PackageTitleLine extends StatelessWidget {
-  const _PackageTitleLine({
-    required this.package,
-    required this.accent,
-    required this.labels,
-  });
-
-  final PortfolioPackage package;
-  final Color accent;
-  final _PackageLabels labels;
-
-  @override
-  Widget build(BuildContext context) {
-    final level = package.maturityLevel;
-    final chipColor = level == PortfolioPackage.maxMaturityLevel
-        ? accent
-        : AppColors.textSecondary;
-    return Wrap(
-      crossAxisAlignment: WrapCrossAlignment.center,
-      spacing: 10,
-      runSpacing: 6,
-      children: [
-        Text(
-          package.name,
-          style: AppFonts.spaceGrotesk(
-            fontSize: 17,
-            fontWeight: FontWeight.w600,
-            color: AppColors.textBright,
-          ),
-        ),
-        Text(
-          'v${package.version} · ${package.pubPoints}/160 ${labels.pubPoints}',
-          style: AppFonts.jetBrainsMono(
-            fontSize: 11,
-            color: AppColors.textSecondary,
-            letterSpacing: 0.2,
-          ),
-        ),
-        if (level != null)
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1.5),
-            decoration: BoxDecoration(
-              border: Border.all(color: chipColor.withValues(alpha: 0.55)),
-              borderRadius: BorderRadius.circular(3),
-            ),
-            child: Text(
-              labels.maturityText(level),
-              style: AppFonts.jetBrainsMono(
-                fontSize: 10,
-                fontWeight: FontWeight.w700,
-                color: chipColor,
-                letterSpacing: 0.6,
-              ),
-            ),
-          ),
-      ],
-    );
-  }
-}
-
-/// The one measured claim that carries the package's case, set off by a
-/// short accent tick so it reads as evidence rather than marketing copy.
-class _ProofLine extends StatelessWidget {
-  const _ProofLine({required this.proof, required this.accent});
-
-  final String proof;
-  final Color accent;
-
-  @override
-  Widget build(BuildContext context) => Row(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Padding(
-        padding: const EdgeInsets.only(top: 6),
-        child: Container(width: 14, height: 2, color: accent),
-      ),
-      const SizedBox(width: 8),
-      Expanded(
-        child: Text(
-          proof,
-          style: AppFonts.jetBrainsMono(
-            fontSize: 11,
-            color: AppColors.textSecondary,
-            height: 1.6,
-            letterSpacing: 0.1,
-          ),
-        ),
-      ),
-    ],
-  );
-}
-
-/// The package's live roadmap: every entry keeps its status visible, so a
-/// visitor can see at a glance what shipped, what is moving now, and what
-/// deliberately waits for a real user to ask.
-class _PackageRoadmap extends StatelessWidget {
-  const _PackageRoadmap({
-    required this.package,
-    required this.accent,
-    required this.labels,
-  });
-
-  final PortfolioPackage package;
-  final Color accent;
-  final _PackageLabels labels;
-
-  @override
-  Widget build(BuildContext context) {
-    if (package.roadmap.isEmpty) return const SizedBox.shrink();
+    final perfect = packages.where((entry) => entry.pubPoints == 160).length;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          labels.roadmap.toUpperCase(),
-          style: AppFonts.jetBrainsMono(
-            fontSize: 9.5,
-            fontWeight: FontWeight.w700,
-            color: AppColors.textSecondary.withValues(alpha: 0.8),
-            letterSpacing: 1.2,
+        SceneAccentBuilder(
+          builder: (context, accent) => NumberedSectionHeading(
+            number: context.read<NarrativeDocument>().sectionNumber(
+              SectionId.packages,
+            ),
+            title: context.strings.packagesSectionTitle,
+            accent: accent,
+            anchorKey: context.read<AppScrollController>().anchorKeyFor(
+              SectionId.packages,
+            ),
           ),
         ),
-        const SizedBox(height: 8),
-        for (var index = 0; index < package.roadmap.length; index++) ...[
-          if (index > 0) const SizedBox(height: 6),
-          _RoadmapItemLine(
-            item: package.roadmap[index],
-            accent: accent,
-            labels: labels,
+        const SizedBox(height: 30),
+        ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 700),
+          child: Text(
+            perfect == 0
+                ? context.strings.packagesSectionSubtitleNoPerfect(
+                    count: '${packages.length}',
+                  )
+                : context.strings.packagesSectionSubtitle(
+                    count: '${packages.length}',
+                    perfect: '$perfect',
+                  ),
+            style: AppFonts.spaceGrotesk(
+              fontSize: 20,
+              fontWeight: FontWeight.w400,
+              color: AppColors.textPrimary,
+              height: 1.55,
+            ),
           ),
-        ],
+        ),
       ],
     );
   }
 }
 
-class _RoadmapItemLine extends StatelessWidget {
-  const _RoadmapItemLine({
-    required this.item,
-    required this.accent,
-    required this.labels,
+class _PackageDisclosure extends StatelessWidget {
+  const _PackageDisclosure({
+    required this.count,
+    required this.expanded,
+    required this.onToggle,
   });
 
-  final PackageRoadmapItem item;
-  final Color accent;
-  final _PackageLabels labels;
+  final int count;
+  final bool expanded;
+  final VoidCallback onToggle;
 
   @override
-  Widget build(BuildContext context) {
-    final (Color markColor, bool filled) = switch (item.status) {
-      'done' => (accent, true),
-      'doing' => (accent, false),
-      _ => (AppColors.textSecondary, false),
-    };
-    final dimmed = item.status == 'waiting';
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(top: 4),
-          child: Container(
-            width: 8,
-            height: 8,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: filled ? markColor : null,
-              border: Border.all(
-                color: markColor.withValues(alpha: dimmed ? 0.45 : 0.9),
-                width: 1.5,
+  Widget build(BuildContext context) => SceneAccentBuilder(
+    builder: (context, accent) {
+      final label = expanded
+          ? context.strings.packagesSectionShowLess
+          : context.strings.packagesSectionShowAll(count: '$count');
+      return AccessibleAction(
+        onTap: onToggle,
+        semanticLabel: label,
+        expanded: expanded,
+        focusColor: accent,
+        borderRadius: BorderRadius.circular(4),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                label,
+                style: AppFonts.spaceGrotesk(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: accent,
+                ),
               ),
-            ),
+              const SizedBox(width: 8),
+              Icon(
+                expanded ? Icons.expand_less : Icons.expand_more,
+                size: 18,
+                color: accent,
+              ),
+            ],
           ),
         ),
-        const SizedBox(width: 8),
-        Expanded(
-          child: Text.rich(
-            TextSpan(
-              children: [
-                TextSpan(
-                  text: item.title,
-                  style: AppFonts.inter(
-                    fontSize: 12.5,
-                    color: dimmed
-                        ? AppColors.textSecondary
-                        : AppColors.textPrimary,
-                    height: 1.45,
-                  ),
-                ),
-                TextSpan(
-                  // Non-breaking spaces keep a two-word status ("in progress")
-                  // on one line; wrapped, it reads as two separate labels.
-                  text:
-                      '  '
-                      '${(labels.statusNames[item.status] ?? item.status).replaceAll(' ', ' ')}',
-                  style: AppFonts.jetBrainsMono(
-                    fontSize: 9.5,
-                    fontWeight: FontWeight.w700,
-                    color: item.status == 'doing'
-                        ? accent
-                        : AppColors.textSecondary.withValues(alpha: 0.75),
-                    letterSpacing: 0.8,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ],
-    );
-  }
+      );
+    },
+  );
 }
-
-Future<void> _openPackage(Uri uri) async =>
-    launchUrl(uri, webOnlyWindowName: '_blank');
