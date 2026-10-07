@@ -27,7 +27,9 @@ class NumberedSectionHeading extends StatelessWidget {
         ? const Offset(14, 0)
         : const Offset(-14, 0);
 
+    // Its own node, so an enclosing container never absorbs the heading.
     return Semantics(
+      container: true,
       header: true,
       headingLevel: 2,
       label: title,
