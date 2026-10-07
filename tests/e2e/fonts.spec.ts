@@ -48,6 +48,29 @@ test("English load stays within the font transfer budget", async ({ page }) => {
   expect(total("gzip")).toBeLessThanOrEqual(budgetBytes);
 });
 
+test("the language menu paints every name without engine fallback fonts", async ({
+  page,
+}) => {
+  const fallbackRequests: string[] = [];
+  page.on("request", (request) => {
+    if (request.url().includes("/fallback_fonts/")) fallbackRequests.push(request.url());
+  });
+
+  await page.goto("/", { waitUntil: "commit" });
+  await expect(page.locator(surface)).toHaveCount(0, { timeout: 45000 });
+  await page.getByRole("button", { name: /: English$/ }).click();
+  await expect(page.getByRole("menuitem")).toHaveCount(locales.length);
+  // The engine asks for a fallback font in the task after the frame that lays the text out.
+  await page.evaluate(
+    () =>
+      new Promise((resolve) =>
+        requestAnimationFrame(() => requestAnimationFrame(() => setTimeout(resolve, 0))),
+      ),
+  );
+
+  expect(fallbackRequests).toEqual([]);
+});
+
 test("Arabic selection loads its font", async ({ page }) => {
   test.skip(!locales.includes("ar"), "The content record does not publish Arabic.");
   const runtimeFontResponses: Response[] = [];

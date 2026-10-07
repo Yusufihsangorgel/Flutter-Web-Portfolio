@@ -8,27 +8,29 @@ abstract final class AppFonts {
   static const jetBrainsMonoFamily = 'JetBrains Mono';
   static const notoSansArabicFamily = 'Noto Sans Arabic';
   static const notoSansDevanagariFamily = 'Noto Sans Devanagari';
+  // Eager subsets with the script glyphs every locale paints, such as language names.
+  static const notoSansArabicSharedFamily = 'Noto Sans Arabic Shared';
+  static const notoSansDevanagariSharedFamily = 'Noto Sans Devanagari Shared';
   static const scriptFallbackFamilies = [
     notoSansArabicFamily,
     notoSansDevanagariFamily,
+    notoSansArabicSharedFamily,
+    notoSansDevanagariSharedFamily,
   ];
 
   static const inter = _FontStyle(interFamily, [
-    notoSansArabicFamily,
-    notoSansDevanagariFamily,
+    ...scriptFallbackFamilies,
     'Arial',
     'sans-serif',
   ]);
   static const spaceGrotesk = _FontStyle(spaceGroteskFamily, [
     interFamily,
-    notoSansArabicFamily,
-    notoSansDevanagariFamily,
+    ...scriptFallbackFamilies,
     'Arial',
     'sans-serif',
   ]);
   static const jetBrainsMono = _FontStyle(jetBrainsMonoFamily, [
-    notoSansArabicFamily,
-    notoSansDevanagariFamily,
+    ...scriptFallbackFamilies,
     'monospace',
   ]);
 
