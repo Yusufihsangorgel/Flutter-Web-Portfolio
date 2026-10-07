@@ -254,6 +254,32 @@ test("retires the critical shell when a renderer omits the first-frame event", a
   ).toBe(1);
 });
 
+test("retires the loading surface on every localized reload without a raster worker", async ({
+  page,
+  isMobile,
+}) => {
+  test.skip(isMobile, "renderer threading contract needs one browser project");
+  const locale =
+    bootstrapLocaleCases.find(({ locale }) => locale !== "en")?.locale ?? "en";
+  const workers: string[] = [];
+  page.on("worker", (worker) => workers.push(worker.url()));
+  await page.addInitScript((value) => {
+    window.localStorage.setItem("flutter.selected_language", JSON.stringify(value));
+  }, locale);
+
+  await page.goto("/", { waitUntil: "domcontentloaded" });
+  for (let load = 0; load < 4; load += 1) {
+    if (load > 0) await page.reload({ waitUntil: "domcontentloaded" });
+    await expect(page.locator("#bootstrap-surface")).toHaveCount(0, {
+      timeout: 20000,
+    });
+    await expect(page.getByRole("heading").first()).toBeAttached();
+    await expect(page.locator("html")).toHaveAttribute("lang", locale);
+  }
+  // A Skwasm raster worker shares the glyph cache with page-side text layout.
+  expect(workers).toEqual([]);
+});
+
 test("offers an accessible retry when the engine fails after its entrypoint loads", async ({
   page,
   isMobile,
