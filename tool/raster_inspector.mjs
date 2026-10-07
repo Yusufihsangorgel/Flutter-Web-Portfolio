@@ -12,7 +12,8 @@ export function inspectRaster(bytes, label = 'raster') {
   if (bytes.length > maxEncodedBytes) throw new Error(`${label} exceeds the encoded raster budget`);
   if (bytes.subarray(0, 8).equals(pngSignature)) return inspectPng(bytes, label);
   if (bytes[0] === 0xff && bytes[1] === 0xd8) return inspectJpeg(bytes, label);
-  throw new Error(`${label} is not a supported PNG or JPEG`);
+  if (isWebp(bytes)) return inspectWebp(bytes, label);
+  throw new Error(`${label} is not a supported PNG, JPEG, or WebP`);
 }
 
 export function assertRasterDimensions(info, width, height, label = 'raster') {
@@ -179,6 +180,61 @@ function inspectJpeg(bytes, label) {
     throw new Error(`${label} has unexpected trailing JPEG data`);
   }
   return { format: 'jpeg', ...dimensions };
+}
+
+function isWebp(bytes) {
+  return (
+    bytes.length >= 12 &&
+    bytes.toString('latin1', 0, 4) === 'RIFF' &&
+    bytes.toString('latin1', 8, 12) === 'WEBP'
+  );
+}
+
+function inspectWebp(bytes, label) {
+  if (bytes.readUInt32LE(4) + 8 !== bytes.length) {
+    throw new Error(`${label} is a truncated or trailing-data WebP`);
+  }
+  let cursor = 12;
+  let dimensions = null;
+  let sawImage = false;
+  while (cursor < bytes.length) {
+    if (cursor + 8 > bytes.length) throw new Error(`${label} has a truncated WebP chunk`);
+    const type = bytes.toString('latin1', cursor, cursor + 4);
+    const size = bytes.readUInt32LE(cursor + 4);
+    const dataOffset = cursor + 8;
+    const chunkEnd = dataOffset + size + (size % 2);
+    if (chunkEnd > bytes.length) throw new Error(`${label} has an invalid WebP chunk length`);
+    const chunk = bytes.subarray(dataOffset, dataOffset + size);
+    dimensions ??= readWebpDimensions(type, chunk, label);
+    sawImage ||= type === 'VP8 ' || type === 'VP8L';
+    cursor = chunkEnd;
+  }
+  if (!dimensions || !sawImage) {
+    throw new Error(`${label} is missing a WebP image chunk`);
+  }
+  validateDimensions(dimensions.width, dimensions.height, label);
+  return { format: 'webp', ...dimensions };
+}
+
+function readWebpDimensions(type, chunk, label) {
+  if (type === 'VP8X') {
+    if (chunk.length < 10) throw new Error(`${label} has an invalid WebP extended header`);
+    return { width: chunk.readUIntLE(4, 3) + 1, height: chunk.readUIntLE(7, 3) + 1 };
+  }
+  if (type === 'VP8 ') {
+    if (chunk.length < 10 || chunk[3] !== 0x9d || chunk[4] !== 0x01 || chunk[5] !== 0x2a) {
+      throw new Error(`${label} has an invalid lossy WebP frame header`);
+    }
+    return { width: chunk.readUInt16LE(6) & 0x3fff, height: chunk.readUInt16LE(8) & 0x3fff };
+  }
+  if (type === 'VP8L') {
+    if (chunk.length < 5 || chunk[0] !== 0x2f) {
+      throw new Error(`${label} has an invalid lossless WebP header`);
+    }
+    const bits = chunk.readUInt32LE(1);
+    return { width: (bits & 0x3fff) + 1, height: ((bits >>> 14) & 0x3fff) + 1 };
+  }
+  return null;
 }
 
 function isStartOfFrame(marker) {

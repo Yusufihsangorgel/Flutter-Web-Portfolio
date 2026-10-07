@@ -3,17 +3,52 @@ import { mkdir, readFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
 
+import { encodeArtifact, encoderSettings } from "./work_artifacts/encoder.mjs";
+import {
+  artifactFileName,
+  manifestEntry,
+  renderInputDigest,
+  verifyArtifacts,
+  workArtifactPaths,
+  writeArtifacts,
+} from "./work_artifacts/manifest.mjs";
+import {
+  boardFrame,
+  capturePage,
+  compactDocumentShell,
+  compactFrame,
+  documentShell,
+  escapeHtml,
+  imageDataUrlFrom,
+  pngDataUrl,
+} from "./work_artifacts/page.mjs";
+
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const sources = path.join(root, "tool", "work_sources");
-const output = path.join(root, "assets", "work");
+const paths = workArtifactPaths(root);
+const sources = paths.sources;
 
-const boardWidth = 1600;
-const boardHeight = 1000;
-const compactWidth = 900;
-const compactHeight = 1200;
+const boardWidth = boardFrame.width;
+const boardHeight = boardFrame.height;
+const compactWidth = compactFrame.width;
+const compactHeight = compactFrame.height;
 
-await mkdir(output, { recursive: true });
+if (process.argv.includes("--check")) {
+  const failures = await verifyArtifacts(paths);
+  if (failures.length > 0) {
+    process.stderr.write(
+      `${failures.map((failure) => `- ${failure}`).join("\n")}\n` +
+        "Work artifacts are stale. Run `node tool/render_work_artifacts.mjs` and commit assets/work plus tool/work_sources/artifact-manifest.json.\n",
+    );
+    process.exit(1);
+  }
+  process.stdout.write("Work artifacts match their renderer inputs.\n");
+  process.exit(0);
+}
 
+await mkdir(paths.output, { recursive: true });
+
+const renderedBoards = new Map();
+const outputs = [];
 const browser = await chromium.launch({ headless: true });
 
 try {
@@ -142,7 +177,6 @@ try {
 
   await renderCompactLandscapeBoard(page, {
     source: "fugasoft-solutions.png",
-    sourceDirectory: sources,
     output: "fugasoft-product-compact.jpg",
     eyebrow: "OFFICIAL PRODUCT LINE",
     title: "FugaSoft",
@@ -245,8 +279,7 @@ try {
     },
   });
   await renderCompactLandscapeBoard(page, {
-    source: "constellation-demo.png",
-    sourceDirectory: output,
+    renderedBoard: "constellation-demo.png",
     output: "constellation-demo-compact.jpg",
     eyebrow: "OPEN ENGINEERING",
     title: "Constellation Particles",
@@ -274,6 +307,11 @@ try {
       stage: "#f2eee5",
       stageInk: "#12110f",
     },
+  });
+  await writeArtifacts(paths, {
+    outputs,
+    inputDigest: await renderInputDigest(paths),
+    renderer: `Chromium ${browser.version()}`,
   });
 } finally {
   await browser.close();
@@ -1067,9 +1105,9 @@ async function renderCompactReleaseBoard(page, config) {
 }
 
 async function renderCompactLandscapeBoard(page, config) {
-  const source = await imageDataUrlFrom(
-    path.join(config.sourceDirectory, config.source),
-  );
+  const source = config.renderedBoard
+    ? pngDataUrl(renderedBoards.get(config.renderedBoard))
+    : await imageDataUrl(config.source);
   const palette = config.palette;
   const html = compactDocumentShell(
     `
@@ -1651,130 +1689,38 @@ async function renderGatewayBoard(page) {
 }
 
 async function renderPage(page, html, outputFile) {
-  await page.setViewportSize({ width: boardWidth, height: boardHeight });
-  await page.setContent(html, { waitUntil: "load" });
-  await page.evaluate(async () => {
-    await document.fonts.ready;
-    await Promise.all(
-      Array.from(document.images, (image) =>
-        image.complete ? Promise.resolve() : image.decode(),
-      ),
-    );
-  });
-  const target = path.join(output, outputFile);
-  const jpeg = path.extname(outputFile).toLowerCase() === ".jpg";
-  await page.screenshot({
-    path: target,
-    type: jpeg ? "jpeg" : "png",
-    quality: jpeg ? 86 : undefined,
-    animations: "disabled",
-  });
-  process.stdout.write(`Rendered assets/work/${outputFile} at 1600x1000.\n`);
+  const png = await capturePage(page, html, boardFrame);
+  await publish(page, outputFile, png, boardFrame);
 }
 
 async function renderCompactPage(page, html, outputFile) {
-  await page.setViewportSize({ width: compactWidth, height: compactHeight });
-  await page.setContent(html, { waitUntil: "load" });
-  await page.evaluate(async () => {
-    await document.fonts.ready;
-    await Promise.all(
-      Array.from(document.images, (image) =>
-        image.complete ? Promise.resolve() : image.decode(),
-      ),
-    );
+  const png = await capturePage(page, html, compactFrame);
+  await publish(page, outputFile, png, compactFrame);
+}
+
+// The configured extension names the legacy format, which stays only when
+// WebP is not smaller.
+async function publish(page, outputFile, png, frame) {
+  renderedBoards.set(outputFile, png);
+  const extension = path.extname(outputFile).toLowerCase();
+  const stem = path.basename(outputFile, extension);
+  const encoded = await encodeArtifact(page, png, {
+    fallback: extension === ".png" ? "png" : "jpeg",
+    settings:
+      frame === compactFrame ? encoderSettings.compact : encoderSettings.board,
   });
-  const target = path.join(output, outputFile);
-  await page.screenshot({
-    path: target,
-    type: "jpeg",
-    quality: 88,
-    animations: "disabled",
+  const asset = `assets/work/${artifactFileName(stem, encoded.format)}`;
+  outputs.push({
+    entry: manifestEntry(asset, encoded, frame),
+    bytes: encoded.bytes,
   });
   process.stdout.write(
-    `Rendered assets/work/${outputFile} at ${compactWidth}x${compactHeight}.\n`,
+    `Rendered ${asset} at ${frame.width}x${frame.height} (${encoded.bytes.length} bytes).\n`,
   );
-}
-
-function documentShell(body, styles) {
-  return `<!doctype html>
-  <html lang="en">
-    <head>
-      <meta charset="utf-8" />
-      <meta name="viewport" content="width=device-width, initial-scale=1" />
-      <style>
-        * {
-          box-sizing: border-box;
-        }
-
-        html,
-        body {
-          width: ${boardWidth}px;
-          height: ${boardHeight}px;
-          margin: 0;
-          overflow: hidden;
-        }
-
-        body {
-          font-family: Arial, Helvetica, sans-serif;
-          text-rendering: geometricPrecision;
-        }
-
-        ${styles}
-      </style>
-    </head>
-    <body>${body}</body>
-  </html>`;
-}
-
-function compactDocumentShell(body, styles) {
-  return `<!doctype html>
-  <html lang="en">
-    <head>
-      <meta charset="utf-8" />
-      <meta name="viewport" content="width=device-width, initial-scale=1" />
-      <style>
-        * {
-          box-sizing: border-box;
-        }
-
-        html,
-        body {
-          width: ${compactWidth}px;
-          height: ${compactHeight}px;
-          margin: 0;
-          overflow: hidden;
-        }
-
-        body {
-          font-family: Arial, Helvetica, sans-serif;
-          text-rendering: geometricPrecision;
-        }
-
-        ${styles}
-      </style>
-    </head>
-    <body>${body}</body>
-  </html>`;
 }
 
 async function imageDataUrl(fileName) {
   return imageDataUrlFrom(path.join(sources, fileName));
-}
-
-async function imageDataUrlFrom(filePath) {
-  const fileName = path.basename(filePath);
-  const extension = path.extname(fileName).toLowerCase();
-  const mime =
-    extension === ".png"
-      ? "image/png"
-      : extension === ".jpg" || extension === ".jpeg"
-        ? "image/jpeg"
-        : null;
-  if (mime === null) {
-    throw new Error(`Unsupported image extension: ${extension}`);
-  }
-  const data = await readFile(filePath);
-  return `data:${mime};base64,${data.toString("base64")}`;
 }
 
 function syntaxHighlightGo(value) {
@@ -1787,13 +1733,4 @@ function syntaxHighlightGo(value) {
       /\b(recover\.New|health\.New|mw\.Auth)\b/g,
       '<span class="argument">$1</span>',
     );
-}
-
-function escapeHtml(value) {
-  return value
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
 }

@@ -160,6 +160,7 @@ void main() {
 
     await tester.pumpWidget(buildSubject());
     await tester.pump(const Duration(milliseconds: 200));
+    await _scrollThrough(tester);
 
     expect(
       find.byType(Image),
@@ -404,6 +405,7 @@ void main() {
 
     await tester.pumpWidget(buildSubject());
     await tester.pump(const Duration(milliseconds: 200));
+    await _scrollThrough(tester);
 
     final assets = _assetNames(tester);
     for (final system in portfolio.featuredSystems) {
@@ -429,6 +431,20 @@ void main() {
 
 Color _hexColor(String value) =>
     Color(int.parse('FF${value.substring(1)}', radix: 16));
+
+/// Artifact images load as they approach the viewport, so visit every entry.
+Future<void> _scrollThrough(WidgetTester tester) async {
+  final position = tester
+      .state<ScrollableState>(find.byType(Scrollable).first)
+      .position;
+  while (position.pixels < position.maxScrollExtent) {
+    position.jumpTo(
+      (position.pixels + 600).clamp(0, position.maxScrollExtent).toDouble(),
+    );
+    await tester.pump();
+  }
+  await tester.pump();
+}
 
 Set<String> _assetNames(WidgetTester tester) => tester
     .widgetList<Image>(find.byType(Image))

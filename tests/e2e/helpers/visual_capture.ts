@@ -43,6 +43,54 @@ export async function installVisualMasks(page: Page) {
   );
 }
 
+// Work artifacts load lazily. Each image's semantics node names its asset,
+// and the app records a user-timing mark once that asset has been painted.
+export async function readVisibleWorkArtifacts(page: Page) {
+  return page.evaluate(() => {
+    const prefix = 'work-artifact:';
+    const counts = { visible: 0, ready: 0 };
+    const artifacts = document.querySelectorAll(
+      `[flt-semantics-identifier^="${prefix}"]`,
+    );
+    for (const artifact of artifacts) {
+      const box = artifact.getBoundingClientRect();
+      const visible =
+        box.width > 0 &&
+        box.height > 0 &&
+        box.bottom > 0 &&
+        box.right > 0 &&
+        box.top < window.innerHeight &&
+        box.left < window.innerWidth;
+      if (!visible) continue;
+      counts.visible += 1;
+      const asset = (
+        artifact.getAttribute('flt-semantics-identifier') ?? ''
+      ).slice(prefix.length);
+      const marks = performance.getEntriesByName(
+        `work-artifact-painted:${asset}`,
+        'mark',
+      );
+      if (marks.length > 0) counts.ready += 1;
+    }
+    return counts;
+  });
+}
+
+export async function waitForWorkImagesPainted(page: Page) {
+  await expect
+    .poll(
+      async () => {
+        const { visible, ready } = await readVisibleWorkArtifacts(page);
+        return visible - ready;
+      },
+      {
+        message: 'A work image in the viewport was never painted.',
+        timeout: 15000,
+      },
+    )
+    .toBe(0);
+}
+
 // Wait for consecutive masked captures to match.
 export async function waitForStableCanvas(page: Page) {
   const mask = await installVisualMasks(page);
