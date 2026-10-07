@@ -49,7 +49,7 @@
     "verify:bundle": "node tool/release/verify_web_build.mjs",
     "measure:runtime": "node tool/runtime/measure_web_runtime.mjs",
     "verify:runtime": "node tool/runtime/measure_web_runtime.mjs --enforce",
-    "test:release-document": "node --test tool/release/test_render_static_document.mjs tool/release/test_verify_release_document.mjs tool/release/test_verify_release_shell.mjs",
+    "test:release-document": "node --test tool/release/test_render_static_document.mjs tool/release/test_verify_release_document.mjs tool/release/test_verify_release_shell.mjs tool/release/test_release_timestamps.mjs",
     "test:hosting-security": "node tool/release/test_verify_hosting_configs.mjs && node tool/public-content/test_public_content_security.mjs",
     "lighthouse": "lhci autorun",
     "lighthouse:desktop": "lhci autorun --collect.settings.preset=desktop --upload.outputDir=.lighthouseci/desktop",

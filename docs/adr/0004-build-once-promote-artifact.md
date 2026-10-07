@@ -12,6 +12,8 @@ Proposed.
 
 Build and verify one release artifact on a hosted, isolated CI runner; publish its digest and provenance with the artifact. After CI succeeds for the exact source revision, an independent production pull process downloads that artifact, verifies its digest and provenance, and promotes the bytes without rebuilding. The GitHub Pages mirror stays a separate build of the same revision because it needs a different base path. Remove the self-hosted runner registered to this public repository. Stop versioning generated `build/web` output once consumers use the attested artifact.
 
+After compression, release preparation sets each file's mtime to one plus the first 30 bits of its SHA-256 as epoch seconds (1970–2004), giving same-size edits content-derived Last-Modified and Nginx ETag values with a residual 30-bit collision risk instead of future HTTP dates. Directory timestamps stay fixed at 2000-01-01 UTC, and tar packaging preserves file mtimes with sorted entries, normalized ownership and timestamp-free gzip so identical prepared content packages identically; Docker's `COPY build/web` preserves those mtimes and existing immutable-path cache policies remain unchanged.
+
 ## Consequences
 
 The release pipeline needs retention and retrieval rules, a digest verification step, and a promotion path for each deployment target. The runner-local production build, runner registration, tracked output, and checks that assume tracked output must be migrated together. The Pages variant keeps its own build. This record does not claim the current pipeline already performs those steps.
