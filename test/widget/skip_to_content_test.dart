@@ -18,20 +18,7 @@ Future<AppScrollController> _mountHome(
   LanguageCubit language, {
   bool reducedMotion = false,
 }) async {
-  // Home and about only: test fonts overflow the denser chapters.
-  final portfolio = loadPortfolioFixture(
-    mutate: (json) {
-      for (final key in [
-        'experience',
-        'contributions',
-        'systems',
-        'packages',
-        'writing',
-      ]) {
-        json[key] = <dynamic>[];
-      }
-    },
-  );
+  final portfolio = loadPortfolioFixture(mutate: _keepHomeAndAbout);
   final narrative = loadNarrativeFixture(
     activeSections: portfolio.activeSections,
   );
@@ -75,6 +62,19 @@ Future<AppScrollController> _mountHome(
   return scroll;
 }
 
+void _keepHomeAndAbout(Map<String, dynamic> json) {
+  // Home and about only: test fonts overflow the denser chapters.
+  for (final key in [
+    'experience',
+    'contributions',
+    'systems',
+    'packages',
+    'writing',
+  ]) {
+    json[key] = <dynamic>[];
+  }
+}
+
 FocusNode _mainFocus(WidgetTester tester) => tester
     .widget<Focus>(find.byKey(const ValueKey('main-content-focus-target')))
     .focusNode!;
@@ -95,7 +95,6 @@ Future<ScrollPosition> _activateSkipLink(
 }
 
 const _tick = Duration(milliseconds: 1);
-
 // Margin for the controller's end-of-frame settle after a scroll.
 const _settle = Duration(milliseconds: 500);
 
@@ -108,27 +107,29 @@ Future<void> _finishScroll(WidgetTester tester) async {
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
-  final bound = AppDurations.sectionScroll * 2;
-  final halfScroll = AppDurations.sectionScroll ~/ 2;
   late LanguageCubit language;
-
   // Outside the fake clock so closing can await its persistence queue.
   setUp(() async {
     language = LanguageCubit(languageRepository: _LanguageRepository());
     await language.initialize();
     addTearDown(language.close);
   });
+  _registerScrollCompletionTests(() => language);
+  _registerFocusBehaviorTests(() => language);
+}
 
+void _registerScrollCompletionTests(LanguageCubit Function() language) {
+  final bound = AppDurations.sectionScroll * 2;
+  final halfScroll = AppDurations.sectionScroll ~/ 2;
   testWidgets('focus moves into main content once the skip scroll ends', (
     tester,
   ) async {
-    final scroll = await _mountHome(tester, language);
+    final scroll = await _mountHome(tester, language());
     final position = await _activateSkipLink(tester, scroll);
     await tester.pump();
     await tester.pump(halfScroll);
     expect(position.isScrollingNotifier.value, isTrue);
     expect(_mainFocus(tester).hasPrimaryFocus, isFalse);
-
     await tester.pump(AppDurations.sectionScroll);
     expect(position.isScrollingNotifier.value, isFalse);
     expect(position.pixels, greaterThan(0));
@@ -137,12 +138,11 @@ void main() {
   });
 
   testWidgets('an interrupted skip scroll still moves focus', (tester) async {
-    final scroll = await _mountHome(tester, language);
+    final scroll = await _mountHome(tester, language());
     final position = await _activateSkipLink(tester, scroll);
     await tester.pump();
     await tester.pump(halfScroll);
     expect(_mainFocus(tester).hasPrimaryFocus, isFalse);
-
     position.jumpTo(position.pixels);
     await tester.pump();
     expect(_mainFocus(tester).hasPrimaryFocus, isTrue);
@@ -152,26 +152,27 @@ void main() {
   testWidgets('a skip scroll without frames moves focus at the time bound', (
     tester,
   ) async {
-    final scroll = await _mountHome(tester, language);
+    final scroll = await _mountHome(tester, language());
     final position = await _activateSkipLink(tester, scroll);
     await tester.binding.delayed(bound - _tick);
     expect(position.isScrollingNotifier.value, isTrue);
     expect(_mainFocus(tester).hasPrimaryFocus, isFalse);
-
     await tester.binding.delayed(_tick);
     expect(_mainFocus(tester).hasPrimaryFocus, isTrue);
     await _finishScroll(tester);
   });
+}
 
+void _registerFocusBehaviorTests(LanguageCubit Function() language) {
+  final bound = AppDurations.sectionScroll * 2;
   testWidgets('focus dropped during the scroll still lands in main content', (
     tester,
   ) async {
-    final scroll = await _mountHome(tester, language);
+    final scroll = await _mountHome(tester, language());
     await _activateSkipLink(tester, scroll);
     _skipFocus(tester).unfocus();
     await tester.pump();
     expect(_mainFocus(tester).hasPrimaryFocus, isFalse);
-
     await _finishScroll(tester);
     expect(_mainFocus(tester).hasPrimaryFocus, isTrue);
   });
@@ -179,12 +180,11 @@ void main() {
   testWidgets('skip focus does not steal a later keyboard selection', (
     tester,
   ) async {
-    final scroll = await _mountHome(tester, language);
+    final scroll = await _mountHome(tester, language());
     await _activateSkipLink(tester, scroll);
     await tester.sendKeyEvent(LogicalKeyboardKey.tab);
     final selected = FocusManager.instance.primaryFocus;
     expect(selected, isNot(same(_skipFocus(tester))));
-
     await _finishScroll(tester);
     await tester.binding.delayed(bound);
     expect(FocusManager.instance.primaryFocus, same(selected));
@@ -194,7 +194,7 @@ void main() {
   testWidgets('unmounting during the skip scroll cancels the pending focus', (
     tester,
   ) async {
-    final scroll = await _mountHome(tester, language);
+    final scroll = await _mountHome(tester, language());
     await _activateSkipLink(tester, scroll);
     await tester.pump();
     await tester.pumpWidget(const SizedBox.shrink());
@@ -205,7 +205,7 @@ void main() {
   testWidgets('reduced motion jumps to the target and focuses at once', (
     tester,
   ) async {
-    final scroll = await _mountHome(tester, language, reducedMotion: true);
+    final scroll = await _mountHome(tester, language(), reducedMotion: true);
     final position = await _activateSkipLink(tester, scroll);
     expect(position.isScrollingNotifier.value, isFalse);
     expect(position.pixels, greaterThan(0));
