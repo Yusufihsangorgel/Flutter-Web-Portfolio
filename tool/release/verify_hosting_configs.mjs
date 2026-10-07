@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url';
 
 import { resolvePagesBaseHref } from './resolve_pages_base_href.mjs';
 import { validateHostingSecurity } from '../public-content/hosting_security.mjs';
+import { validateResumeHosting } from './resume_hosting.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const read = (relativePath) => readFile(path.join(root, relativePath), 'utf8');
@@ -46,6 +47,7 @@ for (const error of validateHostingSecurity(
   content,
 ))
   failures.push(error);
+failures.push(...validateResumeHosting({ nginx, firebase, vercel, netlify }));
 expect(nginx.includes('gzip_static on;'), 'Nginx serves compressed asset siblings');
 expect(
   nginx.includes('try_files $uri $uri/ =404;') && nginx.includes('error_page 404 /404.html;'),
