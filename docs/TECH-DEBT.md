@@ -27,7 +27,6 @@ Record date: 2026-09-29. Counts below are source line counts from the current ch
 | [`measure_web_runtime.mjs`](../tool/measure_web_runtime.mjs) | 590 | Separate browser sampling, budget evaluation, and report formatting. |
 | [`contribution_event_order_lab.dart`](../lib/app/modules/home/sections/proof/widgets/contribution_event_order_lab.dart) | 583 | Extract controls, timeline, and result panels. |
 | [`home_section.dart`](../lib/app/modules/home/sections/home_section.dart) | 572 | Split chapter widgets and responsive layout pieces. |
-| [`scroll_controller.dart`](../lib/app/controllers/scroll_controller.dart) | 525 | Isolate geometry measurement from navigation and scroll state. |
 | [`prepare_web_release.mjs`](../tool/prepare_web_release.mjs) | 523 | Extract shell rendering, asset versioning, and cleanup steps. |
 
 ## Tests over 800 lines
