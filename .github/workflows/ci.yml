@@ -43,6 +43,8 @@ jobs:
       - run: npm run test:content
       - run: npm run test:strings
       - run: npm run verify:strings
+      - run: npm run verify:fonts
+      - run: npm run test:fonts
       - run: npm run verify:hosting
       - run: npm run verify:community
       - run: npm run audit:sources

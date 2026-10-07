@@ -1,15 +1,11 @@
 # adaptive_render_budget
 
-A repository-local Flutter core package that turns frame timing pressure into a
-small, observable rendering-quality state.
-
-It is intentionally not published to pub.dev (`publish_to: none`). The public
-surface is compact and production-oriented, but it may evolve with the
-portfolio's rendering system.
+A Flutter package that turns frame timing pressure into an observable
+rendering-quality state.
 
 ## What it does
 
-- Normalizes build/raster work against the active display refresh rate.
+- Normalizes build/raster work against the refresh rate supplied by a source.
 - Uses a bounded rolling window instead of reacting to isolated slow frames.
 - Downgrades one quality tier after sustained pressure.
 - Probes one tier upward only after a healthy recovery window.
@@ -36,9 +32,50 @@ normalized load = critical work / frame budget
 A normalized load of `1.0` consumes one display interval. As a result, the same
 8 ms frame is roughly `0.48` at 60 Hz and `0.96` at 120 Hz.
 
-The default policy values are conservative starting points. Validate thresholds
-with profile or release telemetry for the target experience; debug-mode timings
-are not representative.
+## Refresh rate
+
+`DisplayRefreshRateSource` follows the refresh rate the engine reports for a
+view's display and notifies when that value changes.
+
+**On the web that value is always 60 Hz.** The Flutter Web engine (checked
+against Flutter 3.47) hard-codes `refreshRate` to 60 for every browser and
+display; upstream tracks it in
+[flutter/flutter#133562](https://github.com/flutter/flutter/issues/133562).
+This package does not measure the browser's real cadence, so on a 120 Hz display
+the budget stays 16.7 ms and an 8 ms frame still reads as `0.48`, not `0.96`.
+A `requestAnimationFrame` interval would not fix that: it reports the frames the
+browser actually delivered, so dropped frames and background-tab throttling
+lower the measured rate and loosen the budget exactly when the page is under
+pressure.
+
+When the application knows the rate it targets, supply it instead:
+
+```dart
+final renderBudget = AdaptiveRenderBudgetController(
+  timingSource: timingSource,
+  refreshRateSource: FixedRefreshRateSource(120),
+);
+```
+
+## Configuration
+
+`AdaptiveRenderBudgetConfig` groups the tunables into `sampling`, `thresholds`,
+`probe` and `transition`. Every field has a documented default, so override only
+what you need:
+
+```dart
+final policy = AdaptiveRenderBudgetPolicy(
+  config: const AdaptiveRenderBudgetConfig(
+    sampling: RenderBudgetSampling(windowCapacity: 120, minimumSamples: 48),
+    transition: RenderBudgetTransitionSettings(cooldown: Duration(seconds: 6)),
+  ),
+);
+```
+
+The policy throws an `ArgumentError` for incoherent combinations. The defaults
+are conservative starting points, not device-performance claims: validate the
+thresholds with profile or release telemetry for the target experience.
+Debug-mode timings are not representative.
 
 ## Integration
 
@@ -115,7 +152,7 @@ The controller accepts custom implementations of:
 This keeps policy tests deterministic without pumping frames or waiting for
 wall-clock time.
 
-Run package checks with your active workspace SDK:
+Run the package checks from the package directory:
 
 ```sh
 flutter analyze
