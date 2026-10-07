@@ -49,7 +49,7 @@ CI runs these checks on every pull request and every push to `main`. [`ci.yml`](
 |---|---|
 | Toolchain | `node tool/verify_toolchain.mjs --current` |
 | Content and generated files | `npm run verify:content`, `npm run portfolio:validate` |
-| Tooling tests | `npm run test:template`, `npm run test:release-security`, `npm run test:refresh`, `npm run test:content` |
+| Tooling tests | `npm run test:template`, `npm run test:release-security`, `npm run test:release-document`, `npm run test:hosting-security`, `npm run test:refresh`, `npm run test:content` |
 | Hosting, community files, sources, history | `npm run verify:hosting`, `npm run verify:community`, `npm run audit:sources`, `npm run audit:history` |
 | Static checks | `npm run typecheck`, `npm run verify:source`, `dart format --output=none --set-exit-if-changed lib test tool`, `flutter analyze --fatal-infos` |
 | Tool syntax | `bash -n tool/hosted_build.sh`, `node --check` on the Node tools |
@@ -59,6 +59,7 @@ CI runs these checks on every pull request and every push to `main`. [`ci.yml`](
 | Clean template | `npm run test:clone` |
 | Browser tests | `npm test` |
 | Runtime budgets | `npm run verify:runtime` |
+| Lighthouse (accessibility, best practices, and SEO at 0.95 or higher; performance reported) | `npm run lighthouse` |
 | Architecture layers, when `lib/` or `quality/` change | `python3 -m unittest discover -s quality/tests -p 'test_architecture.py'`, `python3 quality/check_architecture.py --warn-only` |
 
 Pull requests also run code scanning, dependency review, and a Conventional Commits check on the title.
