@@ -1,20 +1,30 @@
 import { expect, Page, test } from "@playwright/test";
 import { readFileSync } from "node:fs";
-import type { PortfolioTestData } from "../support/portfolio_test_data";
+import {
+  expectedArtifact,
+  openPortfolio,
+  portfolio,
+} from "./helpers/portfolio_test_helpers";
+import {
+  scrollAndSettle,
+  scrollToLocator,
+  waitForFrames,
+  waitForSemanticsSettled,
+} from "./helpers/semantics_scroll";
 
-const portfolio = JSON.parse(
-  readFileSync("assets/content/portfolio.json", "utf8"),
-) as PortfolioTestData;
-const english = JSON.parse(readFileSync("assets/i18n/en.json", "utf8")) as {
-  projects_section: { evidence_index: string };
-};
+const evidenceIndexHeading = (
+  JSON.parse(readFileSync("assets/i18n/en.json", "utf8")) as {
+    projects_section: { evidence_index: string };
+  }
+).projects_section.evidence_index;
 
 // Decoded response bodies are counted, so the budget does not depend on
 // whether a host compresses images.
 const firstVisitImageBudget = 400_000;
-const compactBreakpoint = 900;
 const imagePathPattern = /\.(avif|gif|ico|jpe?g|png|svg|webp)$/i;
 const workPathPrefix = "/assets/assets/work/";
+// Lazy images are requested from a post-frame check after layout.
+const lazyCheckFrames = 10;
 
 type ImageTransfer = { path: string; bytes: number };
 
@@ -41,6 +51,7 @@ function recordImageTransfers(page: Page) {
   });
   return {
     async settled(): Promise<ImageTransfer[]> {
+      await waitForFrames(page, lazyCheckFrames);
       await page.waitForLoadState("networkidle");
       await Promise.all(pending);
       return [...transfers];
@@ -58,42 +69,23 @@ function workAssets(transfers: ImageTransfer[]) {
     .map((transfer) => transfer.path.slice("/assets/".length));
 }
 
-async function openPortfolio(page: Page) {
-  await page.goto("/", { waitUntil: "domcontentloaded" });
-  await page.waitForSelector("flt-semantics-host", {
-    state: "attached",
-    timeout: 20000,
-  });
-  await expect(page.locator("#bootstrap-surface")).toHaveCount(0);
-  await expect(page.getByRole("heading").first()).toBeAttached();
-}
-
-// Scrolls until the evidence index heading reaches the upper part of the
-// viewport, then one more viewport so its selected preview is on screen.
+// Brings the evidence index heading into view, then scrolls far enough for
+// its selected preview to be on screen.
 async function scrollThroughAtlas(page: Page) {
-  const heading = page.getByRole("heading", {
-    name: english.projects_section.evidence_index,
-    exact: true,
-  });
   const { viewportHeight, pixelRatio } = await page.evaluate(() => ({
     viewportHeight: window.innerHeight,
     pixelRatio: window.devicePixelRatio,
   }));
   // Flutter divides wheel deltas by the device pixel ratio.
   const step = viewportHeight * 0.5 * pixelRatio;
-  for (let attempt = 0; attempt < 200; attempt += 1) {
-    const box =
-      (await heading.count()) > 0 ? await heading.first().boundingBox() : null;
-    if (box && box.y < viewportHeight * 0.25) break;
-    await page.mouse.wheel(0, step);
-    await page.waitForTimeout(60);
-  }
-  await expect(heading.first()).toBeAttached();
-  for (let index = 0; index < 2; index += 1) {
-    await page.mouse.wheel(0, step);
-    await page.waitForTimeout(120);
-  }
-  await page.waitForTimeout(1000);
+  const heading = page.getByRole("heading", {
+    name: evidenceIndexHeading,
+    exact: true,
+  });
+  await scrollToLocator(page, heading, step);
+  await scrollAndSettle(page, step);
+  await scrollAndSettle(page, step);
+  await waitForSemanticsSettled(page);
 }
 
 test("loads work images lazily within the first-visit image budget", async ({
@@ -103,7 +95,7 @@ test("loads work images lazily within the first-visit image budget", async ({
   const images = recordImageTransfers(page);
 
   await openPortfolio(page);
-  await page.waitForTimeout(1500);
+  await waitForSemanticsSettled(page);
   const initial = await images.settled();
   testInfo.annotations.push({
     type: "first-load image bytes",
@@ -120,7 +112,6 @@ test("loads work images lazily within the first-visit image budget", async ({
     description: `${totalBytes(visited)} (${fetched.length} work images)`,
   });
 
-  const compact = (page.viewportSize()?.width ?? 0) < compactBreakpoint;
   const authored = new Set(
     portfolio.systems.flatMap((system) =>
       [system.artifact.asset, system.artifact.compact?.asset].filter(
@@ -129,11 +120,7 @@ test("loads work images lazily within the first-visit image budget", async ({
     ),
   );
   for (const system of portfolio.systems.filter((entry) => entry.featured)) {
-    const expected =
-      compact && system.artifact.compact
-        ? system.artifact.compact.asset
-        : system.artifact.asset;
-    expect(fetched, system.id).toContain(expected);
+    expect(fetched, system.id).toContain(expectedArtifact(page, system).asset);
   }
   for (const asset of fetched) expect(authored, asset).toContain(asset);
   expect(new Set(fetched).size, "each work image is fetched once").toBe(
