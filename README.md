@@ -43,16 +43,16 @@ The layer rules are in [docs/ARCHITECTURE-RULES.md](docs/ARCHITECTURE-RULES.md).
 
 ## Quality gates
 
-CI runs these checks on every pull request and every push to `main`. [`ci.yml`](.github/workflows/ci.yml) is the complete list. The toolchain is Flutter 3.47.5, Dart 3.13.4, and Node.js 24.18.0, pinned in [`tool/toolchain.json`](tool/toolchain.json). Install dependencies first with `flutter pub get`, `npm ci`, and `npm run setup:browsers`.
+CI runs these checks on every pull request and every push to `main`. [`ci.yml`](.github/workflows/ci.yml) is the complete list. The toolchain is Flutter 3.47.5, Dart 3.13.4, and Node.js 24.18.0, pinned in [`tool/quality/toolchain.json`](tool/quality/toolchain.json). Install dependencies first with `flutter pub get`, `npm ci`, and `npm run setup:browsers`.
 
 | Gate | Commands |
 |---|---|
-| Toolchain | `node tool/verify_toolchain.mjs --current` |
+| Toolchain | `node tool/quality/verify_toolchain.mjs --current` |
 | Content and generated files | `npm run verify:content`, `npm run portfolio:validate` |
 | Tooling tests | `npm run test:template`, `npm run test:release-security`, `npm run test:release-document`, `npm run test:hosting-security`, `npm run test:refresh`, `npm run test:content` |
 | Hosting, community files, sources, history | `npm run verify:hosting`, `npm run verify:community`, `npm run audit:sources`, `npm run audit:history` |
 | Static checks | `npm run typecheck`, `npm run verify:source`, `dart format --output=none --set-exit-if-changed lib test tool`, `flutter analyze --fatal-infos` |
-| Tool syntax | `bash -n tool/hosted_build.sh`, `node --check` on the Node tools |
+| Tool syntax | `bash -n tool/release/hosted_build.sh`, `node --check` on the Node tools |
 | Flutter tests | `flutter test` |
 | Release build and bundle | `npm run prepare:source`, `flutter build web --release --wasm --no-web-resources-cdn`, `npm run prepare:bundle`, `npm run verify:bundle` |
 | Container | `docker build --tag flutter-web-portfolio:ci .` |

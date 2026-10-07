@@ -14,7 +14,7 @@ Generate a semantic HTML document from the canonical [portfolio content](../../a
 
 ## Consequences
 
-Crawlers and no-JavaScript readers can read core content from the release artifact; [`render_static_document.mjs`](../../tool/render_static_document.mjs) builds it and the [bundle verifier](../../tool/verify_web_build.mjs) checks its headings and links. Once Flutter has revealed the interactive view, the static document is hidden and inert so assistive technology reads one document. Hash fragments cannot produce distinct server responses or per-section metadata. The static document and Flutter view must derive from the same content and be checked for drift. The 404 page links home through the base the release build declares, so it works at a domain root and on a project Pages site. Host configs, the verifier, and browser tests change together.
+Crawlers and no-JavaScript readers can read core content from the release artifact; [`render_static_document.mjs`](../../tool/release/render_static_document.mjs) builds it and the [bundle verifier](../../tool/release/verify_web_build.mjs) checks its headings and links. Once Flutter has revealed the interactive view, the static document is hidden and inert so assistive technology reads one document. Hash fragments cannot produce distinct server responses or per-section metadata. The static document and Flutter view must derive from the same content and be checked for drift. The 404 page links home through the base the release build declares, so it works at a domain root and on a project Pages site. Host configs, the verifier, and browser tests change together.
 
 ## Alternatives considered
 

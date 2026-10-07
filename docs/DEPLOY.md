@@ -22,7 +22,7 @@ npm ci
 npm run setup:browsers
 flutter pub get
 npm run build:release
-node tool/serve_web.mjs
+node tool/runtime/serve_web.mjs
 ```
 
 Open `http://127.0.0.1:4173` and inspect the exact release before sending it to
@@ -134,10 +134,10 @@ Official references:
 For automatic Git deployments, connect the repository in the Pages dashboard
 and use:
 
-- Build command: `bash tool/hosted_build.sh`
+- Build command: `bash tool/release/hosted_build.sh`
 - Build output directory: `build/web`
 - Node.js version: `24.18.0`
-- Do not define Flutter version overrides. `tool/toolchain.json` is the
+- Do not define Flutter version overrides. `tool/quality/toolchain.json` is the
   immutable Node/Flutter version and revision contract consumed by the hosted
   build; the build stops if the provider runtime differs.
 
@@ -170,7 +170,7 @@ cross-origin isolation headers.
 Vercel guarantees the selected Node **major**, not an exact patch. The hosted
 build therefore accepts Vercel's current Node 24.x release while local builds,
 GitHub CI, Netlify, and Cloudflare continue to verify the exact version in
-`tool/toolchain.json`. Flutter's framework and engine revisions remain exact on
+`tool/quality/toolchain.json`. Flutter's framework and engine revisions remain exact on
 every provider.
 
 ```bash

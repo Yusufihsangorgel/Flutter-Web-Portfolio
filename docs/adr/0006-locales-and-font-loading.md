@@ -6,7 +6,7 @@ Proposed.
 
 ## Context
 
-The [content contract](../../assets/content/portfolio.json) and [interface catalogs](../../assets/i18n/) cover `en`, `tr`, `de`, `fr`, `es`, `ar`, and `hi`. [AppFonts](../../lib/app/core/theme/app_fonts.dart) uses bundled Inter, Space Grotesk, JetBrains Mono, Arabic, and Devanagari families. The current [font manifest](../../pubspec.yaml) bundles full font files, while the [release shell](../../tool/prepare_web_release.mjs) conditionally preloads Arabic or Devanagari for the selected locale. That preload is not proof that unused font bytes are excluded from the release.
+The [content contract](../../assets/content/portfolio.json) and [interface catalogs](../../assets/i18n/) cover `en`, `tr`, `de`, `fr`, `es`, `ar`, and `hi`. [AppFonts](../../lib/app/core/theme/app_fonts.dart) uses bundled Inter, Space Grotesk, JetBrains Mono, Arabic, and Devanagari families. The current [font manifest](../../pubspec.yaml) bundles full font files, while the [release shell](../../tool/release/prepare_web_release.mjs) conditionally preloads Arabic or Devanagari for the selected locale. That preload is not proof that unused font bytes are excluded from the release.
 
 ## Decision
 

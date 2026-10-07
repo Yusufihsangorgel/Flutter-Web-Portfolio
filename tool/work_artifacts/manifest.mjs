@@ -2,7 +2,7 @@ import { createHash } from 'node:crypto';
 import { readFile, readdir, rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 
-import { assertRasterDimensions, inspectRaster } from '../raster_inspector.mjs';
+import { assertRasterDimensions, inspectRaster } from '../assets/raster_inspector.mjs';
 
 export const manifestSchema = 'portfolio-work-artifacts/v1';
 
@@ -16,7 +16,7 @@ export function workArtifactPaths(root) {
     output: path.join(root, 'assets', 'work'),
     sources,
     manifest: path.join(sources, 'artifact-manifest.json'),
-    renderer: path.join(root, 'tool', 'render_work_artifacts.mjs'),
+    renderer: path.join(root, 'tool', 'work_artifacts', 'render_work_artifacts.mjs'),
     modules: path.join(root, 'tool', 'work_artifacts'),
     content: path.join(root, 'assets', 'content', 'portfolio.json'),
   });
@@ -33,11 +33,9 @@ export async function renderInputDigest(paths) {
   const modules = (await listFiles(paths.modules)).filter(
     (file) => !path.basename(file).startsWith('test_'),
   );
-  const sources = (await listFiles(paths.sources)).filter(
-    (file) => file !== paths.manifest,
-  );
+  const sources = (await listFiles(paths.sources)).filter((file) => file !== paths.manifest);
   const hash = createHash('sha256');
-  for (const file of [paths.renderer, ...modules, ...sources]) {
+  for (const file of [...modules, ...sources]) {
     hash.update(path.relative(paths.root, file).split(path.sep).join('/'));
     hash.update('\0');
     hash.update(await readFile(file));
@@ -189,8 +187,7 @@ async function listFiles(directory) {
 
 function isWorkAsset(asset) {
   return (
-    typeof asset === 'string' &&
-    /^assets\/work\/[a-z0-9][a-z0-9-]*\.(png|jpg|webp)$/.test(asset)
+    typeof asset === 'string' && /^assets\/work\/[a-z0-9][a-z0-9-]*\.(png|jpg|webp)$/.test(asset)
   );
 }
 
