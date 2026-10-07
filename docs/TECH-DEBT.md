@@ -21,7 +21,6 @@ Record date: 2026-09-29. Counts below are source line counts from the current ch
 | [`refresh_portfolio_data.mjs`](../tool/refresh_portfolio_data.mjs) | 879 | Separate source adapters, feed parsing, merge rules, and orchestration. |
 | [`proof_section.dart`](../lib/app/modules/home/sections/proof_section.dart) | 741 | Split featured contribution, ledger, and label assembly into focused widgets. |
 | [`init_portfolio.mjs`](../tool/init_portfolio.mjs) | 647 | Extract template file rewriting and validation helpers. |
-| [`verify_web_build.mjs`](../tool/verify_web_build.mjs) | 638 | Split artifact, security-header, and manifest checks behind one verifier entrypoint. |
 | [`packages_section.dart`](../lib/app/modules/home/sections/packages/packages_section.dart) | 620 | Extract package grouping and category/card widgets. |
 | [`sync_public_content.mjs`](../tool/sync_public_content.mjs) | 614 | Separate metadata, locale, and public-file renderers. |
 | [`measure_web_runtime.mjs`](../tool/measure_web_runtime.mjs) | 590 | Separate browser sampling, budget evaluation, and report formatting. |

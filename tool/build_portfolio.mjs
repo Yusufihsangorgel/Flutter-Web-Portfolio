@@ -27,6 +27,7 @@ const flutterArguments = [
 ];
 if (baseHref) flutterArguments.push('--base-href', baseHref);
 run('flutter', flutterArguments);
+run('npm', ['run', 'resume:build']);
 run('npm', ['run', 'prepare:bundle']);
 run('npm', ['run', 'verify:bundle']);
 

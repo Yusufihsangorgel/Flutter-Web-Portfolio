@@ -41,6 +41,7 @@ jobs:
       - run: npm run test:release-security
       - run: npm run test:refresh
       - run: npm run test:content
+      - run: npm run test:resume
       - run: npm run test:strings
       - run: npm run verify:strings
       - run: npm run verify:fonts
@@ -113,6 +114,9 @@ jobs:
       - run: npm run verify:content
       - run: npm run prepare:source
       - run: flutter build web --release --wasm --no-web-resources-cdn
+      - run: npm run resume:build
+      - name: Verify resume determinism, text and page count
+        run: node tool/resume/check_browser_pdf.mjs
       - run: npm run prepare:bundle
       - run: npm run verify:bundle
       # The image build runs this check in the exact git tree, not in this workspace.
