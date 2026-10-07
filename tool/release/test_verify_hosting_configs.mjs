@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 
 import { renderContentSecurityPolicy, securityHeaders } from '../public-content/security.mjs';
 import { validateHostingSecurity } from '../public-content/hosting_security.mjs';
+import './test_resume_hosting.mjs';
 
 const content = {
   site: { analytics: { script_url: 'https://analytics.example.invalid/script.js' } },
