@@ -260,7 +260,7 @@ test("back-to-top is a keyboard link that follows on Enter only", async ({
   const settled = await waitForSemanticsSettled(page);
   const hashBeforeSpace = await page.evaluate(() => location.hash);
   await page.keyboard.press("Space");
-  expect(await waitForSemanticsSettled(page, settled)).toBe(settled);
+  expect(await waitForSemanticsSettled(page)).toBe(settled);
   expect(await page.evaluate(() => location.hash)).toBe(hashBeforeSpace);
   await expect(backToTop).toBeVisible();
 
