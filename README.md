@@ -16,7 +16,7 @@ This repository is the source of my portfolio at [developeryusuf.com](https://de
 
 - **Accepted Flutter engine fix.** On SkWasm, `flutter-first-frame` could fire before the compositor presented any Flutter content, which left a blank window between a page's loading screen and the app. [flutter/flutter#189500](https://github.com/flutter/flutter/pull/189500) makes the engine wait for the first frame's outstanding renders and for the next browser frame before it sends the event ([issue #189499](https://github.com/flutter/flutter/issues/189499)). This site's loading shell is removed after that event, and `npm run verify:runtime` measures the handoff. The other accepted upstream changes, in Dart, simdjson, gRPC-Go, and other projects, are listed under [Accepted upstream changes](#accepted-upstream-changes).
 - **Strict content contract.** `assets/content/portfolio.json` is the single source for the page. Node tools generate the HTML metadata, structured data, manifest, sitemap, and the record below from it. The Dart parser runs before `runApp` and rejects unsupported schema versions, missing fields, duplicate identifiers, and invalid links. A translation is a complete overlay: a locale with a missing field is refused instead of mixing languages ([ADR 0005](docs/adr/0005-strict-json-content-contract.md)).
-- **Wasm with a JavaScript fallback.** The release ships the Dart Wasm build (SkWasm) and a JavaScript fallback, and serves the renderer files from the same origin. Hosts that send cross-origin isolation headers get threaded SkWasm. Hosts that cannot, such as GitHub Pages, run the single-threaded or JavaScript path ([ADR 0003](docs/adr/0003-dual-wasm-javascript-runtime.md)).
+- **Wasm with a JavaScript fallback.** The release ships the Dart Wasm build (single-threaded SkWasm while flutter/flutter#190039 is open) and a JavaScript fallback, and serves the renderer files from the same origin. Cross-origin isolation headers are retained but not required for the single-threaded path; they will enable threaded SkWasm again after the revert ([ADR 0003](docs/adr/0003-dual-wasm-javascript-runtime.md)).
 - **Accessibility and reduced motion.** Playwright tests cover keyboard navigation, reduced motion, language switching across seven languages including right-to-left Arabic, deep links, and browser history. With reduced motion the page stops adaptive effects and still exposes its full heading and control structure.
 - **Release checks in CI.** Each pull request runs content synchronization, formatting, static analysis, Flutter tests, the release build, bundle and hosting verification, a clean-template initialization, the browser suite, and runtime budgets. See [Quality gates](#quality-gates).
 
@@ -36,7 +36,7 @@ flowchart LR
   js --> files
   content --> tools["Node tools:<br/>metadata, sitemap,<br/>first-frame shell"]
   tools --> files
-  headers["Cross-origin<br/>isolation headers"] -. enable threaded SkWasm .-> wasm
+  headers["Cross-origin<br/>isolation headers"] -. retained for threaded SkWasm after revert .-> wasm
 ```
 
 The layer rules are in [docs/ARCHITECTURE-RULES.md](docs/ARCHITECTURE-RULES.md). Design decisions are recorded in [docs/adr](docs/adr/README.md), and known gaps in [docs/TECH-DEBT.md](docs/TECH-DEBT.md).

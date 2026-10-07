@@ -1,4 +1,4 @@
-import { expect, Locator, Page, test } from '@playwright/test';
+import { expect, Page, test } from './helpers/test_setup';
 import { readFileSync } from 'node:fs';
 import type {
   InterfaceTestData,
@@ -10,7 +10,11 @@ import {
   waitForStableCanvas,
   waitForWorkImagesPainted,
 } from './helpers/visual_capture';
-import { semanticsTree } from './helpers/semantics_scroll';
+import {
+  scrollToLocator,
+  scrollToPosition,
+  semanticsTree,
+} from './helpers/semantics_scroll';
 
 const portfolio = JSON.parse(
   readFileSync('assets/content/portfolio.json', 'utf8'),
@@ -114,179 +118,37 @@ async function openChapter(
 
 async function scrollToVisualHeading(page: Page, name: string) {
   const heading = page.getByRole('heading', { name, exact: true });
-  for (let attempt = 0; attempt < 80; attempt += 1) {
-    if ((await heading.count()) > 0) {
-      const [box, viewportHeight] = await Promise.all([
-        heading.boundingBox(),
-        page.evaluate(() => window.innerHeight),
-      ]);
-      if (box && box.y < viewportHeight && box.y + box.height > 0) {
-        const targetY = Math.min(140, viewportHeight * 0.18);
-        await page.mouse.wheel(0, Math.max(0, box.y - targetY));
-        await page.evaluate(() => document.fonts.ready);
-        await settleCompositor(page, 8);
-        await waitForStableCanvas(page);
-        return;
-      }
-    }
-    await page.mouse.wheel(0, 500);
-    await settleCompositor(page, 2);
+  await scrollToLocator(page, heading);
+  const box = await heading.boundingBox();
+  const height = await page.evaluate(() => window.innerHeight);
+  const targetY = Math.min(140, height * 0.18);
+  if (box && box.y > targetY) {
+    await scrollToPosition(page, heading, { targetY });
   }
-  await expect(heading).toBeVisible();
-}
-
-// Track the semantics scroll offset and heading positions inside Flutter's canvas.
-async function readScrollProgress(page: Page) {
-  return page.evaluate(() => {
-    let scroller: Element | null = null;
-    for (const overflow of document.querySelectorAll(
-      'flt-semantics-scroll-overflow',
-    )) {
-      const parent = overflow.parentElement;
-      if (!parent) continue;
-      if (!scroller || parent.scrollHeight > scroller.scrollHeight) {
-        scroller = parent;
-      }
-    }
-    const headings = Array.from(
-      document.querySelectorAll('h1,h2,h3,h4,h5,h6'),
-    )
-      .map(
-        (heading) =>
-          `${heading.tagName}|${heading.textContent}|${Math.round(
-            heading.getBoundingClientRect().y,
-          )}`,
-      )
-      .join('~');
-    return {
-      offset: scroller ? scroller.scrollTop : null,
-      token: `${scroller ? scroller.scrollTop : 'detached'}#${headings}`,
-    };
-  });
-}
-
-const SCROLL_STALL_LIMIT = 6;
-const CONVERGENCE_STALL_LIMIT = 24;
-const SCROLL_ATTEMPT_CEILING = 1000;
-
-function createScrollProgressGuard(page: Page) {
-  let previousToken: string | null = null;
-  let stalledAttempts = 0;
-  return async function recordScrollAttempt() {
-    const { offset, token } = await readScrollProgress(page);
-    if (previousToken !== null && token === previousToken) {
-      stalledAttempts += 1;
-    } else {
-      stalledAttempts = 0;
-    }
-    previousToken = token;
-    return { offset, stalled: stalledAttempts >= SCROLL_STALL_LIMIT };
-  };
+  await page.evaluate(() => document.fonts.ready);
+  await settleCompositor(page, 8);
+  await waitForStableCanvas(page);
 }
 
 async function scrollToChapterBoundary(page: Page, name: string) {
   const heading = page.getByRole('heading', { name, exact: true });
-  const recordScrollAttempt = createScrollProgressGuard(page);
-  let bestDistance = Number.POSITIVE_INFINITY;
-  let attemptsSinceConvergence = 0;
-  for (let attempt = 0; attempt < SCROLL_ATTEMPT_CEILING; attempt += 1) {
-    if ((await heading.count()) === 0) {
-      await page.mouse.wheel(0, 900);
-      await settleCompositor(page, 2);
-      const { offset, stalled } = await recordScrollAttempt();
-      if (stalled) {
-        throw new Error(
-          `The ${name} chapter boundary never came into view: the document ` +
-            `stopped scrolling at offset ${offset} after ${attempt + 1} ` +
-            'attempts.',
-        );
-      }
-      continue;
-    }
-    const [box, viewportHeight] = await Promise.all([
-      heading.boundingBox(),
-      page.evaluate(() => window.innerHeight),
-    ]);
-    if (box) {
-      const targetY = Math.round(viewportHeight * 0.7);
-      const delta = box.y - targetY;
-      if (Math.abs(delta) <= 1) {
-        await page.evaluate(() => document.fonts.ready);
-        await settleCompositor(page, 8);
-        await waitForStableCanvas(page);
-        const settledBox = await heading.boundingBox();
-        if (settledBox && Math.abs(settledBox.y - targetY) <= 1) return;
-      }
-      if (Math.abs(delta) < bestDistance - 0.05) {
-        bestDistance = Math.abs(delta);
-        attemptsSinceConvergence = 0;
-      } else {
-        attemptsSinceConvergence += 1;
-        if (attemptsSinceConvergence >= CONVERGENCE_STALL_LIMIT) {
-          throw new Error(
-            `Could not position the ${name} chapter boundary: the heading ` +
-              `stopped converging ${bestDistance.toFixed(1)}px from the 70% ` +
-              `mark after ${attempt + 1} attempts.`,
-          );
-        }
-      }
-      await page.mouse.wheel(0, Math.max(-640, Math.min(640, delta)));
-    } else {
-      await page.mouse.wheel(0, 500);
-    }
-    await settleCompositor(page, 2);
-  }
-  throw new Error(
-    `Could not position the ${name} chapter boundary within ` +
-      `${SCROLL_ATTEMPT_CEILING} attempts.`,
+  const targetY = Math.round(
+    await page.evaluate(() => window.innerHeight) * 0.7,
   );
-}
-
-async function scrollUntilHeadingRenders(
-  page: Page,
-  heading: Locator,
-  name: string,
-  step: number,
-) {
-  const recordScrollAttempt = createScrollProgressGuard(page);
-  for (let attempt = 0; attempt < SCROLL_ATTEMPT_CEILING; attempt += 1) {
-    if ((await heading.count()) > 0) {
-      const box = await heading.boundingBox();
-      if (box) return;
-    }
-    await page.mouse.wheel(0, step);
-    await settleCompositor(page, 2);
-    const { offset, stalled } = await recordScrollAttempt();
-    if (stalled) {
-      throw new Error(
-        `The ${name} heading never rendered: the document stopped scrolling ` +
-          `at offset ${offset} after ${attempt + 1} attempts.`,
-      );
-    }
-  }
-  throw new Error(
-    `The ${name} heading never rendered within ` +
-      `${SCROLL_ATTEMPT_CEILING} attempts.`,
-  );
+  await page.evaluate(() => document.fonts.ready);
+  await scrollToPosition(page, heading, { targetY });
+  await settleCompositor(page, 8);
+  await waitForStableCanvas(page);
+  const box = await heading.boundingBox();
+  expect(box, `Missing settled geometry for ${name}.`).not.toBeNull();
+  expect(
+    Math.abs(box!.y - targetY),
+    `${name}: last geometry ${JSON.stringify(box)}`,
+  ).toBeLessThanOrEqual(1);
 }
 
 async function scrollToVisualText(page: Page, text: string) {
-  const target = semanticsTree(page).getByText(text).first();
-  for (let attempt = 0; attempt < 80; attempt += 1) {
-    if ((await target.count()) > 0) {
-      const [box, viewportHeight] = await Promise.all([
-        target.boundingBox(),
-        page.evaluate(() => window.innerHeight),
-      ]);
-      if (box && box.y < viewportHeight && box.y + box.height > 0) {
-        return target;
-      }
-    }
-    await page.mouse.wheel(0, 420);
-    await settleCompositor(page, 2);
-  }
-  await expect(target).toBeVisible();
-  return target;
+  return scrollToLocator(page, semanticsTree(page).getByText(text).first());
 }
 
 async function expectVisualSnapshot(page: Page, name: string) {
@@ -383,20 +245,13 @@ test('keeps one content-anchored signal with reduced motion', async ({
     name: primaryCase.name,
     exact: true,
   });
-  await scrollUntilHeadingRenders(page, heading, primaryCase.name, 600);
+  await scrollToLocator(page, heading);
   await expect(heading).toBeVisible();
-  for (let attempt = 0; attempt < 24; attempt += 1) {
-    const [box, viewportHeight] = await Promise.all([
-      heading.boundingBox(),
-      page.evaluate(() => window.innerHeight),
-    ]);
-    if (box && Math.abs(box.y - viewportHeight * 0.2) <= 2) break;
-    await page.mouse.wheel(
-      0,
-      box ? box.y - viewportHeight * 0.2 : viewportHeight * 0.5,
-    );
-    await settleCompositor(page, 3);
-  }
+  const viewportHeight = await page.evaluate(() => window.innerHeight);
+  await scrollToPosition(page, heading, {
+    targetY: viewportHeight * 0.2,
+    tolerance: 2,
+  });
   await settleCompositor(page, 8);
   await expectVisualSnapshot(page, 'narrative-stage-work.png');
 });
@@ -430,12 +285,7 @@ test('renders a real supporting-work artifact in the atlas', async (
     });
     selector = selectedHeading;
   }
-  for (let attempt = 0; attempt < 24; attempt += 1) {
-    const box = await selector.boundingBox();
-    if (box && Math.abs(box.y - 120) <= 1) break;
-    await page.mouse.wheel(0, box ? box.y - 120 : 360);
-    await settleCompositor(page, 3);
-  }
+  await scrollToPosition(page, selector, { targetY: 120 });
   const compactViewport = (page.viewportSize()?.width ?? 0) < 900;
   const expectedArtifact =
     compactViewport && selected.artifact.compact

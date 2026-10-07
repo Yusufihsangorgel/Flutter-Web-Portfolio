@@ -1,5 +1,5 @@
 import AxeBuilder from "@axe-core/playwright";
-import { expect, test } from "@playwright/test";
+import { expect, test } from "./helpers/test_setup";
 
 test("has no serious or critical accessibility violations after reveal", async ({
   page,
