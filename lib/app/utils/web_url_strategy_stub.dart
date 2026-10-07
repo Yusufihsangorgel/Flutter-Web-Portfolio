@@ -1,5 +1,3 @@
-// Stub implementation for non-web platforms — all operations are no-ops.
-
 /// Native bootstrap failures use the English fallback copy.
 String getHtmlLanguage() => 'en';
 
@@ -27,6 +25,8 @@ void reloadPage() {}
 /// Native targets can safely rebuild the locale without restarting.
 bool reloadPageForLanguageChange({String? preserveSection}) => false;
 
-/// Registers a listener that fires when the browser navigates back/forward.
-/// Returns a dispose callback.
+/// No-op outside a browser.
+void interceptInPageLinkClicks() {}
+
+/// Returns an inactive browser history listener.
 void Function() onPopState(void Function(String hash) callback) => () {};

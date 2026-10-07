@@ -9,13 +9,10 @@ import 'package:flutter_web_portfolio/app/core/constants/breakpoints.dart';
 import 'package:flutter_web_portfolio/app/core/theme/app_fonts.dart';
 import 'package:flutter_web_portfolio/app/narrative/application/narrative_position.dart';
 import 'package:flutter_web_portfolio/app/narrative/domain/narrative_document.dart';
+import 'package:flutter_web_portfolio/app/narrative/domain/smooth_step.dart';
 import 'package:flutter_web_portfolio/app/utils/motion_preference.dart';
 
-/// A quiet chapter seam inside the portfolio's persistent narrative stage.
-///
-/// The former full-screen portals restarted the visual language between every
-/// section. This seam only identifies the next chapter and leaves the measured
-/// content-to-content signal in [NarrativeStage] visually uninterrupted.
+/// Marks the transition between adjacent chapters.
 class NarrativeChapterHandoff extends StatefulWidget {
   const NarrativeChapterHandoff({
     super.key,
@@ -72,13 +69,13 @@ final class _NarrativeChapterHandoffState
     current?.dispose();
     _chapterOrder = chapterOrder;
     _reducedMotion = reducedMotion;
-    _progress = _NarrativeBoundaryProgress(
+    _progress = _NarrativeBoundaryProgress((
       source: widget.position,
       chapterOrder: chapterOrder,
       from: widget.from,
       to: widget.to,
       reducedMotion: reducedMotion,
-    );
+    ));
   }
 
   @override
@@ -108,7 +105,7 @@ final class _NarrativeChapterHandoffState
             width: double.infinity,
             height: height,
             child: CustomPaint(
-              painter: _NarrativeChapterHandoffPainter(
+              painter: _NarrativeChapterHandoffPainter((
                 to: widget.to,
                 progress: _progress!,
                 textDirection: Directionality.of(context),
@@ -116,7 +113,7 @@ final class _NarrativeChapterHandoffState
                 chapterNumber: widget.chapterNumber,
                 label: widget.label,
                 typography: _typography,
-              ),
+              )),
             ),
           ),
         ),
@@ -126,23 +123,26 @@ final class _NarrativeChapterHandoffState
 }
 
 final class _NarrativeChapterHandoffPainter extends CustomPainter {
-  _NarrativeChapterHandoffPainter({
-    required this.to,
-    required this.progress,
-    required this.textDirection,
-    required this.locale,
-    required this.chapterNumber,
-    required this.label,
-    required this.typography,
-  }) : super(repaint: progress);
+  _NarrativeChapterHandoffPainter(this.input) : super(repaint: input.progress);
 
-  final NarrativeChapter to;
-  final ValueListenable<double> progress;
-  final TextDirection textDirection;
-  final Locale locale;
-  final String chapterNumber;
-  final String label;
-  final _HandoffTypographyCache typography;
+  final ({
+    NarrativeChapter to,
+    ValueListenable<double> progress,
+    TextDirection textDirection,
+    Locale locale,
+    String chapterNumber,
+    String label,
+    _HandoffTypographyCache typography,
+  })
+  input;
+
+  NarrativeChapter get to => input.to;
+  ValueListenable<double> get progress => input.progress;
+  TextDirection get textDirection => input.textDirection;
+  Locale get locale => input.locale;
+  String get chapterNumber => input.chapterNumber;
+  String get label => input.label;
+  _HandoffTypographyCache get typography => input.typography;
 
   final Paint _trackPaint = Paint()
     ..isAntiAlias = true
@@ -154,16 +154,16 @@ final class _NarrativeChapterHandoffPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     if (size.isEmpty) return;
     final accent = _accentFor(to.motif);
-    final eased = _smoothStep(progress.value.clamp(0.0, 1.0));
+    final eased = smoothStep(progress.value.clamp(0.0, 1.0));
     final inset = size.width >= Breakpoints.tablet ? 36.0 : 20.0;
     final y = size.height * 0.5;
-    final labelPainter = typography.layout(
+    final labelPainter = typography.layout((
       chapterNumber: chapterNumber,
       label: label,
       locale: locale,
       textDirection: textDirection,
       maxWidth: math.max(1, size.width * 0.46),
-    );
+    ));
     final rtl = textDirection == TextDirection.rtl;
     final labelX = rtl ? size.width - inset - labelPainter.width : inset;
     labelPainter.paint(canvas, Offset(labelX, y - labelPainter.height * 0.5));
@@ -201,8 +201,6 @@ final class _NarrativeChapterHandoffPainter extends CustomPainter {
     NarrativeMotif.bracket => AppColors.cobalt,
   };
 
-  static double _smoothStep(double value) => value * value * (3 - 2 * value);
-
   @override
   bool shouldRepaint(_NarrativeChapterHandoffPainter oldDelegate) =>
       oldDelegate.to != to ||
@@ -214,29 +212,6 @@ final class _NarrativeChapterHandoffPainter extends CustomPainter {
       !identical(oldDelegate.typography, typography);
 }
 
-/// Measured single-line typography used by a chapter seam.
-///
-/// This public metric surface keeps locale and narrow-layout regressions
-/// testable without relying on screenshot pixel sampling.
-@immutable
-final class NarrativeHandoffTypographyMetrics {
-  const NarrativeHandoffTypographyMetrics({
-    required this.normalizedLabel,
-    required this.titleFontSize,
-    required this.titleSize,
-    required this.railFontSize,
-    required this.railSize,
-    required this.maxRailWidth,
-  });
-
-  final String normalizedLabel;
-  final double titleFontSize;
-  final Size titleSize;
-  final double railFontSize;
-  final Size railSize;
-  final double maxRailWidth;
-}
-
 abstract final class NarrativeHandoffTypography {
   static String uppercaseLabel(String label, Locale locale) {
     final languageCode = locale.languageCode.toLowerCase();
@@ -244,44 +219,6 @@ abstract final class NarrativeHandoffTypography {
       return label.replaceAll('i', 'İ').replaceAll('ı', 'I').toUpperCase();
     }
     return label.toUpperCase();
-  }
-
-  static NarrativeHandoffTypographyMetrics resolve({
-    required Size size,
-    required String chapterNumber,
-    required String label,
-    required Locale locale,
-    required TextDirection textDirection,
-  }) {
-    if (!size.width.isFinite ||
-        !size.height.isFinite ||
-        size.width <= 0 ||
-        size.height <= 0) {
-      throw ArgumentError.value(size, 'size', 'must be finite and positive');
-    }
-    final normalizedLabel = uppercaseLabel(label.trim(), locale);
-    final titleFontSize = size.width >= Breakpoints.tablet ? 11.0 : 9.0;
-    final railFontSize = titleFontSize;
-    final maxRailWidth = math.max(1.0, size.width * 0.46);
-    final titleSize = _measure(
-      text: chapterNumber,
-      textDirection: textDirection,
-      style: _style(fontSize: titleFontSize, color: AppColors.cobalt),
-    );
-    final railSize = _measureFitted(
-      text: '$chapterNumber  $normalizedLabel',
-      textDirection: textDirection,
-      maxWidth: maxRailWidth,
-      maxFontSize: railFontSize,
-    );
-    return NarrativeHandoffTypographyMetrics(
-      normalizedLabel: normalizedLabel,
-      titleFontSize: titleFontSize,
-      titleSize: titleSize,
-      railFontSize: railSize.$2,
-      railSize: railSize.$1,
-      maxRailWidth: maxRailWidth,
-    );
   }
 
   static (Size, double) _measureFitted({
@@ -342,36 +279,37 @@ final class _HandoffTypographyCache {
   String? _text;
   TextDirection? _textDirection;
   double? _maxWidth;
-  double? _fontSize;
 
-  TextPainter layout({
-    required String chapterNumber,
-    required String label,
-    required Locale locale,
-    required TextDirection textDirection,
-    required double maxWidth,
-  }) {
+  TextPainter layout(
+    ({
+      String chapterNumber,
+      String label,
+      Locale locale,
+      TextDirection textDirection,
+      double maxWidth,
+    })
+    input,
+  ) {
+    final (:chapterNumber, :label, :locale, :textDirection, :maxWidth) = input;
     final text =
         '$chapterNumber  '
         '${NarrativeHandoffTypography.uppercaseLabel(label.trim(), locale)}';
+    if (_painter != null &&
+        _text == text &&
+        _textDirection == textDirection &&
+        _maxWidth == maxWidth) {
+      return _painter!;
+    }
     final measured = NarrativeHandoffTypography._measureFitted(
       text: text,
       textDirection: textDirection,
       maxWidth: maxWidth,
       maxFontSize: maxWidth >= Breakpoints.tablet ? 11 : 9,
     );
-    if (_painter != null &&
-        _text == text &&
-        _textDirection == textDirection &&
-        _maxWidth == maxWidth &&
-        _fontSize == measured.$2) {
-      return _painter!;
-    }
     _painter?.dispose();
     _text = text;
     _textDirection = textDirection;
     _maxWidth = maxWidth;
-    _fontSize = measured.$2;
     _painter = TextPainter(
       text: TextSpan(
         text: text,
@@ -394,19 +332,27 @@ final class _HandoffTypographyCache {
 
 final class _NarrativeBoundaryProgress extends ChangeNotifier
     implements ValueListenable<double> {
-  _NarrativeBoundaryProgress({
-    required this.source,
-    required this.chapterOrder,
-    required this.from,
-    required this.to,
-    required this.reducedMotion,
-  }) : _value = NarrativeHandoffReveal.resolve(
-         snapshot: source.value,
-         chapterOrder: chapterOrder,
-         from: from,
-         to: to,
-         reducedMotion: reducedMotion,
-       ) {
+  _NarrativeBoundaryProgress(
+    ({
+      ValueListenable<NarrativePosition> source,
+      List<NarrativeChapter> chapterOrder,
+      NarrativeChapter from,
+      NarrativeChapter to,
+      bool reducedMotion,
+    })
+    input,
+  ) : source = input.source,
+      chapterOrder = input.chapterOrder,
+      from = input.from,
+      to = input.to,
+      reducedMotion = input.reducedMotion,
+      _value = NarrativeHandoffReveal.resolve((
+        snapshot: input.source.value,
+        chapterOrder: input.chapterOrder,
+        from: input.from,
+        to: input.to,
+        reducedMotion: input.reducedMotion,
+      )) {
     if (!reducedMotion) source.addListener(_handleSourceChanged);
   }
 
@@ -421,13 +367,13 @@ final class _NarrativeBoundaryProgress extends ChangeNotifier
   double get value => _value;
 
   void _handleSourceChanged() {
-    final next = NarrativeHandoffReveal.resolve(
+    final next = NarrativeHandoffReveal.resolve((
       snapshot: source.value,
       chapterOrder: chapterOrder,
       from: from,
       to: to,
       reducedMotion: reducedMotion,
-    );
+    ));
     if (next == _value) return;
     _value = next;
     notifyListeners();
@@ -440,18 +386,19 @@ final class _NarrativeBoundaryProgress extends ChangeNotifier
   }
 }
 
-/// Resolves the persistent reveal state of one chapter boundary.
-///
-/// Only the current seam interpolates. Earlier seams remain complete and later
-/// seams stay quiet until the reader reaches them.
+/// Keeps completed chapter seams visible.
 abstract final class NarrativeHandoffReveal {
-  static double resolve({
-    required NarrativePosition snapshot,
-    required List<NarrativeChapter> chapterOrder,
-    required NarrativeChapter from,
-    required NarrativeChapter to,
-    required bool reducedMotion,
-  }) {
+  static double resolve(
+    ({
+      NarrativePosition snapshot,
+      List<NarrativeChapter> chapterOrder,
+      NarrativeChapter from,
+      NarrativeChapter to,
+      bool reducedMotion,
+    })
+    input,
+  ) {
+    final (:snapshot, :chapterOrder, :from, :to, :reducedMotion) = input;
     if (reducedMotion) return 1;
 
     final fromIndex = chapterOrder.indexWhere(

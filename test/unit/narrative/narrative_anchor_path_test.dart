@@ -13,32 +13,32 @@ void main() {
         NarrativeAnchorGeometry(
           sectionId: SectionId.home,
           motif: NarrativeMotif.origin,
-          documentCenter: Offset(460 + shift, 220),
-          size: const Size(280, 96),
+          documentCenter: NarrativePoint(460 + shift, 220),
+          size: const NarrativeSize(280, 96),
         ),
         NarrativeAnchorGeometry(
           sectionId: SectionId.experience,
           motif: NarrativeMotif.timeline,
-          documentCenter: Offset(180 + shift, 1180),
-          size: const Size(8, 8),
+          documentCenter: NarrativePoint(180 + shift, 1180),
+          size: const NarrativeSize(8, 8),
         ),
         NarrativeAnchorGeometry(
           sectionId: SectionId.proof,
           motif: NarrativeMotif.branches,
-          documentCenter: Offset(310 + shift, 2260),
-          size: const Size(8, 8),
+          documentCenter: NarrativePoint(310 + shift, 2260),
+          size: const NarrativeSize(8, 8),
         ),
         NarrativeAnchorGeometry(
           sectionId: SectionId.projects,
           motif: NarrativeMotif.bracket,
-          documentCenter: Offset(610 + shift, 3640),
-          size: const Size(720, 540),
+          documentCenter: NarrativePoint(610 + shift, 3640),
+          size: const NarrativeSize(720, 540),
         ),
         NarrativeAnchorGeometry(
           sectionId: SectionId.about,
           motif: NarrativeMotif.thread,
-          documentCenter: Offset(820 + shift, 5280),
-          size: const Size(420, 180),
+          documentCenter: NarrativePoint(820 + shift, 5280),
+          size: const NarrativeSize(420, 180),
         ),
       ]);
 
@@ -79,8 +79,9 @@ void main() {
     expect(ltr.corridorX, 36);
     expect(rtl.corridorX, viewport.width - 36);
     for (var index = 0; index < anchors.anchors.length; index += 1) {
-      expect(ltr.debugAnchorAt(index), anchors.anchors[index].documentCenter);
-      expect(rtl.debugAnchorAt(index), anchors.anchors[index].documentCenter);
+      final point = anchors.anchors[index].documentCenter;
+      expect(ltr.debugAnchorAt(index), Offset(point.dx, point.dy));
+      expect(rtl.debugAnchorAt(index), Offset(point.dx, point.dy));
     }
   });
 
@@ -111,6 +112,18 @@ void main() {
     expect(kernel.debugCoordinateBufferIdentityHash, firstBuffer);
   });
 
+  test('compares anchor geometry by value', () {
+    final first = snapshot();
+    final second = snapshot();
+
+    expect(first, second);
+    expect(first.hashCode, second.hashCode);
+    expect(
+      first.anchors.first.documentCenter,
+      second.anchors.first.documentCenter,
+    );
+  });
+
   test('keeps the cursor on the same closed-form path as the trace', () {
     final anchors = snapshot();
     final kernel = NarrativeAnchorPathKernel()
@@ -123,7 +136,7 @@ void main() {
     for (final anchor in anchors.anchors) {
       expect(
         kernel.activePoint(anchor.documentCenter.dy),
-        anchor.documentCenter,
+        Offset(anchor.documentCenter.dx, anchor.documentCenter.dy),
       );
     }
     expect(kernel.activePoint(700).dx, kernel.corridorX);
@@ -161,8 +174,8 @@ void main() {
     const home = NarrativeAnchorGeometry(
       sectionId: SectionId.home,
       motif: NarrativeMotif.origin,
-      documentCenter: Offset(100, 200),
-      size: Size(20, 20),
+      documentCenter: NarrativePoint(100, 200),
+      size: NarrativeSize(20, 20),
     );
     expect(() => NarrativeAnchorSnapshot([home, home]), throwsArgumentError);
     expect(
@@ -171,8 +184,8 @@ void main() {
         const NarrativeAnchorGeometry(
           sectionId: SectionId.experience,
           motif: NarrativeMotif.timeline,
-          documentCenter: Offset(100, 100),
-          size: Size(20, 20),
+          documentCenter: NarrativePoint(100, 100),
+          size: NarrativeSize(20, 20),
         ),
       ]),
       throwsArgumentError,
@@ -182,8 +195,8 @@ void main() {
         const NarrativeAnchorGeometry(
           sectionId: SectionId.home,
           motif: NarrativeMotif.origin,
-          documentCenter: Offset(double.nan, 100),
-          size: Size(20, 20),
+          documentCenter: NarrativePoint(double.nan, 100),
+          size: NarrativeSize(20, 20),
         ),
       ]),
       throwsArgumentError,

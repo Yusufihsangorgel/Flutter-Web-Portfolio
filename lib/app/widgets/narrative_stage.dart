@@ -2,23 +2,19 @@ import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_web_portfolio/app/controllers/scene_director.dart';
 import 'package:flutter_web_portfolio/app/controllers/scroll_controller.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_dimensions.dart';
+import 'package:flutter_web_portfolio/app/core/constants/breakpoints.dart';
 import 'package:flutter_web_portfolio/app/narrative/domain/narrative_anchor.dart';
 import 'package:flutter_web_portfolio/app/narrative/domain/narrative_document.dart';
 import 'package:flutter_web_portfolio/app/narrative/rendering/narrative_anchor_path.dart';
+import 'package:flutter_web_portfolio/app/narrative/rendering/frame_coalescer.dart';
 import 'package:flutter_web_portfolio/app/utils/motion_preference.dart';
 
-/// One persistent, content-anchored trace spanning the complete portfolio.
-///
-/// Unlike a boundary interstitial, this stage never restarts. It measures a
-/// meaningful widget inside every chapter, joins those anchors in document
-/// space, and moves one cursor through the same path as the reader scrolls.
-/// The layer is decorative, pointer-transparent, and absent from semantics.
+/// Draws one decorative trace through chapter anchors.
 final class NarrativeStage extends StatefulWidget {
   const NarrativeStage({super.key});
 
@@ -80,13 +76,13 @@ final class _NarrativeStageState extends State<NarrativeStage> {
     final focalPoint = _reducedMotion && snapshot.anchors.isNotEmpty
         ? snapshot.anchors.last.documentCenter.dy
         : position.focalPoint;
-    _frame.queue(
+    _frame.queue((
       anchors: snapshot,
       scrollOffset: scrollOffset,
       focalPoint: focalPoint,
       accent: _accent,
       reducedMotion: _reducedMotion,
-    );
+    ));
   }
 
   @override
@@ -102,18 +98,44 @@ final class _NarrativeStageState extends State<NarrativeStage> {
     child: ExcludeSemantics(
       child: IgnorePointer(
         child: RepaintBoundary(
-          child: CustomPaint(
-            key: const ValueKey('narrative-stage'),
-            painter: _NarrativeStagePainter(
-              frame: _frame,
-              kernel: _kernel,
-              textDirection: Directionality.of(context),
+          child: ClipRect(
+            clipper: NarrativeStageClipper(Directionality.of(context)),
+            child: CustomPaint(
+              key: const ValueKey('narrative-stage'),
+              painter: _NarrativeStagePainter(
+                frame: _frame,
+                kernel: _kernel,
+                textDirection: Directionality.of(context),
+              ),
             ),
           ),
         ),
       ),
     ),
   );
+}
+
+/// Clips narrow-screen traces to the page gutter.
+final class NarrativeStageClipper extends CustomClipper<Rect> {
+  const NarrativeStageClipper(this.textDirection);
+
+  final TextDirection textDirection;
+
+  @override
+  Rect getClip(Size size) {
+    if (size.width >= Breakpoints.mobile) return Offset.zero & size;
+    const gutter = AppDimensions.sectionPaddingMobile;
+    return Rect.fromLTWH(
+      textDirection == TextDirection.rtl ? size.width - gutter : 0,
+      0,
+      gutter,
+      size.height,
+    );
+  }
+
+  @override
+  bool shouldReclip(NarrativeStageClipper oldClipper) =>
+      oldClipper.textDirection != textDirection;
 }
 
 final class _NarrativeStagePainter extends CustomPainter {
@@ -152,23 +174,7 @@ final class _NarrativeStagePainter extends CustomPainter {
       ..clipRect(Rect.fromLTWH(0, topInset, size.width, size.height - topInset))
       ..translate(0, -frame.scrollOffset);
 
-    _trackPaint
-      ..strokeWidth = 0.85
-      ..color = AppColors.textBright.withValues(
-        alpha: frame.reducedMotion ? 0.13 : 0.08,
-      );
-    canvas.drawPath(kernel.path, _trackPaint);
-
-    if (!frame.reducedMotion) {
-      _trackPaint
-        ..strokeWidth = 1.35
-        ..color = frame.accent.withValues(alpha: 0.52);
-      canvas
-        ..save()
-        ..clipRect(Rect.fromLTRB(0, 0, size.width, frame.focalPoint))
-        ..drawPath(kernel.path, _trackPaint)
-        ..restore();
-    }
+    _drawTrace(canvas, size);
 
     for (final anchor in frame.anchors.anchors) {
       _drawAnchorGlyph(
@@ -184,12 +190,32 @@ final class _NarrativeStagePainter extends CustomPainter {
     canvas.restore();
   }
 
+  void _drawTrace(Canvas canvas, Size size) {
+    _trackPaint
+      ..strokeWidth = 0.85
+      ..color = AppColors.textBright.withValues(
+        alpha: frame.reducedMotion ? 0.13 : 0.08,
+      );
+    canvas.drawPath(kernel.path, _trackPaint);
+
+    if (frame.reducedMotion) return;
+    _trackPaint
+      ..strokeWidth = 1.35
+      ..color = frame.accent.withValues(alpha: 0.52);
+    canvas
+      ..save()
+      ..clipRect(Rect.fromLTRB(0, 0, size.width, frame.focalPoint))
+      ..drawPath(kernel.path, _trackPaint)
+      ..restore();
+  }
+
   void _drawAnchorGlyph(
     Canvas canvas,
     NarrativeAnchorGeometry anchor, {
     required bool completed,
   }) {
-    final center = anchor.documentCenter;
+    final point = anchor.documentCenter;
+    final center = Offset(point.dx, point.dy);
     final opacity = frame.reducedMotion ? 0.36 : (completed ? 0.72 : 0.24);
     _trackPaint
       ..strokeWidth = completed ? 1.25 : 0.9
@@ -201,7 +227,11 @@ final class _NarrativeStagePainter extends CustomPainter {
       );
 
     canvas.drawCircle(center, completed ? 5.2 : 4.2, _fillPaint);
-    switch (anchor.motif) {
+    _drawMotif(canvas, anchor.motif, center);
+  }
+
+  void _drawMotif(Canvas canvas, NarrativeMotif motif, Offset center) {
+    switch (motif) {
       case NarrativeMotif.origin:
         canvas.drawRect(
           Rect.fromCenter(center: center, width: 9, height: 9),
@@ -269,8 +299,7 @@ final class _NarrativeStagePainter extends CustomPainter {
       textDirection != oldDelegate.textDirection;
 }
 
-/// Coalesces scene, layout, and scroll updates into one paint notification.
-final class _NarrativeStageFrame extends ChangeNotifier {
+final class _NarrativeStageFrame extends FrameCoalescer {
   NarrativeAnchorSnapshot _anchors = const NarrativeAnchorSnapshot.empty();
   double _scrollOffset = 0;
   double _focalPoint = 0;
@@ -282,8 +311,6 @@ final class _NarrativeStageFrame extends ChangeNotifier {
   double? _pendingFocalPoint;
   Color? _pendingAccent;
   bool? _pendingReducedMotion;
-  bool _notificationPending = false;
-  bool _disposed = false;
 
   NarrativeAnchorSnapshot get anchors => _anchors;
   double get scrollOffset => _scrollOffset;
@@ -291,23 +318,22 @@ final class _NarrativeStageFrame extends ChangeNotifier {
   Color get accent => _accent;
   bool get reducedMotion => _reducedMotion;
 
-  void queue({
-    required NarrativeAnchorSnapshot anchors,
-    required double scrollOffset,
-    required double focalPoint,
-    required Color accent,
-    required bool reducedMotion,
-  }) {
-    _pendingAnchors = anchors;
-    _pendingScrollOffset = scrollOffset;
-    _pendingFocalPoint = focalPoint;
-    _pendingAccent = accent;
-    _pendingReducedMotion = reducedMotion;
-    if (_disposed || _notificationPending) return;
-    _notificationPending = true;
-    SchedulerBinding.instance.scheduleFrameCallback((_) {
-      if (_disposed) return;
-      _notificationPending = false;
+  void queue(
+    ({
+      NarrativeAnchorSnapshot anchors,
+      double scrollOffset,
+      double focalPoint,
+      Color accent,
+      bool reducedMotion,
+    })
+    input,
+  ) {
+    _pendingAnchors = input.anchors;
+    _pendingScrollOffset = input.scrollOffset;
+    _pendingFocalPoint = input.focalPoint;
+    _pendingAccent = input.accent;
+    _pendingReducedMotion = input.reducedMotion;
+    scheduleFrameUpdate(() {
       var changed = false;
       final anchors = _pendingAnchors;
       final scrollOffset = _pendingScrollOffset;
@@ -340,13 +366,7 @@ final class _NarrativeStageFrame extends ChangeNotifier {
         _reducedMotion = reducedMotion;
         changed = true;
       }
-      if (changed) notifyListeners();
+      return changed;
     });
-  }
-
-  @override
-  void dispose() {
-    _disposed = true;
-    super.dispose();
   }
 }

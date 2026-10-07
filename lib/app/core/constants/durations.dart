@@ -8,5 +8,4 @@ final class AppDurations {
   static const medium = Duration(milliseconds: 300);
   static const sectionScroll = Duration(milliseconds: 800);
   static const fadeIn = Duration(milliseconds: 800);
-  static const heroDebounce = Duration(milliseconds: 500);
 }

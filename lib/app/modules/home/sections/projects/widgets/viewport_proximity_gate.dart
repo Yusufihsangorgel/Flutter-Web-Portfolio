@@ -1,3 +1,5 @@
+import 'package:flutter/rendering.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_web_portfolio/app/modules/home/sections/projects/widgets/atlas_style.dart';
 
@@ -36,7 +38,7 @@ final class _ViewportProximityGateState extends State<ViewportProximityGate> {
       _near = true;
     } else if (!identical(scrollable, _scrollable)) {
       _detach();
-      _scrollable = scrollable..position.addListener(_scheduleCheck);
+      _scrollable = scrollable..position.addListener(_onScroll);
     }
   }
 
@@ -47,7 +49,7 @@ final class _ViewportProximityGateState extends State<ViewportProximityGate> {
   }
 
   void _detach() {
-    _scrollable?.position.removeListener(_scheduleCheck);
+    _scrollable?.position.removeListener(_onScroll);
     _scrollable = null;
   }
 
@@ -58,11 +60,16 @@ final class _ViewportProximityGateState extends State<ViewportProximityGate> {
     return widget.placeholder;
   }
 
-  // Measures after layout: a sliver viewport updates child offsets during
-  // layout, so a jump's new position is not visible from the scroll listener.
-  // Rebuilds from viewport-size changes re-measure the same way.
+  // Every offset change (wheel, animation, jump, restore) is measured at once,
+  // except during layout, and again after the next layout.
+  void _onScroll() {
+    final phase = SchedulerBinding.instance.schedulerPhase;
+    if (phase != SchedulerPhase.persistentCallbacks) _check();
+    _scheduleCheck();
+  }
+
   void _scheduleCheck() {
-    if (_checkScheduled) return;
+    if (_near || _checkScheduled) return;
     _checkScheduled = true;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _checkScheduled = false;
@@ -74,21 +81,24 @@ final class _ViewportProximityGateState extends State<ViewportProximityGate> {
     final scrollable = _scrollable;
     if (!mounted || _near || scrollable == null) return;
     final box = context.findRenderObject();
-    final viewport = scrollable.context.findRenderObject();
-    if (box is! RenderBox || viewport is! RenderBox) return;
-    if (!box.hasSize || !viewport.hasSize || !box.attached) return;
-    if (!_isNear(box, viewport, scrollable.axisDirection)) return;
+    if (box is! RenderBox || !box.attached || !box.hasSize) return;
+    if (!_isNear(box, scrollable.position)) return;
     _detach();
     setState(() => _near = true);
   }
 
-  bool _isNear(RenderBox box, RenderBox viewport, AxisDirection direction) {
-    final origin = box.localToGlobal(Offset.zero, ancestor: viewport);
-    final vertical = axisDirectionToAxis(direction) == Axis.vertical;
-    final start = vertical ? origin.dy : origin.dx;
+  // Document-space bounds against the current offset: a jump updates the
+  // offset before the viewport lays out, so painted positions may be stale.
+  bool _isNear(RenderBox box, ScrollPosition position) {
+    final viewport = RenderAbstractViewport.maybeOf(box);
+    if (viewport == null) return true;
+    if (!position.hasPixels || !position.hasViewportDimension) return false;
+    final reveal = viewport.getOffsetToReveal(box, 0).offset;
+    final leading = reveal - position.pixels;
+    final vertical = position.axis == Axis.vertical;
     final length = vertical ? box.size.height : box.size.width;
-    final extent = vertical ? viewport.size.height : viewport.size.width;
+    final extent = position.viewportDimension;
     final lead = extent * widget.lead;
-    return start < extent + lead && start + length > -lead;
+    return leading < extent + lead && leading + length > -lead;
   }
 }

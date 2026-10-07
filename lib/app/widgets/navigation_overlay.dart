@@ -12,16 +12,12 @@ import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
 import 'package:flutter_web_portfolio/app/core/constants/breakpoints.dart';
 import 'package:flutter_web_portfolio/app/core/constants/motion_curves.dart';
 import 'package:flutter_web_portfolio/app/widgets/accessible_action.dart';
+import 'package:flutter_web_portfolio/app/widgets/portfolio_link.dart';
 import 'package:flutter_web_portfolio/app/utils/motion_preference.dart';
 import 'package:flutter_web_portfolio/app/utils/web_url_strategy.dart'
     as url_strategy;
 
-/// Full-screen navigation for compact viewports.
-///
-/// Usage:
-/// ```dart
-/// NavigationOverlay.show(context);
-/// ```
+/// Full-screen chapter menu for compact layouts.
 class NavigationOverlay extends StatefulWidget {
   const NavigationOverlay({super.key});
 
@@ -57,6 +53,9 @@ class _NavigationOverlayState extends State<NavigationOverlay>
   late AnimationController _masterController;
   late Animation<double> _backdropBlur;
   late Animation<double> _overlayOpacity;
+  late final List<_MenuItem> _menuItems;
+  late final List<Animation<double>> _itemAnimations;
+  final List<CurvedAnimation> _curves = [];
 
   int _hoveredIndex = -1;
   bool _reduceMotion = false;
@@ -71,8 +70,6 @@ class _NavigationOverlayState extends State<NavigationOverlay>
   }
 
   List<_MenuItem> _buildMenuItems() {
-    // Drop 'home' — the logo already scrolls to top, so listing it here
-    // produces a confusing duplicate row at the top of the drawer.
     final sections = context
         .read<AppScrollController>()
         .sectionIds
@@ -96,21 +93,38 @@ class _NavigationOverlayState extends State<NavigationOverlay>
       duration: const Duration(milliseconds: 420),
     );
 
-    _backdropBlur = Tween<double>(begin: 0, end: 8).animate(
-      CurvedAnimation(
-        parent: _masterController,
-        curve: const Interval(0.0, 0.4, curve: Curves.easeOut),
-      ),
-    );
+    _backdropBlur = Tween<double>(
+      begin: 0,
+      end: 8,
+    ).animate(_curved(const Interval(0.0, 0.4, curve: Curves.easeOut)));
 
-    _overlayOpacity = Tween<double>(begin: 0, end: 1).animate(
-      CurvedAnimation(
-        parent: _masterController,
-        curve: const Interval(0.0, 0.3, curve: Curves.easeOut),
-      ),
-    );
+    _overlayOpacity = Tween<double>(
+      begin: 0,
+      end: 1,
+    ).animate(_curved(const Interval(0.0, 0.3, curve: Curves.easeOut)));
 
+    _menuItems = _buildMenuItems();
+    _itemAnimations = [
+      for (var index = 0; index < _menuItems.length; index++)
+        _createItemAnimation(index),
+    ];
     _masterController.forward();
+  }
+
+  CurvedAnimation _curved(Curve curve) {
+    final animation = CurvedAnimation(parent: _masterController, curve: curve);
+    _curves.add(animation);
+    return animation;
+  }
+
+  Animation<double> _createItemAnimation(int index) {
+    final itemDelay = 0.15 + index * 0.06;
+    final itemEnd = (itemDelay + 0.25).clamp(0.0, 1.0);
+    return Tween<double>(begin: 0, end: 1).animate(
+      _curved(
+        Interval(itemDelay, itemEnd, curve: MotionCurves.emphasizedDecelerate),
+      ),
+    );
   }
 
   @override
@@ -126,6 +140,9 @@ class _NavigationOverlayState extends State<NavigationOverlay>
 
   @override
   void dispose() {
+    for (final curve in _curves) {
+      curve.dispose();
+    }
     _masterController.dispose();
     super.dispose();
   }
@@ -152,13 +169,37 @@ class _NavigationOverlayState extends State<NavigationOverlay>
     );
   }
 
+  Widget _buildCloseButton(BuildContext context) {
+    final label = MaterialLocalizations.of(context).closeButtonTooltip;
+    return Positioned(
+      top: 24,
+      right: 24,
+      child: Opacity(
+        opacity: _overlayOpacity.value,
+        child: Tooltip(
+          message: label,
+          // The action already carries the label; a second one doubles the name.
+          excludeFromSemantics: true,
+          child: AccessibleAction(
+            onTap: _close,
+            semanticLabel: label,
+            focusColor: AppColors.acid,
+            borderRadius: BorderRadius.circular(4),
+            child: const SizedBox.square(
+              dimension: 48,
+              child: Icon(Icons.close, color: Colors.white, size: 32),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final languageController = context.read<LanguageCubit>();
     final screenWidth = MediaQuery.sizeOf(context).width;
     final isMobile = screenWidth < Breakpoints.tablet;
-    final menuItems = _buildMenuItems();
-
     return Focus(
       autofocus: true,
       onKeyEvent: _handleKeyEvent,
@@ -183,21 +224,7 @@ class _NavigationOverlayState extends State<NavigationOverlay>
                 ),
               ),
             ),
-
-            Positioned(
-              top: 24,
-              right: 24,
-              child: Opacity(
-                opacity: _overlayOpacity.value,
-                child: IconButton(
-                  onPressed: _close,
-                  tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
-                  icon: const Icon(Icons.close, color: Colors.white, size: 32),
-                ),
-              ),
-            ),
-
-            // Menu items
+            _buildCloseButton(context),
             Center(
               child: ConstrainedBox(
                 constraints: BoxConstraints(
@@ -206,30 +233,15 @@ class _NavigationOverlayState extends State<NavigationOverlay>
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: List.generate(menuItems.length, (index) {
-                    final item = menuItems[index];
-                    final itemDelay = 0.15 + (index * 0.06);
-                    final itemEnd = (itemDelay + 0.25).clamp(0.0, 1.0);
-
-                    final itemAnimation = Tween<double>(begin: 0, end: 1)
-                        .animate(
-                          CurvedAnimation(
-                            parent: _masterController,
-                            curve: Interval(
-                              itemDelay,
-                              itemEnd,
-                              curve: MotionCurves.emphasizedDecelerate,
-                            ),
-                          ),
-                        );
-
+                  children: List.generate(_menuItems.length, (index) {
+                    final item = _menuItems[index];
+                    final itemAnimation = _itemAnimations[index];
                     final label = languageController.getText(
                       'nav.${item.sectionId}',
                       defaultValue:
                           item.sectionId[0].toUpperCase() +
                           item.sectionId.substring(1),
                     );
-
                     return Opacity(
                       opacity: itemAnimation.value,
                       child: Transform.translate(
@@ -298,11 +310,13 @@ class _MenuItemWidget extends StatelessWidget {
         ? Duration.zero
         : const Duration(milliseconds: 200);
 
-    return AccessibleAction(
-      onTap: onTap,
+    return PortfolioLink(
+      uri: Uri.parse('#/${item.sectionId}'),
+      onActivate: onTap,
       onHoverChanged: onHover,
       semanticLabel: label,
       selected: isSelected,
+      focusColor: accentColor,
       child: AnimatedContainer(
         duration: motionDuration,
         curve: Curves.easeOut,
@@ -320,7 +334,6 @@ class _MenuItemWidget extends StatelessWidget {
         ),
         child: Row(
           children: [
-            // Number
             AnimatedDefaultTextStyle(
               duration: motionDuration,
               style: AppFonts.spaceGrotesk(
@@ -334,7 +347,6 @@ class _MenuItemWidget extends StatelessWidget {
             ),
             SizedBox(width: isMobile ? 22 : 38),
 
-            // Label
             Expanded(
               child: AnimatedDefaultTextStyle(
                 duration: motionDuration,
@@ -348,7 +360,6 @@ class _MenuItemWidget extends StatelessWidget {
               ),
             ),
 
-            // Arrow on hover
             AnimatedOpacity(
               duration: motionDuration,
               opacity: isHovered ? 1.0 : 0.0,

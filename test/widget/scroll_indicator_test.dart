@@ -55,5 +55,51 @@ void main() {
       await tester.pumpWidget(const SizedBox());
       semantics.dispose();
     });
+
+    testWidgets('pauses its repeating animation while outside the viewport', (
+      tester,
+    ) async {
+      await tester.binding.setSurfaceSize(const Size(400, 300));
+      final controller = ScrollController();
+      addTearDown(() async {
+        await tester.pumpWidget(const SizedBox());
+        controller.dispose();
+        await tester.binding.setSurfaceSize(null);
+      });
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: SingleChildScrollView(
+              controller: controller,
+              child: const Column(
+                children: [
+                  SizedBox(height: 700),
+                  SizedBox(
+                    height: 80,
+                    child: ScrollIndicator(delay: Duration.zero),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pump();
+      final initialTop = tester.widget<Positioned>(find.byType(Positioned)).top;
+      await tester.pump(const Duration(seconds: 2));
+      expect(
+        tester.widget<Positioned>(find.byType(Positioned)).top,
+        initialTop,
+      );
+
+      controller.jumpTo(450);
+      await tester.pump();
+      await tester.pump(const Duration(seconds: 1));
+      await tester.pump(const Duration(seconds: 1));
+      expect(
+        tester.widget<Positioned>(find.byType(Positioned)).top,
+        isNot(initialTop),
+      );
+    });
   });
 }

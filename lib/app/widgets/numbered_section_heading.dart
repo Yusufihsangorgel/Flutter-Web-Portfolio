@@ -3,7 +3,7 @@ import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
 import 'package:flutter_web_portfolio/app/core/theme/app_fonts.dart';
 import 'package:flutter_web_portfolio/app/core/constants/breakpoints.dart';
 
-/// Clear editorial marker shared by the portfolio sections.
+/// Renders a numbered section title and divider.
 class NumberedSectionHeading extends StatelessWidget {
   const NumberedSectionHeading({
     super.key,
@@ -13,19 +13,12 @@ class NumberedSectionHeading extends StatelessWidget {
     this.anchorKey,
   });
 
-  /// Two-digit section number (e.g. "01", "02").
   final String number;
 
-  /// Section title text.
   final String title;
 
-  /// Accent color for the section number and divider.
   final Color accent;
 
-  /// Optional document-space anchor placed just outside the section marker.
-  ///
-  /// The narrative stage can join chapter headings without drawing through
-  /// the section's editorial content.
   final Key? anchorKey;
 
   @override

@@ -7,10 +7,10 @@ import 'package:flutter_web_portfolio/app/core/constants/durations.dart';
 import 'package:flutter_web_portfolio/app/core/theme/app_fonts.dart';
 import 'package:flutter_web_portfolio/app/domain/models/portfolio_document.dart';
 import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
-import 'package:flutter_web_portfolio/app/widgets/accessible_action.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter_web_portfolio/app/widgets/portfolio_link.dart'
+    as portfolio_widgets;
 
-/// A high-contrast closing section with direct navigation and profile links.
+/// Renders section navigation and profile contact links.
 class PortfolioFooter extends StatelessWidget {
   const PortfolioFooter({super.key});
 
@@ -129,6 +129,7 @@ class _FooterNavigation extends StatelessWidget {
         for (var index = 0; index < links.length; index++)
           _FooterLink(
             label: links[index].label,
+            uri: Uri.parse('#/${links[index].id}'),
             onTap: () => context.read<AppScrollController>().scrollToSection(
               links[index].id,
             ),
@@ -193,10 +194,9 @@ class _FooterEmail extends StatelessWidget {
   final String email;
 
   @override
-  Widget build(BuildContext context) => AccessibleAction(
-    onTap: () => launchUrl(Uri(scheme: 'mailto', path: email)),
+  Widget build(BuildContext context) => portfolio_widgets.PortfolioLink(
+    uri: Uri(scheme: 'mailto', path: email),
     semanticLabel: email,
-    semanticRole: ActionSemanticRole.link,
     focusColor: AppColors.background,
     child: Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
@@ -229,10 +229,9 @@ class _ProfileLink extends StatelessWidget {
   final PortfolioLink link;
 
   @override
-  Widget build(BuildContext context) => AccessibleAction(
-    onTap: () => launchUrl(link.url, webOnlyWindowName: '_blank'),
+  Widget build(BuildContext context) => portfolio_widgets.PortfolioLink(
+    uri: link.url,
     semanticLabel: link.label,
-    semanticRole: ActionSemanticRole.link,
     focusColor: AppColors.background,
     child: Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
@@ -260,9 +259,14 @@ class _ProfileLink extends StatelessWidget {
 }
 
 class _FooterLink extends StatefulWidget {
-  const _FooterLink({required this.label, required this.onTap});
+  const _FooterLink({
+    required this.label,
+    required this.uri,
+    required this.onTap,
+  });
 
   final String label;
+  final Uri uri;
   final VoidCallback onTap;
 
   @override
@@ -273,8 +277,9 @@ class _FooterLinkState extends State<_FooterLink> {
   bool _hovered = false;
 
   @override
-  Widget build(BuildContext context) => AccessibleAction(
-    onTap: widget.onTap,
+  Widget build(BuildContext context) => portfolio_widgets.PortfolioLink(
+    uri: widget.uri,
+    onActivate: widget.onTap,
     onHoverChanged: (value) => setState(() => _hovered = value),
     focusColor: AppColors.background,
     semanticLabel: widget.label,

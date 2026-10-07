@@ -119,7 +119,7 @@ async function waitForReveal(page, options) {
     { timeout: startupTimeoutMs },
   );
   await page
-    .getByRole('button', { name: 'Work', exact: true })
+    .getByRole('link', { name: 'Work', exact: true })
     .first()
     .waitFor({ state: 'attached', timeout: startupTimeoutMs });
 }
@@ -156,7 +156,8 @@ async function visitScrollTargets(page, sampleMs) {
   const scrollTargets = ['Work', 'About'];
   const segmentDuration = Math.floor(sampleMs / scrollTargets.length);
   for (const label of scrollTargets) {
-    const controls = page.getByRole('button', { name: label, exact: true });
+    // Section navigation is rendered as in-page links.
+    const controls = page.getByRole('link', { name: label, exact: true });
     if ((await controls.count()) < 1) {
       throw new Error(`Flutter scroll control is missing: ${label}`);
     }

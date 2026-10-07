@@ -3,20 +3,16 @@ import 'dart:math' as math;
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_web_portfolio/app/controllers/scene_director.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
 import 'package:flutter_web_portfolio/app/core/constants/scene_configs.dart';
 import 'package:flutter_web_portfolio/app/features/render_quality/application/render_quality_controller.dart';
 import 'package:flutter_web_portfolio/app/features/render_quality/domain/render_quality.dart';
+import 'package:flutter_web_portfolio/app/narrative/rendering/frame_coalescer.dart';
 import 'package:flutter_web_portfolio/app/utils/motion_preference.dart';
 
-/// A restrained ambient field beneath the content-anchored narrative stage.
-///
-/// This painter owns only atmosphere, vignette, and optional grain. The one
-/// persistent engineering signal is measured from real content by
-/// `NarrativeStage`, avoiding a second disconnected decorative path.
+/// Paints the ambient field behind the narrative trace.
 class NarrativeBackground extends StatefulWidget {
   const NarrativeBackground({super.key});
 
@@ -36,7 +32,7 @@ class _NarrativeBackgroundState extends State<NarrativeBackground> {
   @override
   void initState() {
     super.initState();
-    _frame = _NarrativeFrame(SceneConfigs.hero, RenderQuality.balanced);
+    _frame = _NarrativeFrame(SceneConfigs.document, RenderQuality.balanced);
   }
 
   @override
@@ -233,8 +229,7 @@ final class _NarrativeBackgroundPainter extends CustomPainter {
       !identical(frame, oldDelegate.frame);
 }
 
-/// Coalesces scroll, quality and pointer inputs into one paint notification.
-final class _NarrativeFrame extends ChangeNotifier {
+final class _NarrativeFrame extends FrameCoalescer {
   _NarrativeFrame(this._config, this._quality);
 
   SceneConfig _config;
@@ -244,9 +239,7 @@ final class _NarrativeFrame extends ChangeNotifier {
 
   SceneConfig? _pendingConfig;
   Offset? _pendingPointer;
-  bool _notificationPending = false;
   bool _forceNotification = false;
-  bool _disposed = false;
 
   SceneConfig get config => _config;
   RenderQuality get quality => _quality;
@@ -282,18 +275,13 @@ final class _NarrativeFrame extends ChangeNotifier {
   }
 
   void _scheduleNotification() {
-    if (_disposed || _notificationPending) return;
-    _notificationPending = true;
-    SchedulerBinding.instance.scheduleFrameCallback((_) {
-      if (_disposed) return;
-      _notificationPending = false;
+    scheduleFrameUpdate(() {
       var changed = _forceNotification;
       _forceNotification = false;
       final config = _pendingConfig;
       final pointer = _pendingPointer;
       _pendingConfig = null;
       _pendingPointer = null;
-
       if (config != null && !identical(config, _config)) {
         _config = config;
         changed = true;
@@ -302,13 +290,7 @@ final class _NarrativeFrame extends ChangeNotifier {
         _pointer = pointer;
         changed = true;
       }
-      if (changed) notifyListeners();
+      return changed;
     });
-  }
-
-  @override
-  void dispose() {
-    _disposed = true;
-    super.dispose();
   }
 }

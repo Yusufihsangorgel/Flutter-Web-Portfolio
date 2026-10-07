@@ -7,17 +7,10 @@ const _reloadSectionKey = 'render_atlas_reload_section';
 String getHtmlLanguage() =>
     web.document.documentElement?.getAttribute('lang') ?? 'en';
 
-/// Returns the URL hash fragment without leading `#` or `#/`.
-///
-/// Examples:
-///   `#/about`  -> `about`
-///   `#about`   -> `about`
-///   `#/`       -> ``
-///   (empty)    -> ``
+/// Reads the chapter identifier from the URL fragment.
 String getUrlHash() {
   final raw = web.window.location.hash;
   if (raw.isEmpty) return '';
-  // Strip leading '#', then optional leading '/'
   var hash = raw.startsWith('#') ? raw.substring(1) : raw;
   if (hash.startsWith('/')) hash = hash.substring(1);
   return hash;
@@ -45,8 +38,7 @@ String takeReloadSection() {
   return section;
 }
 
-/// Keeps the root document language and writing direction aligned with the
-/// active application locale for assistive technology and browser tooling.
+/// Aligns document language and direction with the active locale.
 void setHtmlLang(String languageCode) {
   if (languageCode.isEmpty) return;
   web.document.documentElement
@@ -67,10 +59,7 @@ void setTransientOverlayOpen(bool open) {
 /// Reloads the current document after an unrecoverable bootstrap failure.
 void reloadPage() => web.window.location.reload();
 
-/// Restarts the web renderer after a persisted user locale change.
-///
-/// Returns `true` so shared application code can stop the in-process locale
-/// rebuild while the browser navigation takes over.
+/// Reloads the document after a locale change.
 bool reloadPageForLanguageChange({String? preserveSection}) {
   if (preserveSection != null && preserveSection.isNotEmpty) {
     web.window.sessionStorage.setItem(_reloadSectionKey, preserveSection);
@@ -79,9 +68,32 @@ bool reloadPageForLanguageChange({String? preserveSection}) {
   return true;
 }
 
-/// Registers a listener for browser back/forward navigation.
-///
-/// Returns a dispose function that removes the listener.
+var _inPageLinkClicksIntercepted = false;
+
+/// Preserves browser gestures on in-page links.
+void interceptInPageLinkClicks() {
+  if (_inPageLinkClicksIntercepted) return;
+  _inPageLinkClicksIntercepted = true;
+  web.window.addEventListener(
+    'click',
+    ((web.MouseEvent event) {
+      final target = event.target;
+      if (target == null || !target.isA<web.Element>()) return;
+      final anchor = (target as web.Element).closest(
+        'flt-semantics-host a[href^="#/"]',
+      );
+      if (anchor == null) return;
+      if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) {
+        event.stopPropagation();
+      } else {
+        event.preventDefault();
+      }
+    }).toJS,
+    true.toJS,
+  );
+}
+
+/// Subscribes to chapter history navigation.
 void Function() onPopState(void Function(String hash) callback) {
   void handler(web.Event event) {
     callback(getUrlHash());

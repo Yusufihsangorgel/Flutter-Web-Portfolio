@@ -1,525 +1,302 @@
 import 'dart:async';
-import 'dart:developer' as dev;
-import 'dart:math' as math;
 
-import 'package:flutter/foundation.dart'
-    show ValueListenable, kIsWeb, listEquals;
+import 'package:flutter/foundation.dart' show ValueListenable, kIsWeb;
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-
+import 'package:flutter/services.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_dimensions.dart';
-import 'package:flutter_web_portfolio/app/core/constants/durations.dart';
-import 'package:flutter_web_portfolio/app/narrative/domain/narrative_anchor.dart';
 import 'package:flutter_web_portfolio/app/narrative/application/narrative_position.dart';
+import 'package:flutter_web_portfolio/app/narrative/domain/narrative_anchor.dart';
 import 'package:flutter_web_portfolio/app/narrative/domain/narrative_document.dart';
 import 'package:flutter_web_portfolio/app/narrative/domain/section_geometry.dart';
-import 'package:flutter_web_portfolio/app/utils/web_url_strategy.dart'
-    as url_strategy;
 
-@immutable
-final class AppScrollState {
-  const AppScrollState({this.activeSection = 'home'});
+import 'package:flutter_web_portfolio/app/controllers/scroll/active_section_cubit.dart';
+import 'package:flutter_web_portfolio/app/controllers/scroll/browser_history.dart';
+import 'package:flutter_web_portfolio/app/controllers/scroll/reading_anchor_restorer.dart';
+import 'package:flutter_web_portfolio/app/controllers/scroll/section_geometry_tracker.dart';
+import 'package:flutter_web_portfolio/app/controllers/scroll/section_scroller.dart';
 
-  final String activeSection;
+export 'package:flutter_web_portfolio/app/controllers/scroll/active_section_cubit.dart'
+    show AppScrollState;
 
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is AppScrollState && activeSection == other.activeSection;
-
-  @override
-  int get hashCode => activeSection.hashCode;
-}
-
-/// Owns the primary scroll position, section geometry and URL synchronization.
-///
-/// Section changes are exposed as immutable Cubit state. Pixel-level scroll
-/// movement stays on Flutter's [ScrollController], so background painters can
-/// subscribe without rebuilding navigation widgets every frame.
-final class AppScrollController extends Cubit<AppScrollState>
+/// Coordinates chapter navigation and reading state.
+final class AppScrollController extends ActiveSectionCubit
     with WidgetsBindingObserver {
-  AppScrollController({required this.narrative})
-    : super(const AppScrollState()) {
+  AppScrollController({required this.narrative, BrowserHistory? browserHistory})
+    : geometry = SectionGeometryTracker(narrative),
+      super(
+        browserHistory ??
+            (kIsWeb ? const WebBrowserHistory() : const StubBrowserHistory()),
+      ) {
+    _restorer = ReadingAnchorRestorer(scrollController, geometry);
+    _scroller = SectionScroller(scrollController, geometry);
     _readInitialRoute();
     WidgetsBinding.instance
       ..addObserver(this)
-      ..addPostFrameCallback((_) => refreshSectionGeometry());
+      ..addPostFrameCallback((_) {
+        if (!isClosed) refreshSectionGeometry();
+      });
     scrollController.addListener(_handleScroll);
-
-    if (kIsWeb) {
-      _disposePopState = url_strategy.onPopState(_onBrowserNavigation);
-    }
+    _disposePopState = history.onPopState(_onBrowserNavigation);
+    GestureBinding.instance.pointerRouter.addGlobalRoute(_handlePointer);
+    HardwareKeyboard.instance.addHandler(_handleKey);
   }
 
   final NarrativeDocument narrative;
-
-  late final Map<SectionId, GlobalKey> _sectionKeys = {
-    for (final chapter in narrative.chapters) chapter.id: GlobalKey(),
-  };
-  late final Map<SectionId, GlobalKey> _anchorKeys = {
-    for (final chapter in narrative.chapters) chapter.id: GlobalKey(),
-  };
-
+  final SectionGeometryTracker geometry;
   final ScrollController scrollController = ScrollController();
   final ValueNotifier<NarrativePosition> _narrativePosition = ValueNotifier(
     const NarrativePosition.initial(),
   );
-  final ValueNotifier<NarrativeAnchorSnapshot> _narrativeAnchors =
-      ValueNotifier(const NarrativeAnchorSnapshot.empty());
-
-  String get activeSection => state.activeSection;
-  ValueListenable<NarrativePosition> get narrativePosition =>
-      _narrativePosition;
-  ValueListenable<NarrativeAnchorSnapshot> get narrativeAnchors =>
-      _narrativeAnchors;
+  late final ReadingAnchorRestorer _restorer;
+  late final SectionScroller _scroller;
+  late final void Function() _disposePopState;
 
   late final List<String> sectionIds = List.unmodifiable(
     narrative.chapters.map((chapter) => chapter.id.value),
   );
-
-  GlobalKey keyFor(SectionId sectionId) {
-    final key = _sectionKeys[sectionId];
-    if (key == null) {
-      throw ArgumentError.value(
-        sectionId.value,
-        'sectionId',
-        'is not mounted by the active narrative',
-      );
-    }
-    return key;
-  }
-
-  /// Returns the single visual attachment point owned by a narrative chapter.
-  ///
-  /// Sections choose a meaningful, content-derived widget for this key; the
-  /// controller measures it into document coordinates during the same bounded
-  /// geometry pass used by navigation.
-  GlobalKey anchorKeyFor(SectionId sectionId) {
-    final key = _anchorKeys[sectionId];
-    if (key == null) {
-      throw ArgumentError.value(
-        sectionId.value,
-        'sectionId',
-        'does not have a narrative anchor',
-      );
-    }
-    return key;
-  }
-
-  List<SectionGeometry> get sectionGeometries => _sectionGeometries;
-
-  final Map<String, double> _sectionOffsets = {};
-  final Map<String, double> _sectionHeights = {};
-  List<SectionGeometry> _sectionGeometries = const [];
-  bool _isManualScrolling = false;
-  bool _isInitialNavigationPending = false;
   bool _reduceMotion = false;
   bool _geometryFrameScheduled = false;
   bool _positionFrameScheduled = false;
-  _ReadingAnchor? _pendingReadingAnchor;
+  bool _initialNavigationPending = false;
+  bool _manualNavigation = false;
+  bool _internalAnchorScroll = false;
   int _scrollRequestId = 0;
   String? _pendingSection;
-  void Function()? _disposePopState;
+  ReadingAnchor? _pendingReadingAnchor;
+
+  ValueListenable<NarrativePosition> get narrativePosition =>
+      _narrativePosition;
+  ValueListenable<NarrativeAnchorSnapshot> get narrativeAnchors =>
+      geometry.anchors;
+  List<SectionGeometry> get sectionGeometries => geometry.sections;
+
+  GlobalKey keyFor(SectionId id) => geometry.keyFor(id);
+  GlobalKey anchorKeyFor(SectionId id) => geometry.anchorKeyFor(id);
 
   void _readInitialRoute() {
-    if (!kIsWeb) return;
-
-    final hash = url_strategy.getUrlHash();
-    final reloadSection = url_strategy.takeReloadSection();
-    if (reloadSection.isNotEmpty && sectionIds.contains(reloadSection)) {
-      // The browser may still expose the old hash during bootstrap and then
-      // normalize it while MaterialApp mounts. Delay both scroll and URL sync
-      // until the measured document is ready.
-      _pendingSection = reloadSection;
-      _isInitialNavigationPending = reloadSection != 'home';
+    final reload = history.takeReloadSection();
+    final hash = history.hash;
+    final target = sectionIds.contains(reload) ? reload : hash;
+    if (target.isNotEmpty && !sectionIds.contains(target)) {
+      history.replaceHash('home');
       return;
     }
-    if (hash.isNotEmpty && sectionIds.contains(hash)) {
-      _pendingSection = hash;
-      _isInitialNavigationPending = hash != 'home';
-      _setActiveSection(hash);
-    } else if (hash.isNotEmpty) {
-      url_strategy.replaceUrlHash('home');
-    }
+    if (target.isEmpty || target == 'home') return;
+    _pendingSection = target;
+    _initialNavigationPending = true;
+    setActiveSection(target);
   }
 
-  /// Keeps navigation aligned with the platform accessibility preference.
-  void setReduceMotion(bool reduceMotion) {
-    _reduceMotion = reduceMotion;
-  }
+  void setReduceMotion(bool reduceMotion) => _reduceMotion = reduceMotion;
 
   void handleInitialDeepLink() {
-    final target = _pendingSection;
-    _pendingSection = null;
-    if (target == null || target == 'home') {
-      _isInitialNavigationPending = false;
-      return;
-    }
-
+    if (isClosed || _pendingSection == null) return;
     refreshSectionGeometry();
-    Future<void>.delayed(const Duration(milliseconds: 100), () {
-      if (isClosed) return;
-      if (!scrollController.hasClients) {
-        _isInitialNavigationPending = false;
-        return;
-      }
-      if (kIsWeb) url_strategy.replaceUrlHash(target);
-      scrollToSection(target, syncUrl: false);
-    });
+    _restorePendingSection();
   }
 
-  void _setActiveSection(
-    String section, {
-    _UrlHistory history = _UrlHistory.none,
-  }) {
-    if (state.activeSection == section) return;
-    emit(AppScrollState(activeSection: section));
-    if (!kIsWeb) return;
-    switch (history) {
-      case _UrlHistory.none:
-        break;
-      case _UrlHistory.push:
-        url_strategy.pushUrlHash(section);
-      case _UrlHistory.replace:
-        url_strategy.replaceUrlHash(section);
-    }
+  void _restorePendingSection() {
+    final target = _pendingSection;
+    if (target == null || !scrollController.hasClients) return;
+    if (geometry.sectionFor(target) == null) return;
+    _pendingReadingAnchor = null;
+    if (!_scroller.jumpTo(target)) return;
+    _restorer.holdChapter(target);
+    history.replaceHash(target);
+    _pendingSection = null;
+    _initialNavigationPending = false;
+    _updateNarrativePosition();
   }
 
   void _onBrowserNavigation(String hash) {
+    if (isClosed) return;
+    _restorer.release();
     final valid = hash.isEmpty || sectionIds.contains(hash);
     final section = valid && hash.isNotEmpty ? hash : 'home';
-    if (!valid) url_strategy.replaceUrlHash('home');
-    scrollToSection(section, syncUrl: false);
+    if (!valid) history.replaceHash('home');
+    _scrollRequestId += 1;
+    _manualNavigation = false;
+    _pendingReadingAnchor = null;
+    _pendingSection = section;
+    _initialNavigationPending = true;
+    setActiveSection(section);
+    refreshSectionGeometry();
+    _restorePendingSection();
   }
 
   @override
   void didChangeMetrics() => markGeometryDirty();
 
-  /// Re-measures the document after the current layout frame settles.
-  ///
-  /// Language and responsive layout changes can both
-  /// alter chapter heights without moving the primary scroll position.
   void markGeometryDirty({bool preserveReadingAnchor = true}) {
     if (isClosed) return;
-    if (preserveReadingAnchor && _pendingReadingAnchor == null) {
-      _pendingReadingAnchor = _captureReadingAnchor();
+    if (preserveReadingAnchor &&
+        !_manualNavigation &&
+        !_initialNavigationPending &&
+        _pendingReadingAnchor == null) {
+      _pendingReadingAnchor = _restorer.capture(_narrativePosition.value);
     }
     if (_geometryFrameScheduled) return;
     _geometryFrameScheduled = true;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _geometryFrameScheduled = false;
       if (isClosed) return;
-      final readingAnchor = _pendingReadingAnchor;
-      _pendingReadingAnchor = null;
-      _refreshSectionGeometry(restoreAnchor: readingAnchor);
+      refreshSectionGeometry();
     });
   }
 
-  void refreshSectionGeometry() => _refreshSectionGeometry();
-
-  void _refreshSectionGeometry({_ReadingAnchor? restoreAnchor}) {
-    final offsets = <String, double>{};
-    final heights = <String, double>{};
-    for (final chapter in narrative.chapters) {
-      _updateKeyInfo(
-        chapter.id.value,
-        keyFor(chapter.id),
-        offsets: offsets,
-        heights: heights,
-      );
+  void refreshSectionGeometry() {
+    if (isClosed) return;
+    final readingAnchor = _pendingReadingAnchor;
+    _pendingReadingAnchor = null;
+    geometry.measure(scrollController.hasClients ? scrollController.offset : 0);
+    if (_pendingSection != null) {
+      _restorePendingSection();
+    } else if (!_manualNavigation && _restorer.isHolding) {
+      _internalAnchorScroll = true;
+      try {
+        _restorer.restoreHeld();
+      } finally {
+        _internalAnchorScroll = false;
+      }
+    } else if (!_manualNavigation && readingAnchor != null) {
+      _restorer.restore(readingAnchor);
     }
-    final nextGeometries = List<SectionGeometry>.unmodifiable([
-      for (final id in sectionIds)
-        if (offsets[id] case final top?)
-          if (heights[id] case final height?)
-            SectionGeometry(id: id, top: top, height: height),
-    ]);
-    _sectionOffsets
-      ..clear()
-      ..addAll(offsets);
-    _sectionHeights
-      ..clear()
-      ..addAll(heights);
-    if (!listEquals(_sectionGeometries, nextGeometries)) {
-      _sectionGeometries = nextGeometries;
-    }
-    _refreshNarrativeAnchors();
-    if (restoreAnchor != null) _restoreReadingAnchor(restoreAnchor);
     _updateNarrativePosition();
   }
 
-  void _refreshNarrativeAnchors() {
-    final scrollOffset = scrollController.hasClients
-        ? scrollController.offset
-        : 0.0;
-    final anchors = <NarrativeAnchorGeometry>[];
-    for (final chapter in narrative.chapters) {
-      final context = anchorKeyFor(chapter.id).currentContext;
-      final renderObject = context?.findRenderObject();
-      if (renderObject is! RenderBox || !renderObject.hasSize) continue;
-      final viewportCenter = renderObject.localToGlobal(
-        renderObject.size.center(Offset.zero),
-      );
-      anchors.add(
-        NarrativeAnchorGeometry(
-          sectionId: chapter.id,
-          motif: chapter.motif,
-          documentCenter: Offset(
-            viewportCenter.dx,
-            viewportCenter.dy + scrollOffset,
-          ),
-          size: renderObject.size,
-        ),
-      );
-    }
-    final snapshot = NarrativeAnchorSnapshot(anchors);
-    if (_narrativeAnchors.value != snapshot) {
-      _narrativeAnchors.value = snapshot;
-    }
-  }
-
-  _ReadingAnchor? _captureReadingAnchor() {
-    if (!scrollController.hasClients || _sectionGeometries.isEmpty) {
-      return null;
-    }
-    final snapshot = _narrativePosition.value;
-    final geometry = _sectionGeometries
-        .where((section) => section.id == snapshot.activeSectionId)
-        .firstOrNull;
-    if (geometry == null) return null;
-    final localOffset = (snapshot.focalPoint - geometry.top)
-        .clamp(0.0, geometry.height)
-        .toDouble();
-    final localProgress = (localOffset / geometry.height)
-        .clamp(0.0, 1.0)
-        .toDouble();
-    final viewportDimension = scrollController.position.viewportDimension;
-    final focalOffset = _focalOffsetFor(
-      scrollOffset: scrollController.offset,
-      viewportDimension: viewportDimension,
-    );
-    final usableViewport = math.max(
-      0.0,
-      viewportDimension -
-          AppDimensions.appBarHeightForScrollOffset(scrollController.offset),
-    );
-    // A chapter link lands with its heading at the viewport start while the
-    // reading focal point sits further down. Scaling that opening position by
-    // chapter height can skip the heading when a compact layout grows much
-    // taller, so keep an absolute local offset through this short start zone.
-    final isNearChapterStart =
-        localOffset <= focalOffset + usableViewport * 0.25;
-    return _ReadingAnchor(
-      sectionId: geometry.id,
-      localOffset: localOffset,
-      localProgress: localProgress,
-      preserveLocalOffset: isNearChapterStart,
-    );
-  }
-
-  void _restoreReadingAnchor(_ReadingAnchor anchor) {
-    if (!scrollController.hasClients) return;
-    final geometry = _sectionGeometries
-        .where((section) => section.id == anchor.sectionId)
-        .firstOrNull;
-    if (geometry == null) return;
-
-    final desiredLocalOffset = anchor.preserveLocalOffset
-        ? anchor.localOffset.clamp(0.0, geometry.height).toDouble()
-        : geometry.height * anchor.localProgress;
-    final desiredFocalPoint = geometry.top + desiredLocalOffset;
-    final viewportDimension = scrollController.position.viewportDimension;
-    var targetOffset = scrollController.offset;
-    for (var iteration = 0; iteration < 2; iteration += 1) {
-      targetOffset =
-          desiredFocalPoint -
-          _focalOffsetFor(
-            scrollOffset: targetOffset,
-            viewportDimension: viewportDimension,
-          );
-    }
-    targetOffset = targetOffset
-        .clamp(0.0, scrollController.position.maxScrollExtent)
-        .toDouble();
-    if ((targetOffset - scrollController.offset).abs() >= 0.5) {
-      scrollController.jumpTo(targetOffset);
-    }
-  }
-
-  double _focalOffsetFor({
-    required double scrollOffset,
-    required double viewportDimension,
-  }) {
-    final topInset = AppDimensions.appBarHeightForScrollOffset(scrollOffset);
-    return topInset + math.max(0.0, viewportDimension - topInset) * 0.28;
-  }
-
-  void _updateKeyInfo(
-    String sectionId,
-    GlobalKey key, {
-    required Map<String, double> offsets,
-    required Map<String, double> heights,
-  }) {
-    final context = key.currentContext;
-    final renderObject = context?.findRenderObject();
-    if (renderObject is! RenderBox || !renderObject.hasSize) return;
-    final viewport = RenderAbstractViewport.maybeOf(renderObject);
-    if (viewport == null) return;
-
-    offsets[sectionId] = viewport.getOffsetToReveal(renderObject, 0).offset;
-    heights[sectionId] = renderObject.size.height;
-  }
-
   void _handleScroll() {
+    if (_restorer.isHolding && !_internalAnchorScroll) {
+      _cancelReadingHold();
+    }
     if (_positionFrameScheduled || !scrollController.hasClients) return;
     _positionFrameScheduled = true;
     SchedulerBinding.instance.scheduleFrameCallback((_) {
       _positionFrameScheduled = false;
-      if (isClosed) return;
-      _updateNarrativePosition();
+      if (!isClosed) _updateNarrativePosition();
     });
   }
 
   void _updateNarrativePosition() {
-    if (!scrollController.hasClients || scrollController.positions.isEmpty) {
+    if (!scrollController.hasClients || geometry.sections.isEmpty) return;
+    final position = scrollController.position;
+    if (!position.hasViewportDimension || position.viewportDimension <= 0) {
       return;
     }
-
-    try {
-      if (_sectionGeometries.isEmpty) return;
-      final offset = scrollController.offset;
-      final position = NarrativePositionResolver.resolve(
-        offset: offset,
-        viewportDimension: scrollController.position.viewportDimension,
-        topInset: AppDimensions.appBarHeightForScrollOffset(offset),
-        sections: _sectionGeometries,
-      );
-      if (_narrativePosition.value != position) {
-        _narrativePosition.value = position;
-      }
-      if (!_isManualScrolling && !_isInitialNavigationPending) {
-        _setActiveSection(
-          position.activeSectionId,
-          history: _UrlHistory.replace,
-        );
-      }
-    } catch (error, stackTrace) {
-      dev.log(
-        'Narrative position resolution failed',
-        name: 'AppScrollController',
-        error: error,
-        stackTrace: stackTrace,
-      );
+    final offset = scrollController.offset;
+    final resolved = NarrativePositionResolver.resolve(
+      offset: offset,
+      viewportDimension: position.viewportDimension,
+      topInset: AppDimensions.appBarHeightForScrollOffset(offset),
+      sections: geometry.sections,
+    );
+    if (_narrativePosition.value != resolved) {
+      _narrativePosition.value = resolved;
+    }
+    if (!_manualNavigation &&
+        !_initialNavigationPending &&
+        !_restorer.isHolding &&
+        activeSection != resolved.activeSectionId) {
+      setActiveSection(resolved.activeSectionId, write: HistoryWrite.replace);
     }
   }
 
   void scrollToSection(String sectionId, {bool syncUrl = true}) {
-    try {
-      if (!scrollController.hasClients) {
-        _isInitialNavigationPending = false;
-        return;
-      }
-      refreshSectionGeometry();
-      final sectionTop = _sectionOffsets[sectionId];
-      if (sectionTop == null) {
-        _isInitialNavigationPending = false;
-        return;
-      }
+    if (isClosed || !scrollController.hasClients) return;
+    if (!sectionIds.contains(sectionId)) return;
+    final requestId = ++_scrollRequestId;
+    _manualNavigation = true;
+    _restorer.release();
+    _pendingReadingAnchor = null;
+    _pendingSection = null;
+    _initialNavigationPending = false;
+    refreshSectionGeometry();
+    if (geometry.sectionFor(sectionId) == null) {
+      _manualNavigation = false;
+      return;
+    }
+    setActiveSection(
+      sectionId,
+      write: syncUrl ? HistoryWrite.push : HistoryWrite.none,
+    );
+    final future = _scroller.scrollTo(sectionId, reduceMotion: _reduceMotion);
+    if (future == null) {
+      _manualNavigation = false;
+      return;
+    }
+    unawaited(_completeScroll(future, requestId, sectionId));
+  }
 
-      final requestId = ++_scrollRequestId;
-      _isManualScrolling = true;
-      _setActiveSection(
-        sectionId,
-        history: syncUrl ? _UrlHistory.push : _UrlHistory.none,
-      );
+  Future<void> _completeScroll(
+    Future<void> future,
+    int requestId,
+    String sectionId,
+  ) async {
+    await future;
+    if (isClosed || requestId != _scrollRequestId) return;
+    await WidgetsBinding.instance.endOfFrame;
+    if (isClosed || requestId != _scrollRequestId) return;
+    refreshSectionGeometry();
+    _scroller.settleAt(sectionId);
+    _manualNavigation = false;
+    _updateNarrativePosition();
+  }
 
-      // The measured reveal offset is the chapter destination. Applying a
-      // second toolbar subtraction leaves the previous narrative bridge in
-      // view on compact layouts and makes chapter links settle one bar-height
-      // too early.
-      final targetOffset = (sectionId == 'home' ? 0.0 : sectionTop).clamp(
-        0.0,
-        scrollController.position.maxScrollExtent,
-      );
-      final Future<void> scrollFuture;
-      if (_reduceMotion) {
-        scrollController.jumpTo(targetOffset);
-        scrollFuture = Future<void>.value();
-      } else {
-        scrollFuture = scrollController.animateTo(
-          targetOffset,
-          duration: AppDurations.sectionScroll,
-          curve: Curves.easeInOut,
-        );
-      }
-      unawaited(_completeScroll(scrollFuture, requestId));
-    } catch (error, stackTrace) {
-      dev.log(
-        'Scroll to section failed',
-        name: 'AppScrollController',
-        error: error,
-        stackTrace: stackTrace,
-      );
-      _isManualScrolling = false;
-      _isInitialNavigationPending = false;
+  void _handlePointer(PointerEvent event) {
+    if (event is PointerDownEvent || event is PointerSignalEvent) {
+      _cancelManualNavigation();
+      _cancelReadingHold();
     }
   }
 
-  Future<void> _completeScroll(Future<void> scrollFuture, int requestId) async {
-    try {
-      await scrollFuture;
-      if (requestId == _scrollRequestId) _finishScrolling(requestId);
-    } catch (error, stackTrace) {
-      dev.log(
-        'Section scroll animation failed',
-        name: 'AppScrollController',
-        error: error,
-        stackTrace: stackTrace,
-      );
-      if (requestId == _scrollRequestId) {
-        _isManualScrolling = false;
-        _isInitialNavigationPending = false;
-      }
+  bool _handleKey(KeyEvent event) {
+    if (event is KeyDownEvent) {
+      if (_isScrollKey(event.logicalKey)) _cancelManualNavigation();
+      _cancelReadingHold();
+    }
+    return false;
+  }
+
+  bool _isScrollKey(LogicalKeyboardKey key) =>
+      key == LogicalKeyboardKey.arrowUp ||
+      key == LogicalKeyboardKey.arrowDown ||
+      key == LogicalKeyboardKey.pageUp ||
+      key == LogicalKeyboardKey.pageDown ||
+      key == LogicalKeyboardKey.home ||
+      key == LogicalKeyboardKey.end ||
+      key == LogicalKeyboardKey.space;
+
+  void _cancelManualNavigation() {
+    if (!_manualNavigation) return;
+    _scrollRequestId += 1;
+    _manualNavigation = false;
+    _pendingReadingAnchor = null;
+    if (scrollController.hasClients) {
+      scrollController.jumpTo(scrollController.offset);
     }
   }
 
-  void _finishScrolling(int requestId) {
-    Future<void>.delayed(AppDurations.heroDebounce, () {
-      if (isClosed || requestId != _scrollRequestId) return;
-      _isManualScrolling = false;
-      _isInitialNavigationPending = false;
-      refreshSectionGeometry();
-      _updateNarrativePosition();
-    });
+  void _cancelReadingHold() {
+    if (!_restorer.isHolding && _pendingSection == null) return;
+    _restorer.release();
+    _pendingReadingAnchor = null;
+    _pendingSection = null;
+    _initialNavigationPending = false;
+    markGeometryDirty(preserveReadingAnchor: false);
   }
 
   @override
   Future<void> close() {
     WidgetsBinding.instance.removeObserver(this);
-    _disposePopState?.call();
+    GestureBinding.instance.pointerRouter.removeGlobalRoute(_handlePointer);
+    HardwareKeyboard.instance.removeHandler(_handleKey);
+    _disposePopState();
     _narrativePosition.dispose();
-    _narrativeAnchors.dispose();
+    geometry.dispose();
     scrollController
       ..removeListener(_handleScroll)
       ..dispose();
     return super.close();
   }
-}
-
-enum _UrlHistory { none, push, replace }
-
-final class _ReadingAnchor {
-  const _ReadingAnchor({
-    required this.sectionId,
-    required this.localOffset,
-    required this.localProgress,
-    required this.preserveLocalOffset,
-  });
-
-  final String sectionId;
-  final double localOffset;
-  final double localProgress;
-  final bool preserveLocalOffset;
 }

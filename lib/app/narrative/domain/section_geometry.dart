@@ -1,10 +1,4 @@
-import 'package:flutter/foundation.dart';
-
-/// Measured document geometry for one portfolio chapter.
-///
-/// Navigation, URL state, boundary transitions, and the scene engine share
-/// this coordinate system so every consumer describes the same reading point.
-@immutable
+/// Measured document-space bounds of one chapter.
 final class SectionGeometry {
   const SectionGeometry({
     required this.id,

@@ -1,6 +1,4 @@
-import 'package:flutter/foundation.dart';
-
-/// Typed identity for a chapter in the single-page narrative.
+/// Typed chapter identity.
 extension type const SectionId(String value) {
   static const home = SectionId('home');
   static const about = SectionId('about');
@@ -13,7 +11,7 @@ extension type const SectionId(String value) {
   bool get isHome => this == home;
 }
 
-/// The one visual idea carried by a chapter of the engineering trace.
+/// The single visual idea carried by a chapter.
 enum NarrativeMotif {
   origin,
   thread,
@@ -31,7 +29,6 @@ enum NarrativeMotif {
   };
 }
 
-@immutable
 final class NarrativeChapter {
   const NarrativeChapter({required this.id, required this.motif});
 
@@ -43,13 +40,17 @@ final class NarrativeChapter {
 
   final SectionId id;
   final NarrativeMotif motif;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is NarrativeChapter && id == other.id && motif == other.motif;
+
+  @override
+  int get hashCode => Object.hash(id, motif);
 }
 
-/// Immutable presentation contract for the portfolio's continuous story.
-///
-/// It intentionally contains no biographical or project copy. Content stays
-/// in the portfolio document, while this asset owns order and visual rhythm.
-@immutable
+/// Chapter order and motifs; the copy itself lives in the portfolio document.
 final class NarrativeDocument {
   NarrativeDocument._({
     required this.schemaVersion,
@@ -90,6 +91,28 @@ final class NarrativeDocument {
   final String id;
   final List<NarrativeChapter> chapters;
 
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is NarrativeDocument &&
+          schemaVersion == other.schemaVersion &&
+          id == other.id &&
+          _sameChapters(chapters, other.chapters);
+
+  @override
+  int get hashCode => Object.hash(schemaVersion, id, Object.hashAll(chapters));
+
+  static bool _sameChapters(
+    List<NarrativeChapter> a,
+    List<NarrativeChapter> b,
+  ) {
+    if (a.length != b.length) return false;
+    for (var index = 0; index < a.length; index += 1) {
+      if (a[index] != b[index]) return false;
+    }
+    return true;
+  }
+
   List<SectionId> get sectionIds =>
       chapters.map((chapter) => chapter.id).toList(growable: false);
 
@@ -102,10 +125,7 @@ final class NarrativeDocument {
     ),
   );
 
-  /// One-based editorial number in the configured presentation order.
-  ///
-  /// Home is the unnumbered origin; omitted optional chapters never leave a
-  /// gap in the visible sequence.
+  /// Two-digit number counting only the chapters present; home has none.
   String sectionNumber(SectionId sectionId) {
     final visible = sectionIds
         .where((candidate) => !candidate.isHome)
@@ -121,11 +141,7 @@ final class NarrativeDocument {
     return '${index + 1}'.padLeft(2, '0');
   }
 
-  /// Selects the chapters that exist in the current content document.
-  ///
-  /// Every content section must be declared exactly once by the presentation
-  /// asset. Presentation may declare optional chapters whose content is empty;
-  /// those chapters are omitted without changing the remaining order.
+  /// Drops declared optional chapters whose content is empty.
   NarrativeDocument forActiveSections(Iterable<String> activeSections) {
     final requested = activeSections.map(SectionId.new).toSet();
     final declared = sectionIds.toSet();

@@ -3,13 +3,9 @@ import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_web_portfolio/app/narrative/domain/narrative_anchor.dart';
+import 'package:flutter_web_portfolio/app/narrative/domain/smooth_step.dart';
 
-/// Allocation-bounded path joining measured content anchors in document space.
-///
-/// The path leaves each content anchor, travels through a quiet page-margin
-/// corridor, and returns to the next real anchor. Scrolling only translates
-/// the canvas; path geometry is rebuilt exclusively after responsive layout or
-/// locale changes.
+/// Joins chapter anchors through the page margin.
 final class NarrativeAnchorPathKernel {
   Path get path => _path;
   bool get isEmpty => _isEmpty;
@@ -71,7 +67,24 @@ final class NarrativeAnchorPathKernel {
     Size viewportSize,
     TextDirection textDirection,
   ) {
+    _prepareCoordinates(snapshot, viewportSize, textDirection);
     _path.reset();
+    if (_anchorCount == 0) {
+      _isEmpty = true;
+      return;
+    }
+    _isEmpty = false;
+    _path.moveTo(_coordinates[0], _coordinates[1]);
+    for (var index = 1; index < _anchorCount; index += 1) {
+      _appendSegment(index);
+    }
+  }
+
+  void _prepareCoordinates(
+    NarrativeAnchorSnapshot snapshot,
+    Size viewportSize,
+    TextDirection textDirection,
+  ) {
     _anchorCount = snapshot.anchors.length;
     _corridorX = textDirection == TextDirection.rtl
         ? viewportSize.width - _corridorInset(viewportSize.width)
@@ -88,53 +101,42 @@ final class NarrativeAnchorPathKernel {
       _coordinates[index * 2] = center.dx;
       _coordinates[index * 2 + 1] = center.dy;
     }
-
-    if (_anchorCount == 0) {
-      _isEmpty = true;
-      return;
-    }
-    _isEmpty = false;
-    _path.moveTo(_coordinates[0], _coordinates[1]);
-    for (var index = 1; index < _anchorCount; index += 1) {
-      final previousX = _coordinates[(index - 1) * 2];
-      final previousY = _coordinates[(index - 1) * 2 + 1];
-      final nextX = _coordinates[index * 2];
-      final nextY = _coordinates[index * 2 + 1];
-      final distance = math.max(1.0, nextY - previousY);
-      final shoulder = math.min(
-        distance * 0.42,
-        (distance * 0.12).clamp(32.0, 96.0).toDouble(),
-      );
-      _shoulders[index - 1] = shoulder;
-      final exitY = previousY + shoulder;
-      final entryY = nextY - shoulder;
-
-      _path
-        ..cubicTo(
-          previousX,
-          previousY + shoulder / 3,
-          _corridorX,
-          previousY + shoulder * 2 / 3,
-          _corridorX,
-          exitY,
-        )
-        ..lineTo(_corridorX, entryY)
-        ..cubicTo(
-          _corridorX,
-          entryY + shoulder / 3,
-          nextX,
-          entryY + shoulder * 2 / 3,
-          nextX,
-          nextY,
-        );
-    }
   }
 
-  /// Resolves the cursor on the exact closed-form curve used by [path].
-  ///
-  /// Each segment eases from its source anchor into the margin corridor,
-  /// remains vertical through the reading field, then eases into the next
-  /// anchor. No path metrics, samples, or per-frame allocations are required.
+  void _appendSegment(int index) {
+    final previousX = _coordinates[(index - 1) * 2];
+    final previousY = _coordinates[(index - 1) * 2 + 1];
+    final nextX = _coordinates[index * 2];
+    final nextY = _coordinates[index * 2 + 1];
+    final distance = math.max(1.0, nextY - previousY);
+    final shoulder = math.min(
+      distance * 0.42,
+      (distance * 0.12).clamp(32.0, 96.0).toDouble(),
+    );
+    _shoulders[index - 1] = shoulder;
+    final exitY = previousY + shoulder;
+    final entryY = nextY - shoulder;
+
+    _path
+      ..cubicTo(
+        previousX,
+        previousY + shoulder / 3,
+        _corridorX,
+        previousY + shoulder * 2 / 3,
+        _corridorX,
+        exitY,
+      )
+      ..lineTo(_corridorX, entryY)
+      ..cubicTo(
+        _corridorX,
+        entryY + shoulder / 3,
+        nextX,
+        entryY + shoulder * 2 / 3,
+        nextX,
+        nextY,
+      );
+  }
+
   Offset activePoint(double focalPoint) {
     if (_isEmpty || !focalPoint.isFinite) {
       return Offset(_corridorX, focalPoint.isFinite ? focalPoint : 0);
@@ -163,7 +165,7 @@ final class NarrativeAnchorPathKernel {
             .clamp(0.0, 1.0)
             .toDouble();
         return Offset(
-          _mix(sourceX, _corridorX, _smoothStep(progress)),
+          _mix(sourceX, _corridorX, smoothStep(progress)),
           focalPoint,
         );
       }
@@ -173,7 +175,7 @@ final class NarrativeAnchorPathKernel {
           .clamp(0.0, 1.0)
           .toDouble();
       return Offset(
-        _mix(_corridorX, targetX, _smoothStep(progress)),
+        _mix(_corridorX, targetX, smoothStep(progress)),
         focalPoint,
       );
     }
@@ -182,8 +184,6 @@ final class NarrativeAnchorPathKernel {
 
   static double _mix(double a, double b, double progress) =>
       a + (b - a) * progress;
-
-  static double _smoothStep(double value) => value * value * (3 - 2 * value);
 
   static double _corridorInset(double width) =>
       width >= 1200 ? 36 : (width >= 900 ? 28 : 18);

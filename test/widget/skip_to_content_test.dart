@@ -96,11 +96,14 @@ Future<ScrollPosition> _activateSkipLink(
 
 const _tick = Duration(milliseconds: 1);
 
-// Runs the remaining section scroll and the controller's settle delay.
+// Margin for the controller's end-of-frame settle after a scroll.
+const _settle = Duration(milliseconds: 500);
+
+// Runs the remaining section scroll and the controller's settle frame.
 Future<void> _finishScroll(WidgetTester tester) async {
   await tester.pump();
   await tester.pump(AppDurations.sectionScroll + _tick);
-  await tester.pump(AppDurations.heroDebounce);
+  await tester.pump(_settle);
 }
 
 void main() {
@@ -130,7 +133,7 @@ void main() {
     expect(position.isScrollingNotifier.value, isFalse);
     expect(position.pixels, greaterThan(0));
     expect(_mainFocus(tester).hasPrimaryFocus, isTrue);
-    await tester.pump(AppDurations.heroDebounce);
+    await tester.pump(_settle);
   });
 
   testWidgets('an interrupted skip scroll still moves focus', (tester) async {
@@ -195,7 +198,7 @@ void main() {
     await _activateSkipLink(tester, scroll);
     await tester.pump();
     await tester.pumpWidget(const SizedBox.shrink());
-    await tester.pump(AppDurations.heroDebounce);
+    await tester.pump(_settle);
     expect(tester.takeException(), isNull);
   });
 
@@ -208,7 +211,7 @@ void main() {
     expect(position.pixels, greaterThan(0));
     await tester.pump();
     expect(_mainFocus(tester).hasPrimaryFocus, isTrue);
-    await tester.pump(AppDurations.heroDebounce);
+    await tester.pump(_settle);
   });
 }
 

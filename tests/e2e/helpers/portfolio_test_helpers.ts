@@ -143,7 +143,7 @@ export async function openChapterFromNavigation(
       .getByRole("button", { name: "Open navigation menu", exact: true })
       .click();
   }
-  const target = page.getByRole("button", {
+  const target = page.getByRole("link", {
     name: options.control,
     exact: true,
   });

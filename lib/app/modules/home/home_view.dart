@@ -8,8 +8,8 @@ import 'package:flutter_web_portfolio/app/features/language/application/language
 import 'package:flutter_web_portfolio/app/controllers/scroll_controller.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_dimensions.dart';
-import 'package:flutter_web_portfolio/app/core/constants/durations.dart';
 import 'package:flutter_web_portfolio/app/core/constants/breakpoints.dart';
+import 'package:flutter_web_portfolio/app/core/constants/durations.dart';
 import 'package:flutter_web_portfolio/app/modules/home/sections/home_section.dart';
 import 'package:flutter_web_portfolio/app/modules/home/sections/about_section.dart';
 import 'package:flutter_web_portfolio/app/modules/home/sections/experience_section.dart';
@@ -18,10 +18,10 @@ import 'package:flutter_web_portfolio/app/modules/home/sections/projects/project
 import 'package:flutter_web_portfolio/app/modules/home/sections/proof_section.dart';
 import 'package:flutter_web_portfolio/app/modules/home/sections/writing/writing_section.dart';
 import 'package:flutter_web_portfolio/app/widgets/back_to_top_button.dart';
-import 'package:flutter_web_portfolio/app/widgets/accessible_action.dart';
 import 'package:flutter_web_portfolio/app/widgets/command_palette.dart';
 import 'package:flutter_web_portfolio/app/widgets/custom_sliver_app_bar.dart';
 import 'package:flutter_web_portfolio/app/widgets/portfolio_footer.dart';
+import 'package:flutter_web_portfolio/app/widgets/skip_to_content_link.dart';
 import 'package:flutter_web_portfolio/app/widgets/narrative_chapter_handoff.dart';
 import 'package:flutter_web_portfolio/app/widgets/narrative_stage.dart';
 import 'package:flutter_web_portfolio/app/utils/motion_preference.dart';
@@ -37,7 +37,7 @@ class HomeView extends StatefulWidget {
 }
 
 class _HomeViewState extends State<HomeView> {
-  final FocusNode _focusNode = FocusNode();
+  final FocusNode _focusNode = FocusNode(skipTraversal: true);
   final FocusNode _skipLinkFocusNode = FocusNode();
   final FocusNode _mainContentFocusNode = FocusNode(
     debugLabel: 'portfolio-main-content',
@@ -88,6 +88,14 @@ class _HomeViewState extends State<HomeView> {
         (HardwareKeyboard.instance.isControlPressed ||
             HardwareKeyboard.instance.isMetaPressed)) {
       CommandPalette.show(context);
+      return KeyEventResult.handled;
+    }
+
+    // The page holds the initial focus; the first Tab enters at the skip link.
+    if (event.logicalKey == LogicalKeyboardKey.tab &&
+        !HardwareKeyboard.instance.isShiftPressed &&
+        _focusNode.hasPrimaryFocus) {
+      _skipLinkFocusNode.requestFocus();
       return KeyEventResult.handled;
     }
 
@@ -211,64 +219,74 @@ class _HomeViewState extends State<HomeView> {
     AppScrollController scrollController,
     LanguageCubit languageController,
     NarrativeDocument narrative,
-  ) => Stack(
-    children: [
-      const Positioned.fill(
-        child: RepaintBoundary(child: NarrativeBackground()),
-      ),
-      _buildSkipLink(languageController),
-      ScrollConfiguration(
-        behavior: ScrollConfiguration.of(context).copyWith(
-          dragDevices: {
-            PointerDeviceKind.touch,
-            PointerDeviceKind.mouse,
-            PointerDeviceKind.trackpad,
-          },
+  ) => FocusTraversalGroup(
+    // The skip link leads; every other control keeps reading order.
+    policy: OrderedTraversalPolicy(),
+    child: Stack(
+      children: [
+        const Positioned.fill(
+          child: RepaintBoundary(child: NarrativeBackground()),
         ),
-        child: CustomScrollView(
-          controller: scrollController.scrollController,
-          physics: const ClampingScrollPhysics(),
-          slivers: [
-            CustomSliverAppBar(
-              scrollController: scrollController,
-              languageController: languageController,
-            ),
-            // Lay out every chapter to measure navigation targets.
-            SliverToBoxAdapter(
-              child: NotificationListener<SizeChangedLayoutNotification>(
-                onNotification: (_) {
-                  scrollController.markGeometryDirty();
-                  return false;
-                },
-                child: SizeChangedLayoutNotifier(
-                  child: Column(
-                    children: [
-                      ..._buildChapters(context, scrollController, narrative),
-                      const PortfolioFooter(),
-                    ],
+        ScrollConfiguration(
+          behavior: ScrollConfiguration.of(context).copyWith(
+            dragDevices: {
+              PointerDeviceKind.touch,
+              PointerDeviceKind.mouse,
+              PointerDeviceKind.trackpad,
+            },
+          ),
+          child: CustomScrollView(
+            controller: scrollController.scrollController,
+            physics: const ClampingScrollPhysics(),
+            slivers: [
+              CustomSliverAppBar(
+                scrollController: scrollController,
+                languageController: languageController,
+              ),
+              // Lay out every chapter to measure navigation targets.
+              SliverToBoxAdapter(
+                child: NotificationListener<SizeChangedLayoutNotification>(
+                  onNotification: (_) {
+                    scrollController.markGeometryDirty();
+                    return false;
+                  },
+                  child: SizeChangedLayoutNotifier(
+                    child: Column(
+                      children: [
+                        ..._buildChapters(context, scrollController, narrative),
+                        const PortfolioFooter(),
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
-      ),
-      const NarrativeStage(),
-      const BackToTopButton(),
-    ],
+        const NarrativeStage(),
+        const BackToTopButton(),
+        // Above the app bar, so the focused bypass link is never covered.
+        _buildSkipLink(languageController),
+      ],
+    ),
   );
 
   Widget _buildSkipLink(LanguageCubit languageController) => Positioned(
     top: 0,
     left: 0,
     right: 0,
-    child: _SkipToContentLink(
-      label: languageController.getText(
-        'accessibility.skip_to_content',
-        defaultValue: 'Skip to content',
+    child: Center(
+      child: FocusTraversalOrder(
+        order: const NumericFocusOrder(0),
+        child: SkipToContentLink(
+          label: languageController.getText(
+            'accessibility.skip_to_content',
+            defaultValue: 'Skip to content',
+          ),
+          focusNode: _skipLinkFocusNode,
+          onActivate: () => unawaited(_skipToContent()),
+        ),
       ),
-      focusNode: _skipLinkFocusNode,
-      onActivate: () => unawaited(_skipToContent()),
     ),
   );
 
@@ -363,58 +381,4 @@ class _HomeViewState extends State<HomeView> {
       'No section widget is registered for narrative chapter "$value".',
     ),
   };
-}
-
-class _SkipToContentLink extends StatefulWidget {
-  const _SkipToContentLink({
-    required this.label,
-    required this.focusNode,
-    required this.onActivate,
-  });
-
-  final String label;
-  final FocusNode focusNode;
-  final VoidCallback onActivate;
-
-  @override
-  State<_SkipToContentLink> createState() => _SkipToContentLinkState();
-}
-
-class _SkipToContentLinkState extends State<_SkipToContentLink> {
-  bool _visible = false;
-
-  @override
-  Widget build(BuildContext context) => AccessibleAction(
-    focusNode: widget.focusNode,
-    onFocusChanged: (focused) => setState(() => _visible = focused),
-    onTap: widget.onActivate,
-    semanticLabel: widget.label,
-    showFocusRing: false,
-    child: AnimatedOpacity(
-      opacity: _visible ? 1.0 : 0.0,
-      duration: AppDurations.fast,
-      child: AnimatedContainer(
-        duration: AppDurations.fast,
-        transform: Matrix4.translationValues(0, _visible ? 0 : -48, 0),
-        child: Center(
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-            decoration: BoxDecoration(
-              color: AppColors.accent,
-              borderRadius: BorderRadius.circular(4),
-            ),
-            child: Text(
-              widget.label,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                decoration: TextDecoration.none,
-              ),
-            ),
-          ),
-        ),
-      ),
-    ),
-  );
 }

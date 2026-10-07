@@ -12,7 +12,11 @@ import {
   readAccessibilityTree,
   required,
 } from "./helpers/portfolio_test_helpers";
-import { scrollToSemanticLink, waitForFrames } from "./helpers/semantics_scroll";
+import {
+  scrollToSemanticLink,
+  waitForFrames,
+  waitForSemanticsSettled,
+} from "./helpers/semantics_scroll";
 
 async function assertInitialHierarchy(
   page: Page,
@@ -166,7 +170,7 @@ test("publishes a clean heading and control hierarchy", async ({
       .getByRole("button", { name: "Open navigation menu", exact: true })
       .click();
   }
-  const aboutControl = page.getByRole("button", {
+  const aboutControl = page.getByRole("link", {
     name: "About",
     exact: true,
   });
@@ -178,7 +182,7 @@ test("publishes a clean heading and control hierarchy", async ({
   await assertProjectHierarchy(page, isMobile, accessibility);
 });
 
-test("skip link moves keyboard focus into the main document", async ({
+test("the first Tab reveals the skip link, which enters the main document", async ({
   page,
   isMobile,
 }) => {
@@ -186,11 +190,30 @@ test("skip link moves keyboard focus into the main document", async ({
     isMobile,
     "hardware-keyboard traversal is covered by the desktop browser project",
   );
+  // Still chrome, so only the skip link can change the pixels below.
+  await page.emulateMedia({ reducedMotion: "reduce" });
   await openPortfolio(page);
-  await focusActionWithKeyboard(
-    page,
-    englishInterface.accessibility.skip_to_content,
+  const skipLink = page.getByRole("button", {
+    name: englishInterface.accessibility.skip_to_content,
+    exact: true,
+  });
+  await expect(skipLink).toBeAttached();
+  const area = required(
+    (await skipLink.boundingBox()) ?? undefined,
+    "skip link geometry",
   );
+  const hiddenPixels = await page.screenshot({ clip: area });
+
+  await page.keyboard.press("Tab");
+
+  await expect(skipLink).toBeFocused();
+  // The pixels under the link change only if it is painted above the chrome.
+  await expect
+    .poll(async () => {
+      const pixels = await page.screenshot({ clip: area });
+      return !pixels.equals(hiddenPixels);
+    })
+    .toBe(true);
   await page.keyboard.press("Enter");
 
   if (firstContentSection !== "about") {
@@ -203,7 +226,7 @@ test("skip link moves keyboard focus into the main document", async ({
   await expect(target).toBeFocused();
 });
 
-test("back-to-top is keyboard focusable and activates with Space", async ({
+test("back-to-top is a keyboard link that follows on Enter only", async ({
   page,
   isMobile,
 }) => {
@@ -216,7 +239,7 @@ test("back-to-top is keyboard focusable and activates with Space", async ({
     "the authored navigation path requires experience and work chapters",
   );
   await openPortfolio(page);
-  const backToTop = page.getByRole("button", {
+  const backToTop = page.getByRole("link", {
     name: englishInterface.accessibility.back_to_top,
     exact: true,
   });
@@ -232,8 +255,16 @@ test("back-to-top is keyboard focusable and activates with Space", async ({
     page,
     englishInterface.accessibility.back_to_top,
   );
-  await page.keyboard.press("Space");
 
+  // Space is not a link activation key, so the document must not move.
+  const settled = await waitForSemanticsSettled(page);
+  const hashBeforeSpace = await page.evaluate(() => location.hash);
+  await page.keyboard.press("Space");
+  expect(await waitForSemanticsSettled(page)).toBe(settled);
+  expect(await page.evaluate(() => location.hash)).toBe(hashBeforeSpace);
+  await expect(backToTop).toBeVisible();
+
+  await page.keyboard.press("Enter");
   await expect(page).toHaveURL(/#\/$/);
   await expect(backToTop).toHaveCount(0);
   await expectHeadingInViewport(
@@ -254,7 +285,7 @@ test("back-to-top activates from the compact touch layout", async ({
     hash: /#\/projects$/,
     heading: "Selected Work",
   });
-  const backToTop = page.getByRole("button", {
+  const backToTop = page.getByRole("link", {
     name: englishInterface.accessibility.back_to_top,
     exact: true,
   });

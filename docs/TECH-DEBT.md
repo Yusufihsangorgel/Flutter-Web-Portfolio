@@ -21,7 +21,6 @@ Record date: 2026-09-29. Counts below are source line counts from the current ch
 | [`packages_section.dart`](../lib/app/modules/home/sections/packages/packages_section.dart) | 620 | Extract package grouping and category/card widgets. |
 | [`contribution_event_order_lab.dart`](../lib/app/modules/home/sections/proof/widgets/contribution_event_order_lab.dart) | 583 | Extract controls, timeline, and result panels. |
 | [`home_section.dart`](../lib/app/modules/home/sections/home_section.dart) | 572 | Split chapter widgets and responsive layout pieces. |
-| [`scroll_controller.dart`](../lib/app/controllers/scroll_controller.dart) | 525 | Isolate geometry measurement from navigation and scroll state. |
 
 ## Tests over 800 lines
 

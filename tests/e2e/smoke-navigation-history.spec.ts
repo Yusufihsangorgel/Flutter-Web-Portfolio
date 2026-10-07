@@ -163,7 +163,7 @@ test("browser Back closes compact navigation without consuming chapter history",
   await page
     .getByRole("button", { name: "Open navigation menu", exact: true })
     .click();
-  const menuItem = page.getByRole("button", {
+  const menuItem = page.getByRole("link", {
     name: "Experience",
     exact: true,
   });

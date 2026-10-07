@@ -1,13 +1,10 @@
 import 'dart:math' as math;
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter_web_portfolio/app/core/constants/reading_focus.dart';
 import 'package:flutter_web_portfolio/app/narrative/domain/section_geometry.dart';
 
-/// One resolved reading position in the measured portfolio narrative.
-///
-/// The active chapter is suitable for navigation state. [currentSectionId],
-/// [nextSectionId], and [boundaryProgress] describe the boundary-local visual
-/// handoff consumed by the scene layer.
+/// Resolves navigation and handoff positions between chapters.
 @immutable
 final class NarrativePosition {
   const NarrativePosition({
@@ -56,11 +53,7 @@ final class NarrativePosition {
   );
 }
 
-/// Resolves scroll coordinates into a chapter and a short boundary handoff.
-///
-/// Section heights do not influence transition duration. Every handoff is
-/// centred on the next section's measured top and occupies the same physical
-/// viewport-relative window.
+/// Maps scroll geometry to the active chapter and a viewport-relative handoff.
 abstract final class NarrativePositionResolver {
   static NarrativePosition resolve({
     required double offset,
@@ -77,25 +70,27 @@ abstract final class NarrativePositionResolver {
     if (sections.isEmpty) return const NarrativePosition.initial();
 
     final usableViewport = math.max(0.0, viewportDimension - topInset);
-    final focalPoint = offset + topInset + usableViewport * 0.28;
+    final focalPoint = offset + topInset + usableViewport * ReadingFocus.ratio;
     final firstTop = sections.first.top;
     final lastBottom = sections.last.bottom;
     final documentProgress = ((focalPoint - firstTop) / (lastBottom - firstTop))
         .clamp(0.0, 1.0)
         .toDouble();
 
-    if (sections.length == 1) {
-      final sectionId = sections.single.id;
-      return NarrativePosition(
-        activeSectionId: sectionId,
-        currentSectionId: sectionId,
-        nextSectionId: sectionId,
-        focalPoint: focalPoint,
-        boundaryProgress: 0,
-        documentProgress: documentProgress,
-      );
-    }
+    return _resolveBoundary(
+      sections: sections,
+      focalPoint: focalPoint,
+      documentProgress: documentProgress,
+      viewportDimension: viewportDimension,
+    );
+  }
 
+  static NarrativePosition _resolveBoundary({
+    required List<SectionGeometry> sections,
+    required double focalPoint,
+    required double documentProgress,
+    required double viewportDimension,
+  }) {
     final transitionExtent = (viewportDimension * 0.32)
         .clamp(160.0, 320.0)
         .toDouble();
@@ -176,38 +171,42 @@ abstract final class NarrativePositionResolver {
     final seenIds = <String>{};
     SectionGeometry? previous;
     for (final section in sections) {
-      if (section.id.trim().isEmpty) {
-        throw ArgumentError.value(
-          section.id,
-          'sections',
-          'id must not be empty',
-        );
-      }
-      if (!seenIds.add(section.id)) {
-        throw ArgumentError.value(section.id, 'sections', 'ids must be unique');
-      }
-      if (!section.top.isFinite || section.top < 0) {
-        throw ArgumentError.value(
-          section.top,
-          'sections',
-          'top must be finite and non-negative',
-        );
-      }
-      if (!section.height.isFinite || section.height <= 0) {
-        throw ArgumentError.value(
-          section.height,
-          'sections',
-          'height must be finite and positive',
-        );
-      }
-      if (previous != null && section.top < previous.bottom) {
-        throw ArgumentError.value(
-          section.top,
-          'sections',
-          'sections must be ordered and must not overlap',
-        );
-      }
+      _validateSection(section, previous, seenIds);
       previous = section;
+    }
+  }
+
+  static void _validateSection(
+    SectionGeometry section,
+    SectionGeometry? previous,
+    Set<String> seenIds,
+  ) {
+    if (section.id.trim().isEmpty) {
+      throw ArgumentError.value(section.id, 'sections', 'id must not be empty');
+    }
+    if (!seenIds.add(section.id)) {
+      throw ArgumentError.value(section.id, 'sections', 'ids must be unique');
+    }
+    if (!section.top.isFinite || section.top < 0) {
+      throw ArgumentError.value(
+        section.top,
+        'sections',
+        'top must be finite and non-negative',
+      );
+    }
+    if (!section.height.isFinite || section.height <= 0) {
+      throw ArgumentError.value(
+        section.height,
+        'sections',
+        'height must be finite and positive',
+      );
+    }
+    if (previous != null && section.top < previous.bottom) {
+      throw ArgumentError.value(
+        section.top,
+        'sections',
+        'sections must be ordered and must not overlap',
+      );
     }
   }
 }

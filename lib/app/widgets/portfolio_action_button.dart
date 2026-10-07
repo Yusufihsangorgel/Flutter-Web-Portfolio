@@ -5,9 +5,7 @@ import 'package:flutter_web_portfolio/app/core/constants/motion_curves.dart';
 import 'package:flutter_web_portfolio/app/core/constants/durations.dart';
 import 'package:flutter_web_portfolio/app/widgets/accessible_action.dart';
 
-/// Pointer- and keyboard-accessible outlined call-to-action.
-///
-/// [isPrimary] toggles between filled accent (primary) and outline (secondary).
+/// Renders a primary or outlined portfolio action.
 class PortfolioActionButton extends StatefulWidget {
   const PortfolioActionButton({
     super.key,

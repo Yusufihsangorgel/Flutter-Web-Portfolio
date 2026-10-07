@@ -54,6 +54,15 @@ void main() {
   }
 
   group('NarrativeDocument', () {
+    test('compares immutable chapter content by value', () {
+      final first = NarrativeDocument.fromJson(fixture());
+      final second = NarrativeDocument.fromJson(fixture());
+
+      expect(first, second);
+      expect(first.hashCode, second.hashCode);
+      expect(first.chapters.first, second.chapters.first);
+    });
+
     test('loads the generic presentation asset in editorial order', () {
       final document = NarrativeDocument.fromJson(fixture());
 
