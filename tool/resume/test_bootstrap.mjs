@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { test } from 'node:test';
 
-import { verifyBootstrapSource } from '../verify_web_runtime_assets.mjs';
+import { verifyBootstrapSource } from '../release/verify_web_runtime_assets.mjs';
 
 test('extracted bootstrap checks preserve valid release tokens and detect regressions', async () => {
   const source = await readFile(new URL('../../web/flutter_bootstrap.js', import.meta.url), 'utf8');

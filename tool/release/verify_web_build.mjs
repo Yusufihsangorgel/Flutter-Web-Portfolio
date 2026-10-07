@@ -8,7 +8,7 @@ import {
   resolveSafePublicPngPath,
 } from '../shared/safe_public_asset_path.mjs';
 import { assertRasterDimensions, inspectRaster } from '../assets/raster_inspector.mjs';
-import { verifyRuntimeAssets } from '../verify_web_runtime_assets.mjs';
+import { verifyRuntimeAssets } from './verify_web_runtime_assets.mjs';
 import { verifyResumeRelease } from '../resume/verify_resume_release.mjs';
 import { collectFiles } from './bundle_helpers.mjs';
 import { verifyStatic404Release } from './verify_static_404.mjs';
