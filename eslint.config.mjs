@@ -2,7 +2,6 @@ import js from '@eslint/js';
 import globals from 'globals';
 
 export default [
-  { ignores: ['tool/resume/**'] },
   {
     files: ['tool/**/*.mjs'],
     ...js.configs.recommended,

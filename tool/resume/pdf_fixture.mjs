@@ -1,3 +1,4 @@
+// @ts-check
 import { deflateSync } from 'node:zlib';
 
 function stream(value) {
@@ -5,12 +6,25 @@ function stream(value) {
   return `<< /Filter /FlateDecode /Length ${bytes.length} >>\nstream\n${bytes.toString('latin1')}\nendstream`;
 }
 
-export function pdfFixture({ text = 'Example', date = 'D:20261007120000Z', id = 'A'.repeat(32), metadataOnly = false, arrayRange = false, structured = false } = {}) {
+/**
+ * @param {{ text?: string, date?: string, id?: string, metadataOnly?: boolean, arrayRange?: boolean, structured?: boolean }} [options]
+ * @returns {Buffer}
+ */
+export function pdfFixture({
+  text = 'Example',
+  date = 'D:20261007120000Z',
+  id = 'A'.repeat(32),
+  metadataOnly = false,
+  arrayRange = false,
+  structured = false,
+} = {}) {
   const characters = [...new Set([...text])];
   const glyph = (index) => (index + 1).toString(16).padStart(4, '0');
   const mappings = characters.map((character, index) => {
     const unicode = Buffer.from(character, 'utf16le').swap16().toString('hex');
-    return arrayRange ? `<${glyph(index)}> <${glyph(index)}> [<${unicode}>]` : `<${glyph(index)}> <${unicode}>`;
+    return arrayRange
+      ? `<${glyph(index)}> <${glyph(index)}> [<${unicode}>]`
+      : `<${glyph(index)}> <${unicode}>`;
   });
   const cmap = `begincmap\n${mappings.length} begin${arrayRange ? 'bfrange' : 'bfchar'}\n${mappings.join('\n')}\nend${arrayRange ? 'bfrange' : 'bfchar'}\nendcmap`;
   const encoded = [...text].map((character) => glyph(characters.indexOf(character))).join('');
@@ -24,7 +38,8 @@ export function pdfFixture({ text = 'Example', date = 'D:20261007120000Z', id = 
     `<< /Title (Example) /Author (Example) /CreationDate (${date}) /ModDate (${date}) >>`,
   ];
   if (structured) {
-    objects[0] = '<< /Type /Catalog /Pages 2 0 R /MarkInfo << /Marked true >> /StructTreeRoot 8 0 R /Outlines 9 0 R >>';
+    objects[0] =
+      '<< /Type /Catalog /Pages 2 0 R /MarkInfo << /Marked true >> /StructTreeRoot 8 0 R /Outlines 9 0 R >>';
     objects.push(
       '<< /Type /StructTreeRoot /K [] >>',
       '<< /Type /Outlines /First 10 0 R /Last 10 0 R /Count 1 >>',

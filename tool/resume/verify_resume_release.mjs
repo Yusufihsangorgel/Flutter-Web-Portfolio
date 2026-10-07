@@ -1,3 +1,4 @@
+// @ts-check
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 
@@ -7,13 +8,19 @@ import { assertResumeStructure } from './pdf_structure.mjs';
 import { renderResumeHtml } from './render_resume_html.mjs';
 import { loadResumeFont } from './resume_font.mjs';
 
+/**
+ * @param {{ webRoot: string, record: any }} options
+ * @returns {Promise<string[]>}
+ */
 export async function verifyResumeRelease({ webRoot, record }) {
   const failures = [];
   let paper;
   try {
     const html = await readFile(path.join(webRoot, 'resume.html'), 'utf8');
     const fontBase64 = await loadResumeFont();
-    paper = ['a4', 'letter'].find((paper) => html === renderResumeHtml(record, { paper, fontBase64 }));
+    paper = ['a4', 'letter'].find(
+      (paper) => html === renderResumeHtml(record, { paper, fontBase64 }),
+    );
     if (!paper) {
       failures.push('resume.html is stale or invalid');
     }

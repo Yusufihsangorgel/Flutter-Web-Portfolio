@@ -1,8 +1,18 @@
+// @ts-check
 import { createHash } from 'node:crypto';
 
-import { assertSupportedPdfStream, encodePdfUnicode, readPdfDocument, writePdfDocument } from './pdf_document.mjs';
+import {
+  assertSupportedPdfStream,
+  encodePdfUnicode,
+  readPdfDocument,
+  writePdfDocument,
+} from './pdf_document.mjs';
 import { formatDate } from './render_resume_html.mjs';
 
+/**
+ * @param {any} record
+ * @returns {Record<string, string>}
+ */
 export function resumeMetadata(record) {
   formatDate(record.verified_at);
   if (!record.profile?.name?.trim()) throw new Error('A profile name is required.');
@@ -16,6 +26,11 @@ export function resumeMetadata(record) {
   };
 }
 
+/**
+ * @param {Buffer} bytes
+ * @param {any} record
+ * @returns {Buffer}
+ */
 export function normalizeResumePdf(bytes, record) {
   const document = readPdfDocument(bytes);
   if ([...document.objects.values()].some(hasUnsupportedDictionary)) {
@@ -27,8 +42,9 @@ export function normalizeResumePdf(bytes, record) {
   if (!document.objects.has(document.info)) {
     document.info = Math.max(...document.objects.keys()) + 1;
   }
-  const metadata = Object.entries(resumeMetadata(record)).map(([key, value]) =>
-    `/${key} ${key.endsWith('Date') ? `(${value})` : `<${encodePdfUnicode(value)}>`}`,
+  const metadata = Object.entries(resumeMetadata(record)).map(
+    ([key, value]) =>
+      `/${key} ${key.endsWith('Date') ? `(${value})` : `<${encodePdfUnicode(value)}>`}`,
   );
   document.objects.set(document.info, `<<\n${metadata.join('\n')}\n>>`);
   const normalized = writePdfDocument(document, '0'.repeat(32));

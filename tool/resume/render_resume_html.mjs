@@ -1,19 +1,50 @@
+// @ts-check
 const months = [
-  'January', 'February', 'March', 'April', 'May', 'June',
-  'July', 'August', 'September', 'October', 'November', 'December',
+  'January',
+  'February',
+  'March',
+  'April',
+  'May',
+  'June',
+  'July',
+  'August',
+  'September',
+  'October',
+  'November',
+  'December',
 ];
 
+/**
+ * @param {unknown} value
+ * @returns {string}
+ */
 export function escapeHtml(value) {
-  return String(value).replace(/[&<>"']/g, (character) => ({
-    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
-  })[character]);
+  return String(value).replace(
+    /[&<>"']/g,
+    (character) =>
+      ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;',
+      })[character],
+  );
 }
 
+/**
+ * @param {string} paper
+ * @returns {string}
+ */
 export function validatePaper(paper) {
   if (!['a4', 'letter'].includes(paper)) throw new Error('Paper must be a4 or letter.');
   return paper;
 }
 
+/**
+ * @param {string} value
+ * @returns {string}
+ */
 export function formatDate(value) {
   const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
   const date = new Date(`${value}T00:00:00Z`);
@@ -23,8 +54,14 @@ export function formatDate(value) {
   return `${months[Number(match[2]) - 1]} ${Number(match[3])}, ${match[1]}`;
 }
 
+/**
+ * @param {unknown} value
+ * @returns {string}
+ */
 export function formatPeriod(value) {
-  return String(value).trim().replace(/\s+(?:—|–|-)\s+/g, ' — ');
+  return String(value)
+    .trim()
+    .replace(/\s+(?:—|–|-)\s+/g, ' — ');
 }
 
 function paragraph(value, className = '') {
@@ -69,8 +106,11 @@ function writingEntry(entry) {
 }
 
 function printStyles(paper, fontBase64) {
-  if (fontBase64 && !/^[A-Za-z\d+/]+={0,2}$/.test(fontBase64)) throw new Error('Font must be base64 encoded.');
-  const fontFace = fontBase64 ? `@font-face { font-family: Resume; src: url(data:font/ttf;base64,${fontBase64}) format("truetype"); font-weight: 100 900; }\n` : '';
+  if (fontBase64 && !/^[A-Za-z\d+/]+={0,2}$/.test(fontBase64))
+    throw new Error('Font must be base64 encoded.');
+  const fontFace = fontBase64
+    ? `@font-face { font-family: Resume; src: url(data:font/ttf;base64,${fontBase64}) format("truetype"); font-weight: 100 900; }\n`
+    : '';
   return `${fontFace}@page { size: ${paper === 'a4' ? 'A4' : 'Letter'}; margin: 14mm; }
 * { box-sizing: border-box; }
 body { color: #111; font: 10pt/1.3 Resume, Arial, "Liberation Sans", sans-serif; margin: 0 auto; max-width: 182mm; padding: 5mm; }
@@ -87,6 +127,11 @@ a { color: inherit; overflow-wrap: anywhere; text-decoration: underline; }
 @media print { body { max-width: none; padding: 0; } }`;
 }
 
+/**
+ * @param {any} record
+ * @param {{ paper?: string, fontBase64?: string }} [options]
+ * @returns {string}
+ */
 export function renderResumeHtml(record, { paper = 'a4', fontBase64 } = {}) {
   validatePaper(paper);
   const profile = record.profile;

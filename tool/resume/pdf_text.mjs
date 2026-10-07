@@ -1,3 +1,4 @@
+// @ts-check
 import { decodePdfUnicode, pdfStream, readPdfDocument } from './pdf_document.mjs';
 import { formatPeriod } from './render_resume_html.mjs';
 
@@ -9,7 +10,9 @@ function unicodeMap(source) {
     }
   }
   for (const block of source.matchAll(/beginbfrange([\s\S]*?)endbfrange/g)) {
-    for (const entry of block[1].matchAll(/<([\da-f]+)>\s*<([\da-f]+)>\s*(<([\da-f]+)>|\[([^\]]*)\])/gi)) {
+    for (const entry of block[1].matchAll(
+      /<([\da-f]+)>\s*<([\da-f]+)>\s*(<([\da-f]+)>|\[([^\]]*)\])/gi,
+    )) {
       addRange(map, entry);
     }
   }
@@ -22,7 +25,9 @@ function addRange(map, entry) {
   if (end < start || end - start > 65535) throw new Error('Invalid Unicode CMap range.');
   const values = entry[5] && [...entry[5].matchAll(/<([\da-f]+)>/gi)].map((match) => match[1]);
   for (let code = start; code <= end; code += 1) {
-    const hex = values ? values[code - start] : (parseInt(entry[4], 16) + code - start).toString(16).padStart(entry[4].length, '0');
+    const hex = values
+      ? values[code - start]
+      : (parseInt(entry[4], 16) + code - start).toString(16).padStart(entry[4].length, '0');
     if (!hex) throw new Error('Incomplete Unicode CMap range.');
     map.set(code.toString(16).padStart(entry[1].length, '0').toUpperCase(), decodePdfUnicode(hex));
   }
@@ -67,20 +72,31 @@ function streamText(stream, fonts) {
   return text;
 }
 
+/**
+ * @param {Buffer} bytes
+ * @returns {{ pages: number, text: string }}
+ */
 export function inspectResumePdf(bytes) {
   const { objects } = readPdfDocument(bytes);
   const pages = [...objects.values()].filter((body) => /\/Type\s*\/Page\b/.test(body));
-  const text = pages.map((page) => {
-    const contents = /\/Contents\s*(\[[^\]]*\]|\d+ 0 R)/.exec(page)?.[1];
-    if (!contents) throw new Error('PDF page has no text content stream.');
-    const fonts = pageFonts(page, objects);
-    return [...contents.matchAll(/(\d+) 0 R/g)].map((reference) =>
-      streamText(pdfStream(objects.get(Number(reference[1]))), fonts),
-    ).join('\n');
-  }).join('\n');
+  const text = pages
+    .map((page) => {
+      const contents = /\/Contents\s*(\[[^\]]*\]|\d+ 0 R)/.exec(page)?.[1];
+      if (!contents) throw new Error('PDF page has no text content stream.');
+      const fonts = pageFonts(page, objects);
+      return [...contents.matchAll(/(\d+) 0 R/g)]
+        .map((reference) => streamText(pdfStream(objects.get(Number(reference[1]))), fonts))
+        .join('\n');
+    })
+    .join('\n');
   return { pages: pages.length, text };
 }
 
+/**
+ * @param {Buffer} bytes
+ * @param {any} record
+ * @returns {{ pages: number, text: string }}
+ */
 export function assertResumePdf(bytes, record) {
   const result = inspectResumePdf(bytes);
   const compact = (value) => value.normalize('NFC').replace(/\s+/g, '');
@@ -88,7 +104,12 @@ export function assertResumePdf(bytes, record) {
     throw new Error('resume.pdf does not contain the profile name in its text layer.');
   }
   for (const entry of record.experience ?? []) {
-    const facts = [entry.company, entry.role, entry.period && formatPeriod(entry.period), entry.summary].filter(Boolean);
+    const facts = [
+      entry.company,
+      entry.role,
+      entry.period && formatPeriod(entry.period),
+      entry.summary,
+    ].filter(Boolean);
     if (facts.some((fact) => !compact(result.text).includes(compact(fact)))) {
       throw new Error('resume.pdf is missing canonical experience text.');
     }

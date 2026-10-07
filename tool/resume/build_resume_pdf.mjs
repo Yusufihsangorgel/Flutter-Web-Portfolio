@@ -1,3 +1,4 @@
+// @ts-check
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import process from 'node:process';
@@ -11,14 +12,25 @@ import { loadResumeFont } from './resume_font.mjs';
 
 const root = fileURLToPath(new URL('../../', import.meta.url));
 
+/**
+ * @param {string[]} args
+ * @returns {{ out: string, paper: string }}
+ */
 export function parseArguments(args) {
   const options = { out: 'build/web', paper: 'a4' };
   const seen = new Set();
   for (let index = 0; index < args.length; index += 2) {
     const option = args[index];
     const value = args[index + 1];
-    if (!['--out', '--paper'].includes(option) || seen.has(option) || !value || value.startsWith('--')) {
-      throw new Error('Usage: node tool/resume/build_resume_pdf.mjs [--out build/web] [--paper a4|letter]');
+    if (
+      !['--out', '--paper'].includes(option) ||
+      seen.has(option) ||
+      !value ||
+      value.startsWith('--')
+    ) {
+      throw new Error(
+        'Usage: node tool/resume/build_resume_pdf.mjs [--out build/web] [--paper a4|letter]',
+      );
     }
     seen.add(option);
     options[option.slice(2)] = value;
@@ -27,6 +39,11 @@ export function parseArguments(args) {
   return options;
 }
 
+/**
+ * @param {any} record
+ * @param {{ paper?: string }} [options]
+ * @returns {Promise<{ html: string, pdf: Buffer }>}
+ */
 export async function renderResumePdf(record, { paper = 'a4' } = {}) {
   resumeMetadata(record);
   const html = renderResumeHtml(record, { paper, fontBase64: await loadResumeFont() });
@@ -37,7 +54,7 @@ export async function renderResumePdf(record, { paper = 'a4' } = {}) {
     await page.route('**/*', (route) => route.abort());
     await page.setContent(html, { waitUntil: 'load' });
     await page.evaluate(() => document.fonts.ready);
-    if (!await page.evaluate(() => document.fonts.check('10pt Resume'))) {
+    if (!(await page.evaluate(() => document.fonts.check('10pt Resume')))) {
       throw new Error('The bundled resume font did not load.');
     }
     const raw = await page.pdf({
@@ -57,8 +74,14 @@ export async function renderResumePdf(record, { paper = 'a4' } = {}) {
   }
 }
 
+/**
+ * @param {{ out?: string, paper?: string }} [options]
+ * @returns {Promise<{ html: string, pdf: Buffer }>}
+ */
 export async function buildResumePdf({ out = 'build/web', paper = 'a4' } = {}) {
-  const record = JSON.parse(await readFile(path.join(root, 'assets/content/portfolio.json'), 'utf8'));
+  const record = JSON.parse(
+    await readFile(path.join(root, 'assets/content/portfolio.json'), 'utf8'),
+  );
   const output = path.resolve(out);
   const { html, pdf } = await renderResumePdf(record, { paper });
   await mkdir(output, { recursive: true });
