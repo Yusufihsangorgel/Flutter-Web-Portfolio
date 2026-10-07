@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url';
 import test from 'node:test';
 
 import { inspectRaster } from '../assets/raster_inspector.mjs';
+import { renderArchitectureBoard } from './architecture_boards.mjs';
 import { selectSmallest } from './encoder.mjs';
 import {
   renderInputDigest,
@@ -13,8 +14,53 @@ import {
   verifyFormatChoice,
   workArtifactPaths,
 } from './manifest.mjs';
+import { renderReleaseBoard } from './release_board.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
+
+for (const render of [renderReleaseBoard, renderArchitectureBoard]) {
+  test(`${render.name} replaces every title newline in its accessible label`, async () => {
+    const config = {
+      title: 'First line\nSecond line\nThird line',
+      output: 'board.webp',
+      eyebrow: 'EXAMPLE',
+      descriptor: 'Example board',
+      platform: 'Web',
+      icon: 'icon.png',
+      screens: [
+        { file: 'first.png', label: 'FIRST' },
+        { file: 'second.png', label: 'SECOND' },
+      ],
+      stages: ['INPUT', 'OUTPUT'],
+      footer: 'Example footer',
+      footerLeft: 'INPUT',
+      footerRight: 'OUTPUT',
+      palette: {
+        paper: '#ffffff',
+        ink: '#000000',
+        accent: '#0000ff',
+        stage: '#ffffff',
+        stageInk: '#000000',
+        rule: '#000000',
+      },
+    };
+    const renderer = {
+      imageDataUrl: async () => 'data:image/png;base64,',
+      renderPage: async (html, output) => {
+        assert.equal(output, config.output);
+        const suffix = render === renderReleaseBoard ? ' release evidence' : '';
+        assert.equal(
+          html.match(/aria-label="([^"]*)"/)[1],
+          `First line Second line Third line${suffix}`,
+        );
+        for (const line of config.title.split('\n')) {
+          assert.ok(html.includes(`<span>${line}</span>`));
+        }
+      },
+    };
+    await render(renderer, config);
+  });
+}
 
 async function copyFixture(t) {
   const copy = await mkdtemp(path.join(tmpdir(), 'work-artifacts-'));

@@ -181,7 +181,7 @@ export async function renderArchitectureBoard(renderer, config) {
   const { paper, ink, accent } = config.palette;
   const html = documentShell(
     fillTemplate(ARCHITECTURE_TEMPLATE_3, [
-      escapeHtml(config.title.replace('\n', ' ')),
+      escapeHtml(config.title.replaceAll('\n', ' ')),
       escapeHtml(config.eyebrow),
       escapeHtml(config.footer),
       title,

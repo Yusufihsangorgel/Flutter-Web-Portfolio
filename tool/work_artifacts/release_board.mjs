@@ -236,7 +236,7 @@ export async function renderReleaseBoard(renderer, config) {
 
   const html = documentShell(
     fillTemplate(RELEASE_TEMPLATE_2, [
-      escapeHtml(config.title.replace('\n', ' ')),
+      escapeHtml(config.title.replaceAll('\n', ' ')),
       escapeHtml(config.eyebrow),
       icon,
       titleLines,

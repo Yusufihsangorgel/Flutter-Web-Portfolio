@@ -14,7 +14,7 @@ Keep content, template, release, and verification tooling beside the application
 
 ## Consequences
 
-The repository remains larger than a portfolio-only frontend; tooling changes need Node tests as well as application checks. [Technical debt](../TECH-DEBT.md) identifies scripts above the source-size limit and their planned splits. The [tooling inventory](../TOOLING.md) records the purpose folders, callers, and completed splits. Node type checking, lint, and formatting run in the analyze job.
+The repository remains larger than a portfolio-only frontend; tooling changes need Node tests as well as application checks. [Technical debt](../TECH-DEBT.md) records outstanding limits and planned fixes. The [tooling guide](../TOOLING.md) maps folder responsibilities, entry points, npm/CI callers, and contribution conventions. Derive per-file callers and metrics from current code and checks. Node type checking, lint, and formatting run in the analyze job.
 
 ## Alternatives considered
 
