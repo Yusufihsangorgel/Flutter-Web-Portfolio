@@ -35,15 +35,59 @@ final class _LanguageRepository implements LanguageRepository {
 }
 
 void main() {
-  final subject = _HomeViewSubject();
-  setUp(subject.initialize);
-  _registerSectionOrder(subject);
-  _registerSkipLinkFocus(subject);
-  _registerMenuSemantics(subject);
-  _registerSkipLinkActivation(subject);
+  group('with the sample portfolio', () {
+    final subject = _HomeViewSubject(_addSampleWriting);
+    setUp(subject.initialize);
+    _registerSectionOrder(subject);
+    _registerSkipLinkFocus(subject);
+    _registerMenuSemantics(subject);
+    _registerSkipLinkActivation(subject);
+  });
+  group('with only home and about authored', () {
+    final subject = _HomeViewSubject(_keepOnlyHomeAndAbout);
+    setUp(subject.initialize);
+    _registerMainContentHeading(subject);
+  });
+}
+
+void _addSampleWriting(Map<String, dynamic> json) {
+  json['writing_sources'] = [
+    {
+      'id': 'blog',
+      'label': 'Blog',
+      'kind': 'rss',
+      'url': 'https://example.com/writing/feed.xml',
+      'profile_url': 'https://example.com/writing',
+    },
+  ];
+  json['writing'] = [
+    {
+      'title': 'Sample article',
+      'url': 'https://example.com/writing/sample',
+      'source': 'blog',
+      'date': '2026-09-01',
+      'featured': true,
+    },
+  ];
+}
+
+// Mirrors a freshly initialized template: About is the first content chapter.
+void _keepOnlyHomeAndAbout(Map<String, dynamic> json) {
+  for (final chapter in const [
+    'experience',
+    'contributions',
+    'systems',
+    'packages',
+    'writing',
+  ]) {
+    json[chapter] = <Object?>[];
+  }
 }
 
 class _HomeViewSubject {
+  _HomeViewSubject(this.authoredContent);
+
+  final void Function(Map<String, dynamic> json) authoredContent;
   late LanguageCubit language;
   late AppScrollController scroll;
   late SceneDirector scene;
@@ -52,28 +96,7 @@ class _HomeViewSubject {
   late NarrativeDocument narrative;
 
   Future<void> initialize() async {
-    portfolio = loadPortfolioFixture(
-      mutate: (json) {
-        json['writing_sources'] = [
-          {
-            'id': 'blog',
-            'label': 'Blog',
-            'kind': 'rss',
-            'url': 'https://example.com/writing/feed.xml',
-            'profile_url': 'https://example.com/writing',
-          },
-        ];
-        json['writing'] = [
-          {
-            'title': 'Sample article',
-            'url': 'https://example.com/writing/sample',
-            'source': 'blog',
-            'date': '2026-09-01',
-            'featured': true,
-          },
-        ];
-      },
-    );
+    portfolio = loadPortfolioFixture(mutate: authoredContent);
     narrative = loadNarrativeFixture(activeSections: portfolio.activeSections);
     language = LanguageCubit(languageRepository: _LanguageRepository());
     await language.initialize();
@@ -243,5 +266,38 @@ void _registerSkipLinkActivation(_HomeViewSubject subject) {
     );
     expect(subject.opacityOfLink(tester), 0);
     await tester.pumpWidget(const SizedBox.shrink());
+  });
+}
+
+void _registerMainContentHeading(_HomeViewSubject subject) {
+  testWidgets('the main-content chapter still exposes its own heading', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(1440, 4000);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    final semantics = tester.ensureSemantics();
+    await subject.pumpHome(tester);
+
+    expect(subject.narrative.chapters.map((chapter) => chapter.id.value), [
+      'home',
+      'about',
+    ]);
+    final heading = find.semantics.byPredicate(
+      (node) => node.label == 'About' && node.flagsCollection.isHeader,
+    );
+    expect(heading, findsOne);
+    expect(heading.evaluate().single.getSemanticsData().headingLevel, 2);
+    final mainContent = find.semantics.byPredicate(
+      (node) => node.identifier == 'main-content',
+    );
+    expect(mainContent, findsOne);
+    expect(
+      mainContent.evaluate().single.getSemanticsData().flagsCollection.isHeader,
+      isFalse,
+    );
+
+    await tester.pumpWidget(const SizedBox.shrink());
+    semantics.dispose();
   });
 }
