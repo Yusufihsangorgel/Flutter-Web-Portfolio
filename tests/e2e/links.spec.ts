@@ -1,4 +1,4 @@
-import { expect, Page, test } from "@playwright/test";
+import { expect, Page, test } from "./helpers/test_setup";
 import { portfolio } from "./helpers/portfolio_test_helpers";
 import { scrollToLocator } from "./helpers/semantics_scroll";
 
