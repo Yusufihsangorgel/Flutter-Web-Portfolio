@@ -1,0 +1,14 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "target": "ES2023",
+    "lib": ["ES2023", "DOM", "DOM.Iterable"],
+    "types": ["node"],
+    "allowJs": true,
+    "checkJs": true,
+    "strict": false,
+    "exactOptionalPropertyTypes": false
+  },
+  "include": ["tool/**/*.mjs", "tool/**/*.d.ts"],
+  "exclude": ["tool/resume/**"]
+}

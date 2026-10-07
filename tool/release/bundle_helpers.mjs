@@ -3,9 +3,25 @@ import { readFile, readdir, rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { gzipSync } from 'node:zlib';
 
-const compressible = new Set(['.js', '.mjs', '.wasm', '.json', '.html', '.txt', '.xml', '.svg', '.ttf', '.otf']);
+const compressible = new Set([
+  '.js',
+  '.mjs',
+  '.wasm',
+  '.json',
+  '.html',
+  '.txt',
+  '.xml',
+  '.svg',
+  '.ttf',
+  '.otf',
+]);
 // Hosted build sandboxes may ship no .git directory but export the built commit.
-const commitVariables = ['GITHUB_SHA', 'VERCEL_GIT_COMMIT_SHA', 'COMMIT_REF', 'CF_PAGES_COMMIT_SHA'];
+const commitVariables = [
+  'GITHUB_SHA',
+  'VERCEL_GIT_COMMIT_SHA',
+  'COMMIT_REF',
+  'CF_PAGES_COMMIT_SHA',
+];
 
 export function resolveReleaseCommit(env = process.env, readGitCommit = readCheckoutCommit) {
   const provided = commitVariables.map((name) => env[name]).find(Boolean);
@@ -13,7 +29,9 @@ export function resolveReleaseCommit(env = process.env, readGitCommit = readChec
   try {
     return readGitCommit();
   } catch {
-    throw new Error(`version.json needs the built commit: set ${commitVariables.join(', ')} or build in a git checkout`);
+    throw new Error(
+      `version.json needs the built commit: set ${commitVariables.join(', ')} or build in a git checkout`,
+    );
   }
 }
 
@@ -30,7 +48,7 @@ export async function precompressAssets(root) {
     if (!compressible.has(path.extname(file).toLowerCase())) continue;
     const bytes = await readFile(file);
     if (bytes.length <= 1024) continue;
-    await writeFile(`${file}.gz`, gzipSync(bytes, { level: 9, mtime: 0 }));
+    await writeFile(`${file}.gz`, gzipSync(bytes, { level: 9 }));
     count += 1;
   }
   return count;
@@ -67,17 +85,22 @@ self.addEventListener('activate', (event) => {
 
 export async function collectFiles(directory) {
   const entries = await readdir(directory, { withFileTypes: true });
-  const nested = await Promise.all(entries.map(async (entry) => {
-    const entryPath = path.join(directory, entry.name);
-    return entry.isDirectory() ? collectFiles(entryPath) : [entryPath];
-  }));
+  const nested = await Promise.all(
+    entries.map(async (entry) => {
+      const entryPath = path.join(directory, entry.name);
+      return entry.isDirectory() ? collectFiles(entryPath) : [entryPath];
+    }),
+  );
   return nested.flat();
 }
 
 export async function removeEmptyDirectories(directory) {
   const entries = await readdir(directory, { withFileTypes: true });
-  await Promise.all(entries.filter((entry) => entry.isDirectory()).map((entry) =>
-    removeEmptyDirectories(path.join(directory, entry.name))));
+  await Promise.all(
+    entries
+      .filter((entry) => entry.isDirectory())
+      .map((entry) => removeEmptyDirectories(path.join(directory, entry.name))),
+  );
   if ((await readdir(directory)).length === 0) {
     await rm(directory, { recursive: true, force: true });
   }

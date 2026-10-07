@@ -10,7 +10,7 @@ The portfolio is a Flutter Web application assembled from [page sections](../../
 
 ## Decision
 
-Keep Flutter Web as the interactive presentation runtime. Generate the critical shell from canonical content during [release preparation](../../tool/prepare_web_release.mjs), keep static metadata and source documents, and ship both Wasm and JavaScript runtimes. A full static semantic document is the follow-up in [0002](0002-hash-routing-static-semantic-document.md), not a current capability.
+Keep Flutter Web as the interactive presentation runtime. Generate the critical shell from canonical content during [release preparation](../../tool/release/prepare_web_release.mjs), keep static metadata and source documents, and ship both Wasm and JavaScript runtimes. A full static semantic document is the follow-up in [0002](0002-hash-routing-static-semantic-document.md), not a current capability.
 
 ## Consequences
 

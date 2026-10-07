@@ -10,7 +10,7 @@ The local [budget package](../../packages/adaptive_render_budget/) normalizes fr
 
 ## Decision
 
-Keep frame-budget policy in the reusable local package and portfolio-specific visual choices in the application adapter. Reduced motion pauses adaptation and keeps a safe visual tier. Read the framework's display refresh report, fall back to 60 Hz when invalid, and expose the reported rate as an input to normalization rather than a verified physical panel measurement. In the [pinned Flutter SDK](../../tool/toolchain.json), both web display implementations initialize `EngineFlutterDisplay` with `refreshRate: 60` (`bin/cache/flutter_web_sdk/lib/ui/src/engine/display.dart` and `lib/_engine/engine/display.dart`).
+Keep frame-budget policy in the reusable local package and portfolio-specific visual choices in the application adapter. Reduced motion pauses adaptation and keeps a safe visual tier. Read the framework's display refresh report, fall back to 60 Hz when invalid, and expose the reported rate as an input to normalization rather than a verified physical panel measurement. In the [pinned Flutter SDK](../../tool/quality/toolchain.json), both web display implementations initialize `EngineFlutterDisplay` with `refreshRate: 60` (`bin/cache/flutter_web_sdk/lib/ui/src/engine/display.dart` and `lib/_engine/engine/display.dart`).
 
 ## Consequences
 
