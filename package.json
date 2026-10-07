@@ -32,6 +32,8 @@
     "render:social-card": "node tool/render_social_card.mjs",
     "verify:social-card": "node tool/render_social_card.mjs --verify",
     "render:work-artifacts": "node tool/render_work_artifacts.mjs",
+    "verify:work-artifacts": "node tool/render_work_artifacts.mjs --check",
+    "test:work-artifacts": "node --test tool/work_artifacts/test_work_artifacts.mjs",
     "verify:source": "node tool/verify_dart_reachability.mjs",
     "verify:hosting": "node tool/verify_hosting_configs.mjs",
     "verify:community": "node tool/verify_community_files.mjs",
