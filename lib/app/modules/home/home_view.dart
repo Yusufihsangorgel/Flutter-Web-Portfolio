@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
+import 'package:flutter_web_portfolio/app/features/language/application/language_context.dart';
 import 'package:flutter_web_portfolio/app/controllers/scroll_controller.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_dimensions.dart';
@@ -27,6 +28,8 @@ import 'package:flutter_web_portfolio/app/widgets/narrative_stage.dart';
 import 'package:flutter_web_portfolio/app/utils/motion_preference.dart';
 import 'package:flutter_web_portfolio/app/widgets/background/narrative_background.dart';
 import 'package:flutter_web_portfolio/app/narrative/domain/narrative_document.dart';
+
+part 'home_view_sections.dart';
 
 /// A single, semantic portfolio document with measured section navigation.
 class HomeView extends StatefulWidget {
@@ -227,51 +230,63 @@ class _HomeViewState extends State<HomeView> {
         const Positioned.fill(
           child: RepaintBoundary(child: NarrativeBackground()),
         ),
-        ScrollConfiguration(
-          behavior: ScrollConfiguration.of(context).copyWith(
-            dragDevices: {
-              PointerDeviceKind.touch,
-              PointerDeviceKind.mouse,
-              PointerDeviceKind.trackpad,
-            },
-          ),
-          child: CustomScrollView(
-            controller: scrollController.scrollController,
-            physics: const ClampingScrollPhysics(),
-            slivers: [
-              CustomSliverAppBar(
-                scrollController: scrollController,
-                languageController: languageController,
-              ),
-              // Lay out every chapter to measure navigation targets.
-              SliverToBoxAdapter(
-                child: NotificationListener<SizeChangedLayoutNotification>(
-                  onNotification: (_) {
-                    scrollController.markGeometryDirty();
-                    return false;
-                  },
-                  child: SizeChangedLayoutNotifier(
-                    child: Column(
-                      children: [
-                        ..._buildChapters(context, scrollController, narrative),
-                        const PortfolioFooter(),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
+        _scrollDocument(
+          context,
+          scrollController,
+          languageController,
+          narrative,
         ),
         const NarrativeStage(),
         const BackToTopButton(),
         // Above the app bar, so the focused bypass link is never covered.
-        _buildSkipLink(languageController),
+        _buildSkipLink(),
       ],
     ),
   );
 
-  Widget _buildSkipLink(LanguageCubit languageController) => Positioned(
+  Widget _scrollDocument(
+    BuildContext context,
+    AppScrollController scrollController,
+    LanguageCubit languageController,
+    NarrativeDocument narrative,
+  ) => ScrollConfiguration(
+    behavior: ScrollConfiguration.of(context).copyWith(
+      dragDevices: {
+        PointerDeviceKind.touch,
+        PointerDeviceKind.mouse,
+        PointerDeviceKind.trackpad,
+      },
+    ),
+    child: CustomScrollView(
+      controller: scrollController.scrollController,
+      physics: const ClampingScrollPhysics(),
+      slivers: [
+        CustomSliverAppBar(
+          scrollController: scrollController,
+          languageController: languageController,
+        ),
+        // Lay out each chapter so deep links use measured geometry.
+        SliverToBoxAdapter(
+          child: NotificationListener<SizeChangedLayoutNotification>(
+            onNotification: (_) {
+              scrollController.markGeometryDirty();
+              return false;
+            },
+            child: SizeChangedLayoutNotifier(
+              child: Column(
+                children: [
+                  ..._buildChapters(context, scrollController, narrative),
+                  const PortfolioFooter(),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
+    ),
+  );
+
+  Widget _buildSkipLink() => Positioned(
     top: 0,
     left: 0,
     right: 0,
@@ -279,10 +294,7 @@ class _HomeViewState extends State<HomeView> {
       child: FocusTraversalOrder(
         order: const NumericFocusOrder(0),
         child: SkipToContentLink(
-          label: languageController.getText(
-            'accessibility.skip_to_content',
-            defaultValue: 'Skip to content',
-          ),
+          label: context.strings.accessibilitySkipToContent,
           focusNode: _skipLinkFocusNode,
           onActivate: () => unawaited(_skipToContent()),
         ),
@@ -301,26 +313,24 @@ class _HomeViewState extends State<HomeView> {
       final chapter = narrative.chapters[index];
       final isLast = index == narrative.chapters.length - 1;
       chapters.add(
-        _buildSection(
-          context,
-          chapter,
+        _buildSection(context, (
+          key: scrollController.keyFor(chapter.id),
+          child: _widgetFor(chapter.id),
+          isHero: chapter.id.isHome,
+          fullBleed: chapter.id == SectionId.projects,
           isLast: isLast,
           isMainContent: chapter.id == mainContentId,
-        ),
+        )),
       );
       if (!isLast) {
         final nextChapter = narrative.chapters[index + 1];
-        final language = context.read<LanguageCubit>();
         chapters.add(
           NarrativeChapterHandoff(
             from: chapter,
             to: nextChapter,
             position: scrollController.narrativePosition,
             chapterNumber: narrative.sectionNumber(nextChapter.id),
-            label: language.getText(
-              'nav.${nextChapter.id.value}',
-              defaultValue: nextChapter.id.value,
-            ),
+            label: _chapterLabel(context, nextChapter.id),
           ),
         );
       }
@@ -345,19 +355,24 @@ class _HomeViewState extends State<HomeView> {
 
   Widget _buildSection(
     BuildContext context,
-    NarrativeChapter chapter, {
-    required bool isLast,
-    required bool isMainContent,
-  }) {
-    final edgeToEdge = chapter.id.isHome || chapter.id == SectionId.projects;
+    ({
+      GlobalKey key,
+      Widget child,
+      bool isHero,
+      bool fullBleed,
+      bool isLast,
+      bool isMainContent,
+    })
+    layout,
+  ) {
     final section = Container(
-      key: context.read<AppScrollController>().keyFor(chapter.id),
-      padding: edgeToEdge
+      key: layout.key,
+      padding: layout.isHero || layout.fullBleed
           ? EdgeInsets.zero
-          : _sectionPadding(context, isLast: isLast),
-      child: _widgetFor(chapter.id),
+          : _sectionPadding(context, isLast: layout.isLast),
+      child: layout.child,
     );
-    if (!isMainContent) return section;
+    if (!layout.isMainContent) return section;
     return Semantics(
       identifier: 'main-content',
       container: true,
@@ -368,17 +383,4 @@ class _HomeViewState extends State<HomeView> {
       ),
     );
   }
-
-  Widget _widgetFor(SectionId sectionId) => switch (sectionId.value) {
-    'home' => const HomeSection(),
-    'about' => const AboutSection(),
-    'experience' => const ExperienceSection(),
-    'proof' => const ProofSection(),
-    'projects' => const ProjectsSection(),
-    'packages' => const PackagesSection(),
-    'writing' => const WritingSection(),
-    final value => throw StateError(
-      'No section widget is registered for narrative chapter "$value".',
-    ),
-  };
 }

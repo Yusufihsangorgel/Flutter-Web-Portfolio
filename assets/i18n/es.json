@@ -75,7 +75,9 @@
     "event_lab_risk": "Riesgo",
     "event_lab_step": "Paso",
     "status_merged": "Fusionado",
-    "status_under_review": "En revisión"
+    "status_under_review": "En revisión",
+    "summary_accepted": "{merged} cambios aceptados en los proyectos originales.",
+    "summary_review": "{review} cambios en revisión."
   },
   "packages_section": {
     "title": "Paquetes publicados",
@@ -87,13 +89,23 @@
     "status_done": "publicado",
     "status_doing": "en curso",
     "status_next": "siguiente",
-    "status_waiting": "en espera"
+    "status_waiting": "en espera",
+    "category_native_ffi": "Código nativo y FFI",
+    "category_ai_llm": "IA y grandes modelos de lenguaje",
+    "category_server": "Dart del lado del servidor",
+    "category_flutter_ui": "Interfaz de Flutter",
+    "category_dev_tool": "Herramientas de desarrollo",
+    "show_all": "Mostrar los {count}",
+    "show_less": "Mostrar menos",
+    "subtitle_no_perfect": "{count} paquetes publicados en pub.dev. Cada uno incluye resultados medidos, ejemplos ejecutables y su hoja de ruta."
   },
   "writing_section": {
     "title": "Escritos",
     "subtitle": "Artículos recientes de cada lugar donde publico, del más nuevo al más antiguo.",
     "all_writing": "Todos los escritos",
-    "open_article": "Leer artículo"
+    "open_article": "Leer artículo",
+    "show_all": "Mostrar los {count}",
+    "show_less": "Mostrar menos"
   },
   "footer": {
     "command_hint_prefix": "Presione",

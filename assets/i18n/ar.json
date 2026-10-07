@@ -75,7 +75,9 @@
     "event_lab_risk": "خطر",
     "event_lab_step": "الخطوة",
     "status_merged": "مدمج",
-    "status_under_review": "قيد المراجعة"
+    "status_under_review": "قيد المراجعة",
+    "summary_accepted": "تم قبول {merged} تغييرًا في المشاريع الأصلية.",
+    "summary_review": "{review} تغييرًا قيد المراجعة."
   },
   "packages_section": {
     "title": "الحزم المنشورة",
@@ -87,13 +89,23 @@
     "status_done": "تم النشر",
     "status_doing": "قيد التنفيذ",
     "status_next": "التالي",
-    "status_waiting": "في الانتظار"
+    "status_waiting": "في الانتظار",
+    "category_native_ffi": "الكود الأصلي وواجهة FFI",
+    "category_ai_llm": "الذكاء الاصطناعي والنماذج اللغوية الكبيرة",
+    "category_server": "Dart من جانب الخادم",
+    "category_flutter_ui": "واجهة Flutter",
+    "category_dev_tool": "أدوات المطورين",
+    "show_all": "عرض الكل ({count})",
+    "show_less": "عرض أقل",
+    "subtitle_no_perfect": "تم نشر {count} حزمة على pub.dev. تتضمن كل حزمة نتائج مقاسة وأمثلة قابلة للتشغيل وخارطة الطريق الخاصة بها."
   },
   "writing_section": {
     "title": "الكتابة",
     "subtitle": "أحدث المقالات من كل مكان أنشر فيه، الأحدث أولاً.",
     "all_writing": "كل المقالات",
-    "open_article": "قراءة المقال"
+    "open_article": "قراءة المقال",
+    "show_all": "عرض الكل ({count})",
+    "show_less": "عرض أقل"
   },
   "footer": {
     "command_hint_prefix": "اضغط",

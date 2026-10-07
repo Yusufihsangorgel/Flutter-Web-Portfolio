@@ -188,7 +188,7 @@ test('preserves the editorial sequence across responsive viewports', async ({
 }) => {
   await openStaticPortfolio(page);
   await expect(
-    page.getByRole('button', {
+    page.getByRole('link', {
       name: english.home_section.view_work,
       exact: true,
     }),

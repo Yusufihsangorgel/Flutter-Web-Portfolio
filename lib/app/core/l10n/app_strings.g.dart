@@ -171,6 +171,29 @@ final class AppStrings {
 
   String get navWriting => lookup('nav.writing', defaultValue: 'Writing');
 
+  String get packagesSectionCategoryAiLlm =>
+      lookup('packages_section.category_ai_llm', defaultValue: 'AI & LLM');
+
+  String get packagesSectionCategoryDevTool => lookup(
+    'packages_section.category_dev_tool',
+    defaultValue: 'Developer tools',
+  );
+
+  String get packagesSectionCategoryFlutterUi => lookup(
+    'packages_section.category_flutter_ui',
+    defaultValue: 'Flutter UI',
+  );
+
+  String get packagesSectionCategoryNativeFfi => lookup(
+    'packages_section.category_native_ffi',
+    defaultValue: 'Native & FFI',
+  );
+
+  String get packagesSectionCategoryServer => lookup(
+    'packages_section.category_server',
+    defaultValue: 'Server-side Dart',
+  );
+
   String packagesSectionMaturityLevel({
     required String level,
     required String max,
@@ -188,6 +211,15 @@ final class AppStrings {
 
   String get packagesSectionRoadmap =>
       lookup('packages_section.roadmap', defaultValue: 'roadmap');
+
+  String packagesSectionShowAll({required String count}) => _interpolate(
+    'packages_section.show_all',
+    'Show all {count}',
+    {'count': count},
+  );
+
+  String get packagesSectionShowLess =>
+      lookup('packages_section.show_less', defaultValue: 'Show fewer');
 
   String get packagesSectionStatusDoing =>
       lookup('packages_section.status_doing', defaultValue: 'in progress');
@@ -208,6 +240,14 @@ final class AppStrings {
     'packages_section.subtitle',
     '{count} packages live on pub.dev, {perfect} of them at a perfect 160/160 score. Each one ships a measured claim, runnable examples, and the roadmap it is on.',
     {'count': count, 'perfect': perfect},
+  );
+
+  String packagesSectionSubtitleNoPerfect({
+    required String count,
+  }) => _interpolate(
+    'packages_section.subtitle_no_perfect',
+    '{count} packages live on pub.dev. Each one ships a measured claim, runnable examples, and the roadmap it is on.',
+    {'count': count},
   );
 
   String get packagesSectionTitle =>
@@ -335,6 +375,18 @@ final class AppStrings {
     {'merged': merged, 'review': review},
   );
 
+  String proofSectionSummaryAccepted({required String merged}) => _interpolate(
+    'proof_section.summary_accepted',
+    '{merged} changes accepted upstream.',
+    {'merged': merged},
+  );
+
+  String proofSectionSummaryReview({required String review}) => _interpolate(
+    'proof_section.summary_review',
+    '{review} changes under review.',
+    {'review': review},
+  );
+
   String get proofSectionTitle =>
       lookup('proof_section.title', defaultValue: 'Open Source');
 
@@ -343,6 +395,15 @@ final class AppStrings {
 
   String get writingSectionOpenArticle =>
       lookup('writing_section.open_article', defaultValue: 'Read article');
+
+  String writingSectionShowAll({required String count}) => _interpolate(
+    'writing_section.show_all',
+    'Show all {count}',
+    {'count': count},
+  );
+
+  String get writingSectionShowLess =>
+      lookup('writing_section.show_less', defaultValue: 'Show fewer');
 
   String get writingSectionSubtitle => lookup(
     'writing_section.subtitle',

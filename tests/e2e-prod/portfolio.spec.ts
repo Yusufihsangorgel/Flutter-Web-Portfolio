@@ -171,8 +171,8 @@ async function assertAccessibleShell(
   });
   expect(controls).toEqual(
     expect.arrayContaining([
+      // Back to top joins the tree only after the reader scrolls past the hero.
       'Skip to content',
-      'Back to top',
       ...(isMobile
         ? ['Open navigation menu']
         : ['About', 'Experience', 'Open Source', 'Work']),

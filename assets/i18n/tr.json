@@ -75,7 +75,9 @@
     "event_lab_risk": "Risk",
     "event_lab_step": "Adım",
     "status_merged": "Birleştirildi",
-    "status_under_review": "İncelemede"
+    "status_under_review": "İncelemede",
+    "summary_accepted": "{merged} değişiklik kaynak projelerde kabul edildi.",
+    "summary_review": "{review} değişiklik incelemede."
   },
   "packages_section": {
     "title": "Yayınlanan Paketler",
@@ -87,13 +89,23 @@
     "status_done": "yayınlandı",
     "status_doing": "sürüyor",
     "status_next": "sırada",
-    "status_waiting": "bekliyor"
+    "status_waiting": "bekliyor",
+    "category_native_ffi": "Yerel kod ve FFI",
+    "category_ai_llm": "Yapay zekâ ve büyük dil modelleri",
+    "category_server": "Sunucu tarafı Dart",
+    "category_flutter_ui": "Flutter arayüzü",
+    "category_dev_tool": "Geliştirici araçları",
+    "show_all": "Tümünü göster ({count})",
+    "show_less": "Daha az göster",
+    "subtitle_no_perfect": "pub.dev üzerinde {count} paket yayımlandı. Her birinde ölçülmüş sonuçlar, çalıştırılabilir örnekler ve izlenen yol haritası bulunur."
   },
   "writing_section": {
     "title": "Yazılar",
     "subtitle": "Yazdığım her yerden en yeni yazılar, en yeniden en eskiye.",
     "all_writing": "Tüm yazılar",
-    "open_article": "Yazıyı oku"
+    "open_article": "Yazıyı oku",
+    "show_all": "Tümünü göster ({count})",
+    "show_less": "Daha az göster"
   },
   "footer": {
     "command_hint_prefix": "Basın",
