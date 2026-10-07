@@ -6,7 +6,7 @@ Accepted.
 
 ## Context
 
-The [release command](../../tool/build_portfolio.mjs) builds with `--wasm --no-web-resources-cdn`. The [bundle verifier](../../tool/verify_web_build.mjs) checks Wasm, JavaScript, and renderer assets. [Host policy](../../web/_headers) sends Cross-Origin-Opener-Policy `same-origin` and Cross-Origin-Embedder-Policy `credentialless`; [deployment guidance](../DEPLOY.md) explains the same requirements for other hosts.
+The [release command](../../tool/release/build_portfolio.mjs) builds with `--wasm --no-web-resources-cdn`. The [bundle verifier](../../tool/release/verify_web_build.mjs) checks Wasm, JavaScript, and renderer assets. [Host policy](../../web/_headers) sends Cross-Origin-Opener-Policy `same-origin` and Cross-Origin-Embedder-Policy `credentialless`; [deployment guidance](../DEPLOY.md) explains the same requirements for other hosts.
 
 ## Decision
 

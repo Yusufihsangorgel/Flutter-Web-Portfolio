@@ -39,7 +39,7 @@ jobs:
         with:
           flutter-version: 3.47.5
           cache: true
-      - run: node tool/verify_toolchain.mjs --current
+      - run: node tool/quality/verify_toolchain.mjs --current
       - run: flutter clean
       - run: flutter pub get
       - run: npm ci
@@ -51,7 +51,7 @@ jobs:
           CONFIGURED_BASE_HREF: ${{ vars.PORTFOLIO_BASE_HREF }}
         run: |
           cname="$(gh api "repos/${GITHUB_REPOSITORY}/pages" --jq '.cname // ""' 2>/dev/null || true)"
-          base_href="$(node tool/resolve_pages_base_href.mjs \
+          base_href="$(node tool/release/resolve_pages_base_href.mjs \
             --repository "${GITHUB_REPOSITORY#*/}" \
             --owner "${GITHUB_REPOSITORY_OWNER}" \
             --cname "${cname}" \

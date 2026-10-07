@@ -1,6 +1,5 @@
 export class UsageError extends Error {}
 
-
 export function parseArgs(argv) {
   const options = { check: false, counters: false, report: null, file: null };
   for (let index = 0; index < argv.length; index += 1) {

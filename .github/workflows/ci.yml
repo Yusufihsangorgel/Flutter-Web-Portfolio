@@ -31,7 +31,7 @@ jobs:
         with:
           flutter-version: 3.47.5
           cache: true
-      - run: node tool/verify_toolchain.mjs --current
+      - run: node tool/quality/verify_toolchain.mjs --current
       - run: flutter pub get
       - run: npm ci
       - run: npm run verify:content
@@ -43,14 +43,15 @@ jobs:
       - run: npm run test:hosting-security
       - run: npm run test:refresh
       - run: npm run test:content
+      - run: npm run test:resume
       - run: npm run test:strings
       - run: npm run verify:strings
       - run: npm run verify:fonts
       - run: npm run test:fonts
       # An initialized template clone removes the demo owner's renderer.
-      - if: hashFiles('tool/render_work_artifacts.mjs') != ''
+      - if: hashFiles('tool/work_artifacts/render_work_artifacts.mjs') != ''
         run: npm run test:work-artifacts
-      - if: hashFiles('tool/render_work_artifacts.mjs') != ''
+      - if: hashFiles('tool/work_artifacts/render_work_artifacts.mjs') != ''
         run: npm run verify:work-artifacts
       - run: npm run verify:hosting
       - run: npm run verify:community
@@ -58,16 +59,20 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
       - run: npm run audit:history
+      - run: npm run test:audit
+      - run: npm run test:tooling
       - run: npm run typecheck
+      - run: npm run lint
+      - run: npm run format:check
       - run: dart format --output=none --set-exit-if-changed lib test tool
-      - run: bash -n tool/hosted_build.sh
+      - run: bash -n tool/release/hosted_build.sh
       - name: Check tool syntax
         run: |
           find tool -type f -name '*.mjs' -print0 |
             while IFS= read -r -d '' file; do
               node --check "$file" || exit 1
             done
-      - run: node tool/test_coverage_gate.mjs
+      - run: node tool/quality/test_coverage_gate.mjs
       - run: flutter analyze --fatal-infos
       - run: npm run verify:source
 
@@ -84,10 +89,10 @@ jobs:
         with:
           flutter-version: 3.47.5
           cache: true
-      - run: node tool/verify_toolchain.mjs --current
+      - run: node tool/quality/verify_toolchain.mjs --current
       - run: flutter pub get
       - run: flutter test --coverage
-      - run: node tool/coverage_gate.mjs
+      - run: node tool/quality/coverage_gate.mjs
       - run: flutter pub get
         working-directory: packages/adaptive_render_budget
       - run: flutter test
@@ -107,7 +112,7 @@ jobs:
         with:
           flutter-version: 3.47.5
           cache: true
-      - run: node tool/verify_toolchain.mjs --current
+      - run: node tool/quality/verify_toolchain.mjs --current
       - run: flutter clean
       - run: flutter pub get
       - run: npm ci
@@ -115,6 +120,9 @@ jobs:
       - run: npm run verify:content
       - run: npm run prepare:source
       - run: flutter build web --release --wasm --no-web-resources-cdn
+      - run: npm run resume:build
+      - name: Verify resume determinism, text and page count
+        run: node tool/resume/check_browser_pdf.mjs
       - run: npm run prepare:bundle
       - run: npm run verify:bundle
       # The image build runs this check in the exact git tree, not in this workspace.

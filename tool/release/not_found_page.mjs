@@ -1,4 +1,4 @@
-import { normalizeBaseHref } from '../cli_safety.mjs';
+import { normalizeBaseHref } from '../shared/cli_safety.mjs';
 
 const baseElement = /<base href="([^"]*)">/;
 const sourceBase = '<base href="/">';

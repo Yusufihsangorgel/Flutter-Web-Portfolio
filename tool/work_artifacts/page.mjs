@@ -1,7 +1,11 @@
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 
+/** @typedef {{width: number, height: number}} Frame */
+
+/** @type {Readonly<Frame>} */
 export const boardFrame = Object.freeze({ width: 1600, height: 1000 });
+/** @type {Readonly<Frame>} */
 export const compactFrame = Object.freeze({ width: 900, height: 1200 });
 
 const imageTypes = new Map([
@@ -10,6 +14,7 @@ const imageTypes = new Map([
   ['.jpeg', 'image/jpeg'],
 ]);
 
+/** @param {Frame} frame */
 export function documentShell(body, styles, frame = boardFrame) {
   return `<!doctype html>
   <html lang="en">
@@ -59,15 +64,14 @@ export function pngDataUrl(bytes) {
 }
 
 // Returns lossless PNG bytes so encoding happens once, from unblemished pixels.
+/** @param {Frame} frame */
 export async function capturePage(page, html, frame) {
   await page.setViewportSize(frame);
   await page.setContent(html, { waitUntil: 'load' });
   await page.evaluate(async () => {
     await document.fonts.ready;
     await Promise.all(
-      Array.from(document.images, (image) =>
-        image.complete ? Promise.resolve() : image.decode(),
-      ),
+      Array.from(document.images, (image) => (image.complete ? Promise.resolve() : image.decode())),
     );
   });
   return page.screenshot({ type: 'png', animations: 'disabled' });

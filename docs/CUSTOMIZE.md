@@ -21,7 +21,7 @@ flutter pub get
 npm run portfolio:init
 npm run portfolio:validate
 npm run build:release
-node tool/serve_web.mjs
+node tool/runtime/serve_web.mjs
 ```
 
 Open `http://127.0.0.1:4173` to inspect the release you would actually deploy.
@@ -86,7 +86,7 @@ data. Edit the canonical document and your own evidence directly:
 3. Keep each image's declared width and height equal to its real pixel size.
 4. Run `npm run sync:content` and `npm run portfolio:validate`.
 5. Run `npm run build:release`, then preview with
-   `node tool/serve_web.mjs`.
+   `node tool/runtime/serve_web.mjs`.
 
 If a release command fails, fix the reported source mismatch instead of editing
 generated HTML, metadata, README records, or hosting files by hand; the next
@@ -256,9 +256,9 @@ application exists.
 | Flutter page | `lib/app/core/constants/app_colors.dart` | paper, text hierarchy, signal colors, and scene gradient |
 | HTML first frame | `web/index.html` | theme meta tags and the complete `#bootstrap-surface` palette |
 | Startup failure screen | `lib/main.dart` | fallback background and action color |
-| Installed web-app chrome | `tool/sync_public_content.mjs` in `syncManifest` | manifest background and theme colors; `web/manifest.json` is generated |
-| Social sharing card | `tool/social_card.html` | background, text, accent, and signal colors |
-| Repository badges | the badge renderers in `tool/sync_public_content.mjs` | optional repository branding; these do not affect the site |
+| Installed web-app chrome | `tool/content/sync_public_content.mjs` in `syncManifest` | manifest background and theme colors; `web/manifest.json` is generated |
+| Social sharing card | `tool/assets/social_card.html` | background, text, accent, and signal colors |
+| Repository badges | the badge renderers in `tool/content/sync_public_content.mjs` | optional repository branding; these do not affect the site |
 | Individual case studies | each `systems[*].presentation` record in `assets/content/portfolio.json` | project-specific background, foreground, and accent; keep real product branding independent of the site theme |
 
 Several section borders and the project atlas use alpha variants of the default

@@ -47,17 +47,13 @@ async function encodeInBrowser(page, png, requests) {
   const results = await page.evaluate(
     async ({ source, jobs, types }) => {
       const binary = Uint8Array.from(atob(source), (char) => char.charCodeAt(0));
-      const bitmap = await createImageBitmap(
-        new Blob([binary], { type: 'image/png' }),
-      );
+      const bitmap = await createImageBitmap(new Blob([binary], { type: 'image/png' }));
       const canvas = document.createElement('canvas');
       canvas.width = bitmap.width;
       canvas.height = bitmap.height;
       // An opaque software canvas keeps readback reliable and yields the
       // simple (alpha-free) WebP layout.
-      canvas
-        .getContext('2d', { alpha: false, willReadFrequently: true })
-        .drawImage(bitmap, 0, 0);
+      canvas.getContext('2d', { alpha: false, willReadFrequently: true }).drawImage(bitmap, 0, 0);
       const output = [];
       for (const job of jobs) {
         const blob = await new Promise((resolve) =>
@@ -77,8 +73,5 @@ async function encodeInBrowser(page, png, requests) {
     },
     { source: png.toString('base64'), jobs: requests, types: canvasTypes },
   );
-  return results.map(([format, base64]) => [
-    format,
-    Buffer.from(base64, 'base64'),
-  ]);
+  return results.map(([format, base64]) => [format, Buffer.from(base64, 'base64')]);
 }

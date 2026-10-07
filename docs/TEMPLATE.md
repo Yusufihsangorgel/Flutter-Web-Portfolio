@@ -11,7 +11,7 @@ repository's history. Fork only to contribute changes back. GitHub explains the
 difference in [Create a repository from a template](https://docs.github.com/en/repositories/creating-and-managing-repositories/creating-a-repository-from-a-template).
 
 The pinned toolchain is Node.js 24.18.0 and Flutter 3.47.5 with Dart 3.13.4.
-`.nvmrc` holds the Node.js version, `tool/toolchain.json` holds the Flutter
+`.nvmrc` holds the Node.js version, `tool/quality/toolchain.json` holds the Flutter
 revision, and `npm run verify:toolchain` reports a mismatch. Install the tools,
 then run:
 
@@ -24,7 +24,7 @@ flutter pub get
 npm run portfolio:init
 npm run portfolio:validate
 npm run build:release
-node tool/serve_web.mjs
+node tool/runtime/serve_web.mjs
 ```
 
 Open `http://127.0.0.1:4173` to preview the release output. Stop the local
@@ -48,7 +48,7 @@ and server policy. If a step fails, it restores every file it changed.
    canonical document.
 5. Run `npm run sync:content` and `npm run portfolio:validate` after content
    changes.
-6. Run `npm run build:release`, then preview with `node tool/serve_web.mjs`.
+6. Run `npm run build:release`, then preview with `node tool/runtime/serve_web.mjs`.
 
 The parser checks the content schema, links, identifiers, locale overlays, and
 work evidence before the app starts. See [Customize the content](CUSTOMIZE.md)

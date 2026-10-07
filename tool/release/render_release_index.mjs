@@ -6,14 +6,20 @@ export function renderReleaseIndex(index, shell, staticDocument) {
   }
   const shellBlock = `    <!-- bootstrap-content:start -->\n${shell}\n    <!-- bootstrap-content:end -->`;
   const documentBlock = `<!-- static-document:start -->\n${staticDocument}\n  <!-- static-document:end -->`;
-  return index.replace(shellMarker, `\n${shellBlock}`)
-    .replace(documentMarker, documentBlock);
+  return index.replace(shellMarker, `\n${shellBlock}`).replace(documentMarker, documentBlock);
 }
 
 export function renderLocaleData(locales) {
-  const json = JSON.stringify(locales).replace(/[<>&\u2028\u2029]/g, (character) => ({
-    '<': '\\u003c', '>': '\\u003e', '&': '\\u0026',
-    '\u2028': '\\u2028', '\u2029': '\\u2029',
-  })[character]);
+  const json = JSON.stringify(locales).replace(
+    /[<>&\u2028\u2029]/g,
+    (character) =>
+      ({
+        '<': '\\u003c',
+        '>': '\\u003e',
+        '&': '\\u0026',
+        '\u2028': '\\u2028',
+        '\u2029': '\\u2029',
+      })[character],
+  );
   return `window.__portfolioBootstrapLocales = ${json};\n`;
 }
