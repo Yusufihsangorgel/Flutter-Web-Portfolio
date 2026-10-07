@@ -61,31 +61,34 @@ void _registerWritingCurationTests() {
       tester,
     ) async {
       final handle = tester.ensureSemantics();
-      addTearDown(handle.dispose);
-      await _pumpWriting(tester, _portfolioWithWriting());
+      try {
+        await _pumpWriting(tester, _portfolioWithWriting());
 
-      expect(find.text('Article number 0'), findsOneWidget);
-      expect(find.text('Article number 1'), findsOneWidget);
-      expect(find.text('Article number 2'), findsNothing);
-      expect(_disclosure(expanded: false), findsOneWidget);
-      expect(find.text('Show all 7'), findsOneWidget);
-      _expectDisclosureState(tester, 'Show all 7', false);
-      expect(find.textContaining('2026—08—07'), findsOneWidget);
-      expect(find.byType(PortfolioLink), findsNWidgets(4));
-      expect(_articleLink('Article number 0', 'Blog'), findsOneWidget);
+        expect(find.text('Article number 0'), findsOneWidget);
+        expect(find.text('Article number 1'), findsOneWidget);
+        expect(find.text('Article number 2'), findsNothing);
+        expect(_disclosure(expanded: false), findsOneWidget);
+        expect(find.text('Show all 7'), findsOneWidget);
+        _expectDisclosureState(tester, 'Show all 7', false);
+        expect(find.textContaining('2026—08—07'), findsOneWidget);
+        expect(find.byType(PortfolioLink), findsNWidgets(4));
+        expect(_articleLink('Article number 0', 'Blog'), findsOneWidget);
 
-      for (var index = 0; index < 3; index++) {
-        await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+        for (var index = 0; index < 3; index++) {
+          await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+        }
+        await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+        await tester.pump();
+
+        expect(find.text('Article number 6'), findsOneWidget);
+        expect(_disclosure(expanded: true), findsOneWidget);
+        expect(find.text('Show fewer'), findsOneWidget);
+        _expectDisclosureState(tester, 'Show fewer', true);
+        expect(find.byType(PortfolioLink), findsNWidgets(9));
+        expect(tester.takeException(), isNull);
+      } finally {
+        handle.dispose();
       }
-      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
-      await tester.pump();
-
-      expect(find.text('Article number 6'), findsOneWidget);
-      expect(_disclosure(expanded: true), findsOneWidget);
-      expect(find.text('Show fewer'), findsOneWidget);
-      _expectDisclosureState(tester, 'Show fewer', true);
-      expect(find.byType(PortfolioLink), findsNWidgets(9));
-      expect(tester.takeException(), isNull);
     });
   });
 }

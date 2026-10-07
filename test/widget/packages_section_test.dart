@@ -112,25 +112,28 @@ void _registerPackageCurationTests() {
       'shows featured first and reveals the remainder from keyboard',
       (tester) async {
         final handle = tester.ensureSemantics();
-        addTearDown(handle.dispose);
-        await _pumpSection(tester, _language);
+        try {
+          await _pumpSection(tester, _language);
 
-        expect(find.text('example_task_queue'), findsOneWidget);
-        expect(find.text('example_ui_kit'), findsNothing);
-        expect(_disclosure(expanded: false), findsOneWidget);
-        expect(find.text('Show all 2'), findsOneWidget);
-        _expectDisclosureState(tester, 'Show all 2', false);
+          expect(find.text('example_task_queue'), findsOneWidget);
+          expect(find.text('example_ui_kit'), findsNothing);
+          expect(_disclosure(expanded: false), findsOneWidget);
+          expect(find.text('Show all 2'), findsOneWidget);
+          _expectDisclosureState(tester, 'Show all 2', false);
 
-        await tester.sendKeyEvent(LogicalKeyboardKey.tab);
-        await tester.sendKeyEvent(LogicalKeyboardKey.tab);
-        await tester.sendKeyEvent(LogicalKeyboardKey.enter);
-        await tester.pump();
+          await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+          await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+          await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+          await tester.pump();
 
-        expect(find.text('example_ui_kit'), findsOneWidget);
-        expect(_disclosure(expanded: true), findsOneWidget);
-        expect(find.text('Show fewer'), findsOneWidget);
-        _expectDisclosureState(tester, 'Show fewer', true);
-        expect(find.byType(PortfolioLink), findsNWidgets(2));
+          expect(find.text('example_ui_kit'), findsOneWidget);
+          expect(_disclosure(expanded: true), findsOneWidget);
+          expect(find.text('Show fewer'), findsOneWidget);
+          _expectDisclosureState(tester, 'Show fewer', true);
+          expect(find.byType(PortfolioLink), findsNWidgets(2));
+        } finally {
+          handle.dispose();
+        }
       },
     );
 
@@ -180,37 +183,42 @@ void _registerPackageSemanticsTests() {
       tester,
     ) async {
       final handle = tester.ensureSemantics();
-      addTearDown(handle.dispose);
-      await _pumpSection(
-        tester,
-        _language,
-        mutate: (json) {
-          final entry =
-              (json['packages']! as List<dynamic>).first
-                  as Map<String, dynamic>;
-          entry['proof'] = 'Measured package result';
-          entry['roadmap'] = [
-            {'title': 'Runnable example', 'status': 'done'},
-          ];
-        },
-      );
-      final node = tester
-          .getSemantics(
-            find.bySemanticsLabel(RegExp(r'Open package: example_task_queue')),
-          )
-          .getSemanticsData();
-      expect(node.flagsCollection.isLink, isTrue);
-      expect(node.linkUrl, loadPortfolioFixture().packages.first.url);
-      for (final text in [
-        loadPortfolioFixture().packages.first.description,
-        '0.1.0',
-        '160/160 pub points',
-        'Measured package result',
-        'Roadmap',
-        'Runnable example',
-        'shipped',
-      ]) {
-        expect(node.label, contains(text));
+      try {
+        await _pumpSection(
+          tester,
+          _language,
+          mutate: (json) {
+            final entry =
+                (json['packages']! as List<dynamic>).first
+                    as Map<String, dynamic>;
+            entry['proof'] = 'Measured package result';
+            entry['roadmap'] = [
+              {'title': 'Runnable example', 'status': 'done'},
+            ];
+          },
+        );
+        final node = tester
+            .getSemantics(
+              find.bySemanticsLabel(
+                RegExp(r'Open package: example_task_queue'),
+              ),
+            )
+            .getSemanticsData();
+        expect(node.flagsCollection.isLink, isTrue);
+        expect(node.linkUrl, loadPortfolioFixture().packages.first.url);
+        for (final text in [
+          loadPortfolioFixture().packages.first.description,
+          '0.1.0',
+          '160/160 pub points',
+          'Measured package result',
+          'Roadmap',
+          'Runnable example',
+          'shipped',
+        ]) {
+          expect(node.label, contains(text));
+        }
+      } finally {
+        handle.dispose();
       }
     });
   });
