@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_web_portfolio/app/controllers/scroll_controller.dart';
 import 'package:flutter_web_portfolio/app/utils/web_url_strategy.dart'
@@ -56,6 +57,8 @@ class _PortfolioLinkState extends State<PortfolioLink> {
   }
 
   void _scrollToChapter() {
+    // A modified click opens a new tab; the current page stays put.
+    if (_isModifiedActivation) return;
     final onActivate = widget.onActivate;
     if (onActivate != null) return onActivate();
     context.read<AppScrollController>().scrollToSection(_chapter!);
@@ -66,6 +69,15 @@ class _PortfolioLinkState extends State<PortfolioLink> {
     return scheme == 'http' || scheme == 'https'
         ? LinkTarget.blank
         : LinkTarget.self;
+  }
+
+  /// A held browser modifier means the link opens elsewhere.
+  bool get _isModifiedActivation {
+    final keys = HardwareKeyboard.instance;
+    return keys.isControlPressed ||
+        keys.isMetaPressed ||
+        keys.isShiftPressed ||
+        keys.isAltPressed;
   }
 
   Widget _action(VoidCallback onTap) => AccessibleAction(
