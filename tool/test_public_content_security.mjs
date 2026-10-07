@@ -44,18 +44,35 @@ const content = {
   systems: [],
 };
 
-const csp = renderContentSecurityPolicy(content);
-const script = csp.match(/script-src ([^;]+);/)?.[1];
-assert.equal(script, `'self' 'wasm-unsafe-eval' ${analyticsOrigin}`);
-assert.ok(!script?.includes("'unsafe-inline'"));
-assert.ok(!script?.includes("'unsafe-eval'"));
-assert.ok(csp.includes("img-src 'self' data: blob:;"));
-assert.ok(csp.includes(`connect-src 'self' ${analyticsOrigin};`));
-assert.ok(csp.includes('upgrade-insecure-requests;'));
+// Directive name -> exact source list, so assertions compare whole tokens.
+function cspDirectives(policy) {
+  return new Map(policy.split(';').map((part) => part.trim()).filter(Boolean).map((part) => {
+    const [name, ...sources] = part.split(/\s+/);
+    return [name, sources];
+  }));
+}
+
+function cspHosts(policy) {
+  return [...cspDirectives(policy).values()].flat()
+    .filter((source) => /^https?:\/\//.test(source))
+    .map((source) => new URL(source).host);
+}
+
+const directives = cspDirectives(renderContentSecurityPolicy(content));
+assert.deepEqual(directives.get('script-src'), ["'self'", "'wasm-unsafe-eval'", analyticsOrigin]);
+assert.deepEqual(directives.get('img-src'), ["'self'", 'data:', 'blob:']);
+assert.deepEqual(directives.get('connect-src'), ["'self'", analyticsOrigin]);
+assert.deepEqual(directives.get('upgrade-insecure-requests'), []);
 const noAnalytics = { ...content, site: { ...content.site, analytics: null } };
-assert.ok(!renderContentSecurityPolicy(noAnalytics).includes(analyticsOrigin));
+const noAnalyticsPolicy = renderContentSecurityPolicy(noAnalytics);
+assert.deepEqual(cspDirectives(noAnalyticsPolicy).get('script-src'), ["'self'", "'wasm-unsafe-eval'"]);
+assert.deepEqual(cspDirectives(noAnalyticsPolicy).get('connect-src'), ["'self'"]);
+assert.ok(!cspHosts(noAnalyticsPolicy).includes(new URL(analyticsOrigin).host));
 const remoteImage = { ...content, site: { ...content.site, social_image: 'https://images.example.invalid/card.png' } };
-assert.ok(renderContentSecurityPolicy(remoteImage).includes("img-src 'self' data: blob: https://images.example.invalid;"));
+assert.deepEqual(
+  cspDirectives(renderContentSecurityPolicy(remoteImage)).get('img-src'),
+  ["'self'", 'data:', 'blob:', 'https://images.example.invalid'],
+);
 assert.ok(!renderHeadMeta(content).includes('name="keywords"'));
 
 const graph = JSON.parse(renderStructuredData(content).match(/<script type="application\/ld\+json">\s*([\s\S]*?)\s*<\/script>/)?.[1]);

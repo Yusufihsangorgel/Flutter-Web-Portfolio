@@ -81,11 +81,13 @@ test('inserts the document and shell at source markers without duplicate ids', (
 });
 
 test('emits parseable locale data without an HTML script boundary', () => {
-  const script = renderLocaleData({ en: { title: '</script><script>alert(1)</script>' } });
+  const title = '</script><SCRIPT>alert(1)</Script ><!-- & -->';
+  const script = renderLocaleData({ en: { title } });
   assert(script.endsWith('\n'));
-  assert.doesNotMatch(script, /<script>/);
+  // No markup character survives, so no tag in any letter case can end the script element.
+  for (const character of ['<', '>', '&']) assert(!script.includes(character), `${character} leaked`);
   const json = script.match(/^window\.__portfolioBootstrapLocales = ([\s\S]*);\n$/)?.[1];
-  assert.equal(JSON.parse(json).en.title, '</script><script>alert(1)</script>');
+  assert.equal(JSON.parse(json).en.title, title);
 });
 
 const nginx = 'server {\n  location / { try_files $uri $uri/ =404; }\n  error_page 404 /404.html;\n}\n';
@@ -128,6 +130,7 @@ const static404Cases = [
   ['rejects error_page 404 = to the index', { 'nginx/default.conf': nginx.replace('  error_page', '  error_page 404 = /index.html;\n  error_page') }, {}, nginxFailure],
   ['allows a narrow rewrite in another location', { 'nginx/default.conf': nginx.replace('  error_page', '  location /old { rewrite ^ /index.html; }\n  error_page') }, {}, null],
   ['allows a narrow error_page in another location', { 'nginx/default.conf': nginx.replace('  error_page', '  location /old { error_page 404 /index.html; }\n  error_page') }, {}, null],
+  ['allows a narrow rewrite in a quoted regex location', { 'nginx/default.conf': nginx.replace('  error_page', '  location ~ "^/old{1,2}$" { rewrite ^ /index.html; }\n  error_page') }, {}, null],
   ['ignores commented directives', { 'nginx/default.conf': nginx.replace('  error_page', '  # rewrite ^ /index.html;\n  error_page') }, {}, null],
   ['rejects an index fallback in _redirects', { 'web/_redirects': '/*  /index.html  200\n' }, {}, '_redirects contains an index fallback'],
   ['requires the Nginx copy in the Dockerfile', { Dockerfile: 'COPY build/web /usr/share/nginx/html\n' }, {}, 'Dockerfile does not package'],
@@ -169,5 +172,20 @@ test('the 404 home link resolves to the site root at a domain root and on a proj
     assert.ok(declared && link, '404.html must keep its base and home link');
     const missing = new URL(`${base}deep/missing/path`, 'https://example.com');
     assert.equal(new URL(link, new URL(declared, missing)).href, `https://example.com${base}`);
+  }
+});
+
+test('checks an adversarial Nginx location in linear time', async () => {
+  const root = await mkdtemp(path.join(os.tmpdir(), 'static-404-redos-'));
+  try {
+    const adversarial = nginx.replace('  error_page', `  location ${'""'.repeat(50_000)}\n  error_page`);
+    await writeTree(path.join(root, 'source'), { ...validSource, 'nginx/default.conf': adversarial });
+    await writeTree(path.join(root, 'release'), validRelease);
+    const started = performance.now();
+    const issues = await verifyStatic404Release({ sourceRoot: path.join(root, 'source'), webRoot: path.join(root, 'release') });
+    assert(performance.now() - started < 1000, 'the Nginx check must not backtrack');
+    assert.deepEqual(issues, []);
+  } finally {
+    await rm(root, { recursive: true, force: true });
   }
 });

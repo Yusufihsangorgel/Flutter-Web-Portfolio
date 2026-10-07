@@ -54,7 +54,8 @@ async function expectedReleaseFile(relative, source, webRoot) {
 function nginxIssues(source) {
   const nginx = source.replace(/#.*$/gm, '');
   const rootLocation = nginx.match(/\blocation\s+\/\s*\{([^}]*)\}/)?.[1] ?? '';
-  const serverScope = nginx.replace(/\blocation\s+(?:"[^"]*"|[^{}])*\{[^}]*\}/g, '');
+  // Quoted and unquoted runs cannot overlap, so the match stays linear.
+  const serverScope = nginx.replace(/\blocation(?=\s)[^{};"]*(?:"[^"]*"[^{};"]*)*\{[^}]*\}/g, '');
   const unknownPathScope = `${rootLocation}\n${serverScope}`;
   const returns404 = /\btry_files\s+\$uri\s+\$uri\/\s+=404\s*;/.test(rootLocation) &&
     /\berror_page\s+404\s+\/404\.html\s*;/.test(unknownPathScope);
