@@ -206,6 +206,73 @@ void main() {
       semantics.dispose();
     });
 
+    testWidgets('a modified tap leaves the current chapter alone', (
+      tester,
+    ) async {
+      await tester.binding.setSurfaceSize(const Size(1200, 800));
+      final semantics = tester.ensureSemantics();
+      final controller = AppScrollController(narrative: loadNarrativeFixture())
+        ..setReduceMotion(true);
+      addTearDown(() async {
+        await tester.pumpWidget(const SizedBox.shrink());
+        await controller.close();
+        await tester.binding.setSurfaceSize(null);
+      });
+
+      await tester.pumpWidget(
+        BlocProvider.value(
+          value: controller,
+          child: MaterialApp(
+            home: CustomScrollView(
+              controller: controller.scrollController,
+              slivers: [
+                SliverToBoxAdapter(
+                  child: Column(
+                    children: [
+                      for (final chapter in controller.narrative.chapters)
+                        SizedBox(
+                          key: controller.keyFor(chapter.id),
+                          height: 900,
+                          child: chapter.id.isHome
+                              ? PortfolioLink(
+                                  uri: Uri.parse('#/packages'),
+                                  semanticLabel: 'Packages',
+                                  child: const Text('Packages'),
+                                )
+                              : null,
+                        ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+      controller.refreshSectionGeometry();
+
+      // A modifier tap lets the browser open a new tab; the current page
+      // must not navigate away from its chapter.
+      for (final modifier in [
+        LogicalKeyboardKey.controlLeft,
+        LogicalKeyboardKey.metaLeft,
+        LogicalKeyboardKey.shiftLeft,
+        LogicalKeyboardKey.altLeft,
+      ]) {
+        await tester.sendKeyDownEvent(modifier);
+        await tester.tap(find.text('Packages'));
+        await tester.pump();
+        await tester.sendKeyUpEvent(modifier);
+        expect(
+          controller.activeSection,
+          'home',
+          reason: 'held modifier: ${modifier.keyLabel}',
+        );
+        expect(controller.scrollController.offset, 0.0);
+      }
+      semantics.dispose();
+    });
+
     testWidgets('Enter activates the link', (tester) async {
       var activated = false;
       await tester.pumpWidget(

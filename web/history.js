@@ -5,6 +5,28 @@ if (!history.state || history.state.flutter !== true) {
   history.replaceState({ flutter: true }, 'flutter', location.href);
 }
 
+// Modified in-page clicks open a new tab; hide them from engine tap handling.
+const inPageAnchorSelector = 'flt-semantics-host a[href^="#/"]';
+function modifiedInPageGesture(event) {
+  if (!event.ctrlKey && !event.metaKey && !event.shiftKey && !event.altKey) {
+    return false;
+  }
+  const target = event.target;
+  if (!(target instanceof Element)) return false;
+  return target.closest(inPageAnchorSelector) !== null;
+}
+for (const type of ['pointerdown', 'click']) {
+  window.addEventListener(
+    type,
+    (event) => {
+      if (modifiedInPageGesture(event)) {
+        event.stopPropagation();
+      }
+    },
+    true,
+  );
+}
+
 let restoringHistoryAfterModal = false;
 window.addEventListener('popstate', (event) => {
   if (restoringHistoryAfterModal) {
