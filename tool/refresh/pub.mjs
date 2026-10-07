@@ -5,35 +5,54 @@ export function confirmsScore(metricsResponse, grantedPoints) {
   const scorecard = metricsResponse?.scorecard;
   const panaReport = scorecard?.panaReport;
   const sections = panaReport?.report?.sections;
-  return panaReport?.reportStatus === 'success' &&
+  return (
+    panaReport?.reportStatus === 'success' &&
     SETTLED_TASK_STATUSES.has(scorecard?.taskStatus) &&
-    Array.isArray(sections) && sections.length > 0 &&
-    sections.every((section) => Number.isFinite(section?.grantedPoints) && section.grantedPoints >= 0) &&
-    sections.reduce((total, section) => total + section.grantedPoints, 0) === grantedPoints;
+    Array.isArray(sections) &&
+    sections.length > 0 &&
+    sections.every(
+      (section) => Number.isFinite(section?.grantedPoints) && section.grantedPoints >= 0,
+    ) &&
+    sections.reduce((total, section) => total + section.grantedPoints, 0) === grantedPoints
+  );
 }
 
-export function extractPackageFacts(packageResponse, scoreResponse, metricsResponse = null, storedPoints = null) {
+export function extractPackageFacts(
+  packageResponse,
+  scoreResponse,
+  metricsResponse = null,
+  storedPoints = null,
+) {
   const latest = packageResponse?.latest;
   if (!latest || typeof latest.version !== 'string' || latest.version.length === 0) {
     throw new Error('pub.dev package response is missing latest.version');
   }
   const grantedPoints = scoreResponse?.grantedPoints;
   const maxPoints = scoreResponse?.maxPoints;
-  const validScore = Number.isFinite(grantedPoints) && grantedPoints >= 0 &&
-    Number.isFinite(maxPoints) && maxPoints > 0;
+  const validScore = isValidScore(grantedPoints, maxPoints);
   const isDrop = Number.isFinite(storedPoints) && grantedPoints < storedPoints;
   const scorePending = !validScore || (isDrop && !confirmsScore(metricsResponse, grantedPoints));
   return {
     version: latest.version,
-    likes: typeof scoreResponse?.likeCount === 'number' ? scoreResponse.likeCount : null,
-    downloads:
-      typeof scoreResponse?.downloadCount30Days === 'number'
-        ? scoreResponse.downloadCount30Days
-        : null,
+    likes: numericCounter(scoreResponse?.likeCount),
+    downloads: numericCounter(scoreResponse?.downloadCount30Days),
     pubPoints: scorePending ? null : grantedPoints,
     maxPoints,
     scorePending,
   };
+}
+
+function isValidScore(grantedPoints, maxPoints) {
+  return (
+    Number.isFinite(grantedPoints) &&
+    grantedPoints >= 0 &&
+    Number.isFinite(maxPoints) &&
+    maxPoints > 0
+  );
+}
+
+function numericCounter(value) {
+  return typeof value === 'number' ? value : null;
 }
 
 export const COUNTER_FIELDS = new Set(['likes', 'downloads']);

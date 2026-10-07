@@ -1,6 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "buildCommand": "bash tool/hosted_build.sh",
+  "buildCommand": "bash tool/release/hosted_build.sh",
   "outputDirectory": "build/web",
   "headers": [
     {

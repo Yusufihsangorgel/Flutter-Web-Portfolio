@@ -20,7 +20,7 @@ jobs:
         with:
           flutter-version: 3.47.5
           cache: true
-      - run: node tool/verify_toolchain.mjs --current
+      - run: node tool/quality/verify_toolchain.mjs --current
       - run: flutter clean
       - run: flutter pub get
       - run: npm ci

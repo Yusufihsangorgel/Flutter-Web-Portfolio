@@ -4,9 +4,7 @@ export function renderReadmeRecord(data) {
   const merged = data.contributions
     .filter((item) => item.status === 'merged')
     .sort((left, right) => right.date.localeCompare(left.date));
-  const review = data.contributions.filter(
-    (item) => item.status === 'under_review',
-  );
+  const review = data.contributions.filter((item) => item.status === 'under_review');
   const sourceLabels = naturalList(data.sources.map((source) => source.label));
   const lines = [
     '## Public engineering record',
@@ -40,8 +38,7 @@ export function renderReadmeRecord(data) {
       '| Project | Responsibility | Evidence |',
       '|---|---|---|',
       ...data.systems.map(
-        (item) =>
-          `| ${table(item.name)} | ${table(item.ownership)} | [Project](${item.url}) |`,
+        (item) => `| ${table(item.name)} | ${table(item.ownership)} | [Project](${item.url}) |`,
       ),
     );
   }
@@ -52,8 +49,7 @@ export function renderReadmeRecord(data) {
       '### Work under review',
       '',
       ...review.map(
-        (item) =>
-          `- **${item.project}:** [${item.title}](${item.url}) — ${item.change}`,
+        (item) => `- **${item.project}:** [${item.title}](${item.url}) — ${item.change}`,
       ),
     );
   }
@@ -67,14 +63,8 @@ export function renderDemoLinks(data) {
   }
   return links
     .map((link, index) => {
-      const label = requiredString(
-        link?.label,
-        `site.engineering_links[${index}].label`,
-      );
-      const url = requiredHttpsUrl(
-        link?.url,
-        `site.engineering_links[${index}].url`,
-      );
+      const label = requiredString(link?.label, `site.engineering_links[${index}].label`);
+      const url = requiredHttpsUrl(link?.url, `site.engineering_links[${index}].url`);
       return `<a href="${html(url)}">${html(label)}</a>`;
     })
     .join(' · ');
@@ -149,10 +139,7 @@ export function renderHeadMeta(data) {
   const role = html(data.profile.role);
   const name = html(data.profile.name);
   const accessibleName = html(
-    requiredString(
-      data.profile.display_name?.accessible,
-      'profile.display_name.accessible',
-    ),
+    requiredString(data.profile.display_name?.accessible, 'profile.display_name.accessible'),
   );
   return `  <link rel="canonical" href="${site.url}">
   <title>${title}</title>
@@ -185,38 +172,40 @@ export function renderStructuredData(data) {
   const currentWork = data.experience.find((item) => item.current);
   const education = data.experience.find((item) => item.id === 'software-engineering-education');
   return `  <script type="application/ld+json">
-  ${jsonForHtmlScript(
-    {
-      '@context': 'https://schema.org',
-      '@graph': [
-        {
-          '@type': 'ProfilePage',
-          url: data.site.url,
-          mainEntity: { '@id': personId },
-        },
-        {
-          '@type': 'Person',
-          '@id': personId,
-          name: data.profile.name,
-          jobTitle: data.profile.role,
-          email: data.profile.email,
-          address: data.profile.location,
-          url: data.site.url,
-          sameAs,
-          image: siteAssetUrl(data.site.url, data.site.social_image),
-          ...(currentWork ? { worksFor: { '@type': 'Organization', name: currentWork.company } } : {}),
-          ...(education ? { alumniOf: { '@type': 'EducationalOrganization', name: education.company } } : {}),
-          knowsAbout: [...new Set(data.capabilities.flatMap((capability) => capability.items))],
-        },
-        {
-          '@type': 'WebSite',
-          name: `${data.profile.name} — Portfolio`,
-          description: data.site.social_description,
-          url: data.site.url,
-        },
-      ],
-    },
-  ).replaceAll('\n', '\n  ')}
+  ${jsonForHtmlScript({
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'ProfilePage',
+        url: data.site.url,
+        mainEntity: { '@id': personId },
+      },
+      {
+        '@type': 'Person',
+        '@id': personId,
+        name: data.profile.name,
+        jobTitle: data.profile.role,
+        email: data.profile.email,
+        address: data.profile.location,
+        url: data.site.url,
+        sameAs,
+        image: siteAssetUrl(data.site.url, data.site.social_image),
+        ...(currentWork
+          ? { worksFor: { '@type': 'Organization', name: currentWork.company } }
+          : {}),
+        ...(education
+          ? { alumniOf: { '@type': 'EducationalOrganization', name: education.company } }
+          : {}),
+        knowsAbout: [...new Set(data.capabilities.flatMap((capability) => capability.items))],
+      },
+      {
+        '@type': 'WebSite',
+        name: `${data.profile.name} — Portfolio`,
+        description: data.site.social_description,
+        url: data.site.url,
+      },
+    ],
+  }).replaceAll('\n', '\n  ')}
   </script>`;
 }
 
@@ -230,9 +219,7 @@ export function renderAnalytics(data) {
 }
 
 export function renderConductContact(data) {
-  const name = markdownLabel(
-    requiredString(data.profile.name, 'profile.name'),
-  );
+  const name = markdownLabel(requiredString(data.profile.name, 'profile.name'));
   const email = requiredEmail(data.profile.email, 'profile.email');
   return `Report conduct concerns privately to [${name}](mailto:${email}). Include the relevant context and links. Reports are reviewed discreetly; the maintainer may remove content, close participation, or restrict access when necessary to protect the project and its contributors.`;
 }
@@ -263,7 +250,7 @@ function requiredEmail(value, path) {
   const email = requiredString(value, path);
   if (
     email.length > 254 ||
-    !/^[A-Za-z0-9._%+\-]+@[A-Za-z0-9](?:[A-Za-z0-9\-]{0,61}[A-Za-z0-9])?(?:\.[A-Za-z0-9](?:[A-Za-z0-9\-]{0,61}[A-Za-z0-9])?)+$/.test(
+    !/^[A-Za-z0-9._%+-]+@[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)+$/.test(
       email,
     )
   ) {
@@ -282,10 +269,7 @@ function requiredHttpsUrl(value, path) {
 }
 
 function markdownLabel(value) {
-  return value
-    .replaceAll('\\', '\\\\')
-    .replaceAll('[', '\\[')
-    .replaceAll(']', '\\]');
+  return value.replaceAll('\\', '\\\\').replaceAll('[', '\\[').replaceAll(']', '\\]');
 }
 
 function siteDirectoryUrl(value) {
@@ -304,13 +288,14 @@ function siteAssetUrl(siteUrl, assetPath) {
 function jsonForHtmlScript(value) {
   return JSON.stringify(value, null, 2).replace(
     /[<>&\u2028\u2029]/g,
-    (character) => ({
-      '<': '\\u003c',
-      '>': '\\u003e',
-      '&': '\\u0026',
-      '\u2028': '\\u2028',
-      '\u2029': '\\u2029',
-    })[character],
+    (character) =>
+      ({
+        '<': '\\u003c',
+        '>': '\\u003e',
+        '&': '\\u0026',
+        '\u2028': '\\u2028',
+        '\u2029': '\\u2029',
+      })[character],
   );
 }
 

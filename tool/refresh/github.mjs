@@ -1,4 +1,5 @@
-const GITHUB_PULL_PATTERN = /^https:\/\/github\.com\/([A-Za-z0-9_.-]+)\/([A-Za-z0-9_.-]+)\/pull\/(\d+)\/?$/;
+const GITHUB_PULL_PATTERN =
+  /^https:\/\/github\.com\/([A-Za-z0-9_.-]+)\/([A-Za-z0-9_.-]+)\/pull\/(\d+)\/?$/;
 
 export function parseGithubPullUrl(url) {
   const match = typeof url === 'string' ? GITHUB_PULL_PATTERN.exec(url) : null;

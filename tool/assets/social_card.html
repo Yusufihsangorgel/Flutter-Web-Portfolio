@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=1200, initial-scale=1">
+    <title>Portfolio social card</title>
+    <style>
+      @font-face {
+        font-family: "Portfolio Sans";
+        src: url("../../assets/fonts/space_grotesk/SpaceGrotesk-Variable.ttf") format("truetype");
+        font-weight: 300 700;
+      }
+      * { box-sizing: border-box; }
+      html, body {
+        width: 1200px;
+        height: 630px;
+        margin: 0;
+        overflow: hidden;
+      }
+      body {
+        position: relative;
+        color: #12110f;
+        background:
+          radial-gradient(circle at 82% 18%, rgba(30, 81, 255, 0.16), transparent 34%),
+          #f2eee5;
+        font-family: "Portfolio Sans", Inter, sans-serif;
+      }
+      body::before {
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 22px;
+        height: 100%;
+        content: "";
+        background: #e6ff57;
+      }
+      .card {
+        position: absolute;
+        inset: 0;
+        padding: 58px 70px 54px;
+        overflow: hidden;
+      }
+      .rail {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding-bottom: 14px;
+        border-bottom: 1px solid rgba(18, 17, 15, 0.2);
+        color: #403c36;
+        font: 600 16px/1 "Portfolio Sans", Inter, sans-serif;
+      }
+      .rail span:first-child { margin-right: auto; }
+      .rail span {
+        max-width: 72%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .title {
+        position: absolute;
+        top: 173px;
+        left: 70px;
+        z-index: 2;
+        display: flex;
+        width: min(1060px, calc(100% - 140px));
+        flex-wrap: wrap;
+        gap: 0.1em;
+        align-items: baseline;
+        margin: 0;
+        font-size: 108px;
+        font-weight: 680;
+        line-height: 0.76;
+        letter-spacing: -0.06em;
+      }
+      .title-primary { display: block; white-space: nowrap; }
+      .title-accent {
+        padding: 0.16em 0.1em 0.08em;
+        color: #fffcf4;
+        background: #1e51ff;
+        box-shadow: 0 -0.16em 0 #1e51ff;
+        font-family: "Portfolio Sans", Inter, sans-serif;
+        font-size: 1em;
+        font-style: normal;
+        font-weight: 680;
+        letter-spacing: -0.06em;
+        text-transform: uppercase;
+      }
+      .footer {
+        position: absolute;
+        right: 70px;
+        bottom: 54px;
+        left: 70px;
+        z-index: 2;
+        display: flex;
+        align-items: end;
+        justify-content: space-between;
+      }
+      .subtitle {
+        max-width: 610px;
+        margin: 0;
+        color: #403c36;
+        font-size: 19px;
+        line-height: 1.42;
+      }
+      .domain {
+        color: #1e51ff;
+        font: 650 10px/1 ui-monospace, SFMono-Regular, Menlo, monospace;
+        letter-spacing: 0.12em;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="card">
+      <header class="rail">
+        <span data-role></span><span data-focus></span>
+      </header>
+      <h1 class="title"><span class="title-primary" data-name-primary></span><span class="title-accent" data-name-accent></span></h1>
+      <footer class="footer">
+        <p class="subtitle" data-headline></p>
+        <div class="domain" data-domain></div>
+      </footer>
+    </main>
+  </body>
+</html>

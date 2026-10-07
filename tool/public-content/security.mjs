@@ -36,7 +36,11 @@ export function renderSecurityTxt(data, generatedAt = new Date()) {
 export const securityTxtRenewDays = 30;
 export const securityTxtCheckDays = 7;
 
-export function securityTxtNeedsUpdate(current, expected, { now = Date.now(), checkOnly = false } = {}) {
+export function securityTxtNeedsUpdate(
+  current,
+  expected,
+  { now = Date.now(), checkOnly = false } = {},
+) {
   const withoutExpiry = (text) => text.replace(/^Expires: .+$/m, '');
   if (withoutExpiry(current) !== withoutExpiry(expected)) return true;
   const expires = Date.parse(current.match(/^Expires: (.+)$/m)?.[1] ?? '');
@@ -46,8 +50,13 @@ export function securityTxtNeedsUpdate(current, expected, { now = Date.now(), ch
 
 function preferredLanguages(data) {
   const locales = data.site.locales;
-  if (!Array.isArray(locales) || locales.length === 0 ||
-    !locales.every((locale) => typeof locale === 'string' && /^[a-z]{2}(?:-[A-Z]{2})?$/.test(locale))) {
+  if (
+    !Array.isArray(locales) ||
+    locales.length === 0 ||
+    !locales.every(
+      (locale) => typeof locale === 'string' && /^[a-z]{2}(?:-[A-Z]{2})?$/.test(locale),
+    )
+  ) {
     throw new Error('site.locales must list the published language tags');
   }
   return locales;
