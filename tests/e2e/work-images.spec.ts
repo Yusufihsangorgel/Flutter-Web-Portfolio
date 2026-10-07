@@ -6,6 +6,10 @@ import {
   portfolio,
 } from "./helpers/portfolio_test_helpers";
 import {
+  readVisibleWorkArtifacts,
+  waitForWorkImagesPainted,
+} from "./helpers/visual_capture";
+import {
   scrollAndSettle,
   scrollToLocator,
   waitForFrames,
@@ -105,6 +109,7 @@ test("loads work images lazily within the first-visit image budget", async ({
   expect(totalBytes(initial)).toBeLessThanOrEqual(firstVisitImageBudget);
 
   await scrollThroughAtlas(page);
+  await waitForWorkImagesPainted(page);
   const visited = await images.settled();
   const fetched = workAssets(visited);
   testInfo.annotations.push({
@@ -127,4 +132,25 @@ test("loads work images lazily within the first-visit image budget", async ({
     fetched.length,
   );
   expect(totalBytes(visited)).toBeLessThanOrEqual(firstVisitImageBudget);
+});
+
+test("paints the first case artifact after a direct jump to Work", async ({
+  page,
+}) => {
+  const firstCase = portfolio.systems.find((system) => system.featured);
+  test.skip(!firstCase, "no featured case is authored");
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/#/projects", { waitUntil: "domcontentloaded" });
+  await page.waitForSelector("flt-semantics-host", {
+    state: "attached",
+    timeout: 20000,
+  });
+  await scrollToLocator(
+    page,
+    page.getByRole("heading", { name: firstCase!.name, exact: true }),
+  );
+  await waitForWorkImagesPainted(page);
+  const artifacts = await readVisibleWorkArtifacts(page);
+  expect(artifacts.visible, "a case artifact is on screen").toBeGreaterThan(0);
+  expect(artifacts.ready).toBe(artifacts.visible);
 });

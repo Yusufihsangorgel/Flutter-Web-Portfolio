@@ -8,6 +8,7 @@ import {
   installVisualMasks,
   settleCompositor,
   waitForStableCanvas,
+  waitForWorkImagesPainted,
 } from './helpers/visual_capture';
 
 const portfolio = JSON.parse(
@@ -295,6 +296,8 @@ async function expectVisualSnapshot(page: Page, name: string) {
       ),
     )
     .toBe(true);
+  await waitForWorkImagesPainted(page);
+  await settleCompositor(page, 2);
   await expect(page).toHaveScreenshot(name, {
     mask: await installVisualMasks(page),
   });
