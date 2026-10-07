@@ -30,6 +30,9 @@
       "type": "number",
       "minimum": 1000
     },
+    "notes": {
+      "type": "string"
+    },
     "maximum_median": {
       "type": "object",
       "additionalProperties": false,

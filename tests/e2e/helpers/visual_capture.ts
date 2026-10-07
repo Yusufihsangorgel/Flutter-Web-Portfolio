@@ -1,5 +1,6 @@
 import { expect, type Page } from '@playwright/test';
 import { createHash } from 'node:crypto';
+import { waitForFrames } from './semantics_scroll';
 
 const visualMaskRegions = [
   ['narrative-rail', 'left:0;top:0;width:48px;height:100vh'],
@@ -9,22 +10,7 @@ const STABLE_CAPTURES = 4;
 const FRAMES_BETWEEN_CAPTURES = 5;
 
 export async function settleCompositor(page: Page, frameCount = 3) {
-  await page.evaluate(
-    (frames) =>
-      new Promise<void>((resolve) => {
-        let remaining = frames;
-        const next = () => {
-          remaining -= 1;
-          if (remaining === 0) {
-            resolve();
-            return;
-          }
-          window.requestAnimationFrame(next);
-        };
-        window.requestAnimationFrame(next);
-      }),
-    frameCount,
-  );
+  await waitForFrames(page, frameCount);
 }
 
 export async function installVisualMasks(page: Page) {

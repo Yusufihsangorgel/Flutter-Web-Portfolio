@@ -1,6 +1,7 @@
-import { expect, test, type Response } from "@playwright/test";
+import { expect, test, type Response } from "./helpers/test_setup";
 import { readFileSync } from "node:fs";
 import { gzipSync } from "node:zlib";
+import { waitForFrames } from './helpers/semantics_scroll';
 
 const arabicPath = "noto_sans_arabic/NotoSansArabic-Variable.ttf";
 const devanagariPath = "noto_sans_devanagari/NotoSansDevanagari-Variable.ttf";
@@ -61,12 +62,7 @@ test("the language menu paints every name without engine fallback fonts", async 
   await page.getByRole("button", { name: /: English$/ }).click();
   await expect(page.getByRole("menuitem")).toHaveCount(locales.length);
   // The engine asks for a fallback font in the task after the frame that lays the text out.
-  await page.evaluate(
-    () =>
-      new Promise((resolve) =>
-        requestAnimationFrame(() => requestAnimationFrame(() => setTimeout(resolve, 0))),
-      ),
-  );
+  await waitForFrames(page, 3);
 
   expect(fallbackRequests).toEqual([]);
 });
