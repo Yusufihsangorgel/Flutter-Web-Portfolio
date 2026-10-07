@@ -26,21 +26,41 @@ enum AdaptiveRenderBudgetPhase {
 
 /// Why the controller last changed externally visible state.
 enum RenderBudgetTransitionCause {
+  /// The initial tier was established.
   initialized,
+
+  /// Sustained frame pressure lowered the tier.
   downgraded,
+
+  /// A higher tier is being tested.
   probeStarted,
+
+  /// The higher tier passed its probe.
   probeAccepted,
+
+  /// The higher tier failed its probe.
   probeRolledBack,
+
+  /// The maximum tier increased.
   ceilingChanged,
+
+  /// The maximum tier forced a lower tier.
   ceilingClamped,
+
+  /// Frame collection stopped.
   paused,
+
+  /// Frame collection restarted.
   resumed,
+
+  /// The reported refresh rate changed.
   refreshRateChanged,
 }
 
 /// One externally visible controller transition.
 @immutable
 final class RenderBudgetTransition {
+  /// Describes one change in level at a monotonic time.
   const RenderBudgetTransition({
     required this.cause,
     required this.previousLevel,
@@ -48,29 +68,34 @@ final class RenderBudgetTransition {
     required this.at,
   });
 
+  /// Why this transition occurred.
   final RenderBudgetTransitionCause cause;
+
+  /// The tier before the transition.
   final RenderBudgetLevel previousLevel;
+
+  /// The tier after the transition.
   final RenderBudgetLevel nextLevel;
+
+  /// Monotonic time of the transition.
   final Duration at;
 
   @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        other is RenderBudgetTransition &&
-            cause == other.cause &&
-            previousLevel == other.previousLevel &&
-            nextLevel == other.nextLevel &&
-            at == other.at;
-  }
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is RenderBudgetTransition &&
+          cause == other.cause &&
+          previousLevel == other.previousLevel &&
+          nextLevel == other.nextLevel &&
+          at == other.at;
 
   @override
   int get hashCode => Object.hash(cause, previousLevel, nextLevel, at);
 
   @override
-  String toString() {
-    return 'RenderBudgetTransition('
-        '$cause, $previousLevel -> $nextLevel, at: $at)';
-  }
+  String toString() =>
+      'RenderBudgetTransition('
+      '$cause, $previousLevel -> $nextLevel, at: $at)';
 }
 
 /// Immutable state exposed through the controller's [ValueListenable].
@@ -80,6 +105,7 @@ final class RenderBudgetTransition {
 /// `controller.statistics`.
 @immutable
 final class AdaptiveRenderBudgetState {
+  /// Describes the current tier, phase, ceiling, and last transition.
   const AdaptiveRenderBudgetState({
     required this.level,
     required this.ceiling,
@@ -90,11 +116,22 @@ final class AdaptiveRenderBudgetState {
     required this.revision,
   });
 
+  /// Current rendering tier.
   final RenderBudgetLevel level;
+
+  /// Highest allowed rendering tier.
   final RenderBudgetLevel ceiling;
+
+  /// Current steady, probing, or paused phase.
   final AdaptiveRenderBudgetPhase phase;
+
+  /// Rate currently used to normalize frame timings.
   final double refreshRateHz;
+
+  /// Monotonic time before which tier changes are deferred.
   final Duration cooldownUntil;
+
+  /// Most recent externally visible transition.
   final RenderBudgetTransition lastTransition;
 
   /// Monotonically increasing number for externally visible transitions.
@@ -107,35 +144,31 @@ final class AdaptiveRenderBudgetState {
   bool get isPaused => phase == AdaptiveRenderBudgetPhase.paused;
 
   @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        other is AdaptiveRenderBudgetState &&
-            level == other.level &&
-            ceiling == other.ceiling &&
-            phase == other.phase &&
-            refreshRateHz == other.refreshRateHz &&
-            cooldownUntil == other.cooldownUntil &&
-            lastTransition == other.lastTransition &&
-            revision == other.revision;
-  }
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is AdaptiveRenderBudgetState &&
+          level == other.level &&
+          ceiling == other.ceiling &&
+          phase == other.phase &&
+          refreshRateHz == other.refreshRateHz &&
+          cooldownUntil == other.cooldownUntil &&
+          lastTransition == other.lastTransition &&
+          revision == other.revision;
 
   @override
-  int get hashCode {
-    return Object.hash(
-      level,
-      ceiling,
-      phase,
-      refreshRateHz,
-      cooldownUntil,
-      lastTransition,
-      revision,
-    );
-  }
+  int get hashCode => Object.hash(
+    level,
+    ceiling,
+    phase,
+    refreshRateHz,
+    cooldownUntil,
+    lastTransition,
+    revision,
+  );
 
   @override
-  String toString() {
-    return 'AdaptiveRenderBudgetState('
-        'level: $level, ceiling: $ceiling, phase: $phase, '
-        'refreshRateHz: $refreshRateHz, revision: $revision)';
-  }
+  String toString() =>
+      'AdaptiveRenderBudgetState('
+      'level: $level, ceiling: $ceiling, phase: $phase, '
+      'refreshRateHz: $refreshRateHz, revision: $revision)';
 }

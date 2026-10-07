@@ -1,22 +1,26 @@
 import 'dart:collection';
 import 'dart:ui';
 
+import 'package:adaptive_render_budget/src/frame_timing_sample.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
 
-import 'frame_timing_sample.dart';
-
+/// Receives a batch of completed Flutter frame timings.
 typedef RenderFrameTimingCallback =
     void Function(List<RenderFrameTiming> timings);
 
 /// Supplies batches of frame timing samples.
 abstract interface class RenderFrameTimingSource {
+  /// Subscribes to batches of completed frame timings.
   void addListener(RenderFrameTimingCallback listener);
+
+  /// Removes a frame timing subscription.
   void removeListener(RenderFrameTimingCallback listener);
 }
 
 /// Adapts Flutter's scheduler timing callback into package timing samples.
 final class SchedulerFrameTimingSource implements RenderFrameTimingSource {
+  /// Adapts timing callbacks from [binding], or the active scheduler.
   SchedulerFrameTimingSource({SchedulerBinding? binding})
     : _binding = binding ?? SchedulerBinding.instance;
 
@@ -80,13 +84,15 @@ final class SchedulerFrameTimingSource implements RenderFrameTimingSource {
   }
 }
 
-/// Observable source for the active display refresh rate.
+/// Observable source for a positive refresh rate in hertz.
 abstract interface class RefreshRateSource implements Listenable {
+  /// Positive refresh rate used for the frame budget.
   double get refreshRateHz;
 }
 
 /// An immutable refresh-rate source, useful when a display rate is known.
 final class FixedRefreshRateSource implements RefreshRateSource {
+  /// Creates a source with a positive constant rate in hertz.
   FixedRefreshRateSource(this.refreshRateHz) {
     _validateRefreshRate(refreshRateHz);
   }
@@ -101,13 +107,24 @@ final class FixedRefreshRateSource implements RefreshRateSource {
   void removeListener(VoidCallback listener) {}
 }
 
-/// Tracks the display used by one [FlutterView].
+/// Follows the refresh rate the engine reports for the display of one
+/// [FlutterView].
 ///
-/// The source observes framework metric changes and emits only when the
-/// display-reported refresh rate changes.
+/// The rate is re-read when the framework reports changed metrics, and
+/// listeners are notified only when the value changes.
+///
+/// On the web that value is always 60 Hz: the Flutter Web engine (checked
+/// against Flutter 3.47) hard-codes it for every browser and display, and this
+/// source does not measure the real cadence. Give the controller a
+/// [FixedRefreshRateSource] or another [RefreshRateSource] when the web needs a
+/// different budget.
 final class DisplayRefreshRateSource extends ChangeNotifier
     with WidgetsBindingObserver
     implements RefreshRateSource {
+  /// Observes the rate reported for [view].
+  ///
+  /// A reported rate that is not finite and positive is replaced by
+  /// [fallbackRefreshRateHz].
   DisplayRefreshRateSource({
     required FlutterView view,
     WidgetsBinding? binding,

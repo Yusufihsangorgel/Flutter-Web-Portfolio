@@ -43,6 +43,8 @@ jobs:
       - run: npm run test:content
       - run: npm run test:strings
       - run: npm run verify:strings
+      - run: npm run verify:fonts
+      - run: npm run test:fonts
       # An initialized template clone removes the demo owner's renderer.
       - if: hashFiles('tool/render_work_artifacts.mjs') != ''
         run: npm run test:work-artifacts
