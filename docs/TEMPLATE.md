@@ -65,10 +65,13 @@ for field examples, accessibility guidance, and visual changes.
 | Vercel | Import the repository or run `npm run deploy -- vercel` |
 | Docker or another VPS | `npm run deploy -- docker --image portfolio:latest` |
 
-Threaded SkWasm requires cross-origin isolation headers. Firebase Hosting,
-Netlify, Cloudflare Pages, Vercel, and the included Nginx configuration provide
-them. GitHub Pages cannot set custom response headers and uses the compatible
-single-threaded runtime path.
+SkWasm currently runs single-threaded (`forceSingleThreadedSkwasm` in
+`web/flutter_bootstrap.js`) while flutter/flutter#190039 is open, so
+cross-origin isolation headers are not required for startup. Firebase Hosting,
+Netlify, Cloudflare Pages, Vercel, and the included Nginx configuration still
+send them, and they stay in place for the threaded path after the revert.
+GitHub Pages cannot set custom response headers and uses the same
+single-threaded path. See [ADR 0003](adr/0003-dual-wasm-javascript-runtime.md).
 
 A custom domain needs no Dart change. Set `site.url` in
 `assets/content/portfolio.json`, run `npm run sync:content`, then point DNS at

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -8,6 +10,7 @@ import 'package:flutter_web_portfolio/app/controllers/scroll_controller.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_dimensions.dart';
 import 'package:flutter_web_portfolio/app/core/constants/breakpoints.dart';
+import 'package:flutter_web_portfolio/app/core/constants/durations.dart';
 import 'package:flutter_web_portfolio/app/modules/home/sections/home_section.dart';
 import 'package:flutter_web_portfolio/app/modules/home/sections/about_section.dart';
 import 'package:flutter_web_portfolio/app/modules/home/sections/experience_section.dart';
@@ -45,6 +48,9 @@ class _HomeViewState extends State<HomeView> {
   );
   String? _lastAnnouncedLanguageWarning;
   AppScrollController? _scheduledScrollController;
+  VoidCallback? _endSkipWait;
+
+  static final _skipScrollBound = AppDurations.sectionScroll * 2;
 
   @override
   void didChangeDependencies() {
@@ -71,6 +77,7 @@ class _HomeViewState extends State<HomeView> {
 
   @override
   void dispose() {
+    _endSkipWait?.call();
     _focusNode.dispose();
     _skipLinkFocusNode.dispose();
     _mainContentFocusNode.dispose();
@@ -80,7 +87,6 @@ class _HomeViewState extends State<HomeView> {
   KeyEventResult _handleKeyEvent(FocusNode _, KeyEvent event) {
     if (event is! KeyDownEvent) return KeyEventResult.ignored;
 
-    // Ctrl+K / Cmd+K -> open command palette
     if (event.logicalKey == LogicalKeyboardKey.keyK &&
         (HardwareKeyboard.instance.isControlPressed ||
             HardwareKeyboard.instance.isMetaPressed)) {
@@ -118,6 +124,57 @@ class _HomeViewState extends State<HomeView> {
         );
     });
   }
+
+  Future<void> _skipToContent() async {
+    if (_endSkipWait != null) return;
+    final controller = context.read<AppScrollController>();
+    controller.scrollToSection(_mainContentId(controller.narrative).value);
+    if (controller.scrollController.hasClients) {
+      await _waitForScrollEnd(controller.scrollController.position);
+    }
+    if (mounted && _isFocusUnclaimed()) _mainContentFocusNode.requestFocus();
+  }
+
+  // Ends on scroll stop or interruption, on unmount, or at the time bound.
+  Future<void> _waitForScrollEnd(ScrollPosition position) {
+    final scrolling = position.isScrollingNotifier;
+    if (!scrolling.value) return Future<void>.value();
+    final ended = Completer<void>();
+    late final Timer bound;
+    late final VoidCallback onScrollChanged;
+    void end() {
+      if (ended.isCompleted) return;
+      _endSkipWait = null;
+      bound.cancel();
+      scrolling.removeListener(onScrollChanged);
+      ended.complete();
+    }
+
+    onScrollChanged = () {
+      if (!scrolling.value) end();
+    };
+    bound = Timer(_skipScrollBound, end);
+    scrolling.addListener(onScrollChanged);
+    _endSkipWait = end;
+    return ended.future;
+  }
+
+  // Skip focus yields to any control the reader chose in the meantime.
+  bool _isFocusUnclaimed() {
+    final focus = FocusManager.instance.primaryFocus;
+    return focus == null ||
+        focus == _skipLinkFocusNode ||
+        focus == _focusNode ||
+        focus is FocusScopeNode;
+  }
+
+  static SectionId _mainContentId(NarrativeDocument narrative) => narrative
+      .chapters
+      .firstWhere(
+        (chapter) => !chapter.id.isHome,
+        orElse: () => narrative.chapters.first,
+      )
+      .id;
 
   @override
   Widget build(BuildContext context) {
@@ -173,20 +230,16 @@ class _HomeViewState extends State<HomeView> {
         const Positioned.fill(
           child: RepaintBoundary(child: NarrativeBackground()),
         ),
-        // Layer 3: one continuous, immediately interactive document.
         _scrollDocument(
           context,
           scrollController,
           languageController,
           narrative,
         ),
-        // Layer 4: one measured signal connects real content anchors across
-        // otherwise independent chapter surfaces.
         const NarrativeStage(),
-        // Layer 5: Back-to-top button with scroll progress
         const BackToTopButton(),
         // Above the app bar, so the focused bypass link is never covered.
-        _buildSkipLink(scrollController, narrative),
+        _buildSkipLink(),
       ],
     ),
   );
@@ -233,10 +286,7 @@ class _HomeViewState extends State<HomeView> {
     ),
   );
 
-  Widget _buildSkipLink(
-    AppScrollController scrollController,
-    NarrativeDocument narrative,
-  ) => Positioned(
+  Widget _buildSkipLink() => Positioned(
     top: 0,
     left: 0,
     right: 0,
@@ -246,23 +296,11 @@ class _HomeViewState extends State<HomeView> {
         child: SkipToContentLink(
           label: context.strings.accessibilitySkipToContent,
           focusNode: _skipLinkFocusNode,
-          onActivate: () => _skipToContent(scrollController, narrative),
+          onActivate: () => unawaited(_skipToContent()),
         ),
       ),
     ),
   );
-
-  void _skipToContent(
-    AppScrollController scrollController,
-    NarrativeDocument narrative,
-  ) {
-    final firstContentChapter = narrative.chapters.firstWhere(
-      (chapter) => !chapter.id.isHome,
-      orElse: () => narrative.chapters.first,
-    );
-    scrollController.scrollToSection(firstContentChapter.id.value);
-    _mainContentFocusNode.requestFocus();
-  }
 
   List<Widget> _buildChapters(
     BuildContext context,
@@ -270,12 +308,7 @@ class _HomeViewState extends State<HomeView> {
     NarrativeDocument narrative,
   ) {
     final chapters = <Widget>[];
-    final mainContentId = narrative.chapters
-        .firstWhere(
-          (chapter) => !chapter.id.isHome,
-          orElse: () => narrative.chapters.first,
-        )
-        .id;
+    final mainContentId = _mainContentId(narrative);
     for (var index = 0; index < narrative.chapters.length; index += 1) {
       final chapter = narrative.chapters[index];
       final isLast = index == narrative.chapters.length - 1;
@@ -341,6 +374,7 @@ class _HomeViewState extends State<HomeView> {
     );
     if (!layout.isMainContent) return section;
     return Semantics(
+      identifier: 'main-content',
       container: true,
       child: Focus(
         key: const ValueKey('main-content-focus-target'),

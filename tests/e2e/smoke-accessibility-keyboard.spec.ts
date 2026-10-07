@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test } from "./helpers/test_setup";
 import type { CDPSession, Page } from "@playwright/test";
 import {
   englishInterface,
@@ -14,6 +14,7 @@ import {
 } from "./helpers/portfolio_test_helpers";
 import {
   scrollToSemanticLink,
+  waitForFrames,
   waitForSemanticsSettled,
 } from "./helpers/semantics_scroll";
 
@@ -218,16 +219,11 @@ test("the first Tab reveals the skip link, which enters the main document", asyn
   if (firstContentSection !== "about") {
     await expect(page).toHaveURL(new RegExp(`#/${firstContentSection}$`));
   }
-  await expect
-    .poll(() =>
-      page.evaluate(
-        () =>
-          document.activeElement !== document.body &&
-          document.activeElement?.getAttribute("aria-label") !==
-            "Skip to content",
-      ),
-    )
-    .toBe(true);
+  const target = page.locator('[flt-semantics-identifier="main-content"]');
+  await expect(target).toBeInViewport();
+  await expect(target).toBeFocused();
+  await waitForFrames(page, 2);
+  await expect(target).toBeFocused();
 });
 
 test("back-to-top is a keyboard link that follows on Enter only", async ({
