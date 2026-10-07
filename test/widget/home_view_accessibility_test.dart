@@ -5,7 +5,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_web_portfolio/app/controllers/scene_director.dart';
 import 'package:flutter_web_portfolio/app/controllers/scroll_controller.dart';
 import 'package:flutter_web_portfolio/app/domain/models/portfolio_document.dart';
-import 'package:flutter_web_portfolio/app/domain/repositories/language_repository.dart';
 import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
 import 'package:flutter_web_portfolio/app/features/render_quality/application/render_quality_controller.dart';
 import 'package:flutter_web_portfolio/app/modules/home/home_view.dart';
@@ -15,24 +14,9 @@ import 'package:flutter_web_portfolio/app/widgets/skip_to_content_link.dart';
 
 import '../helpers/narrative_fixture.dart';
 import '../helpers/portfolio_fixture.dart';
+import '../support/fake_language_repository.dart';
 
 const _skipLabel = 'Skip to content';
-
-final class _LanguageRepository implements LanguageRepository {
-  @override
-  Set<String> get supportedLanguages => const {'en'};
-
-  @override
-  Future<String> getSelectedLanguage() async => 'en';
-
-  @override
-  Future<Map<String, dynamic>> getTranslations(String languageCode) async => {
-    'accessibility': {'skip_to_content': _skipLabel},
-  };
-
-  @override
-  Future<void> saveSelectedLanguage(String languageCode) async {}
-}
 
 void main() {
   final subject = _HomeViewSubject();
@@ -75,7 +59,15 @@ class _HomeViewSubject {
       },
     );
     narrative = loadNarrativeFixture(activeSections: portfolio.activeSections);
-    language = LanguageCubit(languageRepository: _LanguageRepository());
+    language = LanguageCubit(
+      languageRepository: FakeLanguageRepository(
+        documents: const {
+          'en': {
+            'accessibility': {'skip_to_content': _skipLabel},
+          },
+        },
+      ),
+    );
     await language.initialize();
     scroll = AppScrollController(narrative: narrative);
     scene = SceneDirector(scrollController: scroll);

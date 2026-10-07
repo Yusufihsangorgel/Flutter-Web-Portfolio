@@ -4,11 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
 import 'package:flutter_web_portfolio/app/core/theme/app_fonts.dart';
 import 'package:flutter_web_portfolio/app/domain/models/portfolio_document.dart';
-import 'package:flutter_web_portfolio/app/utils/motion_preference.dart';
-import 'package:flutter_web_portfolio/app/widgets/accessible_action.dart';
-
 import 'package:flutter_web_portfolio/app/features/language/application/language_context.dart';
 import 'package:flutter_web_portfolio/app/modules/home/sections/section_style.dart';
+import 'package:flutter_web_portfolio/app/utils/motion_preference.dart';
+import 'package:flutter_web_portfolio/app/widgets/accessible_action.dart';
 
 part 'event_order_controls.dart';
 part 'event_order_sequence.dart';

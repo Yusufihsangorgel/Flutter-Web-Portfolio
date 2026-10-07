@@ -10,8 +10,8 @@ import 'package:flutter_web_portfolio/app/domain/models/portfolio_document.dart'
 import 'package:flutter_web_portfolio/app/domain/models/portfolio_document.dart'
     as content
     show PortfolioLink;
-import 'package:flutter_web_portfolio/app/narrative/domain/narrative_document.dart';
 import 'package:flutter_web_portfolio/app/features/language/application/language_context.dart';
+import 'package:flutter_web_portfolio/app/narrative/domain/narrative_document.dart';
 import 'package:flutter_web_portfolio/app/widgets/portfolio_link.dart';
 import 'package:flutter_web_portfolio/app/widgets/scroll_indicator.dart';
 

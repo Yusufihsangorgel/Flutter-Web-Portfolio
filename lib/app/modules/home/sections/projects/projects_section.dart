@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_web_portfolio/app/controllers/scroll_controller.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
+import 'package:flutter_web_portfolio/app/core/l10n/app_strings.g.dart';
 import 'package:flutter_web_portfolio/app/core/theme/app_fonts.dart';
 import 'package:flutter_web_portfolio/app/domain/models/portfolio_document.dart';
+import 'package:flutter_web_portfolio/app/features/language/application/language_context.dart';
 import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
 import 'package:flutter_web_portfolio/app/modules/home/sections/projects/widgets/atlas_style.dart';
 import 'package:flutter_web_portfolio/app/modules/home/sections/projects/widgets/project_atlas.dart';
@@ -17,87 +19,43 @@ final class ProjectsSection extends StatelessWidget {
   const ProjectsSection({super.key});
 
   @override
-  Widget build(
-    BuildContext context,
-  ) => BlocBuilder<LanguageCubit, LanguageState>(
-    builder: (context, _) {
-      final language = context.read<LanguageCubit>();
-      final portfolio = context.read<PortfolioDocument>();
-      final labels = ProjectAtlasLabels(
-        challenge: language.getText(
-          'projects_section.challenge',
-          defaultValue: 'The problem',
-        ),
-        approach: language.getText(
-          'projects_section.approach',
-          defaultValue: 'The approach',
-        ),
-        outcome: language.getText(
-          'projects_section.outcome',
-          defaultValue: 'The result',
-        ),
-        ownership: language.getText(
-          'projects_section.ownership',
-          defaultValue: 'What I owned',
-        ),
-        decision: language.getText(
-          'projects_section.decision',
-          defaultValue: 'Engineering focus',
-        ),
-        selectedCases: language.getText(
-          'projects_section.selected_cases',
-          defaultValue: 'Selected cases',
-        ),
-        evidenceIndex: language.getText(
-          'projects_section.evidence_index',
-          defaultValue: 'More work',
-        ),
-        evidenceIntro: language.getText(
-          'projects_section.evidence_intro',
-          defaultValue:
-              'Released products and public engineering records, shown through their source material.',
-        ),
-        shippedProducts: language.getText(
-          'projects_section.shipped_products',
-          defaultValue: 'Shipped products',
-        ),
-        openEngineering: language.getText(
-          'projects_section.open_engineering',
-          defaultValue: 'Open engineering',
-        ),
-        selectEvidence: language.getText(
-          'projects_section.select_evidence',
-          defaultValue: 'Choose a project',
-        ),
-        openEvidence: language.getText(
-          'projects_section.open_evidence',
-          defaultValue: 'View project',
-        ),
-        caseLabel: language.getText(
-          'projects_section.case_label',
-          defaultValue: 'Case',
-        ),
-        indexLabel: language.getText(
-          'projects_section.index_label',
-          defaultValue: 'Index',
-        ),
-      );
+  Widget build(BuildContext context) =>
+      BlocBuilder<LanguageCubit, LanguageState>(
+        builder: (context, _) {
+          final strings = context.strings;
+          final portfolio = context.read<PortfolioDocument>();
+          final labels = ProjectAtlasLabels(
+            challenge: strings.projectsSectionChallenge,
+            approach: strings.projectsSectionApproach,
+            outcome: strings.projectsSectionOutcome,
+            ownership: strings.projectsSectionOwnership,
+            decision: strings.projectsSectionDecision,
+            selectedCases: strings.projectsSectionSelectedCases,
+            evidenceIndex: strings.projectsSectionEvidenceIndex,
+            evidenceIntro: strings.projectsSectionEvidenceIntro,
+            shippedProducts: strings.projectsSectionShippedProducts,
+            openEngineering: strings.projectsSectionOpenEngineering,
+            selectEvidence: strings.projectsSectionSelectEvidence,
+            openEvidence: strings.projectsSectionOpenEvidence,
+            caseLabel: strings.projectsSectionCaseLabel,
+            indexLabel: strings.projectsSectionIndexLabel,
+          );
 
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          _ProjectsIntroduction(language: language),
-          ProjectAtlas(systems: portfolio.systems, labels: labels),
-        ],
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              _ProjectsIntroduction(strings: strings),
+              ProjectAtlas(systems: portfolio.systems, labels: labels),
+            ],
+          );
+        },
       );
-    },
-  );
 }
 
 final class _ProjectsIntroduction extends StatelessWidget {
-  const _ProjectsIntroduction({required this.language});
+  const _ProjectsIntroduction({required this.strings});
 
-  final LanguageCubit language;
+  final AppStrings strings;
 
   @override
   Widget build(BuildContext context) {
@@ -122,10 +80,7 @@ final class _ProjectsIntroduction extends StatelessWidget {
                 number: context.read<NarrativeDocument>().sectionNumber(
                   SectionId.projects,
                 ),
-                title: language.getText(
-                  'projects_section.title',
-                  defaultValue: 'Selected Work',
-                ),
+                title: strings.projectsSectionTitle,
                 accent: accent,
                 anchorKey: context.read<AppScrollController>().anchorKeyFor(
                   SectionId.projects,
@@ -136,11 +91,7 @@ final class _ProjectsIntroduction extends StatelessWidget {
             ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 760),
               child: Text(
-                language.getText(
-                  'projects_section.subtitle',
-                  defaultValue:
-                      'Products I shipped and tools I continue to maintain.',
-                ),
+                strings.projectsSectionSubtitle,
                 style: AppFonts.spaceGrotesk(
                   fontSize: tablet ? 26 : 20,
                   fontWeight: FontWeight.w600,

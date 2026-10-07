@@ -9,43 +9,37 @@ import 'package:flutter_web_portfolio/app/controllers/scene_director.dart';
 import 'package:flutter_web_portfolio/app/controllers/scroll_controller.dart';
 import 'package:flutter_web_portfolio/app/domain/models/portfolio_document.dart'
     hide PortfolioLink;
-import 'package:flutter_web_portfolio/app/domain/repositories/language_repository.dart';
 import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
 import 'package:flutter_web_portfolio/app/modules/home/sections/writing/writing_section.dart';
 import 'package:flutter_web_portfolio/app/widgets/accessible_action.dart';
 import 'package:flutter_web_portfolio/app/widgets/portfolio_link.dart';
+
 import '../helpers/narrative_fixture.dart';
 import '../helpers/portfolio_fixture.dart';
-
-final class _WritingLanguageRepository implements LanguageRepository {
-  @override
-  Set<String> get supportedLanguages => const {'en'};
-
-  @override
-  Future<String> getSelectedLanguage() async => 'en';
-
-  @override
-  Future<Map<String, dynamic>> getTranslations(String languageCode) async => {
-    'nav': {'writing': 'Writing'},
-    'writing_section': {
-      'title': 'Writing',
-      'subtitle': 'Recent articles from every place I publish, newest first.',
-      'all_writing': 'All writing',
-      'open_article': 'Read article',
-      'show_all': 'Show all {count}',
-      'show_less': 'Show fewer',
-    },
-  };
-
-  @override
-  Future<void> saveSelectedLanguage(String languageCode) async {}
-}
+import '../support/fake_language_repository.dart';
 
 late LanguageCubit _language;
 
 void main() {
   setUp(() async {
-    _language = LanguageCubit(languageRepository: _WritingLanguageRepository());
+    _language = LanguageCubit(
+      languageRepository: FakeLanguageRepository(
+        documents: const {
+          'en': {
+            'nav': {'writing': 'Writing'},
+            'writing_section': {
+              'title': 'Writing',
+              'subtitle':
+                  'Recent articles from every place I publish, newest first.',
+              'all_writing': 'All writing',
+              'open_article': 'Read article',
+              'show_all': 'Show all {count}',
+              'show_less': 'Show fewer',
+            },
+          },
+        },
+      ),
+    );
     await _language.initialize();
     addTearDown(_language.close);
   });

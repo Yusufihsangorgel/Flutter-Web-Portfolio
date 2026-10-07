@@ -9,60 +9,47 @@ import 'package:flutter_web_portfolio/app/controllers/scene_director.dart';
 import 'package:flutter_web_portfolio/app/controllers/scroll_controller.dart';
 import 'package:flutter_web_portfolio/app/domain/models/portfolio_document.dart'
     hide PortfolioLink;
-import 'package:flutter_web_portfolio/app/domain/repositories/language_repository.dart';
 import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
 import 'package:flutter_web_portfolio/app/modules/home/sections/packages/packages_section.dart';
 import 'package:flutter_web_portfolio/app/widgets/accessible_action.dart';
 import 'package:flutter_web_portfolio/app/widgets/portfolio_link.dart';
+
 import '../helpers/narrative_fixture.dart';
 import '../helpers/portfolio_fixture.dart';
-
-final class _PackagesLanguageRepository implements LanguageRepository {
-  _PackagesLanguageRepository(this._packagesCopy);
-
-  final Map<String, String> _packagesCopy;
-
-  @override
-  Set<String> get supportedLanguages => const {'en'};
-
-  @override
-  Future<String> getSelectedLanguage() async => 'en';
-
-  @override
-  Future<Map<String, dynamic>> getTranslations(String languageCode) async => {
-    'nav': {'packages': 'Packages'},
-    'packages_section': {
-      'title': 'Published Packages',
-      'subtitle': '{count} packages, {perfect} perfect scores.',
-      'subtitle_no_perfect': '{count} packages with measured claims.',
-      'pub_points': 'pub points',
-      'open_package': 'Open package',
-      'maturity_level': 'Maturity {level} of {max}',
-      'roadmap': 'Roadmap',
-      'status_done': 'shipped',
-      'status_doing': 'in progress',
-      'status_next': 'next',
-      'status_waiting': 'waiting',
-      'category_native_ffi': 'Native & FFI',
-      'category_ai_llm': 'AI & LLM',
-      'category_server': 'Server-side Dart',
-      'category_flutter_ui': 'Flutter UI',
-      'category_dev_tool': 'Developer tools',
-      'show_all': 'Show all {count}',
-      'show_less': 'Show fewer',
-      ..._packagesCopy,
-    },
-  };
-
-  @override
-  Future<void> saveSelectedLanguage(String languageCode) async {}
-}
+import '../support/fake_language_repository.dart';
 
 late LanguageCubit _language;
 
 Future<void> _useLanguage([Map<String, String> copy = const {}]) async {
   _language = LanguageCubit(
-    languageRepository: _PackagesLanguageRepository(copy),
+    languageRepository: FakeLanguageRepository(
+      documents: {
+        'en': {
+          'nav': {'packages': 'Packages'},
+          'packages_section': {
+            'title': 'Published Packages',
+            'subtitle': '{count} packages, {perfect} perfect scores.',
+            'subtitle_no_perfect': '{count} packages with measured claims.',
+            'pub_points': 'pub points',
+            'open_package': 'Open package',
+            'maturity_level': 'Maturity {level} of {max}',
+            'roadmap': 'Roadmap',
+            'status_done': 'shipped',
+            'status_doing': 'in progress',
+            'status_next': 'next',
+            'status_waiting': 'waiting',
+            'category_native_ffi': 'Native & FFI',
+            'category_ai_llm': 'AI & LLM',
+            'category_server': 'Server-side Dart',
+            'category_flutter_ui': 'Flutter UI',
+            'category_dev_tool': 'Developer tools',
+            'show_all': 'Show all {count}',
+            'show_less': 'Show fewer',
+            ...copy,
+          },
+        },
+      },
+    ),
   );
   await _language.initialize();
   addTearDown(_language.close);

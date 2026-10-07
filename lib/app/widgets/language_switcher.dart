@@ -1,9 +1,11 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_web_portfolio/app/core/theme/app_fonts.dart';
-import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
-import 'package:flutter_web_portfolio/app/controllers/scroll_controller.dart';
 import 'package:flutter_web_portfolio/app/controllers/scene_director.dart';
+import 'package:flutter_web_portfolio/app/controllers/scroll_controller.dart';
+import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
+import 'package:flutter_web_portfolio/app/core/theme/app_fonts.dart';
 import 'package:flutter_web_portfolio/app/features/language/application/language_context.dart';
 import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
 import 'package:flutter_web_portfolio/app/utils/web_url_strategy.dart'
@@ -63,17 +65,8 @@ class LanguageSwitcher extends StatelessWidget {
                             .withValues(alpha: 0.05),
                   ),
                 ),
-                onSelected: (languageCode) {
-                  // Read the route at selection time to preserve the current section.
-                  final urlSection = url_strategy.getUrlHash();
-                  final sectionToPreserve = urlSection.isNotEmpty
-                      ? urlSection
-                      : context.read<AppScrollController>().activeSection;
-                  languageController.selectLanguage(
-                    languageCode,
-                    preserveSection: sectionToPreserve,
-                  );
-                },
+                onSelected: (languageCode) =>
+                    _selectLanguage(context, languageController, languageCode),
                 itemBuilder: (context) => languageController.supportedLanguages
                     .map(
                       (code) => _languageItem(
@@ -88,6 +81,23 @@ class LanguageSwitcher extends StatelessWidget {
           ),
     );
   }
+}
+
+void _selectLanguage(
+  BuildContext context,
+  LanguageCubit languageController,
+  String languageCode,
+) {
+  final urlSection = url_strategy.getUrlHash();
+  final sectionToPreserve = urlSection.isNotEmpty
+      ? urlSection
+      : context.read<AppScrollController>().activeSection;
+  unawaited(
+    languageController.selectLanguage(
+      languageCode,
+      preserveSection: sectionToPreserve,
+    ),
+  );
 }
 
 PopupMenuItem<String> _languageItem(String code, bool selected, Color accent) {

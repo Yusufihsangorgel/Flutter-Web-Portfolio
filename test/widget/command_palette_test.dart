@@ -3,35 +3,28 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:flutter_web_portfolio/app/controllers/scroll_controller.dart';
-import 'package:flutter_web_portfolio/app/domain/repositories/language_repository.dart';
 import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
 import 'package:flutter_web_portfolio/app/widgets/command_palette.dart';
-import '../helpers/portfolio_fixture.dart';
+
 import '../helpers/narrative_fixture.dart';
+import '../helpers/portfolio_fixture.dart';
+import '../support/fake_language_repository.dart';
 
-final class _PaletteLanguageRepository implements LanguageRepository {
-  @override
-  Set<String> get supportedLanguages => const {'en'};
-
-  @override
-  Future<String> getSelectedLanguage() async => 'en';
-
-  @override
-  Future<Map<String, dynamic>> getTranslations(String languageCode) async => {
-    'nav': {
-      'home': 'Home',
-      'about': 'About',
-      'experience': 'Experience',
-      'proof': 'Open Source',
-      'blog': 'Blog',
-      'projects': 'Work',
-      'contact': 'Contact',
+FakeLanguageRepository _languageRepository() => FakeLanguageRepository(
+  documents: const {
+    'en': {
+      'nav': {
+        'home': 'Home',
+        'about': 'About',
+        'experience': 'Experience',
+        'proof': 'Open Source',
+        'blog': 'Blog',
+        'projects': 'Work',
+        'contact': 'Contact',
+      },
     },
-  };
-
-  @override
-  Future<void> saveSelectedLanguage(String languageCode) async {}
-}
+  },
+);
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -40,7 +33,7 @@ void main() {
   late AppScrollController scroll;
 
   setUp(() async {
-    language = LanguageCubit(languageRepository: _PaletteLanguageRepository());
+    language = LanguageCubit(languageRepository: _languageRepository());
     scroll = AppScrollController(narrative: loadNarrativeFixture());
     await language.initialize();
     addTearDown(() async {

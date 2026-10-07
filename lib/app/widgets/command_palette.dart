@@ -2,15 +2,16 @@ import 'dart:async';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_web_portfolio/app/core/theme/app_fonts.dart';
-
-import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_web_portfolio/app/controllers/scroll_controller.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
-import 'package:flutter_web_portfolio/app/core/constants/motion_curves.dart';
 import 'package:flutter_web_portfolio/app/core/constants/durations.dart';
+import 'package:flutter_web_portfolio/app/core/constants/motion_curves.dart';
+import 'package:flutter_web_portfolio/app/core/l10n/section_strings.dart';
+import 'package:flutter_web_portfolio/app/core/theme/app_fonts.dart';
+import 'package:flutter_web_portfolio/app/features/language/application/language_context.dart';
+import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
 import 'package:flutter_web_portfolio/app/utils/web_url_strategy.dart'
     as url_strategy;
 import 'package:flutter_web_portfolio/app/widgets/accessible_action.dart';
@@ -38,16 +39,13 @@ class CommandPalette extends StatefulWidget {
 
   /// Shows the command palette as a modal overlay.
   static void show(BuildContext context) {
-    final language = context.read<LanguageCubit>();
+    final strings = context.read<LanguageCubit>().strings;
     url_strategy.setTransientOverlayOpen(true);
     unawaited(
       showGeneralDialog<void>(
         context: context,
         barrierDismissible: true,
-        barrierLabel: language.getText(
-          'command_palette.close',
-          defaultValue: 'Close command palette',
-        ),
+        barrierLabel: strings.commandPaletteClose,
         barrierColor: Colors.black.withValues(alpha: 0.6),
         transitionDuration: AppDurations.medium,
         transitionBuilder: (context, animation, _, child) {
@@ -122,10 +120,8 @@ class _CommandPaletteState extends State<CommandPalette> {
     AppScrollController scrollController,
     LanguageCubit languageController,
   ) {
-    final navigateCategory = languageController.getText(
-      'command_palette.navigate',
-      defaultValue: 'Navigate',
-    );
+    final strings = languageController.strings;
+    final navigateCategory = strings.commandPaletteNavigate;
     const sectionIcons = <String, IconData>{
       'home': Icons.home_rounded,
       'about': Icons.person_rounded,
@@ -137,16 +133,12 @@ class _CommandPaletteState extends State<CommandPalette> {
     return [
       for (final section in scrollController.sectionIds)
         _PaletteCommand(
-          label: languageController
-              .getText('command_palette.go_to', defaultValue: 'Go to {section}')
-              .replaceAll(
-                '{section}',
-                languageController.getText(
-                  'nav.$section',
-                  defaultValue:
-                      '${section[0].toUpperCase()}${section.substring(1)}',
-                ),
-              ),
+          label: strings.commandPaletteGoTo(
+            section: strings.navigationLabel(
+              section,
+              fallback: '${section[0].toUpperCase()}${section.substring(1)}',
+            ),
+          ),
           category: navigateCategory,
           icon: sectionIcons[section] ?? Icons.arrow_forward_rounded,
           uri: Uri.parse('#/$section'),
@@ -160,30 +152,24 @@ class _CommandPaletteState extends State<CommandPalette> {
     LanguageCubit languageController,
     String sectionToPreserve,
   ) {
-    final languageCategory = languageController.getText(
-      'command_palette.language',
-      defaultValue: 'Language',
-    );
+    final strings = languageController.strings;
+    final languageCategory = strings.commandPaletteLanguage;
     return [
       for (final languageCode in languageController.supportedLanguages)
         _PaletteCommand(
-          label: languageController
-              .getText(
-                'command_palette.switch_to',
-                defaultValue: 'Switch to {language}',
-              )
-              .replaceAll(
-                '{language}',
-                LanguageCubit.getLanguageName(languageCode),
-              ),
+          label: strings.commandPaletteSwitchTo(
+            language: LanguageCubit.getLanguageName(languageCode),
+          ),
           category: languageCategory,
           icon: Icons.translate_rounded,
-          onExecute: () => _executeAndClose(
-            () => languageController.selectLanguage(
-              languageCode,
-              preserveSection: sectionToPreserve,
-            ),
-          ),
+          onExecute: () => _executeAndClose(() {
+            unawaited(
+              languageController.selectLanguage(
+                languageCode,
+                preserveSection: sectionToPreserve,
+              ),
+            );
+          }),
         ),
     ];
   }
@@ -332,10 +318,7 @@ class _CommandPaletteState extends State<CommandPalette> {
             focusNode: _focusNode,
             style: AppFonts.inter(fontSize: 15, color: AppColors.textBright),
             decoration: InputDecoration(
-              hintText: context.read<LanguageCubit>().getText(
-                'command_palette.search_hint',
-                defaultValue: 'Type a command...',
-              ),
+              hintText: context.strings.commandPaletteSearchHint,
               hintStyle: AppFonts.inter(
                 fontSize: 15,
                 color: AppColors.textSecondary,
@@ -369,10 +352,7 @@ class _CommandPaletteState extends State<CommandPalette> {
       return Padding(
         padding: const EdgeInsets.all(24),
         child: Text(
-          context.read<LanguageCubit>().getText(
-            'command_palette.no_matches',
-            defaultValue: 'No matching commands',
-          ),
+          context.strings.commandPaletteNoMatches,
           style: AppFonts.inter(fontSize: 14, color: AppColors.textSecondary),
         ),
       );

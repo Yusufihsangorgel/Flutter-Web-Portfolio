@@ -9,12 +9,12 @@ import 'package:flutter_web_portfolio/app/domain/models/portfolio_document.dart'
 import 'package:flutter_web_portfolio/app/domain/models/portfolio_document.dart'
     as content
     show PortfolioLink;
-import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
 import 'package:flutter_web_portfolio/app/features/language/application/language_context.dart';
+import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
 import 'package:flutter_web_portfolio/app/modules/home/sections/section_style.dart';
 import 'package:flutter_web_portfolio/app/narrative/domain/narrative_document.dart';
-import 'package:flutter_web_portfolio/app/widgets/portfolio_link.dart';
 import 'package:flutter_web_portfolio/app/widgets/numbered_section_heading.dart';
+import 'package:flutter_web_portfolio/app/widgets/portfolio_link.dart';
 import 'package:flutter_web_portfolio/app/widgets/scene_accent_builder.dart';
 
 /// Personal context and engineering practice, sourced from the portfolio JSON.

@@ -1,53 +1,16 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter_web_portfolio/app/domain/repositories/language_repository.dart';
 import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
 
-final class _LanguageRepository implements LanguageRepository {
-  _LanguageRepository({
-    this.selectedLanguage = 'en',
-    Map<String, Map<String, dynamic>>? documents,
-    Map<String, Duration>? delays,
-    Map<String, Duration>? saveDelays,
-    this.saveError,
-  }) : documents = documents ?? <String, Map<String, dynamic>>{},
-       delays = delays ?? <String, Duration>{},
-       saveDelays = saveDelays ?? <String, Duration>{};
-
-  String selectedLanguage;
-  final Map<String, Map<String, dynamic>> documents;
-  final Map<String, Duration> delays;
-  final Map<String, Duration> saveDelays;
-  final Object? saveError;
-  final List<String> savedLanguages = [];
-
-  @override
-  Set<String> get supportedLanguages => const {'en', 'tr', 'de'};
-
-  @override
-  Future<String> getSelectedLanguage() async => selectedLanguage;
-
-  @override
-  Future<Map<String, dynamic>> getTranslations(String languageCode) async {
-    final delay = delays[languageCode];
-    if (delay != null) await Future<void>.delayed(delay);
-    return documents[languageCode] ?? const <String, dynamic>{};
-  }
-
-  @override
-  Future<void> saveSelectedLanguage(String languageCode) async {
-    final delay = saveDelays[languageCode];
-    if (delay != null) await Future<void>.delayed(delay);
-    final error = saveError;
-    if (error != null) throw error;
-    selectedLanguage = languageCode;
-    savedLanguages.add(languageCode);
-  }
-}
+import '../../support/fake_language_repository.dart';
 
 void main() {
   group('LanguageCubit', () {
     test('starts with a deterministic English initial state', () async {
-      final cubit = LanguageCubit(languageRepository: _LanguageRepository());
+      final cubit = LanguageCubit(
+        languageRepository: FakeLanguageRepository(
+          supportedLanguages: const {'en', 'tr', 'de'},
+        ),
+      );
       addTearDown(cubit.close);
 
       expect(cubit.state.status, LanguageStatus.initial);
@@ -56,7 +19,8 @@ void main() {
     });
 
     test('initialize loads and persists the selected language', () async {
-      final repository = _LanguageRepository(
+      final repository = FakeLanguageRepository(
+        supportedLanguages: const {'en', 'tr', 'de'},
         selectedLanguage: 'tr',
         documents: {
           'tr': {
@@ -78,12 +42,16 @@ void main() {
       await stateExpectation;
 
       expect(cubit.currentLanguage, 'tr');
-      expect(cubit.getText('screen.label'), 'Portföy');
+      expect(cubit.strings.lookup('screen.label'), 'Portföy');
       expect(repository.savedLanguages, ['tr']);
     });
 
     test('unsupported language is ignored without emitting state', () async {
-      final cubit = LanguageCubit(languageRepository: _LanguageRepository());
+      final cubit = LanguageCubit(
+        languageRepository: FakeLanguageRepository(
+          supportedLanguages: const {'en', 'tr', 'de'},
+        ),
+      );
       addTearDown(cubit.close);
       final states = <LanguageState>[];
       final subscription = cubit.stream.listen(states.add);
@@ -96,7 +64,8 @@ void main() {
     });
 
     test('an explicit language selection updates native targets', () async {
-      final repository = _LanguageRepository(
+      final repository = FakeLanguageRepository(
+        supportedLanguages: const {'en', 'tr', 'de'},
         documents: {
           'en': {
             'screen': {'label': 'Portfolio'},
@@ -114,14 +83,15 @@ void main() {
 
       expect(cubit.state.status, LanguageStatus.ready);
       expect(cubit.currentLanguage, 'de');
-      expect(cubit.getText('screen.label'), 'Portfolio auf Deutsch');
+      expect(cubit.strings.lookup('screen.label'), 'Portfolio auf Deutsch');
       expect(repository.savedLanguages, ['en', 'de']);
     });
 
     test(
       'applies a valid locale in-process when persistence is unavailable',
       () async {
-        final repository = _LanguageRepository(
+        final repository = FakeLanguageRepository(
+          supportedLanguages: const {'en', 'tr', 'de'},
           documents: {
             'en': {
               'screen': {'label': 'Portfolio'},
@@ -130,7 +100,9 @@ void main() {
               'screen': {'label': 'Portfolio auf Deutsch'},
             },
           },
-          saveError: StateError('storage blocked'),
+          behavior: FakeLanguageRepositoryBehavior(
+            saveError: StateError('storage blocked'),
+          ),
         );
         final cubit = LanguageCubit(languageRepository: repository);
         addTearDown(cubit.close);
@@ -140,7 +112,7 @@ void main() {
 
         expect(cubit.state.status, LanguageStatus.ready);
         expect(cubit.currentLanguage, 'de');
-        expect(cubit.getText('screen.label'), 'Portfolio auf Deutsch');
+        expect(cubit.strings.lookup('screen.label'), 'Portfolio auf Deutsch');
         expect(
           cubit.state.errorMessage,
           'Your language preference could not be saved. '
@@ -152,7 +124,8 @@ void main() {
     );
 
     test('uses a localized, non-technical persistence warning', () async {
-      final repository = _LanguageRepository(
+      final repository = FakeLanguageRepository(
+        supportedLanguages: const {'en', 'tr', 'de'},
         selectedLanguage: 'de',
         documents: {
           'de': {
@@ -162,7 +135,9 @@ void main() {
             },
           },
         },
-        saveError: StateError('internal storage implementation detail'),
+        behavior: FakeLanguageRepositoryBehavior(
+          saveError: StateError('internal storage implementation detail'),
+        ),
       );
       final cubit = LanguageCubit(languageRepository: repository);
       addTearDown(cubit.close);
@@ -180,7 +155,8 @@ void main() {
     test(
       'empty translation document fails without replacing good data',
       () async {
-        final repository = _LanguageRepository(
+        final repository = FakeLanguageRepository(
+          supportedLanguages: const {'en', 'tr', 'de'},
           documents: {
             'en': {
               'screen': {'label': 'Portfolio'},
@@ -196,7 +172,7 @@ void main() {
 
         expect(cubit.state.status, LanguageStatus.ready);
         expect(cubit.state.languageCode, 'en');
-        expect(cubit.getText('screen.label'), 'Portfolio');
+        expect(cubit.strings.lookup('screen.label'), 'Portfolio');
         expect(
           cubit.state.errorMessage,
           'That language could not be loaded. '
@@ -209,7 +185,8 @@ void main() {
     test(
       'rejects an incomplete matching-locale catalog before persistence',
       () async {
-        final repository = _LanguageRepository(
+        final repository = FakeLanguageRepository(
+          supportedLanguages: const {'en', 'tr', 'de'},
           selectedLanguage: 'tr',
           documents: {
             'en': {
@@ -243,7 +220,8 @@ void main() {
     test(
       'a broken saved catalog deterministically falls back to English',
       () async {
-        final repository = _LanguageRepository(
+        final repository = FakeLanguageRepository(
+          supportedLanguages: const {'en', 'tr', 'de'},
           selectedLanguage: 'tr',
           documents: {
             'en': {
@@ -259,7 +237,7 @@ void main() {
 
         expect(cubit.state.status, LanguageStatus.ready);
         expect(cubit.state.languageCode, 'en');
-        expect(cubit.getText('screen.label'), 'Portfolio');
+        expect(cubit.strings.lookup('screen.label'), 'Portfolio');
         expect(repository.selectedLanguage, 'en');
         expect(repository.savedLanguages, ['en']);
       },
@@ -268,7 +246,8 @@ void main() {
     test(
       'the latest language request wins even when responses reorder',
       () async {
-        final repository = _LanguageRepository(
+        final repository = FakeLanguageRepository(
+          supportedLanguages: const {'en', 'tr', 'de'},
           documents: {
             'tr': {
               'screen': {'label': 'Türkçe'},
@@ -277,10 +256,12 @@ void main() {
               'screen': {'label': 'Deutsch'},
             },
           },
-          delays: const {
-            'tr': Duration(milliseconds: 20),
-            'de': Duration(milliseconds: 1),
-          },
+          behavior: const FakeLanguageRepositoryBehavior(
+            loadDelays: {
+              'tr': Duration(milliseconds: 20),
+              'de': Duration(milliseconds: 1),
+            },
+          ),
         );
         final cubit = LanguageCubit(languageRepository: repository);
         addTearDown(cubit.close);
@@ -292,7 +273,7 @@ void main() {
 
         expect(cubit.state.status, LanguageStatus.ready);
         expect(cubit.currentLanguage, 'de');
-        expect(cubit.getText('screen.label'), 'Deutsch');
+        expect(cubit.strings.lookup('screen.label'), 'Deutsch');
         expect(repository.savedLanguages, ['de']);
       },
     );
@@ -300,7 +281,8 @@ void main() {
     test(
       'persistence is ordered and a stale save cannot overwrite the latest choice',
       () async {
-        final repository = _LanguageRepository(
+        final repository = FakeLanguageRepository(
+          supportedLanguages: const {'en', 'tr', 'de'},
           documents: {
             'tr': {
               'screen': {'label': 'Türkçe'},
@@ -309,10 +291,12 @@ void main() {
               'screen': {'label': 'Deutsch'},
             },
           },
-          saveDelays: const {
-            'tr': Duration(milliseconds: 20),
-            'de': Duration(milliseconds: 1),
-          },
+          behavior: const FakeLanguageRepositoryBehavior(
+            saveDelays: {
+              'tr': Duration(milliseconds: 20),
+              'de': Duration(milliseconds: 1),
+            },
+          ),
         );
         final cubit = LanguageCubit(languageRepository: repository);
         addTearDown(cubit.close);
@@ -326,46 +310,51 @@ void main() {
         expect(repository.selectedLanguage, 'de');
         expect(cubit.state.status, LanguageStatus.ready);
         expect(cubit.currentLanguage, 'de');
-        expect(cubit.getText('screen.label'), 'Deutsch');
+        expect(cubit.strings.lookup('screen.label'), 'Deutsch');
       },
     );
 
-    test(
-      'getText resolves nested values and uses its explicit fallback',
-      () async {
-        final repository = _LanguageRepository(
-          documents: {
-            'en': {
-              'hero': {'title': 'Flutter Web'},
-            },
-          },
-        );
-        final cubit = LanguageCubit(languageRepository: repository);
-        addTearDown(cubit.close);
-        await cubit.initialize();
+    _registerArbitraryLookupTest();
+    _registerLanguageMetadataTests();
+  });
+}
 
-        expect(cubit.getText('hero.title'), 'Flutter Web');
-        expect(
-          cubit.getText('hero.missing', defaultValue: 'Fallback'),
-          'Fallback',
-        );
+void _registerArbitraryLookupTest() {
+  test('strings.lookup resolves deliberate arbitrary fixture keys', () async {
+    final repository = FakeLanguageRepository(
+      supportedLanguages: const {'en', 'tr', 'de'},
+      documents: {
+        'en': {
+          'hero': {'title': 'Flutter Web'},
+        },
       },
     );
+    final cubit = LanguageCubit(languageRepository: repository);
+    addTearDown(cubit.close);
+    await cubit.initialize();
 
-    group('language metadata', () {
-      test('returns localized names for every supported public locale', () {
-        expect(LanguageCubit.getLanguageName('tr'), 'Türkçe');
-        expect(LanguageCubit.getLanguageName('en'), 'English');
-        expect(LanguageCubit.getLanguageName('de'), 'Deutsch');
-        expect(LanguageCubit.getLanguageName('fr'), 'Français');
-        expect(LanguageCubit.getLanguageName('es'), 'Español');
-        expect(LanguageCubit.getLanguageName('ar'), 'العربية');
-        expect(LanguageCubit.getLanguageName('hi'), 'हिन्दी');
-      });
+    expect(cubit.strings.lookup('hero.title'), 'Flutter Web');
+    expect(
+      cubit.strings.lookup('hero.missing', defaultValue: 'Fallback'),
+      'Fallback',
+    );
+  });
+}
 
-      test('returns safe fallbacks for unknown locale codes', () {
-        expect(LanguageCubit.getLanguageName('ja'), 'Unknown');
-      });
+void _registerLanguageMetadataTests() {
+  group('language metadata', () {
+    test('returns localized names for every supported public locale', () {
+      expect(LanguageCubit.getLanguageName('tr'), 'Türkçe');
+      expect(LanguageCubit.getLanguageName('en'), 'English');
+      expect(LanguageCubit.getLanguageName('de'), 'Deutsch');
+      expect(LanguageCubit.getLanguageName('fr'), 'Français');
+      expect(LanguageCubit.getLanguageName('es'), 'Español');
+      expect(LanguageCubit.getLanguageName('ar'), 'العربية');
+      expect(LanguageCubit.getLanguageName('hi'), 'हिन्दी');
+    });
+
+    test('returns safe fallbacks for unknown locale codes', () {
+      expect(LanguageCubit.getLanguageName('ja'), 'Unknown');
     });
   });
 }

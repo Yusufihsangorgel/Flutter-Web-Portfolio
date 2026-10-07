@@ -6,10 +6,11 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_web_portfolio/app/app_dependencies.dart';
 import 'package:flutter_web_portfolio/app/controllers/scene_director.dart';
 import 'package:flutter_web_portfolio/app/controllers/scroll_controller.dart';
-import 'package:flutter_web_portfolio/app/core/logging/app_logger.dart';
 import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
 import 'package:flutter_web_portfolio/app/features/render_quality/application/render_quality_controller.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../support/fake_app_logger.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -23,7 +24,7 @@ void main() {
     () async {
       final timers = _TimerLedger();
       final dependencies = await timers.track(
-        () => AppDependencies.bootstrap(logger: _FakeLogger()),
+        () => AppDependencies.bootstrap(logger: FakeAppLogger()),
       );
       expect(
         _owners(dependencies).map((owner) => owner.isClosed),
@@ -53,7 +54,7 @@ void main() {
       'on unmount', (tester) async {
     // Assets and preferences load through real I/O, not the fake clock.
     final dependencies = (await tester.runAsync(
-      () => AppDependencies.bootstrap(logger: _FakeLogger()),
+      () => AppDependencies.bootstrap(logger: FakeAppLogger()),
     ))!;
     final provided = <Type, Object>{};
 
@@ -139,15 +140,4 @@ final class _TimerLedger {
     _timers.add(timer);
     return timer;
   }
-}
-
-final class _FakeLogger implements AppLogger {
-  @override
-  void info(String message, {Object? error, StackTrace? stackTrace}) {}
-
-  @override
-  void warning(String message, {Object? error, StackTrace? stackTrace}) {}
-
-  @override
-  void error(String message, {Object? error, StackTrace? stackTrace}) {}
 }

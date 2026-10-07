@@ -1,24 +1,23 @@
-import 'dart:collection';
-
 import 'package:adaptive_render_budget/adaptive_render_budget.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:flutter_web_portfolio/app/features/render_quality/application/render_quality_controller.dart';
 import 'package:flutter_web_portfolio/app/features/render_quality/domain/render_quality.dart';
 
+import '../../../../packages/adaptive_render_budget/test/support/render_budget_fakes.dart';
+
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  late _FakeTimingSource timingSource;
-  late _FakeRefreshRateSource refreshRateSource;
-  late _FakeClock clock;
+  late FakeTimingSource timingSource;
+  late FakeRefreshRateSource refreshRateSource;
+  late FakeClock clock;
   late RenderQualityController controller;
 
   setUp(() {
-    timingSource = _FakeTimingSource();
-    refreshRateSource = _FakeRefreshRateSource(60);
-    clock = _FakeClock();
+    timingSource = FakeTimingSource();
+    refreshRateSource = FakeRefreshRateSource(60);
+    clock = FakeClock();
     controller = RenderQualityController(
       timingSource: timingSource,
       refreshRateSource: refreshRateSource,
@@ -149,60 +148,3 @@ final _slowFrame = RenderFrameTiming(
   buildDuration: const Duration(milliseconds: 20),
   rasterDuration: const Duration(milliseconds: 18),
 );
-
-final class _FakeTimingSource implements RenderFrameTimingSource {
-  final Set<RenderFrameTimingCallback> _listeners =
-      LinkedHashSet<RenderFrameTimingCallback>.identity();
-
-  int get listenerCount => _listeners.length;
-
-  @override
-  void addListener(RenderFrameTimingCallback listener) {
-    _listeners.add(listener);
-  }
-
-  @override
-  void removeListener(RenderFrameTimingCallback listener) {
-    _listeners.remove(listener);
-  }
-
-  void emitRepeated(RenderFrameTiming timing, int count) {
-    final batch = List<RenderFrameTiming>.filled(count, timing);
-    for (final listener in List<RenderFrameTimingCallback>.of(_listeners)) {
-      listener(batch);
-    }
-  }
-}
-
-final class _FakeRefreshRateSource extends ChangeNotifier
-    implements RefreshRateSource {
-  _FakeRefreshRateSource(this._refreshRateHz);
-
-  double _refreshRateHz;
-  int listenerCount = 0;
-
-  @override
-  double get refreshRateHz => _refreshRateHz;
-
-  @override
-  void addListener(VoidCallback listener) {
-    listenerCount += 1;
-    super.addListener(listener);
-  }
-
-  @override
-  void removeListener(VoidCallback listener) {
-    listenerCount -= 1;
-    super.removeListener(listener);
-  }
-
-  void setRefreshRate(double value) {
-    _refreshRateHz = value;
-    notifyListeners();
-  }
-}
-
-final class _FakeClock implements MonotonicClock {
-  @override
-  Duration elapsed = Duration.zero;
-}

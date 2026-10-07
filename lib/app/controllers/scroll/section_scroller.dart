@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_web_portfolio/app/core/constants/durations.dart';
 import 'package:flutter_web_portfolio/app/controllers/scroll/section_geometry_tracker.dart';
+import 'package:flutter_web_portfolio/app/core/constants/durations.dart';
 
 /// Moves the scroll position to the top of a chapter.
 final class SectionScroller {

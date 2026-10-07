@@ -7,11 +7,11 @@ import 'package:flutter_web_portfolio/app/core/theme/app_fonts.dart';
 import 'package:flutter_web_portfolio/app/domain/models/portfolio_document.dart'
     hide PortfolioLink;
 import 'package:flutter_web_portfolio/app/features/language/application/language_context.dart';
-import 'package:flutter_web_portfolio/app/modules/home/sections/section_style.dart';
 import 'package:flutter_web_portfolio/app/modules/home/sections/proof/widgets/contribution_event_order_lab.dart';
+import 'package:flutter_web_portfolio/app/modules/home/sections/section_style.dart';
 import 'package:flutter_web_portfolio/app/narrative/domain/narrative_document.dart';
-import 'package:flutter_web_portfolio/app/widgets/portfolio_link.dart';
 import 'package:flutter_web_portfolio/app/widgets/numbered_section_heading.dart';
+import 'package:flutter_web_portfolio/app/widgets/portfolio_link.dart';
 import 'package:flutter_web_portfolio/app/widgets/scene_accent_builder.dart';
 
 part 'proof/featured_contribution.dart';

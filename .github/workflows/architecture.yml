@@ -36,5 +36,5 @@ jobs:
       - name: Architecture gate calibration
         run: python3 -m unittest discover -s quality/tests -p 'test_architecture.py'
 
-      - name: Architecture import rules (warning mode)
-        run: python3 quality/check_architecture.py --warn-only
+      - name: Architecture import rules
+        run: python3 quality/check_architecture.py

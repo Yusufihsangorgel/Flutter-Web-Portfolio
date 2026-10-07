@@ -1,0 +1,565 @@
+{
+  "version": 1,
+  "limits": {
+    "lines": 60,
+    "buildLines": 100,
+    "parameters": 4,
+    "nesting": 4,
+    "complexity": 15
+  },
+  "entries": [
+    {
+      "path": "lib/app/app_dependencies.dart",
+      "identity": "class:AppDependencies.constructor:_",
+      "metric": "parameters",
+      "value": 7,
+      "reason": "Existing parameters debt measured when the AST metrics gate was introduced; refactor this callable separately and shrink this entry."
+    },
+    {
+      "path": "lib/app/core/theme/app_fonts.dart",
+      "identity": "class:_FontStyle.method:call",
+      "metric": "parameters",
+      "value": 19,
+      "reason": "Existing parameters debt measured when the AST metrics gate was introduced; refactor this callable separately and shrink this entry."
+    },
+    {
+      "path": "lib/app/domain/models/contribution.dart",
+      "identity": "class:PortfolioEventOrderLab.method:validate",
+      "metric": "complexity",
+      "value": 16,
+      "reason": "Existing complexity debt measured when the AST metrics gate was introduced; refactor this callable separately and shrink this entry."
+    },
+    {
+      "path": "lib/app/domain/models/writing.dart",
+      "identity": "class:PortfolioWritingEntry.constructor:new",
+      "metric": "parameters",
+      "value": 5,
+      "reason": "Existing parameters debt measured when the AST metrics gate was introduced; refactor this callable separately and shrink this entry."
+    },
+    {
+      "path": "lib/app/features/language/application/language_cubit.dart",
+      "identity": "class:LanguageCubit.constructor:_",
+      "metric": "parameters",
+      "value": 5,
+      "reason": "Existing parameters debt measured when the AST metrics gate was introduced; refactor this callable separately and shrink this entry."
+    },
+    {
+      "path": "lib/app/features/language/application/language_cubit.dart",
+      "identity": "class:LanguageCubit.constructor:new",
+      "metric": "parameters",
+      "value": 5,
+      "reason": "Existing parameters debt measured when the AST metrics gate was introduced; refactor this callable separately and shrink this entry."
+    },
+    {
+      "path": "lib/app/features/language/application/language_cubit.dart",
+      "identity": "class:LanguageCubit.method:changeLanguage",
+      "metric": "complexity",
+      "value": 16,
+      "reason": "Existing complexity debt measured when the AST metrics gate was introduced; refactor this callable separately and shrink this entry."
+    },
+    {
+      "path": "lib/app/features/render_quality/application/render_quality_controller.dart",
+      "identity": "class:RenderQualityState.constructor:new",
+      "metric": "parameters",
+      "value": 6,
+      "reason": "Existing parameters debt measured when the AST metrics gate was introduced; refactor this callable separately and shrink this entry."
+    },
+    {
+      "path": "lib/app/features/render_quality/application/render_quality_controller.dart",
+      "identity": "class:RenderQualityState.method:copyWith",
+      "metric": "parameters",
+      "value": 6,
+      "reason": "Existing parameters debt measured when the AST metrics gate was introduced; refactor this callable separately and shrink this entry."
+    },
+    {
+      "path": "lib/app/modules/home/sections/projects/widgets/atlas_labels.dart",
+      "identity": "class:ProjectAtlasLabels.constructor:new",
+      "metric": "parameters",
+      "value": 14,
+      "reason": "Existing parameters debt measured when the AST metrics gate was introduced; refactor this callable separately and shrink this entry."
+    },
+    {
+      "path": "lib/app/narrative/application/narrative_position.dart",
+      "identity": "class:NarrativePosition.constructor:new",
+      "metric": "parameters",
+      "value": 6,
+      "reason": "Existing parameters debt measured when the AST metrics gate was introduced; refactor this callable separately and shrink this entry."
+    },
+    {
+      "path": "lib/app/widgets/accessible_action.dart",
+      "identity": "class:AccessibleAction.constructor:new",
+      "metric": "parameters",
+      "value": 16,
+      "reason": "Existing parameters debt measured when the AST metrics gate was introduced; refactor this callable separately and shrink this entry."
+    },
+    {
+      "path": "lib/app/widgets/command_palette.dart",
+      "identity": "class:_PaletteCommand.constructor:new",
+      "metric": "parameters",
+      "value": 5,
+      "reason": "Existing parameters debt measured when the AST metrics gate was introduced; refactor this callable separately and shrink this entry."
+    },
+    {
+      "path": "lib/app/widgets/custom_sliver_app_bar.dart",
+      "identity": "class:_NavItem.constructor:new",
+      "metric": "parameters",
+      "value": 5,
+      "reason": "Existing parameters debt measured when the AST metrics gate was introduced; refactor this callable separately and shrink this entry."
+    },
+    {
+      "path": "lib/app/widgets/narrative_chapter_handoff.dart",
+      "identity": "class:NarrativeChapterHandoff.constructor:new",
+      "metric": "parameters",
+      "value": 6,
+      "reason": "Existing parameters debt measured when the AST metrics gate was introduced; refactor this callable separately and shrink this entry."
+    },
+    {
+      "path": "lib/app/widgets/navigation_overlay.dart",
+      "identity": "class:_MenuItemWidget.constructor:new",
+      "metric": "parameters",
+      "value": 7,
+      "reason": "Existing parameters debt measured when the AST metrics gate was introduced; refactor this callable separately and shrink this entry."
+    },
+    {
+      "path": "lib/app/widgets/navigation_overlay.dart",
+      "identity": "class:_NavigationOverlayState.method:build/closure:1",
+      "metric": "lines",
+      "value": 66,
+      "reason": "Existing lines debt measured when the AST metrics gate was introduced; refactor this callable separately and shrink this entry."
+    },
+    {
+      "path": "lib/app/widgets/numbered_section_heading.dart",
+      "identity": "class:NumberedSectionHeading.constructor:new",
+      "metric": "parameters",
+      "value": 5,
+      "reason": "Existing parameters debt measured when the AST metrics gate was introduced; refactor this callable separately and shrink this entry."
+    },
+    {
+      "path": "lib/app/widgets/portfolio_link.dart",
+      "identity": "class:PortfolioLink.constructor:new",
+      "metric": "parameters",
+      "value": 12,
+      "reason": "Existing parameters debt measured when the AST metrics gate was introduced; refactor this callable separately and shrink this entry."
+    },
+    {
+      "path": "packages/adaptive_render_budget/lib/src/adaptive_render_budget_controller.dart",
+      "identity": "class:AdaptiveRenderBudgetController.constructor:_",
+      "metric": "parameters",
+      "value": 6,
+      "reason": "Existing parameters debt measured when the AST metrics gate was introduced; refactor this callable separately and shrink this entry."
+    },
+    {
+      "path": "packages/adaptive_render_budget/lib/src/adaptive_render_budget_controller.dart",
+      "identity": "class:AdaptiveRenderBudgetController.constructor:new",
+      "metric": "parameters",
+      "value": 6,
+      "reason": "Existing parameters debt measured when the AST metrics gate was introduced; refactor this callable separately and shrink this entry."
+    },
+    {
+      "path": "packages/adaptive_render_budget/lib/src/adaptive_render_budget_controller.dart",
+      "identity": "class:AdaptiveRenderBudgetController.method:_publish",
+      "metric": "parameters",
+      "value": 7,
+      "reason": "Existing parameters debt measured when the AST metrics gate was introduced; refactor this callable separately and shrink this entry."
+    },
+    {
+      "path": "packages/adaptive_render_budget/lib/src/adaptive_render_budget_state.dart",
+      "identity": "class:AdaptiveRenderBudgetState.constructor:new",
+      "metric": "parameters",
+      "value": 7,
+      "reason": "Existing parameters debt measured when the AST metrics gate was introduced; refactor this callable separately and shrink this entry."
+    },
+    {
+      "path": "packages/adaptive_render_budget/lib/src/frame_load_window.dart",
+      "identity": "class:FrameLoadStatistics.constructor:new",
+      "metric": "parameters",
+      "value": 5,
+      "reason": "Existing parameters debt measured when the AST metrics gate was introduced; refactor this callable separately and shrink this entry."
+    },
+    {
+      "path": "packages/adaptive_render_budget/test/adaptive_render_budget_controller_test.dart",
+      "identity": "function:main/closure:1",
+      "metric": "lines",
+      "value": 214,
+      "reason": "Existing lines debt measured when the AST metrics gate was introduced; refactor this callable separately and shrink this entry."
+    },
+    {
+      "path": "packages/adaptive_render_budget/test/adaptive_render_budget_controller_test.dart",
+      "identity": "function:main",
+      "metric": "lines",
+      "value": 216,
+      "reason": "Existing lines debt measured when the AST metrics gate was introduced; refactor this callable separately and shrink this entry."
+    },
+    {
+      "path": "packages/adaptive_render_budget/test/adaptive_render_budget_policy_test.dart",
+      "identity": "function:main/closure:1",
+      "metric": "lines",
+      "value": 82,
+      "reason": "Existing lines debt measured when the AST metrics gate was introduced; refactor this callable separately and shrink this entry."
+    },
+    {
+      "path": "packages/adaptive_render_budget/test/adaptive_render_budget_policy_test.dart",
+      "identity": "function:main/closure:2",
+      "metric": "lines",
+      "value": 165,
+      "reason": "Existing lines debt measured when the AST metrics gate was introduced; refactor this callable separately and shrink this entry."
+    },
+    {
+      "path": "packages/adaptive_render_budget/test/adaptive_render_budget_policy_test.dart",
+      "identity": "function:main",
+      "metric": "lines",
+      "value": 250,
+      "reason": "Existing lines debt measured when the AST metrics gate was introduced; refactor this callable separately and shrink this entry."
+    },
+    {
+      "path": "packages/adaptive_render_budget/test/frame_load_window_test.dart",
+      "identity": "function:main/closure:1",
+      "metric": "lines",
+      "value": 73,
+      "reason": "Existing lines debt measured when the AST metrics gate was introduced; refactor this callable separately and shrink this entry."
+    },
+    {
+      "path": "packages/adaptive_render_budget/test/frame_load_window_test.dart",
+      "identity": "function:main",
+      "metric": "lines",
+      "value": 104,
+      "reason": "Existing lines debt measured when the AST metrics gate was introduced; refactor this callable separately and shrink this entry."
+    },
+    {
+      "path": "packages/adaptive_render_budget/test/sources_test.dart",
+      "identity": "function:main",
+      "metric": "lines",
+      "value": 108,
+      "reason": "Existing lines debt measured when the AST metrics gate was introduced; refactor this callable separately and shrink this entry."
+    },
+    {
+      "path": "test/unit/bootstrap/app_dependencies_test.dart",
+      "identity": "class:_TimerLedger.method:track/closure:1",
+      "metric": "parameters",
+      "value": 5,
+      "reason": "Existing parameters debt measured when the AST metrics gate was introduced; refactor this callable separately and shrink this entry."
+    },
+    {
+      "path": "test/unit/bootstrap/app_dependencies_test.dart",
+      "identity": "class:_TimerLedger.method:track/closure:2",
+      "metric": "parameters",
+      "value": 5,
+      "reason": "Existing parameters debt measured when the AST metrics gate was introduced; refactor this callable separately and shrink this entry."
+    },
+    {
+      "path": "test/unit/bootstrap/app_dependencies_test.dart",
+      "identity": "function:main",
+      "metric": "lines",
+      "value": 85,
+      "reason": "Existing lines debt measured when the AST metrics gate was introduced; refactor this callable separately and shrink this entry."
+    },
+    {
+      "path": "test/unit/constants/scene_configs_test.dart",
+      "identity": "function:main",
+      "metric": "lines",
+      "value": 71,
+      "reason": "Existing lines debt measured when the AST metrics gate was introduced; refactor this callable separately and shrink this entry."
+    },
+    {
+      "path": "test/unit/controllers/language_cubit_test.dart",
+      "identity": "function:main/closure:1",
+      "metric": "lines",
+      "value": 313,
+      "reason": "Existing lines debt measured when the AST metrics gate was introduced; refactor this callable separately and shrink this entry."
+    },
+    {
+      "path": "test/unit/controllers/language_cubit_test.dart",
+      "identity": "function:main",
+      "metric": "lines",
+      "value": 315,
+      "reason": "Existing lines debt measured when the AST metrics gate was introduced; refactor this callable separately and shrink this entry."
+    },
+    {
+      "path": "test/unit/controllers/scene_director_test.dart",
+      "identity": "function:main/closure:2",
+      "metric": "lines",
+      "value": 61,
+      "reason": "Existing lines debt measured when the AST metrics gate was introduced; refactor this callable separately and shrink this entry."
+    },
+    {
+      "path": "test/unit/controllers/scene_director_test.dart",
+      "identity": "function:main",
+      "metric": "lines",
+      "value": 77,
+      "reason": "Existing lines debt measured when the AST metrics gate was introduced; refactor this callable separately and shrink this entry."
+    },
+    {
+      "path": "test/unit/controllers/scroll/deep_link_test.dart",
+      "identity": "function:main",
+      "metric": "lines",
+      "value": 165,
+      "reason": "Existing lines debt measured when the AST metrics gate was introduced; refactor this callable separately and shrink this entry."
+    },
+    {
+      "path": "test/unit/core/theme/locale_font_loader_test.dart",
+      "identity": "function:main",
+      "metric": "lines",
+      "value": 86,
+      "reason": "Existing lines debt measured when the AST metrics gate was introduced; refactor this callable separately and shrink this entry."
+    },
+    {
+      "path": "test/unit/data/json_fields_test.dart",
+      "identity": "function:main/closure:2",
+      "metric": "lines",
+      "value": 90,
+      "reason": "Existing lines debt measured when the AST metrics gate was introduced; refactor this callable separately and shrink this entry."
+    },
+    {
+      "path": "test/unit/data/json_fields_test.dart",
+      "identity": "function:main",
+      "metric": "lines",
+      "value": 131,
+      "reason": "Existing lines debt measured when the AST metrics gate was introduced; refactor this callable separately and shrink this entry."
+    },
+    {
+      "path": "test/unit/data/portfolio_localization_catalog_test.dart",
+      "identity": "function:main/closure:1/closure:2",
+      "metric": "lines",
+      "value": 114,
+      "reason": "Existing lines debt measured when the AST metrics gate was introduced; refactor this callable separately and shrink this entry."
+    },
+    {
+      "path": "test/unit/data/portfolio_localization_catalog_test.dart",
+      "identity": "function:main/closure:1",
+      "metric": "lines",
+      "value": 144,
+      "reason": "Existing lines debt measured when the AST metrics gate was introduced; refactor this callable separately and shrink this entry."
+    },
+    {
+      "path": "test/unit/data/portfolio_localization_catalog_test.dart",
+      "identity": "function:main",
+      "metric": "lines",
+      "value": 152,
+      "reason": "Existing lines debt measured when the AST metrics gate was introduced; refactor this callable separately and shrink this entry."
+    },
+    {
+      "path": "test/unit/domain/portfolio_document_test.dart",
+      "identity": "function:main/closure:1/closure:17",
+      "metric": "lines",
+      "value": 249,
+      "reason": "Existing lines debt measured when the AST metrics gate was introduced; refactor this callable separately and shrink this entry."
+    },
+    {
+      "path": "test/unit/domain/portfolio_document_test.dart",
+      "identity": "function:main/closure:1/closure:2",
+      "metric": "lines",
+      "value": 84,
+      "reason": "Existing lines debt measured when the AST metrics gate was introduced; refactor this callable separately and shrink this entry."
+    },
+    {
+      "path": "test/unit/domain/portfolio_document_test.dart",
+      "identity": "function:main/closure:1/closure:5",
+      "metric": "lines",
+      "value": 63,
+      "reason": "Existing lines debt measured when the AST metrics gate was introduced; refactor this callable separately and shrink this entry."
+    },
+    {
+      "path": "test/unit/domain/portfolio_document_test.dart",
+      "identity": "function:main/closure:1",
+      "metric": "lines",
+      "value": 646,
+      "reason": "Existing lines debt measured when the AST metrics gate was introduced; refactor this callable separately and shrink this entry."
+    },
+    {
+      "path": "test/unit/domain/portfolio_document_test.dart",
+      "identity": "function:main",
+      "metric": "lines",
+      "value": 648,
+      "reason": "Existing lines debt measured when the AST metrics gate was introduced; refactor this callable separately and shrink this entry."
+    },
+    {
+      "path": "test/unit/features/render_quality/render_quality_controller_test.dart",
+      "identity": "function:main/closure:3",
+      "metric": "lines",
+      "value": 84,
+      "reason": "Existing lines debt measured when the AST metrics gate was introduced; refactor this callable separately and shrink this entry."
+    },
+    {
+      "path": "test/unit/features/render_quality/render_quality_controller_test.dart",
+      "identity": "function:main",
+      "metric": "lines",
+      "value": 110,
+      "reason": "Existing lines debt measured when the AST metrics gate was introduced; refactor this callable separately and shrink this entry."
+    },
+    {
+      "path": "test/unit/narrative/narrative_anchor_path_test.dart",
+      "identity": "function:main",
+      "metric": "lines",
+      "value": 198,
+      "reason": "Existing lines debt measured when the AST metrics gate was introduced; refactor this callable separately and shrink this entry."
+    },
+    {
+      "path": "test/unit/narrative/narrative_document_test.dart",
+      "identity": "function:main/closure:1",
+      "metric": "lines",
+      "value": 91,
+      "reason": "Existing lines debt measured when the AST metrics gate was introduced; refactor this callable separately and shrink this entry."
+    },
+    {
+      "path": "test/unit/narrative/narrative_document_test.dart",
+      "identity": "function:main",
+      "metric": "lines",
+      "value": 141,
+      "reason": "Existing lines debt measured when the AST metrics gate was introduced; refactor this callable separately and shrink this entry."
+    },
+    {
+      "path": "test/unit/narrative/narrative_position_test.dart",
+      "identity": "function:main/closure:2",
+      "metric": "lines",
+      "value": 234,
+      "reason": "Existing lines debt measured when the AST metrics gate was introduced; refactor this callable separately and shrink this entry."
+    },
+    {
+      "path": "test/unit/narrative/narrative_position_test.dart",
+      "identity": "function:main",
+      "metric": "lines",
+      "value": 284,
+      "reason": "Existing lines debt measured when the AST metrics gate was introduced; refactor this callable separately and shrink this entry."
+    },
+    {
+      "path": "test/widget/accessible_action_test.dart",
+      "identity": "function:main/closure:1",
+      "metric": "lines",
+      "value": 170,
+      "reason": "Existing lines debt measured when the AST metrics gate was introduced; refactor this callable separately and shrink this entry."
+    },
+    {
+      "path": "test/widget/accessible_action_test.dart",
+      "identity": "function:main",
+      "metric": "lines",
+      "value": 172,
+      "reason": "Existing lines debt measured when the AST metrics gate was introduced; refactor this callable separately and shrink this entry."
+    },
+    {
+      "path": "test/widget/narrative_chapter_handoff_test.dart",
+      "identity": "function:main",
+      "metric": "lines",
+      "value": 253,
+      "reason": "Existing lines debt measured when the AST metrics gate was introduced; refactor this callable separately and shrink this entry."
+    },
+    {
+      "path": "test/widget/narrative_stage_test.dart",
+      "identity": "function:main",
+      "metric": "lines",
+      "value": 91,
+      "reason": "Existing lines debt measured when the AST metrics gate was introduced; refactor this callable separately and shrink this entry."
+    },
+    {
+      "path": "test/widget/numbered_section_heading_test.dart",
+      "identity": "function:main/closure:1",
+      "metric": "lines",
+      "value": 75,
+      "reason": "Existing lines debt measured when the AST metrics gate was introduced; refactor this callable separately and shrink this entry."
+    },
+    {
+      "path": "test/widget/numbered_section_heading_test.dart",
+      "identity": "function:main",
+      "metric": "lines",
+      "value": 77,
+      "reason": "Existing lines debt measured when the AST metrics gate was introduced; refactor this callable separately and shrink this entry."
+    },
+    {
+      "path": "test/widget/portfolio_link_test.dart",
+      "identity": "function:main/closure:1/closure:7",
+      "metric": "lines",
+      "value": 66,
+      "reason": "Existing lines debt measured when the AST metrics gate was introduced; refactor this callable separately and shrink this entry."
+    },
+    {
+      "path": "test/widget/portfolio_link_test.dart",
+      "identity": "function:main/closure:1",
+      "metric": "lines",
+      "value": 342,
+      "reason": "Existing lines debt measured when the AST metrics gate was introduced; refactor this callable separately and shrink this entry."
+    },
+    {
+      "path": "test/widget/portfolio_link_test.dart",
+      "identity": "function:main",
+      "metric": "lines",
+      "value": 344,
+      "reason": "Existing lines debt measured when the AST metrics gate was introduced; refactor this callable separately and shrink this entry."
+    },
+    {
+      "path": "test/widget/project_atlas_landing_test.dart",
+      "identity": "function:main/closure:1",
+      "metric": "lines",
+      "value": 61,
+      "reason": "Existing lines debt measured when the AST metrics gate was introduced; refactor this callable separately and shrink this entry."
+    },
+    {
+      "path": "test/widget/project_atlas_landing_test.dart",
+      "identity": "function:main",
+      "metric": "lines",
+      "value": 66,
+      "reason": "Existing lines debt measured when the AST metrics gate was introduced; refactor this callable separately and shrink this entry."
+    },
+    {
+      "path": "test/widget/project_atlas_test.dart",
+      "identity": "function:main/closure:3",
+      "metric": "lines",
+      "value": 155,
+      "reason": "Existing lines debt measured when the AST metrics gate was introduced; refactor this callable separately and shrink this entry."
+    },
+    {
+      "path": "test/widget/project_atlas_test.dart",
+      "identity": "function:main",
+      "metric": "lines",
+      "value": 282,
+      "reason": "Existing lines debt measured when the AST metrics gate was introduced; refactor this callable separately and shrink this entry."
+    },
+    {
+      "path": "test/widget/projects_section_test.dart",
+      "identity": "function:main",
+      "metric": "lines",
+      "value": 383,
+      "reason": "Existing lines debt measured when the AST metrics gate was introduced; refactor this callable separately and shrink this entry."
+    },
+    {
+      "path": "test/widget/scroll_indicator_test.dart",
+      "identity": "function:main/closure:1",
+      "metric": "lines",
+      "value": 99,
+      "reason": "Existing lines debt measured when the AST metrics gate was introduced; refactor this callable separately and shrink this entry."
+    },
+    {
+      "path": "test/widget/scroll_indicator_test.dart",
+      "identity": "function:main",
+      "metric": "lines",
+      "value": 101,
+      "reason": "Existing lines debt measured when the AST metrics gate was introduced; refactor this callable separately and shrink this entry."
+    },
+    {
+      "path": "test/widget/scroll_reflow_test.dart",
+      "identity": "function:main/closure:1",
+      "metric": "lines",
+      "value": 64,
+      "reason": "Existing lines debt measured when the AST metrics gate was introduced; refactor this callable separately and shrink this entry."
+    },
+    {
+      "path": "test/widget/scroll_reflow_test.dart",
+      "identity": "function:main/closure:2",
+      "metric": "lines",
+      "value": 80,
+      "reason": "Existing lines debt measured when the AST metrics gate was introduced; refactor this callable separately and shrink this entry."
+    },
+    {
+      "path": "test/widget/scroll_reflow_test.dart",
+      "identity": "function:main/closure:3",
+      "metric": "lines",
+      "value": 90,
+      "reason": "Existing lines debt measured when the AST metrics gate was introduced; refactor this callable separately and shrink this entry."
+    },
+    {
+      "path": "test/widget/scroll_reflow_test.dart",
+      "identity": "function:main",
+      "metric": "lines",
+      "value": 243,
+      "reason": "Existing lines debt measured when the AST metrics gate was introduced; refactor this callable separately and shrink this entry."
+    }
+  ]
+}

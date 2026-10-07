@@ -1,7 +1,7 @@
 import 'dart:js_interop';
 
-import 'package:web/web.dart' as web;
 import 'package:flutter_web_portfolio/app/core/logging/app_logger.dart';
+import 'package:web/web.dart' as web;
 
 AppLogger createAppLogger() => _WebAppLogger();
 
