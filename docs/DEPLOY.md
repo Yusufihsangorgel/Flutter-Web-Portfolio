@@ -26,8 +26,14 @@ node tool/serve_web.mjs
 ```
 
 Open `http://127.0.0.1:4173` and inspect the exact release before sending it to
-a provider. The local server applies the same isolation headers and SPA fallback
-expected from production; stop it with `Ctrl+C`.
+a provider. The local server applies the same isolation headers expected from
+production and answers unknown paths with the static `404.html` page and HTTP
+status 404; stop it with `Ctrl+C`.
+
+Section navigation uses `#/section` fragments, which never reach the server, so
+no host rewrites paths to `index.html`. Every provider below serves the root
+document for `/` and returns its 404 response for any path that is not a file in
+the release.
 
 The release command validates content and the reachable Dart source graph,
 renders derived assets, verifies every provider contract, builds with
@@ -58,7 +64,7 @@ npm run build:release -- --base-href /repository-name/
 The deploy helper builds first and always re-runs `verify:bundle` before a
 prebuilt directory can leave the machine. Vercel is the exception: its CLI is
 invoked from the repository root so `vercel.json` performs the same canonical
-hosted build and applies the checked-in rewrites and headers. `--skip-build` is
+hosted build and applies the checked-in headers. `--skip-build` is
 therefore rejected for Vercel.
 
 ## GitHub Pages
@@ -92,9 +98,9 @@ firebase login
 npm run deploy -- firebase --project your-project-id
 ```
 
-The checked-in configuration serves exact static assets first, rewrites
-document routes to `index.html`, sends the isolation headers required by
-threaded SkWasm, and revalidates stable Flutter entrypoint names.
+The checked-in configuration serves exact static files only, answers unknown
+paths with `404.html`, sends the isolation headers required by threaded SkWasm,
+and revalidates stable Flutter entrypoint names.
 
 Official references:
 [Hosting quickstart](https://firebase.google.com/docs/hosting/quickstart),
@@ -158,8 +164,8 @@ and
 ## Vercel
 
 Import the repository or use the CLI. `vercel.json` runs the pinned hosted build,
-publishes `build/web`, preserves SPA routes, and adds the same cross-origin
-isolation headers.
+publishes `build/web`, serves `404.html` for unknown paths, and adds the same
+cross-origin isolation headers.
 
 Vercel guarantees the selected Node **major**, not an exact patch. The hosted
 build therefore accepts Vercel's current Node 24.x release while local builds,
