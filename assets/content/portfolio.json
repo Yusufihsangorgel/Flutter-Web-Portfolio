@@ -1,5 +1,5 @@
 {
-  "schema_version": 10,
+  "schema_version": 11,
   "content_version": "2026.09.28.1",
   "verified_at": "2026-08-29",
   "site": {
@@ -1039,7 +1039,8 @@
       "downloads": 211,
       "category": "server",
       "topics": [],
-      "maturity": "L3",
+      "featured": true,
+      "maturity_level": 3,
       "proof": "Kill the worker mid-task and the task survives — a real TCP-proxy drop test proves it",
       "roadmap": [
         {
@@ -1076,7 +1077,8 @@
       "downloads": 392,
       "category": "native-ffi",
       "topics": [],
-      "maturity": "L3",
+      "featured": false,
+      "maturity_level": 3,
       "proof": "(a+)+$ at 28 chars: 2.76s in RegExp, 39µs here — plotted from a real run",
       "roadmap": [
         {
@@ -1113,7 +1115,8 @@
       "downloads": 360,
       "category": "native-ffi",
       "topics": [],
-      "maturity": "L3",
+      "featured": false,
+      "maturity_level": 3,
       "proof": "The popular pure-Dart writer spends 1.6 GiB exporting 100k rows; this stays flat",
       "roadmap": [
         {
@@ -1150,7 +1153,8 @@
       "downloads": 216,
       "category": "ai-llm",
       "topics": [],
-      "maturity": "L3",
+      "featured": false,
+      "maturity_level": 3,
       "proof": "Per-request timeouts and guaranteed child-process cleanup — no hung runs, no orphans",
       "roadmap": [
         {
@@ -1187,7 +1191,8 @@
       "downloads": 292,
       "category": "native-ffi",
       "topics": [],
-      "maturity": "L3",
+      "featured": false,
+      "maturity_level": 3,
       "proof": "2.2-4.8 characters per token inside one document — a single maxChars cannot be right",
       "roadmap": [
         {
@@ -1224,7 +1229,8 @@
       "downloads": 364,
       "category": "native-ffi",
       "topics": [],
-      "maturity": "L5",
+      "featured": true,
+      "maturity_level": 5,
       "proof": "The portfolio's one proven external user files and fixes real issues here",
       "roadmap": [
         {
@@ -1261,7 +1267,8 @@
       "downloads": 174,
       "category": "native-ffi",
       "topics": [],
-      "maturity": "L3",
+      "featured": false,
+      "maturity_level": 3,
       "proof": "Top-10 over 100,000 embeddings: 82ms scalar loop down to 13.3ms",
       "roadmap": [
         {
@@ -1298,7 +1305,8 @@
       "downloads": 234,
       "category": "ai-llm",
       "topics": [],
-      "maturity": "L3",
+      "featured": false,
+      "maturity_level": 3,
       "proof": "Normalises the VM-vs-web jsonDecode('25.0') integer trap before validation",
       "roadmap": [
         {
@@ -1335,7 +1343,8 @@
       "downloads": 312,
       "category": "ai-llm",
       "topics": [],
-      "maturity": "L3",
+      "featured": false,
+      "maturity_level": 3,
       "proof": "MMR diverse retrieval the bigger framework doesn't have (grep: zero hits)",
       "roadmap": [
         {
@@ -1372,7 +1381,8 @@
       "downloads": 319,
       "category": "native-ffi",
       "topics": [],
-      "maturity": "L3",
+      "featured": false,
+      "maturity_level": 3,
       "proof": "Full pipeline 29.5ms vs 150.2ms against the pure-Dart incumbent (M4 Pro)",
       "roadmap": [
         {
@@ -1409,7 +1419,8 @@
       "downloads": 328,
       "category": "native-ffi",
       "topics": [],
-      "maturity": "L3",
+      "featured": false,
+      "maturity_level": 3,
       "proof": "22x the pure-Dart throughput on bulk data (2318 vs 102 MB/s at 1 MiB)",
       "roadmap": [
         {
@@ -1446,7 +1457,8 @@
       "downloads": 467,
       "category": "native-ffi",
       "topics": [],
-      "maturity": "L3",
+      "featured": false,
+      "maturity_level": 3,
       "proof": "206µs decode where the nearest pure option takes 41.2ms on the same fixture",
       "roadmap": [
         {
@@ -1483,7 +1495,8 @@
       "downloads": 165,
       "category": "server",
       "topics": [],
-      "maturity": "L3",
+      "featured": false,
+      "maturity_level": 3,
       "proof": "Hedging measured: p99 602ms down to 74ms for 5 extra calls in 1,000",
       "roadmap": [
         {
@@ -1520,7 +1533,8 @@
       "downloads": 151,
       "category": "ai-llm",
       "topics": [],
-      "maturity": "L3",
+      "featured": false,
+      "maturity_level": 3,
       "proof": "Baseline diffs name the one broken and one fixed case a bare pass-rate hides",
       "roadmap": [
         {
@@ -1557,7 +1571,8 @@
       "downloads": 373,
       "category": "ai-llm",
       "topics": [],
-      "maturity": "L3",
+      "featured": false,
+      "maturity_level": 3,
       "proof": "Accepts 150 of 150 streamed prefixes where jsonDecode accepts 1",
       "roadmap": [
         {
@@ -1594,7 +1609,8 @@
       "downloads": 270,
       "category": "dev-tool",
       "topics": [],
-      "maturity": "L3",
+      "featured": true,
+      "maturity_level": 3,
       "proof": "Clicks the engine's accessibility placeholder — the step a bare DOM dump has nowhere to put",
       "roadmap": [
         {
@@ -1631,7 +1647,8 @@
       "downloads": 256,
       "category": "flutter-ui",
       "topics": [],
-      "maturity": "L3",
+      "featured": true,
+      "maturity_level": 3,
       "proof": "In use by chaldea, an open-source Fate/Grand Order planner that moved over from photo_view in September 2026",
       "roadmap": [
         {
@@ -1668,7 +1685,8 @@
       "downloads": 158,
       "category": "flutter-ui",
       "topics": [],
-      "maturity": "L3",
+      "featured": false,
+      "maturity_level": 3,
       "proof": "Freezes visibly under reduced motion instead of disappearing",
       "roadmap": [
         {
@@ -1705,7 +1723,8 @@
       "downloads": 1559,
       "category": "flutter-ui",
       "topics": [],
-      "maturity": "L3",
+      "featured": true,
+      "maturity_level": 3,
       "proof": "Counts and reaches matches in rows a ListView never constructed",
       "roadmap": [
         {
@@ -1742,7 +1761,8 @@
       "downloads": 202,
       "category": "flutter-ui",
       "topics": [],
-      "maturity": "L3",
+      "featured": false,
+      "maturity_level": 3,
       "proof": "One static factor leaves a fitted 40pt label 7pt wrong — charted from a real run",
       "roadmap": [
         {
@@ -1779,7 +1799,8 @@
       "downloads": 83,
       "category": "flutter-ui",
       "topics": [],
-      "maturity": "L3",
+      "featured": false,
+      "maturity_level": 3,
       "proof": "The only package in its category whose lib mentions reduced motion at all",
       "roadmap": [
         {
@@ -1816,7 +1837,8 @@
       "downloads": 170,
       "category": "flutter-ui",
       "topics": [],
-      "maturity": "L3",
+      "featured": false,
+      "maturity_level": 3,
       "proof": "20 collapsed panels build 15 hidden bodies without lazy — and 0 with it",
       "roadmap": [
         {
@@ -1858,7 +1880,8 @@
         "async",
         "isolates"
       ],
-      "maturity": "L3",
+      "featured": false,
+      "maturity_level": 3,
       "proof": "Future.any leaks the losing receive; the file:line evidence is in the README",
       "roadmap": [
         {
@@ -1912,73 +1935,85 @@
       "title": "Why one failed font load kept breaking pendingFonts() in Flutter",
       "url": "https://yusufihsangorgel.github.io/2026/09/24/why-one-failed-font-load-kept-breaking-pendingfonts.html",
       "source": "blog",
-      "date": "2026-09-24"
+      "date": "2026-09-24",
+      "featured": false
     },
     {
       "title": "Run it, bound it, check it every week: how I made a Dart MCP client checkable",
       "url": "https://yusufihsangorgel.github.io/2026/09/23/making-an-mcp-client-library-checkable.html",
       "source": "blog",
-      "date": "2026-09-23"
+      "date": "2026-09-23",
+      "featured": false
     },
     {
       "title": "Your leak test is probably measuring the test runner",
       "url": "https://dev.to/yusufihsangorgel/your-leak-test-is-probably-measuring-the-test-runner-1m3m",
       "source": "devto",
-      "date": "2026-08-03"
+      "date": "2026-08-03",
+      "featured": false
     },
     {
       "title": "The Biggest MCP Update Ever, Explained With a Restaurant",
       "url": "https://medium.com/@developeryusufihsan/the-biggest-mcp-update-ever-explained-with-a-restaurant-7b1f2bcd7d06?source=rss-5943a54dc689------2",
       "source": "medium",
-      "date": "2026-07-29"
+      "date": "2026-07-29",
+      "featured": false
     },
     {
       "title": "The object that falls out of the Set it is still in — mutable hashCode in Dart",
       "url": "https://dev.to/yusufihsangorgel/the-object-that-falls-out-of-the-set-it-is-still-in-mutable-hashcode-in-dart-2665",
       "source": "devto",
-      "date": "2026-07-24"
+      "date": "2026-07-24",
+      "featured": false
     },
     {
       "title": "My CI ran on three platforms and still could not catch this",
       "url": "https://dev.to/yusufihsangorgel/my-ci-ran-on-three-platforms-and-still-could-not-catch-this-l04",
       "source": "devto",
-      "date": "2026-07-24"
+      "date": "2026-07-24",
+      "featured": false
     },
     {
       "title": "The 24.8 milliseconds you pay before ffmpeg decodes a single sample",
       "url": "https://dev.to/yusufihsangorgel/the-248-milliseconds-you-pay-before-ffmpeg-decodes-a-single-sample-3983",
       "source": "devto",
-      "date": "2026-07-24"
+      "date": "2026-07-24",
+      "featured": false
     },
     {
       "title": "Pinning the point you pinch: the one line behind anchored zoom",
       "url": "https://dev.to/yusufihsangorgel/pinning-the-point-you-pinch-the-one-line-behind-anchored-zoom-m4l",
       "source": "devto",
-      "date": "2026-07-23"
+      "date": "2026-07-23",
+      "featured": false
     },
     {
       "title": "A public const constructor is the back door around your factory's validation",
       "url": "https://dev.to/yusufihsangorgel/a-public-const-constructor-is-the-back-door-around-your-factorys-validation-2hh8",
       "source": "devto",
-      "date": "2026-07-23"
+      "date": "2026-07-23",
+      "featured": false
     },
     {
       "title": "2.75 seconds or 2 microseconds: the same regex, two engines",
       "url": "https://dev.to/yusufihsangorgel/275-seconds-or-2-microseconds-the-same-regex-two-engines-k2o",
       "source": "devto",
-      "date": "2026-07-23"
+      "date": "2026-07-23",
+      "featured": false
     },
     {
       "title": "A finite loop in skeleton_shimmer that stopped resuming when the loop count was raised",
       "url": "https://dev.to/yusufihsangorgel/a-finite-loop-in-skeletonshimmer-that-stopped-resuming-when-the-loop-count-was-raised-44ib",
       "source": "devto",
-      "date": "2026-07-23"
+      "date": "2026-07-23",
+      "featured": false
     },
     {
       "title": "A route could write index.html outside the output directory: a path traversal fix in flutter_prerender 0.3.2",
       "url": "https://dev.to/yusufihsangorgel/a-route-could-write-indexhtml-outside-the-output-directory-a-path-traversal-fix-in-2o9",
       "source": "devto",
-      "date": "2026-07-23"
+      "date": "2026-07-23",
+      "featured": false
     }
   ]
 }

@@ -82,7 +82,7 @@
     "subtitle": "{count} पैकेज pub.dev पर प्रकाशित हैं, जिनमें से {perfect} का स्कोर पूरे 160/160 है। हर पैकेज के साथ एक मापा गया दावा, चलने योग्य उदाहरण और उसका रोडमैप है।",
     "pub_points": "pub अंक",
     "open_package": "pub.dev पर खोलें",
-    "maturity": "परिपक्वता",
+    "maturity_level": "परिपक्वता {level} / {max}",
     "roadmap": "रोडमैप",
     "status_done": "प्रकाशित",
     "status_doing": "प्रगति पर",
