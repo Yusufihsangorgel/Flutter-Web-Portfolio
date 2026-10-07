@@ -7,9 +7,11 @@ function appendList(lines, heading, items) {
 
 function appendWriting(lines, summary) {
   lines.push('## Writing', '');
-  lines.push(summary.writingChanged
-    ? `Updated: ${summary.writingEntryCount} entries (was ${summary.previousWritingEntryCount}).`
-    : 'No change.');
+  lines.push(
+    summary.writingChanged
+      ? `Updated: ${summary.writingEntryCount} entries (was ${summary.previousWritingEntryCount}).`
+      : 'No change.',
+  );
   if ((summary.writingFailures ?? []).length === 0) {
     lines.push('No source failures.');
   } else {
@@ -43,7 +45,9 @@ function appendCandidates(lines, summary) {
     for (const group of summary.candidateGroups) {
       lines.push(`### ${group.repo}`, '');
       for (const item of group.items) {
-        lines.push(`- [${item.title}](${item.url})${item.mergedDate ? ` — merged ${item.mergedDate}` : ''}`);
+        lines.push(
+          `- [${item.title}](${item.url})${item.mergedDate ? ` — merged ${item.mergedDate}` : ''}`,
+        );
       }
       lines.push('');
     }
@@ -56,9 +60,13 @@ export function buildReport(summary) {
   appendList(lines, '## Counter-only changes', summary.counterChanges);
   appendWriting(lines, summary);
   appendScores(lines, summary);
-  appendList(lines, '## Closed without merging', summary.closedUnmergedContributions.map(
-    (item) => `\`${item.id}\`: ${item.url} closed without merging; entry left unchanged.`,
-  ));
+  appendList(
+    lines,
+    '## Closed without merging',
+    summary.closedUnmergedContributions.map(
+      (item) => `\`${item.id}\`: ${item.url} closed without merging; entry left unchanged.`,
+    ),
+  );
   appendList(lines, '## Fetch failures', summary.failures);
   appendCandidates(lines, summary);
   return `${lines.join('\n').trimEnd()}\n`;

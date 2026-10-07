@@ -10,7 +10,7 @@ Describe the change and why it is needed.
 
 Follow the [architecture rules](../blob/main/docs/ARCHITECTURE-RULES.md) and
 [CONTRIBUTING.md](../blob/main/CONTRIBUTING.md). CI uses Flutter 3.47.5 from
-[`tool/toolchain.json`](../blob/main/tool/toolchain.json), its bundled Dart
+[`tool/quality/toolchain.json`](../blob/main/tool/quality/toolchain.json), its bundled Dart
 3.13.4, and Node.js 24.18.0.
 
 These workflows run on the pull request:

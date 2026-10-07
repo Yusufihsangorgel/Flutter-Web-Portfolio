@@ -1,6 +1,6 @@
 # Automated data refresh
 
-`tool/refresh_portfolio_data.mjs` keeps the factual parts of
+`tool/refresh/refresh_portfolio_data.mjs` keeps the factual parts of
 `assets/content/portfolio.json` in sync with their live sources, so the site
 does not depend on someone remembering to update it by hand.
 

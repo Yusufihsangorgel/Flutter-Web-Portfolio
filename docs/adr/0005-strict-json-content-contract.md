@@ -10,7 +10,7 @@ The canonical [portfolio document](../../assets/content/portfolio.json) declares
 
 ## Decision
 
-Keep factual identifiers, URLs, dates, and records in one canonical document. Treat locale documents as complete overlays of human-facing copy: a missing required translation fails the overlay instead of mixing languages silently. Validate schemas and content during [release checks](../../tool/validate_portfolio.dart) and at application load. Change schema versions when the contract changes incompatibly.
+Keep factual identifiers, URLs, dates, and records in one canonical document. Treat locale documents as complete overlays of human-facing copy: a missing required translation fails the overlay instead of mixing languages silently. Validate schemas and content during [release checks](../../tool/content/validate_portfolio.dart) and at application load. Change schema versions when the contract changes incompatibly.
 
 ## Consequences
 
