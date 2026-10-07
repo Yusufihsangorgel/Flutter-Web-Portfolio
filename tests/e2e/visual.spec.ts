@@ -10,6 +10,7 @@ import {
   waitForStableCanvas,
   waitForWorkImagesPainted,
 } from './helpers/visual_capture';
+import { semanticsTree } from './helpers/semantics_scroll';
 
 const portfolio = JSON.parse(
   readFileSync('assets/content/portfolio.json', 'utf8'),
@@ -270,7 +271,7 @@ async function scrollUntilHeadingRenders(
 }
 
 async function scrollToVisualText(page: Page, text: string) {
-  const target = page.getByText(text).first();
+  const target = semanticsTree(page).getByText(text).first();
   for (let attempt = 0; attempt < 80; attempt += 1) {
     if ((await target.count()) > 0) {
       const [box, viewportHeight] = await Promise.all([

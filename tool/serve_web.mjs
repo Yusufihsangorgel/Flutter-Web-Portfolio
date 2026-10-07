@@ -30,10 +30,12 @@ const contentTypes = new Map([
   ['.png', 'image/png'],
   ['.svg', 'image/svg+xml'],
   ['.ttf', 'font/ttf'],
+  ['.txt', 'text/plain; charset=utf-8'],
   ['.wasm', 'application/wasm'],
   ['.webp', 'image/webp'],
   ['.woff', 'font/woff'],
   ['.woff2', 'font/woff2'],
+  ['.xml', 'application/xml; charset=utf-8'],
 ]);
 
 if (!existsSync(join(configuredRoot, 'index.html'))) {
@@ -42,10 +44,22 @@ if (!existsSync(join(configuredRoot, 'index.html'))) {
   );
 }
 const root = canonicalStaticRoot(configuredRoot);
+const notFoundPage = resolveStaticFile(root, '/404.html');
 
 const globalHeaders = parseGlobalStaticHeaders(
   readFileSync(join(root, '_headers'), 'utf8'),
 );
+
+// Mirrors `error_page 404 /404.html`: the status stays 404.
+function sendNotFound(response) {
+  if (!notFoundPage) {
+    response.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
+    response.end('Not Found');
+    return;
+  }
+  response.writeHead(404, { 'Content-Type': contentTypes.get('.html') });
+  createReadStream(notFoundPage).pipe(response);
+}
 
 const server = createServer((request, response) => {
   for (const { name, value } of globalHeaders) response.setHeader(name, value);
@@ -76,8 +90,7 @@ const server = createServer((request, response) => {
     return;
   }
   if (!filePath) {
-    response.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
-    response.end('Not Found');
+    sendNotFound(response);
     return;
   }
 

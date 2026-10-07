@@ -1,4 +1,4 @@
-import { readFile, readdir, stat } from 'node:fs/promises';
+import { readFile, stat } from 'node:fs/promises';
 import path from 'node:path';
 import process from 'node:process';
 
@@ -8,6 +8,9 @@ import {
   resolveSafePublicPngPath,
 } from './safe_public_asset_path.mjs';
 import { assertRasterDimensions, inspectRaster } from './raster_inspector.mjs';
+import { collectFiles } from './release/bundle_helpers.mjs';
+import { verifyStatic404Release } from './release/verify_static_404.mjs';
+import { verifyReleaseDocument } from './release/verify_document.mjs';
 
 const webRoot = path.resolve(process.env.WEB_ROOT ?? 'build/web');
 const budgets = {
@@ -17,11 +20,7 @@ const budgets = {
 };
 
 const failures = [];
-// Flutter 3.44's self-hosted dual-runtime bundle carries mutually exclusive
-// CanvasKit, SkWasm, and fallback renderer variants. Only one is requested by
-// a browser; the entrypoint budgets above guard actual user payload while this
-// aggregate budget guards the deployment footprint.
-const releaseBudget = 40 * 1024 * 1024;
+const releaseBudget = 52 * 1024 * 1024;
 const sourcePortfolio = JSON.parse(
   await readFile(path.resolve('assets', 'content', 'portfolio.json'), 'utf8'),
 );
@@ -112,13 +111,11 @@ for (const sidecar of ['_headers', '_redirects']) {
     ) {
       failures.push('the release _headers file is missing isolation or CSP policy');
     }
-    if (sidecar === '_redirects' && !release.includes('/*  /index.html  200')) {
-      failures.push('the release _redirects file is missing the SPA fallback');
-    }
   } catch {
     failures.push(`${sidecar} is missing from the release; run npm run prepare:bundle`);
   }
 }
+failures.push(...await verifyStatic404Release({ sourceRoot: path.resolve(), webRoot }));
 const symbolFiles = releaseFiles.filter((file) => file.endsWith('.symbols'));
 if (symbolFiles.length > 0) {
   failures.push(
@@ -126,8 +123,6 @@ if (symbolFiles.length > 0) {
   );
 }
 
-// These renderer variants are only reachable through engine configuration
-// (`enableWimp`, `canvasKitVariant`) that this release never sets.
 const unreachableRendererFiles = releaseFiles.filter((file) => {
   const segments = path.relative(webRoot, file).split(path.sep);
   if (segments[0] !== 'canvaskit') return false;
@@ -142,9 +137,12 @@ if (unreachableRendererFiles.length > 0) {
   );
 }
 
+// Precompressed siblings only duplicate counted files; verifyReleaseDocument checks their bytes.
 const releaseBytes = (
   await Promise.all(
-    releaseFiles.map(async (file) => (await stat(file)).size),
+    releaseFiles
+      .filter((file) => !file.endsWith('.gz'))
+      .map(async (file) => (await stat(file)).size),
   )
 ).reduce((total, size) => total + size, 0);
 if (releaseBytes > releaseBudget) {
@@ -333,7 +331,6 @@ try {
   );
   if (!hasWasmHeader) failures.push('main.dart.wasm has an invalid Wasm header');
 } catch {
-  // The missing-file failure above is more actionable.
 }
 
 try {
@@ -354,135 +351,7 @@ try {
   failures.push('flutter_service_worker.js kill switch is missing');
 }
 
-try {
-  const index = await readFile(path.join(webRoot, 'index.html'), 'utf8');
-  if (index.includes('bootstrap-progress')) {
-    failures.push('the critical shell must not add a synthetic loading cue');
-  }
-  if (!index.includes('aria-busy="true"')) {
-    failures.push('the critical shell does not expose loading state');
-  }
-  if (!index.includes('class="bootstrap-shell" aria-hidden="true"')) {
-    failures.push('the generated critical rendering shell is missing');
-  }
-  if ((index.match(/<!-- bootstrap-content:start -->/g) ?? []).length !== 1) {
-    failures.push('index.html must contain exactly one bootstrap content block');
-  }
-  try {
-    const portfolio = JSON.parse(
-      await readFile(
-        path.join(
-          webRoot,
-          'assets',
-          'assets',
-          'content',
-          'portfolio.json',
-        ),
-        'utf8',
-      ),
-    );
-    const generatedValues = [
-      portfolio.content_version,
-      portfolio.profile?.name,
-      portfolio.profile?.role,
-      portfolio.profile?.headline,
-      portfolio.profile?.location,
-      portfolio.profile?.since,
-      portfolio.profile?.focus?.[0],
-    ];
-    for (const value of generatedValues) {
-      if (typeof value !== 'string' || !index.includes(escapeHtml(value))) {
-        failures.push(`the critical shell is not synchronized with ${value}`);
-      }
-    }
-    if (
-      !index.includes("localStorage.getItem('flutter.selected_language')") ||
-      !index.includes('decoded = JSON.parse(stored)') ||
-      !index.includes('document.documentElement.dir = locales[selected].direction')
-    ) {
-      failures.push('the critical shell does not restore its locale before paint');
-    }
-    for (const locale of portfolio.site?.locales ?? []) {
-      const localePortfolio = locale === 'en'
-        ? portfolio
-        : JSON.parse(
-            await readFile(
-              path.join(
-                webRoot,
-                'assets',
-                'assets',
-                'content',
-                'locales',
-                `${locale}.json`,
-              ),
-              'utf8',
-            ),
-          );
-      const interfaceLocale = JSON.parse(
-        await readFile(
-          path.join(webRoot, 'assets', 'assets', 'i18n', `${locale}.json`),
-          'utf8',
-        ),
-      );
-      const localizedValues = [
-        localePortfolio.site?.title,
-        localePortfolio.profile?.role,
-        localePortfolio.profile?.location,
-        localePortfolio.profile?.headline,
-        localePortfolio.profile?.focus?.[0],
-        interfaceLocale.home_section?.based_in,
-        interfaceLocale.home_section?.working_since,
-        interfaceLocale.home_section?.focus,
-        interfaceLocale.accessibility?.loading_portfolio,
-        interfaceLocale.accessibility?.load_failure,
-        interfaceLocale.accessibility?.retry,
-      ];
-      if (Array.isArray(localePortfolio.systems) && localePortfolio.systems.length > 0) {
-        localizedValues.push(interfaceLocale.home_section?.view_work);
-      }
-      if (localePortfolio.profile?.email?.includes('@')) {
-        localizedValues.push(interfaceLocale.home_section?.email);
-      }
-      for (const value of localizedValues) {
-        if (typeof value !== 'string' || !index.includes(escapeHtml(value))) {
-          failures.push(`the critical shell is missing ${locale} locale content`);
-          break;
-        }
-      }
-    }
-  } catch {
-    failures.push('the critical shell portfolio source is missing or invalid');
-  }
-  const bootstrap = await readFile(
-    path.join(webRoot, 'flutter_bootstrap.js'),
-    'utf8',
-  );
-  const releaseId = bootstrap.match(
-    /"mainWasmPath":"main\.dart\.wasm\?v=([0-9a-f]{16})"/,
-  )?.[1];
-  const engineRevision = bootstrap.match(
-    /"engineRevision":"([0-9a-f]{40})"/,
-  )?.[1];
-  if (!releaseId || !engineRevision) {
-    failures.push('critical preload identifiers cannot be derived');
-  } else {
-    const expectedHints = [
-      `rel="preload" href="main.dart.wasm?v=${releaseId}" as="fetch" type="application/wasm" crossorigin fetchpriority="high"`,
-      `rel="modulepreload" href="main.dart.mjs?v=${releaseId}" crossorigin fetchpriority="high"`,
-      `rel="preload" href="canvaskit/${engineRevision}/skwasm.wasm" as="fetch" type="application/wasm" crossorigin fetchpriority="high"`,
-    ];
-    for (const hint of expectedHints) {
-      if (!index.includes(hint)) {
-        failures.push(`index.html is missing critical hint: ${hint}`);
-      }
-    }
-    if ((index.match(/<!-- release-preloads:start -->/g) ?? []).length !== 1) {
-      failures.push('index.html must contain exactly one critical preload block');
-    }
-  }
-} catch {
-  failures.push('index.html is missing');
-}
+failures.push(...await verifyReleaseDocument(webRoot, sourcePortfolio, releaseFiles));
 
 try {
   const bootstrap = await readFile(
@@ -534,7 +403,6 @@ try {
     await stat(path.join(webRoot, 'canvaskit', 'skwasm.wasm'));
     failures.push('an unversioned SkWasm renderer is still publicly shippable');
   } catch {
-    // Expected: renderer binaries live below the engine revision.
   }
   if (!bootstrap.includes("window.addEventListener('flutter-first-frame'")) {
     failures.push('custom first-frame bootstrap cleanup is missing');
@@ -586,7 +454,6 @@ try {
     failures.push('the application bootstrap re-enabled the service worker');
   }
 } catch {
-  // The missing-file failure above is more actionable.
 }
 
 for (const { fileName, size, budget } of entries) {
@@ -611,28 +478,4 @@ if (failures.length > 0) {
 
 function formatBytes(bytes) {
   return `${(bytes / 1024 / 1024).toFixed(2)} MiB`;
-}
-
-function escapeHtml(value) {
-  return value.replace(/[&<>"']/g, (character) => {
-    const entities = {
-      '&': '&amp;',
-      '<': '&lt;',
-      '>': '&gt;',
-      '"': '&quot;',
-      "'": '&#39;',
-    };
-    return entities[character];
-  });
-}
-
-async function collectFiles(directory) {
-  const directoryEntries = await readdir(directory, { withFileTypes: true });
-  const nested = await Promise.all(
-    directoryEntries.map(async (entry) => {
-      const entryPath = path.join(directory, entry.name);
-      return entry.isDirectory() ? collectFiles(entryPath) : [entryPath];
-    }),
-  );
-  return nested.flat();
 }

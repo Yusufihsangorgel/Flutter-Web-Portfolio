@@ -254,6 +254,54 @@ test("retires the critical shell when a renderer omits the first-frame event", a
   ).toBe(1);
 });
 
+test("offers an accessible retry when the engine fails after its entrypoint loads", async ({
+  page,
+  isMobile,
+}) => {
+  test.skip(isMobile, "bootstrap recovery contract needs one browser project");
+  await page.addInitScript(() => {
+    type EntrypointOptions = {
+      onEntrypointLoaded: (initializer: unknown) => unknown;
+    };
+    type Loader = { load: (options: EntrypointOptions) => Promise<unknown> };
+    const flutter: { loader?: Loader } = {};
+    let loader: Loader | undefined;
+    Object.defineProperty(flutter, "loader", {
+      configurable: true,
+      get: () => loader,
+      set: (value: Loader) => {
+        const load = value.load.bind(value);
+        value.load = (options) =>
+          load({
+            ...options,
+            onEntrypointLoaded: () =>
+              options.onEntrypointLoaded({
+                initializeEngine: () =>
+                  Promise.reject(new Error("engine initialization failed")),
+              }),
+          });
+        loader = value;
+      },
+    });
+    Object.assign(window, { _flutter: flutter });
+  });
+
+  await page.goto("/", { waitUntil: "domcontentloaded" });
+
+  await expect(
+    page.getByRole("button", { name: englishInterface.accessibility.retry }),
+  ).toBeVisible({ timeout: 20000 });
+  await expect(page.locator("#bootstrap-surface")).toHaveAttribute(
+    "aria-busy",
+    "false",
+  );
+  expect(
+    await page.evaluate(
+      () => performance.getEntriesByName("flutter-bootstrap-failed", "mark").length,
+    ),
+  ).toBe(1);
+});
+
 test("offers an accessible retry when the Wasm artifact cannot load", async ({
   page,
 }) => {
@@ -322,11 +370,13 @@ test("offers a readable recovery document when JavaScript is disabled", async ({
   const page = await context.newPage();
   try {
     await page.goto("/", { waitUntil: "domcontentloaded" });
-    await expect(
-      page.getByRole("heading", { name: "JavaScript is required" }),
-    ).toBeVisible();
-    await expect(page.locator(".noscript-recovery")).toContainText(
-      "Enable JavaScript in your browser",
+    const heading = page
+      .locator("#static-document")
+      .getByRole("heading", { level: 1 });
+    await expect(heading).toBeVisible();
+    await expect(heading).toContainText(portfolio.profile.name);
+    await expect(page.locator(".noscript-recovery")).toHaveText(
+      "The interactive version needs JavaScript.",
     );
     await expect(page.locator("#bootstrap-surface")).toBeHidden();
   } finally {

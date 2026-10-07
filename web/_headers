@@ -7,8 +7,12 @@
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: camera=(), microphone=(), geolocation=()
   # portfolio-csp:start
-  Content-Security-Policy: default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://analytics.developeryusuf.com; worker-src 'self' blob:; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: https: blob:; connect-src 'self' https://analytics.developeryusuf.com; frame-ancestors 'self';
+  Content-Security-Policy: default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; script-src 'self' 'wasm-unsafe-eval' https://analytics.developeryusuf.com; worker-src 'self' blob:; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: blob:; connect-src 'self' https://analytics.developeryusuf.com; frame-ancestors 'self'; upgrade-insecure-requests;
+  Strict-Transport-Security: max-age=31536000
   # portfolio-csp:end
+
+/.well-known/security.txt
+  Content-Type: text/plain; charset=utf-8
 
 /*.html
   Cache-Control: public, max-age=0, must-revalidate
