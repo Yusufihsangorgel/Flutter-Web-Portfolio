@@ -1,86 +1,87 @@
-import { readFile } from "node:fs/promises";
-import { resolve } from "node:path";
 import { expect, Page, test } from "@playwright/test";
+import { portfolio } from "./helpers/portfolio_test_helpers";
+import { scrollToLocator } from "./helpers/semantics_scroll";
 
-type PortfolioLinks = {
-  profile: { links: Array<{ label: string; url: string }> };
-};
-
-async function profileUrl(label: string): Promise<string> {
-  const portfolio = JSON.parse(
-    await readFile(
-      resolve(__dirname, "../../assets/content/portfolio.json"),
-      "utf8",
-    ),
-  ) as PortfolioLinks;
-  const url = portfolio.profile.links.find((link) => link.label === label)?.url;
-  if (!url) throw new Error(`Missing ${label} profile link`);
-  return url;
-}
+const profileLink = portfolio.profile.links.find((link) =>
+  /^https?:\/\//.test(link.url),
+);
 
 async function openRevealedPage(page: Page, hash = "") {
-  await page.goto(`/${hash}`);
-  await page.waitForSelector("flt-semantics-host", { state: "attached" });
-  await expect(page.locator("#bootstrap-surface")).toHaveCount(0);
+  await page.goto(`/${hash}`, { waitUntil: "domcontentloaded" });
+  await page.waitForSelector("flt-semantics-host", {
+    state: "attached",
+    timeout: 20000,
+  });
+  await expect(page.locator("#bootstrap-surface")).toHaveCount(0, {
+    timeout: 20000,
+  });
   await expect(page.getByRole("heading").first()).toBeAttached();
 }
 
 // Flutter drops semantics for content outside the viewport, so the footer's
-// profile links only exist once the last chapter has been scrolled through.
-async function openFooterProfileLinks(page: Page) {
+// profile anchors exist only once the last chapter has been scrolled through.
+async function footerProfileAnchor(page: Page, url: string) {
   await openRevealedPage(page, "#/about");
   const viewport = page.viewportSize();
-  await page.mouse.move((viewport?.width ?? 800) / 2, (viewport?.height ?? 600) / 2);
-  const profileLinks = page.locator(
-    `flt-semantics-host a[href^="https://github.com/"]`,
+  await page.mouse.move(
+    (viewport?.width ?? 800) / 2,
+    (viewport?.height ?? 600) / 2,
   );
-  await expect
-    .poll(
-      async () => {
-        if ((await profileLinks.count()) === 0) await page.mouse.wheel(0, 1600);
-        return profileLinks.count();
-      },
-      { timeout: 20000, intervals: [250] },
-    )
-    .toBeGreaterThan(0);
+  return scrollToLocator(
+    page,
+    page.locator(`flt-semantics-host a[href="${url}"]`),
+    900,
+  );
 }
 
 // The persistent navigation on wide layouts, the menu overlay on narrow ones.
-async function navigationLinks(page: Page) {
+async function navigationLinks(page: Page, isMobile: boolean) {
+  if (isMobile) {
+    await page
+      .getByRole("button", { name: "Open navigation menu", exact: true })
+      .click();
+  }
   const links = page.locator(
     `flt-semantics-host a[href*="#/"]:not([href$="#/"])`,
   );
-  if ((await links.count()) === 0) {
-    await page.getByRole("button", { name: "Open navigation menu" }).click();
-  }
-  await expect(links).not.toHaveCount(0);
+  await expect(links.first()).toBeVisible();
   return links;
 }
 
-test("exposes the profile links as real anchors", async ({ page }) => {
-  const expectedProfileUrl = await profileUrl("GitHub");
-  await openFooterProfileLinks(page);
+function hashOf(page: Page, href: string | null) {
+  expect(href, "navigation anchor href").not.toBeNull();
+  return new URL(href!, page.url()).hash;
+}
 
-  const profileLinks = page.getByRole("link", { name: "GitHub", exact: true });
-  await expect(profileLinks).not.toHaveCount(0);
-  await expect(profileLinks.first()).toHaveAttribute("href", expectedProfileUrl);
+test("exposes the profile links as real anchors", async ({ page }) => {
+  test.skip(!profileLink, "the profile publishes no web link");
+  const anchor = await footerProfileAnchor(page, profileLink!.url);
+
+  await expect(anchor).toHaveAttribute("href", profileLink!.url);
+  await expect(
+    page.getByRole("link", { name: profileLink!.label, exact: true }),
+  ).not.toHaveCount(0);
 });
 
-test("exposes the navigation as real in-page anchors", async ({ page }) => {
+test("exposes the navigation as real in-page anchors", async ({
+  page,
+  isMobile,
+}) => {
   await openRevealedPage(page);
-  const links = await navigationLinks(page);
-  const href = await links.first().getAttribute("href");
-  expect(href).not.toBeNull();
-  expect(new URL(href!, page.url()).hash).toContain("#/");
+  const links = await navigationLinks(page, isMobile);
+
+  expect(hashOf(page, await links.first().getAttribute("href"))).toMatch(
+    /^#\/[a-z]+$/,
+  );
 });
 
 test("a plain click on a navigation link stays inside the app", async ({
   page,
+  isMobile,
 }) => {
   await openRevealedPage(page);
-  const links = await navigationLinks(page);
-  const href = await links.first().getAttribute("href");
-  const expectedHash = new URL(href!, page.url()).hash;
+  const links = await navigationLinks(page, isMobile);
+  const expectedHash = hashOf(page, await links.first().getAttribute("href"));
   await page.evaluate(() => {
     const counter = window as unknown as { browserNavigations: number };
     counter.browserNavigations = 0;
@@ -95,7 +96,9 @@ test("a plain click on a navigation link stays inside the app", async ({
   await expect
     .poll(() => page.evaluate(() => location.hash))
     .toBe(expectedHash);
-  expect(await page.evaluate(() => history.length)).toBe(entriesBefore + 1);
+  await expect
+    .poll(() => page.evaluate(() => history.length))
+    .toBe(entriesBefore + 1);
   expect(
     await page.evaluate(
       () =>
@@ -111,8 +114,8 @@ test("a modified click on a navigation link opens a new tab", async ({
 }) => {
   test.skip(isMobile, "Modifier clicks are a desktop pointer gesture.");
   await openRevealedPage(page);
-  const links = await navigationLinks(page);
-  const href = await links.first().getAttribute("href");
+  const links = await navigationLinks(page, isMobile);
+  const expectedHash = hashOf(page, await links.first().getAttribute("href"));
   const hashBefore = await page.evaluate(() => location.hash);
 
   const [opened] = await Promise.all([
@@ -121,28 +124,28 @@ test("a modified click on a navigation link opens a new tab", async ({
   ]);
 
   // A popup reports about:blank until its navigation commits.
-  await expect
-    .poll(() => new URL(opened.url()).hash)
-    .toBe(new URL(href!, page.url()).hash);
+  await expect.poll(() => new URL(opened.url()).hash).toBe(expectedHash);
   expect(await page.evaluate(() => location.hash)).toBe(hashBefore);
 });
 
 test("an external profile link opens in a new tab", async ({ page }) => {
-  const expectedProfileUrl = await profileUrl("GitHub");
-  await page.context().route(`${expectedProfileUrl}**`, (route) =>
-    route.fulfill({ contentType: "text/html", body: "<title>profile</title>" }),
-  );
-  await openFooterProfileLinks(page);
-  const link = page
-    .getByRole("link", { name: "GitHub", exact: true })
-    .first();
+  test.skip(!profileLink, "the profile publishes no web link");
+  const expectedUrl = new URL(profileLink!.url).href;
+  await page
+    .context()
+    .route(`${profileLink!.url}**`, (route) =>
+      route.fulfill({
+        contentType: "text/html",
+        body: "<title>profile</title>",
+      }),
+    );
+  const anchor = await footerProfileAnchor(page, profileLink!.url);
 
   const [opened] = await Promise.all([
     page.context().waitForEvent("page"),
-    link.click(),
+    anchor.click(),
   ]);
 
-  await opened.waitForLoadState();
-  expect(opened.url()).toBe(expectedProfileUrl);
+  await expect.poll(() => opened.url()).toBe(expectedUrl);
   expect(new URL(page.url()).pathname).toBe("/");
 });

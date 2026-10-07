@@ -14,11 +14,26 @@ const interfaceCopy = readJson<Record<string, { title?: string }>>(
 );
 const portfolio = readJson<{
   profile: { display_name: { accessible: string }; role: string };
+  experience: unknown[];
+  contributions: unknown[];
+  systems: unknown[];
+  packages?: unknown[];
+  writing?: unknown[];
 }>("content/portfolio.json");
 
 const landingBudgetMs = 1000;
 const observationMs = 3000;
 const driftBudgetPx = 24;
+const revealMark = "flutter-bootstrap-surface-removed";
+
+// Mirrors PortfolioDocument.activeSections: empty chapters are not rendered.
+const authoredItems: Record<string, number> = {
+  experience: portfolio.experience.length,
+  proof: portfolio.contributions.length,
+  projects: portfolio.systems.length,
+  packages: portfolio.packages?.length ?? 0,
+  writing: portfolio.writing?.length ?? 0,
+};
 
 // One entry per animation frame on the page's own clock: milliseconds since
 // the reveal mark and the heading's top edge, or null while it is not exposed.
@@ -32,24 +47,25 @@ declare global {
 
 // Runs inside the page from its first script, so the measurement does not
 // depend on how quickly the test process can query the browser.
-function recordHeadingFrames(headingName: string) {
+function recordHeadingFrames(args: { name: string; mark: string }) {
   const frames: HeadingFrame[] = [];
   window.headingFrames = frames;
   const nameOf = (element: Element) =>
     (element.getAttribute("aria-label") ?? element.textContent ?? "")
       .replace(/\s+/g, " ")
       .trim();
+  const headingSelector = [
+    '[role="heading"]',
+    ...[1, 2, 3, 4, 5, 6].map((level) => `h${level}`),
+  ]
+    .map((selector) => `flt-semantics-host ${selector}`)
+    .join(", ");
   const sample = () => {
-    const [reveal] = performance.getEntriesByName(
-      "flutter-bootstrap-surface-removed",
-      "mark",
-    );
+    const [reveal] = performance.getEntriesByName(args.mark, "mark");
     if (reveal) {
-      const heading = [
-        ...document.querySelectorAll(
-          "flt-semantics-host h1, flt-semantics-host h2, flt-semantics-host h3",
-        ),
-      ].find((element) => nameOf(element) === headingName);
+      const heading = [...document.querySelectorAll(headingSelector)].find(
+        (element) => nameOf(element) === args.name,
+      );
       frames.push([
         performance.now() - reveal.startTime,
         heading?.getBoundingClientRect().top ?? null,
@@ -87,10 +103,19 @@ function measureLanding(frames: HeadingFrame[], viewportHeight: number) {
 
 for (const chapter of chapters) {
   test(`cold deep link stays at ${chapter.id}`, async ({ page }) => {
+    test.skip(
+      authoredItems[chapter.id] === 0,
+      `the ${chapter.id} chapter is not authored`,
+    );
     const headingName = headingNameFor(chapter.id);
-    await page.addInitScript(recordHeadingFrames, headingName);
+    await page.addInitScript(recordHeadingFrames, {
+      name: headingName,
+      mark: revealMark,
+    });
 
     await page.goto(`/#/${chapter.id}`, { waitUntil: "domcontentloaded" });
+    // Sampling runs on the page's frame clock until the observation window
+    // after the latest permitted landing has been recorded.
     await page.waitForFunction(
       (horizonMs) => (window.headingFrames.at(-1)?.[0] ?? 0) >= horizonMs,
       landingBudgetMs + observationMs,
