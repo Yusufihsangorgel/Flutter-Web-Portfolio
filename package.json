@@ -44,6 +44,7 @@
     "fonts:subset": "node tool/subset_fonts.mjs",
     "verify:fonts": "node tool/subset_fonts.mjs --check",
     "test:fonts": "node tool/test_subset_fonts.mjs",
+    "test:visual:docker": "bash tool/run_visual_in_docker.sh",
     "generate:strings": "node tool/generate_app_strings.mjs",
     "verify:strings": "node tool/generate_app_strings.mjs --check",
     "test:strings": "node tool/test_generate_app_strings.mjs"

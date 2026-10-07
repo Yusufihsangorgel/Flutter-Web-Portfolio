@@ -1,5 +1,5 @@
 {
-  "schema_version": 10,
+  "schema_version": 11,
   "content_version": "test.1",
   "verified_at": "2026-01-01",
   "site": {
@@ -329,7 +329,9 @@
       "likes": 1,
       "pub_points": 160,
       "downloads": 100,
-      "category": "server"
+      "category": "server",
+      "featured": true,
+      "maturity_level": 3
     },
     {
       "id": "example_ui_kit",
@@ -341,7 +343,8 @@
       "likes": 0,
       "pub_points": 160,
       "downloads": 50,
-      "category": "flutter-ui"
+      "category": "flutter-ui",
+      "maturity_level": 5
     }
   ]
 }

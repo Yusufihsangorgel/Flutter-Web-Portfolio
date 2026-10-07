@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:flutter_web_portfolio/app/domain/models/portfolio_document.dart';
+import 'package:flutter_web_portfolio/app/data/dto/portfolio_document_mapper.dart';
 
 void main(List<String> arguments) {
   if (arguments.length > 1) {
@@ -22,7 +22,7 @@ void main(List<String> arguments) {
     if (json is! Map<String, dynamic>) {
       throw const FormatException('The root value must be a JSON object.');
     }
-    final document = PortfolioDocument.fromJson(json);
+    final document = parsePortfolioDocument(json);
     stdout.writeln(
       'Portfolio ${document.contentVersion} is valid: '
       '${document.profile.name}, ${document.activeSections.length} sections.',

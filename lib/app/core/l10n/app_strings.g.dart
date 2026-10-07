@@ -171,8 +171,14 @@ final class AppStrings {
 
   String get navWriting => lookup('nav.writing', defaultValue: 'Writing');
 
-  String get packagesSectionMaturity =>
-      lookup('packages_section.maturity', defaultValue: 'maturity');
+  String packagesSectionMaturityLevel({
+    required String level,
+    required String max,
+  }) => _interpolate(
+    'packages_section.maturity_level',
+    'Maturity {level} of {max}',
+    {'level': level, 'max': max},
+  );
 
   String get packagesSectionOpenPackage =>
       lookup('packages_section.open_package', defaultValue: 'Open on pub.dev');
