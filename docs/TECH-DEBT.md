@@ -12,7 +12,7 @@ Record date: 2026-10-07. [Architecture rules](ARCHITECTURE-RULES.md) set product
 
 The prerequisite section and navigation changes removed the domain import violations and split the previously listed
 oversized files. Current lengths: `portfolio_document.dart` 295, `project_atlas.dart` 51, `proof_section.dart` 128,
-`packages_section.dart` 174, `contribution_event_order_lab.dart` 232, `home_section.dart` 111, `scroll_controller.dart` 258,
+`packages_section.dart` 174, `contribution_event_order_lab.dart` 232, `home_section.dart` 111, `scroll_controller.dart` 301,
 and `smoke.spec.ts` 149. No Dart production file in `lib/` or `packages/` exceeds 500 lines; no Dart test exceeds 800.
 File-size checks remain a manual review criterion.
 

@@ -100,6 +100,7 @@ final class AppScrollController extends ActiveSectionCubit
     final target = _pendingSection;
     if (target == null || !scrollController.hasClients) return;
     if (geometry.sectionFor(target) == null) return;
+    _pendingReadingAnchor = null;
     if (!_scroller.jumpTo(target)) return;
     _restorer.holdChapter(target);
     history.replaceHash(target);
@@ -129,7 +130,10 @@ final class AppScrollController extends ActiveSectionCubit
 
   void markGeometryDirty({bool preserveReadingAnchor = true}) {
     if (isClosed) return;
-    if (preserveReadingAnchor && _pendingReadingAnchor == null) {
+    if (preserveReadingAnchor &&
+        !_manualNavigation &&
+        !_initialNavigationPending &&
+        _pendingReadingAnchor == null) {
       _pendingReadingAnchor = _restorer.capture(_narrativePosition.value);
     }
     if (_geometryFrameScheduled) return;
@@ -148,14 +152,14 @@ final class AppScrollController extends ActiveSectionCubit
     geometry.measure(scrollController.hasClients ? scrollController.offset : 0);
     if (_pendingSection != null) {
       _restorePendingSection();
-    } else if (_restorer.isHolding) {
+    } else if (!_manualNavigation && _restorer.isHolding) {
       _internalAnchorScroll = true;
       try {
         _restorer.restoreHeld();
       } finally {
         _internalAnchorScroll = false;
       }
-    } else if (readingAnchor != null) {
+    } else if (!_manualNavigation && readingAnchor != null) {
       _restorer.restore(readingAnchor);
     }
     _updateNarrativePosition();
@@ -199,38 +203,77 @@ final class AppScrollController extends ActiveSectionCubit
 
   void scrollToSection(String sectionId, {bool syncUrl = true}) {
     if (isClosed || !scrollController.hasClients) return;
+    if (!sectionIds.contains(sectionId)) return;
+    final requestId = ++_scrollRequestId;
+    _manualNavigation = true;
     _restorer.release();
     _pendingReadingAnchor = null;
     _pendingSection = null;
     _initialNavigationPending = false;
     refreshSectionGeometry();
-    if (geometry.sectionFor(sectionId) == null) return;
-    final requestId = ++_scrollRequestId;
-    _manualNavigation = true;
+    if (geometry.sectionFor(sectionId) == null) {
+      _manualNavigation = false;
+      return;
+    }
     setActiveSection(
       sectionId,
       write: syncUrl ? HistoryWrite.push : HistoryWrite.none,
     );
     final future = _scroller.scrollTo(sectionId, reduceMotion: _reduceMotion);
-    if (future != null) unawaited(_completeScroll(future, requestId));
+    if (future == null) {
+      _manualNavigation = false;
+      return;
+    }
+    unawaited(_completeScroll(future, requestId, sectionId));
   }
 
-  Future<void> _completeScroll(Future<void> future, int requestId) async {
+  Future<void> _completeScroll(
+    Future<void> future,
+    int requestId,
+    String sectionId,
+  ) async {
     await future;
     if (isClosed || requestId != _scrollRequestId) return;
-    _manualNavigation = false;
+    await WidgetsBinding.instance.endOfFrame;
+    if (isClosed || requestId != _scrollRequestId) return;
     refreshSectionGeometry();
+    _scroller.settleAt(sectionId);
+    _manualNavigation = false;
+    _updateNarrativePosition();
   }
 
   void _handlePointer(PointerEvent event) {
     if (event is PointerDownEvent || event is PointerSignalEvent) {
+      _cancelManualNavigation();
       _cancelReadingHold();
     }
   }
 
   bool _handleKey(KeyEvent event) {
-    if (event is KeyDownEvent) _cancelReadingHold();
+    if (event is KeyDownEvent) {
+      if (_isScrollKey(event.logicalKey)) _cancelManualNavigation();
+      _cancelReadingHold();
+    }
     return false;
+  }
+
+  bool _isScrollKey(LogicalKeyboardKey key) =>
+      key == LogicalKeyboardKey.arrowUp ||
+      key == LogicalKeyboardKey.arrowDown ||
+      key == LogicalKeyboardKey.pageUp ||
+      key == LogicalKeyboardKey.pageDown ||
+      key == LogicalKeyboardKey.home ||
+      key == LogicalKeyboardKey.end ||
+      key == LogicalKeyboardKey.space;
+
+  void _cancelManualNavigation() {
+    if (!_manualNavigation) return;
+    _scrollRequestId += 1;
+    _manualNavigation = false;
+    _pendingReadingAnchor = null;
+    if (scrollController.hasClients) {
+      scrollController.jumpTo(scrollController.offset);
+    }
   }
 
   void _cancelReadingHold() {

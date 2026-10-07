@@ -9,6 +9,5 @@
     "strict": false,
     "exactOptionalPropertyTypes": false
   },
-  "include": ["tool/**/*.mjs", "tool/**/*.d.ts"],
-  "exclude": ["tool/resume/**"]
+  "include": ["tool/**/*.mjs", "tool/**/*.d.ts"]
 }

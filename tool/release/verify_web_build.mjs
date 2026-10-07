@@ -8,6 +8,8 @@ import {
   resolveSafePublicPngPath,
 } from '../shared/safe_public_asset_path.mjs';
 import { assertRasterDimensions, inspectRaster } from '../assets/raster_inspector.mjs';
+import { verifyRuntimeAssets } from './verify_web_runtime_assets.mjs';
+import { verifyResumeRelease } from '../resume/verify_resume_release.mjs';
 import { collectFiles } from './bundle_helpers.mjs';
 import { verifyStatic404Release } from './verify_static_404.mjs';
 import { verifyReleaseDocument } from './verify_document.mjs';
@@ -269,37 +271,13 @@ try {
   failures.push(`the generated social preview is missing or corrupt: ${error.message}`);
 }
 
-try {
-  const fontManifest = JSON.parse(
-    await readFile(path.join(webRoot, 'assets', 'FontManifest.json'), 'utf8'),
-  );
-  const declaredFonts = fontManifest.flatMap((family) => family.fonts.map((font) => font.asset));
-
-  await Promise.all(
-    declaredFonts.map(async (asset) => {
-      const outputPath = path.join(webRoot, 'assets', asset);
-      try {
-        const metadata = await stat(outputPath);
-        if (!metadata.isFile() || metadata.size === 0) {
-          failures.push(`declared font ${asset} is not a non-empty file`);
-        }
-      } catch {
-        failures.push(`declared font ${asset} is missing from the release`);
-      }
-    }),
-  );
-} catch {
-  failures.push('assets/FontManifest.json is missing or invalid');
-}
-
-try {
-  const wasmHeader = await readFile(path.join(webRoot, 'main.dart.wasm'));
-  const expectedHeader = [0x00, 0x61, 0x73, 0x6d];
-  const hasWasmHeader = expectedHeader.every((byte, index) => wasmHeader[index] === byte);
-  if (!hasWasmHeader) failures.push('main.dart.wasm has an invalid Wasm header');
-} catch {
-  // Artifact presence is checked before its Wasm header.
-}
+failures.push(
+  ...(await verifyRuntimeAssets({
+    webRoot,
+    expectedEngine: expectedToolchain.flutterEngineRevision,
+  })),
+);
+failures.push(...(await verifyResumeRelease({ webRoot, record: sourcePortfolio })));
 
 try {
   const killSwitch = await readFile(path.join(webRoot, 'flutter_service_worker.js'), 'utf8');
@@ -317,98 +295,6 @@ try {
 }
 
 failures.push(...(await verifyReleaseDocument(webRoot, sourcePortfolio, releaseFiles)));
-
-try {
-  const bootstrap = await readFile(path.join(webRoot, 'flutter_bootstrap.js'), 'utf8');
-  if (!bootstrap.includes('"compileTarget":"dart2wasm"')) {
-    failures.push('flutter_bootstrap.js does not advertise a dart2wasm build');
-  }
-  const usesLegacyLocalRendererFlag = bootstrap.includes('"useLocalCanvasKit":true');
-  const usesExplicitLocalRendererUrl =
-    bootstrap.includes('canvasKitBaseUrl: new URL(') &&
-    bootstrap.includes('`canvaskit/${_flutter.buildConfig.engineRevision}/`');
-  if (!usesLegacyLocalRendererFlag && !usesExplicitLocalRendererUrl) {
-    failures.push('renderer binaries are not configured for self-hosting');
-  }
-  for (const artifact of ['main.dart.wasm', 'main.dart.mjs', 'main.dart.js']) {
-    if (!bootstrap.includes(`${artifact}?v=`)) {
-      failures.push(`${artifact} does not have a release-versioned URL`);
-    }
-  }
-  const engineRevision = bootstrap.match(/"engineRevision":"([0-9a-f]{40})"/)?.[1];
-  if (!engineRevision) {
-    failures.push('flutter_bootstrap.js does not expose an engine revision');
-  } else {
-    if (engineRevision !== expectedToolchain.flutterEngineRevision) {
-      failures.push(
-        `the release engine revision is ${engineRevision}; expected ${expectedToolchain.flutterEngineRevision}`,
-      );
-    }
-    try {
-      const renderer = await stat(path.join(webRoot, 'canvaskit', engineRevision, 'skwasm.wasm'));
-      if (!renderer.isFile() || renderer.size === 0) {
-        failures.push('the versioned SkWasm renderer is empty');
-      }
-    } catch {
-      failures.push('the versioned SkWasm renderer is missing');
-    }
-  }
-  try {
-    await stat(path.join(webRoot, 'canvaskit', 'skwasm.wasm'));
-    failures.push('an unversioned SkWasm renderer is still publicly shippable');
-  } catch {
-    // A missing unversioned renderer satisfies this check.
-  }
-  if (!bootstrap.includes("window.addEventListener('flutter-first-frame'")) {
-    failures.push('custom first-frame bootstrap cleanup is missing');
-  }
-  if (
-    !bootstrap.includes("markRuntime('flutter-run-app-fallback')") ||
-    !bootstrap.includes("document.querySelector('flt-glass-pane')")
-  ) {
-    failures.push('the CanvasKit/WebKit first-frame fallback is missing');
-  }
-  if (
-    !bootstrap.includes('window.requestAnimationFrame(() => {') ||
-    !bootstrap.includes('window.requestAnimationFrame(removeBootstrapSurface)')
-  ) {
-    failures.push('the first-frame reveal is not compositor-safe');
-  }
-  for (const timelineEntry of [
-    'flutter-bootstrap-start',
-    'flutter-entrypoint-loaded',
-    'flutter-engine-initialized',
-    'flutter-first-frame-event',
-    'flutter-first-frame-signal',
-    'flutter-surface-reveal-start',
-    'flutter-bootstrap-surface-removed',
-    'flutter-bootstrap-to-first-frame',
-    'flutter-bootstrap-to-reveal-signal',
-    'flutter-first-frame-to-reveal',
-  ]) {
-    if (!bootstrap.includes(`'${timelineEntry}'`)) {
-      failures.push(`the runtime timeline is missing ${timelineEntry}`);
-    }
-  }
-  if (
-    !bootstrap.includes('fontFallbackBaseUrl: new URL(') ||
-    !bootstrap.includes("'assets/fallback_fonts/'") ||
-    !bootstrap.includes('document.baseURI')
-  ) {
-    failures.push('Flutter fallback fonts are not configured for same-origin loading');
-  }
-  if (!bootstrap.includes('}).catch(showBootstrapFailure);')) {
-    failures.push('the bootstrap failure recovery surface is missing');
-  }
-  if (!bootstrap.includes("splash.setAttribute('aria-busy', 'false')")) {
-    failures.push('the bootstrap does not resolve its accessible busy state');
-  }
-  if (/_flutter\.loader\.load\(\{\s*serviceWorkerSettings/.test(bootstrap)) {
-    failures.push('the application bootstrap re-enabled the service worker');
-  }
-} catch {
-  // Artifact presence is checked before bootstrap content.
-}
 
 for (const { fileName, size, budget } of entries) {
   if (size === null) continue;
