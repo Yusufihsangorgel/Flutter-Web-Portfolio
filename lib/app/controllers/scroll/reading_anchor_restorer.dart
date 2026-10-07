@@ -1,10 +1,10 @@
 import 'dart:math' as math;
 
 import 'package:flutter/widgets.dart';
+import 'package:flutter_web_portfolio/app/controllers/scroll/section_geometry_tracker.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_dimensions.dart';
 import 'package:flutter_web_portfolio/app/core/constants/reading_focus.dart';
 import 'package:flutter_web_portfolio/app/narrative/application/narrative_position.dart';
-import 'package:flutter_web_portfolio/app/controllers/scroll/section_geometry_tracker.dart';
 
 /// A reading position inside one chapter.
 final class ReadingAnchor {

@@ -1,7 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_web_portfolio/app/data/repositories/persistent_language_repository.dart';
 import 'package:flutter_web_portfolio/app/domain/providers/asset_loader.dart';
-import 'package:flutter_web_portfolio/app/domain/providers/key_value_store.dart';
+
+import '../../support/fake_key_value_store.dart';
 
 final class _StubAssetLoader implements AssetLoader {
   @override
@@ -20,33 +21,12 @@ final class _StubAssetLoader implements AssetLoader {
   };
 }
 
-final class _MemoryKeyValueStore implements KeyValueStore {
-  String? value;
-
-  @override
-  String? readString(String key) => value;
-
-  @override
-  Future<void> writeString(String key, String value) async {
-    this.value = value;
-  }
-}
-
-final class _FailingKeyValueStore implements KeyValueStore {
-  @override
-  String? readString(String key) => throw StateError('unavailable');
-
-  @override
-  Future<void> writeString(String key, String value) =>
-      throw StateError('unavailable');
-}
-
 void main() {
-  late _MemoryKeyValueStore preferences;
+  late FakeKeyValueStore preferences;
   late PersistentLanguageRepository repository;
 
   setUp(() {
-    preferences = _MemoryKeyValueStore();
+    preferences = FakeKeyValueStore();
     repository = PersistentLanguageRepository(
       assetLoader: _StubAssetLoader(),
       preferenceStore: preferences,
@@ -81,7 +61,7 @@ void main() {
       () async {
         final unavailable = PersistentLanguageRepository(
           assetLoader: _StubAssetLoader(),
-          preferenceStore: _FailingKeyValueStore(),
+          preferenceStore: FakeKeyValueStore(error: StateError('unavailable')),
           supportedLanguages: const {'en', 'fr'},
         );
 

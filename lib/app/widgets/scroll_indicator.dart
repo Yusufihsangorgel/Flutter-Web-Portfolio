@@ -3,8 +3,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
-import 'package:flutter_web_portfolio/app/core/constants/motion_curves.dart';
 import 'package:flutter_web_portfolio/app/core/constants/durations.dart';
+import 'package:flutter_web_portfolio/app/core/constants/motion_curves.dart';
 import 'package:flutter_web_portfolio/app/utils/motion_preference.dart';
 
 /// Decorative reading cue that fades in and moves along a vertical track.

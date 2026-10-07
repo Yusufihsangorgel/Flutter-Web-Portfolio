@@ -5,17 +5,16 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_web_portfolio/app/core/constants/app_dimensions.dart';
-import 'package:flutter_web_portfolio/app/narrative/application/narrative_position.dart';
-import 'package:flutter_web_portfolio/app/narrative/domain/narrative_anchor.dart';
-import 'package:flutter_web_portfolio/app/narrative/domain/narrative_document.dart';
-import 'package:flutter_web_portfolio/app/narrative/domain/section_geometry.dart';
-
 import 'package:flutter_web_portfolio/app/controllers/scroll/active_section_cubit.dart';
 import 'package:flutter_web_portfolio/app/controllers/scroll/browser_history.dart';
 import 'package:flutter_web_portfolio/app/controllers/scroll/reading_anchor_restorer.dart';
 import 'package:flutter_web_portfolio/app/controllers/scroll/section_geometry_tracker.dart';
 import 'package:flutter_web_portfolio/app/controllers/scroll/section_scroller.dart';
+import 'package:flutter_web_portfolio/app/core/constants/app_dimensions.dart';
+import 'package:flutter_web_portfolio/app/narrative/application/narrative_position.dart';
+import 'package:flutter_web_portfolio/app/narrative/domain/narrative_anchor.dart';
+import 'package:flutter_web_portfolio/app/narrative/domain/narrative_document.dart';
+import 'package:flutter_web_portfolio/app/narrative/domain/section_geometry.dart';
 
 export 'package:flutter_web_portfolio/app/controllers/scroll/active_section_cubit.dart'
     show AppScrollState;

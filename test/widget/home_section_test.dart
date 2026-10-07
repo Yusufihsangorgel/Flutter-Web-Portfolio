@@ -3,37 +3,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:flutter_web_portfolio/app/controllers/scroll_controller.dart';
-import 'package:flutter_web_portfolio/app/domain/repositories/language_repository.dart';
 import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
-import 'package:flutter_web_portfolio/app/modules/home/sections/home_section.dart';
 import 'package:flutter_web_portfolio/app/modules/home/sections/about_section.dart';
+import 'package:flutter_web_portfolio/app/modules/home/sections/home_section.dart';
 import 'package:flutter_web_portfolio/app/widgets/portfolio_link.dart';
-import '../helpers/portfolio_fixture.dart';
+
 import '../helpers/narrative_fixture.dart';
-
-final class _HomeLanguageRepository implements LanguageRepository {
-  @override
-  Set<String> get supportedLanguages => const {'en'};
-
-  @override
-  Future<String> getSelectedLanguage() async => 'en';
-
-  @override
-  Future<Map<String, dynamic>> getTranslations(String languageCode) async => {
-    'home_section': {
-      'view_work': 'Explore my work',
-      'view_github': 'GitHub',
-      'email': 'Email me',
-      'currently': 'Currently',
-      'based_in': 'Based in',
-      'working_since': 'Working since',
-      'focus': 'Focus',
-    },
-  };
-
-  @override
-  Future<void> saveSelectedLanguage(String languageCode) async {}
-}
+import '../helpers/portfolio_fixture.dart';
+import '../support/fake_language_repository.dart';
 
 void main() {
   final subject = _HomeSubject();
@@ -50,7 +27,23 @@ class _HomeSubject {
   late AppScrollController scroll;
 
   Future<void> initialize() async {
-    language = LanguageCubit(languageRepository: _HomeLanguageRepository());
+    language = LanguageCubit(
+      languageRepository: FakeLanguageRepository(
+        documents: const {
+          'en': {
+            'home_section': {
+              'view_work': 'Explore my work',
+              'view_github': 'GitHub',
+              'email': 'Email me',
+              'currently': 'Currently',
+              'based_in': 'Based in',
+              'working_since': 'Working since',
+              'focus': 'Focus',
+            },
+          },
+        },
+      ),
+    );
     scroll = AppScrollController(narrative: loadNarrativeFixture());
     await language.initialize();
     addTearDown(() async {

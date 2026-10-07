@@ -120,11 +120,9 @@
         "dart:collection",
         "dart:convert",
         "dart:math",
-        "dart:typed_data",
-        "package:meta/",
-        "package:freezed_annotation/"
+        "dart:typed_data"
       ],
-      "why": "domain uses framework-independent imports"
+      "why": "domain imports Dart core libraries only"
     },
     {
       "id": "F-DOMAIN-INWARD",
@@ -343,6 +341,16 @@
       "file": "lib/app/features/alpha/providers/calibration_probe.dart",
       "source": "import 'package:drift/drift.dart';\n",
       "expect": []
+    },
+    {
+      "file": "lib/app/domain/models/calibration_probe.dart",
+      "source": "import 'package:meta/meta.dart';\n",
+      "expect": [
+        "F-DOMAIN-PURE"
+      ],
+      "covers": [
+        "F-DOMAIN-PURE"
+      ]
     }
   ]
 }

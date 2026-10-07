@@ -10,8 +10,8 @@ import 'package:flutter_web_portfolio/app/core/constants/app_dimensions.dart';
 import 'package:flutter_web_portfolio/app/core/constants/breakpoints.dart';
 import 'package:flutter_web_portfolio/app/narrative/domain/narrative_anchor.dart';
 import 'package:flutter_web_portfolio/app/narrative/domain/narrative_document.dart';
-import 'package:flutter_web_portfolio/app/narrative/rendering/narrative_anchor_path.dart';
 import 'package:flutter_web_portfolio/app/narrative/rendering/frame_coalescer.dart';
+import 'package:flutter_web_portfolio/app/narrative/rendering/narrative_anchor_path.dart';
 import 'package:flutter_web_portfolio/app/utils/motion_preference.dart';
 
 /// Draws one decorative trace through chapter anchors.
@@ -45,7 +45,7 @@ final class _NarrativeStageState extends State<NarrativeStage> {
 
     final sceneDirector = context.read<SceneDirector>();
     if (!identical(sceneDirector, _sceneDirector)) {
-      _sceneSubscription?.cancel();
+      unawaited(_sceneSubscription?.cancel());
       _sceneDirector = sceneDirector;
       _accent = sceneDirector.state.blendedConfig.accent;
       _sceneSubscription = sceneDirector.stream.listen((state) {
@@ -88,7 +88,7 @@ final class _NarrativeStageState extends State<NarrativeStage> {
   @override
   void dispose() {
     _detachScrollController();
-    _sceneSubscription?.cancel();
+    unawaited(_sceneSubscription?.cancel());
     _frame.dispose();
     super.dispose();
   }

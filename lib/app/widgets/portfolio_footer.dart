@@ -4,8 +4,11 @@ import 'package:flutter_web_portfolio/app/controllers/scroll_controller.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
 import 'package:flutter_web_portfolio/app/core/constants/breakpoints.dart';
 import 'package:flutter_web_portfolio/app/core/constants/durations.dart';
+import 'package:flutter_web_portfolio/app/core/l10n/app_strings.g.dart';
+import 'package:flutter_web_portfolio/app/core/l10n/section_strings.dart';
 import 'package:flutter_web_portfolio/app/core/theme/app_fonts.dart';
 import 'package:flutter_web_portfolio/app/domain/models/portfolio_document.dart';
+import 'package:flutter_web_portfolio/app/features/language/application/language_context.dart';
 import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
 import 'package:flutter_web_portfolio/app/widgets/portfolio_link.dart'
     as portfolio_widgets;
@@ -18,7 +21,7 @@ class PortfolioFooter extends StatelessWidget {
   Widget build(BuildContext context) =>
       BlocBuilder<LanguageCubit, LanguageState>(
         builder: (context, _) {
-          final language = context.read<LanguageCubit>();
+          final strings = context.strings;
           final portfolio = context.read<PortfolioDocument>();
           final width = MediaQuery.sizeOf(context).width;
           final desktop = width >= Breakpoints.desktop;
@@ -58,7 +61,7 @@ class PortfolioFooter extends StatelessWidget {
                     ),
                     SizedBox(height: desktop ? 76 : 54),
                     _FooterNavigation(
-                      language: language,
+                      strings: strings,
                       portfolio: portfolio,
                       desktop: desktop,
                     ),
@@ -99,12 +102,12 @@ class _FooterRail extends StatelessWidget {
 
 class _FooterNavigation extends StatelessWidget {
   const _FooterNavigation({
-    required this.language,
+    required this.strings,
     required this.portfolio,
     required this.desktop,
   });
 
-  final LanguageCubit language;
+  final AppStrings strings;
   final PortfolioDocument portfolio;
   final bool desktop;
 
@@ -115,10 +118,9 @@ class _FooterNavigation extends StatelessWidget {
         if (section != 'home')
           (
             id: section,
-            label: language.getText(
-              'nav.$section',
-              defaultValue:
-                  '${section[0].toUpperCase()}${section.substring(1)}',
+            label: strings.navigationLabel(
+              section,
+              fallback: '${section[0].toUpperCase()}${section.substring(1)}',
             ),
           ),
     ];
@@ -140,10 +142,7 @@ class _FooterNavigation extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          language.getText(
-            'footer.verification',
-            defaultValue: 'Current focus',
-          ),
+          strings.footerVerification,
           style: AppFonts.spaceGrotesk(
             fontSize: 12,
             fontWeight: FontWeight.w500,

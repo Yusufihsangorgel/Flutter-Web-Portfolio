@@ -5,7 +5,12 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   final english = _flatten(_readJson('assets/i18n/en.json'));
+  _registerCatalogParityTest(english);
+  _registerBridgeRemovalTest();
+  _registerTypedAccessorCoverageTest(english);
+}
 
+void _registerCatalogParityTest(Map<String, String> english) {
   test('every interface catalog has the English keys and placeholders', () {
     final locales = _catalogLocales();
     expect(locales, ['ar', 'de', 'en', 'es', 'fr', 'hi', 'tr']);
@@ -37,22 +42,36 @@ void main() {
       }
     }
   });
+}
 
-  test('every literal getText key in lib exists in English', () {
-    final calls = RegExp(r'''\bgetText\(\s*['"]([^'"]+)['"]''');
+void _registerBridgeRemovalTest() {
+  test('production code has no untyped getText bridge usage', () {
+    final calls = RegExp(r'\bgetText\s*\(');
     final dartFiles = Directory('lib')
         .listSync(recursive: true)
         .whereType<File>()
         .where((file) => file.path.endsWith('.dart'));
-    var scannedCalls = 0;
+    final usages = <String>[];
     for (final file in dartFiles) {
-      for (final match in calls.allMatches(file.readAsStringSync())) {
-        if (match.group(1)!.contains(r'$')) continue;
-        scannedCalls++;
-        expect(english, contains(match.group(1)), reason: file.path);
+      final source = file.readAsStringSync();
+      if (calls.hasMatch(source)) {
+        usages.add(file.path);
       }
     }
-    expect(scannedCalls, greaterThan(0));
+    expect(usages, isEmpty);
+  });
+}
+
+void _registerTypedAccessorCoverageTest(Map<String, String> english) {
+  test('generated typed accessors cover every English lookup key', () {
+    final source = File(
+      'lib/app/core/l10n/app_strings.g.dart',
+    ).readAsStringSync();
+    final generatedKeys = RegExp(
+      r'''\b(?:lookup|_interpolate)\(\s*['"]([^'"]+)['"]''',
+    ).allMatches(source).map((match) => match.group(1)!).toSet();
+
+    expect(generatedKeys, english.keys.toSet());
   });
 }
 

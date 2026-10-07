@@ -2,20 +2,20 @@ import 'dart:async';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_web_portfolio/app/core/theme/app_fonts.dart';
-
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_web_portfolio/app/controllers/scroll_controller.dart';
-import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
 import 'package:flutter_web_portfolio/app/core/constants/breakpoints.dart';
 import 'package:flutter_web_portfolio/app/core/constants/motion_curves.dart';
-import 'package:flutter_web_portfolio/app/widgets/accessible_action.dart';
-import 'package:flutter_web_portfolio/app/widgets/portfolio_link.dart';
+import 'package:flutter_web_portfolio/app/core/l10n/section_strings.dart';
+import 'package:flutter_web_portfolio/app/core/theme/app_fonts.dart';
+import 'package:flutter_web_portfolio/app/features/language/application/language_context.dart';
 import 'package:flutter_web_portfolio/app/utils/motion_preference.dart';
 import 'package:flutter_web_portfolio/app/utils/web_url_strategy.dart'
     as url_strategy;
+import 'package:flutter_web_portfolio/app/widgets/accessible_action.dart';
+import 'package:flutter_web_portfolio/app/widgets/portfolio_link.dart';
 
 /// Full-screen chapter menu for compact layouts.
 class NavigationOverlay extends StatefulWidget {
@@ -108,7 +108,7 @@ class _NavigationOverlayState extends State<NavigationOverlay>
       for (var index = 0; index < _menuItems.length; index++)
         _createItemAnimation(index),
     ];
-    _masterController.forward();
+    unawaited(_masterController.forward());
   }
 
   CurvedAnimation _curved(Curve curve) {
@@ -153,9 +153,11 @@ class _NavigationOverlayState extends State<NavigationOverlay>
       Navigator.of(context).pop();
       return;
     }
-    _masterController.reverse().then((_) {
-      if (mounted) Navigator.of(context).pop();
-    });
+    unawaited(
+      _masterController.reverse().then((_) {
+        if (mounted) Navigator.of(context).pop();
+      }),
+    );
   }
 
   void _navigateToSection(String key) {
@@ -197,7 +199,7 @@ class _NavigationOverlayState extends State<NavigationOverlay>
 
   @override
   Widget build(BuildContext context) {
-    final languageController = context.read<LanguageCubit>();
+    final strings = context.strings;
     final screenWidth = MediaQuery.sizeOf(context).width;
     final isMobile = screenWidth < Breakpoints.tablet;
     return Focus(
@@ -236,9 +238,9 @@ class _NavigationOverlayState extends State<NavigationOverlay>
                   children: List.generate(_menuItems.length, (index) {
                     final item = _menuItems[index];
                     final itemAnimation = _itemAnimations[index];
-                    final label = languageController.getText(
-                      'nav.${item.sectionId}',
-                      defaultValue:
+                    final label = strings.navigationLabel(
+                      item.sectionId,
+                      fallback:
                           item.sectionId[0].toUpperCase() +
                           item.sectionId.substring(1),
                     );

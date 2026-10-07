@@ -1,21 +1,20 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter/semantics.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_bloc/flutter_bloc.dart'
     show BlocBuilder, RepositoryProvider;
-
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_web_portfolio/app/app_dependencies.dart';
 import 'package:flutter_web_portfolio/app/core/logging/app_error_handlers.dart';
 import 'package:flutter_web_portfolio/app/core/logging/app_logger.dart';
-import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
 import 'package:flutter_web_portfolio/app/core/theme/app_theme.dart';
 import 'package:flutter_web_portfolio/app/core/theme/locale_font_loader.dart';
-import 'package:flutter_web_portfolio/app/domain/models/portfolio_document.dart';
 import 'package:flutter_web_portfolio/app/data/providers/bundle_asset_loader.dart';
+import 'package:flutter_web_portfolio/app/domain/models/portfolio_document.dart';
+import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
 import 'package:flutter_web_portfolio/app/modules/home/home_view.dart';
 import 'package:flutter_web_portfolio/app/utils/web_url_strategy.dart'
     as url_strategy;
@@ -23,38 +22,42 @@ import 'package:flutter_web_portfolio/app/utils/web_url_strategy.dart'
 void main() {
   final logger = createAppLogger();
   final errorHandlers = AppErrorHandlers(logger);
-  runZonedGuarded(() async {
-    WidgetsFlutterBinding.ensureInitialized();
-    // Expose DOM semantics to assistive technology and crawlers without a placeholder.
-    SemanticsBinding.instance.ensureSemantics();
-    errorHandlers.install();
+  unawaited(
+    runZonedGuarded<Future<void>>(() async {
+      WidgetsFlutterBinding.ensureInitialized();
+      // Expose DOM semantics to assistive technology and crawlers without a placeholder.
+      SemanticsBinding.instance.ensureSemantics();
+      errorHandlers.install();
 
-    SystemChrome.setSystemUIOverlayStyle(
-      const SystemUiOverlayStyle(
-        statusBarColor: Colors.transparent,
-        statusBarIconBrightness: Brightness.dark,
-        statusBarBrightness: Brightness.light,
-      ),
-    );
+      SystemChrome.setSystemUIOverlayStyle(
+        const SystemUiOverlayStyle(
+          statusBarColor: Colors.transparent,
+          statusBarIconBrightness: Brightness.dark,
+          statusBarBrightness: Brightness.light,
+        ),
+      );
 
-    try {
-      final dependencies = await AppDependencies.bootstrap(logger: logger);
-      await dependencies.localeFontLoader.loadForLanguage(
-        url_strategy.getHtmlLanguage(),
-      );
-      runApp(AppRuntime(dependencies: dependencies, child: const MyApp()));
-    } catch (error, stackTrace) {
-      logger.error(
-        'Application bootstrap failed',
-        error: error,
-        stackTrace: stackTrace,
-      );
-      final languageCode = url_strategy.getHtmlLanguage();
-      final copy = await _loadBootstrapFailureCopy(languageCode, logger);
-      await AssetLocaleFontLoader(logger: logger).loadForLanguage(languageCode);
-      runApp(_BootstrapFailureApp(languageCode: languageCode, copy: copy));
-    }
-  }, errorHandlers.onZoneError);
+      try {
+        final dependencies = await AppDependencies.bootstrap(logger: logger);
+        await dependencies.localeFontLoader.loadForLanguage(
+          url_strategy.getHtmlLanguage(),
+        );
+        runApp(AppRuntime(dependencies: dependencies, child: const MyApp()));
+      } catch (error, stackTrace) {
+        logger.error(
+          'Application bootstrap failed',
+          error: error,
+          stackTrace: stackTrace,
+        );
+        final languageCode = url_strategy.getHtmlLanguage();
+        final copy = await _loadBootstrapFailureCopy(languageCode, logger);
+        await AssetLocaleFontLoader(
+          logger: logger,
+        ).loadForLanguage(languageCode);
+        runApp(_BootstrapFailureApp(languageCode: languageCode, copy: copy));
+      }
+    }, errorHandlers.onZoneError),
+  );
 }
 
 Future<_BootstrapFailureCopy> _loadBootstrapFailureCopy(

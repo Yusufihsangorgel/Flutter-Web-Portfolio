@@ -5,9 +5,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_web_portfolio/app/controllers/scroll_controller.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
 import 'package:flutter_web_portfolio/app/core/constants/breakpoints.dart';
-import 'package:flutter_web_portfolio/app/core/constants/motion_curves.dart';
 import 'package:flutter_web_portfolio/app/core/constants/durations.dart';
-import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
+import 'package:flutter_web_portfolio/app/core/constants/motion_curves.dart';
+import 'package:flutter_web_portfolio/app/features/language/application/language_context.dart';
 import 'package:flutter_web_portfolio/app/utils/motion_preference.dart';
 import 'package:flutter_web_portfolio/app/widgets/portfolio_link.dart';
 
@@ -129,10 +129,7 @@ class _BackToTopButtonState extends State<BackToTopButton>
                             setState(() => _hovered = hovered);
                           }
                         },
-                        semanticLabel: context.read<LanguageCubit>().getText(
-                          'accessibility.back_to_top',
-                          defaultValue: 'Back to top',
-                        ),
+                        semanticLabel: context.strings.accessibilityBackToTop,
                         borderRadius: BorderRadius.circular(buttonSize / 2),
                         child: SizedBox.square(
                           dimension: buttonSize,

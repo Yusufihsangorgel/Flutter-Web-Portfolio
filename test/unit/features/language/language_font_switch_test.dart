@@ -2,33 +2,10 @@ import 'dart:async';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_web_portfolio/app/core/theme/locale_font_loader.dart';
-import 'package:flutter_web_portfolio/app/domain/repositories/language_repository.dart';
 import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
-import 'package:flutter_web_portfolio/app/utils/language_browser.dart';
 
-final class _Repository implements LanguageRepository {
-  @override
-  Set<String> get supportedLanguages => const {'en', 'de', 'ar', 'hi'};
-
-  @override
-  Future<String> getSelectedLanguage() async => 'en';
-
-  @override
-  Future<Map<String, dynamic>> getTranslations(String languageCode) async => {
-    'language': languageCode,
-  };
-
-  @override
-  Future<void> saveSelectedLanguage(String languageCode) async {}
-}
-
-final class _Browser implements LanguageBrowser {
-  @override
-  bool reloadForLanguageChange({String? preserveSection}) => false;
-
-  @override
-  void setDocumentLanguage(String languageCode) {}
-}
+import '../../../support/fake_language_browser.dart';
+import '../../../support/fake_language_repository.dart';
 
 final class _Fonts implements LocaleFontLoader {
   _Fonts({this.gate, this.error});
@@ -49,8 +26,16 @@ LanguageCubit _cubit(
   _Fonts fonts, {
   Duration timeout = const Duration(seconds: 3),
 }) => LanguageCubit(
-  languageRepository: _Repository(),
-  browser: _Browser(),
+  languageRepository: FakeLanguageRepository(
+    supportedLanguages: const {'en', 'de', 'ar', 'hi'},
+    documents: const {
+      'en': {'language': 'en'},
+      'de': {'language': 'de'},
+      'ar': {'language': 'ar'},
+      'hi': {'language': 'hi'},
+    },
+  ),
+  browser: FakeLanguageBrowser(),
   fontLoader: fonts,
   fontLoadTimeout: timeout,
 );

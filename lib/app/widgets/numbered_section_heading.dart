@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
-import 'package:flutter_web_portfolio/app/core/theme/app_fonts.dart';
 import 'package:flutter_web_portfolio/app/core/constants/breakpoints.dart';
+import 'package:flutter_web_portfolio/app/core/theme/app_fonts.dart';
 
 /// Renders a numbered section title and divider.
 class NumberedSectionHeading extends StatelessWidget {

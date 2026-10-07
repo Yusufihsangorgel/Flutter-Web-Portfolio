@@ -2,26 +2,30 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_web_portfolio/app/controllers/scroll_controller.dart';
-import 'package:flutter_web_portfolio/app/domain/repositories/language_repository.dart';
 import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
 import 'package:flutter_web_portfolio/app/widgets/navigation_overlay.dart';
 import 'package:flutter_web_portfolio/app/widgets/portfolio_link.dart';
 
 import '../helpers/narrative_fixture.dart';
+import '../support/fake_language_repository.dart';
 
-final class _LanguageRepository implements LanguageRepository {
-  @override
-  Set<String> get supportedLanguages => const {'en'};
-
-  @override
-  Future<String> getSelectedLanguage() async => 'en';
-
-  @override
-  Future<Map<String, dynamic>> getTranslations(String languageCode) async => {};
-
-  @override
-  Future<void> saveSelectedLanguage(String languageCode) async {}
-}
+Widget _buildSubject(AppScrollController scroll, LanguageCubit language) =>
+    MultiBlocProvider(
+      providers: [
+        BlocProvider.value(value: scroll),
+        BlocProvider.value(value: language),
+      ],
+      child: MaterialApp(
+        home: Builder(
+          builder: (context) => Scaffold(
+            body: TextButton(
+              onPressed: () => NavigationOverlay.show(context),
+              child: const Text('Open navigation'),
+            ),
+          ),
+        ),
+      ),
+    );
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -31,7 +35,7 @@ void main() {
 
   setUp(() async {
     scroll = AppScrollController(narrative: loadNarrativeFixture());
-    language = LanguageCubit(languageRepository: _LanguageRepository());
+    language = LanguageCubit(languageRepository: FakeLanguageRepository());
     await language.initialize();
     addTearDown(() async {
       await language.close();
@@ -39,26 +43,9 @@ void main() {
     });
   });
 
-  Widget buildSubject() => MultiBlocProvider(
-    providers: [
-      BlocProvider.value(value: scroll),
-      BlocProvider.value(value: language),
-    ],
-    child: MaterialApp(
-      home: Builder(
-        builder: (context) => Scaffold(
-          body: TextButton(
-            onPressed: () => NavigationOverlay.show(context),
-            child: const Text('Open navigation'),
-          ),
-        ),
-      ),
-    ),
-  );
-
   testWidgets('opens, exposes section links, and closes', (tester) async {
     final semantics = tester.ensureSemantics();
-    await tester.pumpWidget(buildSubject());
+    await tester.pumpWidget(_buildSubject(scroll, language));
     await tester.tap(find.text('Open navigation'));
     await tester.pumpAndSettle();
 

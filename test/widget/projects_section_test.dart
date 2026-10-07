@@ -6,44 +6,36 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_web_portfolio/app/controllers/scene_director.dart';
 import 'package:flutter_web_portfolio/app/controllers/scroll_controller.dart';
 import 'package:flutter_web_portfolio/app/domain/models/portfolio_document.dart';
-import 'package:flutter_web_portfolio/app/domain/repositories/language_repository.dart';
 import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
 import 'package:flutter_web_portfolio/app/modules/home/sections/projects/projects_section.dart';
 import 'package:flutter_web_portfolio/app/widgets/accessible_action.dart';
 
 import '../helpers/narrative_fixture.dart';
 import '../helpers/portfolio_fixture.dart';
+import '../support/fake_language_repository.dart';
 
-final class _ProjectsLanguageRepository implements LanguageRepository {
-  @override
-  Set<String> get supportedLanguages => const {'en'};
-
-  @override
-  Future<String> getSelectedLanguage() async => 'en';
-
-  @override
-  Future<Map<String, dynamic>> getTranslations(String languageCode) async => {
-    'projects_section': {
-      'title': 'Selected Work',
-      'subtitle': 'Products and maintained tools.',
-      'selected_cases': 'Professional cases',
-      'evidence_index': 'More work',
-      'evidence_intro': 'Released products and open-source projects.',
-      'shipped_products': 'Shipped products',
-      'open_engineering': 'Open engineering',
-      'select_evidence': 'Choose a project',
-      'challenge': 'The problem',
-      'approach': 'The approach',
-      'outcome': 'The result',
-      'open_evidence': 'View project',
-      'ownership': 'What I owned',
-      'decision': 'Engineering focus',
+FakeLanguageRepository _languageRepository() => FakeLanguageRepository(
+  documents: const {
+    'en': {
+      'projects_section': {
+        'title': 'Selected Work',
+        'subtitle': 'Products and maintained tools.',
+        'selected_cases': 'Professional cases',
+        'evidence_index': 'More work',
+        'evidence_intro': 'Released products and open-source projects.',
+        'shipped_products': 'Shipped products',
+        'open_engineering': 'Open engineering',
+        'select_evidence': 'Choose a project',
+        'challenge': 'The problem',
+        'approach': 'The approach',
+        'outcome': 'The result',
+        'open_evidence': 'View project',
+        'ownership': 'What I owned',
+        'decision': 'Engineering focus',
+      },
     },
-  };
-
-  @override
-  Future<void> saveSelectedLanguage(String languageCode) async {}
-}
+  },
+);
 
 void main() {
   late PortfolioDocument portfolio;
@@ -55,7 +47,7 @@ void main() {
     portfolio = loadPortfolioFixture();
     scroll = AppScrollController(narrative: loadNarrativeFixture());
     scene = SceneDirector(scrollController: scroll);
-    language = LanguageCubit(languageRepository: _ProjectsLanguageRepository());
+    language = LanguageCubit(languageRepository: _languageRepository());
     await language.initialize();
     addTearDown(() async {
       await scene.close();

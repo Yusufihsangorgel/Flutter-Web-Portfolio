@@ -6,49 +6,38 @@ import 'package:flutter_web_portfolio/app/controllers/scene_director.dart';
 import 'package:flutter_web_portfolio/app/controllers/scroll_controller.dart';
 import 'package:flutter_web_portfolio/app/domain/models/portfolio_document.dart'
     hide PortfolioLink;
-import 'package:flutter_web_portfolio/app/domain/repositories/language_repository.dart';
 import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
 import 'package:flutter_web_portfolio/app/modules/home/sections/proof_section.dart';
 import 'package:flutter_web_portfolio/app/widgets/accessible_action.dart';
 import 'package:flutter_web_portfolio/app/widgets/portfolio_link.dart';
-import '../helpers/portfolio_fixture.dart';
+
 import '../helpers/narrative_fixture.dart';
+import '../helpers/portfolio_fixture.dart';
+import '../support/fake_language_repository.dart';
 
-final class _ProofLanguageRepository implements LanguageRepository {
-  @override
-  Set<String> get supportedLanguages => const {'en'};
-
-  @override
-  Future<String> getSelectedLanguage() async => 'en';
-
-  @override
-  Future<Map<String, dynamic>> getTranslations(String languageCode) async => {
-    'nav': {'proof': 'Open Source'},
-    'proof_section': {
-      'title': 'Open Source',
-      'summary':
-          '{merged} changes accepted upstream; {review} more under review.',
-      'featured_label': 'Featured contribution',
-      'accepted_title': 'Accepted upstream',
-      'review_title': 'In review',
-      'problem_label': 'The failure',
-      'change_label': 'The patch',
-      'open_pull_request': 'View pull request',
-      'status_merged': 'Merged',
-      'status_under_review': 'Under review',
-      'event_lab_label': 'Event order lab',
-      'event_lab_without_patch': 'Without patch',
-      'event_lab_with_patch': 'With patch',
-      'event_lab_replay': 'Replay sequence',
-      'event_lab_sequence': 'Event sequence',
-      'event_lab_risk': 'Risk',
-      'event_lab_step': 'Step',
-    },
-  };
-
-  @override
-  Future<void> saveSelectedLanguage(String languageCode) async {}
-}
+const _proofTranslations = <String, dynamic>{
+  'nav': {'proof': 'Open Source'},
+  'proof_section': {
+    'title': 'Open Source',
+    'summary':
+        '{merged} changes accepted upstream; {review} more under review.',
+    'featured_label': 'Featured contribution',
+    'accepted_title': 'Accepted upstream',
+    'review_title': 'In review',
+    'problem_label': 'The failure',
+    'change_label': 'The patch',
+    'open_pull_request': 'View pull request',
+    'status_merged': 'Merged',
+    'status_under_review': 'Under review',
+    'event_lab_label': 'Event order lab',
+    'event_lab_without_patch': 'Without patch',
+    'event_lab_with_patch': 'With patch',
+    'event_lab_replay': 'Replay sequence',
+    'event_lab_sequence': 'Event sequence',
+    'event_lab_risk': 'Risk',
+    'event_lab_step': 'Step',
+  },
+};
 
 void main() {
   final subject = _ProofSubject();
@@ -75,7 +64,11 @@ class _ProofSubject {
     portfolio = loadPortfolioFixture();
     scroll = AppScrollController(narrative: loadNarrativeFixture());
     scene = SceneDirector(scrollController: scroll);
-    language = LanguageCubit(languageRepository: _ProofLanguageRepository());
+    language = LanguageCubit(
+      languageRepository: FakeLanguageRepository(
+        documents: const {'en': _proofTranslations},
+      ),
+    );
     await language.initialize();
     addTearDown(() async {
       await scene.close();

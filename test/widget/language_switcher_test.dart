@@ -3,40 +3,32 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_web_portfolio/app/controllers/scene_director.dart';
 import 'package:flutter_web_portfolio/app/controllers/scroll_controller.dart';
-import 'package:flutter_web_portfolio/app/domain/repositories/language_repository.dart';
 import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
 import 'package:flutter_web_portfolio/app/widgets/language_switcher.dart';
 
 import '../helpers/narrative_fixture.dart';
+import '../support/fake_language_repository.dart';
 
-final class _SwitcherLanguageRepository implements LanguageRepository {
-  String selectedLanguage = 'en';
-
-  @override
-  Set<String> get supportedLanguages => const {'en', 'tr'};
-
-  @override
-  Future<String> getSelectedLanguage() async => selectedLanguage;
-
-  @override
-  Future<Map<String, dynamic>> getTranslations(String languageCode) async => {
-    'accessibility': {'language_menu': 'Language menu'},
-  };
-
-  @override
-  Future<void> saveSelectedLanguage(String languageCode) async {
-    selectedLanguage = languageCode;
-  }
-}
+FakeLanguageRepository _languageRepository() => FakeLanguageRepository(
+  supportedLanguages: const {'en', 'tr'},
+  documents: const {
+    'en': {
+      'accessibility': {'language_menu': 'Language menu'},
+    },
+    'tr': {
+      'accessibility': {'language_menu': 'Language menu'},
+    },
+  },
+);
 
 void main() {
   late LanguageCubit language;
-  late _SwitcherLanguageRepository repository;
+  late FakeLanguageRepository repository;
   late AppScrollController scroll;
   late SceneDirector scene;
 
   setUp(() async {
-    repository = _SwitcherLanguageRepository();
+    repository = _languageRepository();
     language = LanguageCubit(languageRepository: repository);
     scroll = AppScrollController(narrative: loadNarrativeFixture());
     scene = SceneDirector(scrollController: scroll);

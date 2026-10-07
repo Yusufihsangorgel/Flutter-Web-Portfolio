@@ -1,11 +1,11 @@
 # Flutter Web Portfolio — Architecture Rules (binding)
 
-Version 2 · 2026-09-29 · Scope: every contributor changing code, tests, CI, or UI in this repository.
+Version 3 · 2026-10-07 · Scope: every contributor changing code, tests, CI, or UI in this repository.
 
 This document defines the repository's binding code-structure rules. The current import gate is
 [`quality/architecture-rules.json`](../quality/architecture-rules.json). For architecture, these rules take precedence
-over general repository documentation. The gate still contains legacy package deny entries and a provider-named UI
-exception; synchronize that configuration in the same release before claiming full mechanical coverage of this version.
+over general repository documentation. Import boundaries are checked by that gate; Dart callable metrics are checked
+by [`tool/quality/dart_metrics.dart`](../tool/quality/dart_metrics.dart). Both checks block CI.
 
 ## 1. This repository’s architecture
 
@@ -34,8 +34,8 @@ Domain code is plain Dart: no Flutter, `dart:ui`, data, presentation, or applica
 `lib/app/narrative/rendering/` is presentation support; `lib/app/utils/` contains platform helpers.
 
 The direction is presentation → application → domain ← data. `AppDependencies.bootstrap()` is the explicit
-composition root that supplies adapters and controllers. The five existing domain purity violations are listed in
-[`docs/TECH-DEBT.md`](TECH-DEBT.md) and the architecture baseline; they are not new-code precedents.
+composition root that supplies adapters and controllers. Domain purity violations have been removed; the architecture
+baseline is empty.
 
 The browser application is Flutter Web; there is no separate HTML/TypeScript page hierarchy. The deployed site is
 static output under `build/web/`. Node tooling may access external sources, but that does not create a runtime HTTP
@@ -60,15 +60,15 @@ configuration drift noted above; it does not inspect runtime calls or architectu
 | Rule | Enforced restriction |
 |---|---|
 | `F-ISOLATION` | A feature cannot import another feature. Shared code belongs in an appropriate shared layer. |
-| `F-UI-NO-IO` | UI groups cannot import the preference adapter's `shared_preferences` package; direct asset/preference I/O is also prohibited by review. The present config lists unused package patterns pending synchronization. |
-| `F-UI-NO-REPO` | UI groups cannot import `data/**`. The current checker has a provider-named exception pending removal. |
+| `F-PRESENTATION-NO-IO` | UI groups cannot import `dart:io` or the I/O packages listed in the configuration, including `shared_preferences`; direct asset/preference I/O is also prohibited by review. |
+| `F-PRESENTATION-NO-DATA` | UI groups cannot import `data/**`; there are no provider exceptions. |
 | `P-DATA-DOWN` | `data/**` cannot import modules, widgets, controllers, features, or narrative code. |
 | `P-WIDGETS-NO-MODULES` | Shared widgets cannot import page modules. |
-| `F-DOMAIN-PURE` | Domain may import Dart core libraries only; the current config also allows unused annotation package patterns pending synchronization. |
+| `F-DOMAIN-PURE` | Domain may import the listed Dart core libraries only; Flutter, `dart:ui`, and annotation packages are rejected. |
 | `F-DOMAIN-INWARD` | Domain cannot import data, UI, controllers, feature application, or narrative application/rendering layers. |
 
-The legacy `F-FORBIDDEN-SDK` rule still exists in the current JSON gate. Its unused-package list is not part of this
-repository-specific policy; removing it requires a coordinated configuration and calibration change.
+`F-FORBIDDEN-SDK` additionally rejects the SDK imports listed in the configuration. Calibration includes accepted and
+rejected imports for every configured rule, including presentation controllers and plain Dart domain imports.
 
 ## 2. When adding new code
 
@@ -100,14 +100,11 @@ existing platform-helper structure under `lib/app/utils/`; do not create a paral
 
 ## 3. Spaghetti prohibitions
 
-- Do not grow oversized UI files as the default extension point. `project_atlas.dart` is already 1,356 lines and
-  `proof_section.dart` is 741 lines; extract focused widgets or state when changing these areas.
+- Keep section composition small; extend the focused widgets extracted from the project atlas and proof section.
 - Do not make a page or widget read repositories, data sources, or preferences directly.
 - Do not make data code depend on presentation, controllers, features, or narrative layers.
-- Do not add Flutter or `dart:ui` imports to domain code. The current five `F-DOMAIN-PURE` violations are
-  recorded in `docs/TECH-DEBT.md`.
-- Keep nested translation lookup and JSON handling out of unrelated widgets. `language_cubit.dart:93` currently uses
-  a `dynamic` traversal value; treat this as a manual review point, not a configured architecture violation.
+- Do not add Flutter or `dart:ui` imports to domain code.
+- Use `context.strings` and typed translation members in widgets; keep JSON traversal at the asset boundary.
 - Keep external-source fetches in tooling. The Flutter UI has no direct fetch path; Node tooling owns refresh and
   runtime-measurement requests.
 - Preserve explicit dependency construction in `AppDependencies`; do not replace it with mutable global registration.
@@ -122,7 +119,7 @@ existing platform-helper structure under `lib/app/utils/`; do not create a paral
   behavior expected by their callers.
 - **Interface Segregation:** keep domain contracts and state owners focused on the capability their consumers need.
 - **Dependency Inversion:** UI depends on state and domain-facing APIs; the composition root supplies data
-  implementations and shared controllers.
+implementations and shared controllers.
 
 ## 5. Technical debt policy
 
@@ -137,20 +134,26 @@ existing platform-helper structure under `lib/app/utils/`; do not create a paral
 - Close debt in a separate change. A bug fix in a file over 500 lines may add at most 10 lines; split a feature before
   adding it to such a file.
 - Limits: production file 500 lines, test file 800 lines, function/member 60 lines, `build()` 100 lines,
-  parameters 4, nesting depth 4, cyclomatic complexity 15. The architecture gate currently enforces import
-  direction only. File, function, `build()`, parameter, nesting, and complexity limits are manual review criteria;
-  automated metric enforcement is planned for a later release. Existing breaches and planned fixes are recorded in
+  parameters 4, nesting depth 4, cyclomatic complexity 15. The architecture gate checks import direction.
+  The Dart AST metrics gate checks callable lines, parameters, control-flow nesting, complexity, and `build()` lines
+  in the analyze job. Existing breaches are recorded with measurements and reasons in
+  [`quality/metrics-baseline.json`](../quality/metrics-baseline.json); new, increased, and stale entries fail.
+  File size remains a manual review criterion. Metric semantics and counts are recorded in
   [`docs/TECH-DEBT.md`](TECH-DEBT.md).
 
 ## 6. Quality gates
 
-`.github/workflows/architecture.yml` runs the architecture checker (warning mode, baseline 5) and its calibration
-(blocking) on GitHub-hosted runners. Run both locally as well and record gate results with relevant counts.
+`.github/workflows/architecture.yml` runs the blocking architecture checker with an empty baseline and its calibration
+on GitHub-hosted runners. The CI analyze job also runs the Dart metric check and fixture calibration. Run these locally
+as well and record gate results with relevant counts. Root and package analysis share the strict settings and lints in
+`analysis_options.yaml`; the package includes that file and adds its public API documentation rules.
 
 | Command | Purpose | Mode |
 |---|---|---|
-| `python3 quality/check_architecture.py` | §1.3 import rules | Warning baseline: 5 · `NEW`/`STALE` = reject |
+| `python3 quality/check_architecture.py` | §1.3 import rules | Blocking · baseline empty · `NEW`/`STALE` = reject |
 | `python3 -m unittest discover -s quality/tests -p 'test_architecture.py'` | Architecture-gate calibration | Blocking |
+| `dart run tool/quality/dart_metrics_test.dart` | AST metrics fixture calibration | Blocking · CI |
+| `dart run tool/quality/dart_metrics.dart --base-ref <base-sha>` | Callable metrics and shrinking baseline | Blocking · CI · limits in §5 |
 | `npm run verify:content && npm run portfolio:validate` | Content synchronization and schema validation | Blocking · CI |
 | `npm run test:template && npm run test:release-security && npm run test:refresh && npm run test:content` | Template, release-security, refresh, and content checks | Blocking · CI |
 | `npm run verify:hosting && npm run verify:community && npm run audit:sources && npm run audit:history` | Hosting, community, source, and history checks | Blocking · CI |

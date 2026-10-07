@@ -65,6 +65,22 @@ jobs:
       - run: npm run lint
       - run: npm run format:check
       - run: dart format --output=none --set-exit-if-changed lib test tool
+      - run: flutter pub get
+        working-directory: packages/adaptive_render_budget
+      - run: dart format --output=none --set-exit-if-changed lib test example/lib
+        working-directory: packages/adaptive_render_budget
+      - run: flutter analyze --no-pub --fatal-infos
+        working-directory: packages/adaptive_render_budget
+      - run: dart run tool/quality/dart_metrics_test.dart
+      - name: Enforce shrink-only Dart metrics
+        env:
+          BASE_REF: ${{ github.event.pull_request.base.sha || github.event.before }}
+        run: |
+          if [[ -n "${BASE_REF}" && ! "${BASE_REF}" =~ ^0+$ ]]; then
+            dart run tool/quality/dart_metrics.dart --base-ref "${BASE_REF}"
+          else
+            dart run tool/quality/dart_metrics.dart
+          fi
       - run: bash -n tool/release/hosted_build.sh
       - name: Check tool syntax
         run: |

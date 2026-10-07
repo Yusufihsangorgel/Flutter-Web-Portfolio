@@ -4,22 +4,9 @@ import 'dart:typed_data';
 
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:flutter_web_portfolio/app/core/logging/app_logger.dart';
 import 'package:flutter_web_portfolio/app/core/theme/locale_font_loader.dart';
 
-final class _Logger implements AppLogger {
-  final List<String> errors = <String>[];
-
-  @override
-  void info(String message, {Object? error, StackTrace? stackTrace}) {}
-
-  @override
-  void warning(String message, {Object? error, StackTrace? stackTrace}) {}
-
-  @override
-  void error(String message, {Object? error, StackTrace? stackTrace}) =>
-      errors.add(message);
-}
+import '../../../support/fake_app_logger.dart';
 
 const _arabicAsset =
     'assets/fonts/noto_sans_arabic/NotoSansArabic-Variable.ttf';
@@ -30,12 +17,12 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   late List<String> requestedAssets;
-  late _Logger logger;
+  late FakeAppLogger logger;
   late AssetLocaleFontLoader loader;
 
   setUp(() {
     requestedAssets = <String>[];
-    logger = _Logger();
+    logger = FakeAppLogger();
     loader = AssetLocaleFontLoader(logger: logger);
     addTearDown(() {
       _messenger.setMockMessageHandler('flutter/assets', null);

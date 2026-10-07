@@ -1,33 +1,30 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter_web_portfolio/app/domain/repositories/language_repository.dart';
 import 'package:flutter_web_portfolio/app/features/language/application/language_context.dart';
 import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
 
-final class _Repository implements LanguageRepository {
-  @override
-  Set<String> get supportedLanguages => const {'en', 'tr'};
-
-  @override
-  Future<String> getSelectedLanguage() async => 'en';
-
-  @override
-  Future<Map<String, dynamic>> getTranslations(String languageCode) async => {
-    if (languageCode == 'tr') 'nav': {'home': 'Ana sayfa'},
-    'accessibility': {'retry': languageCode},
-  };
-
-  @override
-  Future<void> saveSelectedLanguage(String languageCode) async {}
-}
+import '../../../support/fake_language_repository.dart';
 
 void main() {
   testWidgets('context.strings rebuilds with the active language', (
     tester,
   ) async {
     final cubit = (await tester.runAsync(() async {
-      final cubit = LanguageCubit(languageRepository: _Repository());
+      final cubit = LanguageCubit(
+        languageRepository: FakeLanguageRepository(
+          supportedLanguages: const {'en', 'tr'},
+          documents: const {
+            'en': {
+              'accessibility': {'retry': 'en'},
+            },
+            'tr': {
+              'nav': {'home': 'Ana sayfa'},
+              'accessibility': {'retry': 'tr'},
+            },
+          },
+        ),
+      );
       await cubit.initialize();
       return cubit;
     }))!;

@@ -1,22 +1,24 @@
 import 'package:flutter/foundation.dart' show ValueListenable;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_web_portfolio/app/controllers/scroll_controller.dart';
+import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
+import 'package:flutter_web_portfolio/app/core/constants/app_dimensions.dart';
+import 'package:flutter_web_portfolio/app/core/constants/breakpoints.dart';
+import 'package:flutter_web_portfolio/app/core/constants/durations.dart';
+import 'package:flutter_web_portfolio/app/core/constants/motion_curves.dart';
+import 'package:flutter_web_portfolio/app/core/l10n/section_strings.dart';
 import 'package:flutter_web_portfolio/app/core/theme/app_fonts.dart';
 import 'package:flutter_web_portfolio/app/domain/models/portfolio_document.dart'
     show PortfolioDocument;
+import 'package:flutter_web_portfolio/app/features/language/application/language_context.dart';
 import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
-import 'package:flutter_web_portfolio/app/controllers/scroll_controller.dart';
-import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
-import 'package:flutter_web_portfolio/app/core/constants/breakpoints.dart';
-import 'package:flutter_web_portfolio/app/core/constants/motion_curves.dart';
-import 'package:flutter_web_portfolio/app/core/constants/durations.dart';
-import 'package:flutter_web_portfolio/app/core/constants/app_dimensions.dart';
+import 'package:flutter_web_portfolio/app/narrative/application/narrative_position.dart';
 import 'package:flutter_web_portfolio/app/widgets/accessible_action.dart';
+import 'package:flutter_web_portfolio/app/widgets/language_switcher.dart';
 import 'package:flutter_web_portfolio/app/widgets/navigation_overlay.dart';
 import 'package:flutter_web_portfolio/app/widgets/portfolio_link.dart';
-import 'package:flutter_web_portfolio/app/widgets/language_switcher.dart';
 import 'package:flutter_web_portfolio/app/widgets/scene_accent_builder.dart';
-import 'package:flutter_web_portfolio/app/narrative/application/narrative_position.dart';
 
 /// Compact navigation for the single-page document.
 class CustomSliverAppBar extends StatefulWidget {
@@ -104,10 +106,7 @@ class _CustomSliverAppBarState extends State<CustomSliverAppBar> {
         onTap: () => widget.scrollController.scrollToSection('home'),
         scaleFactor: _scaleFactor,
         languageController: widget.languageController,
-        semanticLabel: widget.languageController.getText(
-          'accessibility.go_home',
-          defaultValue: 'Go to home',
-        ),
+        semanticLabel: context.strings.accessibilityGoHome,
       ),
       leading: isMobile ? _buildMenuButton(context) : null,
       actions: [
@@ -161,9 +160,9 @@ class _CustomSliverAppBarState extends State<CustomSliverAppBar> {
                 for (final section in sections)
                   _NavItem(
                     sectionId: section,
-                    label: widget.languageController.getText(
-                      'nav.$section',
-                      defaultValue: section.toUpperCase(),
+                    label: context.strings.navigationLabel(
+                      section,
+                      fallback: section.toUpperCase(),
                     ),
                     isActive: scrollState.activeSection == section,
                     onTap: () =>

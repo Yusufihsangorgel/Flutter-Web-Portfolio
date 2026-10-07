@@ -41,7 +41,7 @@ class _NarrativeBackgroundState extends State<NarrativeBackground> {
     final reduceMotion = prefersReducedMotion(context);
     final qualityController = context.read<RenderQualityController>();
     if (!identical(qualityController, _qualityController)) {
-      _qualitySubscription?.cancel();
+      unawaited(_qualitySubscription?.cancel());
       _qualityController = qualityController;
       qualityController.setReducedMotion(reduceMotion);
       _applyQuality(qualityController.state);
@@ -53,7 +53,7 @@ class _NarrativeBackgroundState extends State<NarrativeBackground> {
     _reduceMotion = reduceMotion;
     final director = context.read<SceneDirector>();
     if (!identical(director, _sceneDirector)) {
-      _sceneSubscription?.cancel();
+      unawaited(_sceneSubscription?.cancel());
       _sceneDirector = director;
       _queueScene(director.state);
       _sceneSubscription = director.stream.listen(_queueScene);
@@ -64,8 +64,8 @@ class _NarrativeBackgroundState extends State<NarrativeBackground> {
 
   @override
   void dispose() {
-    _sceneSubscription?.cancel();
-    _qualitySubscription?.cancel();
+    unawaited(_sceneSubscription?.cancel());
+    unawaited(_qualitySubscription?.cancel());
     _frame.dispose();
     _grainTexture?.dispose();
     super.dispose();

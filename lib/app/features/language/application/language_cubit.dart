@@ -87,6 +87,8 @@ final class LanguageCubit extends Cubit<LanguageState> {
     this._fontLoadTimeout,
   ) : super(const LanguageState.initial());
 
+  static const _fallbackStrings = AppStrings(<String, Object?>{});
+
   final LanguageRepository _languageRepository;
   final TranslationDocumentValidator? _validateTranslations;
   final LanguageBrowser _browser;
@@ -102,9 +104,6 @@ final class LanguageCubit extends Cubit<LanguageState> {
   AppStrings get strings => AppStrings(state.translations);
 
   Set<String> get supportedLanguages => _languageRepository.supportedLanguages;
-
-  String getText(String key, {String defaultValue = ''}) =>
-      strings.lookup(key, defaultValue: defaultValue);
 
   Future<void> initialize() => loadSavedLanguage();
 
@@ -255,26 +254,28 @@ final class LanguageCubit extends Cubit<LanguageState> {
 
   String _persistenceWarning(Map<String, Object?> translations) {
     final accessibility = translations['accessibility'];
-    if (accessibility is Map<String, Object?>) {
-      final localized = accessibility['language_not_saved'];
-      if (localized is String && localized.trim().isNotEmpty) {
-        return localized.trim();
-      }
+    final fallback = _fallbackStrings.accessibilityLanguageNotSaved;
+    if (accessibility is! Map<String, Object?> ||
+        accessibility['language_not_saved'] is! String) {
+      return fallback;
     }
-    return 'Your language preference could not be saved. '
-        'This language will remain active for this visit.';
+    final localized = AppStrings(
+      translations,
+    ).accessibilityLanguageNotSaved.trim();
+    return localized.isEmpty ? fallback : localized;
   }
 
   String _languageChangeWarning(Map<String, Object?> translations) {
     final accessibility = translations['accessibility'];
-    if (accessibility is Map<String, Object?>) {
-      final localized = accessibility['language_change_failed'];
-      if (localized is String && localized.trim().isNotEmpty) {
-        return localized.trim();
-      }
+    final fallback = _fallbackStrings.accessibilityLanguageChangeFailed;
+    if (accessibility is! Map<String, Object?> ||
+        accessibility['language_change_failed'] is! String) {
+      return fallback;
     }
-    return 'That language could not be loaded. '
-        'Your current language is still active.';
+    final localized = AppStrings(
+      translations,
+    ).accessibilityLanguageChangeFailed.trim();
+    return localized.isEmpty ? fallback : localized;
   }
 
   @override
