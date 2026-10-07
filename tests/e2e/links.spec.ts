@@ -126,6 +126,8 @@ test("a modified click on a navigation link opens a new tab", async ({
   // A popup reports about:blank until its navigation commits.
   await expect.poll(() => new URL(opened.url()).hash).toBe(expectedHash);
   expect(await page.evaluate(() => location.hash)).toBe(hashBefore);
+  // Only the opened URL matters; close the second app instance before teardown.
+  await opened.close();
 });
 
 test("an external profile link opens in a new tab", async ({ page }) => {
