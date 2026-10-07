@@ -36,7 +36,7 @@ final class _ViewportProximityGateState extends State<ViewportProximityGate> {
       _near = true;
     } else if (!identical(scrollable, _scrollable)) {
       _detach();
-      _scrollable = scrollable..position.addListener(_check);
+      _scrollable = scrollable..position.addListener(_scheduleCheck);
     }
   }
 
@@ -47,7 +47,7 @@ final class _ViewportProximityGateState extends State<ViewportProximityGate> {
   }
 
   void _detach() {
-    _scrollable?.position.removeListener(_check);
+    _scrollable?.position.removeListener(_scheduleCheck);
     _scrollable = null;
   }
 
@@ -58,8 +58,9 @@ final class _ViewportProximityGateState extends State<ViewportProximityGate> {
     return widget.placeholder;
   }
 
-  // Layout and viewport-size changes rebuild this widget without scrolling,
-  // so every placeholder frame re-measures once after layout.
+  // Measures after layout: a sliver viewport updates child offsets during
+  // layout, so a jump's new position is not visible from the scroll listener.
+  // Rebuilds from viewport-size changes re-measure the same way.
   void _scheduleCheck() {
     if (_checkScheduled) return;
     _checkScheduled = true;

@@ -1,9 +1,14 @@
+import 'dart:async';
 import 'dart:math' as math;
+import 'dart:ui' as ui;
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_dimensions.dart';
 import 'package:flutter_web_portfolio/app/domain/models/portfolio_document.dart';
+import 'package:flutter_web_portfolio/app/modules/home/sections/projects/widgets/artifact_picture.dart';
+import 'package:flutter_web_portfolio/app/modules/home/sections/projects/widgets/artifact_view.dart';
 import 'package:flutter_web_portfolio/app/modules/home/sections/projects/widgets/atlas_style.dart';
 import 'package:flutter_web_portfolio/app/modules/home/sections/projects/widgets/evidence_index_model.dart';
 import 'package:flutter_web_portfolio/app/modules/home/sections/projects/widgets/featured_case.dart';
@@ -117,19 +122,120 @@ void main() {
       );
       expect(_workAssets(tester), isEmpty);
 
-      controller.jumpTo(1000);
-      await tester.pump();
+      // The gate measures after layout, then builds the image a frame later.
+      Future<void> jumpAndSettle(double offset) async {
+        controller.jumpTo(offset);
+        await tester.pump();
+        await tester.pump();
+      }
+
+      await jumpAndSettle(0);
       expect(_workAssets(tester), isEmpty);
 
-      controller.jumpTo(3000);
-      await tester.pump();
+      await jumpAndSettle(2400);
       final featured = portfolio.featuredSystems.first.artifact.asset;
       expect(_workAssets(tester), contains(featured));
 
-      controller.jumpTo(0);
-      await tester.pump();
+      await jumpAndSettle(0);
       expect(_workAssets(tester), contains(featured), reason: 'stays loaded');
       expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('loads after a single jump inside a sliver scroll view', (
+      tester,
+    ) async {
+      tester.view.physicalSize = const Size(1440, 900);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      final controller = ScrollController();
+      addTearDown(controller.dispose);
+      await tester.pumpWidget(
+        withPortfolioFixtureAssets(
+          child: MaterialApp(
+            home: Scaffold(
+              body: CustomScrollView(
+                controller: controller,
+                slivers: [
+                  SliverToBoxAdapter(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        const SizedBox(height: 6000),
+                        ProjectAtlas(
+                          systems: portfolio.systems,
+                          labels: _labels,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pump();
+      expect(_workAssets(tester), isEmpty);
+
+      controller.jumpTo(5800);
+      await tester.pump();
+      await tester.pump();
+      expect(
+        _workAssets(tester),
+        contains(portfolio.featuredSystems.first.artifact.asset),
+      );
+    });
+
+    testWidgets('reports an artifact only after its image is painted', (
+      tester,
+    ) async {
+      final semantics = tester.ensureSemantics();
+      final image = _DeferredImage();
+      final view = ArtifactView.resolve(
+        portfolio.featuredSystems.first.artifact,
+        compact: false,
+      );
+      final reports = <String>[];
+      await tester.pumpWidget(
+        Directionality(
+          textDirection: TextDirection.ltr,
+          child: Center(
+            child: SizedBox(
+              width: 160,
+              height: 100,
+              child: ArtifactPicture(
+                view: view,
+                image: image,
+                onPainted: reports.add,
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pump();
+      expect(
+        tester.getSemantics(find.byType(ArtifactPicture)).identifier,
+        '${ArtifactPicture.identifierPrefix}${view.asset}',
+      );
+      expect(reports, isEmpty);
+
+      final decoded = await tester.runAsync(
+        () => createTestImage(width: 16, height: 10),
+      );
+      image.completer.complete(ImageInfo(image: decoded!));
+      ui.Image? painted() =>
+          tester.widget<RawImage>(find.byType(RawImage)).image;
+      for (var frame = 0; frame < 5 && painted() == null; frame++) {
+        expect(reports, isEmpty, reason: 'nothing is painted yet');
+        await tester.pump();
+      }
+      expect(painted(), isNotNull);
+      expect(reports, [view.asset]);
+
+      await tester.pump();
+      expect(reports, [view.asset], reason: 'reported once');
+      semantics.dispose();
     });
 
     testWidgets('builds immediately without an enclosing scroll view', (
@@ -258,3 +364,18 @@ Set<String> _workAssets(WidgetTester tester) => tester
     .map((image) => image.assetName)
     .where((name) => name.startsWith('assets/work/'))
     .toSet();
+
+/// An image whose single frame arrives only when the test completes it.
+final class _DeferredImage extends ImageProvider<_DeferredImage> {
+  final completer = Completer<ImageInfo>();
+
+  @override
+  Future<_DeferredImage> obtainKey(ImageConfiguration configuration) =>
+      SynchronousFuture(this);
+
+  @override
+  ImageStreamCompleter loadImage(
+    _DeferredImage key,
+    ImageDecoderCallback decode,
+  ) => OneFrameImageStreamCompleter(completer.future);
+}

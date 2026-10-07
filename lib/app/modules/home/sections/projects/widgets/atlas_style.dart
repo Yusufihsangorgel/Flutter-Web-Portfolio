@@ -45,8 +45,9 @@ final class AtlasLayout {
   static const int artifactFlex = 58;
   static const int narrativeFlex = 42;
 
-  /// Viewport heights ahead of the visible area at which images start loading.
-  static const double lazyLoadLead = 1;
+  /// Viewport extents beyond the visible area at which images start loading,
+  /// so an artifact one screen away is already decoded when scrolled in.
+  static const double lazyLoadLead = 2;
 
   final double width;
 

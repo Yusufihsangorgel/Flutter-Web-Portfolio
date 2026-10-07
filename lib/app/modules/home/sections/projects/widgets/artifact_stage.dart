@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_web_portfolio/app/core/theme/app_fonts.dart';
 import 'package:flutter_web_portfolio/app/domain/models/portfolio_document.dart';
+import 'package:flutter_web_portfolio/app/modules/home/sections/projects/widgets/artifact_picture.dart';
+import 'package:flutter_web_portfolio/app/modules/home/sections/projects/widgets/artifact_view.dart';
 import 'package:flutter_web_portfolio/app/modules/home/sections/projects/widgets/atlas_style.dart';
 import 'package:flutter_web_portfolio/app/modules/home/sections/projects/widgets/project_palette.dart';
-import 'package:flutter_web_portfolio/app/modules/home/sections/projects/widgets/viewport_proximity_gate.dart';
 
 /// How an [ArtifactStage] paints its image.
 @immutable
@@ -23,41 +24,6 @@ final class ArtifactRendering {
   final bool prominent;
   final bool paintImage;
   final int? cacheWidth;
-}
-
-/// The landscape board or its portrait crop, resolved for one viewport.
-@immutable
-final class ArtifactView {
-  const ArtifactView._(this._artifact, this._variant);
-
-  /// Uses the portrait crop when [compact] and the content provides one.
-  factory ArtifactView.resolve(
-    PortfolioSystemArtifact artifact, {
-    required bool compact,
-  }) => ArtifactView._(artifact, compact ? artifact.compact : null);
-
-  final PortfolioSystemArtifact _artifact;
-  final PortfolioArtifactVariant? _variant;
-
-  String get asset => _variant?.asset ?? _artifact.asset;
-  String get alt => _variant?.alt ?? _artifact.alt;
-  String get caption => _variant?.caption ?? _artifact.caption;
-
-  double get aspectRatio =>
-      (_variant?.width ?? _artifact.width) /
-      (_variant?.height ?? _artifact.height);
-
-  BoxFit get fit => switch (_variant?.fit ?? _artifact.fit) {
-    PortfolioArtifactFit.contain => BoxFit.contain,
-    PortfolioArtifactFit.cover => BoxFit.cover,
-  };
-
-  AlignmentGeometry get alignment =>
-      switch (_variant?.alignment ?? _artifact.alignment) {
-        PortfolioArtifactAlignment.start => AlignmentDirectional.centerStart,
-        PortfolioArtifactAlignment.center => Alignment.center,
-        PortfolioArtifactAlignment.end => AlignmentDirectional.centerEnd,
-      };
 }
 
 /// A labelled, framed project artifact with its caption.
@@ -134,25 +100,22 @@ final class _ArtifactFrame extends StatelessWidget {
       aspectRatio: view.aspectRatio,
       child: Padding(
         padding: EdgeInsets.all(rendering.prominent ? 10 : 8),
-        child: Semantics(
-          image: true,
-          label: view.alt,
-          excludeSemantics: true,
-          child: ExcludeSemantics(
-            child: rendering.paintImage
-                ? ViewportProximityGate(builder: _buildImage)
-                : const SizedBox.expand(),
-          ),
-        ),
+        child: rendering.paintImage
+            ? ArtifactPicture(
+                view: view,
+                image: ResizeImage.resizeIfNeeded(
+                  rendering.cacheWidth,
+                  null,
+                  AssetImage(view.asset),
+                ),
+              )
+            : Semantics(
+                image: true,
+                label: view.alt,
+                excludeSemantics: true,
+                child: const SizedBox.expand(),
+              ),
       ),
     ),
-  );
-
-  Widget _buildImage(BuildContext context) => Image.asset(
-    view.asset,
-    fit: view.fit,
-    alignment: view.alignment,
-    filterQuality: FilterQuality.high,
-    cacheWidth: rendering.cacheWidth,
   );
 }
