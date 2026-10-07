@@ -178,6 +178,8 @@ class _NavigationOverlayState extends State<NavigationOverlay>
         opacity: _overlayOpacity.value,
         child: Tooltip(
           message: label,
+          // The action already carries the label; a second one doubles the name.
+          excludeFromSemantics: true,
           child: AccessibleAction(
             onTap: _close,
             semanticLabel: label,

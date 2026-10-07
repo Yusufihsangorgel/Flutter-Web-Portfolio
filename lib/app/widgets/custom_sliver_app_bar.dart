@@ -121,17 +121,22 @@ class _CustomSliverAppBarState extends State<CustomSliverAppBar> {
 
   Widget _buildMenuButton(BuildContext context) {
     final label = MaterialLocalizations.of(context).openAppDrawerTooltip;
-    return Tooltip(
-      message: label,
-      child: SizedBox(
-        width: 56,
+    // A 48 px target centred in the slot, as a Material icon button has.
+    return Center(
+      child: Tooltip(
+        message: label,
+        // The action already carries the label; a second one doubles the name.
+        excludeFromSemantics: true,
         child: AccessibleAction(
           onTap: () => NavigationOverlay.show(context),
           semanticLabel: label,
-          child: Icon(
-            Icons.menu_rounded,
-            color: AppColors.textPrimary,
-            size: 24 * _scaleFactor,
+          child: SizedBox.square(
+            dimension: 48,
+            child: Icon(
+              Icons.menu_rounded,
+              color: AppColors.textPrimary,
+              size: 24 * _scaleFactor,
+            ),
           ),
         ),
       ),

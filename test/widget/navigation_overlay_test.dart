@@ -73,6 +73,13 @@ void main() {
     expect(link.getSemanticsData().flagsCollection.isLink, isTrue);
     expect(link.getSemanticsData().linkUrl.toString(), startsWith('#/'));
 
+    // Browsers join label and tooltip, so one of them must carry the name.
+    final close = tester
+        .getSemantics(find.bySemanticsLabel('Close'))
+        .getSemanticsData();
+    expect(close.label, 'Close');
+    expect(close.tooltip, isEmpty);
+
     await tester.tap(find.byIcon(Icons.close));
     await tester.pumpAndSettle();
     expect(find.byType(NavigationOverlay), findsNothing);

@@ -10,6 +10,7 @@ import 'package:flutter_web_portfolio/app/features/language/application/language
 import 'package:flutter_web_portfolio/app/features/render_quality/application/render_quality_controller.dart';
 import 'package:flutter_web_portfolio/app/modules/home/home_view.dart';
 import 'package:flutter_web_portfolio/app/narrative/domain/narrative_document.dart';
+import 'package:flutter_web_portfolio/app/widgets/accessible_action.dart';
 import 'package:flutter_web_portfolio/app/widgets/skip_to_content_link.dart';
 
 import '../helpers/narrative_fixture.dart';
@@ -134,6 +135,33 @@ void main() {
     expect(Focus.of(tester.element(menuButton)).hasPrimaryFocus, isTrue);
     expect(opacityOfLink(tester), 0);
     await tester.pumpWidget(const SizedBox.shrink());
+  });
+
+  testWidgets('the compact menu button has exactly one accessible name', (
+    tester,
+  ) async {
+    final semantics = tester.ensureSemantics();
+    await pumpHome(tester);
+
+    // Browsers join label and tooltip, so one of them must carry the name.
+    final menu = tester
+        .getSemantics(find.bySemanticsLabel('Open navigation menu'))
+        .getSemanticsData();
+    expect(menu.label, 'Open navigation menu');
+    expect(menu.tooltip, isEmpty);
+    expect(menu.flagsCollection.isButton, isTrue);
+    final icon = find.byIcon(Icons.menu_rounded);
+    final action = find.ancestor(
+      of: icon,
+      matching: find.byType(AccessibleAction),
+    );
+    expect(tester.getCenter(icon), tester.getCenter(action));
+    // An icon-button target, so a pointer resting in the corner shows no tooltip.
+    expect(tester.getSize(action), const Size.square(48));
+    expect(tester.getRect(action).contains(Offset.zero), isFalse);
+
+    await tester.pumpWidget(const SizedBox.shrink());
+    semantics.dispose();
   });
 
   testWidgets('activating the skip link moves focus into the main content', (
