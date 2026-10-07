@@ -73,11 +73,13 @@ test('dates are consistent and invalid calendar dates fail', () => {
 
 test('content is escaped and selections use only authored fields', () => {
   const html = renderResumeHtml({
-    profile: { name: 'Example <&>', role: '<script>role</script>', email: 'resume@example.com' },
+    profile: { name: 'Example <&>', role: '<SCRIPT>role</Script >', email: 'resume@example.com' },
     contributions: [{ project: 'Project', title: '<b>Change</b>', date: '2026-09-24', status: 'open', url: 'https://example.com/change?a=1&b=2' }],
   });
   assert.match(html, /Example &lt;&amp;&gt;/);
-  assert.doesNotMatch(html, /<script>|<b>Change/);
+  // Authored text must never reach the page as markup, in any letter case.
+  assert.doesNotMatch(html, /<\s*\/?\s*script\b|<b>Change/i);
+  assert.match(html, /&lt;SCRIPT&gt;role&lt;\/Script &gt;/);
   assert.match(html, /September 24, 2026 · open/);
   assert.match(html, /https:\/\/example.com\/change\?a=1&amp;b=2/);
   assert.throws(() => renderResumeHtml({ profile: {} }), /profile name/);
