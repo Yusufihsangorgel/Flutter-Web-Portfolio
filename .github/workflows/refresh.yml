@@ -20,7 +20,7 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version-file: '.nvmrc'
           cache: npm
@@ -89,6 +89,13 @@ jobs:
         if: steps.content-diff.outputs.changed == 'true'
         run: npm run sync:content
 
+      # New text from the refreshed record must not silently fall back to another font.
+      - name: Subset the Latin fonts to the refreshed glyph set
+        if: steps.content-diff.outputs.changed == 'true'
+        run: |
+          npm run fonts:subset
+          npm run verify:fonts
+
       # Hosted builds verify the committed social card instead of rendering it.
       - name: Render the social card and source manifest
         if: steps.content-diff.outputs.changed == 'true'
@@ -116,6 +123,7 @@ jobs:
             firebase.json \
             vercel.json \
             package.json \
+            assets/fonts \
             assets/build/source_manifest.sha256
           leftover="$(git diff --name-only; git ls-files --others --exclude-standard)"
           if [ -n "${leftover}" ]; then

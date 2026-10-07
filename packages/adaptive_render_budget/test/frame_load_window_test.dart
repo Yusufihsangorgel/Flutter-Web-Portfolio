@@ -34,8 +34,7 @@ void main() {
     });
 
     test('evicts the oldest sample without growing beyond capacity', () {
-      final window = FrameLoadWindow(capacity: 3);
-      window
+      final window = FrameLoadWindow(capacity: 3)
         ..add(_timing(4), refreshRateHz: 100)
         ..add(_timing(6), refreshRateHz: 100)
         ..add(_timing(8), refreshRateHz: 100)
@@ -51,9 +50,8 @@ void main() {
 
     test('clear retains capacity while dropping accumulated evidence', () {
       final window = FrameLoadWindow(capacity: 2)
-        ..add(_timing(10), refreshRateHz: 100);
-
-      window.clear();
+        ..add(_timing(10), refreshRateHz: 100)
+        ..clear();
 
       expect(window.length, 0);
       expect(
@@ -110,9 +108,7 @@ void main() {
   });
 }
 
-RenderFrameTiming _timing(int milliseconds) {
-  return RenderFrameTiming(
-    buildDuration: Duration(milliseconds: milliseconds),
-    rasterDuration: const Duration(milliseconds: 1),
-  );
-}
+RenderFrameTiming _timing(int milliseconds) => RenderFrameTiming(
+  buildDuration: Duration(milliseconds: milliseconds),
+  rasterDuration: const Duration(milliseconds: 1),
+);

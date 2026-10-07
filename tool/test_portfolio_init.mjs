@@ -195,10 +195,18 @@ async function testRepositoryInitialization() {
   assert(absentFailure.status !== 0 && absentFailure.stderr.includes('Simulated social-card failure'),
     'missing screenshot failure reaches rollback');
   assert(!(await exists(screenshotFile)), 'rollback preserves absent screenshot');
+  const rendererModules = path.join(clone, 'tool', 'work_artifacts');
+  assert(await exists(path.join(rendererModules, 'encoder.mjs')),
+    'rollback restores the demo renderer modules');
   runInClone(args, clone);
   const readme = await readFile(readmeFile, 'utf8');
   assert(findTemplateIdentityResidue(readme, templateIdentityMarkers).length === 0, 'README identity residue');
   assert(!(await exists(screenshotFile)), 'initialized clone omits screenshot');
+  assert(!(await exists(rendererModules)), 'initialized clone omits the demo renderer modules');
+  const scripts = JSON.parse(await readFile(path.join(clone, 'package.json'), 'utf8')).scripts;
+  for (const script of ['render:work-artifacts', 'verify:work-artifacts', 'test:work-artifacts']) {
+    assert(!(script in scripts), `initialized clone omits ${script}`);
+  }
   for (const marker of ['portfolio-ci', 'portfolio-template', 'portfolio-demo',
     'portfolio-onboarding', 'portfolio-record-intro', 'portfolio-record']) {
     const body = readme.match(new RegExp(`<!-- ${marker}:start -->\\n([\\s\\S]*?)\\n<!-- ${marker}:end -->`))?.[1];

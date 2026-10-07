@@ -1,0 +1,223 @@
+{
+  "schema": "portfolio-work-artifacts/v1",
+  "input_sha256": "4c90ae8baf653fc4b2202a11ee0ee6e3a706f382dd8883022c71ef40bf3e4990",
+  "renderer": "Chromium 147.0.7727.15",
+  "artifacts": [
+    {
+      "asset": "assets/work/aydinlik-release-compact.webp",
+      "format": "webp",
+      "width": 900,
+      "height": 1200,
+      "bytes": 109524,
+      "sha256": "7b516d36fd96d8d7760e82536a82b94657610e570bff134f760ee31ccd718b55",
+      "candidates": {
+        "webp": 109524,
+        "jpeg": 165864
+      }
+    },
+    {
+      "asset": "assets/work/aydinlik-release.webp",
+      "format": "webp",
+      "width": 1600,
+      "height": 1000,
+      "bytes": 115664,
+      "sha256": "6179c2487ce0dc5fb14868b8e003f16e20d4a6ff47f04cfe9d8b057371f23c52",
+      "candidates": {
+        "webp": 115664,
+        "jpeg": 184287
+      }
+    },
+    {
+      "asset": "assets/work/bilim-utopya-release-compact.webp",
+      "format": "webp",
+      "width": 900,
+      "height": 1200,
+      "bytes": 82924,
+      "sha256": "35d669671523597df84ac7a346d417936bee028d31b0cbfd83c8b84133045a5e",
+      "candidates": {
+        "webp": 82924,
+        "jpeg": 143210
+      }
+    },
+    {
+      "asset": "assets/work/bilim-utopya-release.webp",
+      "format": "webp",
+      "width": 1600,
+      "height": 1000,
+      "bytes": 76046,
+      "sha256": "7aa086a7eed621744611934d8e073f03d6b867b0757d04ac154077859d0b7509",
+      "candidates": {
+        "webp": 76046,
+        "jpeg": 141169
+      }
+    },
+    {
+      "asset": "assets/work/constellation-demo-compact.webp",
+      "format": "webp",
+      "width": 900,
+      "height": 1200,
+      "bytes": 29794,
+      "sha256": "5f2b538bcdebd6f272f567ba9bb083f045a41e130d180eddc5e0e30461725099",
+      "candidates": {
+        "webp": 29794,
+        "jpeg": 70706
+      }
+    },
+    {
+      "asset": "assets/work/constellation-demo.webp",
+      "format": "webp",
+      "width": 1600,
+      "height": 1000,
+      "bytes": 32680,
+      "sha256": "5b405e570ffede3b194a9666f6cfbf27e7a520998f95e649448e91598c0abea9",
+      "candidates": {
+        "webp": 32680,
+        "png": 288543
+      }
+    },
+    {
+      "asset": "assets/work/dorse-product-compact.webp",
+      "format": "webp",
+      "width": 900,
+      "height": 1200,
+      "bytes": 34546,
+      "sha256": "f54ff9642e9dddf7d125e5933812eff9cae9a43f7e382d1ba68107f2c027887d",
+      "candidates": {
+        "webp": 34546,
+        "jpeg": 74472
+      }
+    },
+    {
+      "asset": "assets/work/dorse-product.webp",
+      "format": "webp",
+      "width": 1600,
+      "height": 1000,
+      "bytes": 47702,
+      "sha256": "e5d3aa3e8e60a7b16e8182c4299bcfc037087de109a7a063f4a2f33cdfbc7d97",
+      "candidates": {
+        "webp": 47702,
+        "jpeg": 101737
+      }
+    },
+    {
+      "asset": "assets/work/fugasoft-product-compact.webp",
+      "format": "webp",
+      "width": 900,
+      "height": 1200,
+      "bytes": 34060,
+      "sha256": "f7941132e13fff83df2b0b6c8f09bf42c2667e776241864213909a5927be3004",
+      "candidates": {
+        "webp": 34060,
+        "jpeg": 72096
+      }
+    },
+    {
+      "asset": "assets/work/fugasoft-product.webp",
+      "format": "webp",
+      "width": 1600,
+      "height": 1000,
+      "bytes": 38506,
+      "sha256": "788acb2e8b939c018325e0938c9125ac8af930065f0b026ca58fa43956d952ce",
+      "candidates": {
+        "webp": 38506,
+        "jpeg": 74278
+      }
+    },
+    {
+      "asset": "assets/work/go-multitenant-gateway-compact.webp",
+      "format": "webp",
+      "width": 900,
+      "height": 1200,
+      "bytes": 20898,
+      "sha256": "8a6390cee7cdaef05c6e1d667edf3c36809620e14f8685d06fc4e083e7f358f6",
+      "candidates": {
+        "webp": 20898,
+        "jpeg": 50618
+      }
+    },
+    {
+      "asset": "assets/work/go-multitenant-gateway.webp",
+      "format": "webp",
+      "width": 1600,
+      "height": 1000,
+      "bytes": 59012,
+      "sha256": "d4a9e40ddd0133068a4f375448529cd829d6edca412699579ed83ab50ff429b6",
+      "candidates": {
+        "webp": 59012,
+        "jpeg": 114357
+      }
+    },
+    {
+      "asset": "assets/work/portfolio-current-compact.webp",
+      "format": "webp",
+      "width": 900,
+      "height": 1200,
+      "bytes": 20400,
+      "sha256": "0091f17d684dd3cf460cde8bdc1c530656458a05bd3a4215a245a28de35d0121",
+      "candidates": {
+        "webp": 20400,
+        "jpeg": 49375
+      }
+    },
+    {
+      "asset": "assets/work/portfolio-current.webp",
+      "format": "webp",
+      "width": 1600,
+      "height": 1000,
+      "bytes": 34534,
+      "sha256": "f3ca8e485a3d75629a1c0b4164cc1f164716e016cf9b4b11eaccb4d4725c171c",
+      "candidates": {
+        "webp": 34534,
+        "jpeg": 76806
+      }
+    },
+    {
+      "asset": "assets/work/queue-inspector-compact.webp",
+      "format": "webp",
+      "width": 900,
+      "height": 1200,
+      "bytes": 21870,
+      "sha256": "1d0f0676942f217b9c3dea6368e38bec211da98dbb000f90a7589ff667bdf6f3",
+      "candidates": {
+        "webp": 21870,
+        "jpeg": 50549
+      }
+    },
+    {
+      "asset": "assets/work/queue-inspector.webp",
+      "format": "webp",
+      "width": 1600,
+      "height": 1000,
+      "bytes": 31406,
+      "sha256": "bade44bb479806b22001c2de3004c7d1cc766e0661b89f1fc8ba24071e1d2085",
+      "candidates": {
+        "webp": 31406,
+        "png": 72093
+      }
+    },
+    {
+      "asset": "assets/work/redis-task-queue-compact.webp",
+      "format": "webp",
+      "width": 900,
+      "height": 1200,
+      "bytes": 21526,
+      "sha256": "9570d1d410a3fa07e65affdee9a88a494695e5f03c294ce4c54e36bb41396354",
+      "candidates": {
+        "webp": 21526,
+        "jpeg": 50296
+      }
+    },
+    {
+      "asset": "assets/work/redis-task-queue.webp",
+      "format": "webp",
+      "width": 1600,
+      "height": 1000,
+      "bytes": 31770,
+      "sha256": "21de741357335d8268a1915207f02c25e819ca911143ee0f200cb32c808f7315",
+      "candidates": {
+        "webp": 31770,
+        "png": 72668
+      }
+    }
+  ]
+}

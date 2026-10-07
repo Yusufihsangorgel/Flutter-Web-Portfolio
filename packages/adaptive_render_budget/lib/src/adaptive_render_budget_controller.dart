@@ -1,21 +1,21 @@
 import 'dart:math' as math;
 
+import 'package:adaptive_render_budget/src/adaptive_render_budget_policy.dart';
+import 'package:adaptive_render_budget/src/adaptive_render_budget_state.dart';
+import 'package:adaptive_render_budget/src/frame_load_window.dart';
+import 'package:adaptive_render_budget/src/frame_timing_sample.dart';
+import 'package:adaptive_render_budget/src/monotonic_clock.dart';
+import 'package:adaptive_render_budget/src/sources.dart';
 import 'package:flutter/foundation.dart';
-
-import 'adaptive_render_budget_policy.dart';
-import 'adaptive_render_budget_state.dart';
-import 'frame_load_window.dart';
-import 'frame_timing_sample.dart';
-import 'monotonic_clock.dart';
-import 'sources.dart';
 
 /// Adapts an application's rendering tier to sustained frame pressure.
 ///
-/// The controller is deliberately independent of BLoC and widget lifecycle
+/// The controller is independent of BLoC and widget lifecycle
 /// APIs. Rendering code can consume it with [ValueListenableBuilder], while
 /// tests can inject deterministic timing, refresh-rate, and clock sources.
 final class AdaptiveRenderBudgetController extends ChangeNotifier
     implements ValueListenable<AdaptiveRenderBudgetState> {
+  /// Starts collecting samples from the supplied sources.
   factory AdaptiveRenderBudgetController({
     required RenderFrameTimingSource timingSource,
     required RefreshRateSource refreshRateSource,
@@ -84,9 +84,8 @@ final class AdaptiveRenderBudgetController extends ChangeNotifier
   AdaptiveRenderBudgetPolicy get policy => _policy;
 
   /// Current rolling telemetry without frame-by-frame notifications.
-  FrameLoadStatistics get statistics {
-    return _window.statistics(overloadThreshold: _policy.overloadThreshold);
-  }
+  FrameLoadStatistics get statistics =>
+      _window.statistics(overloadThreshold: _policy.overloadThreshold);
 
   /// Whether [dispose] has permanently detached the controller.
   bool get isDisposed => _isDisposed;
@@ -398,13 +397,10 @@ final class AdaptiveRenderBudgetController extends ChangeNotifier
   static RenderBudgetLevel _lowerOf(
     RenderBudgetLevel first,
     RenderBudgetLevel second,
-  ) {
-    return RenderBudgetLevel.values[math.min(first.index, second.index)];
-  }
+  ) => RenderBudgetLevel.values[math.min(first.index, second.index)];
 
-  static double _validRefreshRateOr(double value, {required double fallback}) {
-    return value.isFinite && value > 0 ? value : fallback;
-  }
+  static double _validRefreshRateOr(double value, {required double fallback}) =>
+      value.isFinite && value > 0 ? value : fallback;
 
   static void _validateRefreshRate(double refreshRateHz) {
     if (!refreshRateHz.isFinite || refreshRateHz <= 0) {

@@ -430,9 +430,19 @@ async function removeDemoArtifactRenderer() {
   await rm(path.join(root, 'tool', 'render_work_artifacts.mjs'), {
     force: true,
   });
+  await rm(path.join(root, 'tool', 'work_artifacts'), {
+    recursive: true,
+    force: true,
+  });
   const packagePath = path.join(root, 'package.json');
   const packageDocument = JSON.parse(await readFile(packagePath, 'utf8'));
-  delete packageDocument.scripts?.['render:work-artifacts'];
+  for (const script of [
+    'render:work-artifacts',
+    'verify:work-artifacts',
+    'test:work-artifacts',
+  ]) {
+    delete packageDocument.scripts?.[script];
+  }
   await writeAtomically(packagePath, `${JSON.stringify(packageDocument, null, 2)}\n`);
 }
 
@@ -579,6 +589,7 @@ async function createRepositoryTransaction() {
     'build/web',
     'packages',
     'docs/readme/home-desktop.jpg',
+    'tool/work_artifacts',
   ];
   const snapshots = [];
   for (const relative of targets) {
