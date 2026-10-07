@@ -1,298 +1,67 @@
-<h1 align="center">
-  <img src="docs/readme/hero.svg" width="100%" alt="Flutter Web Portfolio — your work with proof">
-</h1>
+# Yusuf İhsan Görgel — Flutter Web Portfolio
 
-<p align="center"><strong>A portfolio that reads as one continuous document and deploys as static files.</strong></p>
+This repository is the source of my portfolio at [developeryusuf.com](https://developeryusuf.com/): a Flutter Web app that builds to static files, with the tooling to reuse it as a template.
 
-<p align="center">
-  <!-- portfolio-ci:start -->
-  <a href="https://github.com/Yusufihsangorgel/Flutter-Web-Portfolio/actions/workflows/ci.yml"><img alt="CI status" src="https://github.com/Yusufihsangorgel/Flutter-Web-Portfolio/actions/workflows/ci.yml/badge.svg?branch=main"></a>
-<!-- portfolio-ci:end -->
-  <a href="https://flutter.dev"><img alt="Flutter 3.47.5" src="https://img.shields.io/badge/Flutter-3.47.5-1E51FF?style=flat-square&amp;logo=flutter&amp;logoColor=white"></a>
-  <a href="LICENSE"><img alt="MIT license" src="https://img.shields.io/badge/license-MIT-12110F?style=flat-square"></a>
-  <img alt="Dart Wasm and JavaScript fallback" src="https://img.shields.io/badge/runtime-Wasm%20%2B%20JS-DFFF3F?style=flat-square&amp;logoColor=12110F">
-</p>
-
-<p align="center">
-<!-- portfolio-template:start -->
-  <a href="https://github.com/Yusufihsangorgel/Flutter-Web-Portfolio/generate"><img alt="Create a repository from this template" src="https://img.shields.io/badge/USE%20THIS%20TEMPLATE-DFFF3F?style=for-the-badge&amp;logo=github&amp;logoColor=12110F"></a>
-<!-- portfolio-template:end -->
-</p>
-
-<p align="center">
 <!-- portfolio-demo:start -->
 <a href="https://developeryusuf.com/">Live site</a> · <a href="https://github.com/flutter/flutter/issues/189499">Flutter Web first-frame issue</a> · <a href="https://github.com/flutter/flutter/pull/189500">Engine patch</a>
 <!-- portfolio-demo:end -->
-</p>
 
-| You edit | Visitors get | CI proves |
-|---|---|---|
-| Identity, biography, work, evidence, links, and metadata in one validated JSON document. | One accessible, responsive page with real deep links and reduced-motion support. | The Wasm/JavaScript bundle, hosting headers, clean-template reset, and browser behaviour pass executable checks. |
+<!-- portfolio-ci:start -->
+  <a href="https://github.com/Yusufihsangorgel/Flutter-Web-Portfolio/actions/workflows/ci.yml"><img alt="CI status" src="https://github.com/Yusufihsangorgel/Flutter-Web-Portfolio/actions/workflows/ci.yml/badge.svg?branch=main"></a>
+<!-- portfolio-ci:end -->
 
-## Your portfolio, from a clean template
+![First screen of developeryusuf.com at 1440 by 900 pixels: the name in large type, the role Software Engineer, the current position, links to GitHub, LinkedIn, and writing, and the buttons Explore my work and Email me.](docs/readme/home-desktop.jpg)
 
-Prerequisites: Git, Node.js 24.18.0, and Flutter 3.47.5. The exact framework
-and engine revisions live in `tool/toolchain.json` and are verified before a
-release build.
-The checked-in `.nvmrc` gives Node version managers the same local version;
-`npm run verify:toolchain` reports any mismatch. Hosted builds use the pinned
-Flutter revision in `tool/hosted_build.sh`.
+## Engineering highlights
 
-<!-- portfolio-onboarding:start -->
-Choose **Use this template** above and create your own repository. Do not fork the demo for a personal site: GitHub forks retain the parent history, whereas a repository created from a template starts with one unrelated commit. Forks remain the right path for contributing changes back here. Clone your new repository, then run:
-<!-- portfolio-onboarding:end -->
+- **Accepted Flutter engine fix.** On SkWasm, `flutter-first-frame` could fire before the compositor presented any Flutter content, which left a blank window between a page's loading screen and the app. [flutter/flutter#189500](https://github.com/flutter/flutter/pull/189500) makes the engine wait for the first frame's outstanding renders and for the next browser frame before it sends the event ([issue #189499](https://github.com/flutter/flutter/issues/189499)). This site's loading shell is removed after that event, and `npm run verify:runtime` measures the handoff. The other accepted upstream changes, in Dart, simdjson, gRPC-Go, and other projects, are listed under [Accepted upstream changes](#accepted-upstream-changes).
+- **Strict content contract.** `assets/content/portfolio.json` is the single source for the page. Node tools generate the HTML metadata, structured data, manifest, sitemap, and the record below from it. The Dart parser runs before `runApp` and rejects unsupported schema versions, missing fields, duplicate identifiers, and invalid links. A translation is a complete overlay: a locale with a missing field is refused instead of mixing languages ([ADR 0005](docs/adr/0005-strict-json-content-contract.md)).
+- **Wasm with a JavaScript fallback.** The release ships the Dart Wasm build (SkWasm) and a JavaScript fallback, and serves the renderer files from the same origin. Hosts that send cross-origin isolation headers get threaded SkWasm. Hosts that cannot, such as GitHub Pages, run the single-threaded or JavaScript path ([ADR 0003](docs/adr/0003-dual-wasm-javascript-runtime.md)).
+- **Accessibility and reduced motion.** Playwright tests cover keyboard navigation, reduced motion, language switching across seven languages including right-to-left Arabic, deep links, and browser history. With reduced motion the page stops adaptive effects and still exposes its full heading and control structure.
+- **Release checks in CI.** Each pull request runs content synchronization, formatting, static analysis, Flutter tests, the release build, bundle and hosting verification, a clean-template initialization, the browser suite, and runtime budgets. See [Quality gates](#quality-gates).
 
-```bash
-git clone https://github.com/your-name/your-portfolio.git
-cd your-portfolio
-npm ci
-npm run setup:browsers
-flutter pub get
-npm run portfolio:init
-npm run build:release
-node tool/serve_web.mjs
+## Architecture
+
+One content document drives the page. The Flutter app loads it through data adapters, parses it into a strict domain model before `runApp`, and renders semantic sections from Cubit and controller state. Node tools generate the metadata, sitemap, and first-frame shell from the same document. The release is a set of static files with a Wasm build and a JavaScript fallback.
+
+```mermaid
+flowchart LR
+  content["portfolio.json,<br/>locale overlays,<br/>narrative.json"] --> parse["Strict parse<br/>before runApp"]
+  parse --> state["Cubits and<br/>controllers"]
+  state --> sections["Semantic<br/>sections"]
+  sections --> build["Flutter web<br/>release build"]
+  build --> wasm["Dart Wasm<br/>with SkWasm"]
+  build --> js["JavaScript<br/>fallback"]
+  wasm --> files["Static files<br/>in build/web"]
+  js --> files
+  content --> tools["Node tools:<br/>metadata, sitemap,<br/>first-frame shell"]
+  tools --> files
+  headers["Cross-origin<br/>isolation headers"] -. enable threaded SkWasm .-> wasm
 ```
 
-Open `http://127.0.0.1:4173`. The preview serves the exact release directory
-with the security headers and SPA fallback used in production. Press `Ctrl+C`
-to stop it. During normal UI work, `flutter run -d chrome` remains the faster
-hot-reload loop.
+The layer rules are in [docs/ARCHITECTURE-RULES.md](docs/ARCHITECTURE-RULES.md). Design decisions are recorded in [docs/adr](docs/adr/README.md), and known gaps in [docs/TECH-DEBT.md](docs/TECH-DEBT.md).
 
-[GitHub's template-repository guide](https://docs.github.com/en/repositories/creating-and-managing-repositories/creating-a-repository-from-a-template)
-explains the history and contribution differences.
+## Quality gates
 
-The initializer is a real reset, not a search-and-replace checklist. It asks for
-your public identity, role, contact, canonical domain, headline, and focus;
-removes the original owner’s optional work, experience, and contribution data;
-deletes the demo work artifacts, source captures, and inherited `build/web`
-release; then regenerates the social card, source manifest, README record, SEO,
-JSON-LD, web manifest,
-sitemap, robots file, analytics include, and server policy. The reset is
-transactional: a failed renderer or synchronization step restores every touched
-file instead of leaving a half-customized repository. When the Git remote is on
-GitHub, the live CI badge is rewritten to that repository as part of the reset.
+CI runs these checks on every pull request and every push to `main`. [`ci.yml`](.github/workflows/ci.yml) is the complete list. The toolchain is Flutter 3.47.5, Dart 3.13.4, and Node.js 24.18.0, pinned in [`tool/toolchain.json`](tool/toolchain.json). Install dependencies first with `flutter pub get`, `npm ci`, and `npm run setup:browsers`.
 
-```text
-you answer once
-      │
-      ▼
-assets/content/portfolio.json
-      ├──► Flutter document
-      ├──► search + social metadata
-      ├──► README engineering record
-      ├──► manifest + sitemap + robots
-      └──► hosting policy + social card
-```
-
-[Customization guide](docs/CUSTOMIZE.md) · [Content contract](#the-content-contract) · [Deployment guide](docs/DEPLOY.md)
-
-## Deploy it where you already live
-
-The app is static and has no backend lock-in.
-
-| Host | Shortest path |
+| Gate | Commands |
 |---|---|
-| GitHub Pages | push `main`; the included workflow builds with the repository-aware base path |
-| Firebase Hosting | `npm run deploy -- firebase --project <id>` |
-| Netlify | connect the repo or run `npm run deploy -- netlify` |
-| Cloudflare Pages | `npm run deploy -- cloudflare --project <name>` |
-| Vercel | import the repo or run `npm run deploy -- vercel` |
-| Docker / VPS | `npm run deploy -- docker --image portfolio:latest` |
+| Toolchain | `node tool/verify_toolchain.mjs --current` |
+| Content and generated files | `npm run verify:content`, `npm run portfolio:validate` |
+| Tooling tests | `npm run test:template`, `npm run test:release-security`, `npm run test:refresh`, `npm run test:content` |
+| Hosting, community files, sources, history | `npm run verify:hosting`, `npm run verify:community`, `npm run audit:sources`, `npm run audit:history` |
+| Static checks | `npm run typecheck`, `npm run verify:source`, `dart format --output=none --set-exit-if-changed lib test tool`, `flutter analyze --fatal-infos` |
+| Tool syntax | `bash -n tool/hosted_build.sh`, `node --check` on the Node tools |
+| Flutter tests | `flutter test` |
+| Release build and bundle | `npm run prepare:source`, `flutter build web --release --wasm --no-web-resources-cdn`, `npm run prepare:bundle`, `npm run verify:bundle` |
+| Container | `docker build --tag flutter-web-portfolio:ci .` |
+| Clean template | `npm run test:clone` |
+| Browser tests | `npm test` |
+| Runtime budgets | `npm run verify:runtime` |
+| Architecture layers, when `lib/` or `quality/` change | `python3 -m unittest discover -s quality/tests -p 'test_architecture.py'`, `python3 quality/check_architecture.py --warn-only` |
 
-Firebase, Netlify, Cloudflare Pages, Vercel, and Nginx preserve SPA navigation,
-the generated content-security policy, and the cross-origin isolation headers
-used by threaded SkWasm. GitHub Pages cannot set custom response headers, so its
-build uses the compatible single-threaded/JavaScript fallback.
-Custom domains require no Dart change: edit `site.url`, run
-`npm run sync:content`, then point DNS at the host.
-
-The deployment guide separates Git-connected builds from direct uploads and
-gives custom-domain changes an explicit cutover order. In particular,
-Cloudflare Pages treats Git integration and Direct Upload as different project
-types; choose the one you intend to keep before the first deployment.
-
-[Provider-by-provider instructions](docs/DEPLOY.md)
-
-## Why this is not another portfolio grid
-
-Most portfolio templates start with cards and later bolt on data. This one
-starts with a document contract:
-
-- Optional chapters genuinely disappear; there are no empty demo sections.
-- Work artifacts must be local, accessible, dimensioned, and backed by linked evidence.
-- Professional claims remain outside presentation code and interface-copy
-  catalogs.
-- The same measured position controls active navigation, browser history,
-  scene interpolation, and every progress indicator.
-- Reduced motion preserves the entire information architecture instead of
-  serving a diminished page.
-- Decorative painting listens to frame-adjacent state without rebuilding the
-  semantic document or idling at 60 frames per second.
-- The critical HTML shell gives slow Wasm visits meaningful content before
-  Flutter reaches the compositor.
-
-## The content contract
-
-`assets/content/portfolio.json` is parsed into immutable final classes before
-`runApp`. The parser rejects schema drift, duplicate IDs, invalid URLs, reused
-artifacts, incomplete featured cases, malformed colors, and identity/metadata
-disagreement.
-
-```json
-{
-  "schema_version": 8,
-  "site": { "url": "https://example.com" },
-  "profile": { "name": "Your Name", "role": "Software Engineer" },
-  "experience": [],
-  "contributions": [],
-  "systems": []
-}
-```
-
-That excerpt is incomplete by design; use the initializer to produce a
-valid clean document, then follow [the field guide](docs/CUSTOMIZE.md) to add
-traceable experience and selected work.
-
-`assets/i18n/<locale>.json` owns interface chrome only. Complete translated
-professional copy belongs in `assets/content/locales/<locale>.json`, whose
-structure must match the canonical document before that locale can be enabled.
-This all-or-nothing contract rejects missing fields instead of silently mixing
-languages. The initializer removes the demo professional overlays and starts a
-new portfolio with English only, so a clone never advertises untranslated
-claims.
-
-Accessibility is content, too: `display_name.accessible` carries the spoken
-name, project `alt` text describes the visible evidence, captions provide
-context, and links name their destination. The field guide shows each of these
-records; keyboard, reduced-motion, RTL, and responsive behaviour are covered by
-the browser suite.
-
-## The runtime, drawn as one path
-
-```text
-assets/content/portfolio.json
-        │ strict parse before runApp
-        ▼
-PortfolioDocument ───────────────┐
-                                │
-assets/presentation/narrative.json
-        │ chapter order + motif  │
-        ▼                        │
-NarrativeDocument               │
-        │                        │
-assets/i18n/{locale}.json        │
-        │ ordered async loading  │
-        ▼                        ▼
-LanguageCubit              semantic sections
-        │                        ▲
-assets/content/locales/          │ complete professional overlay
-  {locale}.json ─────────────────┘
-                                │ measured bounds
-                                ▼
-AppScrollController ─────► NarrativePosition
-        │                       │
-        │ browser history       ├────► SceneDirector
-        │ + visible progress    │           │
-        ▼                       ▼           ▼
-chapter navigation      chapter anchors    ambient painter
-                                │
-                                ▼
-                       NarrativeAnchorPath
-```
-
-The document and render loop use different update paths. Content
-loads once. Frame-frequency scene and pointer changes stay in synchronous
-listenables. Responsive reflow preserves chapter-relative focus instead of a
-stale pixel offset, and one early popstate bridge keeps browser history from
-being consumed twice by Flutter navigation.
-
-## First frame is a measured event
-
-The release does not treat Flutter’s first-frame signal as proof that pixels
-have reached the browser compositor. Its generated HTML shell remains aligned
-for two browser frames, then leaves exactly once. Ordered User Timing marks
-separate entrypoint transfer, engine initialization, Flutter rendering,
-compositor-safe reveal, and shell removal.
-
-```bash
-# Serve build/web, then sample cold starts and a real full-document scroll.
-npm run measure:runtime
-
-# Enforce the checked-in median budget.
-npm run verify:runtime
-```
-
-Software-rendered headless sessions still record every metric; only explicitly
-hardware-bound thresholds are reported rather than misjudged against
-SwiftShader readback latency.
-
-## Quality is executable
-
-For a portfolio owner, the release gate is one command:
-
-```bash
-npm run build:release
-```
-
-It validates content, derived public files, the Dart source graph, host policy,
-the dual runtime, and the final bundle. Repository maintainers run the broader
-suite below before changing the template itself:
-
-```bash
-npm run verify:toolchain
-npm run portfolio:validate
-npm run test:template
-npm run test:clone
-npm run test:release-security
-npm run verify:content
-npm run verify:hosting
-npm run verify:community
-npm run verify:source
-npm run audit:sources
-npm run audit:history
-npm run typecheck
-dart format --output=none --set-exit-if-changed lib test tool
-flutter analyze --fatal-infos
-flutter test
-npm run build:release
-npm run test:visual
-npm test
-npm run verify:runtime
-```
-
-The gates cover:
-
-- canonical-content drift and source status;
-- every reachable Dart source file;
-- immutable renderer assets and same-origin fallbacks;
-- Wasm/JavaScript size budgets and Nginx packaging;
-- keyboard semantics, reduced motion, locale switching, RTL, deep links, and back/forward history;
-- desktop, tablet, and mobile visual baselines;
-- cold-start, layout-shift, long-task, and scroll-frame budgets;
-- a generated clean portfolio with no inherited identity.
-
-## Repository map
-
-| Change this | To change that |
-|---|---|
-| `assets/content/portfolio.json` | professional content and public metadata |
-| `assets/work/` | real project evidence and compact crops |
-| `assets/i18n/` | interface translations |
-| `assets/presentation/narrative.json` | chapter motifs and scene order |
-| `lib/app/domain/` | strict content and narrative contracts |
-| `lib/app/controllers/` | measured scroll, history, scene, and reflow state |
-| `lib/app/widgets/narrative_stage.dart` | the continuous document trace |
-| `tool/` | initialization, synchronization, release, and verification |
-| `tests/e2e/` | browser and visual regression contracts |
-
-## Verified public engineering record
-
-<!-- portfolio-record-intro:start -->
-The live demo uses this template with the author's own record. This block is regenerated from the canonical content document; it is evidence for the demo, not starter data inherited by `npm run portfolio:init`.
-<!-- portfolio-record-intro:end -->
-
-<details>
-<summary><strong>Open the current record</strong></summary>
+Pull requests also run code scanning, dependency review, and a Conventional Commits check on the title.
 
 <!-- portfolio-record:start -->
 ## Public engineering record
@@ -343,15 +112,33 @@ Source status: `2026.09.28.1`, verified 2026-08-29 against GitHub, LinkedIn, Fug
 | Flutter Web Portfolio | I built and run the Flutter Web site, its external content pipeline, accessibility layer, browser regression suite, and production release. | [Project](https://developeryusuf.com) |
 <!-- portfolio-record:end -->
 
-</details>
+<!-- portfolio-record-intro:start -->
+The live demo uses this template with the author's own record. This block is regenerated from the canonical content document; it is evidence for the demo, not starter data inherited by `npm run portfolio:init`.
+<!-- portfolio-record-intro:end -->
+
+## Use it as a template
+
+You can reuse the site for your own portfolio: create a repository from this template, run the initializer, and follow [docs/TEMPLATE.md](docs/TEMPLATE.md) for content, build, and hosting.
+
+<!-- portfolio-template:start -->
+  <a href="https://github.com/Yusufihsangorgel/Flutter-Web-Portfolio/generate"><img alt="Create a repository from this template" src="https://img.shields.io/badge/USE%20THIS%20TEMPLATE-DFFF3F?style=for-the-badge&amp;logo=github&amp;logoColor=12110F"></a>
+<!-- portfolio-template:end -->
+
+<!-- portfolio-onboarding:start -->
+Choose **Use this template** above and create your own repository. Do not fork the demo for a personal site: GitHub forks retain the parent history, whereas a repository created from a template starts with one unrelated commit. Forks remain the right path for contributing changes back here. Clone your new repository, then run:
+<!-- portfolio-onboarding:end -->
+
+```bash
+npm ci
+npm run setup:browsers
+flutter pub get
+npm run portfolio:init
+```
 
 ## Contributing
 
-Focused fixes, measured performance improvements, accessibility work, new host
-adapters, and locale corrections are welcome. Start with
-[CONTRIBUTING.md](CONTRIBUTING.md); the pull-request template names the same
-checks CI enforces.
+Read [CONTRIBUTING.md](CONTRIBUTING.md) and the [architecture rules](docs/ARCHITECTURE-RULES.md) before you propose a change. Pull request titles use Conventional Commits, and the [pull request template](.github/PULL_REQUEST_TEMPLATE.md) lists the CI checks. To report a security problem, see [SECURITY.md](SECURITY.md).
 
 ## License
 
-MIT. Keep the license, replace the content, and make the document yours.
+MIT. See [LICENSE](LICENSE). [NOTICE](NOTICE) lists the screenshots, product names, and fonts that the MIT license does not cover.

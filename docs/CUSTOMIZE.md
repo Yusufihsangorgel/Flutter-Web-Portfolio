@@ -258,7 +258,7 @@ application exists.
 | Startup failure screen | `lib/main.dart` | fallback background and action color |
 | Installed web-app chrome | `tool/sync_public_content.mjs` in `syncManifest` | manifest background and theme colors; `web/manifest.json` is generated |
 | Social sharing card | `tool/social_card.html` | background, text, accent, and signal colors |
-| Repository poster and badges | `docs/readme/hero.svg` and the badge renderers in `tool/sync_public_content.mjs` | optional repository branding; these do not affect the site |
+| Repository badges | the badge renderers in `tool/sync_public_content.mjs` | optional repository branding; these do not affect the site |
 | Individual case studies | each `systems[*].presentation` record in `assets/content/portfolio.json` | project-specific background, foreground, and accent; keep real product branding independent of the site theme |
 
 Several section borders and the project atlas use alpha variants of the default
@@ -268,7 +268,7 @@ from the old palette:
 ```bash
 git grep -n -i -E \
   'f2eee5|faf7ef|d4cec1|12110f|403c36|756e64|fffcf4|1e51ff|e6ff57|d9e1ff' \
-  -- lib web tool docs/readme
+  -- lib web tool
 ```
 
 Classify each match instead of blind replacement: UI chrome should follow the
@@ -296,6 +296,9 @@ docker run --rm --ipc=host \
   mcr.microsoft.com/playwright:v1.59.1-noble@sha256:b0ab6f3cb99aa7803adbc14d9027ec1785fc6e433b97e134e0f8fe61683b6b53 \
   bash -lc 'npm run test:visual:update && npm run test:visual'
 ```
+
+Alternatively, run the manual "Visual baselines" workflow and commit the
+`visual-baselines` artifact into `tests/e2e/visual.spec.ts-snapshots/`.
 
 Review both `*-darwin.png` and `*-linux.png` changes before committing them.
 

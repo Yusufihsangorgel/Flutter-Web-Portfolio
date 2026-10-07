@@ -20,7 +20,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
       - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
@@ -37,9 +37,12 @@ jobs:
       - run: npm run verify:content
       - run: npm run portfolio:validate
       - run: npm run test:template
+      - run: npm run test:starter
       - run: npm run test:release-security
       - run: npm run test:refresh
       - run: npm run test:content
+      - run: npm run test:strings
+      - run: npm run verify:strings
       - run: npm run verify:hosting
       - run: npm run verify:community
       - run: npm run audit:sources
@@ -63,7 +66,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
         with:
           node-version: 24.18.0
@@ -86,7 +89,7 @@ jobs:
     timeout-minutes: 30
     needs: [analyze, test]
     steps:
-      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
         with:
           node-version: 24.18.0
@@ -105,9 +108,24 @@ jobs:
       - run: flutter build web --release --wasm --no-web-resources-cdn
       - run: npm run prepare:bundle
       - run: npm run verify:bundle
+      # The image build runs this check in the exact git tree, not in this workspace.
+      - name: Verify the release manifest against the exact git tree
+        run: |
+          tree="$(mktemp -d)"
+          git archive HEAD | tar -x -C "${tree}"
+          (cd "${tree}" && sha256sum -c --quiet "${GITHUB_WORKSPACE}/build/web/assets/assets/build/source_manifest.sha256")
       - run: docker build --tag flutter-web-portfolio:ci .
       - run: npm run test:clone
       - run: npm test
+      - name: Upload Playwright results
+        if: failure()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: playwright-results
+          path: |
+            test-results/
+            playwright-report/
+          retention-days: 7
       - run: npm run verify:runtime
       - name: Package verified release
         run: |

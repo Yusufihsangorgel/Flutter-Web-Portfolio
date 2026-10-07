@@ -82,7 +82,7 @@
     "subtitle": "{count} paquetes publicados en pub.dev, {perfect} de ellos con una puntuación perfecta de 160/160. Cada uno trae una afirmación medida, ejemplos ejecutables y su hoja de ruta.",
     "pub_points": "puntos pub",
     "open_package": "Abrir en pub.dev",
-    "maturity": "madurez",
+    "maturity_level": "Madurez {level} de {max}",
     "roadmap": "hoja de ruta",
     "status_done": "publicado",
     "status_doing": "en curso",

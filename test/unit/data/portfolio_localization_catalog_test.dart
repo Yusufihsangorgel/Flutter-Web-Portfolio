@@ -2,13 +2,13 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter_web_portfolio/app/domain/models/portfolio_document.dart';
+import 'package:flutter_web_portfolio/app/data/dto/portfolio_document_mapper.dart';
 
 void main() {
   final canonicalJson =
       jsonDecode(File('assets/content/portfolio.json').readAsStringSync())
           as Map<String, dynamic>;
-  final canonical = PortfolioDocument.fromJson(canonicalJson);
+  final canonical = parsePortfolioDocument(canonicalJson);
   final expectedLocales = canonical.site.locales;
 
   group('portfolio localization catalog', () {

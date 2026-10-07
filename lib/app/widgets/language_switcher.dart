@@ -4,6 +4,7 @@ import 'package:flutter_web_portfolio/app/core/theme/app_fonts.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_colors.dart';
 import 'package:flutter_web_portfolio/app/controllers/scroll_controller.dart';
 import 'package:flutter_web_portfolio/app/controllers/scene_director.dart';
+import 'package:flutter_web_portfolio/app/features/language/application/language_context.dart';
 import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
 import 'package:flutter_web_portfolio/app/utils/web_url_strategy.dart'
     as url_strategy;
@@ -21,10 +22,7 @@ class LanguageSwitcher extends StatelessWidget {
           BlocSelector<SceneDirector, SceneState, Color>(
             selector: (state) => state.currentAccent,
             builder: (context, accent) {
-              final menuLabel = languageController.getText(
-                'accessibility.language_menu',
-                defaultValue: 'Language menu',
-              );
+              final menuLabel = context.strings.accessibilityLanguageMenu;
               final currentLanguage = LanguageCubit.getLanguageName(
                 languageState.languageCode,
               );
@@ -66,9 +64,7 @@ class LanguageSwitcher extends StatelessWidget {
                   ),
                 ),
                 onSelected: (languageCode) {
-                  // Read the route at selection time. This widget can outlive
-                  // several chapter changes, so capturing the hash during
-                  // build may preserve a stale section across the web reload.
+                  // Read the route at selection time to preserve the current section.
                   final urlSection = url_strategy.getUrlHash();
                   final sectionToPreserve = urlSection.isNotEmpty
                       ? urlSection
@@ -78,63 +74,55 @@ class LanguageSwitcher extends StatelessWidget {
                     preserveSection: sectionToPreserve,
                   );
                 },
-                itemBuilder: (BuildContext context) => languageController
-                    .supportedLanguages
-                    .map((String languageCode) {
-                      final languageName = LanguageCubit.getLanguageName(
-                        languageCode,
-                      );
-                      final isSelected =
-                          languageState.languageCode == languageCode;
-
-                      return PopupMenuItem<String>(
-                        value: languageCode,
-                        height: 48,
-                        child: Row(
-                          children: [
-                            SizedBox(
-                              width: 38,
-                              child: Text(
-                                languageCode.toUpperCase(),
-                                style: AppFonts.spaceGrotesk(
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w600,
-                                  color: isSelected
-                                      ? accent
-                                      : AppColors.textSecondary,
-                                  letterSpacing: 0.8,
-                                ),
-                              ),
-                            ),
-                            Expanded(
-                              child: Text(
-                                languageName,
-                                style: AppFonts.spaceGrotesk(
-                                  color: isSelected
-                                      ? AppColors.textBright
-                                      : AppColors.textPrimary,
-                                  fontWeight: isSelected
-                                      ? FontWeight.w600
-                                      : FontWeight.normal,
-                                ),
-                              ),
-                            ),
-                            if (isSelected) ...[
-                              const SizedBox(width: 12),
-                              Icon(
-                                Icons.check_rounded,
-                                size: 16,
-                                color: accent,
-                              ),
-                            ],
-                          ],
-                        ),
-                      );
-                    })
+                itemBuilder: (context) => languageController.supportedLanguages
+                    .map(
+                      (code) => _languageItem(
+                        code,
+                        languageState.languageCode == code,
+                        accent,
+                      ),
+                    )
                     .toList(),
               );
             },
           ),
     );
   }
+}
+
+PopupMenuItem<String> _languageItem(String code, bool selected, Color accent) {
+  final name = LanguageCubit.getLanguageName(code);
+  return PopupMenuItem<String>(
+    value: code,
+    height: 48,
+    child: Row(
+      children: [
+        SizedBox(
+          width: 38,
+          child: Text(
+            code.toUpperCase(),
+            style: AppFonts.spaceGrotesk(
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+              color: selected ? accent : AppColors.textSecondary,
+              letterSpacing: 0.8,
+            ),
+          ),
+        ),
+        Expanded(
+          child: Text(
+            name,
+            style: AppFonts.spaceGrotesk(
+              color: selected ? AppColors.textBright : AppColors.textPrimary,
+              fontWeight: selected ? FontWeight.w600 : FontWeight.normal,
+            ),
+          ),
+        ),
+        if (selected) ...[
+          const SizedBox(width: 12),
+          Icon(Icons.check_rounded, size: 16, color: accent),
+        ],
+      ],
+    ),
+  );
 }
