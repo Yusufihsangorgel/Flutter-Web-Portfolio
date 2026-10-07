@@ -7,7 +7,7 @@ interface text in `assets/i18n/`.
 
 ## Toolchain
 
-The repository pins Flutter 3.47.5 in [`tool/toolchain.json`](tool/toolchain.json).
+The repository pins Flutter 3.47.5 in [`tool/quality/toolchain.json`](tool/quality/toolchain.json).
 Use its bundled Dart 3.13.4 and Node.js 24.18.0 (see `.nvmrc`).
 `npm run verify:toolchain` reports a mismatch.
 

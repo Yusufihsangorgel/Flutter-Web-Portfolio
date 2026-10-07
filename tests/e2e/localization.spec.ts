@@ -2,6 +2,7 @@ import { expect, Locator, Page, test } from "@playwright/test";
 import { readFileSync } from "node:fs";
 import {
   scrollAndSettle,
+  semanticsTree,
   waitForSemanticsSettled,
 } from "./helpers/semantics_scroll";
 
@@ -247,8 +248,10 @@ async function revealText(page: Page, text: string) {
     const semanticGroup = page.getByRole("group", {
       name: new RegExp(text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i"),
     });
-    const authored = page.getByText(text, { exact: false });
-    const upper = page.getByText(text.toUpperCase(), { exact: false });
+    const authored = semanticsTree(page).getByText(text, { exact: false });
+    const upper = semanticsTree(page).getByText(text.toUpperCase(), {
+      exact: false,
+    });
     if ((await semanticGroup.count()) > 0) return semanticGroup.first();
     if ((await authored.count()) > 0) return authored.first();
     if ((await upper.count()) > 0) return upper.first();
@@ -283,34 +286,40 @@ async function assertLocalizedHome(
     exact: true,
   });
   await expectInViewport(page, heading);
-  await expect(page.getByText(expected.headline, { exact: true })).toBeAttached();
+  const semantics = semanticsTree(page);
+  await expect(
+    semantics.getByText(expected.headline, { exact: true }),
+  ).toBeAttached();
   if (locale !== "en") {
     await expect(
-      page.getByText(portfolio.profile.headline, { exact: true }),
+      semantics.getByText(portfolio.profile.headline, { exact: true }),
     ).toHaveCount(0);
     await expect(
-      page.getByText(portfolio.profile.role, { exact: true }),
+      semantics.getByText(portfolio.profile.role, { exact: true }),
     ).toHaveCount(0);
   }
   await expectNoHorizontalOverflow(page);
 }
 
 async function assertNoEnglishProjectCopy(page: Page, expected: LocalizedRecord) {
+  const semantics = semanticsTree(page);
   await expect(
-    page.getByText(portfolio.systems[0].kind, { exact: true }),
+    semantics.getByText(portfolio.systems[0].kind, { exact: true }),
   ).toHaveCount(0);
   if (portfolio.systems[0].year !== expected.systemYear) {
     await expect(
-      page.getByText(portfolio.systems[0].year, { exact: true }),
+      semantics.getByText(portfolio.systems[0].year, { exact: true }),
     ).toHaveCount(0);
   }
   for (const technology of portfolio.systems[0].technologies) {
     if (!expected.systemTechnologies!.includes(technology)) {
-      await expect(page.getByText(technology, { exact: true })).toHaveCount(0);
+      await expect(
+        semantics.getByText(technology, { exact: true }),
+      ).toHaveCount(0);
     }
   }
   await expect(
-    page.getByText(portfolio.systems[0].artifact.caption, { exact: true }),
+    semantics.getByText(portfolio.systems[0].artifact.caption, { exact: true }),
   ).toHaveCount(0);
 }
 

@@ -30,6 +30,10 @@ export function createLimiter(limit) {
   };
 }
 
+/**
+ * @param {string} url
+ * @param {{headers?: HeadersInit, attempts?: number}} options
+ */
 export async function fetchJson(url, { headers, attempts = 3 } = {}) {
   let lastError = null;
   for (let attempt = 1; attempt <= attempts; attempt += 1) {
@@ -45,6 +49,7 @@ export async function fetchJson(url, { headers, attempts = 3 } = {}) {
         try {
           body = await response.json();
         } catch {
+          body = null;
         }
         return { ok: false, status: response.status, body, error: null };
       }
@@ -56,6 +61,10 @@ export async function fetchJson(url, { headers, attempts = 3 } = {}) {
   return { ok: false, status: null, body: null, error: lastError };
 }
 
+/**
+ * @param {string} url
+ * @param {{headers?: HeadersInit, attempts?: number}} options
+ */
 export async function fetchText(url, { headers, attempts = 3 } = {}) {
   let lastError = null;
   for (let attempt = 1; attempt <= attempts; attempt += 1) {

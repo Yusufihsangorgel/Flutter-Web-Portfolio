@@ -71,3 +71,6 @@ deploy.sh
 node_modules/
 test-results/
 playwright-report/
+
+# Lighthouse CI reports
+.lighthouseci/

@@ -35,7 +35,7 @@ export default defineConfig({
   ...(externalBaseUrl
     ? {}
     : { webServer: {
-        command: 'node tool/serve_web.mjs',
+        command: 'node tool/runtime/serve_web.mjs',
         url: previewUrl,
         env: { PORT: String(previewPort) },
         reuseExistingServer: false,

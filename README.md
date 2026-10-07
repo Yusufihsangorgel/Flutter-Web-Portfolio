@@ -43,22 +43,23 @@ The layer rules are in [docs/ARCHITECTURE-RULES.md](docs/ARCHITECTURE-RULES.md).
 
 ## Quality gates
 
-CI runs these checks on every pull request and every push to `main`. [`ci.yml`](.github/workflows/ci.yml) is the complete list. The toolchain is Flutter 3.47.5, Dart 3.13.4, and Node.js 24.18.0, pinned in [`tool/toolchain.json`](tool/toolchain.json). Install dependencies first with `flutter pub get`, `npm ci`, and `npm run setup:browsers`.
+CI runs these checks on every pull request and every push to `main`. [`ci.yml`](.github/workflows/ci.yml) is the complete list. The toolchain is Flutter 3.47.5, Dart 3.13.4, and Node.js 24.18.0, pinned in [`tool/quality/toolchain.json`](tool/quality/toolchain.json). Install dependencies first with `flutter pub get`, `npm ci`, and `npm run setup:browsers`.
 
 | Gate | Commands |
 |---|---|
-| Toolchain | `node tool/verify_toolchain.mjs --current` |
+| Toolchain | `node tool/quality/verify_toolchain.mjs --current` |
 | Content and generated files | `npm run verify:content`, `npm run portfolio:validate` |
-| Tooling tests | `npm run test:template`, `npm run test:release-security`, `npm run test:refresh`, `npm run test:content` |
+| Tooling tests | `npm run test:template`, `npm run test:release-security`, `npm run test:release-document`, `npm run test:hosting-security`, `npm run test:refresh`, `npm run test:content` |
 | Hosting, community files, sources, history | `npm run verify:hosting`, `npm run verify:community`, `npm run audit:sources`, `npm run audit:history` |
 | Static checks | `npm run typecheck`, `npm run verify:source`, `dart format --output=none --set-exit-if-changed lib test tool`, `flutter analyze --fatal-infos` |
-| Tool syntax | `bash -n tool/hosted_build.sh`, `node --check` on the Node tools |
+| Tool syntax | `bash -n tool/release/hosted_build.sh`, `node --check` on the Node tools |
 | Flutter tests | `flutter test` |
 | Release build and bundle | `npm run prepare:source`, `flutter build web --release --wasm --no-web-resources-cdn`, `npm run prepare:bundle`, `npm run verify:bundle` |
 | Container | `docker build --tag flutter-web-portfolio:ci .` |
 | Clean template | `npm run test:clone` |
 | Browser tests | `npm test` |
 | Runtime budgets | `npm run verify:runtime` |
+| Lighthouse (accessibility, best practices, and SEO at 0.95 or higher; performance reported) | `npm run lighthouse` |
 | Architecture layers, when `lib/` or `quality/` change | `python3 -m unittest discover -s quality/tests -p 'test_architecture.py'`, `python3 quality/check_architecture.py --warn-only` |
 
 Pull requests also run code scanning, dependency review, and a Conventional Commits check on the title.
@@ -76,6 +77,8 @@ Source status: `2026.09.28.1`, verified 2026-08-29 against GitHub, LinkedIn, Fug
 
 | Project | Change | Merged | Evidence |
 |---|---|---:|---|
+| Flutter | Wait for web rendering before the first-frame event | 2026-08-11 | [Pull request](https://github.com/flutter/flutter/pull/189500) |
+| MCP Kotlin SDK | Add SEP-2575 request metadata and discovery types | 2026-08-05 | [Pull request](https://github.com/modelcontextprotocol/kotlin-sdk/pull/893) |
 | Flutter | Return null from RenderProxyBoxMixin.computeDryBaseline when the child has no baseline | 2026-07-30 | [Pull request](https://github.com/flutter/flutter/pull/189723) |
 | Flutter Packages | Ignore unrecognized SVG font-weight values | 2026-07-28 | [Pull request](https://github.com/flutter/packages/pull/12199) |
 | simdjson | Treat 20-digit positive overflows as big integers | 2026-07-28 | [Pull request](https://github.com/simdjson/simdjson/pull/2793) |
@@ -91,8 +94,6 @@ Source status: `2026.09.28.1`, verified 2026-08-29 against GitHub, LinkedIn, Fug
 | Dart MCP | Add request-scoped message dispatch for MCP servers | 2026-07-17 | [Pull request](https://github.com/dart-lang/ai/pull/528) |
 | Dart MCP | Separate server feature registration from legacy initialization | 2026-07-15 | [Pull request](https://github.com/dart-lang/ai/pull/524) |
 | FlutterFire | Make Firebase core loading deterministic on WebKit | 2026-07-15 | [Pull request](https://github.com/firebase/flutterfire/pull/18443) |
-| Flutter | Wait for web rendering before the first-frame event | 2026-08-11 | [Pull request](https://github.com/flutter/flutter/pull/189500) |
-| MCP Kotlin SDK | Add SEP-2575 request metadata and discovery types | 2026-08-05 | [Pull request](https://github.com/modelcontextprotocol/kotlin-sdk/pull/893) |
 | Flutter Form Builder | Reset unknown dropdown initial values on first build | 2026-07-14 | [Pull request](https://github.com/flutter-form-builder-ecosystem/flutter_form_builder/pull/1512) |
 | Drift | Treat SQLite TRUE and 1 defaults as the same schema | 2026-07-14 | [Pull request](https://github.com/simolus3/drift/pull/3835) |
 | Go Fiber Recipes | Add a Fiber and Asynq background-jobs recipe | 2026-07-12 | [Pull request](https://github.com/gofiber/recipes/pull/4997) |
@@ -113,7 +114,7 @@ Source status: `2026.09.28.1`, verified 2026-08-29 against GitHub, LinkedIn, Fug
 <!-- portfolio-record:end -->
 
 <!-- portfolio-record-intro:start -->
-The live demo uses the same template with a real professional record. This block is regenerated from the canonical content document; it is evidence for the demo, not starter data inherited by `npm run portfolio:init`.
+The live demo uses this template with the author's own record. This block is regenerated from the canonical content document; it is evidence for the demo, not starter data inherited by `npm run portfolio:init`.
 <!-- portfolio-record-intro:end -->
 
 ## Use it as a template

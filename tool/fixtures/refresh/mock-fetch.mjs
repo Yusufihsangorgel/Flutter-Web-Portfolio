@@ -12,13 +12,23 @@ globalThis.fetch = async (url) => {
       return Response.json({ error: 'unavailable' }, { status: 404 });
     }
     if (process.env.REFRESH_TEST_CONFIRMED_DROP === '1') {
-      return Response.json({ grantedPoints: 140, maxPoints: 160, likeCount: 2, downloadCount30Days: 600 });
+      return Response.json({
+        grantedPoints: 140,
+        maxPoints: 160,
+        likeCount: 2,
+        downloadCount30Days: 600,
+      });
     }
     return Response.json(fixture('pub-score-pending'));
   }
   if (url.endsWith('/api/packages/re2/metrics')) {
-    return Response.json(fixture(process.env.REFRESH_TEST_CONFIRMED_DROP === '1'
-      ? 'pub-metrics-confirmed' : 'pub-metrics-pending'));
+    return Response.json(
+      fixture(
+        process.env.REFRESH_TEST_CONFIRMED_DROP === '1'
+          ? 'pub-metrics-confirmed'
+          : 'pub-metrics-pending',
+      ),
+    );
   }
   throw new Error(`Unexpected request: ${url}`);
 };

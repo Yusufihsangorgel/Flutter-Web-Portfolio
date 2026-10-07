@@ -90,6 +90,9 @@ const revealAfterRunApp = () => {
 };
 
 const showBootstrapFailure = (error) => {
+  // Later reveal fallbacks must not uncover a partially started application.
+  revealStarted = true;
+  window.removeEventListener('flutter-first-frame', onFlutterFirstFrame);
   markRuntime('flutter-bootstrap-failed');
   console.error('Flutter bootstrap failed', error);
   const splash = document.getElementById('bootstrap-surface');
@@ -138,9 +141,16 @@ _flutter.loader.load({
     window.addEventListener('flutter-first-frame', onFlutterFirstFrame, {
       once: true,
     });
-    const appRunner = await engineInitializer.initializeEngine(engineConfig);
-    markRuntime('flutter-engine-initialized');
-    await appRunner.runApp();
+    // The loader drops this promise, so a rejection here must reach the
+    // recovery surface explicitly instead of leaving the loading state.
+    try {
+      const appRunner = await engineInitializer.initializeEngine(engineConfig);
+      markRuntime('flutter-engine-initialized');
+      await appRunner.runApp();
+    } catch (error) {
+      showBootstrapFailure(error);
+      return;
+    }
     markRuntime('flutter-run-app-complete');
     revealAfterRunApp();
   },

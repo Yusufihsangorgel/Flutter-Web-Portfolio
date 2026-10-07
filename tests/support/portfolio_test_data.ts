@@ -43,6 +43,7 @@ export type PortfolioTestData = {
     headline: string;
     links: Array<{ label: string; url: string }>;
     location: string;
+    name: string;
     role: string;
     since: string;
   };
