@@ -5,7 +5,6 @@ import type {
   PortfolioTestData,
 } from '../support/portfolio_test_data';
 import {
-  installVisualMasks,
   settleCompositor,
   waitForStableCanvas,
   waitForWorkImagesPainted,
@@ -161,9 +160,8 @@ async function expectVisualSnapshot(page: Page, name: string) {
     .toBe(true);
   await waitForWorkImagesPainted(page);
   await settleCompositor(page, 2);
-  await expect(page).toHaveScreenshot(name, {
-    mask: await installVisualMasks(page),
-  });
+  await waitForStableCanvas(page);
+  await expect(page).toHaveScreenshot(name);
 }
 
 test('keeps the first meaningful paint visually aligned with the portfolio', async ({

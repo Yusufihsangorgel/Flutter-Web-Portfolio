@@ -2,31 +2,13 @@ import { expect, type Page } from '@playwright/test';
 import { createHash } from 'node:crypto';
 import { waitForFrames } from './semantics_scroll';
 
-const visualMaskRegions = [
-  ['narrative-rail', 'left:0;top:0;width:48px;height:100vh'],
-  ['scrollbar', 'right:0;top:0;width:16px;height:100vh'],
-] as const;
 const STABLE_CAPTURES = 4;
+// Spans the scrollbar's 600 ms hide delay and 300 ms fade across four captures.
+const CAPTURE_INTERVAL_MS = 350;
 const FRAMES_BETWEEN_CAPTURES = 5;
 
 export async function settleCompositor(page: Page, frameCount = 3) {
   await waitForFrames(page, frameCount);
-}
-
-export async function installVisualMasks(page: Page) {
-  await page.evaluate((regions) => {
-    for (const [name, bounds] of regions) {
-      if (document.querySelector(`[data-visual-mask="${name}"]`)) continue;
-      const element = document.createElement('div');
-      element.dataset.visualMask = name;
-      element.setAttribute('aria-hidden', 'true');
-      element.style.cssText = `position:fixed;${bounds};opacity:0;pointer-events:none`;
-      document.body.append(element);
-    }
-  }, visualMaskRegions);
-  return visualMaskRegions.map(([name]) =>
-    page.locator(`[data-visual-mask="${name}"]`),
-  );
 }
 
 // Work artifacts load lazily. Each image's semantics node names its asset,
@@ -77,9 +59,8 @@ export async function waitForWorkImagesPainted(page: Page) {
     .toBe(0);
 }
 
-// Wait for consecutive masked captures to match.
+// Wait for consecutive full-viewport captures to match.
 export async function waitForStableCanvas(page: Page) {
-  const mask = await installVisualMasks(page);
   let previous = '';
   let identical = 0;
   await expect
@@ -88,7 +69,6 @@ export async function waitForStableCanvas(page: Page) {
         const capture = await page.screenshot({
           animations: 'disabled',
           caret: 'hide',
-          mask,
           scale: 'css',
         });
         const digest = createHash('sha1').update(capture).digest('hex');
@@ -100,7 +80,7 @@ export async function waitForStableCanvas(page: Page) {
         return identical >= STABLE_CAPTURES;
       },
       {
-        intervals: [0],
+        intervals: [CAPTURE_INTERVAL_MS],
         message: 'The canvas never stopped changing.',
         timeout: 20000,
       },
