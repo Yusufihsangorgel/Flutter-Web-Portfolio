@@ -1,5 +1,4 @@
 // Intentionally preserves block bodies and closure syntax for AST fixtures.
-// ignore_for_file: prefer_expression_function_bodies, prefer_function_declarations_over_variables, unnecessary_lambdas
 
 void lineBoundary() {
   // 02

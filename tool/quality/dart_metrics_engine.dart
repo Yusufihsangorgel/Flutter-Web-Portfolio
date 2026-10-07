@@ -373,7 +373,5 @@ String _enclosingType(AstNode node) {
   return 'unit';
 }
 
-// The stable replacement is still experimental in analyzer 14.5.0.
-// ignore: deprecated_member_use
 int _parameterCount(FormalParameterList? parameters) =>
-    parameters?.parameters.length ?? 0;
+    parameters?.parameterFragments.length ?? 0;

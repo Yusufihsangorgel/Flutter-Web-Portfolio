@@ -119,9 +119,8 @@ final class FlowMetricsVisitor extends RecursiveAstVisitor<void> {
   bool _isElseIfElement(IfElement node) {
     final parent = node.parent;
     if (parent is! IfElement) return false;
-    // The stable replacement is still experimental in analyzer 14.5.0.
-    // ignore: deprecated_member_use
-    return identical(parent.elseElement, node);
+    final elseKeyword = parent.elseKeyword;
+    return elseKeyword != null && node.offset > elseKeyword.offset;
   }
 
   void _nested(void Function() visitChildren) {

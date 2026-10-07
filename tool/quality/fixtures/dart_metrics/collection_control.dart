@@ -1,5 +1,4 @@
 // Collection-control syntax is intentionally repetitive at exact boundaries.
-// ignore_for_file: prefer_function_declarations_over_variables
 
 List<int> collectionControlPassing(bool value) => <int>[
   if (value) 1,

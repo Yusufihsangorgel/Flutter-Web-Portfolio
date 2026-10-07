@@ -42,10 +42,9 @@ callables and shrink the matching entries in its next focused refactor.
 The strictness lane shares all three strict analyzer switches and the requested lints between the application and
 package. It removes the `getText` bridge, uses typed interface strings, and centralizes duplicated test fakes. Domain
 annotations are now rejected by import calibration; there are no provider exceptions and no architecture baseline
-entries. Application and package code add no lint suppression. The metrics tool uses two `deprecated_member_use`
-suppressions: `FormalParameterList.parameters` in the engine and `IfElement.elseElement` in the flow visitor.
-Their replacements are still experimental in the pinned analyzer release; each adjacent source comment records the
-reason for using the stable accessor.
+entries. The repository contains no lint suppression: the metrics tool counts parameters through
+`FormalParameterList.parameterFragments` and recognises an `else if` branch from `IfElement.elseKeyword`, and its
+intentionally imperfect fixtures under `tool/quality/fixtures/` are excluded from analysis in `analysis_options.yaml`.
 
 ## Dart metrics baseline
 
