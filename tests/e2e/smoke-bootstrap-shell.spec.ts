@@ -322,11 +322,13 @@ test("offers a readable recovery document when JavaScript is disabled", async ({
   const page = await context.newPage();
   try {
     await page.goto("/", { waitUntil: "domcontentloaded" });
-    await expect(
-      page.getByRole("heading", { name: "JavaScript is required" }),
-    ).toBeVisible();
-    await expect(page.locator(".noscript-recovery")).toContainText(
-      "Enable JavaScript in your browser",
+    const heading = page
+      .locator("#static-document")
+      .getByRole("heading", { level: 1 });
+    await expect(heading).toBeVisible();
+    await expect(heading).toContainText(portfolio.profile.name);
+    await expect(page.locator(".noscript-recovery")).toHaveText(
+      "The interactive version needs JavaScript.",
     );
     await expect(page.locator("#bootstrap-surface")).toBeHidden();
   } finally {
