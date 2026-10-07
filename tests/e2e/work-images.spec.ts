@@ -2,6 +2,7 @@ import { expect, Page, test } from "./helpers/test_setup";
 import { readFileSync } from "node:fs";
 import {
   expectedArtifact,
+  openChapterFromNavigation,
   openPortfolio,
   portfolio,
 } from "./helpers/portfolio_test_helpers";
@@ -73,9 +74,15 @@ function workAssets(transfers: ImageTransfer[]) {
     .map((transfer) => transfer.path.slice("/assets/".length));
 }
 
-// Brings the evidence index heading into view, then scrolls far enough for
-// its selected preview to be on screen.
-async function scrollThroughAtlas(page: Page) {
+// Opens Work from the navigation, scrolls through the atlas to the evidence
+// index, then far enough for its selected preview to be on screen.
+async function scrollThroughAtlas(page: Page, isMobile: boolean) {
+  await openChapterFromNavigation(page, {
+    isMobile,
+    control: "Work",
+    hash: /#\/projects$/,
+    heading: "Selected Work",
+  });
   const viewportHeight = await page.evaluate(() => window.innerHeight);
   const step = viewportHeight * 0.5;
   const heading = page.getByRole("heading", {
@@ -90,6 +97,7 @@ async function scrollThroughAtlas(page: Page) {
 
 test("loads work images lazily within the first-visit image budget", async ({
   page,
+  isMobile,
 }, testInfo) => {
   test.skip(portfolio.systems.length === 0, "work chapter is not authored");
   const images = recordImageTransfers(page);
@@ -104,7 +112,7 @@ test("loads work images lazily within the first-visit image budget", async ({
   expect(workAssets(initial), "no work image before the atlas nears").toEqual([]);
   expect(totalBytes(initial)).toBeLessThanOrEqual(firstVisitImageBudget);
 
-  await scrollThroughAtlas(page);
+  await scrollThroughAtlas(page, isMobile);
   await waitForWorkImagesPainted(page);
   const visited = await images.settled();
   const fetched = workAssets(visited);
