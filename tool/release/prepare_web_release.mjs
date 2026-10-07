@@ -17,6 +17,7 @@ import {
   collectFiles,
   formatBytes,
   normalizeNoticeWhitespace,
+  normalizeReleaseTimestamps,
   precompressAssets,
   removeEmptyDirectories,
   resolveReleaseCommit,
@@ -78,6 +79,7 @@ await copyFile(
 );
 await writeReleaseMetadata();
 const compressedAssets = await precompressAssets(webRoot);
+await normalizeReleaseTimestamps(webRoot);
 
 console.log(
   `Removed ${symbolFiles.length} renderer symbol files (${formatBytes(removedBytes)}) from the public release.`,
@@ -169,7 +171,10 @@ async function injectReleasePreloads(releaseId, engineRevision) {
   if (!withoutPreviousHints.includes('</head>')) {
     throw new Error('index.html does not contain a closing head tag');
   }
-  await writeFile(indexPath, withoutPreviousHints.replace('</head>', `${preloadBlock}\n</head>`));
+  await writeFile(
+    indexPath,
+    withoutPreviousHints.replace(/\s*<\/head>/, `\n${preloadBlock}\n</head>`),
+  );
 }
 
 async function injectBootstrapShell() {

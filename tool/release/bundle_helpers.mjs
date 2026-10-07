@@ -1,5 +1,6 @@
 import { execFileSync } from 'node:child_process';
-import { readFile, readdir, rm, writeFile } from 'node:fs/promises';
+import { createHash } from 'node:crypto';
+import { readFile, readdir, rm, utimes, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { gzipSync } from 'node:zlib';
 
@@ -52,6 +53,24 @@ export async function precompressAssets(root) {
     count += 1;
   }
   return count;
+}
+
+export async function normalizeReleaseTimestamps(directory) {
+  for (const entry of await readdir(directory, { withFileTypes: true })) {
+    const file = path.join(directory, entry.name);
+    if (entry.isDirectory()) {
+      await normalizeReleaseTimestamps(file);
+      continue;
+    }
+    if (!entry.isFile()) throw new Error(`Release entry is not a regular file: ${file}`);
+    const digest = createHash('sha256')
+      .update(await readFile(file))
+      .digest();
+    // Keep HTTP dates in the past and within signed 32-bit epoch seconds.
+    const timestamp = 1 + (digest.readUInt32BE(0) >>> 2);
+    await utimes(file, timestamp, timestamp);
+  }
+  await utimes(directory, 946684800, 946684800);
 }
 
 export async function normalizeNoticeWhitespace(root) {
