@@ -2,7 +2,7 @@
   "ci": {
     "collect": {
       "url": ["http://127.0.0.1:43177/"],
-      "startServerCommand": "PORT=43177 node tool/serve_web.mjs",
+      "startServerCommand": "PORT=43177 node tool/runtime/serve_web.mjs",
       "startServerReadyPattern": "Flutter web test server listening on",
       "startServerReadyTimeout": 15000,
       "numberOfRuns": 3,

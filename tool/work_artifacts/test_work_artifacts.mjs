@@ -5,15 +5,80 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import test from 'node:test';
 
-import { inspectRaster } from '../raster_inspector.mjs';
+import { inspectRaster } from '../assets/raster_inspector.mjs';
+import { renderArchitectureBoard } from './architecture_boards.mjs';
 import { selectSmallest } from './encoder.mjs';
 import {
+  renderInputDigest,
   verifyArtifacts,
   verifyFormatChoice,
   workArtifactPaths,
 } from './manifest.mjs';
+import { renderReleaseBoard } from './release_board.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
+
+for (const render of [renderReleaseBoard, renderArchitectureBoard]) {
+  test(`${render.name} replaces every title newline in its accessible label`, async () => {
+    const config = {
+      title: 'First line\nSecond line\nThird line',
+      output: 'board.webp',
+      eyebrow: 'EXAMPLE',
+      descriptor: 'Example board',
+      platform: 'Web',
+      icon: 'icon.png',
+      screens: [
+        { file: 'first.png', label: 'FIRST' },
+        { file: 'second.png', label: 'SECOND' },
+      ],
+      stages: ['INPUT', 'OUTPUT'],
+      footer: 'Example footer',
+      footerLeft: 'INPUT',
+      footerRight: 'OUTPUT',
+      palette: {
+        paper: '#ffffff',
+        ink: '#000000',
+        accent: '#0000ff',
+        stage: '#ffffff',
+        stageInk: '#000000',
+        rule: '#000000',
+      },
+    };
+    const renderer = {
+      imageDataUrl: async () => 'data:image/png;base64,',
+      renderPage: async (html, output) => {
+        assert.equal(output, config.output);
+        const suffix = render === renderReleaseBoard ? ' release evidence' : '';
+        assert.equal(
+          html.match(/aria-label="([^"]*)"/)[1],
+          `First line Second line Third line${suffix}`,
+        );
+        for (const line of config.title.split('\n')) {
+          assert.ok(html.includes(`<span>${line}</span>`));
+        }
+      },
+    };
+    await render(renderer, config);
+  });
+}
+
+async function copyFixture(t) {
+  const copy = await mkdtemp(path.join(tmpdir(), 'work-artifacts-'));
+  t.after(() => rm(copy, { recursive: true, force: true }));
+  for (const relative of [
+    'assets/work',
+    'assets/content/portfolio.json',
+    'tool/work_artifacts',
+    'tool/work_sources',
+  ]) {
+    await cp(path.join(root, relative), path.join(copy, relative), { recursive: true });
+  }
+  const paths = workArtifactPaths(copy);
+  const manifest = JSON.parse(await readFile(paths.manifest, 'utf8'));
+  manifest.input_sha256 = await renderInputDigest(paths);
+  await writeFile(paths.manifest, `${JSON.stringify(manifest, null, 2)}\n`);
+  return paths;
+}
 
 function riff(chunks) {
   const body = Buffer.concat([Buffer.from('WEBP', 'latin1'), ...chunks]);
@@ -96,22 +161,11 @@ test('flags a recorded format that is not the smallest candidate', () => {
 });
 
 test('check mode detects stale inputs, edited assets, and orphans', async (t) => {
-  const copy = await mkdtemp(path.join(tmpdir(), 'work-artifacts-'));
-  t.after(() => rm(copy, { recursive: true, force: true }));
-  for (const relative of [
-    'assets/work',
-    'assets/content/portfolio.json',
-    'tool/render_work_artifacts.mjs',
-    'tool/work_artifacts',
-    'tool/work_sources',
-  ]) {
-    await cp(path.join(root, relative), path.join(copy, relative), { recursive: true });
-  }
-  const paths = workArtifactPaths(copy);
+  const paths = await copyFixture(t);
   assert.deepEqual(await verifyArtifacts(paths), []);
 
   const manifest = JSON.parse(await readFile(paths.manifest, 'utf8'));
-  const first = path.join(copy, manifest.artifacts[0].asset);
+  const first = path.join(paths.root, manifest.artifacts[0].asset);
   const original = await readFile(first);
   await writeFile(first, Buffer.concat([original, Buffer.alloc(1)]));
   assert.match((await verifyArtifacts(paths)).join('\n'), /differs from its recorded digest/);
@@ -122,5 +176,15 @@ test('check mode detects stale inputs, edited assets, and orphans', async (t) =>
   await rm(path.join(paths.output, 'stray.png'));
 
   await writeFile(path.join(paths.sources, 'README.md'), 'changed\n');
+  assert.match((await verifyArtifacts(paths)).join('\n'), /renderer inputs changed/);
+});
+
+test('check mode detects a changed split renderer helper', async (t) => {
+  const paths = await copyFixture(t);
+  assert.deepEqual(await verifyArtifacts(paths), []);
+
+  const helper = path.join(paths.modules, 'template.mjs');
+  await writeFile(helper, `${await readFile(helper, 'utf8')}\n// changed\n`);
+
   assert.match((await verifyArtifacts(paths)).join('\n'), /renderer inputs changed/);
 });

@@ -24,7 +24,11 @@ export function normalizeWritingTitle(title) {
     .trim();
 }
 
-export function mergeWritingEntries(entriesBySource, sourceOrder, { cap = WRITING_ENTRY_CAP, previous = [] } = {}) {
+export function mergeWritingEntries(
+  entriesBySource,
+  sourceOrder,
+  { cap = WRITING_ENTRY_CAP, previous = [] } = {},
+) {
   const bestByTitle = new Map();
   for (const sourceId of sourceOrder) {
     for (const entry of entriesBySource[sourceId] ?? []) {
@@ -34,14 +38,19 @@ export function mergeWritingEntries(entriesBySource, sourceOrder, { cap = WRITIN
     }
   }
   return [...bestByTitle.values()]
-    .sort((a, b) => new Date(b.publishedAt) - new Date(a.publishedAt))
+    .sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime())
     .slice(0, cap)
     .map((entry) => ({
       ...(previous.find((item) => item.source === entry.source && item.url === entry.url) ??
-        previous.find((item) => item.source === entry.source &&
-          normalizeWritingTitle(item.title) === normalizeWritingTitle(entry.title)) ??
-        previous.find((item) => normalizeWritingTitle(item.title) ===
-          normalizeWritingTitle(entry.title)) ?? {}),
+        previous.find(
+          (item) =>
+            item.source === entry.source &&
+            normalizeWritingTitle(item.title) === normalizeWritingTitle(entry.title),
+        ) ??
+        previous.find(
+          (item) => normalizeWritingTitle(item.title) === normalizeWritingTitle(entry.title),
+        ) ??
+        {}),
       title: entry.title,
       url: entry.url,
       source: entry.source,

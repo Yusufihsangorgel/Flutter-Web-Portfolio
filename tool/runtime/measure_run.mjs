@@ -58,10 +58,7 @@ function listenForTransfers(session, byteState) {
     const bytes = Number.isFinite(encodedDataLength)
       ? Math.max(0, Math.round(encodedDataLength))
       : 0;
-    byteState.totals.set(
-      resourceType,
-      (byteState.totals.get(resourceType) ?? 0) + bytes,
-    );
+    byteState.totals.set(resourceType, (byteState.totals.get(resourceType) ?? 0) + bytes);
     byteState.requestTypes.delete(requestId);
   });
 }
@@ -103,9 +100,7 @@ function installRuntimeVitals() {
     if (last) window.__runtimeVitals.largestContentfulPaint = last.startTime;
   });
   observe('longtask', (entries) => {
-    window.__runtimeVitals.longTasks.push(
-      ...entries.map((entry) => entry.duration),
-    );
+    window.__runtimeVitals.longTasks.push(...entries.map((entry) => entry.duration));
   });
 }
 
@@ -118,8 +113,8 @@ async function waitForReveal(page, options) {
   });
   await page.waitForFunction(
     () =>
-      performance.getEntriesByName('flutter-surface-reveal-start', 'mark')
-        .length === 1 && !document.querySelector('#bootstrap-surface'),
+      performance.getEntriesByName('flutter-surface-reveal-start', 'mark').length === 1 &&
+      !document.querySelector('#bootstrap-surface'),
     undefined,
     { timeout: startupTimeoutMs },
   );
@@ -173,9 +168,7 @@ async function visitScrollTargets(page, sampleMs) {
 
 function readScrollSample() {
   const sample = window.__flutterScrollSample;
-  const visitedSections = [...new Set(sample.routeHashes)].filter(
-    (hash) => hash && hash !== '#/',
-  );
+  const visitedSections = [...new Set(sample.routeHashes)].filter((hash) => hash && hash !== '#/');
   if (visitedSections.length === 0) {
     throw new Error('Runtime performance sample did not move the Flutter scroll view.');
   }
@@ -187,14 +180,14 @@ async function readPageMetrics(page) {
 }
 
 function readMetricsFromDocument() {
-  const mark = (name) =>
-    performance.getEntriesByName(name, 'mark').at(-1)?.startTime ?? null;
-  const measure = (name) =>
-    performance.getEntriesByName(name, 'measure').at(-1)?.duration ?? null;
-  const navigation = performance.getEntriesByType('navigation').at(-1);
-  const wasm = performance
-    .getEntriesByType('resource')
-    .find((entry) => entry.name.includes('/main.dart.wasm'));
+  const mark = (name) => performance.getEntriesByName(name, 'mark').at(-1)?.startTime ?? null;
+  const measure = (name) => performance.getEntriesByName(name, 'measure').at(-1)?.duration ?? null;
+  const navigation = /** @type {PerformanceNavigationTiming} */ (
+    performance.getEntriesByType('navigation').at(-1)
+  );
+  const wasm = /** @type {PerformanceResourceTiming} */ (
+    performance.getEntriesByType('resource').find((entry) => entry.name.includes('/main.dart.wasm'))
+  );
   return {
     marks: {
       bootstrapStart: mark('flutter-bootstrap-start'),
@@ -214,9 +207,7 @@ function readMetricsFromDocument() {
     wasmTransferBytes: wasm?.transferSize ?? null,
     vitals: window.__runtimeVitals,
     renderQuality: document.documentElement.getAttribute('data-render-quality'),
-    renderQualityReason: document.documentElement.getAttribute(
-      'data-render-quality-reason',
-    ),
+    renderQualityReason: document.documentElement.getAttribute('data-render-quality-reason'),
   };
 }
 
@@ -233,9 +224,10 @@ function buildRunResult(input) {
     dom_content_loaded_ms: round(input.pageMetrics.domContentLoaded),
     wasm_duration_ms: round(input.pageMetrics.wasmDuration),
     wasm_transfer_bytes: input.pageMetrics.wasmTransferBytes,
-    total_transferred_bytes: [...Object.values(
-      input.transferredBytesByResourceType,
-    )].reduce((total, bytes) => total + bytes, 0),
+    total_transferred_bytes: [...Object.values(input.transferredBytesByResourceType)].reduce(
+      (total, bytes) => total + bytes,
+      0,
+    ),
     transferred_bytes_by_resource_type: input.transferredBytesByResourceType,
   };
 }
@@ -244,9 +236,7 @@ function summarizeTiming(pageMetrics, medianFrameInterval) {
   const marks = pageMetrics.marks;
   const firstFrameToReveal = pageMetrics.firstFrameToReveal;
   return {
-    navigation_to_first_frame_ms: round(
-      marks.firstFrameEvent ?? marks.firstFrameSignal,
-    ),
+    navigation_to_first_frame_ms: round(marks.firstFrameEvent ?? marks.firstFrameSignal),
     bootstrap_to_first_frame_ms: round(
       pageMetrics.bootstrapToFirstFrame ?? pageMetrics.bootstrapToRevealSignal,
     ),
@@ -257,12 +247,8 @@ function summarizeTiming(pageMetrics, medianFrameInterval) {
     ),
     bootstrap_start_ms: round(marks.bootstrapStart),
     bootstrap_to_entrypoint_ms: round(marks.entrypointLoaded - marks.bootstrapStart),
-    entrypoint_to_engine_initialized_ms: round(
-      marks.engineInitialized - marks.entrypointLoaded,
-    ),
-    engine_initialized_to_render_signal_ms: round(
-      marks.firstFrameSignal - marks.engineInitialized,
-    ),
+    entrypoint_to_engine_initialized_ms: round(marks.engineInitialized - marks.entrypointLoaded),
+    engine_initialized_to_render_signal_ms: round(marks.firstFrameSignal - marks.engineInitialized),
     first_frame_event_observed: marks.firstFrameEvent !== null,
     reveal_source: getRevealSource(marks),
   };
@@ -290,10 +276,7 @@ function summarizeFrames(intervals) {
 }
 
 function summarizeVitals(vitals) {
-  const longTaskTotal = vitals.longTasks.reduce(
-    (total, duration) => total + duration,
-    0,
-  );
+  const longTaskTotal = vitals.longTasks.reduce((total, duration) => total + duration, 0);
   return {
     long_task_total_ms: round(longTaskTotal),
     longest_task_ms: round(Math.max(0, ...vitals.longTasks)),
@@ -319,13 +302,8 @@ function assertTimeline(marks) {
       throw new Error(`Runtime timeline is out of order: ${JSON.stringify(marks)}`);
     }
   }
-  if (
-    marks.firstFrameEvent !== null &&
-    marks.firstFrameEvent > marks.firstFrameSignal
-  ) {
-    throw new Error(
-      `First-frame event followed its reveal signal: ${JSON.stringify(marks)}`,
-    );
+  if (marks.firstFrameEvent !== null && marks.firstFrameEvent > marks.firstFrameSignal) {
+    throw new Error(`First-frame event followed its reveal signal: ${JSON.stringify(marks)}`);
   }
 }
 

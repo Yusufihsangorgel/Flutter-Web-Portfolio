@@ -4,7 +4,8 @@ import path from 'node:path';
 import { releaseBaseHref, renderNotFoundPage } from './not_found_page.mjs';
 
 const releaseFiles = ['404.html', '.well-known/security.txt'];
-const nginxFailure = 'Nginx must return 404 for unknown paths using /404.html without an index fallback';
+const nginxFailure =
+  'Nginx must return 404 for unknown paths using /404.html without an index fallback';
 const nginxPackaging = /^COPY\s+nginx\/default\.conf\s+\/etc\/nginx\/conf\.d\/default\.conf\s*$/m;
 const releasePackaging = /^COPY\s+build\/web\s+\/usr\/share\/nginx\/html\s*$/m;
 const indexFallbackRule = /^\s*\/\*\s+\/(?:index\.html)?(?=\s|$)/m;
@@ -16,7 +17,7 @@ export async function verifyStatic404Release({ sourceRoot, webRoot }) {
     readText(path.join(sourceRoot, 'web', '_redirects')),
   ]);
   return [
-    ...await releaseFileIssues(sourceRoot, webRoot),
+    ...(await releaseFileIssues(sourceRoot, webRoot)),
     ...nginxIssues(nginx ?? ''),
     ...dockerfileIssues(dockerfile ?? ''),
     ...(indexFallbackRule.test(redirects ?? '') ? ['_redirects contains an index fallback'] : []),
@@ -57,11 +58,14 @@ function nginxIssues(source) {
   // Quoted and unquoted runs cannot overlap, so the match stays linear.
   const serverScope = nginx.replace(/\blocation(?=\s)[^{};"]*(?:"[^"]*"[^{};"]*)*\{[^}]*\}/g, '');
   const unknownPathScope = `${rootLocation}\n${serverScope}`;
-  const returns404 = /\btry_files\s+\$uri\s+\$uri\/\s+=404\s*;/.test(rootLocation) &&
+  const returns404 =
+    /\btry_files\s+\$uri\s+\$uri\/\s+=404\s*;/.test(rootLocation) &&
     /\berror_page\s+404\s+\/404\.html\s*;/.test(unknownPathScope);
-  const fallsBack = /\b(?:try_files|rewrite)\s+[^;]*\s+\/(?:index\.html)?(?=\s|;)/.test(rootLocation) ||
+  const fallsBack =
+    /\b(?:try_files|rewrite)\s+[^;]*\s+\/(?:index\.html)?(?=\s|;)/.test(rootLocation) ||
     hasServerFallback(serverScope) ||
-    /\breturn\s+200\b/.test(rootLocation) || /\breturn\s+200\b/.test(serverScope) ||
+    /\breturn\s+200\b/.test(rootLocation) ||
+    /\breturn\s+200\b/.test(serverScope) ||
     /\berror_page\s+404\s+(?:=\d{3}|=)?\s*\/index\.html\s*;/.test(unknownPathScope);
   return returns404 && !fallsBack ? [] : [nginxFailure];
 }
@@ -69,8 +73,9 @@ function nginxIssues(source) {
 function hasServerFallback(serverScope) {
   if (/\btry_files\s+[^;]*\s+\/(?:index\.html)?(?=\s|;)/.test(serverScope)) return true;
   const catchAll = new Set(['', '.*', '(.*)']);
-  return [...serverScope.matchAll(/\brewrite\s+(\S+)\s+\/(?:index\.html)?(?=\s|;)/g)]
-    .some(([, pattern]) => catchAll.has(pattern.replace(/^\^\/?/, '').replace(/\$$/, '')));
+  return [...serverScope.matchAll(/\brewrite\s+(\S+)\s+\/(?:index\.html)?(?=\s|;)/g)].some(
+    ([, pattern]) => catchAll.has(pattern.replace(/^\^\/?/, '').replace(/\$$/, '')),
+  );
 }
 
 function dockerfileIssues(dockerfile) {

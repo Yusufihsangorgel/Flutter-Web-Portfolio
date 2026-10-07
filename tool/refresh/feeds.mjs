@@ -34,7 +34,7 @@ export function extractAtomLink(entryFragment) {
     if (!hrefMatch) continue;
     const href = hrefMatch[1] ?? hrefMatch[2];
     const relMatch = /rel\s*=\s*"([^"]*)"|rel\s*=\s*'([^']*)'/.exec(attributes);
-    const rel = relMatch ? relMatch[1] ?? relMatch[2] : null;
+    const rel = relMatch ? (relMatch[1] ?? relMatch[2]) : null;
     if (rel === 'alternate') return href;
     if (fallback === null) fallback = href;
   }
