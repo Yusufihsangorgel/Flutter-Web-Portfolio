@@ -1,7 +1,15 @@
 import 'dart:io';
 
+import 'dart_metrics.dart' as cli;
 import 'dart_metrics_baseline.dart';
 import 'dart_metrics_engine.dart';
+
+const _shrinkRoot = 'tool/quality/fixtures/dart_metrics/shrink';
+const _staleBaseline = '$_shrinkRoot/stale_baseline.json';
+const _shrunkBaseline = '$_shrinkRoot/shrunk_baseline.json';
+
+// A fixed past timestamp reveals whether a temporary baseline was rewritten.
+final _untouched = DateTime.utc(2001);
 
 var _checks = 0;
 
@@ -13,6 +21,14 @@ void main() {
   _testSourceRatchet();
   _testBaselineEvolution();
   _testBaselineValidation();
+  _testShrinkRemoval();
+  _testShrinkLowering();
+  _testShrinkRefusesIncrease();
+  _testShrinkRefusesNewViolation();
+  _testShrinkRewriteKeepsOrderAndReasons();
+  _testShrinkWithoutStaleEntriesDoesNotWrite();
+  _testShrinkIsIdempotent();
+  _testShrinkOptions();
   _testGeneratedDirectoriesExcluded();
   stdout.writeln('dart_metrics_test: $_checks checks passed');
 }
@@ -296,6 +312,101 @@ void _testBaselineValidation() {
   _expect(rejected, 'empty baseline reason accepted');
 }
 
+void _testShrinkRemoval() {
+  final measured = <CallableMetrics>[_metric(parameters: 4)];
+  final baseline = Baseline(<BaselineEntry>[
+    _entry(5),
+    _entry(5, identity: 'function:gone'),
+  ]);
+  final shrink = shrinkBaseline(measured, baseline);
+  _expect(shrink.removed == 2, 'resolved and vanished entries were kept');
+  _expect(shrink.baseline.entries.isEmpty, 'removed entries remain listed');
+  _expect(!shrink.refused && shrink.lowered == 0, 'removal was misreported');
+}
+
+void _testShrinkLowering() {
+  final measured = <CallableMetrics>[_metric(parameters: 5)];
+  final baseline = Baseline(<BaselineEntry>[_entry(7)]);
+  final shrink = shrinkBaseline(measured, baseline);
+  final lowered = shrink.baseline.entries.single;
+  _expect(shrink.lowered == 1 && shrink.removed == 0, 'decrease not lowered');
+  _expect(lowered.value == 5, 'lowered value differs from the measurement');
+  _expect(lowered.reason == _entry(7).reason, 'lowering replaced the reason');
+}
+
+void _testShrinkRefusesIncrease() {
+  final stale = Baseline.parse(_read(_staleBaseline));
+  final retained = stale.entries.first;
+  _expect(retained.identity == 'function:retained', 'fixture order changed');
+  final increased = Baseline(<BaselineEntry>[
+    BaselineEntry(
+      keyParts: retained.keyParts,
+      value: retained.value - 1,
+      reason: retained.reason,
+    ),
+    ...stale.entries.skip(1),
+  ]);
+  _expectRefusedWithoutWrite(increased, RatchetIssueKind.worsened);
+}
+
+void _testShrinkRefusesNewViolation() {
+  final stale = Baseline.parse(_read(_staleBaseline));
+  final missing = Baseline(stale.entries.skip(1).toList());
+  _expectRefusedWithoutWrite(missing, RatchetIssueKind.newViolation);
+}
+
+void _testShrinkRewriteKeepsOrderAndReasons() {
+  final run = _shrinkCopy(_read(_staleBaseline));
+  _expect(run.written, 'stale baseline was not rewritten');
+  _expect(
+    run.shrink.removed == 2 && run.shrink.lowered == 1,
+    'rewrite reported wrong removed or lowered counts',
+  );
+  _expect(
+    run.content == _read(_shrunkBaseline),
+    'rewrite changed entry order, reasons, or formatting',
+  );
+  final measured = measureRepository(Directory(_shrinkRoot));
+  _expect(
+    auditBaseline(measured, Baseline.parse(run.content)).passes,
+    'rewritten baseline still fails the ratchet',
+  );
+}
+
+void _testShrinkWithoutStaleEntriesDoesNotWrite() {
+  final source = _read(_shrunkBaseline);
+  final run = _shrinkCopy(source);
+  _expect(
+    !run.shrink.changed && !run.shrink.refused,
+    'a clean baseline reported changes or a refusal',
+  );
+  _expect(!run.written && run.content == source, 'clean baseline rewritten');
+}
+
+void _testShrinkIsIdempotent() {
+  final first = _shrinkCopy(_read(_staleBaseline));
+  final second = _shrinkCopy(first.content);
+  _expect(first.written, 'the first shrink did not rewrite the baseline');
+  _expect(!second.shrink.changed, 'a second shrink found more stale entries');
+  _expect(!second.written, 'a second shrink rewrote the baseline');
+  _expect(second.content == first.content, 'a second shrink changed content');
+}
+
+void _testShrinkOptions() {
+  final options = cli.parseMetricsOptions(<String>[
+    '--root',
+    _shrinkRoot,
+    '--baseline',
+    'custom.json',
+    '--shrink-baseline',
+  ]);
+  _expect(options.shrinkBaseline, '--shrink-baseline was not parsed');
+  _expect(options.rootPath == _shrinkRoot, '--root was not kept');
+  _expect(options.baselinePath == 'custom.json', '--baseline was not kept');
+  _expectOptionsRejected(<String>['--shrink-baseline', '--create-baseline']);
+  _expectOptionsRejected(<String>['--base-ref', 'HEAD', '--shrink-baseline']);
+}
+
 void _testGeneratedDirectoriesExcluded() {
   final root = Directory.systemTemp.createTempSync('dart_metrics_test_');
   try {
@@ -345,6 +456,55 @@ BaselineEntry _entry(int value, {String identity = 'function:sample'}) =>
       value: value,
       reason: 'Existing parameter debt has a focused refactor target.',
     );
+
+typedef _ShrinkRun = ({BaselineShrink shrink, String content, bool written});
+
+_ShrinkRun _shrinkCopy(String source) {
+  final temp = Directory.systemTemp.createTempSync('dart_metrics_shrink_');
+  try {
+    final file = File('${temp.path}/metrics-baseline.json')
+      ..writeAsStringSync(source)
+      ..setLastModifiedSync(_untouched);
+    final measured = measureRepository(Directory(_shrinkRoot));
+    final shrink = shrinkBaselineFile(measured, file);
+    return (
+      shrink: shrink,
+      content: file.readAsStringSync(),
+      written: !file.lastModifiedSync().isAtSameMomentAs(_untouched),
+    );
+  } finally {
+    temp.deleteSync(recursive: true);
+  }
+}
+
+void _expectRefusedWithoutWrite(Baseline baseline, RatchetIssueKind kind) {
+  final source = baseline.encode();
+  final run = _shrinkCopy(source);
+  _expect(run.shrink.changed, '${kind.name} case had nothing to shrink');
+  _expect(
+    _hasKind(run.shrink.blockingIssues, kind),
+    '${kind.name} did not block the shrink',
+  );
+  _expect(
+    !run.written && run.content == source,
+    '${kind.name} refusal rewrote the baseline',
+  );
+}
+
+void _expectOptionsRejected(List<String> arguments) {
+  var message = '';
+  try {
+    cli.parseMetricsOptions(arguments);
+  } on FormatException catch (error) {
+    message = error.message;
+  }
+  _expect(
+    message.contains('cannot be combined'),
+    'conflicting options accepted: $arguments',
+  );
+}
+
+String _read(String path) => File(path).readAsStringSync();
 
 void _expectMetric(
   Map<String, CallableMetrics> byIdentity,

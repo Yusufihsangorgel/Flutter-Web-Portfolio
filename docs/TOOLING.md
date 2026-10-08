@@ -15,7 +15,7 @@ Entry points below are relative to their folder. Supporting folders have no stan
 | `tool/content/` | Content synchronization, validation, string generation | `sync_public_content.mjs`, `validate_portfolio.dart`, `generate_app_strings.mjs` | `sync:content`, `verify:content`, `portfolio:validate`, `generate:strings`, `verify:strings`, `test:content`, `test:strings`; CI analyze, refresh, build |
 | `tool/fonts/` | Font text extraction and subsetting | `subset_fonts.mjs` | `fonts:subset`, `verify:fonts`, `test:fonts`; CI analyze, refresh |
 | `tool/public-content/` | Static metadata and host-security helpers | Imported modules | Content synchronization, `verify:hosting`, `test:hosting-security`; CI analyze |
-| `tool/quality/` | Toolchain, coverage, community, source-graph checks | `verify_toolchain.mjs`, `coverage_gate.mjs`, `verify_community_files.mjs`, `verify_dart_reachability.mjs` | `verify:toolchain`, `verify:community`, `verify:source`, `test:tooling`; CI analyze, test, build |
+| `tool/quality/` | Toolchain, coverage, community, source-graph, Dart callable-metric checks | `verify_toolchain.mjs`, `coverage_gate.mjs`, `verify_community_files.mjs`, `verify_dart_reachability.mjs`, `dart_metrics.dart` | `verify:toolchain`, `verify:community`, `verify:source`, `test:tooling`; CI analyze, test, build |
 | `tool/refresh/` | External-source adapters, merge rules, reports | `refresh_portfolio_data.mjs` | `refresh:data`, `test:refresh`; CI analyze, refresh |
 | `tool/release/` | Release builds, documents, provenance, hosting checks | `build_portfolio.mjs`, `deploy_portfolio.mjs`, `prepare_web_release.mjs`, `verify_web_build.mjs` | `build:release`, `deploy`, `prepare:source`, `prepare:bundle`, `verify:bundle`, `verify:hosting`, `test:release-security`, `test:release-document`, `test:hosting-security`; CI analyze, build, deploy |
 | `tool/resume/` | ATS-readable résumé PDF from the content record | `build_resume_pdf.mjs` | `resume:build`, `test:resume`; CI analyze, build |
@@ -26,6 +26,20 @@ Entry points below are relative to their folder. Supporting folders have no stan
 | `tool/fixtures/` | Local coverage and refresh test data | None | Coverage and refresh tests |
 | `tool/font_sources/` | Licensed source fonts and license notices | None | `fonts:subset`, `verify:fonts` |
 | `tool/work_sources/` | Artifact source inputs, provenance, and manifest | None | Work-artifact rendering and verification |
+
+## Dart metrics baseline
+
+`dart run tool/quality/dart_metrics.dart` measures Dart callables and fails on new, increased, or stale entries in
+[metrics-baseline.json](../quality/metrics-baseline.json); CI adds `--base-ref <base-sha>` to reject baseline growth.
+`dart run tool/quality/dart_metrics_test.dart` calibrates measurements and baseline rules against
+`tool/quality/fixtures/dart_metrics/`.
+
+After a refactor lowers or removes a recorded breach, run `dart run tool/quality/dart_metrics.dart --shrink-baseline`
+and commit the rewritten baseline in the same change. The command re-measures the sources, drops entries that are
+gone or within limits, and lowers decreased values. It never adds entries or raises values, keeps entry order, reasons,
+and the 2-space JSON layout, and prints the removed and lowered counts. It leaves the file untouched when no entry is
+stale. A new or increased violation is printed and the command exits 1 without writing. It accepts `--root` and
+`--baseline` and rejects `--create-baseline` and `--base-ref`.
 
 ## Adding a tool
 

@@ -1,0 +1,26 @@
+{
+  "version": 1,
+  "limits": {
+    "lines": 60,
+    "buildLines": 100,
+    "parameters": 4,
+    "nesting": 4,
+    "complexity": 15
+  },
+  "entries": [
+    {
+      "path": "lib/shrink_sample.dart",
+      "identity": "function:retained",
+      "metric": "parameters",
+      "value": 6,
+      "reason": "Retained debt keeps its custom reason."
+    },
+    {
+      "path": "lib/shrink_sample.dart",
+      "identity": "function:lowered",
+      "metric": "parameters",
+      "value": 5,
+      "reason": "Lowered debt keeps its custom reason."
+    }
+  ]
+}

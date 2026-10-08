@@ -96,18 +96,17 @@ final class Baseline {
 
   final List<BaselineEntry> entries;
 
-  void write(File file) {
-    final sorted = [...entries]
-      ..sort((left, right) => left.key.compareTo(right.key));
+  // Entries keep their order so a shrinking rewrite stays a minimal diff.
+  String encode() {
     final document = <String, Object>{
       'version': 1,
       'limits': metricLimits,
-      'entries': sorted.map((entry) => entry.toJson()).toList(),
+      'entries': entries.map((entry) => entry.toJson()).toList(),
     };
-    file.writeAsStringSync(
-      '${const JsonEncoder.withIndent('  ').convert(document)}\n',
-    );
+    return '${const JsonEncoder.withIndent('  ').convert(document)}\n';
   }
+
+  void write(File file) => file.writeAsStringSync(encode());
 }
 
 List<RatchetIssue> auditBaselineEvolution(
@@ -234,6 +233,69 @@ void _addRemovedViolationIssues(
       ),
     );
   }
+}
+
+final class BaselineShrink {
+  const BaselineShrink({
+    required this.baseline,
+    required this.removed,
+    required this.lowered,
+    required this.blockingIssues,
+  });
+
+  final Baseline baseline;
+  final int removed;
+  final int lowered;
+  final List<RatchetIssue> blockingIssues;
+
+  bool get refused => blockingIssues.isNotEmpty;
+  bool get changed => removed > 0 || lowered > 0;
+}
+
+BaselineShrink shrinkBaseline(
+  List<CallableMetrics> measurements,
+  Baseline baseline,
+) {
+  final audit = auditBaseline(measurements, baseline);
+  final actualByKey = <String, BaselineEntry>{
+    for (final entry in audit.violations) entry.key: entry,
+  };
+  final kept = <BaselineEntry>[];
+  var lowered = 0;
+  for (final entry in baseline.entries) {
+    final actual = actualByKey[entry.key];
+    if (actual == null) continue;
+    if (actual.value >= entry.value) {
+      kept.add(entry);
+      continue;
+    }
+    lowered += 1;
+    kept.add(
+      BaselineEntry(
+        keyParts: entry.keyParts,
+        value: actual.value,
+        reason: entry.reason,
+      ),
+    );
+  }
+  return BaselineShrink(
+    baseline: Baseline(kept),
+    removed: baseline.entries.length - kept.length,
+    lowered: lowered,
+    blockingIssues: <RatchetIssue>[
+      for (final issue in audit.issues)
+        if (issue.kind != RatchetIssueKind.stale) issue,
+    ],
+  );
+}
+
+BaselineShrink shrinkBaselineFile(
+  List<CallableMetrics> measurements,
+  File file,
+) {
+  final shrink = shrinkBaseline(measurements, Baseline.read(file));
+  if (shrink.changed && !shrink.refused) shrink.baseline.write(file);
+  return shrink;
 }
 
 List<BaselineEntry> findViolations(List<CallableMetrics> measurements) {

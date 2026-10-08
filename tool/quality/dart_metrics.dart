@@ -19,16 +19,19 @@ Options:
   --base-ref REVISION      Reject baseline growth against this Git revision.
   --json                   Print the complete measurement report as JSON.
   --create-baseline        Create the initial baseline; refuses to overwrite.
+  --shrink-baseline        Remove resolved entries and lower decreased values;
+                           writes nothing while a violation is NEW or WORSENED.
   --help                   Show this help.
 
 Ratchet behavior: NEW and WORSENED violations fail. A lower or removed legacy
-violation is STALE and also fails until the baseline is shrunk. Baseline entries
-therefore preserve exact measured debt and can only be lowered or removed.
+violation is STALE and also fails until --shrink-baseline rewrites the baseline.
+Baseline entries therefore preserve exact measured debt and can only be lowered
+or removed.
 ''';
 
 void main(List<String> arguments) {
   try {
-    final options = _parseOptions(arguments);
+    final options = parseMetricsOptions(arguments);
     if (options.help) {
       stdout.write(_usage);
       return;
@@ -38,6 +41,10 @@ void main(List<String> arguments) {
     final measurements = measureRepository(root);
     if (options.createBaseline) {
       _createBaseline(baselineFile, measurements);
+      return;
+    }
+    if (options.shrinkBaseline) {
+      _runShrink(baselineFile, measurements);
       return;
     }
     final audit = auditBaseline(measurements, Baseline.read(baselineFile));
@@ -54,8 +61,8 @@ void main(List<String> arguments) {
   }
 }
 
-final class _Options {
-  const _Options(this.values);
+final class MetricsOptions {
+  const MetricsOptions(this.values);
 
   final ({
     String rootPath,
@@ -63,6 +70,7 @@ final class _Options {
     String? baseRef,
     bool json,
     bool createBaseline,
+    bool shrinkBaseline,
     bool help,
   })
   values;
@@ -72,15 +80,17 @@ final class _Options {
   String? get baseRef => values.baseRef;
   bool get json => values.json;
   bool get createBaseline => values.createBaseline;
+  bool get shrinkBaseline => values.shrinkBaseline;
   bool get help => values.help;
 }
 
-_Options _parseOptions(List<String> arguments) {
+MetricsOptions parseMetricsOptions(List<String> arguments) {
   var root = '.';
   var baseline = 'quality/metrics-baseline.json';
   String? baseRef;
   var json = false;
   var create = false;
+  var shrink = false;
   var help = false;
   for (var index = 0; index < arguments.length; index += 1) {
     final argument = arguments[index];
@@ -99,20 +109,39 @@ _Options _parseOptions(List<String> arguments) {
       json = true;
     } else if (argument == '--create-baseline') {
       create = true;
+    } else if (argument == '--shrink-baseline') {
+      shrink = true;
     } else if (argument == '--help') {
       help = true;
     } else {
       throw FormatException('Unknown option: $argument');
     }
   }
-  return _Options((
+  final options = MetricsOptions((
     rootPath: root,
     baselinePath: baseline,
     baseRef: baseRef,
     json: json,
     createBaseline: create,
+    shrinkBaseline: shrink,
     help: help,
   ));
+  _rejectConflictingModes(options);
+  return options;
+}
+
+void _rejectConflictingModes(MetricsOptions options) {
+  if (!options.shrinkBaseline) return;
+  if (options.createBaseline) {
+    throw const FormatException(
+      '--shrink-baseline cannot be combined with --create-baseline.',
+    );
+  }
+  if (options.baseRef != null) {
+    throw const FormatException(
+      '--shrink-baseline cannot be combined with --base-ref.',
+    );
+  }
 }
 
 void _createBaseline(File baselineFile, List<CallableMetrics> measurements) {
@@ -124,6 +153,27 @@ void _createBaseline(File baselineFile, List<CallableMetrics> measurements) {
   Baseline(violations).write(baselineFile);
   stdout.writeln(
     'Created ${baselineFile.path} with ${violations.length} retained violations.',
+  );
+}
+
+void _runShrink(File baselineFile, List<CallableMetrics> measurements) {
+  final shrink = shrinkBaselineFile(measurements, baselineFile);
+  if (shrink.refused) {
+    for (final issue in shrink.blockingIssues) {
+      stderr.writeln(issue.message);
+    }
+    stderr.writeln(
+      'Refusing to shrink ${baselineFile.path}: '
+      '${shrink.blockingIssues.length} new or increased violations.',
+    );
+    exitCode = 1;
+    return;
+  }
+  final outcome = shrink.changed ? 'Shrunk' : 'Unchanged';
+  stdout.writeln(
+    '$outcome ${baselineFile.path}: removed ${shrink.removed}, '
+    'lowered ${shrink.lowered}; '
+    '${shrink.baseline.entries.length} retained violations.',
   );
 }
 
@@ -177,7 +227,10 @@ void _printJson(
   stdout.writeln(const JsonEncoder.withIndent('  ').convert(report));
 }
 
-List<RatchetIssue> _auditHistoricalBaseline(Directory root, _Options options) {
+List<RatchetIssue> _auditHistoricalBaseline(
+  Directory root,
+  MetricsOptions options,
+) {
   final reference = options.baseRef;
   if (reference == null || reference.isEmpty) return const <RatchetIssue>[];
   if (File(options.baselinePath).isAbsolute) {

@@ -138,6 +138,10 @@ implementations and shared controllers.
   The Dart AST metrics gate checks callable lines, parameters, control-flow nesting, complexity, and `build()` lines
   in the analyze job. Existing breaches are recorded with measurements and reasons in
   [`quality/metrics-baseline.json`](../quality/metrics-baseline.json); new, increased, and stale entries fail.
+  When a change lowers or removes a recorded breach, shrink its entry in the same change with
+  `dart run tool/quality/dart_metrics.dart --shrink-baseline`. The command drops entries that are gone or within
+  limits, lowers decreased values, keeps entry order and reasons, and writes nothing while a violation is new or
+  increased.
   File size remains a manual review criterion. Metric semantics and counts are recorded in
   [`docs/TECH-DEBT.md`](TECH-DEBT.md).
 
