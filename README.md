@@ -93,7 +93,7 @@ The architecture workflow matches changes under `lib/`, `quality/`, its own work
 
 Since 2021, I have built and maintained software for mobile devices, tablets, desktop operating systems, and the web. My work includes ERP and point-of-sale products, logistics workflows, digital publishing, backend services, and the release systems around them.
 
-Source status: `2026.09.28.1`, verified 2026-08-29 against GitHub, LinkedIn, FugaSoft, Dorse, and Medium.
+Source status: `2026.10.12.1`, verified 2026-08-29 against GitHub, LinkedIn, FugaSoft, Dorse, and Medium.
 
 ### Accepted upstream changes
 
