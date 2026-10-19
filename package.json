@@ -77,14 +77,14 @@
   "type": "commonjs",
   "homepage": "https://developeryusuf.com",
   "devDependencies": {
-    "@axe-core/playwright": "4.13.0",
+    "@axe-core/playwright": "4.14.0",
     "@eslint/js": "9.39.5",
     "@lhci/cli": "0.15.1",
-    "@playwright/test": "^1.59.1",
-    "@types/node": "24.13.3",
+    "@playwright/test": "^1.64.1",
+    "@types/node": "24.19.2",
     "eslint": "9.39.5",
     "globals": "17.13.0",
-    "prettier": "3.9.9",
+    "prettier": "3.9.10",
     "subset-font": "2.9.0",
     "typescript": "7.0.2"
   },
