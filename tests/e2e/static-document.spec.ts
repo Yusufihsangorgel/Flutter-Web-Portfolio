@@ -1,5 +1,20 @@
 import { expect, test } from "./helpers/test_setup";
 import { readFileSync } from "node:fs";
+import { Script } from "node:vm";
+
+test("loads the classic scripts without redeclaring a global binding", () => {
+  const sources = [
+    "history.js",
+    "bootstrap_locales.js",
+    "bootstrap_locale.js",
+    "apply_bootstrap_locale.js",
+    "static_document.js",
+    "flutter_bootstrap.js",
+    "retire_service_worker.js",
+  ].map((script) => readFileSync(`web/${script}`, "utf8")
+    .replace(/^\{\{flutter_js\}\}\r?\n\{\{flutter_build_config\}\}\r?\n/, ""));
+  expect(() => new Script(sources.join("\n"))).not.toThrow();
+});
 
 type Linked = { url?: string };
 type PortfolioContent = {
@@ -67,6 +82,11 @@ test("serves the semantic document when JavaScript is disabled", async (
     await expect(note).toBeVisible();
     await expect(note).toHaveText("The interactive version needs JavaScript.");
     await expect(page.locator("#bootstrap-surface")).toBeHidden();
+    await expect(page.locator("#static-document main")).toBeVisible();
+    await expect(page.getByRole("navigation")).toBeVisible();
+    expect(await page.evaluate(() => getComputedStyle(document.body).overflow)).toBe(
+      "auto",
+    );
     const heading = page.locator("h1");
     await expect(heading).toHaveCount(1);
     await expect(heading).toBeVisible();
@@ -105,5 +125,6 @@ test("hides the static document from assistive technology after reveal", async (
   const staticDocument = page.locator("#static-document");
   await expect(staticDocument).toHaveAttribute("hidden", "");
   await expect(staticDocument).toHaveAttribute("inert", "");
+  await expect(page.locator("html")).not.toHaveClass(/bootstrap-failed/);
   await expect(page.getByRole("heading", { level: 1 })).toHaveCount(1);
 });

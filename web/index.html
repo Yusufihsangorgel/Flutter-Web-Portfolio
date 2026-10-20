@@ -148,12 +148,17 @@
     html, body { height: 100%; }
     body { margin: 0; overflow: hidden; background: #f2eee5; }
     html.js #static-document { display: none; }
+    html.bootstrap-failed body { height: auto; overflow: auto; }
+    html.js.bootstrap-failed #static-document { display: block; }
+    html.bootstrap-failed flutter-view,
+    html.bootstrap-failed flt-glass-pane,
+    html.bootstrap-failed flt-semantics-host { display: none; }
     #static-document {
       max-width: 72rem;
       margin: 0 auto;
       padding: 3rem clamp(1.5rem, 5vw, 5rem);
       color: #12110f;
-      font: 400 1rem/1.6 var(--bootstrap-sans);
+      font: 400 1rem/1.6 "Space Grotesk Critical", ui-sans-serif, sans-serif;
     }
     #static-document h1 { font-size: clamp(2.5rem, 7vw, 5rem); line-height: 1.05; }
     #static-document h2 { margin-top: 3rem; font-size: 2rem; }
@@ -177,6 +182,14 @@
     #bootstrap-surface.bootstrap-surface--done {
       pointer-events: none;
       opacity: 0;
+    }
+    html.bootstrap-failed #bootstrap-surface {
+      position: relative;
+      inset: auto;
+      height: auto;
+      overflow: visible;
+      background: #f2eee5;
+      transition: none;
     }
     .bootstrap-shell {
       position: relative;
@@ -322,6 +335,16 @@
       border: 1px solid rgba(30, 81, 255, 0.72);
       font: inherit;
     }
+    html.bootstrap-failed .bootstrap-error {
+      position: static;
+      width: auto;
+      max-width: 72rem;
+      margin: 0 auto;
+      padding: 1.5rem clamp(1.5rem, 5vw, 5rem);
+      text-align: start;
+      transform: none;
+    }
+    html.bootstrap-failed .bootstrap-retry { margin: 1rem 0 0; }
     @media (max-width: 1400px) and (min-width: 900px) {
       .bootstrap-shell { padding-right: 80px; padding-left: 80px; }
       .bootstrap-title { font-size: clamp(72px, 9vw, 96px); }

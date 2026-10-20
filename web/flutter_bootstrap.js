@@ -14,26 +14,25 @@ const measureRuntime = (name, start, end) => {
 
 markRuntime('flutter-bootstrap-start');
 
-const bootstrapCopy = window.__portfolioBootstrapLocale ?? {
-  loadingPortfolio: 'Loading interactive portfolio',
-  loadFailure: 'The portfolio could not load. Please try again.',
-  retry: 'Retry',
-};
-
+const flutterBootstrapSurface = document.getElementById('bootstrap-surface');
 let revealStarted = false;
+let bootstrapFailed = false;
+let removalTimer;
 
 const removeBootstrapSurface = () => {
+  if (bootstrapFailed) return;
   markRuntime('flutter-surface-reveal-start');
   measureRuntime(
     'flutter-first-frame-to-reveal',
     'flutter-first-frame-signal',
     'flutter-surface-reveal-start',
   );
-  const splash = document.getElementById('bootstrap-surface');
+  const splash = flutterBootstrapSurface;
   if (!splash) return;
   splash.setAttribute('aria-busy', 'false');
   splash.classList.add('bootstrap-surface--done');
-  window.setTimeout(() => {
+  removalTimer = window.setTimeout(() => {
+    if (bootstrapFailed) return;
     splash.remove();
     markRuntime('flutter-bootstrap-surface-removed');
     measureRuntime(
@@ -48,7 +47,7 @@ const removeBootstrapSurface = () => {
 // compositing that frame. Keeping the matching HTML surface for two browser
 // frames prevents a one-frame blank flash on cold GPU/Wasm starts.
 const revealFlutterSurface = () => {
-  if (revealStarted) return;
+  if (revealStarted || bootstrapFailed) return;
   revealStarted = true;
   window.removeEventListener('flutter-first-frame', onFlutterFirstFrame);
   markRuntime('flutter-first-frame-signal');
@@ -67,6 +66,7 @@ const revealFlutterSurface = () => {
     'flutter-first-frame-signal',
   );
   window.requestAnimationFrame(() => {
+    if (bootstrapFailed) return;
     markRuntime('flutter-reveal-frame-1');
     window.requestAnimationFrame(removeBootstrapSurface);
   });
@@ -81,7 +81,7 @@ const revealAfterRunApp = () => {
   window.setTimeout(() => {
     window.requestAnimationFrame(() => {
       window.requestAnimationFrame(() => {
-        if (revealStarted) return;
+        if (revealStarted || bootstrapFailed) return;
         markRuntime('flutter-run-app-fallback');
         revealFlutterSurface();
       });
@@ -89,29 +89,49 @@ const revealAfterRunApp = () => {
   }, 250);
 };
 
-const showBootstrapFailure = (error) => {
-  // Later reveal fallbacks must not uncover a partially started application.
-  revealStarted = true;
-  window.removeEventListener('flutter-first-frame', onFlutterFirstFrame);
+const showFailureWithoutStaticScript = () => {
   markRuntime('flutter-bootstrap-failed');
-  console.error('Flutter bootstrap failed', error);
-  const splash = document.getElementById('bootstrap-surface');
-  if (!splash) return;
-
-  splash.setAttribute('aria-busy', 'false');
-  splash.setAttribute('aria-label', bootstrapCopy.loadFailure);
-  splash.replaceChildren();
+  const copy = window.__portfolioBootstrapLocale ?? {
+    loadFailure: 'The portfolio could not load. Please try again.',
+    retry: 'Retry',
+  };
+  const staticDocument = document.getElementById('static-document');
+  if (staticDocument) {
+    staticDocument.lang = 'en';
+    staticDocument.dir = 'ltr';
+    staticDocument.hidden = false;
+    staticDocument.inert = false;
+  }
+  document.documentElement.classList.add('bootstrap-failed');
+  if (!flutterBootstrapSurface) return;
+  flutterBootstrapSurface.classList.remove('bootstrap-surface--done');
+  flutterBootstrapSurface.setAttribute('aria-busy', 'false');
+  flutterBootstrapSurface.removeAttribute('role');
+  flutterBootstrapSurface.removeAttribute('aria-label');
   const status = document.createElement('div');
   status.className = 'bootstrap-error';
   status.setAttribute('role', 'alert');
-  status.textContent = bootstrapCopy.loadFailure;
+  status.textContent = copy.loadFailure;
   const retry = document.createElement('button');
   retry.type = 'button';
   retry.className = 'bootstrap-retry';
-  retry.textContent = bootstrapCopy.retry;
+  retry.textContent = copy.retry;
   retry.addEventListener('click', () => window.location.reload());
   status.appendChild(retry);
-  splash.appendChild(status);
+  flutterBootstrapSurface.replaceChildren(status);
+  staticDocument?.before(flutterBootstrapSurface);
+};
+
+const showBootstrapFailure = (error) => {
+  if (bootstrapFailed) return;
+  bootstrapFailed = true;
+  window.clearTimeout(removalTimer);
+  window.removeEventListener('flutter-first-frame', onFlutterFirstFrame);
+  console.error('Flutter bootstrap failed', error);
+  document.dispatchEvent(new Event('portfolio-bootstrap-failed'));
+  if (!document.documentElement.classList.contains('bootstrap-failed')) {
+    showFailureWithoutStaticScript();
+  }
 };
 
 const engineConfig = {
@@ -165,7 +185,7 @@ _flutter.loader.load({
 // shell until Flutter owns a glass pane, then retire it instead of trapping
 // those browsers behind an otherwise healthy loading surface.
 window.setTimeout(() => {
-  if (revealStarted || !document.querySelector('flt-glass-pane')) return;
+  if (revealStarted || bootstrapFailed || !document.querySelector('flt-glass-pane')) return;
   markRuntime('flutter-glass-pane-fallback');
   revealFlutterSurface();
 }, 12000);

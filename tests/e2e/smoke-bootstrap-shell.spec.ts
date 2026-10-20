@@ -10,6 +10,120 @@ import {
 type BootstrapLocale = (typeof bootstrapLocaleCases)[number];
 type CriticalScriptFont = { family: string; href: string };
 
+async function expectStaticRecovery(page: Page) {
+  const document = page.locator("#static-document");
+  await expect(document).toBeVisible();
+  await expect(document).not.toHaveAttribute("hidden", "");
+  await expect(document).not.toHaveAttribute("inert", "");
+  await expect(document).toHaveAttribute("lang", "en");
+  await expect(document).toHaveAttribute("dir", "ltr");
+  expect(
+    await document.evaluate((element) => getComputedStyle(element).direction),
+  ).toBe("ltr");
+  await expect(document.locator("main")).toBeVisible();
+  await expect(document.getByRole("navigation")).toBeVisible();
+  await expect(document.getByRole("heading", { level: 1 })).toBeVisible();
+  await expect(page.locator("h1:visible")).toHaveCount(1);
+  await expect(page.locator("#bootstrap-surface + #static-document")).toHaveCount(1);
+  const surface = page.locator("#bootstrap-surface");
+  await expect(surface).not.toHaveAttribute("role", /.+/);
+  await expect(surface).not.toHaveAttribute("aria-label", /.+/);
+  await expect(surface.getByRole("alert")).toHaveCount(1);
+  await expect(page.getByRole("status")).toHaveCount(0);
+  const retry = surface.locator(".bootstrap-retry");
+  await expect(retry).toBeEnabled();
+  await retry.focus();
+  await expect(retry).toBeFocused();
+  await expect(page.locator("#bootstrap-surface .bootstrap-shell")).toHaveCount(0);
+  const layout = await page.evaluate(() => ({
+    overflow: getComputedStyle(window.document.body).overflow,
+    position: getComputedStyle(window.document.getElementById("bootstrap-surface")!)
+      .position,
+    scrollHeight: window.document.documentElement.scrollHeight,
+    viewportHeight: window.innerHeight,
+  }));
+  expect(layout.overflow).toBe("auto");
+  expect(layout.position).not.toBe("fixed");
+  expect(layout.scrollHeight).toBeGreaterThan(layout.viewportHeight);
+}
+
+async function expectBootstrapStillLoadingAfterScript(page: Page, shell: Locator) {
+  // Script evaluation is finished; a later error must not mistake slow Wasm for failure.
+  await page.evaluate(() => {
+    window.dispatchEvent(new ErrorEvent("error", {
+      filename: new URL("flutter_bootstrap.js", document.baseURI).href,
+    }));
+  });
+  await expect(shell).toHaveAttribute("aria-busy", "true");
+  await expect(page.locator("#static-document")).toBeHidden();
+}
+
+async function expectFirstFrameRetired(page: Page, shell: Locator) {
+  await expect(shell).toHaveCount(0, { timeout: 20000 });
+  await expect(page.locator("#static-document")).toHaveAttribute("hidden", "");
+  await expect(page.locator("#static-document")).toHaveAttribute("inert", "");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveCount(1);
+  expect(
+    await page.evaluate(
+      () => performance.getEntriesByName("flutter-bootstrap-failed", "mark").length,
+    ),
+  ).toBe(0);
+}
+
+async function stubRejectingRunApp(
+  page: Page,
+  stage: "no-first-frame" | "immediate-after-frame" | "during-removal" | "after-removal",
+) {
+  await page.addInitScript((rejectionStage) => {
+    if (rejectionStage === "during-removal") {
+      const nativeSetTimeout = window.setTimeout;
+      window.setTimeout = ((handler: TimerHandler, timeout?: number, ...args: unknown[]) => {
+        const id = nativeSetTimeout(handler, timeout, ...args);
+        if (timeout === 220 && document.querySelector("#bootstrap-surface.bootstrap-surface--done")) {
+          queueMicrotask(() => {
+            (window as typeof window & { rejectBootstrapRunApp: () => void })
+              .rejectBootstrapRunApp();
+          });
+        }
+        return id;
+      }) as typeof window.setTimeout;
+    }
+    type EntrypointOptions = { onEntrypointLoaded: (initializer: unknown) => unknown };
+    type Loader = { load: (options: EntrypointOptions) => Promise<unknown> };
+    const flutter: { loader?: Loader } = {};
+    let loader: Loader | undefined;
+    Object.defineProperty(flutter, "loader", {
+      configurable: true,
+      get: () => loader,
+      set: (value: Loader) => {
+        const load = value.load.bind(value);
+        value.load = (options) => load({
+          ...options,
+          onEntrypointLoaded: () => options.onEntrypointLoaded({
+            initializeEngine: async () => ({
+              runApp: () => {
+                if (rejectionStage !== "no-first-frame") {
+                  window.dispatchEvent(new Event("flutter-first-frame"));
+                }
+                return new Promise<void>((_, reject) => {
+                  const fail = () => reject(new Error("runApp rejected during startup"));
+                  if (rejectionStage === "no-first-frame" || rejectionStage === "immediate-after-frame") {
+                    queueMicrotask(fail);
+                  } else {
+                    Object.assign(window, { rejectBootstrapRunApp: fail });
+                  }
+                });
+              },
+            }),
+          }),
+        });
+        loader = value;
+      },
+    });
+    Object.assign(window, { _flutter: flutter });
+  }, stage);
+}
+
 function scriptFontFor(locale: string): CriticalScriptFont | undefined {
   if (locale === "ar") {
     return {
@@ -121,6 +235,10 @@ test("renders a JSON-derived critical shell before the first Flutter frame", asy
   const shell = page.locator("#bootstrap-surface");
   await expect(shell).toBeVisible();
   await expect(shell).toHaveAttribute("aria-busy", "true");
+  await expect(page.locator("#static-document")).toBeHidden();
+  expect(
+    await page.evaluate(() => getComputedStyle(document.body).overflow),
+  ).toBe("hidden");
   await expect(shell).toHaveAttribute(
     "aria-label",
     "Loading interactive portfolio",
@@ -156,8 +274,9 @@ test("renders a JSON-derived critical shell before the first Flutter frame", asy
     await expect(facts.nth(index)).toContainText(value);
   }
 
+  await expectBootstrapStillLoadingAfterScript(page, shell);
   releaseWasm?.();
-  await expect(shell).toHaveCount(0, { timeout: 20000 });
+  await expectFirstFrameRetired(page, shell);
 });
 
 for (const bootstrapLocale of bootstrapLocaleCases) {
@@ -321,12 +440,83 @@ test("offers an accessible retry when the engine fails after its entrypoint load
     "aria-busy",
     "false",
   );
+  await expectStaticRecovery(page);
   expect(
     await page.evaluate(
       () => performance.getEntriesByName("flutter-bootstrap-failed", "mark").length,
     ),
   ).toBe(1);
 });
+
+test("recovers without the static document script when the engine fails", async ({
+  page,
+  isMobile,
+}) => {
+  test.skip(isMobile, "bootstrap recovery fallback needs one browser project");
+  await page.route("**/static_document.js*", (route) => route.abort("failed"));
+  await page.route(/main\.dart\.(?:wasm|mjs|js)/, (route) => route.abort("failed"));
+  await page.goto("/", { waitUntil: "domcontentloaded" });
+
+  await expect(
+    page.getByRole("button", { name: englishInterface.accessibility.retry }),
+  ).toBeVisible({ timeout: 20000 });
+  await expectStaticRecovery(page);
+  expect(
+    await page.evaluate(
+      () => performance.getEntriesByName("flutter-bootstrap-failed", "mark").length,
+    ),
+  ).toBe(1);
+});
+
+for (const stage of [
+  "no-first-frame", "immediate-after-frame", "during-removal", "after-removal",
+] as const) {
+  test(`recovers when runApp rejects ${stage}`, async ({ page, isMobile }) => {
+    test.skip(isMobile, "late runApp recovery needs one browser project");
+    await stubRejectingRunApp(page, stage);
+    await page.goto("/", { waitUntil: "domcontentloaded" });
+    if (stage !== "no-first-frame") {
+      await page.waitForFunction(
+        () => performance.getEntriesByName("flutter-first-frame-event", "mark").length > 0,
+      );
+    }
+    if (stage === "after-removal") {
+      await expect(page.locator("#bootstrap-surface")).toHaveCount(0);
+      await expect(page.locator("#static-document")).toHaveAttribute("hidden", "");
+      await page.evaluate(() => {
+        const semantics = document.createElement("flt-semantics-host");
+        const heading = document.createElement("h1");
+        heading.textContent = "Incomplete frame";
+        semantics.appendChild(heading);
+        document.body.appendChild(semantics);
+        (window as typeof window & { rejectBootstrapRunApp: () => void })
+          .rejectBootstrapRunApp();
+      });
+    }
+
+    await expect(
+      page.getByRole("button", { name: englishInterface.accessibility.retry }),
+    ).toBeVisible();
+    await expectStaticRecovery(page);
+    await page.waitForTimeout(300);
+    await expect(page.locator("#bootstrap-surface")).toBeVisible();
+    if (stage === "no-first-frame") {
+      expect(await page.evaluate(
+        () => performance.getEntriesByName("flutter-first-frame-event", "mark").length,
+      )).toBe(0);
+    }
+    if (stage !== "after-removal") {
+      expect(await page.evaluate(
+        () => performance.getEntriesByName("flutter-bootstrap-surface-removed", "mark").length,
+      )).toBe(0);
+    }
+    expect(
+      await page.evaluate(
+        () => performance.getEntriesByName("flutter-bootstrap-failed", "mark").length,
+      ),
+    ).toBe(1);
+  });
+}
 
 test("offers an accessible retry when the Wasm artifact cannot load", async ({
   page,
@@ -343,8 +533,7 @@ test("offers an accessible retry when the Wasm artifact cannot load", async ({
   ).toBeVisible({
     timeout: 20000,
   });
-  await expect(page.locator("#bootstrap-surface")).toHaveAttribute(
-    "aria-label",
+  await expect(page.getByRole("alert")).toContainText(
     englishInterface.accessibility.load_failure,
   );
   await expect(page.locator("#bootstrap-surface")).toHaveAttribute(
@@ -354,6 +543,60 @@ test("offers an accessible retry when the Wasm artifact cannot load", async ({
   await expect(
     page.getByText(englishInterface.accessibility.load_failure),
   ).toBeVisible();
+  await expectStaticRecovery(page);
+});
+
+test("recovers the static document when the bootstrap script cannot load", async ({
+  page,
+  isMobile,
+}) => {
+  test.skip(isMobile, "bootstrap script recovery needs one browser project");
+  await page.setViewportSize({ width: 900, height: 400 });
+  await page.route("**/flutter_bootstrap.js*", (route) => route.abort("failed"));
+  await page.goto("/", { waitUntil: "domcontentloaded" });
+
+  await expect(
+    page.getByRole("button", { name: englishInterface.accessibility.retry }),
+  ).toBeVisible();
+  await expectStaticRecovery(page);
+  const lastLink = page.locator("#static-document nav a").last();
+  const href = await lastLink.getAttribute("href");
+  expect(href).toMatch(/^#[a-z-]+$/);
+  const targetHeading = page.locator(`#static-document section${href} h2`);
+  expect(await targetHeading.evaluate((heading) => heading.getBoundingClientRect().top))
+    .toBeGreaterThan(page.viewportSize()!.height);
+  await lastLink.click();
+  await expect(page).toHaveURL(new URL(href!, page.url()).href);
+  await expect.poll(() => targetHeading.evaluate((heading) => {
+    const { top, bottom } = heading.getBoundingClientRect();
+    return top < window.innerHeight && bottom > 0;
+  })).toBe(true);
+  expect(await page.evaluate(() => window.scrollY)).toBeGreaterThan(0);
+});
+
+test("recovers the static document when bootstrap execution throws", async ({
+  page,
+  isMobile,
+}) => {
+  test.skip(isMobile, "bootstrap script recovery needs one browser project");
+  await page.route("**/flutter_bootstrap.js*", (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: "application/javascript",
+      body: 'throw new Error("bootstrap script failed");',
+    }),
+  );
+  await page.goto("/", { waitUntil: "domcontentloaded" });
+
+  await expect(
+    page.getByRole("button", { name: englishInterface.accessibility.retry }),
+  ).toBeVisible();
+  await expectStaticRecovery(page);
+  expect(
+    await page.evaluate(
+      () => performance.getEntriesByName("flutter-bootstrap-failed", "mark").length,
+    ),
+  ).toBe(1);
 });
 
 test("keeps bootstrap recovery in the saved locale", async ({
@@ -377,12 +620,18 @@ test("keeps bootstrap recovery in the saved locale", async ({
   await expect(
     page.getByRole("button", { name: arabic!.interface.accessibility.retry }),
   ).toBeVisible({ timeout: 20000 });
-  await expect(page.locator("#bootstrap-surface")).toHaveAttribute(
-    "aria-label",
+  await expect(page.getByRole("alert")).toContainText(
     arabic!.interface.accessibility.load_failure,
   );
   await expect(page.locator("html")).toHaveAttribute("lang", "ar");
   await expect(page.locator("html")).toHaveAttribute("dir", "rtl");
+  await expectStaticRecovery(page);
+  const fonts = await page.evaluate(() => ({
+    static: getComputedStyle(document.getElementById("static-document")!).fontFamily,
+    error: getComputedStyle(document.querySelector(".bootstrap-error")!).fontFamily,
+  }));
+  expect(fonts.static).toContain("Space Grotesk Critical");
+  expect(fonts.error).toContain("Noto Sans Arabic Critical");
 });
 
 test("offers a readable recovery document when JavaScript is disabled", async ({
