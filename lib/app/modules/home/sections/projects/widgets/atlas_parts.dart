@@ -2,11 +2,11 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_web_portfolio/app/core/theme/app_fonts.dart';
-import 'package:flutter_web_portfolio/app/domain/models/portfolio_document.dart';
+import 'package:flutter_web_portfolio/app/domain/models/portfolio_document.dart'
+    hide PortfolioLink;
 import 'package:flutter_web_portfolio/app/modules/home/sections/projects/widgets/atlas_style.dart';
 import 'package:flutter_web_portfolio/app/modules/home/sections/projects/widgets/project_palette.dart';
-import 'package:flutter_web_portfolio/app/widgets/accessible_action.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter_web_portfolio/app/widgets/portfolio_link.dart';
 
 /// Dark band that introduces the featured case studies with their count.
 final class AtlasDivider extends StatelessWidget {
@@ -171,10 +171,9 @@ final class AtlasLink extends StatelessWidget {
       maxWidth,
       MediaQuery.sizeOf(context).width - viewportInset,
     );
-    return AccessibleAction(
-      onTap: () => launchUrl(evidence.url, webOnlyWindowName: '_blank'),
+    return PortfolioLink(
+      uri: evidence.url,
       semanticLabel: semanticLabel,
-      semanticRole: ActionSemanticRole.link,
       focusColor: palette.accent,
       child: ConstrainedBox(
         constraints: BoxConstraints(maxWidth: width),

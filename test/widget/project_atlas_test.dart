@@ -6,14 +6,19 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_web_portfolio/app/core/constants/app_dimensions.dart';
-import 'package:flutter_web_portfolio/app/domain/models/portfolio_document.dart';
+import 'package:flutter_web_portfolio/app/domain/models/portfolio_document.dart'
+    hide PortfolioLink;
 import 'package:flutter_web_portfolio/app/modules/home/sections/projects/widgets/artifact_picture.dart';
 import 'package:flutter_web_portfolio/app/modules/home/sections/projects/widgets/artifact_view.dart';
+import 'package:flutter_web_portfolio/app/modules/home/sections/projects/widgets/atlas_parts.dart';
 import 'package:flutter_web_portfolio/app/modules/home/sections/projects/widgets/atlas_style.dart';
 import 'package:flutter_web_portfolio/app/modules/home/sections/projects/widgets/evidence_index_model.dart';
 import 'package:flutter_web_portfolio/app/modules/home/sections/projects/widgets/featured_case.dart';
 import 'package:flutter_web_portfolio/app/modules/home/sections/projects/widgets/project_atlas.dart';
+import 'package:flutter_web_portfolio/app/modules/home/sections/projects/widgets/project_palette.dart';
 import 'package:flutter_web_portfolio/app/modules/home/sections/projects/widgets/viewport_proximity_gate.dart';
+import 'package:flutter_web_portfolio/app/widgets/portfolio_link.dart';
+import 'package:url_launcher/link.dart';
 
 import '../helpers/portfolio_fixture.dart';
 
@@ -83,10 +88,9 @@ void main() {
   group('AtlasLayout', () {
     test('switches layouts at the shared breakpoints', () {
       const mobile = AtlasLayout.forWidth(390);
-      expect(
-        [mobile.narrow, mobile.tablet, mobile.desktop],
-        [true, false, false],
-      );
+      expect(mobile.narrow, isTrue);
+      expect(mobile.tablet, isFalse);
+      expect(mobile.desktop, isFalse);
       expect(mobile.usesCompactArtifacts, isTrue);
       expect(const AtlasLayout.forWidth(899).usesCompactArtifacts, isTrue);
       expect(const AtlasLayout.forWidth(900).usesCompactArtifacts, isFalse);
@@ -318,6 +322,46 @@ void main() {
 
     expect(primary, greaterThanOrEqualTo(_boardWidth / 2));
     expect(compact, greaterThanOrEqualTo(_compactBoardWidth / 2));
+  });
+  _registerEvidenceLinkTest(() => portfolio);
+}
+
+void _registerEvidenceLinkTest(PortfolioDocument Function() portfolio) {
+  testWidgets('featured evidence exposes one named link with its destination', (
+    tester,
+  ) async {
+    final semantics = tester.ensureSemantics();
+    final system = portfolio().featuredSystems.first;
+    final evidence = system.evidence.first;
+    final name = '${_labels.openEvidence}: ${system.name}, ${evidence.label}';
+    try {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: AtlasLink(
+              evidence: evidence,
+              semanticLabel: name,
+              palette: ProjectPalette.from(system.presentation),
+            ),
+          ),
+        ),
+      );
+
+      final link = tester.widget<PortfolioLink>(find.byType(PortfolioLink));
+      expect(link.uri, evidence.url);
+      final browserLink = tester.widget<Link>(find.byType(Link));
+      expect(browserLink.uri, evidence.url);
+      expect(browserLink.target, LinkTarget.blank);
+
+      final namedLink = find.bySemanticsLabel(name);
+      expect(namedLink, findsOneWidget);
+      final node = tester.getSemantics(namedLink);
+      expect(node.getSemanticsData().flagsCollection.isLink, isTrue);
+      expect(node.getSemanticsData().label, name);
+      expect(node.getSemanticsData().linkUrl, evidence.url);
+    } finally {
+      semantics.dispose();
+    }
   });
 }
 

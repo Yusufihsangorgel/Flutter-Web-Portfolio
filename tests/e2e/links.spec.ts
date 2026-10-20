@@ -1,10 +1,19 @@
 import { expect, Page, test } from "./helpers/test_setup";
-import { portfolio } from "./helpers/portfolio_test_helpers";
+import {
+  englishInterface,
+  portfolio,
+  required,
+} from "./helpers/portfolio_test_helpers";
 import { scrollToLocator } from "./helpers/semantics_scroll";
 
 const profileLink = portfolio.profile.links.find((link) =>
   /^https?:\/\//.test(link.url),
 );
+const featured = required(
+  portfolio.systems.find((system) => system.featured && system.evidence.length > 0),
+  "featured case with evidence",
+);
+const featuredEvidence = required(featured.evidence[0], "featured evidence");
 
 async function openRevealedPage(page: Page, hash = "") {
   await page.goto(`/${hash}`, { waitUntil: "domcontentloaded" });
@@ -30,6 +39,16 @@ async function footerProfileAnchor(page: Page, url: string) {
   return scrollToLocator(
     page,
     page.locator(`flt-semantics-host a[href="${url}"]`),
+    900,
+  );
+}
+
+async function featuredEvidenceAnchor(page: Page) {
+  await openRevealedPage(page, "#/projects");
+  const name = `${englishInterface.projects_section.open_evidence}: ${featured.name}, ${featuredEvidence.label}`;
+  return scrollToLocator(
+    page,
+    page.locator("flt-semantics-host").getByRole("link", { name, exact: true }),
     900,
   );
 }
@@ -137,6 +156,41 @@ test("a modified click on a navigation link opens a new tab", async ({
     waitUntil: "commit",
   });
   expect(new URL(opened.url()).hash).toBe(expectedHash);
+  expect(await page.evaluate(() => location.hash)).toBe(hashBefore);
+  await opened.close();
+});
+
+test("featured evidence exposes its full name and real destination", async ({ page }) => {
+  const anchor = await featuredEvidenceAnchor(page);
+  await expect(anchor).toHaveAttribute("href", featuredEvidence.url);
+});
+
+test("modified click on featured evidence opens its destination in a new tab", async ({
+  page,
+  isMobile,
+}) => {
+  test.skip(isMobile, "Modifier clicks are a desktop pointer gesture.");
+  const anchor = await featuredEvidenceAnchor(page);
+  const hashBefore = await page.evaluate(() => location.hash);
+  expect(hashBefore).toBe("#/projects");
+
+  const destination = new URL(featuredEvidence.url);
+  // Answer the external document locally; never request the live destination.
+  await page.context().route(
+    (url) => url.origin === destination.origin,
+    (route) =>
+      route.request().resourceType() === "document"
+        ? route.fulfill({ contentType: "text/html", body: "<title>evidence</title>" })
+        : route.abort(),
+  );
+  const [opened] = await Promise.all([
+    page.context().waitForEvent("page"),
+    anchor.click({ modifiers: ["ControlOrMeta"] }),
+  ]);
+  await opened.waitForURL((url) => url.protocol !== "about:", {
+    waitUntil: "commit",
+  });
+  expect(opened.url()).toBe(destination.href);
   expect(await page.evaluate(() => location.hash)).toBe(hashBefore);
   await opened.close();
 });
