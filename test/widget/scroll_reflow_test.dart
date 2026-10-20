@@ -1,12 +1,157 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_web_portfolio/app/controllers/scroll_controller.dart';
+import 'package:flutter_web_portfolio/app/features/language/application/language_cubit.dart';
 import 'package:flutter_web_portfolio/app/narrative/domain/narrative_document.dart';
+import 'package:flutter_web_portfolio/app/widgets/back_to_top_button.dart';
 
 import '../helpers/narrative_fixture.dart';
+import '../helpers/scroll_navigation_fixture.dart';
+
+void _registerSameFrameReflowTests() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+  _registerLayoutReflowTests();
+
+  testWidgets(
+    'same-frame jump and reflow preserve the latest reading position',
+    (tester) async {
+      final fixture = ScrollNavigationFixture(tester);
+      await fixture.mount();
+      expect(
+        fixture.controller.narrativePosition.value.activeSectionId,
+        'home',
+      );
+
+      // No frame may publish the jump before the reflow anchor is captured.
+      fixture.controller.scrollController.jumpTo(3000);
+      await fixture.reflow();
+      await fixture.settle();
+
+      expect(
+        fixture.controller.narrativePosition.value.activeSectionId,
+        'projects',
+      );
+      expect(fixture.controller.activeSection, 'projects');
+      expect(fixture.controller.scrollController.offset, closeTo(3400, 0.5));
+    },
+  );
+
+  testWidgets('same-frame backward jump survives coalesced reflow marks', (
+    tester,
+  ) async {
+    final fixture = ScrollNavigationFixture(tester);
+    await fixture.mount();
+    await fixture.readAt(3000);
+    expect(
+      fixture.controller.narrativePosition.value.activeSectionId,
+      'projects',
+    );
+
+    fixture.controller.scrollController.jumpTo(1200);
+    fixture.controller.markGeometryDirty();
+    await fixture.reflow();
+    await fixture.settle();
+
+    expect(
+      fixture.controller.narrativePosition.value.activeSectionId,
+      'experience',
+    );
+    expect(fixture.controller.activeSection, 'experience');
+    expect(fixture.controller.scrollController.offset, closeTo(1600, 0.5));
+  });
+}
+
+void _registerLayoutReflowTests() {
+  testWidgets('layout reflow captures without publishing during layout', (
+    tester,
+  ) async {
+    final fixture = ScrollNavigationFixture(tester);
+    final dirtyPhases = <SchedulerPhase>[];
+    await tester.pumpWidget(_layoutReflowDocument(fixture, dirtyPhases));
+    await fixture.settle();
+    fixture.controller.refreshSectionGeometry();
+    await fixture.readAt(2800);
+    dirtyPhases.clear();
+    final publishedPhases = <SchedulerPhase>[];
+    fixture.controller.narrativePosition.addListener(() {
+      publishedPhases.add(SchedulerBinding.instance.schedulerPhase);
+    });
+
+    // The first callback publishes 2900; the later transient callback models
+    // a momentum tick and content-only reflow before that frame's layout.
+    fixture.controller.scrollController.jumpTo(2900);
+    SchedulerBinding.instance.scheduleFrameCallback((_) {
+      fixture.controller.scrollController.jumpTo(3000);
+      fixture.homeHeight.value += 400;
+    });
+    await tester.pump();
+    expect(tester.takeException(), isNull);
+    await fixture.settle();
+
+    expect(dirtyPhases, [SchedulerPhase.persistentCallbacks]);
+    expect(publishedPhases, isNotEmpty);
+    expect(
+      publishedPhases,
+      isNot(contains(SchedulerPhase.persistentCallbacks)),
+    );
+    expect(
+      fixture.controller.narrativePosition.value.activeSectionId,
+      'projects',
+    );
+    expect(fixture.controller.scrollController.offset, closeTo(3400, 0.5));
+  });
+}
+
+Widget _layoutReflowDocument(
+  ScrollNavigationFixture fixture,
+  List<SchedulerPhase> dirtyPhases,
+) => MultiBlocProvider(
+  providers: [
+    BlocProvider.value(value: fixture.controller),
+    BlocProvider<LanguageCubit>.value(value: fixture.language),
+  ],
+  child: MaterialApp(
+    home: Stack(
+      children: [
+        ValueListenableBuilder<double>(
+          valueListenable: fixture.homeHeight,
+          builder: (_, height, _) => CustomScrollView(
+            controller: fixture.controller.scrollController,
+            slivers: [
+              SliverToBoxAdapter(
+                child: NotificationListener<SizeChangedLayoutNotification>(
+                  onNotification: (_) {
+                    dirtyPhases.add(SchedulerBinding.instance.schedulerPhase);
+                    fixture.controller.markGeometryDirty();
+                    return false;
+                  },
+                  child: SizeChangedLayoutNotifier(
+                    child: Column(
+                      children: [
+                        for (final chapter
+                            in fixture.controller.narrative.chapters)
+                          SizedBox(
+                            key: fixture.controller.keyFor(chapter.id),
+                            height: chapter.id == SectionId.home ? height : 900,
+                          ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        const BackToTopButton(),
+      ],
+    ),
+  ),
+);
 
 void main() {
-  TestWidgetsFlutterBinding.ensureInitialized();
+  _registerSameFrameReflowTests();
 
   testWidgets('keeps measured content anchors stable in document space', (
     tester,

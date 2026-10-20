@@ -134,7 +134,8 @@ final class AppScrollController extends ActiveSectionCubit
         !_manualNavigation &&
         !_initialNavigationPending &&
         _pendingReadingAnchor == null) {
-      _pendingReadingAnchor = _restorer.capture(_narrativePosition.value);
+      final position = _resolveNarrativePosition();
+      if (position != null) _pendingReadingAnchor = _restorer.capture(position);
     }
     if (_geometryFrameScheduled) return;
     _geometryFrameScheduled = true;
@@ -177,19 +178,24 @@ final class AppScrollController extends ActiveSectionCubit
     });
   }
 
-  void _updateNarrativePosition() {
-    if (!scrollController.hasClients || geometry.sections.isEmpty) return;
+  NarrativePosition? _resolveNarrativePosition() {
+    if (!scrollController.hasClients || geometry.sections.isEmpty) return null;
     final position = scrollController.position;
     if (!position.hasViewportDimension || position.viewportDimension <= 0) {
-      return;
+      return null;
     }
     final offset = scrollController.offset;
-    final resolved = NarrativePositionResolver.resolve(
+    return NarrativePositionResolver.resolve(
       offset: offset,
       viewportDimension: position.viewportDimension,
       topInset: AppDimensions.appBarHeightForScrollOffset(offset),
       sections: geometry.sections,
     );
+  }
+
+  void _updateNarrativePosition() {
+    final resolved = _resolveNarrativePosition();
+    if (resolved == null) return;
     if (_narrativePosition.value != resolved) {
       _narrativePosition.value = resolved;
     }
