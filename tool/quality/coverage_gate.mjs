@@ -1,4 +1,5 @@
-import { appendFile, readFile, writeFile } from 'node:fs/promises';
+import { createHash } from 'node:crypto';
+import { appendFile, readFile, readdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import process from 'node:process';
 
@@ -8,6 +9,17 @@ const groups = {
     file.startsWith('lib/app/controllers/') ||
     file.startsWith('lib/app/narrative/application/') ||
     /^lib\/app\/features\/[^/]+\/application\//.test(file),
+};
+
+// Only these audited, abstract-only contracts may be absent from LCOV.
+// A byte change revokes the exemption until the new content is reviewed.
+const auditedLcovExemptions = {
+  'lib/app/domain/providers/asset_loader.dart':
+    '52a9c09e75ada65c8f496b16ab1c071050c8b9de857e5788cb7ec8bbacca2f46',
+  'lib/app/domain/providers/key_value_store.dart':
+    '6f0f504c295f90a81c13a2a4ee1c8126f61e16b8d3e88b1951463275982f6d37',
+  'lib/app/domain/repositories/language_repository.dart':
+    '0b269489aef00be8c865180ed42ea09786c52acd1019e39ea5da2a048b258196',
 };
 
 function optionsFrom(args) {
@@ -36,7 +48,7 @@ function optionsFrom(args) {
 
 function sourcePath(file) {
   const relative = path.isAbsolute(file) ? path.relative(process.cwd(), file) : file;
-  return relative.replaceAll('\\', '/').replace(/^\.\//, '');
+  return path.posix.normalize(relative.replaceAll('\\', '/'));
 }
 
 function parseCoverage(input) {
@@ -59,6 +71,24 @@ function parseCoverage(input) {
     }
   }
   return sources;
+}
+
+async function validateSourceInventory(sources) {
+  const entries = await readdir('lib/app', { recursive: true, withFileTypes: true });
+  const missing = [];
+  for (const entry of entries) {
+    if ((!entry.isFile() && !entry.isSymbolicLink()) || !entry.name.endsWith('.dart')) continue;
+    const file = sourcePath(path.join(entry.parentPath, entry.name));
+    if (!Object.values(groups).some((includes) => includes(file)) || sources.get(file)?.size)
+      continue;
+    const expectedHash = auditedLcovExemptions[file];
+    if (expectedHash) {
+      const content = await readFile(file);
+      if (createHash('sha256').update(content).digest('hex') === expectedHash) continue;
+    }
+    missing.push(file);
+  }
+  if (missing.length) throw new Error(`Missing LCOV source: ${missing.sort().join(', ')}`);
 }
 
 function collectGroups(sources) {
@@ -115,6 +145,7 @@ function tableFor(totals, thresholds) {
 async function main() {
   const options = optionsFrom(process.argv.slice(2));
   const coverage = parseCoverage(await readFile(options.coverage, 'utf8'));
+  await validateSourceInventory(coverage);
   const totals = collectGroups(coverage);
   const thresholds = validateThresholds(JSON.parse(await readFile(options.thresholds, 'utf8')));
   const table = tableFor(totals, thresholds);
