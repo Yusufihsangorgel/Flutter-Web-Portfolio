@@ -112,27 +112,90 @@ test('an unchanged tree cannot masquerade as a completed wheel', async (t) => {
   assert.match(result.error?.message ?? '', /semantics.*change/i);
 });
 
-// Emulated Chromium divides wheel deltas by the pixel ratio (3) and Flutter divides them again.
-function scrollingDocument({ startY, discover = false, fraction = 1 }) {
+test('an unchanged wheel remains pending until the full bounded change deadline', async (t) => {
+  const fake = browser(t);
+  const initial = helpers.waitForSemanticsSettled(fake.page);
+  for (let frame = 0; frame < 3; frame += 1) fake.frame();
+  const token = await initial;
+  const result = await outcome(helpers.waitForSemanticsSettled(fake.page, token));
+  for (let frame = 0; frame < 3; frame += 1) fake.frame();
+  t.mock.timers.tick(1000);
+  await setImmediate();
+  assert.equal(result.error, undefined);
+  assert.equal(result.value, undefined);
+  t.mock.timers.tick(14_000);
+  await setImmediate();
+  assert.match(result.error?.message ?? '', /semantics.*change.*15000/i);
+  assert.equal(fake.pendingTimers(), 0);
+  assert.equal(fake.pendingFrames(), 0);
+});
+
+test('geometry arriving after an early stationary interval still settles', async (t) => {
+  let top = 100;
+  const fake = browser(t, { document: { querySelectorAll: () => [{ getBoundingClientRect: () => ({ top }) }] } });
+  const initial = helpers.waitForSemanticsSettled(fake.page);
+  for (let frame = 0; frame < 3; frame += 1) fake.frame();
+  const token = await initial;
+  const result = await outcome(helpers.waitForSemanticsSettled(fake.page, token));
+  for (let frame = 0; frame < 3; frame += 1) fake.frame();
+  t.mock.timers.tick(1000);
+  await setImmediate();
+  assert.equal(result.value, undefined);
+  assert.equal(result.error, undefined);
+  top = 300;
+  for (let frame = 0; frame < 3; frame += 1) fake.frame();
+  await setImmediate();
+  assert.notEqual(result.value, token);
+  assert.equal(result.error, undefined);
+  assert.equal(fake.pendingTimers(), 0);
+});
+
+// The saved mobile traces show both one and two DPR divisions, depending on the AX path.
+function scrollingDocument({ startY, discover = false, fraction = 1, revealAtWheel = 0,
+  pixelRatio = 3, viewportHeight = 800, wheelDivisor = pixelRatio ** 2,
+  maxOffset = Infinity, anchorGeneration = () => 'content' }) {
   let offset = 0;
   const y = () => startY - offset;
   const wheels = [];
   const moves = [];
   const target = {
-    count: async () => discover && (y() < -40 || y() >= 800) ? 0 : 1,
+    count: async () => wheels.length < revealAtWheel || (discover && (y() < -40 || y() >= viewportHeight)) ? 0 : 1,
     first: () => target,
     boundingBox: async () => ({ x: 0, y: y(), width: 100, height: 40 }),
     toString: () => 'chapter heading',
   };
   const wheel = async (_, distance) => {
     wheels.push(distance);
-    moves.push(fraction * distance / 9);
-    offset += moves.at(-1);
+    const divisor = typeof wheelDivisor === 'function' ? wheelDivisor(wheels.length) : wheelDivisor;
+    const next = Math.min(maxOffset, offset + fraction * distance / divisor);
+    moves.push(next - offset);
+    offset = next;
   };
-  const evaluate = async (callback) => callback.toString().includes('querySelectorAll')
-    ? String(offset) : vm.runInNewContext(`(${callback})`, {
-      window: { innerHeight: 800, devicePixelRatio: 3 },
-    })();
+  const document = { querySelectorAll: () => {
+    const generation = anchorGeneration(wheels.length);
+    if (generation === null) return [];
+    return Array.from({ length: Math.ceil(viewportHeight / 200) + 1 }, (_, index) => {
+      const row = Math.floor(offset / 200) + index;
+      return {
+        id: `${generation}-${row}`,
+        textContent: `Content row ${row}`,
+        getAttribute: () => null,
+        getBoundingClientRect: () => ({ top: row * 200 - offset, width: 100, height: 200 }),
+      };
+    });
+  } };
+  const evaluate = async (callback, arg) => {
+    if (arg && 'stableFrames' in arg) {
+      const current = String(offset);
+      if (arg.changedFrom && arg.changedFrom === current) {
+        throw new Error(`The semantics tree did not change within 15000ms; last geometry: ${current}.`);
+      }
+      return current;
+    }
+    return vm.runInNewContext(`(${callback})`, {
+      document, window: { innerHeight: viewportHeight, devicePixelRatio: pixelRatio },
+    })(arg);
+  };
   return { page: { mouse: { wheel }, evaluate }, target, wheels, moves, position: y };
 }
 
@@ -157,6 +220,122 @@ test('missing target discovery has a finite ceiling and reports geometry', async
   assert.equal(wheels.length, 48);
 });
 
+test('a simulated stalled wheel propagates the target and geometry diagnostics', async () => {
+  const { page, target, wheels } = scrollingDocument({ startY: 20_000, discover: true, fraction: 0 });
+  await assert.rejects(helpers.scrollToLocator(page, target),
+    /Wheel 1 failed.*chapter heading.*last geometry.*viewportHeight.*did not change within 15000ms/);
+  assert.equal(wheels.length, 1);
+});
+
+test('a target arriving after advancing discovery wheels is found', async () => {
+  const { page, target, wheels } = scrollingDocument({ startY: 700, fraction: 0.5, revealAtWheel: 2 });
+  await helpers.scrollToLocator(page, target);
+  assert.equal(wheels.length, 2);
+});
+
+test('discovery continues while geometry advances even without an attached target', async () => {
+  const { page, target, wheels, position } = scrollingDocument({ startY: 20_000, discover: true });
+  await helpers.scrollToLocator(page, target);
+  assert(position() > -40 && position() < 800);
+  assert(wheels.length > 2);
+});
+
+test('semantic link helper requests a tappable anchor with its full text', async () => {
+  const { page, target } = scrollingDocument({ startY: 700 });
+  const label = 'View project: Case, Source';
+  let selected = false;
+  const textLink = { ...target, first: () => textLink, waitFor: async () => undefined };
+  page.locator = (selector) => {
+    assert.equal(selector, 'flt-semantics-host a[flt-tappable]');
+    return { filter: ({ hasText }) => {
+      assert.equal(hasText, label);
+      selected = true;
+      return textLink;
+    } };
+  };
+  await helpers.scrollToSemanticLink(page, label);
+  assert.equal(selected, true);
+});
+
+test('aria-label-only narrative groups use the exact accessible name, not text nodes', async () => {
+  const { page, target } = scrollingDocument({ startY: 700 });
+  const sentence = 'Owned the client and releases.';
+  const name = `More work\nWhat I owned\n${sentence}`;
+  let matched = false;
+  page.locator = (selector) => {
+    assert.equal(selector, 'flt-semantics-host');
+    return {
+      getByText: () => { throw new Error('The group has an aria-label but no text node.'); },
+      getByRole: (role, options) => {
+        assert.equal(role, 'group');
+        assert.equal(options.name, name);
+        assert.equal(options.exact, true);
+        matched = true;
+        return target;
+      },
+    };
+  };
+  assert.equal(await helpers.scrollToSemanticGroup(page, name), target);
+  assert.equal(matched, true);
+});
+
+function selectedEvidenceDocument(options) {
+  const state = scrollingDocument(options);
+  const label = 'View project: Selected case, Release';
+  const link = { ...state.target, first: () => link, waitFor: async () => undefined };
+  const from = {
+    count: async () => 1,
+    first: () => from,
+    boundingBox: async () => ({ x: 0, y: 407 + state.position() - options.startY, width: 306, height: 371 }),
+    toString: () => 'selected compact artifact',
+  };
+  state.page.locator = (selector) => {
+    assert.equal(selector, 'flt-semantics-host a[flt-tappable]');
+    return { filter: ({ hasText }) => { assert.equal(hasText, label); return link; } };
+  };
+  return { ...state, label, from };
+}
+
+test('mobile discovery cannot leap over a virtualized selected evidence link', async () => {
+  const { page, label, from, moves, position } = selectedEvidenceDocument({
+    startY: 1250, discover: true, pixelRatio: 2.625, viewportHeight: 839,
+    wheelDivisor: 2.625, maxOffset: 5000,
+  });
+  await helpers.scrollToSemanticLink(page, label, { from });
+  assert(position() > -40 && position() < 839, `Selected evidence ended at y=${position()}.`);
+  assert(moves.every((move) => move <= 839), `Observed discovery movement: ${moves}.`);
+});
+
+test('nearby discovery bounds wheel progress across device ratios and division modes', async () => {
+  for (const pixelRatio of [0.75, 1, 2.625, 3]) {
+    for (const divisions of [0, 1, 2]) {
+      const { page, label, from, moves } = selectedEvidenceDocument({
+        startY: 1250, discover: true, pixelRatio, wheelDivisor: pixelRatio ** divisions,
+      });
+      await helpers.scrollToSemanticLink(page, label, { from });
+      assert(moves.every((move) => move <= 800), `DPR=${pixelRatio}, divisions=${divisions}: ${moves}.`);
+    }
+  }
+});
+
+test('nearby discovery stays bounded when anchors disappear and wheel gain changes', async () => {
+  const { page, label, from, moves, wheels } = selectedEvidenceDocument({
+    startY: 2000, discover: true, anchorGeneration: (count) => count < 2 ? 'content' : null,
+    wheelDivisor: (count) => count === 1 ? 9 : 3, maxOffset: 5000,
+  });
+  await helpers.scrollToSemanticLink(page, label, { from });
+  assert(wheels.length > 1);
+  assert(wheels.every((delta) => delta <= 640), `Unobserved wheel amplified input: ${wheels}.`);
+  assert(moves.every((move) => move <= 800));
+});
+
+test('nearby discovery requires the selected artifact to be in the viewport', async () => {
+  const { page, label, from, wheels } = selectedEvidenceDocument({ startY: 1250, discover: true });
+  from.boundingBox = async () => ({ x: 0, y: 1200, width: 306, height: 371 });
+  await assert.rejects(helpers.scrollToSemanticLink(page, label, { from }), /Starting artifact.*viewport/);
+  assert.equal(wheels.length, 0);
+});
+
 test('boundary correction converges despite partial wheel movement', async () => {
   const { page, target, wheels, position } = scrollingDocument({ startY: 700, fraction: 0.8 });
   await helpers.scrollToPosition(page, target, { targetY: 560 });
@@ -166,8 +345,9 @@ test('boundary correction converges despite partial wheel movement', async () =>
 
 test('an unachievable boundary fails with the last rectangle', async () => {
   const { page, target, wheels } = scrollingDocument({ startY: 700, fraction: 0 });
-  await assert.rejects(helpers.scrollToPosition(page, target, { targetY: 560 }), /8 corrections.*last geometry.*700/);
-  assert.equal(wheels.length, 8);
+  await assert.rejects(helpers.scrollToPosition(page, target, { targetY: 560 }),
+    /Correction 1 failed.*last geometry.*700/);
+  assert.equal(wheels.length, 1);
 });
 
 test('settled waits release their deadline and frame callbacks', async (t) => {

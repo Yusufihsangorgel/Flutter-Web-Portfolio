@@ -15,6 +15,7 @@ export default defineConfig({
   reporter: [['list'], ['json', { outputFile: 'test-results/results.json' }]],
   use: {
     baseURL: productionBaseUrl.toString(),
+    serviceWorkers: 'block',
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
     ignoreHTTPSErrors: false,

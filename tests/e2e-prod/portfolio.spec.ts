@@ -7,6 +7,7 @@ import type {
 } from '@playwright/test';
 import type { PortfolioTestData } from '../support/portfolio_test_data';
 import {
+  englishInterface,
   expectedArtifact,
   openChapterFromPalette,
   openPortfolio,
@@ -20,8 +21,8 @@ import {
 import {
   scrollToHeading,
   scrollToLocator,
+  scrollToSemanticGroup,
   scrollToSemanticLink,
-  scrollToText,
 } from '../e2e/helpers/semantics_scroll';
 
 type ProductionSystem = PortfolioTestData['systems'][number] & {
@@ -39,6 +40,16 @@ type ReleaseResponses = {
 };
 
 const portfolio = basePortfolio as ProductionPortfolio;
+
+// Production tests may read the live release but must never mutate it.
+test.beforeEach(async ({ context }) => {
+  await context.routeWebSocket('**/*', (socket) => socket.close());
+  await context.route('**/*', (route) =>
+    ['GET', 'HEAD'].includes(route.request().method())
+      ? route.fallback()
+      : route.abort(),
+  );
+});
 
 async function openProductionPortfolio(page: Page) {
   await openPortfolio(page, { timeout: 75000, requireOk: true });
@@ -213,10 +224,6 @@ async function assertProductionContributionLinks(
 
 async function assertProductionProjectLinks(page: Page, accessibility: CDPSession) {
   await openChapterFromPalette(page, 'Go to Work', /#\/projects$/, 'Selected Work');
-  const tree = await accessibility.send('Accessibility.getFullAXTree');
-  const links = tree.nodes
-    .filter((node) => !node.ignored && node.role?.value === 'link')
-    .map((node) => node.name?.value ?? '');
   const featured = required(
     portfolio.systems.find((system) => system.featured),
     'a featured system',
@@ -227,18 +234,21 @@ async function assertProductionProjectLinks(page: Page, accessibility: CDPSessio
   );
   expect(featured).toBeTruthy();
   expect(supporting).toBeTruthy();
-  const evidenceLabel = `Open evidence: ${featured.name}, ${featured.evidence[0].label}`;
+  const evidenceLabel = `${englishInterface.projects_section.open_evidence}: ${featured.name}, ${featured.evidence[0].label}`;
   await scrollToSemanticLink(page, evidenceLabel);
+  // Flutter emits the complete name as anchor text, not href or aria-label.
+  await expect(page.locator('flt-semantics-host a[flt-tappable]')
+    .filter({ hasText: evidenceLabel })).toHaveCount(1);
   const visibleTree = await accessibility.send('Accessibility.getFullAXTree');
   const visibleLinks = visibleTree.nodes
     .filter((node) => !node.ignored && node.role?.value === 'link')
     .map((node) => node.name?.value ?? '');
   expect(visibleLinks).toEqual(expect.arrayContaining([evidenceLabel]));
-  expect(links).not.toEqual(
+  expect(visibleLinks).not.toEqual(
     expect.arrayContaining([expect.stringContaining('Open project:')]),
   );
-  expect(links).not.toContain('View source');
-  expect(links).not.toContain('Website');
+  expect(visibleLinks).not.toContain('View source');
+  expect(visibleLinks).not.toContain('Website');
   return supporting;
 }
 
@@ -260,25 +270,53 @@ async function assertSupportingAtlas(
   );
   expect(headings).toContain(supporting.name);
   expect(disclosures.length).toBeGreaterThanOrEqual(1);
+  const selected = page.getByRole('button', {
+    name: `${englishInterface.projects_section.select_evidence}: ${supporting.name}`,
+    exact: true,
+  });
+  // The served Flutter button exposes selected state as aria-current, not aria-selected.
+  await expect(selected).toHaveAttribute('aria-current', 'true');
+  await expect(selected).toHaveAttribute('aria-expanded', 'true');
+  await expect(selected).toBeInViewport();
   const artifact = expectedArtifact(page, supporting);
-  await scrollToLocator(page, page.getByRole('img', { name: artifact.alt }));
+  const image = page.getByRole('img', { name: artifact.alt });
+  await scrollToLocator(page, image);
+  await expect(image).toBeInViewport();
   const imageTree = await accessibility.send('Accessibility.getFullAXTree');
   const images = imageTree.nodes
     .filter((node) => !node.ignored && node.role?.value === 'image')
     .map((node) => node.name?.value ?? '');
   expect(images).toContain(artifact.alt);
-  await scrollToText(page, supporting.evidence[0].label);
+  await assertSupportingOwnership(page, supporting, accessibility);
+  await scrollToLocator(page, image);
+  await expect(image).toBeInViewport();
+  const evidenceLabel = `${englishInterface.projects_section.open_evidence}: ${supporting.name}, ${supporting.evidence[0].label}`;
+  const evidence = await scrollToSemanticLink(page, evidenceLabel, { from: image });
+  await expect(evidence).toBeInViewport();
   const evidenceTree = await accessibility.send('Accessibility.getFullAXTree');
   const evidenceLinks = evidenceTree.nodes
     .filter((node) => !node.ignored && node.role?.value === 'link')
     .map((node) => node.name?.value ?? '');
-  expect(evidenceLinks).toEqual(
-    expect.arrayContaining([
-      expect.stringContaining(
-        `Open evidence: ${supporting.name}, ${supporting.evidence[0].label}`,
-      ),
-    ]),
-  );
+  expect(evidenceLinks).toContain(evidenceLabel);
+}
+
+async function assertSupportingOwnership(
+  page: Page, supporting: ProductionSystem, accessibility: CDPSession,
+) {
+  const tree = await accessibility.send('Accessibility.getFullAXTree');
+  const names = tree.nodes
+    .filter((node) => !node.ignored && node.role?.value === 'group')
+    .map((node) => String(node.name?.value ?? ''))
+    .filter((name) => name.includes(supporting.ownership));
+  expect(names).toHaveLength(1);
+  const name = required(names[0], 'the complete ownership group name');
+  expect(name).toContain(supporting.ownership);
+  const group = await scrollToSemanticGroup(page, name);
+  await expect(group).toHaveCount(1);
+  const label = await group.getAttribute('aria-label');
+  expect(label).toContain(supporting.ownership);
+  expect(label?.replace(/\s+/g, ' ').trim()).toBe(name.replace(/\s+/g, ' ').trim());
+  await expect(group).toBeInViewport();
 }
 
 async function assertProductionDocument(request: APIRequestContext) {
@@ -380,7 +418,7 @@ test('serves the complete professional narrative in production', async ({
 }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await openProductionPortfolio(page);
-  await expect(page.getByRole('heading', { name: 'About' })).toBeAttached();
+  await openChapterFromPalette(page, 'Go to About', /#\/about$/, 'About');
 
   await openChapterFromPalette(
     page,
@@ -413,12 +451,14 @@ test('serves the complete professional narrative in production', async ({
   await expect(
     page.getByRole('img', { name: expectedArtifact(page, supportingSystem).alt }),
   ).toBeAttached();
-  await scrollToText(page, supportingSystem.ownership);
+  const accessibility = await readAccessibilityTree(page);
+  await assertSupportingOwnership(page, supportingSystem, accessibility);
+  await accessibility.detach();
 
   if (!isMobile) {
     const nextSystem = required(supportingSystems[1], 'a second work item');
     const selector = page.getByRole('button', {
-      name: `Select evidence: ${nextSystem.name}`,
+      name: `${englishInterface.projects_section.select_evidence}: ${nextSystem.name}`,
       exact: true,
     });
     await scrollToLocator(page, selector);
