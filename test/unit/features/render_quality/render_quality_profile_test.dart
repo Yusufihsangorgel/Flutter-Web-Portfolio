@@ -44,6 +44,15 @@ void main() {
         ),
       ], everyElement(isNot(profile)));
     });
+
+    test('tier transitions clamp at endpoints and move one step', () {
+      expect(RenderQuality.essential.lower, RenderQuality.essential);
+      expect(RenderQuality.balanced.lower, RenderQuality.essential);
+      expect(RenderQuality.full.lower, RenderQuality.balanced);
+      expect(RenderQuality.essential.higher, RenderQuality.balanced);
+      expect(RenderQuality.balanced.higher, RenderQuality.full);
+      expect(RenderQuality.full.higher, RenderQuality.full);
+    });
   });
 }
 

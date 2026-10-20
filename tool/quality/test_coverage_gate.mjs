@@ -14,6 +14,10 @@ const contracts = [
   'lib/app/domain/providers/key_value_store.dart',
   'lib/app/domain/repositories/language_repository.dart',
 ];
+const additionalDomains = [
+  'lib/app/narrative/domain/chapter.dart',
+  'lib/app/features/render_quality/domain/profile.dart',
+];
 async function withThresholds(values, check, fixture = 'equal.lcov') {
   const directory = await mkdtemp(path.join(os.tmpdir(), 'coverage-gate-'));
   const thresholds = path.join(directory, 'thresholds.json');
@@ -177,3 +181,54 @@ test('equivalent LCOV paths match the source inventory', async () => {
     assert.equal(result.status, 0, result.stderr);
   });
 });
+
+async function addDomainSources(directory) {
+  for (const file of additionalDomains) {
+    const destination = path.join(directory, file);
+    await mkdir(path.dirname(destination), { recursive: true });
+    await writeFile(destination, 'int fixture() => 1;\n');
+  }
+}
+
+test('narrative and feature domain lines count without changing application', async () => {
+  await withThresholds({ domain: 75, application: 50 }, async ({ thresholds, directory }) => {
+    await addDomainSources(directory);
+    const coverage = path.join(directory, 'expanded.lcov');
+    const original = await readFile(path.join(fixtures, 'equal.lcov'), 'utf8');
+    const extra = additionalDomains.map((file) => `SF:${file}\nDA:1,1\nDA:2,0\nend_of_record\n`);
+    await writeFile(coverage, original + extra.join(''));
+    const result = runGate('equal.lcov', thresholds, { coverage });
+    assert.equal(result.status, 1, result.stderr);
+    assert.match(result.stdout, /\| domain \| 5\/8 \| 62\.5% \| 75\.0% \| FAIL \|/);
+    assert.match(result.stdout, /\| application \| 3\/6 \| 50\.0% \| 50\.0% \| PASS \|/);
+  });
+});
+
+for (const file of additionalDomains) {
+  test(`omitted ${file} fails the source inventory`, async () => {
+    await withThresholds({ domain: 75, application: 50 }, async ({ thresholds, directory }) => {
+      await addDomainSources(directory);
+      const result = runGate('equal.lcov', thresholds);
+      assert.equal(result.status, 1, result.stdout);
+      assert.match(result.stderr, /Missing LCOV source:/);
+      assert.ok(result.stderr.includes(file), result.stderr);
+    });
+  });
+
+  test(`empty ${file} record fails the source inventory`, async () => {
+    await withThresholds({ domain: 75, application: 50 }, async ({ thresholds, directory }) => {
+      await addDomainSources(directory);
+      const coverage = path.join(directory, 'empty-domain.lcov');
+      const original = await readFile(path.join(fixtures, 'equal.lcov'), 'utf8');
+      const other = additionalDomains.find((candidate) => candidate !== file);
+      await writeFile(
+        coverage,
+        `${original}SF:${other}\nDA:1,1\nend_of_record\nSF:${file}\nend_of_record\n`,
+      );
+      const result = runGate('equal.lcov', thresholds, { coverage });
+      assert.equal(result.status, 1, result.stdout);
+      assert.match(result.stderr, /Missing LCOV source:/);
+      assert.ok(result.stderr.includes(file), result.stderr);
+    });
+  });
+}

@@ -23,7 +23,6 @@ void main() {
       'software',
       'website',
     };
-
     void add(Object? value) {
       if (value is! String) return;
       final normalized = value.trim().toLowerCase();
@@ -143,5 +142,65 @@ void main() {
 
       expect(() => NarrativeDocument.fromJson(json), throwsFormatException);
     });
+  });
+  _registerDocumentValidationTests(fixture);
+}
+
+void _registerDocumentValidationTests(Map<String, dynamic> Function() fixture) {
+  test('rejects unsupported narrative schema and motif', () {
+    final invalidVersion = fixture()..['schema_version'] = 2;
+    expect(
+      () => NarrativeDocument.fromJson(invalidVersion),
+      throwsFormatException,
+    );
+
+    final invalidMotif = fixture();
+    final chapters = invalidMotif['chapters']! as List<dynamic>;
+    (chapters.last as Map<String, dynamic>)['motif'] = 'unsupported';
+    expect(
+      () => NarrativeDocument.fromJson(invalidMotif),
+      throwsFormatException,
+    );
+  });
+
+  test('rejects malformed chapter collections and entries', () {
+    final missingChapters = fixture()..remove('chapters');
+    expect(
+      () => NarrativeDocument.fromJson(missingChapters),
+      throwsFormatException,
+    );
+
+    final malformedChapter = fixture();
+    (malformedChapter['chapters']! as List<dynamic>)[1] = 'invalid';
+    expect(
+      () => NarrativeDocument.fromJson(malformedChapter),
+      throwsFormatException,
+    );
+  });
+
+  test('requires nonempty string and integer fields', () {
+    final missingId = fixture()..['id'] = ' ';
+    expect(() => NarrativeDocument.fromJson(missingId), throwsFormatException);
+
+    final invalidVersion = fixture()..['schema_version'] = '1';
+    expect(
+      () => NarrativeDocument.fromJson(invalidVersion),
+      throwsFormatException,
+    );
+
+    final missingMotif = fixture();
+    final chapters = missingMotif['chapters']! as List<dynamic>;
+    (chapters.last as Map<String, dynamic>)['motif'] = null;
+    expect(
+      () => NarrativeDocument.fromJson(missingMotif),
+      throwsFormatException,
+    );
+  });
+
+  test('an undeclared chapter cannot be looked up', () {
+    final document = NarrativeDocument.fromJson(
+      fixture(),
+    ).forActiveSections(const ['home', 'about']);
+    expect(() => document.chapterFor(SectionId.proof), throwsArgumentError);
   });
 }

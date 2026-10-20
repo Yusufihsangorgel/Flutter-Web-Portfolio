@@ -50,7 +50,6 @@ void main() {
       );
     });
   });
-
   group('NarrativePositionResolver', () {
     test('returns the initial position for an empty document', () {
       expect(
@@ -284,5 +283,20 @@ void main() {
         throwsArgumentError,
       );
     });
+  });
+  _registerSectionGeometryValueTests();
+}
+
+void _registerSectionGeometryValueTests() {
+  test('a section center and identity follow its measured bounds', () {
+    const measured = SectionGeometry(id: 'home', top: 100, height: 300);
+    const same = SectionGeometry(id: 'home', top: 100, height: 300);
+    const different = SectionGeometry(id: 'home', top: 100, height: 200);
+
+    expect(measured.center, 250);
+    expect(measured.bottom, 400);
+    expect(measured, same);
+    expect(measured.hashCode, same.hashCode);
+    expect(measured, isNot(different));
   });
 }

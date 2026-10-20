@@ -169,7 +169,6 @@ void main() {
       );
     }
   });
-
   test('rejects duplicate, invalid, or out-of-order anchor geometry', () {
     const home = NarrativeAnchorGeometry(
       sectionId: SectionId.home,
@@ -201,5 +200,25 @@ void main() {
       ]),
       throwsArgumentError,
     );
+  });
+  _registerAnchorValueTests();
+}
+
+void _registerAnchorValueTests() {
+  test('an empty snapshot reports no anchors while a measured one does', () {
+    const empty = NarrativeAnchorSnapshot.empty();
+    const home = NarrativeAnchorGeometry(
+      sectionId: SectionId.home,
+      motif: NarrativeMotif.origin,
+      documentCenter: NarrativePoint(100, 200),
+      size: NarrativeSize(20, 20),
+    );
+    final measured = NarrativeAnchorSnapshot([home]);
+
+    expect(empty.isEmpty, isTrue);
+    expect(measured.isEmpty, isFalse);
+    expect(measured.anchorFor(SectionId.home), home);
+    expect(measured.covers(const [SectionId.home]), isTrue);
+    expect(measured.covers(const [SectionId.about]), isFalse);
   });
 }

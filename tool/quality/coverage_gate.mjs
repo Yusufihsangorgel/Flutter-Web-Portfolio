@@ -4,7 +4,10 @@ import path from 'node:path';
 import process from 'node:process';
 
 const groups = {
-  domain: (file) => file.startsWith('lib/app/domain/'),
+  domain: (file) =>
+    file.startsWith('lib/app/domain/') ||
+    file.startsWith('lib/app/narrative/domain/') ||
+    /^lib\/app\/features\/[^/]+\/domain\//.test(file),
   application: (file) =>
     file.startsWith('lib/app/controllers/') ||
     file.startsWith('lib/app/narrative/application/') ||
