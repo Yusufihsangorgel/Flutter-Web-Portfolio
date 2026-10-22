@@ -108,6 +108,24 @@ assert.deepEqual(cspDirectives(renderContentSecurityPolicy(remoteImage)).get('im
 ]);
 assert.ok(!renderHeadMeta(content).includes('name="keywords"'));
 
+const quotedSiteUrl = 'https://portfolio.example.test/path" data-proof="ok';
+assert.equal(new URL(quotedSiteUrl).protocol, 'https:');
+const quotedSiteHead = renderHeadMeta({
+  ...content,
+  site: { ...content.site, url: quotedSiteUrl },
+});
+assert.ok(
+  quotedSiteHead.includes(
+    '<link rel="canonical" href="https://portfolio.example.test/path&quot; data-proof=&quot;ok">',
+  ),
+);
+assert.ok(
+  quotedSiteHead.includes(
+    '<meta property="og:url" content="https://portfolio.example.test/path&quot; data-proof=&quot;ok">',
+  ),
+);
+assert.ok(!quotedSiteHead.includes('" data-proof="ok'));
+
 const graph = JSON.parse(
   renderStructuredData(content).match(
     /<script type="application\/ld\+json">\s*([\s\S]*?)\s*<\/script>/,

@@ -141,13 +141,13 @@ export function renderHeadMeta(data) {
   const accessibleName = html(
     requiredString(data.profile.display_name?.accessible, 'profile.display_name.accessible'),
   );
-  return `  <link rel="canonical" href="${site.url}">
+  return `  <link rel="canonical" href="${html(site.url)}">
   <title>${title}</title>
   <meta name="description" content="${description}">
   <meta name="author" content="${name}">
 
   <meta property="og:type" content="website">
-  <meta property="og:url" content="${site.url}">
+  <meta property="og:url" content="${html(site.url)}">
   <meta property="og:title" content="${title}">
   <meta property="og:description" content="${social}">
   <meta property="og:site_name" content="${name} — ${role}">
