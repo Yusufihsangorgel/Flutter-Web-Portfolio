@@ -30,8 +30,7 @@ final class FeaturedCase extends StatelessWidget {
 
     return Semantics(
       container: true,
-      label:
-          '${system.name}. ${system.kind}. ${system.year}. ${system.summary}',
+      explicitChildNodes: true,
       child: ColoredBox(
         color: palette.background,
         child: Padding(
