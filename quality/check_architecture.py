@@ -274,8 +274,8 @@ def scan(root, sources, rules, exclude, files=None):
         try:
             with open(os.path.join(root, path), encoding="utf-8", errors="replace") as handle:
                 text = handle.read()
-        except OSError:
-            continue
+        except OSError as error:
+            raise ConfigError("cannot read %s: %s" % (path, error)) from error
         is_client = source.lang == "ts" and bool(USE_CLIENT.match(text))
         active = [rule for rule in rules if rule.applies_to(path, is_client)]
         try:

@@ -4,9 +4,11 @@ import contextlib
 import io
 import json
 import os
+import subprocess
 import sys
 import tempfile
 import unittest
+from unittest import mock
 
 QUALITY_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 REPO_ROOT = os.path.dirname(QUALITY_DIR)
@@ -332,6 +334,122 @@ class ArchitectureCalibrationTest(unittest.TestCase):
         self.assertEqual(known, [])
         self.assertIn("NEW lib/app/features/alpha/probe.dart:2 F-ISOLATION", output.getvalue())
         self.assertIn("STALE baseline entry", output.getvalue())
+
+
+class ArchitectureReadFailureTest(unittest.TestCase):
+    source_path = "lib/app/domain/models/selected.dart"
+    valid_path = "lib/app/domain/models/readable.dart"
+    violation_path = "lib/app/domain/models/boundary_violation.dart"
+
+    def setUp(self):
+        directory = tempfile.TemporaryDirectory(prefix="arch-read-failure-")
+        self.addCleanup(directory.cleanup)
+        self.root = directory.name
+        with open(os.path.join(REPO_ROOT, arch.DEFAULT_CONFIG), encoding="utf-8") as handle:
+            config = dict(json.load(handle), baseline="quality/no-baseline.json")
+        write(self.root, arch.DEFAULT_CONFIG, json.dumps(config))
+        write(self.root, self.source_path, "import 'dart:core';\n")
+        write(self.root, self.valid_path, "import 'dart:core';\n")
+
+    def test_scan_selected_source_read_errors_raise_config_error(self):
+        write(self.root, self.violation_path, "import 'package:flutter/material.dart';\n")
+        _, _, sources, rules, exclude = arch.load_config(self.root, arch.DEFAULT_CONFIG)
+        files = arch.list_files(self.root)
+        self.assertTrue({self.source_path, self.valid_path, self.violation_path} <= set(files))
+        target = os.path.join(self.root, self.source_path)
+        for error_type in (PermissionError, FileNotFoundError):
+            for stage in ("open", "read"):
+                with self.subTest(error=error_type.__name__, stage=stage):
+                    error = error_type("selected source read failed")
+                    failing_handle = mock.mock_open()
+                    failing_handle.return_value.read.side_effect = error
+
+                    def open_source(path, *args, **kwargs):
+                        if os.fspath(path) == target:
+                            if stage == "open":
+                                raise error
+                            return failing_handle(path, *args, **kwargs)
+                        return open(path, *args, **kwargs)
+
+                    with (
+                        mock.patch.object(arch, "open", open_source, create=True),
+                        self.assertRaises(arch.ConfigError) as failure,
+                    ):
+                        arch.scan(self.root, sources, rules, exclude, files=files)
+                    self.assertIn(self.source_path, str(failure.exception))
+                    self.assertIn(str(error), str(failure.exception))
+                    self.assertIs(error, failure.exception.__cause__)
+
+    def test_cli_readable_source_exit_semantics(self):
+        for violating in (False, True):
+            if violating:
+                write(self.root, self.violation_path, "import 'package:flutter/material.dart';\n")
+            for flags in ([], ["--warn-only"]):
+                with self.subTest(violating=violating, flags=flags):
+                    result = self.run_cli(flags)
+                    self.assertEqual(1 if violating and not flags else 0, result.returncode)
+                    self.assertEqual("", result.stderr)
+                    self.assertIn("ARCH summary: %d violations, %d new" %
+                                  (int(violating), int(violating)), result.stdout)
+                    self.assertEqual(violating, "F-DOMAIN-PURE" in result.stdout)
+
+    def test_cli_selected_source_read_errors_cannot_be_warned_away(self):
+        write(self.root, self.violation_path, "import 'package:flutter/material.dart';\n")
+        for error_type in (PermissionError, FileNotFoundError):
+            for stage in ("open", "read"):
+                for flags in ([], ["--warn-only"]):
+                    with self.subTest(error=error_type.__name__, stage=stage, flags=flags):
+                        result = self.run_cli(flags, (error_type.__name__, stage))
+                        self.assertEqual(2, result.returncode)
+                        self.assertEqual("", result.stdout)
+                        self.assertIn("ARCH config error: cannot read " + self.source_path,
+                                      result.stderr)
+                        self.assertIn("selected source read failed", result.stderr)
+                        self.assertNotIn("Traceback", result.stderr)
+
+    def run_cli(self, flags, read_failure=None):
+        if read_failure is None:
+            command = [sys.executable, os.path.join(QUALITY_DIR, "check_architecture.py"),
+                       "--root", self.root, *flags]
+        else:
+            command = [sys.executable, "-c", self.read_failure_cli, QUALITY_DIR,
+                       self.root, self.source_path, *read_failure, *flags]
+        return subprocess.run(command, cwd=REPO_ROOT, capture_output=True, text=True, check=False)
+
+    # Arm the read failure only after the real inventory has selected the file.
+    # The child uses the actual CLI parser/main and exits with its return code.
+    read_failure_cli = """
+import builtins
+import os
+import sys
+from unittest import mock
+
+sys.path.insert(0, sys.argv[1])
+import check_architecture as arch
+
+root, target, error_name, stage = sys.argv[2:6]
+original_list_files = arch.list_files
+error = getattr(builtins, error_name)("selected source read failed")
+failing_handle = mock.mock_open()
+failing_handle.return_value.read.side_effect = error
+
+def open_source(path, *args, **kwargs):
+    if os.fspath(path) == os.path.join(root, target):
+        if stage == "open":
+            raise error
+        return failing_handle(path, *args, **kwargs)
+    return builtins.open(path, *args, **kwargs)
+
+def selected_files(root):
+    files = original_list_files(root)
+    if target not in files:
+        raise AssertionError("read failure target was not selected")
+    arch.open = open_source
+    return files
+
+arch.list_files = selected_files
+sys.exit(arch.main(["--root", root, *sys.argv[6:]]))
+"""
 
 
 if __name__ == "__main__":
