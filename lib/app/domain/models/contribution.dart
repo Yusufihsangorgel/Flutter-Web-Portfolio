@@ -138,6 +138,11 @@ final class PortfolioEventOrderLab {
       );
     }
     assertUnique('event-order lab event', events.map((event) => event.id));
+    _validateSequences();
+    _validateRiskGap();
+  }
+
+  void _validateSequences() {
     final eventIds = events.map((event) => event.id).toSet();
     for (final sequence in [baseline, withPatch]) {
       if (sequence.order.length < 2 ||
@@ -159,7 +164,9 @@ final class PortfolioEventOrderLab {
         'Baseline and patched event orders must differ.',
       );
     }
+  }
 
+  void _validateRiskGap() {
     final gap = baseline.gap;
     if (gap == null || withPatch.gap != null) {
       throw const FormatException(

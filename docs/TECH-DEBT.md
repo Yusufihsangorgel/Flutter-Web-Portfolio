@@ -80,18 +80,26 @@ their own flow metrics, without increasing the parent's complexity or nesting.
 |---|---:|---:|---:|
 | Callable lines | 60 | 60 | 54 |
 | `build()` lines | 100 | 0 | 0 |
-| Parameters | 4 | 24 | 23 |
+| Parameters | 4 | 24 | 22 |
 | Control-flow nesting | 4 | 0 | 0 |
-| Cyclomatic complexity | 15 | 2 | 2 |
-| Total violations | | 86 | 79 |
+| Cyclomatic complexity | 15 | 2 | 1 |
+| Total violations | | 86 | 77 |
 
 At introduction, the same metric implementation measured the initial revision and changed sources: 2,421 and 2,486
-callables respectively. The merged revision now has 2,576 callables, 79 retained violations and 0 ratchet issues
-(`dart run tool/quality/dart_metrics.dart --base-ref HEAD --json`, exit 0, 2026-10-07). No retained violation key was new
+callables respectively. The 2026-10-07 merged measurement recorded 2,576 callables, 79 retained violations and 0 ratchet
+issues (`dart run tool/quality/dart_metrics.dart --base-ref HEAD --json`, exit 0). No retained violation key was new
 or greater than its introduction measurement. Every retained entry is listed
 with file, callable, metric, value, and reason in [metrics-baseline.json](../quality/metrics-baseline.json). Each owning
 area must split the registered callable in its next focused refactor, preserving existing behavior and then lowering or
 removing that entry. The new tooling has zero metric violations.
+
+On 2026-10-23, the focused contribution-invariant refactor measured 2,696 callables, 78 retained violations and 0 ratchet
+issues against base `0e957dd4a27a90fbad828944c9deb60c512207fb` (`dart run tool/quality/dart_metrics.dart --base-ref
+0e957dd4a27a90fbad828944c9deb60c512207fb --json`, exit 0). `PortfolioEventOrderLab.validate` decreased from complexity 16
+to 2; its sequence and risk-gap validators each measure 8. Only that resolved complexity entry was removed; unrelated
+baseline entries and limits are unchanged. This measurement does not include parallel refactors. The existing
+`contribution.dart` serialization methods and domain-boundary contracts above are unchanged; broader typed-boundary
+work remains separate from this invariant-only refactor.
 
 The local check fails on new or increased violations and on removed/lower measurements left stale in the baseline.
 CI also supplies the PR base or previous push revision through `--base-ref`, rejecting baseline additions or increases

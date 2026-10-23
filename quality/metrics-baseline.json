@@ -16,13 +16,6 @@
       "reason": "Existing parameters debt measured when the AST metrics gate was introduced; refactor this callable separately and shrink this entry."
     },
     {
-      "path": "lib/app/domain/models/contribution.dart",
-      "identity": "class:PortfolioEventOrderLab.method:validate",
-      "metric": "complexity",
-      "value": 16,
-      "reason": "Existing complexity debt measured when the AST metrics gate was introduced; refactor this callable separately and shrink this entry."
-    },
-    {
       "path": "lib/app/domain/models/writing.dart",
       "identity": "class:PortfolioWritingEntry.constructor:new",
       "metric": "parameters",
