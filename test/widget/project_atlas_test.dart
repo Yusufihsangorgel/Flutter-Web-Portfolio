@@ -21,23 +21,9 @@ import 'package:flutter_web_portfolio/app/widgets/portfolio_link.dart';
 import 'package:url_launcher/link.dart';
 
 import '../helpers/portfolio_fixture.dart';
+import '../helpers/project_atlas_labels_fixture.dart';
 
-const _labels = ProjectAtlasLabels(
-  challenge: 'The problem',
-  approach: 'The approach',
-  outcome: 'The result',
-  ownership: 'What I owned',
-  decision: 'Engineering focus',
-  selectedCases: 'Case studies',
-  evidenceIndex: 'More work',
-  evidenceIntro: 'Released products and open-source projects.',
-  shippedProducts: 'Shipped products',
-  openEngineering: 'Open engineering',
-  selectEvidence: 'Choose a project',
-  openEvidence: 'View project',
-  caseLabel: 'Case',
-  indexLabel: 'Index',
-);
+final _labels = projectAtlasLabelsFixture();
 
 /// Landscape board and portrait crop sizes produced by the work renderer.
 const _boardWidth = 1600;

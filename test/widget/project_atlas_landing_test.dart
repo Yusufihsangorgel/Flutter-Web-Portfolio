@@ -7,23 +7,9 @@ import 'package:flutter_web_portfolio/app/narrative/domain/narrative_document.da
 
 import '../helpers/narrative_fixture.dart';
 import '../helpers/portfolio_fixture.dart';
+import '../helpers/project_atlas_labels_fixture.dart';
 
-const _labels = ProjectAtlasLabels(
-  challenge: 'The problem',
-  approach: 'The approach',
-  outcome: 'The result',
-  ownership: 'What I owned',
-  decision: 'Engineering focus',
-  selectedCases: 'Case studies',
-  evidenceIndex: 'More work',
-  evidenceIntro: 'Released products and open-source projects.',
-  shippedProducts: 'Shipped products',
-  openEngineering: 'Open engineering',
-  selectEvidence: 'Choose a project',
-  openEvidence: 'View project',
-  caseLabel: 'Case',
-  indexLabel: 'Index',
-);
+final _labels = projectAtlasLabelsFixture();
 
 void main() {
   testWidgets(

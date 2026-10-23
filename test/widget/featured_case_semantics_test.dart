@@ -1,27 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_web_portfolio/app/domain/models/portfolio_document.dart';
-import 'package:flutter_web_portfolio/app/modules/home/sections/projects/widgets/atlas_labels.dart';
 import 'package:flutter_web_portfolio/app/modules/home/sections/projects/widgets/featured_case.dart';
 
 import '../helpers/portfolio_fixture.dart';
+import '../helpers/project_atlas_labels_fixture.dart';
 
-const _labels = ProjectAtlasLabels(
-  challenge: 'The problem',
-  approach: 'The approach',
-  outcome: 'The result',
-  ownership: 'What I owned',
-  decision: 'Engineering focus',
-  selectedCases: 'Case studies',
-  evidenceIndex: 'More work',
-  evidenceIntro: 'Released products and open-source projects.',
-  shippedProducts: 'Shipped products',
-  openEngineering: 'Open engineering',
-  selectEvidence: 'Choose a project',
-  openEvidence: 'View project',
-  caseLabel: 'Case',
-  indexLabel: 'Index',
-);
+final _labels = projectAtlasLabelsFixture();
 
 void main() {
   testWidgets(

@@ -58,13 +58,6 @@
       "reason": "Existing parameters debt measured when the AST metrics gate was introduced; refactor this callable separately and shrink this entry."
     },
     {
-      "path": "lib/app/modules/home/sections/projects/widgets/atlas_labels.dart",
-      "identity": "class:ProjectAtlasLabels.constructor:new",
-      "metric": "parameters",
-      "value": 14,
-      "reason": "Existing parameters debt measured when the AST metrics gate was introduced; refactor this callable separately and shrink this entry."
-    },
-    {
       "path": "lib/app/narrative/application/narrative_position.dart",
       "identity": "class:NarrativePosition.constructor:new",
       "metric": "parameters",

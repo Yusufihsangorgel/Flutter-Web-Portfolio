@@ -24,22 +24,7 @@ final class ProjectsSection extends StatelessWidget {
         builder: (context, _) {
           final strings = context.strings;
           final portfolio = context.read<PortfolioDocument>();
-          final labels = ProjectAtlasLabels(
-            challenge: strings.projectsSectionChallenge,
-            approach: strings.projectsSectionApproach,
-            outcome: strings.projectsSectionOutcome,
-            ownership: strings.projectsSectionOwnership,
-            decision: strings.projectsSectionDecision,
-            selectedCases: strings.projectsSectionSelectedCases,
-            evidenceIndex: strings.projectsSectionEvidenceIndex,
-            evidenceIntro: strings.projectsSectionEvidenceIntro,
-            shippedProducts: strings.projectsSectionShippedProducts,
-            openEngineering: strings.projectsSectionOpenEngineering,
-            selectEvidence: strings.projectsSectionSelectEvidence,
-            openEvidence: strings.projectsSectionOpenEvidence,
-            caseLabel: strings.projectsSectionCaseLabel,
-            indexLabel: strings.projectsSectionIndexLabel,
-          );
+          final labels = ProjectAtlasLabels.fromStrings(strings);
 
           return Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,

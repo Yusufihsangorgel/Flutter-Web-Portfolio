@@ -80,10 +80,10 @@ their own flow metrics, without increasing the parent's complexity or nesting.
 |---|---:|---:|---:|
 | Callable lines | 60 | 60 | 44 |
 | `build()` lines | 100 | 0 | 0 |
-| Parameters | 4 | 24 | 21 |
+| Parameters | 4 | 24 | 20 |
 | Control-flow nesting | 4 | 0 | 0 |
 | Cyclomatic complexity | 15 | 2 | 1 |
-| Total violations | | 86 | 66 |
+| Total violations | | 86 | 65 |
 
 The retained-baseline column reflects the combined inventory; the dated measurements below refer to individual
 refactors.
@@ -117,3 +117,8 @@ behavior are unchanged and remain a separate contract follow-up.
 The local check fails on new or increased violations and on removed/lower measurements left stale in the baseline.
 CI also supplies the PR base or previous push revision through `--base-ref`, rejecting baseline additions or increases
 in the same change. Creating the first baseline refuses to overwrite an existing file.
+
+2026-10-24: `ProjectAtlasLabels` now snapshots all fourteen typed labels from `AppStrings`. The calibrated exact-base
+metrics closed its fourteen-parameter constructor entry, moving the retained count from 66 to 65; the new constructor
+measures one parameter, and no other baseline entry, order, reason, or limit changed. The fixture-free focused mapping,
+snapshot, and fallback tests pass; dataset-backed widget tests and browser verification remain pending.

@@ -1,24 +1,24 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter_web_portfolio/app/core/l10n/app_strings.g.dart';
 
 /// Localized interface copy for the work atlas.
 @immutable
 final class ProjectAtlasLabels {
-  const ProjectAtlasLabels({
-    required this.challenge,
-    required this.approach,
-    required this.outcome,
-    required this.ownership,
-    required this.decision,
-    required this.selectedCases,
-    required this.evidenceIndex,
-    required this.evidenceIntro,
-    required this.shippedProducts,
-    required this.openEngineering,
-    required this.selectEvidence,
-    required this.openEvidence,
-    required this.caseLabel,
-    required this.indexLabel,
-  });
+  ProjectAtlasLabels.fromStrings(AppStrings strings)
+    : challenge = strings.projectsSectionChallenge,
+      approach = strings.projectsSectionApproach,
+      outcome = strings.projectsSectionOutcome,
+      ownership = strings.projectsSectionOwnership,
+      decision = strings.projectsSectionDecision,
+      selectedCases = strings.projectsSectionSelectedCases,
+      evidenceIndex = strings.projectsSectionEvidenceIndex,
+      evidenceIntro = strings.projectsSectionEvidenceIntro,
+      shippedProducts = strings.projectsSectionShippedProducts,
+      openEngineering = strings.projectsSectionOpenEngineering,
+      selectEvidence = strings.projectsSectionSelectEvidence,
+      openEvidence = strings.projectsSectionOpenEvidence,
+      caseLabel = strings.projectsSectionCaseLabel,
+      indexLabel = strings.projectsSectionIndexLabel;
 
   final String challenge;
   final String approach;
