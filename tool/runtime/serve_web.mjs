@@ -108,6 +108,17 @@ server.listen(port, '127.0.0.1', () => {
   console.log(`Flutter web test server listening on http://127.0.0.1:${port}${delay}`);
 });
 
+const closeServer = () => server.close(() => process.exit(0));
 for (const signal of ['SIGINT', 'SIGTERM']) {
-  process.on(signal, () => server.close(() => process.exit(0)));
+  process.on(signal, closeServer);
+}
+
+if (process.send) {
+  process.on('message', (message) => {
+    if (!message || typeof message !== 'object' || !('type' in message)) return;
+    if (message.type !== 'runtime-server:shutdown') return;
+    closeServer();
+    server.closeAllConnections();
+  });
+  process.send({ type: 'runtime-server:control-ready', pid: process.pid });
 }
