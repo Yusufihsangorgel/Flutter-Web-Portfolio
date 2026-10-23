@@ -59,15 +59,19 @@ For automation or a reproducible team setup:
 
 ```bash
 npm run portfolio:init -- \
-  --name "Ada Lovelace" \
-  --role "Software Engineer" \
-  --email "hello@example.com" \
-  --site "https://example.com" \
-  --location "London, UK" \
-  --focus "Distributed systems, Developer tools, Reliability" \
-  --github "https://github.com/example" \
-  --force
+  --name "${PORTFOLIO_NAME:?Set PORTFOLIO_NAME}" \
+  --role "${PORTFOLIO_ROLE:?Set PORTFOLIO_ROLE}" \
+  --email "${PORTFOLIO_EMAIL:?Set PORTFOLIO_EMAIL}" \
+  --site "${PORTFOLIO_SITE:?Set PORTFOLIO_SITE}" \
+  --location "${PORTFOLIO_LOCATION:?Set PORTFOLIO_LOCATION}" \
+  --focus "${PORTFOLIO_FOCUS:?Set PORTFOLIO_FOCUS}"
 ```
+
+Set these Bash variables from your own profile before running. Each `${VAR:?Set VAR}` expansion stops if a value is unset or empty. `PORTFOLIO_FOCUS` must contain at least three comma-separated items. The initializer validates the email and requires HTTPS for the site.
+
+`--github` is optional. To include a profile link, add `--github "${PORTFOLIO_GITHUB_URL:?Set PORTFOLIO_GITHUB_URL}"` using your own HTTPS URL; omit `--github` otherwise.
+
+`--force` is optional. If the output file already exists, an interactive run asks for confirmation; without `--force`, a non-interactive run refuses to overwrite it. Add `--force` only when replacing the existing file is intentional.
 
 Use `npm run portfolio:init -- --help` for every optional field.
 `--primary-name-line` and `--accent-name-line` control the two typographic name

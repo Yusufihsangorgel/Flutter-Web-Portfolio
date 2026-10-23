@@ -28,7 +28,7 @@
     "lint": "eslint 'tool/**/*.mjs'",
     "format:check": "prettier --check 'tool/**/*.mjs' eslint.config.mjs",
     "test:audit": "node tool/audit/test_audit_repository_history.mjs",
-    "test:tooling": "node --test tool/quality/test_tooling_config.mjs tool/quality/test_verify_dart_reachability.mjs tool/template/test_repository_recovery.mjs",
+    "test:tooling": "node --test tool/quality/test_tooling_config.mjs tool/quality/test_verify_dart_reachability.mjs tool/template/test_repository_recovery.mjs tool/template/test_customize_documentation.mjs",
     "test:visual": "playwright test tests/e2e/visual.spec.ts",
     "test:visual:update": "playwright test tests/e2e/visual.spec.ts --update-snapshots",
     "sync:content": "node tool/content/sync_public_content.mjs",
