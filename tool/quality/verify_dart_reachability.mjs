@@ -1,5 +1,6 @@
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { dirname, join, relative, resolve, sep } from 'node:path';
+import { parseDartDirectives } from './dart_directives.mjs';
 
 const projectRoot = process.cwd();
 const libRoot = join(projectRoot, 'lib');
@@ -34,7 +35,7 @@ function visit(file) {
   reachable.add(normalized);
 
   const source = readFileSync(normalized, 'utf8');
-  for (const uri of directiveUris(source)) {
+  for (const { uri } of parseDartDirectives(source, relative(projectRoot, normalized))) {
     const dependency = resolveDartUri(uri, normalized);
     if (dependency == null) continue;
     if (!existsSync(dependency)) {
@@ -44,17 +45,6 @@ function visit(file) {
     }
     visit(dependency);
   }
-}
-
-function directiveUris(source) {
-  const uris = [];
-  const directivePattern = /^[\t ]*(?:import|export|part)[\t ]+([^;]+);/gm;
-  for (const directive of source.matchAll(directivePattern)) {
-    for (const match of directive[1].matchAll(/['"]([^'"]+)['"]/g)) {
-      uris.push(match[1]);
-    }
-  }
-  return uris;
 }
 
 function resolveDartUri(uri, sourceFile) {

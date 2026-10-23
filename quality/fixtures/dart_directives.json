@@ -1,0 +1,125 @@
+{
+  "cases": [
+    {
+      "name": "multiline-import-and-export",
+      "source": "import\n  'dart:core';\nexport\n  'package:flutter/material.dart';\n",
+      "directives": [
+        {"kind": "import", "uri": "dart:core", "line": 2},
+        {"kind": "export", "uri": "package:flutter/material.dart", "line": 4}
+      ]
+    },
+    {
+      "name": "comments-between-keyword-and-uri",
+      "source": "import /* block */ // line\n 'package:flutter/material.dart';\n",
+      "directives": [{"kind": "import", "uri": "package:flutter/material.dart", "line": 2}]
+    },
+    {
+      "name": "nested-comment-hides-directive",
+      "source": "/* outer /* inner */\nimport 'package:flutter/material.dart';\n*/\nimport 'dart:core';\n",
+      "directives": [{"kind": "import", "uri": "dart:core", "line": 4}]
+    },
+    {
+      "name": "raw-and-triple-quoted-uris",
+      "source": "import r'''package:flutter/material.dart'''\n if (dart.library.html) \"\"\"dart:html\"\"\";\nexport r\"dart:core\";\n",
+      "directives": [
+        {"kind": "import", "uri": "package:flutter/material.dart", "line": 1},
+        {"kind": "import", "uri": "dart:html", "line": 2},
+        {"kind": "export", "uri": "dart:core", "line": 3}
+      ]
+    },
+    {
+      "name": "string-cannot-create-directive",
+      "source": "const fake = '''\nimport 'package:flutter/material.dart';\n''';\nimport 'dart:core';\n",
+      "directives": [{"kind": "import", "uri": "dart:core", "line": 4}]
+    },
+    {
+      "name": "annotation-interpolation-same-quote",
+      "source": "@Deprecated('use ${'another'} instead')\nimport 'package:flutter/material.dart';\n",
+      "directives": [{"kind": "import", "uri": "package:flutter/material.dart", "line": 2}]
+    },
+    {
+      "name": "nested-interpolation-comments-and-quotes",
+      "source": "const text = \"${{'key': \"${'import \\\"fake\\\";'}\" /* detail */}['key']}\";\nimport 'dart:core';\n",
+      "directives": [{"kind": "import", "uri": "dart:core", "line": 2}]
+    },
+    {
+      "name": "quoted-semicolon-does-not-end-directive",
+      "source": "import 'dart:core;tag' if (dart.library.html) 'package:flutter/material.dart';\n",
+      "directives": [
+        {"kind": "import", "uri": "dart:core;tag", "line": 1},
+        {"kind": "import", "uri": "package:flutter/material.dart", "line": 1}
+      ]
+    },
+    {
+      "name": "conditional-uri-containing-semicolon",
+      "source": "import 'dart:core'\n if (dart.library.html) 'package:flutter/a;b.dart'\n if (dart.library.io) 'dart:io';\n",
+      "directives": [
+        {"kind": "import", "uri": "dart:core", "line": 1},
+        {"kind": "import", "uri": "package:flutter/a;b.dart", "line": 2},
+        {"kind": "import", "uri": "dart:io", "line": 3}
+      ]
+    },
+    {
+      "name": "inline-comment-cannot-inject-branch",
+      "source": "import 'dart:core' // if (dart.library.html) 'package:flutter/material.dart'\n if (dart.library.io) 'dart:io';\n",
+      "directives": [
+        {"kind": "import", "uri": "dart:core", "line": 1},
+        {"kind": "import", "uri": "dart:io", "line": 2}
+      ]
+    },
+    {
+      "name": "same-line-second-import",
+      "source": "import 'dart:core'; import 'package:flutter/material.dart';\n",
+      "directives": [
+        {"kind": "import", "uri": "dart:core", "line": 1},
+        {"kind": "import", "uri": "package:flutter/material.dart", "line": 1}
+      ]
+    },
+    {
+      "name": "metadata-before-import-on-same-line",
+      "source": "@Deprecated('old') import 'package:flutter/material.dart';\n",
+      "directives": [{"kind": "import", "uri": "package:flutter/material.dart", "line": 1}]
+    },
+    {
+      "name": "quoted-condition-punctuation",
+      "source": "import 'dart:core' if (dart.library.io == ')') 'package:flutter/material.dart';\n",
+      "directives": [
+        {"kind": "import", "uri": "dart:core", "line": 1},
+        {"kind": "import", "uri": "package:flutter/material.dart", "line": 1}
+      ]
+    },
+    {
+      "name": "cr-and-crlf-line-count",
+      "source": "// hidden\rimport 'dart:core';\r\nimport 'package:flutter/material.dart';\r",
+      "directives": [
+        {"kind": "import", "uri": "dart:core", "line": 2},
+        {"kind": "import", "uri": "package:flutter/material.dart", "line": 3}
+      ]
+    },
+    {
+      "name": "unsupported-interpolated-uri",
+      "source": "import 'package:${name}/unsafe.dart';\n",
+      "error": 1
+    },
+    {
+      "name": "unsupported-uri-expression",
+      "source": "import base + 'package:flutter/material.dart';\n",
+      "error": 1
+    },
+    {
+      "name": "unterminated-triple-string",
+      "source": "const text = '''unfinished\nimport 'package:flutter/material.dart';\n",
+      "error": 1
+    },
+    {
+      "name": "unterminated-nested-comment",
+      "source": "/* outer /* inner */\nimport 'dart:core';\n",
+      "error": 1
+    },
+    {
+      "name": "unterminated-interpolation",
+      "source": "const text = '${{'key': 'value'}';\nimport 'dart:core';\n",
+      "error": 1
+    }
+  ]
+}

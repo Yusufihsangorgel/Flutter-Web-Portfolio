@@ -91,6 +91,158 @@ class ArchitectureCalibrationTest(unittest.TestCase):
             violations, _ = arch.scan(scratch, sources, rules, exclude)
             return sorted(rule.id for rule, path, _, _ in violations if path == case["file"])
 
+    def test_multiline_domain_directives_preserve_boundary(self):
+        path = "lib/app/domain/models/calibration_probe.dart"
+        for uri, expected in (
+            ("dart:core", []),
+            ("package:flutter/material.dart", ["F-DOMAIN-PURE"]),
+        ):
+            with self.subTest(uri=uri):
+                self.assertEqual(expected, self.scan_case({
+                    "file": path,
+                    "source": "import\n  '%s';\n" % uri,
+                }))
+
+    def test_directives_ignore_comments_and_preserve_conditional_uris(self):
+        source = (
+            "// import 'package:flutter/material.dart';\n"
+            "import\n  'dart:core'\n"
+            "    if (dart.library.html) 'dart:html';\n"
+        )
+        self.assertEqual([(3, "dart:core"), (4, "dart:html")],
+                         list(arch.dart_imports(source)))
+
+    def test_comments_between_keyword_and_uri_do_not_hide_domain_imports(self):
+        path = "lib/app/domain/models/calibration_probe.dart"
+        for directive in (
+            "import /* separator */ 'package:flutter/material.dart';\n",
+            "import // separator\n  'package:flutter/material.dart';\n",
+        ):
+            with self.subTest(directive=directive):
+                self.assertEqual(["F-DOMAIN-PURE"], self.scan_case({
+                    "file": path,
+                    "source": directive,
+                }))
+
+    def test_inline_comment_cannot_create_conditional_import(self):
+        source = (
+            "import 'dart:core' // if (dart.library.html) 'package:flutter/material.dart'\n"
+            "  if (dart.library.io) 'dart:io';\n"
+        )
+        self.assertEqual([(1, "dart:core"), (2, "dart:io")],
+                         list(arch.dart_imports(source)))
+
+    def test_conditional_uri_reports_its_own_line(self):
+        source = (
+            "import 'dart:core'\n"
+            "  if (dart.library.html)\n"
+            "    'package:flutter/material.dart';\n"
+        )
+        self.assertEqual([(1, "dart:core"), (3, "package:flutter/material.dart")],
+                         list(arch.dart_imports(source)))
+
+    def test_quoted_comment_marker_remains_part_of_uri(self):
+        self.assertEqual([(1, ".//dependency.dart")],
+                         list(arch.dart_imports("import './/dependency.dart';\n")))
+
+    def test_nested_block_comment_hides_import_until_outer_close(self):
+        source = (
+            "/* outer\n"
+            "  /* inner */\n"
+            "  import 'package:flutter/material.dart';\n"
+            "*/\n"
+            "import 'package:flutter/material.dart';\n"
+        )
+        self.assertEqual([(5, "package:flutter/material.dart")],
+                         list(arch.dart_imports(source)))
+        self.assertEqual(["F-DOMAIN-PURE"], self.scan_case({
+            "file": "lib/app/domain/models/calibration_probe.dart",
+            "source": source,
+        }))
+
+    def test_triple_quoted_import_export_and_conditional_uris(self):
+        source = (
+            "import '''package:flutter/material.dart'''\n"
+            "  if (dart.library.html) \"\"\"dart:html\"\"\";\n"
+            "export \"\"\"dart:core\"\"\";\n"
+        )
+        self.assertEqual([(1, "package:flutter/material.dart"), (2, "dart:html"),
+                          (3, "dart:core")], list(arch.dart_imports(source)))
+        self.assertEqual(["F-DOMAIN-PURE", "F-DOMAIN-PURE"], self.scan_case({
+            "file": "lib/app/domain/models/calibration_probe.dart",
+            "source": source,
+        }))
+
+    def test_multiline_string_cannot_fake_directive_or_comment(self):
+        source = (
+            "import 'dart:core';\n"
+            "const fake = '''\n"
+            "import 'package:flutter/material.dart';\n"
+            "''';\n"
+            "const marker = \"\"\"/* not a comment */\"\"\";\n"
+        )
+        self.assertEqual([(1, "dart:core")], list(arch.dart_imports(source)))
+
+    def test_raw_uri_prefix_stays_visible(self):
+        source = "import r'''package:flutter/material.dart''';\n"
+        self.assertEqual([(1, "package:flutter/material.dart")],
+                         list(arch.dart_imports(source)))
+        self.assertEqual(["F-DOMAIN-PURE"], self.scan_case({
+            "file": "lib/app/domain/models/calibration_probe.dart",
+            "source": source,
+        }))
+
+    def test_shared_dart_directive_fixtures(self):
+        fixture = os.path.join(QUALITY_DIR, "fixtures", "dart_directives.json")
+        with open(fixture, encoding="utf-8") as handle:
+            cases = json.load(handle)["cases"]
+        self.assertGreaterEqual(len(cases), 10)
+        for case in cases:
+            with self.subTest(name=case["name"]):
+                if "error" in case:
+                    with self.assertRaises(arch.ConfigError) as failure:
+                        self.scan_case({
+                            "file": "lib/app/domain/models/calibration_probe.dart",
+                            "source": case["source"],
+                        })
+                    self.assertIn("calibration_probe.dart:%d" % case["error"], str(failure.exception))
+                    continue
+                actual = list(arch.parse_dart_directives(case["source"]))
+                self.assertEqual(case["directives"], actual)
+                self.assertEqual([(item["line"], item["uri"]) for item in actual],
+                                 list(arch.dart_imports(case["source"])))
+                if any(item["uri"].startswith("package:flutter/") for item in actual):
+                    rules = self.scan_case({
+                        "file": "lib/app/domain/models/calibration_probe.dart",
+                        "source": case["source"],
+                    })
+                    self.assertIn("F-DOMAIN-PURE", rules)
+
+    def test_same_line_import_after_metadata_enforces_domain_boundary(self):
+        source = (
+            "@Deprecated('old') import 'dart:core'; "
+            "import 'package:flutter/material.dart';\n"
+        )
+        self.assertEqual([(1, 'dart:core'), (1, 'package:flutter/material.dart')],
+                         list(arch.dart_imports(source)))
+        self.assertEqual(["F-DOMAIN-PURE"], self.scan_case({
+            "file": "lib/app/domain/models/calibration_probe.dart",
+            "source": source,
+        }))
+
+    def test_parser_error_cannot_be_warned_away(self):
+        with tempfile.TemporaryDirectory(prefix="arch-config-fail-") as scratch:
+            write(scratch, arch.DEFAULT_CONFIG, json.dumps(self.config))
+            for source in self.config["sources"]:
+                if source["lang"] == "go":
+                    write(scratch, source["dir"] + "/go.mod", "module %s\n" % source["go_module"])
+            write(scratch, "lib/app/domain/models/bad.dart", "import unknownUri;\n")
+            output = io.StringIO()
+            with contextlib.redirect_stderr(output):
+                result = arch.main(["--root", scratch, "--warn-only"])
+            self.assertEqual(2, result)
+            self.assertIn("lib/app/domain/models/bad.dart:1", output.getvalue())
+
     def test_baseline_shrink_only_removes_entries(self):
         with tempfile.TemporaryDirectory(prefix="arch-baseline-") as scratch:
             baseline_path = "quality/architecture-baseline.json"

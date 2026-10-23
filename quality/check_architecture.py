@@ -20,6 +20,8 @@ import subprocess
 import sys
 from collections import Counter
 
+from dart_directives import DirectiveError, parse_dart_directives
+
 DEFAULT_CONFIG = "quality/architecture-rules.json"
 LANG_EXTENSIONS = {
     "dart": (".dart",),
@@ -30,7 +32,6 @@ TS_RESOLVE_SUFFIXES = (
     "", ".ts", ".tsx", ".js", ".jsx", ".mjs", ".cjs",
     "/index.ts", "/index.tsx", "/index.js", "/index.jsx",
 )
-QUOTED = re.compile(r"""['"]([^'"\n]+)['"]""")
 TS_STATEMENT = re.compile(
     r"""^[ \t]*(?:import|export)(?:[ \t]+type)?\s+(?:[^'";]*?\s+from\s+)?(['"])([^'"\n]+)\1""",
     re.M,
@@ -116,18 +117,9 @@ def list_files(root):
 
 
 def dart_imports(text):
-    lines = text.split("\n")
-    i = 0
-    while i < len(lines):
-        stripped = lines[i].lstrip()
-        if stripped.startswith(("import ", "export ", "import'", "export'", 'import"', 'export"')):
-            start, chunk = i, lines[i]
-            while ";" not in chunk and i + 1 < len(lines) and i - start < 8:
-                i += 1
-                chunk += "\n" + lines[i]
-            for spec in QUOTED.findall(chunk.split(";")[0]):
-                yield start + 1, spec
-        i += 1
+    """Legacy (line, URI) adapter for the shared directive parser."""
+    for directive in parse_dart_directives(text):
+        yield directive["line"], directive["uri"]
 
 
 def ts_imports(text):
@@ -286,12 +278,15 @@ def scan(root, sources, rules, exclude, files=None):
             continue
         is_client = source.lang == "ts" and bool(USE_CLIENT.match(text))
         active = [rule for rule in rules if rule.applies_to(path, is_client)]
-        for line, spec in source.imports(text):
-            kind, target = source.resolve(spec, path, fileset)
-            edges.append((path, kind, target))
-            for rule in active:
-                if rule.breaks(path, kind, target):
-                    violations.append((rule, path, line, target))
+        try:
+            for line, spec in source.imports(text):
+                kind, target = source.resolve(spec, path, fileset)
+                edges.append((path, kind, target))
+                for rule in active:
+                    if rule.breaks(path, kind, target):
+                        violations.append((rule, path, line, target))
+        except DirectiveError as error:
+            raise ConfigError("%s:%d: %s" % (path, error.line, error)) from error
     return violations, edges
 
 
