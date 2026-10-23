@@ -15,6 +15,9 @@ const Map<String, int> metricLimits = <String, int>{
   'complexity': 15,
 };
 
+const int _productionFileLineLimit = 500;
+const int _testFileLineLimit = 800;
+
 /// One syntactic callable measured without resolving imports or types.
 ///
 /// Lines include the declaration from its first token through its final token.
@@ -126,10 +129,49 @@ List<CallableMetrics> measureRepository(Directory root) {
   final measurements = <CallableMetrics>[];
   for (final file in files) {
     final path = _relativePath(root, file);
-    measurements.addAll(measureSource(file.readAsStringSync(), path));
+    final source = file.readAsStringSync();
+    final lineCount = _physicalLineCount(source);
+    final limit = _fileLineLimit(path);
+    if (lineCount > limit) {
+      throw StateError(
+        'Dart source $path has $lineCount physical lines; limit is $limit.',
+      );
+    }
+    measurements.addAll(measureSource(source, path));
   }
   measurements.sort(_compareMeasurements);
   return measurements;
+}
+
+int _physicalLineCount(String source) {
+  if (source.isEmpty) return 0;
+  var lineCount = 0;
+  for (var index = 0; index < source.length; index += 1) {
+    final codeUnit = source.codeUnitAt(index);
+    if (codeUnit == 0x0a || codeUnit == 0x0d) {
+      lineCount += 1;
+      if (codeUnit == 0x0d &&
+          index + 1 < source.length &&
+          source.codeUnitAt(index + 1) == 0x0a) {
+        index += 1;
+      }
+    }
+  }
+  final lastCodeUnit = source.codeUnitAt(source.length - 1);
+  if (lastCodeUnit != 0x0a && lastCodeUnit != 0x0d) lineCount += 1;
+  return lineCount;
+}
+
+int _fileLineLimit(String path) =>
+    _isTestPath(path) ? _testFileLineLimit : _productionFileLineLimit;
+
+bool _isTestPath(String path) {
+  final segments = path.split('/');
+  return segments[0] == 'test' ||
+      (segments.length >= 4 &&
+          segments[0] == 'packages' &&
+          segments[2] == 'test') ||
+      (segments[0] == 'tool' && segments.last.endsWith('_test.dart'));
 }
 
 List<File> collectDartFiles(Directory root) {

@@ -157,7 +157,7 @@ as well and record gate results with relevant counts. Root and package analysis 
 | Import direction and plain-Dart domain | `architecture.yml` → `Architecture import rules`; `Architecture gate calibration` tests accepted and rejected imports |
 | Dart callables 60 lines, `build()` 100, parameters 4, nesting 4, complexity 15 | `ci.yml` → `analyze` → `Enforce shrink-only Dart metrics`; the preceding `dart_metrics_test.dart` step calibrates counts |
 | Node files 500 lines, functions 60, parameters 4, nesting 4, complexity 15 | `ci.yml` → `analyze` → `npm run lint`, configured in `eslint.config.mjs` |
-| Dart production files 500 lines and test files 800 lines | Manual changed-file review and line inventory; the import and callable gates do not enforce file size |
+| Dart physical lines: production ≤500; tests ≤800 | `ci.yml` → `analyze` → `Enforce shrink-only Dart metrics` measures repository files before any baseline write and rejects over-limit files. Test paths: `test/**`, `packages/<package>/test/**`, and `tool/**/*_test.dart`; `lib/**/*_test.dart` remains production (500). Blank/comment lines count; LF, CRLF, and CR each terminate one line, and a trailing terminator adds no empty line. Manual changed-file review also applies. |
 | Strict types, shared application/package lints | `ci.yml` → `analyze` → root `flutter analyze --fatal-infos` and package `flutter analyze --no-pub --fatal-infos` |
 
 The complete CI step inventory, including string/font checks, résumé verification, coverage, reports, artifact packaging,
@@ -168,7 +168,7 @@ and provenance, is in [README.md](../README.md#quality-gates). The commands belo
 | `python3 quality/check_architecture.py` | §1.3 import rules | Blocking · baseline empty · `NEW`/`STALE` = reject |
 | `python3 -m unittest discover -s quality/tests -p 'test_architecture.py'` | Architecture-gate calibration | Blocking |
 | `dart run tool/quality/dart_metrics_test.dart` | AST metrics fixture calibration | Blocking · CI |
-| `dart run tool/quality/dart_metrics.dart --base-ref <base-sha>` | Callable metrics and shrinking baseline | Blocking · CI · limits in §5 |
+| `dart run tool/quality/dart_metrics.dart --base-ref <base-sha>` | Physical Dart file limits, callable metrics, and shrink-only baseline | Blocking · CI · limits in §5 |
 | `npm run verify:content && npm run portfolio:validate` | Content synchronization and schema validation | Blocking · CI |
 | `npm run test:template && npm run test:release-security && npm run test:refresh && npm run test:content` | Template, release-security, refresh, and content checks | Blocking · CI |
 | `npm run verify:hosting && npm run verify:community && npm run audit:sources && npm run audit:history` | Hosting, community, source, and history checks | Blocking · CI |

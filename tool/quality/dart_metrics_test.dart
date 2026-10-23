@@ -30,6 +30,7 @@ void main() {
   _testShrinkIsIdempotent();
   _testShrinkOptions();
   _testGeneratedDirectoriesExcluded();
+  _testPhysicalFileLimits();
   _testShrinkSourceRoots();
   _testShrinkRejectsEmptyMeasurements();
   _testShrinkFromNonemptyRoot();
@@ -510,6 +511,170 @@ void _testGeneratedDirectoriesExcluded() {
     root.deleteSync(recursive: true);
   }
 }
+
+void _testPhysicalFileLimits() {
+  final root = Directory.systemTemp.createTempSync('dart_metrics_file_size_');
+  try {
+    _expect(
+      _measureFile(root, 'lib/empty.dart', '').isEmpty,
+      'empty source changed callable inventory',
+    );
+    _expect(
+      _measureFile(root, 'lib/blank.dart', _blankLines(500)).isEmpty,
+      'newline-only source changed callable inventory',
+    );
+    _expectRejectedFile(root, 'lib/blank_overflow.dart', _blankLines(501), (
+      observed: 501,
+      limit: 500,
+    ));
+    _expectAcceptedFile(root, 'lib/boundary.dart', _sourceWithLines(500));
+    _expectRejectedFile(
+      root,
+      'lib/no_final_newline.dart',
+      _sourceWithLines(501, finalNewline: false),
+      (observed: 501, limit: 500),
+    );
+    _expectRejectedFile(
+      root,
+      'lib/crlf.dart',
+      _sourceWithLines(501, separator: '\r\n'),
+      (observed: 501, limit: 500),
+    );
+    _expectAcceptedFile(root, 'test/boundary.dart', _sourceWithLines(800));
+    _expectAcceptedFile(
+      root,
+      'packages/sample/test/support.dart',
+      _sourceWithLines(800, finalNewline: false),
+    );
+    _expectRejectedFile(
+      root,
+      'packages/sample/test/overflow.dart',
+      _sourceWithLines(801, separator: '\r\n', finalNewline: false),
+      (observed: 801, limit: 800),
+    );
+    _expectAcceptedFile(
+      root,
+      'tool/quality/dart_metrics_test.dart',
+      _sourceWithLines(501),
+    );
+    _testProductionLookalikes(root);
+    _expectOversizedCliFailure(root);
+  } finally {
+    root.deleteSync(recursive: true);
+  }
+}
+
+void _testProductionLookalikes(Directory root) {
+  for (final path in <String>[
+    'tool/quality/dart_metrics.dart',
+    'lib/fixture_test.dart',
+    'packages/sample/lib/fixture_test.dart',
+    'tool/quality/fixture.dart',
+  ]) {
+    _expectRejectedFile(root, path, _sourceWithLines(501), (
+      observed: 501,
+      limit: 500,
+    ));
+  }
+}
+
+void _expectOversizedCliFailure(Directory parent) {
+  final root = Directory('${parent.path}/cli-root')..createSync();
+  File('${root.path}/lib/oversized.dart')
+    ..createSync(recursive: true)
+    ..writeAsStringSync(_sourceWithLines(501));
+  final created = File('${root.path}/created.json');
+  _expectCliFileLimit(_runOversizedCli(root, created, '--create-baseline'));
+  _expect(!created.existsSync(), 'oversized create wrote a baseline');
+
+  final baseline = File('${root.path}/baseline.json');
+  final original = _read('quality/metrics-baseline.json');
+  baseline
+    ..writeAsStringSync(original)
+    ..setLastModifiedSync(_untouched);
+  _expectCliFileLimit(_runOversizedCli(root, baseline, '--shrink-baseline'));
+  _expect(
+    baseline.readAsStringSync() == original &&
+        baseline.lastModifiedSync().isAtSameMomentAs(_untouched),
+    'oversized shrink changed the baseline',
+  );
+}
+
+ProcessResult _runOversizedCli(Directory root, File baseline, String mode) =>
+    Process.runSync(Platform.resolvedExecutable, <String>[
+      '--packages=${File('.dart_tool/package_config.json').absolute.path}',
+      File('tool/quality/dart_metrics.dart').absolute.path,
+      '--root',
+      root.path,
+      '--baseline',
+      baseline.path,
+      mode,
+    ], workingDirectory: Directory.current.path);
+
+void _expectCliFileLimit(ProcessResult result) {
+  final error = result.stderr.toString();
+  _expect(
+    result.exitCode == 2 &&
+        error.contains('lib/oversized.dart') &&
+        error.contains('501') &&
+        error.contains('500'),
+    'CLI missed the file limit: ${result.exitCode} $error',
+  );
+}
+
+void _expectAcceptedFile(Directory root, String path, String source) {
+  final measurements = _measureFile(root, path, source);
+  _expect(
+    measurements.length == 1 && measurements.single.identity == 'function:kept',
+    '$path changed the callable inventory',
+  );
+}
+
+void _expectRejectedFile(
+  Directory root,
+  String path,
+  String source,
+  ({int observed, int limit}) expected,
+) {
+  Object? failure;
+  try {
+    _measureFile(root, path, source);
+  } on Object catch (error) {
+    failure = error;
+  }
+  final message = failure.toString();
+  _expect(
+    failure is StateError &&
+        message.contains(path) &&
+        message.contains('${expected.observed}') &&
+        message.contains('${expected.limit}') &&
+        message.contains('physical lines'),
+    '$path did not report its physical line limit: $message',
+  );
+}
+
+List<CallableMetrics> _measureFile(Directory root, String path, String source) {
+  final file = File('${root.path}/$path')..createSync(recursive: true);
+  try {
+    file.writeAsStringSync(source);
+    return measureRepository(root);
+  } finally {
+    file.deleteSync();
+  }
+}
+
+String _sourceWithLines(
+  int lineCount, {
+  String separator = '\n',
+  bool finalNewline = true,
+}) {
+  final lines = List<String>.filled(lineCount, '// padding');
+  lines[0] = 'void kept() {}';
+  return '${lines.join(separator)}${finalNewline ? separator : ''}';
+}
+
+String _blankLines(int lineCount) =>
+    List<String>.filled(lineCount + 1, '').join('\n');
 
 CallableMetrics _metric({required int parameters}) => CallableMetrics(
   location: const CallableLocation(

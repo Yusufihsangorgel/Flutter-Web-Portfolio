@@ -1,6 +1,6 @@
 # Flutter Web Portfolio — technical debt
 
-Record date: 2026-10-23. [Architecture rules](ARCHITECTURE-RULES.md) set production files at 500 lines, tests at 800, members at 60, `build()` at 100, parameters at 4, nesting at 4, and cyclomatic complexity at 15. The [import checker](../quality/check_architecture.py) blocks architecture violations with an empty baseline. The [Dart metrics gate](../tool/quality/dart_metrics.dart) measures callables and rejects new, increased, or stale debt against [its baseline](../quality/metrics-baseline.json). Targets mean the next focused refactor of the named area; they are not claims that work is scheduled.
+Record date: 2026-10-23. [Architecture rules](ARCHITECTURE-RULES.md) set production files at 500 lines, tests at 800, members at 60, `build()` at 100, parameters at 4, nesting at 4, and cyclomatic complexity at 15. The [import checker](../quality/check_architecture.py) blocks architecture violations with an empty baseline. The [Dart metrics gate](../tool/quality/dart_metrics.dart) measures callables, enforces physical 500-line production and 800-line test limits before baseline writes, and rejects new, increased, or stale debt against [its baseline](../quality/metrics-baseline.json). Targets mean the next focused refactor of the named area; they are not claims that work is scheduled.
 
 ## Domain boundary and parsing
 
@@ -11,11 +11,11 @@ Record date: 2026-10-23. [Architecture rules](ARCHITECTURE-RULES.md) set product
 ## Closed source-size and boundary entries
 
 The merged section and navigation changes removed the domain import violations and split the previously listed
-oversized files. Current lengths: `portfolio_document.dart` 295, `project_atlas.dart` 51, `proof_section.dart` 128,
+oversized files. Lengths measured on 2026-10-07: `portfolio_document.dart` 295, `project_atlas.dart` 51, `proof_section.dart` 128,
 `packages_section.dart` 174, `contribution_event_order_lab.dart` 232, `home_section.dart` 111, `scroll_controller.dart` 301,
 and `smoke.spec.ts` 149. No Dart production file in `lib/` or `packages/` exceeds 500 lines; no Dart test exceeds 800.
 These lengths were checked with `wc -l` against the merged source on 2026-10-07. The deleted
-`portfolio_action_button.dart` and its widget test are absent. File-size checks remain a manual review criterion.
+`portfolio_action_button.dart` and its widget test are absent. CI enforces the 500/800 physical-line limits before baseline writes; manual changed-file review remains additional.
 
 ## Member and parameter limits
 
