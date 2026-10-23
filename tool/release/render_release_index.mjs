@@ -6,7 +6,9 @@ export function renderReleaseIndex(index, shell, staticDocument) {
   }
   const shellBlock = `    <!-- bootstrap-content:start -->\n${shell}\n    <!-- bootstrap-content:end -->`;
   const documentBlock = `<!-- static-document:start -->\n${staticDocument}\n  <!-- static-document:end -->`;
-  return index.replace(shellMarker, `\n${shellBlock}`).replace(documentMarker, documentBlock);
+  return index
+    .replace(shellMarker, () => `\n${shellBlock}`)
+    .replace(documentMarker, () => documentBlock);
 }
 
 export function renderLocaleData(locales) {

@@ -133,20 +133,22 @@ const operations = [
   () => syncManifest(document),
 ];
 
-const results = [];
-for (const operation of operations) results.push(await operation());
-const drift = results.filter((result) => result.changed);
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  const results = [];
+  for (const operation of operations) results.push(await operation());
+  const drift = results.filter((result) => result.changed);
 
-if (checkOnly && drift.length > 0) {
-  for (const result of drift) {
-    console.error(`Public content drift: ${path.relative(root, result.file)}`);
-  }
-  process.exitCode = 1;
-} else if (drift.length === 0) {
-  console.log('Public content is synchronized with assets/content/portfolio.json.');
-} else {
-  for (const result of drift) {
-    console.log(`Synchronized ${path.relative(root, result.file)}.`);
+  if (checkOnly && drift.length > 0) {
+    for (const result of drift) {
+      console.error(`Public content drift: ${path.relative(root, result.file)}`);
+    }
+    process.exitCode = 1;
+  } else if (drift.length === 0) {
+    console.log('Public content is synchronized with assets/content/portfolio.json.');
+  } else {
+    for (const result of drift) {
+      console.log(`Synchronized ${path.relative(root, result.file)}.`);
+    }
   }
 }
 
@@ -156,13 +158,13 @@ async function syncMarkedFile(file, marker, body) {
   return syncDelimitedFile(file, start, end, body);
 }
 
-async function syncDelimitedFile(file, start, end, body) {
+export async function syncDelimitedFile(file, start, end, body) {
   const current = await readFile(file, 'utf8');
   const pattern = new RegExp(`${escapeRegExp(start)}[\\s\\S]*?${escapeRegExp(end)}`);
   if (!pattern.test(current)) {
     throw new Error(`${path.relative(root, file)} is missing the ${start} / ${end} delimiters`);
   }
-  const next = current.replace(pattern, `${start}\n${body}\n${end}`);
+  const next = current.replace(pattern, () => `${start}\n${body}\n${end}`);
   if (next === current) return { file, changed: false };
   if (!checkOnly) await writeFile(file, next);
   return { file, changed: true };
