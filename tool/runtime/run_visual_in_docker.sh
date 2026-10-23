@@ -6,7 +6,7 @@ if [[ $# -gt 1 || ( $# -eq 1 && $1 != --update-snapshots ) ]]; then
   exit 2
 fi
 
-repository=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
+repository=$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)
 cd "$repository"
 
 if [[ ! -f build/web/index.html ]]; then
@@ -47,10 +47,11 @@ PY
   module_mount=(--mount "type=bind,source=$(realpath node_modules),target=$container_modules,readonly")
 fi
 
-docker run --rm --init --ipc=host --network none \
+# Bash 3.2 treats empty arrays as unset under nounset.
+docker run --rm --init --ipc=host --network none --cpus=2 \
   --user "$(id -u):$(id -g)" -e HOME=/tmp \
   --mount "type=bind,source=$repository,target=/workspace" \
-  "${module_mount[@]}" \
+  ${module_mount[@]+"${module_mount[@]}"} \
   --workdir /workspace \
   "mcr.microsoft.com/playwright:v${version}-noble" \
   node node_modules/@playwright/test/cli.js test tests/e2e/visual.spec.ts "$@"
