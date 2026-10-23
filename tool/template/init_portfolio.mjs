@@ -19,6 +19,7 @@ import { findTemplateRepository } from './package_links.mjs';
 import {
   createRepositoryTransaction,
   initializeCanonicalRepository,
+  rollbackInitialization,
   writeAtomically,
 } from './portfolio_init_repository.mjs';
 
@@ -80,11 +81,7 @@ async function runRepositoryTransaction(context) {
       run,
     });
   } catch (error) {
-    await transaction.rollback();
-    console.error(
-      'Initialization failed; restored every repository file changed by the initializer.',
-    );
-    throw error;
+    await rollbackInitialization(transaction, error);
   } finally {
     await transaction.dispose();
   }

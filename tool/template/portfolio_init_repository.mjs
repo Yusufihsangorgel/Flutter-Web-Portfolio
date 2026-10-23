@@ -170,10 +170,40 @@ export async function createRepositoryTransaction(root) {
   for (const relative of transactionTargets) {
     snapshots.push(await snapshotTarget(root, temporary, relative));
   }
+  let rollbackIncomplete = false;
   return {
-    rollback: () => restoreSnapshots(snapshots),
-    dispose: () => rm(temporary, { recursive: true, force: true }),
+    async rollback() {
+      rollbackIncomplete = true;
+      try {
+        await restoreSnapshots(snapshots);
+        rollbackIncomplete = false;
+      } catch (error) {
+        throw new Error(
+          `Repository rollback failed. Keep recovery files at ${temporary}; copy them back to their matching paths under ${root} before retrying initialization.`,
+          { cause: error },
+        );
+      }
+    },
+    async dispose() {
+      if (!rollbackIncomplete) await rm(temporary, { recursive: true, force: true });
+    },
   };
+}
+
+export async function rollbackInitialization(transaction, originalError) {
+  try {
+    await transaction.rollback();
+  } catch (rollbackError) {
+    throw new AggregateError(
+      [originalError, rollbackError],
+      `Initialization failed and rollback was incomplete. ${rollbackError.message}`,
+      { cause: originalError },
+    );
+  }
+  console.error(
+    'Initialization failed; restored every repository file changed by the initializer.',
+  );
+  throw originalError;
 }
 
 async function snapshotTarget(root, temporary, relative) {
