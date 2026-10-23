@@ -1,4 +1,6 @@
 import assert from 'node:assert/strict';
+import './test_feed_integrity.mjs';
+import './test_feed_xml_safety.mjs';
 
 import {
   buildReport,

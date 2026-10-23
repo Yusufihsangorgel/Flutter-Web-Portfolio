@@ -135,7 +135,7 @@ async function refreshContributions(ctx) {
   }
 }
 
-async function refreshWriting(ctx) {
+export async function refreshWriting(ctx) {
   const sources = Array.isArray(ctx.document.writing_sources) ? ctx.document.writing_sources : [];
   const previous = Array.isArray(ctx.document.writing) ? ctx.document.writing : [];
   const entriesBySource = {};
