@@ -15,7 +15,6 @@ export async function measureRun(browserInstance, run, options) {
     await waitForReveal(page, { target, startupTimeoutMs });
     const scroll = await sampleScroll(page, budget.scroll_sample_ms);
     const pageMetrics = await readPageMetrics(page);
-    assertTimeline(pageMetrics.marks);
     return buildRunResult({
       run,
       pageMetrics,
@@ -76,13 +75,18 @@ async function applyThrottleProfile(session, profile) {
 }
 
 function installRuntimeVitals() {
+  const supportedEntryTypes =
+    typeof PerformanceObserver === 'undefined'
+      ? []
+      : (PerformanceObserver.supportedEntryTypes ?? []);
+  const supports = (type) => supportedEntryTypes.includes(type);
   window.__runtimeVitals = {
-    cumulativeLayoutShift: 0,
-    largestContentfulPaint: 0,
-    longTasks: [],
+    cumulativeLayoutShift: supports('layout-shift') ? 0 : null,
+    largestContentfulPaint: null,
+    longTasks: supports('longtask') ? [] : null,
   };
   const observe = (type, callback) => {
-    if (!PerformanceObserver.supportedEntryTypes.includes(type)) return;
+    if (!supports(type)) return;
     new PerformanceObserver((list) => callback(list.getEntries())).observe({
       type,
       buffered: true,
@@ -211,25 +215,78 @@ function readMetricsFromDocument() {
   };
 }
 
-function buildRunResult(input) {
-  const frameMetrics = summarizeFrames(input.frameIntervals);
+export function buildRunResult(input) {
+  const sample = requireRecord(input, 'Runtime sample');
+  const pageMetrics = requireRecord(sample.pageMetrics, 'Runtime page metrics');
+  assertTimeline(pageMetrics.marks);
+  requireOwnMeasurement(pageMetrics, 'firstFrameToReveal');
+  requireNullableMeasurement(pageMetrics, 'bootstrapToFirstFrame');
+  requireOwnMeasurement(pageMetrics, 'bootstrapToRevealSignal');
+  const domContentLoaded = requireOwnMeasurement(pageMetrics, 'domContentLoaded');
+  const wasmDuration = requireNullableMeasurement(pageMetrics, 'wasmDuration');
+  const wasmTransferBytes = requireNullableMeasurement(pageMetrics, 'wasmTransferBytes');
+  const frameMetrics = summarizeFrames(sample.frameIntervals);
+  const visitedSections = requireVisitedSections(sample.visitedSections);
+  const transferredBytes = requireRecord(
+    sample.transferredBytesByResourceType,
+    'Runtime transferred byte measurements',
+  );
+  const totalTransferredBytes = Object.values(transferredBytes).reduce(
+    (total, bytes) => total + assertFiniteMeasurement(bytes, 'Transferred byte measurement'),
+    0,
+  );
+  assertFiniteMeasurement(totalTransferredBytes, 'Total transferred byte measurement');
   return {
-    run: input.run,
-    ...summarizeTiming(input.pageMetrics, frameMetrics.median),
+    run: sample.run,
+    ...summarizeTiming(pageMetrics, frameMetrics.median),
     ...frameMetrics.values,
-    ...summarizeVitals(input.pageMetrics.vitals),
-    render_quality: input.pageMetrics.renderQuality,
-    render_quality_reason: input.pageMetrics.renderQualityReason,
-    scroll_sections_visited: input.visitedSections,
-    dom_content_loaded_ms: round(input.pageMetrics.domContentLoaded),
-    wasm_duration_ms: round(input.pageMetrics.wasmDuration),
-    wasm_transfer_bytes: input.pageMetrics.wasmTransferBytes,
-    total_transferred_bytes: [...Object.values(input.transferredBytesByResourceType)].reduce(
-      (total, bytes) => total + bytes,
-      0,
-    ),
-    transferred_bytes_by_resource_type: input.transferredBytesByResourceType,
+    ...summarizeVitals(pageMetrics.vitals),
+    render_quality: pageMetrics.renderQuality,
+    render_quality_reason: pageMetrics.renderQualityReason,
+    scroll_sections_visited: visitedSections,
+    dom_content_loaded_ms: round(domContentLoaded),
+    wasm_duration_ms: roundNullable(wasmDuration),
+    wasm_transfer_bytes: wasmTransferBytes,
+    total_transferred_bytes: totalTransferredBytes,
+    transferred_bytes_by_resource_type: transferredBytes,
   };
+}
+
+function requireRecord(value, name) {
+  if (value === null || typeof value !== 'object' || Array.isArray(value)) {
+    throw new Error(`${name} must be an object.`);
+  }
+  return value;
+}
+
+function requireOwnMeasurement(record, metric) {
+  if (!Object.hasOwn(record, metric)) throw new Error(`Runtime measurement ${metric} is missing.`);
+  return assertFiniteMeasurement(record[metric], `Runtime measurement ${metric}`);
+}
+
+function requireNullableMeasurement(record, metric) {
+  if (!Object.hasOwn(record, metric)) throw new Error(`Runtime measurement ${metric} is missing.`);
+  return record[metric] === null
+    ? null
+    : assertFiniteMeasurement(record[metric], `Runtime measurement ${metric}`);
+}
+
+function assertFiniteMeasurement(value, name) {
+  if (typeof value !== 'number' || !Number.isFinite(value) || value < 0) {
+    throw new Error(`${name} must be a finite, non-negative number.`);
+  }
+  return value;
+}
+
+function requireVisitedSections(value) {
+  if (!Array.isArray(value) || value.length === 0 || value.some((section) => !section)) {
+    throw new Error('Runtime scroll sample must contain a visited section.');
+  }
+  return value;
+}
+
+function roundNullable(value) {
+  return value === null ? null : round(value);
 }
 
 function summarizeTiming(pageMetrics, medianFrameInterval) {
@@ -241,10 +298,7 @@ function summarizeTiming(pageMetrics, medianFrameInterval) {
       pageMetrics.bootstrapToFirstFrame ?? pageMetrics.bootstrapToRevealSignal,
     ),
     first_frame_to_reveal_ms: round(firstFrameToReveal),
-    first_frame_to_reveal_frame_intervals: round(
-      medianFrameInterval > 0 ? firstFrameToReveal / medianFrameInterval : 0,
-      3,
-    ),
+    first_frame_to_reveal_frame_intervals: round(firstFrameToReveal / medianFrameInterval, 3),
     bootstrap_start_ms: round(marks.bootstrapStart),
     bootstrap_to_entrypoint_ms: round(marks.entrypointLoaded - marks.bootstrapStart),
     entrypoint_to_engine_initialized_ms: round(marks.engineInitialized - marks.entrypointLoaded),
@@ -261,7 +315,23 @@ function getRevealSource(marks) {
 }
 
 function summarizeFrames(intervals) {
-  const sorted = [...intervals].sort((left, right) => left - right);
+  if (!Array.isArray(intervals) || intervals.length === 0) {
+    throw new Error('Runtime frame sampling must contain at least one measured interval.');
+  }
+  const sorted = [];
+  for (let index = 0; index < intervals.length; index += 1) {
+    const value = intervals[index];
+    if (
+      !Object.hasOwn(intervals, index) ||
+      typeof value !== 'number' ||
+      !Number.isFinite(value) ||
+      value <= 0
+    ) {
+      throw new Error(`Runtime frame interval ${index} must be a positive finite number.`);
+    }
+    sorted.push(value);
+  }
+  sorted.sort((left, right) => left - right);
   const median = percentile(sorted, 0.5);
   const p95 = percentile(sorted, 0.95);
   return {
@@ -269,34 +339,58 @@ function summarizeFrames(intervals) {
     values: {
       scroll_frame_median_ms: round(median),
       scroll_frame_p95_ms: round(p95),
-      scroll_frame_p95_over_median_ratio: round(median > 0 ? p95 / median : 0, 3),
+      scroll_frame_p95_over_median_ratio: round(p95 / median, 3),
       scroll_frames_over_50_ms: intervals.filter((value) => value > 50).length,
     },
   };
 }
 
 function summarizeVitals(vitals) {
-  const longTaskTotal = vitals.longTasks.reduce((total, duration) => total + duration, 0);
+  requireRecord(vitals, 'Runtime vitals');
+  for (const metric of ['cumulativeLayoutShift', 'largestContentfulPaint']) {
+    if (!Object.hasOwn(vitals, metric)) throw new Error(`Runtime vitals ${metric} is missing.`);
+    assertFiniteMeasurement(vitals[metric], `Runtime vitals ${metric}`);
+  }
+  if (!Object.hasOwn(vitals, 'longTasks') || !Array.isArray(vitals.longTasks)) {
+    throw new Error('Runtime vitals longTasks must be an actual measurement array.');
+  }
+  let longTaskTotal = 0;
+  let longestTask = 0;
+  for (let index = 0; index < vitals.longTasks.length; index += 1) {
+    if (!Object.hasOwn(vitals.longTasks, index)) {
+      throw new Error(`Runtime vitals longTasks[${index}] is missing.`);
+    }
+    const duration = assertFiniteMeasurement(
+      vitals.longTasks[index],
+      `Runtime vitals longTasks[${index}]`,
+    );
+    longTaskTotal += duration;
+    longestTask = Math.max(longestTask, duration);
+  }
+  assertFiniteMeasurement(longTaskTotal, 'Runtime vitals long-task total');
   return {
     long_task_total_ms: round(longTaskTotal),
-    longest_task_ms: round(Math.max(0, ...vitals.longTasks)),
+    longest_task_ms: round(longestTask),
     cumulative_layout_shift: round(vitals.cumulativeLayoutShift, 4),
     largest_contentful_paint_ms: round(vitals.largestContentfulPaint),
   };
 }
 
 function assertTimeline(marks) {
-  const ordered = [
-    marks.bootstrapStart,
-    marks.entrypointLoaded,
-    marks.engineInitialized,
-    marks.firstFrameSignal,
-    marks.revealStart,
-    marks.surfaceRemoved,
+  requireRecord(marks, 'Runtime timeline');
+  const orderedNames = [
+    'bootstrapStart',
+    'entrypointLoaded',
+    'engineInitialized',
+    'firstFrameSignal',
+    'revealStart',
+    'surfaceRemoved',
   ];
-  if (ordered.some((value) => value === null)) {
-    throw new Error(`Runtime timeline is incomplete: ${JSON.stringify(marks)}`);
+  for (const name of orderedNames) requireTimelineMeasurement(marks, name);
+  for (const name of ['firstFrameEvent', 'runAppFallback']) {
+    requireTimelineMeasurement(marks, name, true);
   }
+  const ordered = orderedNames.map((name) => marks[name]);
   for (let index = 1; index < ordered.length; index += 1) {
     if (ordered[index] < ordered[index - 1]) {
       throw new Error(`Runtime timeline is out of order: ${JSON.stringify(marks)}`);
@@ -307,8 +401,19 @@ function assertTimeline(marks) {
   }
 }
 
+function requireTimelineMeasurement(marks, name, nullable = false) {
+  if (!Object.hasOwn(marks, name)) throw new Error(`Runtime timeline is missing ${name}.`);
+  const value = marks[name];
+  if (nullable && value === null) return null;
+  if (typeof value !== 'number' || !Number.isFinite(value) || value < 0) {
+    throw new Error(`Runtime timeline ${name} must be a finite, non-negative number.`);
+  }
+  return value;
+}
+
 function percentile(sortedValues, percentileValue) {
-  if (sortedValues.length === 0) return 0;
+  if (sortedValues.length === 0)
+    throw new Error('A frame percentile requires a measured interval.');
   const index = Math.min(
     sortedValues.length - 1,
     Math.ceil(sortedValues.length * percentileValue) - 1,
@@ -317,8 +422,5 @@ function percentile(sortedValues, percentileValue) {
 }
 
 function round(value, digits = 2) {
-  if (value === null || value === undefined || !Number.isFinite(value)) {
-    return 0;
-  }
-  return Number(value.toFixed(digits));
+  return Number(assertFiniteMeasurement(value, 'Runtime rounded measurement').toFixed(digits));
 }

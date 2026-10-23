@@ -117,12 +117,7 @@ export function getEnforcementSkips(value, backend, measuredMedian) {
   }));
 }
 
-export function getBudgetFailures(thresholds, measured, skippedMetrics = new Set()) {
-  return Object.entries(thresholds)
-    .filter(([metric]) => !skippedMetrics.has(metric))
-    .filter(([metric, maximum]) => measured[metric] > maximum)
-    .map(([metric, maximum]) => `${metric}: ${measured[metric]} exceeds ${maximum}`);
-}
+export { getBudgetFailures, summarize, summarizeTransferredBytes } from './runtime_statistics.mjs';
 
 export function parseChromiumArgs(value) {
   if (!value) return [];
@@ -377,62 +372,6 @@ function signalLocalServer(child, state, signal) {
   } catch (error) {
     return error;
   }
-}
-
-export function summarize(samples, maximumMedian) {
-  const metrics = [
-    ...new Set([
-      ...Object.keys(maximumMedian),
-      'first_frame_to_reveal_ms',
-      'scroll_frame_median_ms',
-      'scroll_frame_p95_ms',
-    ]),
-  ];
-  return Object.fromEntries(
-    metrics.map((metric) => [
-      metric,
-      round(
-        percentile(
-          samples.map((sample) => sample[metric]).sort((a, b) => a - b),
-          0.5,
-        ),
-        metric === 'cumulative_layout_shift' ? 4 : 2,
-      ),
-    ]),
-  );
-}
-
-export function summarizeTransferredBytes(samples) {
-  const resourceTypes = [
-    ...new Set(samples.flatMap((sample) => Object.keys(sample.transferred_bytes_by_resource_type))),
-  ].sort();
-  return Object.fromEntries(
-    resourceTypes.map((resourceType) => [
-      resourceType,
-      percentile(
-        samples
-          .map((sample) => sample.transferred_bytes_by_resource_type[resourceType] ?? 0)
-          .sort((left, right) => left - right),
-        0.5,
-      ),
-    ]),
-  );
-}
-
-function percentile(sortedValues, percentileValue) {
-  if (sortedValues.length === 0) return 0;
-  const index = Math.min(
-    sortedValues.length - 1,
-    Math.ceil(sortedValues.length * percentileValue) - 1,
-  );
-  return sortedValues[index];
-}
-
-function round(value, digits = 2) {
-  if (value === null || value === undefined || !Number.isFinite(value)) {
-    return 0;
-  }
-  return Number(value.toFixed(digits));
 }
 
 function describeGraphicsBackend(gpu) {
