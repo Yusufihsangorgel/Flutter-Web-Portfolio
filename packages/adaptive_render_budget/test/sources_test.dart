@@ -6,6 +6,12 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
+  _fixedRefreshRateTests();
+  _schedulerTimingTests();
+  _displayRefreshRateTests();
+}
+
+void _fixedRefreshRateTests() {
   test('FixedRefreshRateSource exposes a validated immutable rate', () {
     final source = FixedRefreshRateSource(120);
     var notifications = 0;
@@ -16,7 +22,9 @@ void main() {
     expect(notifications, 0);
     expect(() => FixedRefreshRateSource(0), throwsArgumentError);
   });
+}
 
+void _schedulerTimingTests() {
   test('SchedulerFrameTimingSource maps and detaches scheduler timings', () {
     final binding = TestWidgetsFlutterBinding.instance;
     final source = SchedulerFrameTimingSource(binding: binding);
@@ -60,7 +68,9 @@ void main() {
       ..dispose();
     expect(() => source.addListener(listener), throwsStateError);
   });
+}
 
+void _displayRefreshRateTests() {
   test('DisplayRefreshRateSource follows test display metrics', () {
     final binding = TestWidgetsFlutterBinding.instance;
     final view = binding.platformDispatcher.views.first;

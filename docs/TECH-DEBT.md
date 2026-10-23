@@ -1,6 +1,6 @@
 # Flutter Web Portfolio — technical debt
 
-Record date: 2026-10-07. [Architecture rules](ARCHITECTURE-RULES.md) set production files at 500 lines, tests at 800, members at 60, `build()` at 100, parameters at 4, nesting at 4, and cyclomatic complexity at 15. The [import checker](../quality/check_architecture.py) blocks architecture violations with an empty baseline. The [Dart metrics gate](../tool/quality/dart_metrics.dart) measures callables and rejects new, increased, or stale debt against [its baseline](../quality/metrics-baseline.json). Targets mean the next focused refactor of the named area; they are not claims that work is scheduled.
+Record date: 2026-10-23. [Architecture rules](ARCHITECTURE-RULES.md) set production files at 500 lines, tests at 800, members at 60, `build()` at 100, parameters at 4, nesting at 4, and cyclomatic complexity at 15. The [import checker](../quality/check_architecture.py) blocks architecture violations with an empty baseline. The [Dart metrics gate](../tool/quality/dart_metrics.dart) measures callables and rejects new, increased, or stale debt against [its baseline](../quality/metrics-baseline.json). Targets mean the next focused refactor of the named area; they are not claims that work is scheduled.
 
 ## Domain boundary and parsing
 
@@ -78,12 +78,15 @@ their own flow metrics, without increasing the parent's complexity or nesting.
 
 | Metric | Limit | Before strictness | Retained baseline |
 |---|---:|---:|---:|
-| Callable lines | 60 | 60 | 54 |
+| Callable lines | 60 | 60 | 44 |
 | `build()` lines | 100 | 0 | 0 |
-| Parameters | 4 | 24 | 22 |
+| Parameters | 4 | 24 | 21 |
 | Control-flow nesting | 4 | 0 | 0 |
 | Cyclomatic complexity | 15 | 2 | 1 |
-| Total violations | | 86 | 77 |
+| Total violations | | 86 | 66 |
+
+The retained-baseline column reflects the combined inventory; the dated measurements below refer to individual
+refactors.
 
 At introduction, the same metric implementation measured the initial revision and changed sources: 2,421 and 2,486
 callables respectively. The 2026-10-07 merged measurement recorded 2,576 callables, 79 retained violations and 0 ratchet
@@ -100,6 +103,16 @@ to 2; its sequence and risk-gap validators each measure 8. Only that resolved co
 baseline entries and limits are unchanged. This measurement does not include parallel refactors. The existing
 `contribution.dart` serialization methods and domain-boundary contracts above are unchanged; broader typed-boundary
 work remains separate from this invariant-only refactor.
+
+On 2026-10-23, the focused API-compatible render-budget refactor measured 2,659 callables, 68 retained violations and 0
+ratchet issues against base `0e957dd4a27a90fbad828944c9deb60c512207fb` (`dart run tool/quality/dart_metrics.dart --base-ref
+0e957dd4a27a90fbad828944c9deb60c512207fb --json`, exit 0). This measurement does not include parallel refactors.
+
+Topic-based registration closes eight package-test and two application-test line waivers. The private render-budget
+transition record closes the `_publish` parameter waiver (seven parameters to three). The package's source/clock
+constructors and the application's `RenderQualityState` named constructor and `copyWith` remain unchanged; their
+parameter waivers require a separate compatibility-aware migration. Default cadence and callback-batch partition
+behavior are unchanged and remain a separate contract follow-up.
 
 The local check fails on new or increased violations and on removed/lower measurements left stale in the baseline.
 CI also supplies the PR base or previous push revision through `--base-ref`, rejecting baseline additions or increases

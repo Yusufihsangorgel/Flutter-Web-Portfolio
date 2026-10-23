@@ -8,6 +8,14 @@ import 'package:adaptive_render_budget/src/monotonic_clock.dart';
 import 'package:adaptive_render_budget/src/sources.dart';
 import 'package:flutter/foundation.dart';
 
+typedef _Transition = ({
+  RenderBudgetTransitionCause cause,
+  RenderBudgetLevel level,
+  AdaptiveRenderBudgetPhase phase,
+  Duration cooldownUntil,
+  Duration at,
+});
+
 /// Adapts an application's rendering tier to sustained frame pressure.
 ///
 /// The controller is independent of BLoC and widget lifecycle
@@ -108,18 +116,17 @@ final class AdaptiveRenderBudgetController extends ChangeNotifier
       _resetEvidence();
     }
 
-    _publish(
+    _publish((
       cause: didClamp
           ? RenderBudgetTransitionCause.ceilingClamped
           : RenderBudgetTransitionCause.ceilingChanged,
       level: clampedLevel,
-      ceiling: ceiling,
       phase: didClamp && !_value.isPaused
           ? AdaptiveRenderBudgetPhase.steady
           : _value.phase,
       cooldownUntil: didClamp ? now + _policy.cooldown : _value.cooldownUntil,
       at: now,
-    );
+    ), ceiling: ceiling);
   }
 
   /// Detaches timing and refresh-rate listeners while holding a safe tier.
@@ -136,13 +143,13 @@ final class AdaptiveRenderBudgetController extends ChangeNotifier
     _probeFallbackLevel = null;
     _detachSources();
     _resetEvidence();
-    _publish(
+    _publish((
       cause: RenderBudgetTransitionCause.paused,
       level: heldLevel,
       phase: AdaptiveRenderBudgetPhase.paused,
       cooldownUntil: now + _policy.cooldown,
       at: now,
-    );
+    ));
   }
 
   /// Reattaches sources and begins with an empty evidence window.
@@ -159,14 +166,13 @@ final class AdaptiveRenderBudgetController extends ChangeNotifier
     );
     _resetEvidence();
     _attachSources();
-    _publish(
+    _publish((
       cause: RenderBudgetTransitionCause.resumed,
       level: _value.level,
       phase: AdaptiveRenderBudgetPhase.steady,
-      refreshRateHz: refreshRateHz,
       cooldownUntil: now + _policy.cooldown,
       at: now,
-    );
+    ), refreshRateHz: refreshRateHz);
   }
 
   @override
@@ -241,13 +247,13 @@ final class AdaptiveRenderBudgetController extends ChangeNotifier
       if (_value.level != RenderBudgetLevel.minimal) {
         final next = RenderBudgetLevel.values[_value.level.index - 1];
         _resetEvidence();
-        _publish(
+        _publish((
           cause: RenderBudgetTransitionCause.downgraded,
           level: next,
           phase: AdaptiveRenderBudgetPhase.steady,
           cooldownUntil: now + _policy.cooldown,
           at: now,
-        );
+        ));
       }
       return;
     }
@@ -259,13 +265,13 @@ final class AdaptiveRenderBudgetController extends ChangeNotifier
       final next = RenderBudgetLevel.values[_value.level.index + 1];
       _probeFallbackLevel = _value.level;
       _resetEvidence();
-      _publish(
+      _publish((
         cause: RenderBudgetTransitionCause.probeStarted,
         level: next,
         phase: AdaptiveRenderBudgetPhase.probing,
         cooldownUntil: now,
         at: now,
-      );
+      ));
     }
   }
 
@@ -296,13 +302,13 @@ final class AdaptiveRenderBudgetController extends ChangeNotifier
     final now = _clock.elapsed;
     _probeFallbackLevel = null;
     _resetEvidence();
-    _publish(
+    _publish((
       cause: RenderBudgetTransitionCause.probeAccepted,
       level: _value.level,
       phase: AdaptiveRenderBudgetPhase.steady,
       cooldownUntil: now + _policy.cooldown,
       at: now,
-    );
+    ));
   }
 
   void _rollbackProbe() {
@@ -313,13 +319,13 @@ final class AdaptiveRenderBudgetController extends ChangeNotifier
     final now = _clock.elapsed;
     _probeFallbackLevel = null;
     _resetEvidence();
-    _publish(
+    _publish((
       cause: RenderBudgetTransitionCause.probeRolledBack,
       level: fallback,
       phase: AdaptiveRenderBudgetPhase.steady,
       cooldownUntil: now + _policy.cooldown,
       at: now,
-    );
+    ));
   }
 
   void _handleRefreshRateChanged() {
@@ -346,14 +352,13 @@ final class AdaptiveRenderBudgetController extends ChangeNotifier
       _resetEvidence();
     }
 
-    _publish(
+    _publish((
       cause: RenderBudgetTransitionCause.refreshRateChanged,
       level: level,
       phase: phase,
-      refreshRateHz: next,
       cooldownUntil: cooldownUntil,
       at: now,
-    );
+    ), refreshRateHz: next);
   }
 
   void _resetEvidence() {
@@ -361,27 +366,23 @@ final class AdaptiveRenderBudgetController extends ChangeNotifier
     _framesSinceEvaluation = 0;
   }
 
-  void _publish({
-    required RenderBudgetTransitionCause cause,
-    required RenderBudgetLevel level,
-    required AdaptiveRenderBudgetPhase phase,
-    required Duration cooldownUntil,
-    required Duration at,
+  void _publish(
+    _Transition transition, {
     RenderBudgetLevel? ceiling,
     double? refreshRateHz,
   }) {
     final previous = _value;
     _value = AdaptiveRenderBudgetState(
-      level: level,
+      level: transition.level,
       ceiling: ceiling ?? previous.ceiling,
-      phase: phase,
+      phase: transition.phase,
       refreshRateHz: refreshRateHz ?? previous.refreshRateHz,
-      cooldownUntil: cooldownUntil,
+      cooldownUntil: transition.cooldownUntil,
       lastTransition: RenderBudgetTransition(
-        cause: cause,
+        cause: transition.cause,
         previousLevel: previous.level,
-        nextLevel: level,
-        at: at,
+        nextLevel: transition.level,
+        at: transition.at,
       ),
       revision: previous.revision + 1,
     );
