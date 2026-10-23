@@ -157,11 +157,13 @@ final class SelectedEvidenceContent extends StatelessWidget {
           child: Text(
             system.name,
             style: AppFonts.spaceGrotesk(
-              fontSize: tablet ? 34 : 27,
-              fontWeight: FontWeight.w700,
-              color: palette.foreground,
-              height: 1.02,
-              letterSpacing: -1.1,
+              TextStyle(
+                fontSize: tablet ? 34 : 27,
+                fontWeight: FontWeight.w700,
+                color: palette.foreground,
+                height: 1.02,
+                letterSpacing: -1.1,
+              ),
             ),
           ),
         ),
@@ -169,9 +171,11 @@ final class SelectedEvidenceContent extends StatelessWidget {
         Text(
           system.spotlight,
           style: AppFonts.inter(
-            fontSize: 14,
-            color: palette.ink(AtlasAlpha.spotlight),
-            height: 1.52,
+            TextStyle(
+              fontSize: 14,
+              color: palette.ink(AtlasAlpha.spotlight),
+              height: 1.52,
+            ),
           ),
         ),
         const SizedBox(height: 28),

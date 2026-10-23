@@ -178,11 +178,13 @@ final class CaseTitle extends StatelessWidget {
           maxLines: 2,
           overflow: TextOverflow.ellipsis,
           style: AppFonts.spaceGrotesk(
-            fontSize: fontSize,
-            fontWeight: FontWeight.w700,
-            color: palette.foreground,
-            height: 0.95,
-            letterSpacing: -fontSize * 0.047,
+            TextStyle(
+              fontSize: fontSize,
+              fontWeight: FontWeight.w700,
+              color: palette.foreground,
+              height: 0.95,
+              letterSpacing: -fontSize * 0.047,
+            ),
           ),
         ),
       ),
@@ -279,11 +281,13 @@ final class CaseNarrative extends StatelessWidget {
         Text(
           system.summary,
           style: AppFonts.spaceGrotesk(
-            fontSize: 24,
-            fontWeight: FontWeight.w700,
-            color: palette.foreground,
-            height: 1.25,
-            letterSpacing: -0.55,
+            TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.w700,
+              color: palette.foreground,
+              height: 1.25,
+              letterSpacing: -0.55,
+            ),
           ),
         ),
         const SizedBox(height: 30),

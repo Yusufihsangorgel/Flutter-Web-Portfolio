@@ -316,12 +316,13 @@ class _CommandPaletteState extends State<CommandPalette> {
           child: TextField(
             controller: _searchController,
             focusNode: _focusNode,
-            style: AppFonts.inter(fontSize: 15, color: AppColors.textBright),
+            style: AppFonts.inter(
+              const TextStyle(fontSize: 15, color: AppColors.textBright),
+            ),
             decoration: InputDecoration(
               hintText: context.strings.commandPaletteSearchHint,
               hintStyle: AppFonts.inter(
-                fontSize: 15,
-                color: AppColors.textSecondary,
+                const TextStyle(fontSize: 15, color: AppColors.textSecondary),
               ),
               border: InputBorder.none,
               contentPadding: const EdgeInsets.symmetric(vertical: 14),
@@ -338,8 +339,7 @@ class _CommandPaletteState extends State<CommandPalette> {
           child: Text(
             'ESC',
             style: AppFonts.jetBrainsMono(
-              fontSize: 10,
-              color: AppColors.textSecondary,
+              const TextStyle(fontSize: 10, color: AppColors.textSecondary),
             ),
           ),
         ),
@@ -353,7 +353,9 @@ class _CommandPaletteState extends State<CommandPalette> {
         padding: const EdgeInsets.all(24),
         child: Text(
           context.strings.commandPaletteNoMatches,
-          style: AppFonts.inter(fontSize: 14, color: AppColors.textSecondary),
+          style: AppFonts.inter(
+            const TextStyle(fontSize: 14, color: AppColors.textSecondary),
+          ),
         ),
       );
     }
@@ -387,10 +389,12 @@ class _CommandPaletteState extends State<CommandPalette> {
     child: Text(
       category.toUpperCase(),
       style: AppFonts.jetBrainsMono(
-        fontSize: 10,
-        fontWeight: FontWeight.w600,
-        color: AppColors.textSecondary,
-        letterSpacing: 1.5,
+        const TextStyle(
+          fontSize: 10,
+          fontWeight: FontWeight.w600,
+          color: AppColors.textSecondary,
+          letterSpacing: 1.5,
+        ),
       ),
     ),
   );
@@ -450,10 +454,12 @@ class _CommandPaletteState extends State<CommandPalette> {
               child: Text(
                 command.label,
                 style: AppFonts.inter(
-                  fontSize: 14,
-                  color: isSelected
-                      ? AppColors.textBright
-                      : AppColors.textPrimary,
+                  TextStyle(
+                    fontSize: 14,
+                    color: isSelected
+                        ? AppColors.textBright
+                        : AppColors.textPrimary,
+                  ),
                 ),
               ),
             ),

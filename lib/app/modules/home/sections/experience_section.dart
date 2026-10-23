@@ -142,10 +142,12 @@ class _Period extends StatelessWidget {
         child: Text(
           period,
           style: AppFonts.spaceGrotesk(
-            fontSize: 13,
-            fontWeight: FontWeight.w600,
-            color: AppColors.textPrimary,
-            height: 1.5,
+            const TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: AppColors.textPrimary,
+              height: 1.5,
+            ),
           ),
         ),
       ),
@@ -165,23 +167,27 @@ class _ExperienceContent extends StatelessWidget {
       Text(
         experience.company,
         style: AppFonts.spaceGrotesk(
-          fontSize: MediaQuery.sizeOf(context).width < Breakpoints.tablet
-              ? 31
-              : 42,
-          fontWeight: FontWeight.w600,
-          color: AppColors.textBright,
-          height: 1.02,
-          letterSpacing: -1.15,
+          TextStyle(
+            fontSize: MediaQuery.sizeOf(context).width < Breakpoints.tablet
+                ? 31
+                : 42,
+            fontWeight: FontWeight.w600,
+            color: AppColors.textBright,
+            height: 1.02,
+            letterSpacing: -1.15,
+          ),
         ),
       ),
       const SizedBox(height: 12),
       Text(
         '${experience.role} · ${experience.domain}',
         style: AppFonts.spaceGrotesk(
-          fontSize: 16,
-          fontWeight: FontWeight.w500,
-          color: AppColors.accent,
-          height: 1.45,
+          const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
+            color: AppColors.accent,
+            height: 1.45,
+          ),
         ),
       ),
       const SizedBox(height: 24),
@@ -190,9 +196,11 @@ class _ExperienceContent extends StatelessWidget {
         child: Text(
           experience.summary,
           style: AppFonts.inter(
-            fontSize: 16,
-            color: AppColors.textPrimary,
-            height: 1.72,
+            const TextStyle(
+              fontSize: 16,
+              color: AppColors.textPrimary,
+              height: 1.72,
+            ),
           ),
         ),
       ),
@@ -206,10 +214,12 @@ class _ExperienceContent extends StatelessWidget {
         child: Text(
           experience.evidence.take(4).join('  /  '),
           style: AppFonts.inter(
-            fontSize: 12,
-            fontWeight: FontWeight.w500,
-            color: AppColors.textSecondary,
-            height: 1.65,
+            const TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+              color: AppColors.textSecondary,
+              height: 1.65,
+            ),
           ),
         ),
       ),

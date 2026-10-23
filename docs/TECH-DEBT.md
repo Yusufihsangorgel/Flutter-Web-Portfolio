@@ -19,9 +19,9 @@ These lengths were checked with `wc -l` against the merged source on 2026-10-07.
 
 ## Member and parameter limits
 
-| Location | Known breach | Planned fix |
-|---|---|---|
-| [`_FontStyle.call`](../lib/app/core/theme/app_fonts.dart) | The shared style adapter accepts nineteen named style options. | Migrate callers to an immutable style configuration in a separate API refactor; retain font fallback and style defaults. |
+The source-level [`_FontStyle.call`](../lib/app/core/theme/app_fonts.dart) parameter breach is closed: its 113
+current production callers now pass a `TextStyle` to the single-parameter adapter. Linux font rendering and full
+workflow validation remain pending.
 
 The proof/package build methods and handoff painter constructor listed previously are below their respective limits.
 Every remaining callable breach is registered individually, with its measured value and deferral reason, in the metrics

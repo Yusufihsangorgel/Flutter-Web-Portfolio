@@ -73,19 +73,23 @@ class _PackageCategoryGroup extends StatelessWidget {
             Text(
               _categoryLabel(context, category),
               style: AppFonts.spaceGrotesk(
-                fontSize: 20,
-                fontWeight: FontWeight.w600,
-                color: AppColors.textBright,
-                letterSpacing: -0.4,
+                const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.textBright,
+                  letterSpacing: -0.4,
+                ),
               ),
             ),
             Text(
               packages.length.toString().padLeft(2, '0'),
               style: AppFonts.spaceGrotesk(
-                fontSize: 12,
-                fontWeight: FontWeight.w800,
-                color: accent,
-                letterSpacing: 0.4,
+                TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w800,
+                  color: accent,
+                  letterSpacing: 0.4,
+                ),
               ),
             ),
           ],
@@ -212,9 +216,11 @@ class _PackageSummary extends StatelessWidget {
       Text(
         package.description,
         style: AppFonts.inter(
-          fontSize: 14,
-          color: AppColors.textPrimary,
-          height: 1.55,
+          const TextStyle(
+            fontSize: 14,
+            color: AppColors.textPrimary,
+            height: 1.55,
+          ),
         ),
       ),
       if (package.proof case final proof?) ...[
@@ -240,18 +246,22 @@ class _PackageTitle extends StatelessWidget {
       Text(
         package.name,
         style: AppFonts.spaceGrotesk(
-          fontSize: 17,
-          fontWeight: FontWeight.w600,
-          color: AppColors.textBright,
+          const TextStyle(
+            fontSize: 17,
+            fontWeight: FontWeight.w600,
+            color: AppColors.textBright,
+          ),
         ),
       ),
       Text(
         '${package.version} · ${package.pubPoints}/160 '
         '${context.strings.packagesSectionPubPoints}',
         style: AppFonts.jetBrainsMono(
-          fontSize: 11,
-          color: AppColors.textSecondary,
-          letterSpacing: 0.2,
+          const TextStyle(
+            fontSize: 11,
+            color: AppColors.textSecondary,
+            letterSpacing: 0.2,
+          ),
         ),
       ),
     ],
@@ -277,9 +287,11 @@ class _CompactPackage extends StatelessWidget {
             Text(
               package.description,
               style: AppFonts.inter(
-                fontSize: 13,
-                color: AppColors.textPrimary,
-                height: 1.5,
+                const TextStyle(
+                  fontSize: 13,
+                  color: AppColors.textPrimary,
+                  height: 1.5,
+                ),
               ),
             ),
           ],
@@ -310,9 +322,11 @@ class _ProofLine extends StatelessWidget {
         child: Text(
           proof,
           style: AppFonts.jetBrainsMono(
-            fontSize: 11,
-            color: AppColors.textSecondary,
-            height: 1.6,
+            const TextStyle(
+              fontSize: 11,
+              color: AppColors.textSecondary,
+              height: 1.6,
+            ),
           ),
         ),
       ),
@@ -335,10 +349,12 @@ class _PackageRoadmap extends StatelessWidget {
         Text(
           context.strings.packagesSectionRoadmap.toUpperCase(),
           style: AppFonts.jetBrainsMono(
-            fontSize: 9.5,
-            fontWeight: FontWeight.w700,
-            color: AppColors.textSecondary,
-            letterSpacing: 1.2,
+            const TextStyle(
+              fontSize: 9.5,
+              fontWeight: FontWeight.w700,
+              color: AppColors.textSecondary,
+              letterSpacing: 1.2,
+            ),
           ),
         ),
         const SizedBox(height: 8),
@@ -366,20 +382,24 @@ class _RoadmapLine extends StatelessWidget {
             TextSpan(
               text: item.title,
               style: AppFonts.inter(
-                fontSize: 12.5,
-                color: AppColors.textPrimary,
-                height: 1.45,
+                const TextStyle(
+                  fontSize: 12.5,
+                  color: AppColors.textPrimary,
+                  height: 1.45,
+                ),
               ),
             ),
             TextSpan(
               text: '  ${status.replaceAll(' ', ' ')}',
               style: AppFonts.jetBrainsMono(
-                fontSize: 9.5,
-                fontWeight: FontWeight.w700,
-                color: item.status == 'doing'
-                    ? accent
-                    : AppColors.textSecondary,
-                letterSpacing: 0.8,
+                TextStyle(
+                  fontSize: 9.5,
+                  fontWeight: FontWeight.w700,
+                  color: item.status == 'doing'
+                      ? accent
+                      : AppColors.textSecondary,
+                  letterSpacing: 0.8,
+                ),
               ),
             ),
           ],

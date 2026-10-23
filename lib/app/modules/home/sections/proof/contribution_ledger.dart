@@ -25,19 +25,23 @@ class _ContributionLedger extends StatelessWidget {
             Text(
               title,
               style: AppFonts.spaceGrotesk(
-                fontSize: 24,
-                fontWeight: FontWeight.w600,
-                color: AppColors.textBright,
-                letterSpacing: -0.5,
+                const TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.textBright,
+                  letterSpacing: -0.5,
+                ),
               ),
             ),
             Text(
               entries.length.toString().padLeft(2, '0'),
               style: AppFonts.spaceGrotesk(
-                fontSize: 12,
-                fontWeight: FontWeight.w800,
-                color: accent,
-                letterSpacing: 0.4,
+                TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w800,
+                  color: accent,
+                  letterSpacing: 0.4,
+                ),
               ),
             ),
           ],
@@ -138,9 +142,7 @@ class _WideLedgerContent extends StatelessWidget {
         child: Text(
           index.toString().padLeft(2, '0'),
           style: AppFonts.jetBrainsMono(
-            fontSize: 10,
-            color: accent,
-            letterSpacing: 0.8,
+            TextStyle(fontSize: 10, color: accent, letterSpacing: 0.8),
           ),
         ),
       ),
@@ -149,9 +151,11 @@ class _WideLedgerContent extends StatelessWidget {
         child: Text(
           contribution.project,
           style: AppFonts.spaceGrotesk(
-            fontSize: 13,
-            fontWeight: FontWeight.w600,
-            color: AppColors.textPrimary,
+            const TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: AppColors.textPrimary,
+            ),
           ),
         ),
       ),
@@ -159,11 +163,13 @@ class _WideLedgerContent extends StatelessWidget {
         child: Text(
           contribution.title,
           style: AppFonts.spaceGrotesk(
-            fontSize: 20,
-            fontWeight: FontWeight.w500,
-            color: AppColors.textBright,
-            height: 1.25,
-            letterSpacing: -0.35,
+            const TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w500,
+              color: AppColors.textBright,
+              height: 1.25,
+              letterSpacing: -0.35,
+            ),
           ),
         ),
       ),
@@ -173,9 +179,11 @@ class _WideLedgerContent extends StatelessWidget {
         child: Text(
           statusLabel,
           style: AppFonts.jetBrainsMono(
-            fontSize: 10,
-            color: AppColors.textSecondary,
-            letterSpacing: 0.6,
+            const TextStyle(
+              fontSize: 10,
+              color: AppColors.textSecondary,
+              letterSpacing: 0.6,
+            ),
           ),
         ),
       ),
@@ -185,8 +193,7 @@ class _WideLedgerContent extends StatelessWidget {
           sectionDateLabel(contribution.date),
           textAlign: TextAlign.end,
           style: AppFonts.jetBrainsMono(
-            fontSize: 10,
-            color: AppColors.textSecondary,
+            const TextStyle(fontSize: 10, color: AppColors.textSecondary),
           ),
         ),
       ),
@@ -217,17 +224,21 @@ class _CompactLedgerContent extends StatelessWidget {
         children: [
           Text(
             index.toString().padLeft(2, '0'),
-            style: AppFonts.jetBrainsMono(fontSize: 10, color: accent),
+            style: AppFonts.jetBrainsMono(
+              TextStyle(fontSize: 10, color: accent),
+            ),
           ),
           const SizedBox(width: 16),
           Expanded(
             child: Text(
               contribution.project,
               style: AppFonts.jetBrainsMono(
-                fontSize: 10,
-                fontWeight: FontWeight.w600,
-                color: AppColors.textSecondary,
-                letterSpacing: 0.6,
+                const TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.textSecondary,
+                  letterSpacing: 0.6,
+                ),
               ),
             ),
           ),
@@ -238,20 +249,24 @@ class _CompactLedgerContent extends StatelessWidget {
       Text(
         contribution.title,
         style: AppFonts.spaceGrotesk(
-          fontSize: 22,
-          fontWeight: FontWeight.w500,
-          color: AppColors.textBright,
-          height: 1.2,
-          letterSpacing: -0.45,
+          const TextStyle(
+            fontSize: 22,
+            fontWeight: FontWeight.w500,
+            color: AppColors.textBright,
+            height: 1.2,
+            letterSpacing: -0.45,
+          ),
         ),
       ),
       const SizedBox(height: 14),
       Text(
         '$statusLabel · ${sectionDateLabel(contribution.date)}',
         style: AppFonts.jetBrainsMono(
-          fontSize: 10,
-          color: AppColors.textSecondary,
-          height: 1.4,
+          const TextStyle(
+            fontSize: 10,
+            color: AppColors.textSecondary,
+            height: 1.4,
+          ),
         ),
       ),
     ],
@@ -285,10 +300,12 @@ class _OpenPullRequest extends StatelessWidget {
           Text(
             label,
             style: AppFonts.spaceGrotesk(
-              fontSize: 13,
-              fontWeight: FontWeight.w600,
-              color: accent,
-              height: 1.4,
+              TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+                color: accent,
+                height: 1.4,
+              ),
             ),
           ),
           const SizedBox(width: 8),

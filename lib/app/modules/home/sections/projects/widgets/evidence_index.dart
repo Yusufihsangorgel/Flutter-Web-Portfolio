@@ -127,9 +127,11 @@ final class EvidenceIndexHeader extends StatelessWidget {
     final intro = Text(
       labels.evidenceIntro,
       style: AppFonts.inter(
-        fontSize: tablet ? 15 : 14,
-        color: AtlasColors.introText,
-        height: 1.55,
+        TextStyle(
+          fontSize: tablet ? 15 : 14,
+          color: AtlasColors.introText,
+          height: 1.55,
+        ),
       ),
     );
     return Container(
@@ -182,11 +184,13 @@ final class _EvidenceIndexTitle extends StatelessWidget {
         child: Text(
           labels.evidenceIndex,
           style: AppFonts.spaceGrotesk(
-            fontSize: AtlasLayout.of(context).tablet ? 46 : 36,
-            fontWeight: FontWeight.w700,
-            color: AtlasColors.ink,
-            height: 1,
-            letterSpacing: -1.7,
+            TextStyle(
+              fontSize: AtlasLayout.of(context).tablet ? 46 : 36,
+              fontWeight: FontWeight.w700,
+              color: AtlasColors.ink,
+              height: 1,
+              letterSpacing: -1.7,
+            ),
           ),
         ),
       ),

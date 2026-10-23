@@ -93,11 +93,13 @@ final class _ProjectsIntroduction extends StatelessWidget {
               child: Text(
                 strings.projectsSectionSubtitle,
                 style: AppFonts.spaceGrotesk(
-                  fontSize: tablet ? 26 : 20,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.textBright,
-                  height: 1.35,
-                  letterSpacing: -0.45,
+                  TextStyle(
+                    fontSize: tablet ? 26 : 20,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textBright,
+                    height: 1.35,
+                    letterSpacing: -0.45,
+                  ),
                 ),
               ),
             ),

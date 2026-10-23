@@ -21,10 +21,12 @@ class _IdentityRail extends StatelessWidget {
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: AppFonts.spaceGrotesk(
-              fontSize: 13,
-              fontWeight: FontWeight.w700,
-              color: AppColors.textBright,
-              letterSpacing: -0.1,
+              const TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w700,
+                color: AppColors.textBright,
+                letterSpacing: -0.1,
+              ),
             ),
           ),
         ),
@@ -32,8 +34,7 @@ class _IdentityRail extends StatelessWidget {
         Text(
           profile.location,
           style: AppFonts.spaceGrotesk(
-            fontSize: 12,
-            color: AppColors.textPrimary,
+            const TextStyle(fontSize: 12, color: AppColors.textPrimary),
           ),
         ),
         if (MediaQuery.sizeOf(context).width >= Breakpoints.tablet) ...[
@@ -41,9 +42,11 @@ class _IdentityRail extends StatelessWidget {
           Text(
             '${profile.since} →',
             style: AppFonts.spaceGrotesk(
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-              color: AppColors.accent,
+              const TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: AppColors.accent,
+              ),
             ),
           ),
         ],
@@ -160,11 +163,13 @@ class _PersonalTitle extends StatelessWidget {
                 displayName.primary,
                 maxLines: 1,
                 style: AppFonts.spaceGrotesk(
-                  fontSize: titleSize,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.textBright,
-                  height: 0.88,
-                  letterSpacing: -titleSize * 0.055,
+                  TextStyle(
+                    fontSize: titleSize,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.textBright,
+                    height: 0.88,
+                    letterSpacing: -titleSize * 0.055,
+                  ),
                 ),
               ),
             ),
@@ -194,11 +199,13 @@ class _PersonalTitle extends StatelessWidget {
               title,
               maxLines: 1,
               style: AppFonts.spaceGrotesk(
-                fontSize: size * 0.9,
-                fontWeight: FontWeight.w700,
-                color: AppColors.white,
-                height: 1,
-                letterSpacing: -size * 0.045,
+                TextStyle(
+                  fontSize: size * 0.9,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.white,
+                  height: 1,
+                  letterSpacing: -size * 0.045,
+                ),
               ),
             ),
           ),

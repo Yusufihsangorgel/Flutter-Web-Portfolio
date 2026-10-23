@@ -148,10 +148,12 @@ class _ContributionEventOrderLabState extends State<ContributionEventOrderLab> {
       Text(
         context.strings.proofSectionEventLabLabel.toUpperCase(),
         style: AppFonts.jetBrainsMono(
-          fontSize: 10,
-          fontWeight: FontWeight.w600,
-          color: signal,
-          letterSpacing: 1.2,
+          TextStyle(
+            fontSize: 10,
+            fontWeight: FontWeight.w600,
+            color: signal,
+            letterSpacing: 1.2,
+          ),
         ),
       ),
       const SizedBox(height: 12),
@@ -161,11 +163,13 @@ class _ContributionEventOrderLabState extends State<ContributionEventOrderLab> {
         child: Text(
           widget.lab.title,
           style: AppFonts.spaceGrotesk(
-            fontSize: MediaQuery.sizeOf(context).width >= 760 ? 31 : 26,
-            fontWeight: FontWeight.w600,
-            color: AppColors.white,
-            height: 1.05,
-            letterSpacing: -0.8,
+            TextStyle(
+              fontSize: MediaQuery.sizeOf(context).width >= 760 ? 31 : 26,
+              fontWeight: FontWeight.w600,
+              color: AppColors.white,
+              height: 1.05,
+              letterSpacing: -0.8,
+            ),
           ),
         ),
       ),
@@ -210,9 +214,11 @@ class _ContributionEventOrderLabState extends State<ContributionEventOrderLab> {
       child: Text(
         _sequence.summary,
         style: AppFonts.inter(
-          fontSize: 14,
-          color: AppColors.white.withValues(alpha: 0.62),
-          height: 1.55,
+          TextStyle(
+            fontSize: 14,
+            color: AppColors.white.withValues(alpha: 0.62),
+            height: 1.55,
+          ),
         ),
       ),
     ),

@@ -17,11 +17,13 @@ class _HeroNarrative extends StatelessWidget {
           child: Text(
             portfolio.profile.headline,
             style: AppFonts.spaceGrotesk(
-              fontSize: compact ? 20 : 26,
-              fontWeight: FontWeight.w600,
-              color: AppColors.textBright,
-              height: 1.24,
-              letterSpacing: compact ? -0.35 : -0.65,
+              TextStyle(
+                fontSize: compact ? 20 : 26,
+                fontWeight: FontWeight.w600,
+                color: AppColors.textBright,
+                height: 1.24,
+                letterSpacing: compact ? -0.35 : -0.65,
+              ),
             ),
           ),
         ),
@@ -31,9 +33,11 @@ class _HeroNarrative extends StatelessWidget {
           child: Text(
             portfolio.profile.summary,
             style: AppFonts.inter(
-              fontSize: compact ? 14 : 15,
-              color: AppColors.textPrimary,
-              height: 1.55,
+              TextStyle(
+                fontSize: compact ? 14 : 15,
+                color: AppColors.textPrimary,
+                height: 1.55,
+              ),
             ),
           ),
         ),
@@ -82,10 +86,12 @@ class _CurrentPractice extends StatelessWidget {
         Text(
           context.strings.homeSectionCurrently,
           style: AppFonts.spaceGrotesk(
-            fontSize: 12,
-            fontWeight: FontWeight.w700,
-            color: AppColors.accent,
-            letterSpacing: 0.2,
+            const TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w700,
+              color: AppColors.accent,
+              letterSpacing: 0.2,
+            ),
           ),
         ),
         const SizedBox(height: 14),
@@ -95,9 +101,11 @@ class _CurrentPractice extends StatelessWidget {
           Text(
             profile.focus.take(3).join(' · '),
             style: AppFonts.spaceGrotesk(
-              fontSize: 15,
-              color: AppColors.textPrimary,
-              height: 1.5,
+              const TextStyle(
+                fontSize: 15,
+                color: AppColors.textPrimary,
+                height: 1.5,
+              ),
             ),
           ),
         const SizedBox(height: 20),
@@ -154,10 +162,12 @@ class _CurrentRole extends StatelessWidget {
         Text(
           experience.company,
           style: AppFonts.spaceGrotesk(
-            fontSize: 18,
-            fontWeight: FontWeight.w700,
-            color: AppColors.textBright,
-            letterSpacing: -0.3,
+            const TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w700,
+              color: AppColors.textBright,
+              letterSpacing: -0.3,
+            ),
           ),
         ),
         const SizedBox(height: 4),
@@ -166,9 +176,11 @@ class _CurrentRole extends StatelessWidget {
           maxLines: 2,
           overflow: TextOverflow.ellipsis,
           style: AppFonts.inter(
-            fontSize: 12,
-            color: AppColors.textPrimary,
-            height: 1.45,
+            const TextStyle(
+              fontSize: 12,
+              color: AppColors.textPrimary,
+              height: 1.45,
+            ),
           ),
         ),
       ],
@@ -207,9 +219,11 @@ class _ProfileLink extends StatelessWidget {
           Text(
             link.label,
             style: AppFonts.spaceGrotesk(
-              fontSize: 12,
-              fontWeight: FontWeight.w700,
-              color: AppColors.textBright,
+              const TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w700,
+                color: AppColors.textBright,
+              ),
             ),
           ),
           const SizedBox(width: 6),
@@ -263,10 +277,12 @@ class _HeroLinkState extends State<_HeroLink> {
       child: Text(
         widget.label,
         style: AppFonts.spaceGrotesk(
-          fontSize: 14,
-          fontWeight: FontWeight.w500,
-          color: widget.primary ? AppColors.white : AppColors.textBright,
-          letterSpacing: 2,
+          TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+            color: widget.primary ? AppColors.white : AppColors.textBright,
+            letterSpacing: 2,
+          ),
         ),
       ),
     ),

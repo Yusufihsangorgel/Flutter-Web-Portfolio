@@ -44,10 +44,12 @@ class ProofSection extends StatelessWidget {
             child: Text(
               _summary(context, portfolio),
               style: AppFonts.spaceGrotesk(
-                fontSize: 20,
-                fontWeight: FontWeight.w400,
-                color: AppColors.textPrimary,
-                height: 1.55,
+                const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w400,
+                  color: AppColors.textPrimary,
+                  height: 1.55,
+                ),
               ),
             ),
           ),

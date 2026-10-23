@@ -173,11 +173,13 @@ final class _EvidenceRowText extends StatelessWidget {
             child: Text(
               system.name,
               style: AppFonts.spaceGrotesk(
-                fontSize: tablet ? 20 : 18,
-                fontWeight: FontWeight.w700,
-                color: AtlasColors.ink,
-                height: 1.15,
-                letterSpacing: -0.45,
+                TextStyle(
+                  fontSize: tablet ? 20 : 18,
+                  fontWeight: FontWeight.w700,
+                  color: AtlasColors.ink,
+                  height: 1.15,
+                  letterSpacing: -0.45,
+                ),
               ),
             ),
           ),
@@ -198,9 +200,11 @@ final class _EvidenceRowText extends StatelessWidget {
         maxLines: spotlightLines,
         overflow: TextOverflow.ellipsis,
         style: AppFonts.inter(
-          fontSize: 12,
-          color: AtlasColors.spotlightText,
-          height: 1.45,
+          const TextStyle(
+            fontSize: 12,
+            color: AtlasColors.spotlightText,
+            height: 1.45,
+          ),
         ),
       ),
     ],

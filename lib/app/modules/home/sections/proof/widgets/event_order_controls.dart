@@ -34,9 +34,11 @@ class _ScenarioControl extends StatelessWidget {
           child: Text(
             action.label,
             style: AppFonts.spaceGrotesk(
-              fontSize: 13,
-              fontWeight: FontWeight.w600,
-              color: action.selected ? SectionStyle.labInk : AppColors.white,
+              TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+                color: action.selected ? SectionStyle.labInk : AppColors.white,
+              ),
             ),
           ),
         ),
@@ -77,9 +79,11 @@ class _ReplayControl extends StatelessWidget {
             Text(
               label,
               style: AppFonts.spaceGrotesk(
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
-                color: AppColors.white,
+                const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.white,
+                ),
               ),
             ),
           ],

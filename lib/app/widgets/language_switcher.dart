@@ -32,28 +32,7 @@ class LanguageSwitcher extends StatelessWidget {
                 tooltip: '$menuLabel: $currentLanguage',
                 offset: const Offset(0, 40),
                 padding: const EdgeInsets.symmetric(horizontal: 8),
-                icon: ExcludeSemantics(
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        languageState.languageCode.toUpperCase(),
-                        style: AppFonts.spaceGrotesk(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.textBright,
-                          letterSpacing: 1.1,
-                        ),
-                      ),
-                      const SizedBox(width: 4),
-                      const Icon(
-                        Icons.keyboard_arrow_down_rounded,
-                        color: AppColors.textSecondary,
-                        size: 15,
-                      ),
-                    ],
-                  ),
-                ),
+                icon: _buildLanguageTrigger(languageState.languageCode),
                 color: AppColors.backgroundLight,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(2),
@@ -81,6 +60,31 @@ class LanguageSwitcher extends StatelessWidget {
           ),
     );
   }
+
+  Widget _buildLanguageTrigger(String languageCode) => ExcludeSemantics(
+    child: Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          languageCode.toUpperCase(),
+          style: AppFonts.spaceGrotesk(
+            const TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+              color: AppColors.textBright,
+              letterSpacing: 1.1,
+            ),
+          ),
+        ),
+        const SizedBox(width: 4),
+        const Icon(
+          Icons.keyboard_arrow_down_rounded,
+          color: AppColors.textSecondary,
+          size: 15,
+        ),
+      ],
+    ),
+  );
 }
 
 void _selectLanguage(
@@ -112,10 +116,12 @@ PopupMenuItem<String> _languageItem(String code, bool selected, Color accent) {
           child: Text(
             code.toUpperCase(),
             style: AppFonts.spaceGrotesk(
-              fontSize: 11,
-              fontWeight: FontWeight.w600,
-              color: selected ? accent : AppColors.textSecondary,
-              letterSpacing: 0.8,
+              TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w600,
+                color: selected ? accent : AppColors.textSecondary,
+                letterSpacing: 0.8,
+              ),
             ),
           ),
         ),
@@ -123,8 +129,10 @@ PopupMenuItem<String> _languageItem(String code, bool selected, Color accent) {
           child: Text(
             name,
             style: AppFonts.spaceGrotesk(
-              color: selected ? AppColors.textBright : AppColors.textPrimary,
-              fontWeight: selected ? FontWeight.w600 : FontWeight.normal,
+              TextStyle(
+                color: selected ? AppColors.textBright : AppColors.textPrimary,
+                fontWeight: selected ? FontWeight.w600 : FontWeight.normal,
+              ),
             ),
           ),
         ),

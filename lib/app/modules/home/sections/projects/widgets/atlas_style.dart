@@ -73,9 +73,11 @@ abstract final class AtlasText {
     FontWeight weight = FontWeight.w800,
     double? letterSpacing,
   }) => AppFonts.spaceGrotesk(
-    fontSize: size,
-    fontWeight: weight,
-    color: color,
-    letterSpacing: letterSpacing,
+    TextStyle(
+      fontSize: size,
+      fontWeight: weight,
+      color: color,
+      letterSpacing: letterSpacing,
+    ),
   );
 }

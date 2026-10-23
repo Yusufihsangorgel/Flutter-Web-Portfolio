@@ -267,10 +267,12 @@ abstract final class NarrativeHandoffTypography {
 
   static TextStyle _style({required double fontSize, required Color color}) =>
       AppFonts.jetBrainsMono(
-        fontSize: fontSize,
-        fontWeight: FontWeight.w600,
-        letterSpacing: 0.8,
-        color: color,
+        TextStyle(
+          fontSize: fontSize,
+          fontWeight: FontWeight.w600,
+          letterSpacing: 0.8,
+          color: color,
+        ),
       );
 }
 

@@ -109,10 +109,12 @@ class _WritingHeader extends StatelessWidget {
         child: Text(
           context.strings.writingSectionSubtitle,
           style: AppFonts.spaceGrotesk(
-            fontSize: 20,
-            fontWeight: FontWeight.w400,
-            color: AppColors.textPrimary,
-            height: 1.55,
+            const TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w400,
+              color: AppColors.textPrimary,
+              height: 1.55,
+            ),
           ),
         ),
       ),
@@ -151,9 +153,11 @@ class _WritingDisclosure extends StatelessWidget {
               Text(
                 label,
                 style: AppFonts.spaceGrotesk(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  color: accent,
+                  TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: accent,
+                  ),
                 ),
               ),
               const SizedBox(width: 8),
@@ -187,10 +191,12 @@ class _AllWritingRow extends StatelessWidget {
           Text(
             context.strings.writingSectionAllWriting.toUpperCase(),
             style: AppFonts.jetBrainsMono(
-              fontSize: 10.5,
-              fontWeight: FontWeight.w700,
-              color: AppColors.textSecondary,
-              letterSpacing: 1.1,
+              const TextStyle(
+                fontSize: 10.5,
+                fontWeight: FontWeight.w700,
+                color: AppColors.textSecondary,
+                letterSpacing: 1.1,
+              ),
             ),
           ),
           for (final source in sources)
@@ -203,11 +209,13 @@ class _AllWritingRow extends StatelessWidget {
               child: Text(
                 source.label,
                 style: AppFonts.spaceGrotesk(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                  color: accent,
-                  decoration: TextDecoration.underline,
-                  decorationColor: accent,
+                  TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: accent,
+                    decoration: TextDecoration.underline,
+                    decorationColor: accent,
+                  ),
                 ),
               ),
             ),

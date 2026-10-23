@@ -16,13 +16,6 @@
       "reason": "Existing parameters debt measured when the AST metrics gate was introduced; refactor this callable separately and shrink this entry."
     },
     {
-      "path": "lib/app/core/theme/app_fonts.dart",
-      "identity": "class:_FontStyle.method:call",
-      "metric": "parameters",
-      "value": 19,
-      "reason": "Existing parameters debt measured when the AST metrics gate was introduced; refactor this callable separately and shrink this entry."
-    },
-    {
       "path": "lib/app/domain/models/contribution.dart",
       "identity": "class:PortfolioEventOrderLab.method:validate",
       "metric": "complexity",

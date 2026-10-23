@@ -54,10 +54,12 @@ class NumberedSectionHeading extends StatelessWidget {
                     Text(
                       number,
                       style: AppFonts.spaceGrotesk(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w800,
-                        color: accent,
-                        letterSpacing: 0.5,
+                        TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w800,
+                          color: accent,
+                          letterSpacing: 0.5,
+                        ),
                       ),
                     ),
                   ],
@@ -76,13 +78,16 @@ class NumberedSectionHeading extends StatelessWidget {
             Text(
               title,
               style: AppFonts.spaceGrotesk(
-                fontSize: MediaQuery.sizeOf(context).width < Breakpoints.tablet
-                    ? 44
-                    : 68,
-                fontWeight: FontWeight.w600,
-                color: AppColors.textBright,
-                height: 0.98,
-                letterSpacing: -2.2,
+                TextStyle(
+                  fontSize:
+                      MediaQuery.sizeOf(context).width < Breakpoints.tablet
+                      ? 44
+                      : 68,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.textBright,
+                  height: 0.98,
+                  letterSpacing: -2.2,
+                ),
               ),
             ),
           ],

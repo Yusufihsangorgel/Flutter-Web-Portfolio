@@ -111,10 +111,12 @@ class _PackagesHeader extends StatelessWidget {
                     perfect: '$perfect',
                   ),
             style: AppFonts.spaceGrotesk(
-              fontSize: 20,
-              fontWeight: FontWeight.w400,
-              color: AppColors.textPrimary,
-              height: 1.55,
+              const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w400,
+                color: AppColors.textPrimary,
+                height: 1.55,
+              ),
             ),
           ),
         ),
@@ -154,9 +156,11 @@ class _PackageDisclosure extends StatelessWidget {
               Text(
                 label,
                 style: AppFonts.spaceGrotesk(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  color: accent,
+                  TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: accent,
+                  ),
                 ),
               ),
               const SizedBox(width: 8),

@@ -212,10 +212,12 @@ class _LogoTextState extends State<_LogoText> {
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
           style: AppFonts.spaceGrotesk(
-            fontSize: 13 * widget.scaleFactor,
-            fontWeight: FontWeight.w600,
-            color: _hovered ? hoverColor : baseColor,
-            letterSpacing: -0.15,
+            TextStyle(
+              fontSize: 13 * widget.scaleFactor,
+              fontWeight: FontWeight.w600,
+              color: _hovered ? hoverColor : baseColor,
+              letterSpacing: -0.15,
+            ),
           ),
         ),
       ),
@@ -265,12 +267,16 @@ class _NavItemState extends State<_NavItem> {
             Text(
               widget.label,
               style: AppFonts.spaceGrotesk(
-                fontSize: 12 * widget.scaleFactor,
-                fontWeight: widget.isActive ? FontWeight.w600 : FontWeight.w400,
-                color: widget.isActive
-                    ? activeColor
-                    : (_hovered ? activeColor : inactiveColor),
-                letterSpacing: 0,
+                TextStyle(
+                  fontSize: 12 * widget.scaleFactor,
+                  fontWeight: widget.isActive
+                      ? FontWeight.w600
+                      : FontWeight.w400,
+                  color: widget.isActive
+                      ? activeColor
+                      : (_hovered ? activeColor : inactiveColor),
+                  letterSpacing: 0,
+                ),
               ),
             ),
             const SizedBox(height: 4),

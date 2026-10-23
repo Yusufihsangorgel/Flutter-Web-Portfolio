@@ -27,11 +27,13 @@ class _FeaturedContribution extends StatelessWidget {
           Text(
             context.strings.proofSectionFeaturedLabel.toUpperCase(),
             style: AppFonts.jetBrainsMono(
-              fontSize: 11,
-              fontWeight: FontWeight.w600,
-              color: accent,
-              height: 1.4,
-              letterSpacing: 1.4,
+              TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w600,
+                color: accent,
+                height: 1.4,
+                letterSpacing: 1.4,
+              ),
             ),
           ),
           SizedBox(height: compact ? 26 : 38),
@@ -90,11 +92,13 @@ class _FeaturedContribution extends StatelessWidget {
         Text(
           contribution.title,
           style: AppFonts.spaceGrotesk(
-            fontSize: compact ? 36 : 54,
-            fontWeight: FontWeight.w600,
-            color: AppColors.textBright,
-            height: 0.98,
-            letterSpacing: compact ? -1.4 : -2.3,
+            TextStyle(
+              fontSize: compact ? 36 : 54,
+              fontWeight: FontWeight.w600,
+              color: AppColors.textBright,
+              height: 0.98,
+              letterSpacing: compact ? -1.4 : -2.3,
+            ),
           ),
         ),
         SizedBox(height: compact ? 34 : 48),
@@ -152,19 +156,23 @@ class _StoryColumn extends StatelessWidget {
       Text(
         label.toUpperCase(),
         style: AppFonts.jetBrainsMono(
-          fontSize: 10,
-          fontWeight: FontWeight.w600,
-          color: accent,
-          letterSpacing: 1.2,
+          TextStyle(
+            fontSize: 10,
+            fontWeight: FontWeight.w600,
+            color: accent,
+            letterSpacing: 1.2,
+          ),
         ),
       ),
       const SizedBox(height: 13),
       Text(
         body,
         style: AppFonts.inter(
-          fontSize: 15,
-          color: AppColors.textPrimary,
-          height: 1.72,
+          const TextStyle(
+            fontSize: 15,
+            color: AppColors.textPrimary,
+            height: 1.72,
+          ),
         ),
       ),
     ],
@@ -193,20 +201,24 @@ class _ContributionMetadata extends StatelessWidget {
       Text(
         contribution.project,
         style: AppFonts.spaceGrotesk(
-          fontSize: 17,
-          fontWeight: FontWeight.w600,
-          color: AppColors.textBright,
-          height: 1.25,
+          const TextStyle(
+            fontSize: 17,
+            fontWeight: FontWeight.w600,
+            color: AppColors.textBright,
+            height: 1.25,
+          ),
         ),
       ),
       const SizedBox(height: 9),
       Text(
         '$statusLabel\n${sectionDateLabel(contribution.date)}',
         style: AppFonts.jetBrainsMono(
-          fontSize: 10,
-          color: AppColors.textSecondary,
-          height: 1.65,
-          letterSpacing: 0.7,
+          const TextStyle(
+            fontSize: 10,
+            color: AppColors.textSecondary,
+            height: 1.65,
+            letterSpacing: 0.7,
+          ),
         ),
       ),
     ],

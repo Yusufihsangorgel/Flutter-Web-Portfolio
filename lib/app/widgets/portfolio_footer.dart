@@ -51,11 +51,13 @@ class PortfolioFooter extends StatelessWidget {
                         name,
                         maxLines: 1,
                         style: AppFonts.spaceGrotesk(
-                          fontSize: desktop ? 76 : 44,
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.background,
-                          height: 0.98,
-                          letterSpacing: desktop ? -2.8 : -1.2,
+                          TextStyle(
+                            fontSize: desktop ? 76 : 44,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.background,
+                            height: 0.98,
+                            letterSpacing: desktop ? -2.8 : -1.2,
+                          ),
                         ),
                       ),
                     ),
@@ -88,9 +90,11 @@ class _FooterRail extends StatelessWidget {
         Text(
           '${portfolio.profile.role} · ${portfolio.profile.location}',
           style: AppFonts.spaceGrotesk(
-            fontSize: 12,
-            fontWeight: FontWeight.w600,
-            color: AppColors.background,
+            const TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              color: AppColors.background,
+            ),
           ),
         ),
         const SizedBox(width: 16),
@@ -146,18 +150,22 @@ class _FooterNavigation extends StatelessWidget {
         Text(
           strings.footerVerification,
           style: AppFonts.spaceGrotesk(
-            fontSize: 12,
-            fontWeight: FontWeight.w500,
-            color: AppColors.background.withValues(alpha: 0.62),
+            TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+              color: AppColors.background.withValues(alpha: 0.62),
+            ),
           ),
         ),
         const SizedBox(height: 10),
         Text(
           portfolio.profile.focus.take(3).join(' · '),
           style: AppFonts.spaceGrotesk(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-            color: AppColors.background,
+            const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              color: AppColors.background,
+            ),
           ),
         ),
         const SizedBox(height: 24),
@@ -207,9 +215,11 @@ class _FooterEmail extends StatelessWidget {
           Text(
             email,
             style: AppFonts.spaceGrotesk(
-              fontSize: 13,
-              fontWeight: FontWeight.w600,
-              color: AppColors.background,
+              const TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+                color: AppColors.background,
+              ),
             ),
           ),
           const SizedBox(width: 6),
@@ -242,9 +252,11 @@ class _ProfileLink extends StatelessWidget {
           Text(
             link.label,
             style: AppFonts.spaceGrotesk(
-              fontSize: 13,
-              fontWeight: FontWeight.w600,
-              color: AppColors.background,
+              const TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+                color: AppColors.background,
+              ),
             ),
           ),
           const SizedBox(width: 6),
@@ -293,10 +305,12 @@ class _FooterLinkState extends State<_FooterLink> {
       child: Text(
         widget.label,
         style: AppFonts.spaceGrotesk(
-          fontSize: 14,
-          fontWeight: FontWeight.w600,
-          color: AppColors.background,
-          letterSpacing: -0.1,
+          const TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+            color: AppColors.background,
+            letterSpacing: -0.1,
+          ),
         ),
       ),
     ),
@@ -330,9 +344,11 @@ class _FooterBottom extends StatelessWidget {
   );
 
   TextStyle _bottomStyle() => AppFonts.spaceGrotesk(
-    fontSize: 10,
-    fontWeight: FontWeight.w600,
-    color: AppColors.background.withValues(alpha: 0.62),
-    letterSpacing: 0.1,
+    TextStyle(
+      fontSize: 10,
+      fontWeight: FontWeight.w600,
+      color: AppColors.background.withValues(alpha: 0.62),
+      letterSpacing: 0.1,
+    ),
   );
 }

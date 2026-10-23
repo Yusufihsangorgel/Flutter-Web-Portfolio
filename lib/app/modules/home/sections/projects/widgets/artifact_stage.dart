@@ -69,9 +69,11 @@ final class ArtifactStage extends StatelessWidget {
         Text(
           view.caption,
           style: AppFonts.inter(
-            fontSize: 11,
-            color: palette.ink(AtlasAlpha.caption),
-            height: 1.45,
+            TextStyle(
+              fontSize: 11,
+              color: palette.ink(AtlasAlpha.caption),
+              height: 1.45,
+            ),
           ),
         ),
       ],

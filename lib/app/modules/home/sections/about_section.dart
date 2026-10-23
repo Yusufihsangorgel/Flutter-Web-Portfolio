@@ -52,9 +52,11 @@ class AboutSection extends StatelessWidget {
                 Text(
                   context.strings.aboutSectionPracticeTitle,
                   style: AppFonts.spaceGrotesk(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.textBright,
+                    const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.textBright,
+                    ),
                   ),
                 ),
                 const SizedBox(height: 24),
@@ -98,13 +100,15 @@ class _AboutLead extends StatelessWidget {
     child: Text(
       profile.summary,
       style: AppFonts.spaceGrotesk(
-        fontSize: MediaQuery.sizeOf(context).width < Breakpoints.tablet
-            ? 29
-            : 43,
-        fontWeight: FontWeight.w500,
-        color: AppColors.textBright,
-        height: 1.15,
-        letterSpacing: -1.25,
+        TextStyle(
+          fontSize: MediaQuery.sizeOf(context).width < Breakpoints.tablet
+              ? 29
+              : 43,
+          fontWeight: FontWeight.w500,
+          color: AppColors.textBright,
+          height: 1.15,
+          letterSpacing: -1.25,
+        ),
       ),
     ),
   );
@@ -122,9 +126,11 @@ class _AboutDetail extends StatelessWidget {
       Text(
         profile.background,
         style: AppFonts.inter(
-          fontSize: 16,
-          color: AppColors.textPrimary,
-          height: 1.75,
+          const TextStyle(
+            fontSize: 16,
+            color: AppColors.textPrimary,
+            height: 1.75,
+          ),
         ),
       ),
       const SizedBox(height: 32),
@@ -186,9 +192,11 @@ class _EmailLink extends StatelessWidget {
           Text(
             email,
             style: AppFonts.spaceGrotesk(
-              fontSize: 13,
-              fontWeight: FontWeight.w600,
-              color: AppColors.textBright,
+              const TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+                color: AppColors.textBright,
+              ),
             ),
           ),
           const SizedBox(width: 7),
@@ -217,8 +225,7 @@ class _FactLine extends StatelessWidget {
         child: Text(
           label,
           style: AppFonts.spaceGrotesk(
-            fontSize: 13,
-            color: AppColors.textSecondary,
+            const TextStyle(fontSize: 13, color: AppColors.textSecondary),
           ),
         ),
       ),
@@ -228,9 +235,11 @@ class _FactLine extends StatelessWidget {
           value,
           textAlign: TextAlign.end,
           style: AppFonts.spaceGrotesk(
-            fontSize: 13,
-            fontWeight: FontWeight.w600,
-            color: AppColors.textBright,
+            const TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: AppColors.textBright,
+            ),
           ),
         ),
       ),
@@ -256,9 +265,11 @@ class _ProfileLink extends StatelessWidget {
           Text(
             link.label,
             style: AppFonts.spaceGrotesk(
-              fontSize: 13,
-              fontWeight: FontWeight.w600,
-              color: AppColors.textBright,
+              const TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+                color: AppColors.textBright,
+              ),
             ),
           ),
           const SizedBox(width: 7),
@@ -326,10 +337,12 @@ class _PracticeRow extends StatelessWidget {
         Text(
           '${index + 1}'.padLeft(2, '0'),
           style: AppFonts.spaceGrotesk(
-            fontSize: 12,
-            fontWeight: FontWeight.w800,
-            color: AppColors.accent,
-            letterSpacing: 0.4,
+            const TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w800,
+              color: AppColors.accent,
+              letterSpacing: 0.4,
+            ),
           ),
         ),
         const SizedBox(width: 22),
@@ -340,19 +353,23 @@ class _PracticeRow extends StatelessWidget {
               Text(
                 capability.label,
                 style: AppFonts.spaceGrotesk(
-                  fontSize: 22,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.textBright,
-                  letterSpacing: -0.45,
+                  const TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textBright,
+                    letterSpacing: -0.45,
+                  ),
                 ),
               ),
               const SizedBox(height: 10),
               Text(
                 capability.items.join(' · '),
                 style: AppFonts.inter(
-                  fontSize: 14,
-                  color: AppColors.textPrimary,
-                  height: 1.6,
+                  const TextStyle(
+                    fontSize: 14,
+                    color: AppColors.textPrimary,
+                    height: 1.6,
+                  ),
                 ),
               ),
             ],

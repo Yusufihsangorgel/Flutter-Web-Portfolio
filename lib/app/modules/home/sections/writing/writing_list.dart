@@ -134,9 +134,11 @@ class _FeaturedWriting extends StatelessWidget {
           child: Text(
             entry.title,
             style: AppFonts.spaceGrotesk(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-              color: AppColors.textBright,
+              const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: AppColors.textBright,
+              ),
             ),
           ),
         ),
@@ -183,9 +185,11 @@ class _CompactWriting extends StatelessWidget {
           child: Text(
             entry.title,
             style: AppFonts.spaceGrotesk(
-              fontSize: 15,
-              fontWeight: FontWeight.w600,
-              color: AppColors.textBright,
+              const TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w600,
+                color: AppColors.textBright,
+              ),
             ),
           ),
         ),
@@ -222,9 +226,11 @@ class _NarrowWriting extends StatelessWidget {
             child: Text(
               entry.title,
               style: AppFonts.spaceGrotesk(
-                fontSize: compact ? 15 : 18,
-                fontWeight: FontWeight.w600,
-                color: AppColors.textBright,
+                TextStyle(
+                  fontSize: compact ? 15 : 18,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.textBright,
+                ),
               ),
             ),
           ),
@@ -257,16 +263,13 @@ class _WritingMeta extends StatelessWidget {
       Text(
         sourceLabel,
         style: AppFonts.jetBrainsMono(
-          fontSize: 11,
-          fontWeight: FontWeight.w700,
-          color: accent,
+          TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: accent),
         ),
       ),
       Text(
         dateLabel,
         style: AppFonts.jetBrainsMono(
-          fontSize: 11,
-          color: AppColors.textSecondary,
+          const TextStyle(fontSize: 11, color: AppColors.textSecondary),
         ),
       ),
     ],

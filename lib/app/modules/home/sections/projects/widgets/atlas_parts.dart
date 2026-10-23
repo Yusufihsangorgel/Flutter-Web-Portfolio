@@ -93,9 +93,11 @@ final class NarrativeBeat extends StatelessWidget {
         Text(
           value,
           style: AppFonts.inter(
-            fontSize: 14,
-            color: palette.ink(AtlasAlpha.body),
-            height: 1.58,
+            TextStyle(
+              fontSize: 14,
+              color: palette.ink(AtlasAlpha.body),
+              height: 1.58,
+            ),
           ),
         ),
       ],

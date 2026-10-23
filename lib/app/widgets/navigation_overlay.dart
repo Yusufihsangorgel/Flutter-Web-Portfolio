@@ -339,11 +339,13 @@ class _MenuItemWidget extends StatelessWidget {
             AnimatedDefaultTextStyle(
               duration: motionDuration,
               style: AppFonts.spaceGrotesk(
-                fontSize: isMobile ? 18 : 22,
-                fontWeight: FontWeight.w700,
-                color: isHovered
-                    ? accentColor
-                    : textColor.withValues(alpha: 0.4),
+                TextStyle(
+                  fontSize: isMobile ? 18 : 22,
+                  fontWeight: FontWeight.w700,
+                  color: isHovered
+                      ? accentColor
+                      : textColor.withValues(alpha: 0.4),
+                ),
               ),
               child: Text(item.number),
             ),
@@ -353,10 +355,12 @@ class _MenuItemWidget extends StatelessWidget {
               child: AnimatedDefaultTextStyle(
                 duration: motionDuration,
                 style: AppFonts.spaceGrotesk(
-                  fontSize: fontSize,
-                  fontWeight: FontWeight.w500,
-                  color: isHovered ? accentColor : textColor,
-                  letterSpacing: -fontSize * 0.025,
+                  TextStyle(
+                    fontSize: fontSize,
+                    fontWeight: FontWeight.w500,
+                    color: isHovered ? accentColor : textColor,
+                    letterSpacing: -fontSize * 0.025,
+                  ),
                 ),
                 child: Text(label),
               ),

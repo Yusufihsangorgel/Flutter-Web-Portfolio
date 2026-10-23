@@ -139,22 +139,26 @@ class _EventNode extends StatelessWidget {
       Text(
         progress.step.toString().padLeft(2, '0'),
         style: AppFonts.jetBrainsMono(
-          fontSize: 10,
-          fontWeight: FontWeight.w700,
-          color: progress.visible ? accent : quiet,
-          letterSpacing: 0.8,
+          TextStyle(
+            fontSize: 10,
+            fontWeight: FontWeight.w700,
+            color: progress.visible ? accent : quiet,
+            letterSpacing: 0.8,
+          ),
         ),
       ),
       const SizedBox(height: 20),
       Text(
         event.label,
         style: AppFonts.spaceGrotesk(
-          fontSize: 14,
-          fontWeight: FontWeight.w600,
-          color: progress.visible
-              ? AppColors.white
-              : AppColors.white.withValues(alpha: 0.5),
-          height: 1.3,
+          TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+            color: progress.visible
+                ? AppColors.white
+                : AppColors.white.withValues(alpha: 0.5),
+            height: 1.3,
+          ),
         ),
       ),
       const SizedBox(height: 10),
@@ -162,7 +166,9 @@ class _EventNode extends StatelessWidget {
         textDirection: TextDirection.ltr,
         child: Text(
           event.id,
-          style: AppFonts.jetBrainsMono(fontSize: 9, color: quiet, height: 1.3),
+          style: AppFonts.jetBrainsMono(
+            TextStyle(fontSize: 9, color: quiet, height: 1.3),
+          ),
         ),
       ),
     ],
@@ -203,10 +209,12 @@ class _SequenceLink extends StatelessWidget {
               '${context.strings.proofSectionEventLabRisk}\n${gap!.label}',
               textAlign: TextAlign.center,
               style: AppFonts.jetBrainsMono(
-                fontSize: 9,
-                fontWeight: FontWeight.w600,
-                color: SectionStyle.labRiskText,
-                height: 1.45,
+                const TextStyle(
+                  fontSize: 9,
+                  fontWeight: FontWeight.w600,
+                  color: SectionStyle.labRiskText,
+                  height: 1.45,
+                ),
               ),
             ),
           ),
