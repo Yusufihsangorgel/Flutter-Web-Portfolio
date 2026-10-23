@@ -19,6 +19,9 @@
     "language_not_saved": "No se pudo guardar tu preferencia de idioma. Este idioma permanecerá activo durante esta visita.",
     "language_change_failed": "No se pudo cargar ese idioma. Tu idioma actual sigue activo."
   },
+  "documents": {
+    "resume_pdf": "Currículum (PDF)"
+  },
   "about_section": {
     "title": "Sobre mí",
     "practice_title": "Áreas en las que trabajo",

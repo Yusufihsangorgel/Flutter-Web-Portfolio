@@ -136,6 +136,8 @@ class _FooterNavigation extends StatelessWidget {
               links[index].id,
             ),
           ),
+        if (portfolio.site.resumeUrl case final resumeUrl?)
+          _FooterLink(label: strings.documentsResumePdf, uri: resumeUrl),
       ],
     );
     final focus = Column(
@@ -258,15 +260,11 @@ class _ProfileLink extends StatelessWidget {
 }
 
 class _FooterLink extends StatefulWidget {
-  const _FooterLink({
-    required this.label,
-    required this.uri,
-    required this.onTap,
-  });
+  const _FooterLink({required this.label, required this.uri, this.onTap});
 
   final String label;
   final Uri uri;
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
 
   @override
   State<_FooterLink> createState() => _FooterLinkState();

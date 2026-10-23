@@ -20,7 +20,7 @@ typedef PortfolioSiteFields = ({
 });
 
 final class PortfolioSite {
-  PortfolioSite(PortfolioSiteFields fields)
+  PortfolioSite(PortfolioSiteFields fields, {this.resumeEnabled = false})
     : url = fields.url,
       title = fields.title,
       description = fields.description,
@@ -41,7 +41,7 @@ final class PortfolioSite {
     locales: locales,
     engineeringLinks: changes.engineeringLinks,
     analytics: analytics,
-  ));
+  ), resumeEnabled: resumeEnabled);
 
   Map<String, Object?> toJson() => {
     'url': url.toString(),
@@ -53,7 +53,11 @@ final class PortfolioSite {
     'locales': locales,
     'engineering_links': [for (final value in engineeringLinks) value.toJson()],
     'analytics': analytics?.toJson(),
+    'resume_enabled': resumeEnabled,
   };
+
+  /// Document-relative résumé address, or null when disabled.
+  Uri? get resumeUrl => resumeEnabled ? Uri.parse('resume.pdf') : null;
 
   final Uri url;
   final String title;
@@ -64,6 +68,7 @@ final class PortfolioSite {
   final List<String> locales;
   final List<PortfolioLink> engineeringLinks;
   final PortfolioAnalytics? analytics;
+  final bool resumeEnabled;
 }
 
 final class PortfolioAnalytics {

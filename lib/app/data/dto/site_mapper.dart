@@ -9,26 +9,31 @@ PortfolioSite parsePortfolioSite(Map<String, dynamic> json) {
       'The social image must be a root-relative asset path.',
     );
   }
-  return PortfolioSite((
-    url: requiredUri(json, 'url'),
-    title: requiredString(json, 'title'),
-    description: requiredString(json, 'description'),
-    socialDescription: requiredString(json, 'social_description'),
-    socialImage: socialImage,
-    domainLabel: requiredString(json, 'domain_label'),
-    locales: switch (json['locales']) {
-      null => const ['en'],
-      _ => requiredStrings(json, 'locales'),
-    },
-    engineeringLinks: requiredObjects(
-      json,
-      'engineering_links',
-    ).map(parsePortfolioLink).toList(),
-    analytics: switch (optionalObject(json, 'analytics')) {
-      final value? => _parsePortfolioAnalytics(value),
-      null => null,
-    },
-  ));
+  return PortfolioSite(
+    (
+      url: requiredUri(json, 'url'),
+      title: requiredString(json, 'title'),
+      description: requiredString(json, 'description'),
+      socialDescription: requiredString(json, 'social_description'),
+      socialImage: socialImage,
+      domainLabel: requiredString(json, 'domain_label'),
+      locales: switch (json['locales']) {
+        null => const ['en'],
+        _ => requiredStrings(json, 'locales'),
+      },
+      engineeringLinks: requiredObjects(
+        json,
+        'engineering_links',
+      ).map(parsePortfolioLink).toList(),
+      analytics: switch (optionalObject(json, 'analytics')) {
+        final value? => _parsePortfolioAnalytics(value),
+        null => null,
+      },
+    ),
+    resumeEnabled: json.containsKey('resume_enabled')
+        ? requiredBool(json, 'resume_enabled')
+        : false,
+  );
 }
 
 PortfolioAnalytics _parsePortfolioAnalytics(Map<String, dynamic> json) =>

@@ -27,6 +27,7 @@ export type PortfolioContribution = {
 export type PortfolioTestData = {
   content_version: string;
   site: {
+    resume_enabled?: boolean;
     locales: string[];
     social_image: string;
     title: string;
@@ -54,6 +55,7 @@ export type PortfolioTestData = {
 };
 
 export type InterfaceTestData = {
+  documents: { resume_pdf: string };
   accessibility: {
     back_to_top: string;
     load_failure: string;

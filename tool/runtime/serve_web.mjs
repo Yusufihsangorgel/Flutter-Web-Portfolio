@@ -27,6 +27,7 @@ const contentTypes = new Map([
   ['.json', 'application/json; charset=utf-8'],
   ['.mjs', 'text/javascript; charset=utf-8'],
   ['.otf', 'font/otf'],
+  ['.pdf', 'application/pdf'],
   ['.png', 'image/png'],
   ['.svg', 'image/svg+xml'],
   ['.ttf', 'font/ttf'],

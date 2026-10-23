@@ -19,6 +19,9 @@
     "language_not_saved": "Your language preference could not be saved. This language will remain active for this visit.",
     "language_change_failed": "That language could not be loaded. Your current language is still active."
   },
+  "documents": {
+    "resume_pdf": "Résumé (PDF)"
+  },
   "about_section": {
     "title": "About",
     "practice_title": "What I work across",

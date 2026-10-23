@@ -112,6 +112,9 @@ final class AppStrings {
     {'language': language},
   );
 
+  String get documentsResumePdf =>
+      lookup('documents.resume_pdf', defaultValue: 'Résumé (PDF)');
+
   String get experienceSectionPresent =>
       lookup('experience_section.present', defaultValue: 'Present');
 

@@ -7,6 +7,7 @@ import { test } from 'node:test';
 import { fileURLToPath } from 'node:url';
 
 import { formatDate, formatPeriod, renderResumeHtml } from './render_resume_html.mjs';
+import { isResumeEnabled } from './resume_availability.mjs';
 
 const root = fileURLToPath(new URL('../../', import.meta.url));
 const record = JSON.parse(await readFile(path.join(root, 'assets/content/portfolio.json'), 'utf8'));
@@ -131,6 +132,7 @@ test('the actual initializer custom-output record renders without demo identity'
     );
     assert.equal(result.status, 0, result.stderr);
     const clone = JSON.parse(await readFile(output, 'utf8'));
+    assert.equal(isResumeEnabled(clone), false);
     const html = renderResumeHtml(clone);
     assert.ok(html.includes(clone.profile.name));
     assert.ok(html.includes(clone.profile.email));

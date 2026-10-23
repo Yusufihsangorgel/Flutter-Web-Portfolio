@@ -18,6 +18,7 @@ test("loads the classic scripts without redeclaring a global binding", () => {
 
 type Linked = { url?: string };
 type PortfolioContent = {
+  site: { resume_enabled?: boolean };
   profile: {
     name: string;
     summary?: string;
@@ -109,6 +110,53 @@ test("serves the semantic document when JavaScript is disabled", async (
       }).length,
     );
     expect(invalidLinks).toBe(0);
+    const resumeLink = page.locator('#static-document a[href="resume.pdf"]');
+    await expect(resumeLink).toHaveCount(
+      portfolio.site.resume_enabled === true ? 1 : 0,
+    );
+    if (portfolio.site.resume_enabled === true) {
+      await expect(resumeLink).toHaveAccessibleName("Résumé (PDF)");
+      const destination = await resumeLink.evaluate((anchor: HTMLAnchorElement) => ({
+        actual: anchor.href,
+        expected: new URL("resume.pdf", document.baseURI).href,
+      }));
+      expect(destination.actual).toBe(destination.expected);
+    }
+  } finally {
+    await context.close();
+  }
+});
+
+test("static resume anchor uses a Pages base even at a deep document URL", async (
+  { browser },
+  testInfo,
+) => {
+  const context = await browser.newContext({
+    baseURL: testInfo.project.use.baseURL as string,
+    javaScriptEnabled: false,
+  });
+  const page = await context.newPage();
+  try {
+    // Keep the built HTML intact except for the base of this Pages-path fixture.
+    // No PDF response is mocked; the release verifier checks the actual artifact.
+    await page.route("**/portfolio/deep/", async (route) => {
+      const root = new URL("/", route.request().url());
+      const response = await route.fetch({ url: root.href });
+      const html = await response.text();
+      expect(html).toMatch(/<base href="[^"]+">/);
+      await route.fulfill({
+        response,
+        body: html.replace(/<base href="[^"]+">/, '<base href="/portfolio/">'),
+      });
+    });
+    await page.goto("/portfolio/deep/", { waitUntil: "domcontentloaded" });
+    const resumeLink = page.locator('#static-document a[href="resume.pdf"]');
+    await expect(resumeLink).toHaveCount(portfolio.site.resume_enabled === true ? 1 : 0);
+    if (portfolio.site.resume_enabled === true) {
+      const expected = new URL("/portfolio/resume.pdf", page.url()).href;
+      await expect(resumeLink).toHaveJSProperty("href", expected);
+      expect(new URL("resume.pdf", page.url()).href).not.toBe(expected);
+    }
   } finally {
     await context.close();
   }

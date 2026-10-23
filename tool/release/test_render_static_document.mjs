@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import { renderStaticDocument, evidenceUrls } from './render_static_document.mjs';
+import { renderReadmeRecord } from '../public-content/renderers.mjs';
 
 const fixture = {
   profile: {
@@ -72,4 +73,39 @@ test('renders one anchor for each evidence URL', () => {
 test('rejects unsafe link schemes', () => {
   const unsafe = { ...fixture, writing: [{ title: 'Bad', url: 'javascript:alert(1)' }] };
   assert.throws(() => renderStaticDocument(unsafe), /Unsafe URL/);
+});
+
+test('enabled static resume anchor resolves against its document base, not its deep path', () => {
+  const enabled = { ...fixture, site: { url: 'https://example.com', resume_enabled: true } };
+  const html = renderStaticDocument(enabled);
+  const resumeHref = html.match(/<a href="([^"]+)">Résumé \(PDF\)<\/a>/)?.[1];
+  assert.equal(resumeHref, 'resume.pdf');
+  for (const [base, location, expected] of [
+    ['https://example.com/', 'https://example.com/', 'https://example.com/resume.pdf'],
+    [
+      'https://example.com/portfolio/',
+      'https://example.com/portfolio/',
+      'https://example.com/portfolio/resume.pdf',
+    ],
+    [
+      'https://example.com/portfolio/',
+      'https://example.com/portfolio/deep/',
+      'https://example.com/portfolio/resume.pdf',
+    ],
+  ]) {
+    assert.equal(new URL(resumeHref, base).href, expected);
+    if (location !== base) assert.notEqual(new URL(resumeHref, location).href, expected);
+  }
+  assert.match(
+    renderReadmeRecord(enabled),
+    /\[Résumé \(PDF\)\]\(https:\/\/example\.com\/resume\.pdf\)/,
+  );
+});
+
+test('omits resume links unless the content explicitly enables them', () => {
+  for (const resume_enabled of [undefined, false]) {
+    const disabled = { ...fixture, site: { url: 'https://example.com', resume_enabled } };
+    assert.doesNotMatch(renderStaticDocument(disabled), /resume\.pdf/);
+    assert.doesNotMatch(renderReadmeRecord(disabled), /resume\.pdf/);
+  }
 });

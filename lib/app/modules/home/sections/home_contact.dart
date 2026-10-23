@@ -56,6 +56,8 @@ class _HeroNarrative extends StatelessWidget {
         uri: Uri(scheme: 'mailto', path: portfolio.profile.email),
         label: context.strings.homeSectionEmail,
       ),
+      if (portfolio.site.resumeUrl case final resumeUrl?)
+        _HeroLink(uri: resumeUrl, label: context.strings.documentsResumePdf),
     ],
   );
 }

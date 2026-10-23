@@ -19,6 +19,9 @@
     "language_not_saved": "تعذّر حفظ تفضيل اللغة. ستظل هذه اللغة مفعّلة خلال هذه الزيارة.",
     "language_change_failed": "تعذّر تحميل هذه اللغة. ستظل لغتك الحالية مفعّلة."
   },
+  "documents": {
+    "resume_pdf": "السيرة الذاتية (PDF)"
+  },
   "about_section": {
     "title": "عني",
     "practice_title": "مجالات عملي",

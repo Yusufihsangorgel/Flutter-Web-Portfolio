@@ -3,6 +3,7 @@
   "content_version": "2026.09.28.1",
   "verified_at": "2026-08-29",
   "site": {
+    "resume_enabled": true,
     "template_repository": true,
     "url": "https://developeryusuf.com",
     "title": "Yusuf İhsan Görgel — Software Engineer",

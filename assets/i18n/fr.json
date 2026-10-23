@@ -19,6 +19,9 @@
     "language_not_saved": "Votre choix de langue n’a pas pu être enregistré. Cette langue restera active pendant cette visite.",
     "language_change_failed": "Cette langue n’a pas pu être chargée. Votre langue actuelle reste active."
   },
+  "documents": {
+    "resume_pdf": "CV (PDF)"
+  },
   "about_section": {
     "title": "À propos",
     "practice_title": "Mes domaines de travail",

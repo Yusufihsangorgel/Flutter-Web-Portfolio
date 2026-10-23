@@ -1,3 +1,5 @@
+import { isResumeEnabled } from '../resume/resume_availability.mjs';
+
 /** @type {Array<[string, string, (portfolio: any) => string]>} */
 const chapters = [
   ['about', 'About', renderAbout],
@@ -22,6 +24,7 @@ export function renderStaticDocument(portfolio) {
     )
     .join('\n');
   const contact = [
+    isResumeEnabled(portfolio) ? '<a href="resume.pdf">Résumé (PDF)</a>' : '',
     profile.email ? `<a href="${escapeHtml(mailto(profile.email))}">Email</a>` : '',
     ...(profile.links ?? []).map(({ label, url }) => evidenceLink(label, url)),
   ]

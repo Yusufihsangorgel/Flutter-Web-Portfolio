@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_web_portfolio/app/controllers/scroll_controller.dart';
+import 'package:flutter_web_portfolio/app/utils/resolve_document_link_stub.dart'
+    if (dart.library.js_interop) 'package:flutter_web_portfolio/app/utils/resolve_document_link_web.dart'
+    as document_link;
 import 'package:flutter_web_portfolio/app/utils/web_url_strategy.dart'
     as url_strategy;
 import 'package:flutter_web_portfolio/app/widgets/accessible_action.dart';
@@ -64,8 +67,8 @@ class _PortfolioLinkState extends State<PortfolioLink> {
     context.read<AppScrollController>().scrollToSection(_chapter!);
   }
 
-  LinkTarget get _target {
-    final scheme = widget.uri.scheme;
+  LinkTarget _target(Uri destination) {
+    final scheme = destination.scheme;
     return scheme == 'http' || scheme == 'https'
         ? LinkTarget.blank
         : LinkTarget.self;
@@ -80,7 +83,7 @@ class _PortfolioLinkState extends State<PortfolioLink> {
         keys.isAltPressed;
   }
 
-  Widget _action(VoidCallback onTap) => AccessibleAction(
+  Widget _action(VoidCallback onTap, Uri destination) => AccessibleAction(
     onTap: onTap,
     onHoverChanged: widget.onHoverChanged,
     onFocusChanged: widget.onFocusChanged,
@@ -90,7 +93,7 @@ class _PortfolioLinkState extends State<PortfolioLink> {
     excludeFromSemantics: true,
     semanticLabel: widget.semanticLabel,
     semanticRole: ActionSemanticRole.link,
-    linkUrl: widget.uri,
+    linkUrl: destination,
     selected: widget.selected,
     borderRadius: widget.borderRadius,
     child: widget.child,
@@ -98,12 +101,13 @@ class _PortfolioLinkState extends State<PortfolioLink> {
 
   @override
   Widget build(BuildContext context) {
-    if (_chapter != null) return _action(_scrollToChapter);
+    if (_chapter != null) return _action(_scrollToChapter, widget.uri);
+    final destination = document_link.resolveDocumentLink(widget.uri);
     return Link(
-      uri: widget.uri,
-      target: _target,
+      uri: destination,
+      target: _target(destination),
       builder: (context, followLink) =>
-          _action(widget.onActivate ?? followLink!),
+          _action(widget.onActivate ?? followLink!, destination),
     );
   }
 }

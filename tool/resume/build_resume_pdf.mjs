@@ -1,5 +1,5 @@
 // @ts-check
-import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import process from 'node:process';
 import { fileURLToPath } from 'node:url';
@@ -9,6 +9,7 @@ import { assertResumePdf } from './pdf_text.mjs';
 import { assertResumeStructure } from './pdf_structure.mjs';
 import { renderResumeHtml, validatePaper } from './render_resume_html.mjs';
 import { loadResumeFont } from './resume_font.mjs';
+import { isResumeEnabled, resumeArtifactFiles } from './resume_availability.mjs';
 
 const root = fileURLToPath(new URL('../../', import.meta.url));
 
@@ -76,13 +77,26 @@ export async function renderResumePdf(record, { paper = 'a4' } = {}) {
 
 /**
  * @param {{ out?: string, paper?: string }} [options]
- * @returns {Promise<{ html: string, pdf: Buffer }>}
+ * @returns {Promise<{ html: string, pdf: Buffer } | null>}
  */
 export async function buildResumePdf({ out = 'build/web', paper = 'a4' } = {}) {
   const record = JSON.parse(
     await readFile(path.join(root, 'assets/content/portfolio.json'), 'utf8'),
   );
+  return writeResumeArtifacts(record, { out, paper });
+}
+
+/**
+ * @param {any} record
+ * @param {{ out?: string, paper?: string }} [options]
+ * @returns {Promise<{ html: string, pdf: Buffer } | null>}
+ */
+export async function writeResumeArtifacts(record, { out = 'build/web', paper = 'a4' } = {}) {
   const output = path.resolve(out);
+  if (!isResumeEnabled(record)) {
+    for (const file of resumeArtifactFiles) await rm(path.join(output, file), { force: true });
+    return null;
+  }
   const { html, pdf } = await renderResumePdf(record, { paper });
   await mkdir(output, { recursive: true });
   await writeFile(path.join(output, 'resume.html'), html);
@@ -93,8 +107,12 @@ export async function buildResumePdf({ out = 'build/web', paper = 'a4' } = {}) {
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   try {
     const options = parseArguments(process.argv.slice(2));
-    await buildResumePdf(options);
-    console.log(`Resume ready at ${path.join(options.out, 'resume.pdf')} and resume.html.`);
+    const result = await buildResumePdf(options);
+    console.log(
+      result
+        ? `Resume ready at ${path.join(options.out, 'resume.pdf')} and resume.html.`
+        : 'Resume disabled; previous resume artifacts removed.',
+    );
   } catch (error) {
     console.error(`Resume build failed: ${error.message}`);
     process.exitCode = 1;

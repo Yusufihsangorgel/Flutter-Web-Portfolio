@@ -116,6 +116,11 @@ The Dart parser rejects unsupported schema versions, malformed HTTPS URLs,
 duplicate IDs, identity/metadata drift, incomplete cases, reused artifacts,
 invalid colors, and unverifiable work records before `runApp`.
 
+Set `site.resume_enabled` to `true` to build `/resume.pdf` and `/resume.html`
+from your canonical record and expose the PDF link in the hero, footer, static
+document, and generated README. The optional field defaults to `false` in
+initialized templates. Disabling it removes previous résumé release files.
+
 ## Add experience
 
 Append an object to `experience`:

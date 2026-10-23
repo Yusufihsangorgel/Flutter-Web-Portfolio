@@ -19,6 +19,9 @@
     "language_not_saved": "Ihre Sprachauswahl konnte nicht gespeichert werden. Diese Sprache bleibt für diesen Besuch aktiv.",
     "language_change_failed": "Diese Sprache konnte nicht geladen werden. Ihre aktuelle Sprache bleibt aktiv."
   },
+  "documents": {
+    "resume_pdf": "Lebenslauf (PDF)"
+  },
   "about_section": {
     "title": "Über mich",
     "practice_title": "Meine Arbeitsfelder",

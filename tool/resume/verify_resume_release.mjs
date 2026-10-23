@@ -1,5 +1,5 @@
 // @ts-check
-import { readFile } from 'node:fs/promises';
+import { lstat, readFile } from 'node:fs/promises';
 import path from 'node:path';
 
 import { assertResumePdf } from './pdf_text.mjs';
@@ -7,12 +7,14 @@ import { normalizeResumePdf } from './normalize_resume_pdf.mjs';
 import { assertResumeStructure } from './pdf_structure.mjs';
 import { renderResumeHtml } from './render_resume_html.mjs';
 import { loadResumeFont } from './resume_font.mjs';
+import { isResumeEnabled, resumeArtifactFiles } from './resume_availability.mjs';
 
 /**
  * @param {{ webRoot: string, record: any }} options
  * @returns {Promise<string[]>}
  */
 export async function verifyResumeRelease({ webRoot, record }) {
+  if (!isResumeEnabled(record)) return verifyDisabledResume(webRoot);
   const failures = [];
   let paper;
   try {
@@ -36,6 +38,19 @@ export async function verifyResumeRelease({ webRoot, record }) {
     if (paper) assertResumeStructure(pdf, paper);
   } catch (error) {
     failures.push(`resume.pdf is missing or invalid: ${error.message}`);
+  }
+  return failures;
+}
+
+async function verifyDisabledResume(webRoot) {
+  const failures = [];
+  for (const file of resumeArtifactFiles) {
+    try {
+      await lstat(path.join(webRoot, file));
+      failures.push(`${file} must be absent when the resume is disabled`);
+    } catch (error) {
+      if (error.code !== 'ENOENT') failures.push(`${file} could not be checked: ${error.message}`);
+    }
   }
   return failures;
 }

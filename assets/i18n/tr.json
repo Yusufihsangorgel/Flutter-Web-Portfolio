@@ -19,6 +19,9 @@
     "language_not_saved": "Dil tercihiniz kaydedilemedi. Bu dil, bu ziyaret boyunca etkin kalacak.",
     "language_change_failed": "Bu dil yüklenemedi. Mevcut diliniz kullanılmaya devam ediyor."
   },
+  "documents": {
+    "resume_pdf": "Özgeçmiş (PDF)"
+  },
   "about_section": {
     "title": "Hakkımda",
     "practice_title": "Çalıştığım alanlar",

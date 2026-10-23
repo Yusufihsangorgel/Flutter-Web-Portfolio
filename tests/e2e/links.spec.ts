@@ -1,3 +1,4 @@
+import { readFile } from "node:fs/promises";
 import { expect, Page, test } from "./helpers/test_setup";
 import {
   englishInterface,
@@ -15,8 +16,8 @@ const featured = required(
 );
 const featuredEvidence = required(featured.evidence[0], "featured evidence");
 
-async function openRevealedPage(page: Page, hash = "") {
-  await page.goto(`/${hash}`, { waitUntil: "domcontentloaded" });
+async function openRevealedPage(page: Page, hash = "", path = "/") {
+  await page.goto(`${path}${hash}`, { waitUntil: "domcontentloaded" });
   await page.waitForSelector("flt-semantics-host", {
     state: "attached",
     timeout: 20000,
@@ -80,6 +81,106 @@ test("exposes the profile links as real anchors", async ({ page }) => {
   await expect(
     page.getByRole("link", { name: profileLink!.label, exact: true }),
   ).not.toHaveCount(0);
+});
+
+const resumeHref = 'resume.pdf';
+
+async function builtResumeUrl(page: Page) {
+  return page.evaluate((href) => new URL(href, document.baseURI).href, resumeHref);
+}
+
+async function expectResumePopup(
+  page: Page,
+  anchor: ReturnType<Page['locator']>,
+  resumeUrl: string,
+) {
+  const sourceUrl = page.url();
+  // Chromium opens a blank viewer tab and downloads the PDF on the source page.
+  const [opened, download] = await Promise.all([
+    page.context().waitForEvent('page', { timeout: 15000 }),
+    page.waitForEvent('download', { timeout: 15000 }),
+    anchor.click(),
+  ]);
+  expect(opened).not.toBe(page);
+  expect(download.url()).toBe(resumeUrl);
+  expect((await readFile(await download.path())).subarray(0, 5).toString()).toBe('%PDF-');
+  await expect(anchor).toHaveAttribute('target', '_blank');
+  expect(page.url()).toBe(sourceUrl);
+  await opened.close();
+}
+
+test('exposes the enabled resume in the hero and footer as real anchors', async ({ page }) => {
+  test.skip(portfolio.site.resume_enabled !== true, 'the content disables the resume');
+  await openRevealedPage(page);
+  const resumeUrl = await builtResumeUrl(page);
+  const anchor = page.locator(`flt-semantics-host a[href="${resumeUrl}"]`);
+  await expect(anchor).toHaveCount(1);
+  await expect(anchor).toHaveAccessibleName(englishInterface.documents.resume_pdf);
+  await expect(anchor).toHaveAttribute('href', resumeUrl);
+  const footerAnchor = await footerProfileAnchor(page, resumeUrl);
+  await expect(footerAnchor).toHaveAccessibleName(englishInterface.documents.resume_pdf);
+  await expect(footerAnchor).toHaveAttribute('href', resumeUrl);
+  await expectResumePopup(page, footerAnchor, resumeUrl);
+});
+
+test('a deep document URL still links to the document-base PDF', async ({ page }) => {
+  test.skip(portfolio.site.resume_enabled !== true, 'the content disables the resume');
+  // Serve the real root document at a deep URL, as a history-fallback host does.
+  // Its <base> stays at / while location.pathname is /portfolio/deep/.
+  await page.route('**/portfolio/deep/', async (route) => {
+    const root = new URL('/', route.request().url());
+    await route.fulfill({ response: await route.fetch({ url: root.href }) });
+  });
+  await openRevealedPage(page, '', '/portfolio/deep/');
+  const resumeUrl = await builtResumeUrl(page);
+  expect(new URL(resumeUrl).pathname).toBe('/resume.pdf');
+  expect(new URL(resumeHref, page.url()).href).not.toBe(resumeUrl);
+  const anchor = page.locator(`flt-semantics-host a[href="${resumeUrl}"]`);
+  await expect(anchor).toHaveCount(1);
+  await expect(anchor).toHaveAccessibleName(englishInterface.documents.resume_pdf);
+  await expect(anchor).toHaveAttribute('href', resumeUrl);
+  await expectResumePopup(page, anchor, resumeUrl);
+});
+
+test('a Pages deep URL links to the PDF under its document base', async ({ page }, testInfo) => {
+  test.skip(portfolio.site.resume_enabled !== true, 'the content disables the resume');
+  const origin = new URL(testInfo.project.use.baseURL as string).origin;
+  // A popup's first request bypasses page.route; serve its real PDF via the context.
+  await page.context().route(
+    (url) => url.origin === origin && url.pathname === '/portfolio/resume.pdf',
+    async (route) => {
+      const query = new URL(route.request().url()).search;
+      await route.fulfill({ response: await route.fetch({ url: `${origin}/resume.pdf${query}` }) });
+    },
+  );
+  await page.route(
+    (url) => url.origin === origin && url.pathname.startsWith('/portfolio/'),
+    async (route) => {
+      const requested = new URL(route.request().url());
+      const path = requested.pathname.slice('/portfolio'.length);
+      const rootPath = path === '/deep/' ? '/' : path;
+      const response = await route.fetch({ url: `${origin}${rootPath}${requested.search}` });
+      if (path === '/deep/' && route.request().resourceType() === 'document') {
+        const html = await response.text();
+        expect(html).toContain('<base href="/">');
+        await route.fulfill({
+          response,
+          body: html.replace('<base href="/">', '<base href="/portfolio/">'),
+        });
+        return;
+      }
+      await route.fulfill({ response });
+    },
+  );
+
+  await openRevealedPage(page, '', '/portfolio/deep/');
+  const resumeUrl = await builtResumeUrl(page);
+  expect(resumeUrl).toBe(`${origin}/portfolio/resume.pdf`);
+  const anchor = page.locator(`flt-semantics-host a[href="${resumeUrl}"]`);
+  await expect(anchor).toHaveCount(1);
+  await expect(anchor).toHaveAccessibleName(englishInterface.documents.resume_pdf);
+  await expect(anchor).toHaveAttribute('href', resumeUrl);
+  await expectResumePopup(page, anchor, resumeUrl);
 });
 
 test("exposes the navigation as real in-page anchors", async ({
@@ -218,4 +319,35 @@ test("an external profile link opens in a new tab", async ({ page }) => {
   });
   expect(opened.url()).toBe(expectedUrl);
   expect(new URL(page.url()).pathname).toBe("/");
+});
+
+test('the resume link opens the built PDF in a new tab', async ({ page }) => {
+  test.skip(portfolio.site.resume_enabled !== true, 'the content disables the resume');
+  await openRevealedPage(page);
+  const resumeUrl = await builtResumeUrl(page);
+  const response = await page.request.get(resumeUrl);
+  expect(response.ok()).toBe(true);
+  expect(response.headers()['content-type']).toContain('application/pdf');
+  const pdfBytes = await response.body();
+  expect(pdfBytes.subarray(0, 5).toString()).toBe('%PDF-');
+  const anchor = page.locator(`flt-semantics-host a[href="${resumeUrl}"]`);
+  await expect(anchor).toHaveAccessibleName(englishInterface.documents.resume_pdf);
+  await expect(anchor).toHaveAttribute('href', resumeUrl);
+  const sourceUrl = page.url();
+
+  // Chromium downloads PDFs while opening a blank tab for the viewer.
+  // Observe both effects without assuming that the viewer commits a URL.
+  const [opened, download] = await Promise.all([
+    page.context().waitForEvent('page'),
+    page.waitForEvent('download'),
+    anchor.click(),
+  ]);
+
+  expect(opened).not.toBe(page);
+  await expect(anchor).toHaveAttribute('target', '_blank');
+  expect(download.url()).toBe(resumeUrl);
+  expect(download.suggestedFilename()).toBe('resume.pdf');
+  expect(await readFile(await download.path())).toEqual(pdfBytes);
+  expect(page.url()).toBe(sourceUrl);
+  await opened.close();
 });

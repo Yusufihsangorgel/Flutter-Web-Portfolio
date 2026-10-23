@@ -21,6 +21,7 @@ import { loadResumeFont } from './resume_font.mjs';
 import { assertResumeStructure } from './pdf_structure.mjs';
 
 const record = {
+  site: { resume_enabled: true },
   verified_at: '2026-08-29',
   profile: { name: 'Example', role: 'Engineer', focus: ['Software'] },
 };

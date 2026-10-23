@@ -1,4 +1,8 @@
 import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
+import test from 'node:test';
+import { format } from 'prettier';
+import { parsers, printers } from 'prettier/plugins/markdown';
 
 import { renderHeadMeta, renderReadmeRecord, renderStructuredData } from './renderers.mjs';
 import {
@@ -210,3 +214,86 @@ assert.ok(
 );
 
 process.stdout.write('Public content security contracts passed.\n');
+
+const canonicalReadmeContent = JSON.parse(
+  await readFile(new URL('../../assets/content/portfolio.json', import.meta.url), 'utf8'),
+);
+const resumeDirectoryCases = [
+  ['https://example.com', 'https://example.com/resume.pdf'],
+  ['https://example.com/', 'https://example.com/resume.pdf'],
+  ['https://example.com/?preview=1#section', 'https://example.com/resume.pdf'],
+  ['https://example.com/portfolio', 'https://example.com/portfolio/resume.pdf'],
+  ['https://example.com/portfolio/', 'https://example.com/portfolio/resume.pdf'],
+  ['https://example.com/portfolio?preview=1#section', 'https://example.com/portfolio/resume.pdf'],
+  ['https://example.com/portfolio/?preview=1#section', 'https://example.com/portfolio/resume.pdf'],
+  ['https://example.com/portfolio(1)/', 'https://example.com/portfolio%281%29/resume.pdf'],
+  ['https://example.com/portfolio)/', 'https://example.com/portfolio%29/resume.pdf'],
+  ['https://example.com/portfolio(/', 'https://example.com/portfolio%28/resume.pdf'],
+  ['https://example.com/portfolio[1]/', 'https://example.com/portfolio[1]/resume.pdf'],
+  ['https://example.com/portfolio&copy;/', 'https://example.com/portfolio&amp;copy;/resume.pdf'],
+  [
+    "https://example.com/portfolio!_~*'.,;:@&=/",
+    "https://example.com/portfolio!_~*'.,;:@&amp;=/resume.pdf",
+  ],
+  [
+    'https://example.com/portfolio%28public%29/',
+    'https://example.com/portfolio%28public%29/resume.pdf',
+  ],
+  ['https://example.com/portfolio%20path/', 'https://example.com/portfolio%20path/resume.pdf'],
+  ['https://example.com/portfolio<1>/', 'https://example.com/portfolio%3C1%3E/resume.pdf'],
+];
+for (const [url, destination] of resumeDirectoryCases) {
+  test(`README resume directory and Markdown destination: ${url}`, async () => {
+    const data = {
+      ...canonicalReadmeContent,
+      site: { ...canonicalReadmeContent.site, url, resume_enabled: true },
+    };
+    const line = renderReadmeRecord(data)
+      .split('\n')
+      .find((value) => value.startsWith('[Résumé (PDF)]'));
+    assert.equal(line, `[Résumé (PDF)](${destination})`);
+    const links = [];
+    await format(line, {
+      parser: 'markdown',
+      plugins: [
+        {
+          parsers: {
+            markdown: {
+              ...parsers.markdown,
+              async parse(text, options) {
+                const ast = await parsers.markdown.parse(text, options);
+                links.push(
+                  ...ast.children
+                    .flatMap((node) => node.children ?? [])
+                    .filter((node) => node.type === 'link')
+                    .map((node) => node.url),
+                );
+                return ast;
+              },
+            },
+          },
+          printers,
+        },
+      ],
+    });
+    assert.equal(links.length, 1);
+    assert.equal(links[0], destination.replaceAll('&amp;', '&'));
+  });
+}
+for (const resume_enabled of [undefined, false]) {
+  test(`README omits an unavailable resume: ${resume_enabled}`, () => {
+    const data = {
+      ...canonicalReadmeContent,
+      site: { ...canonicalReadmeContent.site, resume_enabled },
+    };
+    assert.ok(!renderReadmeRecord(data).includes('[Résumé (PDF)]('));
+  });
+}
+test('canonical apex README producer region remains byte-identical', async () => {
+  const readme = await readFile(new URL('../../README.md', import.meta.url), 'utf8');
+  const region = `<!-- portfolio-record:start -->\n${renderReadmeRecord(canonicalReadmeContent)}\n<!-- portfolio-record:end -->`;
+  assert.ok(
+    readme.includes(region),
+    'The existing canonical README producer region must stay synchronized.',
+  );
+});

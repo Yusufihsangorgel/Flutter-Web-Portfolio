@@ -1,4 +1,5 @@
 import { renderContentSecurityPolicy } from './security.mjs';
+import { isResumeEnabled } from '../resume/resume_availability.mjs';
 
 export function renderReadmeRecord(data) {
   const merged = data.contributions
@@ -12,6 +13,7 @@ export function renderReadmeRecord(data) {
     `**${data.profile.name} — ${data.profile.role}.** ${data.profile.headline}`,
     '',
     `${data.profile.summary}`,
+    ...(isResumeEnabled(data) ? ['', resumeReadmeLink(data)] : []),
     '',
     `Source status: \`${data.content_version}\`, verified ${data.verified_at} against ${sourceLabels}.`,
   ];
@@ -54,6 +56,13 @@ export function renderReadmeRecord(data) {
     );
   }
   return lines.join('\n');
+}
+
+function resumeReadmeLink(data) {
+  const destination = new URL('resume.pdf', siteDirectoryUrl(data.site.url)).href
+    .replaceAll('(', '%28')
+    .replaceAll(')', '%29');
+  return `[Résumé (PDF)](${html(destination)})`;
 }
 
 export function renderDemoLinks(data) {
