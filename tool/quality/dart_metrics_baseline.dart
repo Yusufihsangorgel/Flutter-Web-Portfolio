@@ -256,6 +256,9 @@ BaselineShrink shrinkBaseline(
   List<CallableMetrics> measurements,
   Baseline baseline,
 ) {
+  if (measurements.isEmpty) {
+    throw StateError('Cannot shrink without measured Dart callables.');
+  }
   final audit = auditBaseline(measurements, baseline);
   final actualByKey = <String, BaselineEntry>{
     for (final entry in audit.violations) entry.key: entry,

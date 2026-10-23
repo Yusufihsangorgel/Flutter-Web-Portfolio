@@ -30,6 +30,9 @@ void main() {
   _testShrinkIsIdempotent();
   _testShrinkOptions();
   _testGeneratedDirectoriesExcluded();
+  _testShrinkSourceRoots();
+  _testShrinkRejectsEmptyMeasurements();
+  _testShrinkFromNonemptyRoot();
   stdout.writeln('dart_metrics_test: $_checks checks passed');
 }
 
@@ -406,6 +409,80 @@ void _testShrinkOptions() {
   _expectOptionsRejected(<String>['--shrink-baseline', '--create-baseline']);
   _expectOptionsRejected(<String>['--base-ref', 'HEAD', '--shrink-baseline']);
 }
+
+void _testShrinkSourceRoots() {
+  // Keep these positively identified scratch baselines for inspection.
+  final scratch = Directory.systemTemp.createTempSync('dart_metrics_roots_');
+  stdout.writeln('dart_metrics root fixtures: ${scratch.path}');
+  final roots = <String, Directory>{
+    'missing': Directory('${scratch.path}/missing'),
+    'empty': Directory('${scratch.path}/empty')..createSync(),
+    'zero-callable': Directory('$_shrinkRoot/zero_callable').absolute,
+  };
+  _expect(!roots['missing']!.existsSync(), 'missing root fixture exists');
+  _expect(
+    collectDartFiles(roots['zero-callable']!).length == 1,
+    'zero-callable fixture must contain a Dart source file',
+  );
+  final source = _read(_staleBaseline);
+  for (final entry in roots.entries) {
+    final file = File('${scratch.path}/${entry.key}.json')
+      ..writeAsStringSync(source)
+      ..setLastModifiedSync(_untouched);
+    final run = _runShrinkCli(entry.value, file);
+    stdout.writeln('${entry.key}: exit=${run.exitCode}; ${run.stderr}');
+    _expect(run.exitCode == 2, '${entry.key} root was not rejected');
+    _expect(
+      file.readAsStringSync() == source,
+      '${entry.key} root changed baseline bytes',
+    );
+    _expect(
+      file.lastModifiedSync().isAtSameMomentAs(_untouched),
+      '${entry.key} root rewrote the baseline',
+    );
+  }
+}
+
+void _testShrinkRejectsEmptyMeasurements() {
+  for (final baseline in <Baseline>[
+    const Baseline([]),
+    Baseline(<BaselineEntry>[_entry(5)]),
+  ]) {
+    var rejected = false;
+    try {
+      shrinkBaseline(const <CallableMetrics>[], baseline);
+    } on StateError {
+      rejected = true;
+    }
+    _expect(rejected, 'empty measurements accepted for shrinking');
+  }
+}
+
+void _testShrinkFromNonemptyRoot() {
+  final scratch = Directory.systemTemp.createTempSync('dart_metrics_resolved_');
+  stdout.writeln('dart_metrics resolved fixture: ${scratch.path}');
+  final file = File('${scratch.path}/baseline.json')
+    ..writeAsStringSync(_read(_staleBaseline));
+  final root = Directory('$_shrinkRoot/resolved').absolute;
+  _expect(measureRepository(root).length == 1, 'resolved fixture is empty');
+  final run = _runShrinkCli(root, file);
+  _expect(run.exitCode == 0, 'valid stale removal failed: ${run.stderr}');
+  _expect(
+    Baseline.read(file).entries.isEmpty,
+    'stale entries remain in a nonempty measured root',
+  );
+}
+
+ProcessResult _runShrinkCli(Directory root, File baseline) =>
+    Process.runSync(Platform.resolvedExecutable, <String>[
+      '--packages=${File('.dart_tool/package_config.json').absolute.path}',
+      File('tool/quality/dart_metrics.dart').absolute.path,
+      '--root',
+      root.path,
+      '--baseline',
+      baseline.absolute.path,
+      '--shrink-baseline',
+    ], workingDirectory: Directory.current.path);
 
 void _testGeneratedDirectoriesExcluded() {
   final root = Directory.systemTemp.createTempSync('dart_metrics_test_');

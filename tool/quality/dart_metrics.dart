@@ -37,8 +37,14 @@ void main(List<String> arguments) {
       return;
     }
     final root = Directory(options.rootPath).absolute;
+    if (!root.existsSync()) {
+      throw StateError('Source root does not exist: ${root.path}.');
+    }
     final baselineFile = File(_resolve(root, options.baselinePath));
     final measurements = measureRepository(root);
+    if (measurements.isEmpty) {
+      throw StateError('No Dart callables measured under ${root.path}.');
+    }
     if (options.createBaseline) {
       _createBaseline(baselineFile, measurements);
       return;

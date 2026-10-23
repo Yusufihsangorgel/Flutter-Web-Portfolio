@@ -39,7 +39,9 @@ and commit the rewritten baseline in the same change. The command re-measures th
 gone or within limits, and lowers decreased values. It never adds entries or raises values, keeps entry order, reasons,
 and the 2-space JSON layout, and prints the removed and lowered counts. It leaves the file untouched when no entry is
 stale. A new or increased violation is printed and the command exits 1 without writing. It accepts `--root` and
-`--baseline` and rejects `--create-baseline` and `--base-ref`.
+`--baseline` and rejects `--create-baseline` and `--base-ref`. A missing source root or a measurement with no Dart
+callables exits 2 before any baseline write, even with an absolute baseline path. Removing every stale entry remains
+valid when at least one callable was measured.
 
 ## Adding a tool
 
