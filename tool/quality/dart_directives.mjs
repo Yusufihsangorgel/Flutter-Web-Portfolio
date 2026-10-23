@@ -1,5 +1,16 @@
 // Dart directive URI scanner. Lexical nesting keeps interpolation strings from
 // hiding subsequent directives; it intentionally does not parse Dart expressions.
+// Reserved, not built-in/contextual, keywords are excluded from library names.
+// Categories follow _fe_analyzer_shared's scanner/token.dart.
+const reservedKeywords = new Set(
+  (
+    'assert break case catch class const continue default do else enum extends ' +
+    'false final finally for if in is new null rethrow return super switch this ' +
+    'throw true try var void while with'
+  ).split(' '),
+);
+const directiveKeywords = new Set(['import', 'export', 'part', 'library']);
+
 function location(file, line, message) {
   return new Error(`${file}:${line}: ${message}`);
 }
@@ -26,7 +37,11 @@ class DartLexer {
     this.file = file;
     this.tokens = [];
     this.frames = [{ kind: 'code' }];
-    this.index = 0;
+    this.index = Number(source.startsWith('\ufeff'));
+    if (source.startsWith('#!', this.index)) {
+      const end = source.slice(this.index).search(/[\r\n]/);
+      this.index = end < 0 ? source.length : this.index + end;
+    }
     this.line = 1;
     this.braceDepth = 0;
   }
@@ -132,10 +147,14 @@ class DartLexer {
     const word = /^[A-Za-z_$][\w$]*/.exec(source.slice(index));
     const value = word ? word[0] : source[index];
     if (this.frames.length === 1) {
-      if (this.braceDepth === 0)
+      if (this.braceDepth === 0 || (value === '}' && this.braceDepth === 1))
         this.tokens.push({ type: word ? 'word' : 'symbol', value, line, index });
       if (value === '{') this.braceDepth += 1;
-      else if (value === '}') this.braceDepth -= 1;
+      else if (value === '}') {
+        if (this.braceDepth === 0)
+          throw location(this.file, line, 'unmatched declaration group close');
+        this.braceDepth -= 1;
+      }
     }
     this.advance(index + value.length);
   }
@@ -211,23 +230,43 @@ function consumeClause(context, cursor) {
   throw location(file, token.line, 'unsupported directive syntax');
 }
 
+function consumeLibraryName(tokens, cursor, context) {
+  const { file, line, description } = context;
+  // ASCII identifier ('.' identifier)* ';'; built-in/contextual words are names.
+  while (tokens[cursor]?.type === 'word' && !reservedKeywords.has(tokens[cursor].value)) {
+    cursor += 1;
+    const separator = tokens[cursor];
+    if (separator?.type === 'symbol' && separator.value === ';') return cursor;
+    if (separator?.type !== 'symbol' || separator.value !== '.') break;
+    cursor += 1;
+  }
+  throw location(file, tokens[cursor]?.line ?? line, `unsupported ${description} directive`);
+}
+
 function parseDirective(tokens, start, file) {
   const keyword = tokens[start];
   let cursor = start + 1;
   let kind = keyword.value;
-  if (kind === 'part' && tokens[cursor]?.value === 'of') {
+  if (kind === 'library') {
+    const next =
+      tokens[cursor]?.type === 'symbol' && tokens[cursor].value === ';'
+        ? cursor
+        : consumeLibraryName(tokens, cursor, { file, line: keyword.line, description: kind });
+    return { next, directives: [] };
+  }
+  if (kind === 'part' && tokens[cursor]?.type === 'word' && tokens[cursor].value === 'of') {
     kind = 'part of';
     cursor += 1;
     // Dart also permits `part of library.name;`, which is not a URI edge.
     if (tokens[cursor]?.type === 'word') {
-      while (
-        cursor < tokens.length &&
-        (tokens[cursor].type !== 'symbol' || tokens[cursor].value !== ';')
-      )
-        cursor += 1;
-      if (cursor === tokens.length)
-        throw location(file, keyword.line, 'unterminated part of directive');
-      return { next: cursor, directives: [] };
+      return {
+        next: consumeLibraryName(tokens, cursor, {
+          file,
+          line: keyword.line,
+          description: 'named part of',
+        }),
+        directives: [],
+      };
     }
   }
   const first = requireUri(tokens, cursor, file, keyword.line);
@@ -240,15 +279,97 @@ function parseDirective(tokens, start, file) {
   return { next: cursor, directives };
 }
 
+function afterGroup(tokens, start, file) {
+  // Angle brackets are groups only when skipping metadata type arguments.
+  const pairs = new Map([
+    ['(', ')'],
+    ['[', ']'],
+    ['{', '}'],
+  ]);
+  if (tokens[start].value === '<') pairs.set('<', '>');
+  const closes = new Set(pairs.values());
+  const stack = [];
+  for (let cursor = start; cursor < tokens.length; cursor += 1) {
+    const token = tokens[cursor];
+    if (token.type !== 'symbol') continue;
+    if (pairs.has(token.value)) stack.push(pairs.get(token.value));
+    else if (closes.has(token.value)) {
+      if (stack.pop() !== token.value)
+        throw location(file, token.line, 'unbalanced declaration group');
+      if (stack.length === 0) return cursor + 1;
+    }
+  }
+  throw location(file, tokens[start].line, 'unterminated declaration group');
+}
+
+function afterMetadata(tokens, start, file) {
+  let cursor = start + 1;
+  while (true) {
+    if (tokens[cursor]?.type !== 'word')
+      throw location(file, tokens[start].line, 'unsupported metadata reference');
+    cursor += 1;
+    if (tokens[cursor]?.type === 'symbol' && tokens[cursor].value === '<')
+      cursor = afterGroup(tokens, cursor, file);
+    if (tokens[cursor]?.type !== 'symbol' || tokens[cursor].value !== '.') break;
+    cursor += 1;
+  }
+  if (tokens[cursor]?.type === 'symbol' && tokens[cursor].value === '(')
+    cursor = afterGroup(tokens, cursor, file);
+  return cursor;
+}
+
+function isDirectiveStart(tokens, index) {
+  const token = tokens[index];
+  const next = tokens[index + 1];
+  return (
+    token.type === 'word' &&
+    directiveKeywords.has(token.value) &&
+    !(next?.type === 'symbol' && ['.', '<', '('].includes(next.value))
+  );
+}
+
+function isEmbeddedDirective(tokens, index) {
+  const token = tokens[index];
+  const next = tokens[index + 1];
+  return (
+    token.type === 'word' &&
+    ['import', 'export', 'part'].includes(token.value) &&
+    (next?.type === 'string' ||
+      (token.value === 'part' && next?.type === 'word' && next.value === 'of'))
+  );
+}
+
+function afterDeclaration(tokens, start, file) {
+  // An item-boundary scan, not Dart declaration/expression grammar.
+  let cursor = start;
+  while (cursor < tokens.length) {
+    const token = tokens[cursor];
+    if (isEmbeddedDirective(tokens, cursor))
+      throw location(file, token.line, 'directive inside unfinished declaration');
+    if (token.type === 'symbol' && ['(', '[', '{'].includes(token.value)) {
+      cursor = afterGroup(tokens, cursor, file);
+      if (token.value === '{') return cursor;
+    } else if (token.type === 'symbol' && [')', ']', '}'].includes(token.value)) {
+      throw location(file, token.line, 'unmatched declaration group close');
+    } else if (token.type === 'symbol' && token.value === ';') return cursor + 1;
+    else cursor += 1;
+  }
+  return cursor;
+}
+
 export function parseDartDirectives(source, file = '<source>') {
   const tokens = new DartLexer(source, file).lex();
   const directives = [];
-  for (let index = 0; index < tokens.length; index += 1) {
+  let index = 0;
+  while (index < tokens.length) {
     const token = tokens[index];
-    if (token.type !== 'word' || !['import', 'export', 'part'].includes(token.value)) continue;
-    const parsed = parseDirective(tokens, index, file);
-    directives.push(...parsed.directives);
-    index = parsed.next;
+    if (token.type === 'symbol' && token.value === '@') {
+      index = afterMetadata(tokens, index, file);
+    } else if (isDirectiveStart(tokens, index)) {
+      const parsed = parseDirective(tokens, index, file);
+      directives.push(...parsed.directives);
+      index = parsed.next + 1;
+    } else index = afterDeclaration(tokens, index, file);
   }
   return directives;
 }

@@ -5,6 +5,16 @@ an explicit state stack. Unsupported directive URI expressions fail closed.
 """
 
 
+# Reserved keywords cannot be library-name segments; built-in and contextual
+# keywords can. Categories follow _fe_analyzer_shared's scanner/token.dart.
+_RESERVED = frozenset((
+    "assert break case catch class const continue default do else enum extends "
+    "false final finally for if in is new null rethrow return super switch this "
+    "throw true try var void while with"
+).split())
+_DIRECTIVES = ("import", "export", "part", "library")
+
+
 class DirectiveError(ValueError):
     def __init__(self, line, message):
         super().__init__(message)
@@ -14,7 +24,7 @@ class DirectiveError(ValueError):
 class _Lexer:
     def __init__(self, text):
         self.text = text
-        self.pos = 0
+        self.pos = int(text.startswith("\ufeff"))
         self.line = 1
         self.line_start = True
         self.brace_depth = 0
@@ -92,7 +102,12 @@ class _Lexer:
     def _code(self, frame):
         text, pos = self.text, self.pos
         char = text[pos]
-        if char.isspace():
+        if text.startswith("#!", pos) and pos == int(text.startswith("\ufeff")):
+            end = pos + 2
+            while end < len(text) and text[end] not in "\r\n":
+                end += 1
+            self._move(end)
+        elif char.isspace():
             self._move(pos + 1)
         elif text.startswith("//", pos):
             self.stack.append({"kind": "line-comment"})
@@ -107,20 +122,22 @@ class _Lexer:
             self._move(pos + 1, visible=True)
             if frame["depth"] == 0:
                 self.stack.pop()
-        elif char.isalpha() or char == "_":
+        elif char.isalpha() or char in "_$":
             end = pos + 1
-            while end < len(text) and (text[end].isalnum() or text[end] == "_"):
+            while end < len(text) and (text[end].isalnum() or text[end] in "_$"):
                 end += 1
             if len(self.stack) == 1 and self.brace_depth == 0:
                 self.tokens.append(("identifier", text[pos:end], self.line, self.line_start))
             self._move(end, visible=True)
         else:
             if len(self.stack) == 1:
-                if self.brace_depth == 0:
+                if self.brace_depth == 0 or (char == "}" and self.brace_depth == 1):
                     self.tokens.append(("symbol", char, self.line, self.line_start))
                 if char == "{":
                     self.brace_depth += 1
                 elif char == "}":
+                    if self.brace_depth == 0:
+                        raise DirectiveError(self.line, "unmatched declaration group close")
                     self.brace_depth -= 1
             self._move(pos + 1, visible=True)
 
@@ -184,15 +201,124 @@ def _modifier(tokens, index):
     return index
 
 
+def _name_end(tokens, index, directive_line, description):
+    # Library-name resolution and other Dart semantics belong to the compiler.
+    while index < len(tokens):
+        kind, name, _, _ = tokens[index]
+        if (kind != "identifier" or name in _RESERVED or not name.isascii()
+                or not name.replace("$", "_").isidentifier()):
+            break
+        index += 1
+        if index < len(tokens) and tokens[index][:2] == ("symbol", ";"):
+            return index + 1
+        if index >= len(tokens) or tokens[index][:2] != ("symbol", "."):
+            break
+        index += 1
+    line = tokens[index][2] if index < len(tokens) else directive_line
+    raise DirectiveError(line, "unsupported %s directive" % description)
+
+
+def _part(tokens, index, directive_line):
+    if index < len(tokens) and tokens[index][:2] == ("identifier", "of"):
+        index += 1
+        if index < len(tokens) and tokens[index][0] == "identifier":
+            return _name_end(tokens, index, directive_line, "named part of")
+    _, index = _uri(tokens, index, directive_line)
+    if index >= len(tokens) or tokens[index][:2] != ("symbol", ";"):
+        line = tokens[index][2] if index < len(tokens) else directive_line
+        raise DirectiveError(line, "unsupported or unterminated part directive")
+    return index + 1
+
+
+def _group_end(tokens, index):
+    """Skip one balanced region; angle brackets are groups only in metadata types."""
+    pairs = {"(": ")", "[": "]", "{": "}"}
+    if tokens[index][1] == "<":
+        pairs["<"] = ">"
+    stack = []
+    start_line = tokens[index][2]
+    while index < len(tokens):
+        kind, value, line, _ = tokens[index]
+        if kind == "symbol":
+            if value in pairs:
+                stack.append(pairs[value])
+            elif value in pairs.values():
+                if not stack or value != stack.pop():
+                    raise DirectiveError(line, "unbalanced declaration group")
+                if not stack:
+                    return index + 1
+        index += 1
+    raise DirectiveError(start_line, "unterminated declaration group")
+
+
+def _metadata_end(tokens, index):
+    line = tokens[index][2]
+    index += 1
+    while True:
+        if index >= len(tokens) or tokens[index][0] != "identifier":
+            raise DirectiveError(line, "unsupported metadata reference")
+        index += 1
+        if index < len(tokens) and tokens[index][:2] == ("symbol", "<"):
+            index = _group_end(tokens, index)
+        if index >= len(tokens) or tokens[index][:2] != ("symbol", "."):
+            break
+        index += 1
+    if index < len(tokens) and tokens[index][:2] == ("symbol", "("):
+        index = _group_end(tokens, index)
+    return index
+
+
+def _directive_start(tokens, index):
+    kind, value, _, _ = tokens[index]
+    following = tokens[index + 1][:2] if index + 1 < len(tokens) else None
+    return (kind == "identifier" and value in _DIRECTIVES
+            and following not in (("symbol", "."), ("symbol", "<"), ("symbol", "(")))
+
+
+def _declaration_end(tokens, index):
+    # This is an item boundary scan, not a Dart declaration/expression parser.
+    while index < len(tokens):
+        kind, value, line, _ = tokens[index]
+        following = tokens[index + 1][:2] if index + 1 < len(tokens) else None
+        if kind == "identifier" and value in ("import", "export", "part") and following:
+            if following[0] in ("string", "unsupported") or (
+                    value == "part" and following == ("identifier", "of")):
+                raise DirectiveError(line, "directive inside unfinished declaration")
+        if kind == "symbol" and value in ("(", "[", "{"):
+            index = _group_end(tokens, index)
+            if value == "{":
+                return index
+        elif kind == "symbol" and value in (")", "]", "}"):
+            raise DirectiveError(line, "unmatched declaration group close")
+        elif kind == "symbol" and value == ";":
+            return index + 1
+        else:
+            index += 1
+    return index
+
+
 def parse_dart_directives(text):
-    """Return {kind, uri, line} for every import/export URI branch."""
+    """Return import/export URI branches; validate but omit part directives."""
     tokens = _Lexer(text).scan()
     result = []
     index = 0
     while index < len(tokens):
         kind, value, line, _at_line_start = tokens[index]
+        if (kind, value) == ("symbol", "@"):
+            index = _metadata_end(tokens, index)
+            continue
+        if not _directive_start(tokens, index):
+            index = _declaration_end(tokens, index)
+            continue
         index += 1
-        if kind != "identifier" or value not in ("import", "export"):
+        if value == "library":
+            if index < len(tokens) and tokens[index][:2] == ("symbol", ";"):
+                index += 1
+            else:
+                index = _name_end(tokens, index, line, "library")
+            continue
+        if value == "part":
+            index = _part(tokens, index, line)
             continue
         uri, index = _uri(tokens, index, line)
         result.append({"kind": value, **uri})

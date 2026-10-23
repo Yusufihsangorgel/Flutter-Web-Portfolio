@@ -218,6 +218,23 @@ class ArchitectureCalibrationTest(unittest.TestCase):
                     })
                     self.assertIn("F-DOMAIN-PURE", rules)
 
+    def test_part_uris_are_validated_without_import_edges(self):
+        for directive in (
+            "part 'of';", "part of 'of';",
+            "part of r'''parent.dart''';", 'part """child.dart""";',
+        ):
+            with self.subTest(directive=directive):
+                self.assertEqual([], arch.parse_dart_directives(directive))
+                source = directive + "\nimport 'dart:core';\n"
+                self.assertEqual([(2, "dart:core")], list(arch.dart_imports(source)))
+
+    def test_named_part_of_has_no_import_edge(self):
+        for name in ("library", "library.name", "_library.$segment_2"):
+            with self.subTest(name=name):
+                self.assertEqual([], arch.parse_dart_directives("part of %s;" % name))
+                source = "part of %s;\nimport 'dart:core';\n" % name
+                self.assertEqual([(2, "dart:core")], list(arch.dart_imports(source)))
+
     def test_same_line_import_after_metadata_enforces_domain_boundary(self):
         source = (
             "@Deprecated('old') import 'dart:core'; "
@@ -231,17 +248,55 @@ class ArchitectureCalibrationTest(unittest.TestCase):
         }))
 
     def test_parser_error_cannot_be_warned_away(self):
-        with tempfile.TemporaryDirectory(prefix="arch-config-fail-") as scratch:
-            write(scratch, arch.DEFAULT_CONFIG, json.dumps(self.config))
-            for source in self.config["sources"]:
-                if source["lang"] == "go":
-                    write(scratch, source["dir"] + "/go.mod", "module %s\n" % source["go_module"])
-            write(scratch, "lib/app/domain/models/bad.dart", "import unknownUri;\n")
-            output = io.StringIO()
-            with contextlib.redirect_stderr(output):
-                result = arch.main(["--root", scratch, "--warn-only"])
-            self.assertEqual(2, result)
-            self.assertIn("lib/app/domain/models/bad.dart:1", output.getvalue())
+        for text, line in (
+            ("import unknownUri;\n", 1),
+            ("part of library.name\r\nimport 'missing.dart';\n", 2),
+            ("part of library.name + other;\n", 1),
+            ("part of library name;\n", 1),
+            ("library library.class;\n", 1),
+            ("part of library.class;\n", 1),
+            ("final value = of\nimport 'missing.dart';\n", 2),
+            ("void part() {}\npart of class;\n", 2),
+        ):
+            with (
+                self.subTest(text=text),
+                tempfile.TemporaryDirectory(prefix="arch-config-fail-") as scratch,
+            ):
+                write(scratch, arch.DEFAULT_CONFIG, json.dumps(self.config))
+                for source in self.config["sources"]:
+                    if source["lang"] == "go":
+                        write(scratch, source["dir"] + "/go.mod", "module %s\n" % source["go_module"])
+                write(scratch, "lib/app/domain/models/bad.dart", text)
+                output = io.StringIO()
+                with contextlib.redirect_stderr(output):
+                    result = arch.main(["--root", scratch, "--warn-only"])
+                self.assertEqual(2, result)
+                self.assertIn("lib/app/domain/models/bad.dart:%d" % line, output.getvalue())
+
+    def test_declarations_leave_later_domain_imports_visible(self):
+        for declaration in (
+            "library library.import;", "void part() {}", "part<T>() {}",
+            "final value = of(part);", "final value = () { return part; };",
+            "final value = <int>[part];", "final value = {part};",
+            "@prefix.import<List<int>>.named(of(part)) void of() {}",
+        ):
+            with self.subTest(declaration=declaration):
+                self.assertEqual(["F-DOMAIN-PURE"], self.scan_case({
+                    "file": "lib/app/domain/models/calibration_probe.dart",
+                    "source": declaration + "\nimport 'package:flutter/material.dart';\n",
+                }))
+
+    def test_reserved_words_cannot_be_library_name_segments(self):
+        reserved = (
+            "assert break case catch class const continue default do else enum extends "
+            "false final finally for if in is new null rethrow return super switch this "
+            "throw true try var void while with"
+        ).split()
+        for word in reserved:
+            for directive in ("library", "part of"):
+                with self.subTest(word=word, directive=directive):
+                    with self.assertRaises(arch.DirectiveError):
+                        arch.parse_dart_directives("%s name.%s;" % (directive, word))
 
     def test_baseline_shrink_only_removes_entries(self):
         with tempfile.TemporaryDirectory(prefix="arch-baseline-") as scratch:

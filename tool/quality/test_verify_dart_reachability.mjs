@@ -12,13 +12,13 @@ const sharedFixtures = JSON.parse(
   readFileSync(new URL('../../quality/fixtures/dart_directives.json', import.meta.url), 'utf8'),
 ).cases;
 
-function checkFixture(mainSource) {
+function checkFixture(mainSource, includeDependency = true) {
   const root = mkdtempSync(join(tmpdir(), 'dart-reachability-'));
   try {
     const lib = join(root, 'lib');
     mkdirSync(lib);
     writeFileSync(join(lib, 'main.dart'), mainSource);
-    writeFileSync(join(lib, 'dependency.dart'), 'const value = 1;\n');
+    if (includeDependency) writeFileSync(join(lib, 'dependency.dart'), 'const value = 1;\n');
     return spawnSync(process.execPath, [verifier], { cwd: root, encoding: 'utf8' });
   } finally {
     rmSync(root, { recursive: true, force: true });
@@ -39,6 +39,80 @@ test('shared Dart directive fixtures agree on URI branches and line numbers', ()
         parseDartDirectives(fixture.source, 'lib/main.dart'),
         fixture.directives,
         fixture.name,
+      );
+    }
+  }
+});
+
+test('a part URI equal to of is not the part of keyword', () => {
+  for (const literal of ["'of'", 'r"""of"""']) {
+    assert.deepEqual(parseDartDirectives(`part ${literal};`, 'lib/main.dart'), [
+      { kind: 'part', uri: 'of', line: 1 },
+    ]);
+    assert.deepEqual(parseDartDirectives(`part of ${literal};`, 'lib/main.dart'), [
+      { kind: 'part of', uri: 'of', line: 1 },
+    ]);
+  }
+});
+
+test('a named dotted part of declaration creates no URI edge', () => {
+  const source = 'part of library.name;\n';
+  assert.deepEqual(parseDartDirectives(source, 'lib/main.dart'), []);
+  const result = checkFixture(source, false);
+  assert.equal(result.status, 0, result.stderr);
+  assert.match(result.stdout, /1\/1 files reachable/);
+});
+
+test('a named part of terminator leaves the following import visible', () => {
+  const result = checkFixture("part of library.name;\nimport 'dependency.dart';\n");
+  assert.equal(result.status, 0, result.stderr);
+  assert.match(result.stdout, /2\/2 files reachable/);
+});
+
+test('malformed named part of syntax fails closed even in a one-file graph', () => {
+  for (const fixture of sharedFixtures.filter(
+    (item) => item.name.startsWith('named-part-of-') && 'error' in item,
+  )) {
+    const result = checkFixture(fixture.source, false);
+    assert.equal(result.status, 1, fixture.name);
+    assert.match(
+      result.stderr,
+      new RegExp(`lib/main\\.dart:${fixture.error}: unsupported named part of directive`),
+      fixture.name,
+    );
+  }
+});
+
+test('declaration boundaries preserve import and part reachability', () => {
+  for (const declaration of [
+    'library library.import;',
+    'void part() {}',
+    'part<T>() {}',
+    'final value = of(part);',
+    'final value = () { return part; };',
+    'final value = <int>[part];',
+    'final value = {part};',
+    '@prefix.import<List<int>>.named(of(part)) void of() {}',
+  ]) {
+    for (const directive of ['import', 'export', 'part', 'part of']) {
+      const result = checkFixture(`${declaration}\n${directive} 'dependency.dart';\n`);
+      assert.equal(result.status, 0, `${declaration}: ${result.stderr}`);
+      assert.match(result.stdout, /2\/2 files reachable/);
+    }
+  }
+});
+
+test('reserved keywords cannot be library name segments', () => {
+  const reserved = (
+    'assert break case catch class const continue default do else enum extends ' +
+    'false final finally for if in is new null rethrow return super switch this ' +
+    'throw true try var void while with'
+  ).split(' ');
+  for (const word of reserved) {
+    for (const directive of ['library', 'part of']) {
+      assert.throws(
+        () => parseDartDirectives(`${directive} name.${word};`, 'lib/main.dart'),
+        /main\.dart:1:/,
       );
     }
   }

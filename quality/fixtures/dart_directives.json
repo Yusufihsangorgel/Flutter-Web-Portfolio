@@ -120,6 +120,330 @@
       "name": "unterminated-interpolation",
       "source": "const text = '${{'key': 'value'}';\nimport 'dart:core';\n",
       "error": 1
+    },
+    {
+      "name": "named-part-of-simple-library",
+      "source": "part of library;\n",
+      "directives": []
+    },
+    {
+      "name": "named-part-of-dotted-library",
+      "source": "part of library.name;\n",
+      "directives": []
+    },
+    {
+      "name": "named-part-of-commented-identifiers",
+      "source": "@Note('${'inner'}')\r\npart /* outer /* inner */ */ of _library /* separator */ . $segment_2;\r",
+      "directives": []
+    },
+    {
+      "name": "named-part-of-same-line-embedded-import",
+      "source": "part of library.name import \"missing.dart\";\n",
+      "error": 1
+    },
+    {
+      "name": "named-part-of-embedded-import",
+      "source": "part of library.name\r\nimport 'missing.dart';\n",
+      "error": 2
+    },
+    {
+      "name": "named-part-of-unexpected-token",
+      "source": "part of library.name + other;\n",
+      "error": 1
+    },
+    {
+      "name": "named-part-of-missing-dot",
+      "source": "part of library name;\n",
+      "error": 1
+    },
+    {
+      "name": "named-part-of-repeated-dot",
+      "source": "part of library..name;\n",
+      "error": 1
+    },
+    {
+      "name": "named-part-of-trailing-dot",
+      "source": "part of library.name.;\n",
+      "error": 1
+    },
+    {
+      "name": "named-part-of-missing-terminator",
+      "source": "part of library.name\n",
+      "error": 1
+    },
+    {
+      "name": "named-part-of-unsupported-name",
+      "source": "part of naïve.name;\n",
+      "error": 1
+    },
+    {
+      "name": "library-contextual-segments",
+      "source": "library part.of;\n",
+      "directives": []
+    },
+    {
+      "name": "library-built-in-segments",
+      "source": "library library.import;\n",
+      "directives": []
+    },
+    {
+      "name": "library-other-contextual-segments",
+      "source": "library async.show.of;\n",
+      "directives": []
+    },
+    {
+      "name": "anonymous-library",
+      "source": "library;\n",
+      "directives": []
+    },
+    {
+      "name": "function-named-part",
+      "source": "void part() {}\n",
+      "directives": []
+    },
+    {
+      "name": "variable-named-part",
+      "source": "int part = 0;\n",
+      "directives": []
+    },
+    {
+      "name": "identifier-reference-part",
+      "source": "final value = part;\n",
+      "directives": []
+    },
+    {
+      "name": "identifier-argument-part",
+      "source": "final value = of(part);\n",
+      "directives": []
+    },
+    {
+      "name": "implicit-function-named-part",
+      "source": "part() {}\n",
+      "directives": []
+    },
+    {
+      "name": "generic-function-named-import",
+      "source": "import<T>() => null;\n",
+      "directives": []
+    },
+    {
+      "name": "generic-function-named-export",
+      "source": "export<T>() {}\n",
+      "directives": []
+    },
+    {
+      "name": "implicit-function-named-library",
+      "source": "library() {}\n",
+      "directives": []
+    },
+    {
+      "name": "prefixed-type-named-part",
+      "source": "part.Type value;\n",
+      "directives": []
+    },
+    {
+      "name": "metadata-keyword-reference",
+      "source": "@part() void of() {}\n",
+      "directives": []
+    },
+    {
+      "name": "metadata-keyword-generic-reference",
+      "source": "@prefix.import<List<int>>.named(of(part)) void of() {}\n",
+      "directives": []
+    },
+    {
+      "name": "metadata-multiple-keyword-references",
+      "source": "@part @prefix.export() void of() {}\n",
+      "directives": []
+    },
+    {
+      "name": "closure-initializer-keyword-reference",
+      "source": "final value = () { return part; };\n",
+      "directives": []
+    },
+    {
+      "name": "collection-initializer-keyword-reference",
+      "source": "final value = <int>[part];\n",
+      "directives": []
+    },
+    {
+      "name": "set-initializer-keyword-reference",
+      "source": "final value = {part};\n",
+      "directives": []
+    },
+    {
+      "name": "record-initializer-keyword-reference",
+      "source": "final value = (part, of(part));\n",
+      "directives": []
+    },
+    {
+      "name": "named-part-of-contextual-segments",
+      "source": "part of library.import.part.of;\n",
+      "directives": []
+    },
+    {
+      "name": "named-part-of-reserved-word",
+      "source": "part of class;\n",
+      "error": 1
+    },
+    {
+      "name": "named-part-of-reserved-segment",
+      "source": "part of library.class;\n",
+      "error": 1
+    },
+    {
+      "name": "named-part-of-nested-name",
+      "source": "part of library.(name);\n",
+      "error": 1
+    },
+    {
+      "name": "named-part-of-nested-suffix",
+      "source": "part of library.name(other);\n",
+      "error": 1
+    },
+    {
+      "name": "library-reserved-segment",
+      "source": "library name.class;\n",
+      "error": 1
+    },
+    {
+      "name": "library-missing-terminator",
+      "source": "library part.of\nimport 'dart:core';\n",
+      "error": 2
+    },
+    {
+      "name": "declaration-embedded-import",
+      "source": "final value = part\nimport 'dart:core';\n",
+      "error": 2
+    },
+    {
+      "name": "declaration-embedded-part-of",
+      "source": "final value = of\npart of library;\n",
+      "error": 2
+    },
+    {
+      "name": "unterminated-declaration-group",
+      "source": "final value = of(part;\n",
+      "error": 1
+    },
+    {
+      "name": "unterminated-declaration-body",
+      "source": "void of() {\n",
+      "error": 1
+    },
+    {
+      "name": "unmatched-declaration-close",
+      "source": "void of() {}\n}\n",
+      "error": 2
+    },
+    {
+      "name": "malformed-directive-after-semicolon",
+      "source": "final value = part;\nimport unknownUri;\n",
+      "error": 2
+    },
+    {
+      "name": "malformed-directive-after-body",
+      "source": "void of() {}\npart of class;\n",
+      "error": 2
+    },
+    {
+      "name": "import-after-function-body",
+      "source": "void part() {}\nimport 'dart:core';\n",
+      "directives": [
+        {
+          "kind": "import",
+          "uri": "dart:core",
+          "line": 2
+        }
+      ]
+    },
+    {
+      "name": "import-after-variable",
+      "source": "int part = 0; import 'dart:core';\n",
+      "directives": [
+        {
+          "kind": "import",
+          "uri": "dart:core",
+          "line": 1
+        }
+      ]
+    },
+    {
+      "name": "import-after-closure",
+      "source": "final value = () { return part; };\nimport 'dart:core';\n",
+      "directives": [
+        {
+          "kind": "import",
+          "uri": "dart:core",
+          "line": 2
+        }
+      ]
+    },
+    {
+      "name": "import-after-list",
+      "source": "final value = <int>[part];\nimport 'dart:core';\n",
+      "directives": [
+        {
+          "kind": "import",
+          "uri": "dart:core",
+          "line": 2
+        }
+      ]
+    },
+    {
+      "name": "import-after-set",
+      "source": "final value = {part};\nimport 'dart:core';\n",
+      "directives": [
+        {
+          "kind": "import",
+          "uri": "dart:core",
+          "line": 2
+        }
+      ]
+    },
+    {
+      "name": "metadata-generic-before-import",
+      "source": "@prefix.part<List<int>>.named(of(part)) import 'dart:core';\n",
+      "directives": [
+        {
+          "kind": "import",
+          "uri": "dart:core",
+          "line": 1
+        }
+      ]
+    },
+    {
+      "name": "bom-before-import",
+      "source": "﻿import 'dart:core';\n",
+      "directives": [
+        {
+          "kind": "import",
+          "uri": "dart:core",
+          "line": 1
+        }
+      ]
+    },
+    {
+      "name": "shebang-before-import",
+      "source": "#!/usr/bin/env dart\nimport 'dart:core';\n",
+      "directives": [
+        {
+          "kind": "import",
+          "uri": "dart:core",
+          "line": 2
+        }
+      ]
+    },
+    {
+      "name": "bom-shebang-before-import",
+      "source": "﻿#!/usr/bin/env dart\nimport 'dart:core';\n",
+      "directives": [
+        {
+          "kind": "import",
+          "uri": "dart:core",
+          "line": 2
+        }
+      ]
     }
   ]
 }
