@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { cp, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
+import { cp, mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -9,6 +9,8 @@ import { inspectRaster } from '../assets/raster_inspector.mjs';
 import { renderArchitectureBoard } from './architecture_boards.mjs';
 import { selectSmallest } from './encoder.mjs';
 import {
+  manifestEntry,
+  manifestSchema,
   renderInputDigest,
   verifyArtifacts,
   verifyFormatChoice,
@@ -152,12 +154,163 @@ test('keeps the smallest encoding and lets WebP win ties', () => {
 });
 
 test('flags a recorded format that is not the smallest candidate', () => {
-  const entry = (format, candidates) => ({ asset: 'assets/work/a.webp', format, candidates });
+  const entry = (format, candidates) => ({
+    asset: 'assets/work/a.webp',
+    format,
+    candidates,
+    bytes: candidates[format],
+  });
   assert.deepEqual(verifyFormatChoice(entry('webp', { webp: 5, jpeg: 9 })), []);
   assert.deepEqual(verifyFormatChoice(entry('jpeg', { webp: 9, jpeg: 5 })), []);
   assert.equal(verifyFormatChoice(entry('jpeg', { webp: 5, jpeg: 5 })).length, 1);
   assert.equal(verifyFormatChoice(entry('webp', { webp: 9, jpeg: 5 })).length, 1);
   assert.equal(verifyFormatChoice(entry('png', { png: 5 })).length, 1);
+});
+
+function sizeEntry(format, candidates, bytes = candidates?.[format]) {
+  return { asset: 'assets/work/candidate.webp', format, candidates, bytes };
+}
+
+function registerInvalidCandidateSizes() {
+  const cases = [
+    ['missing value', undefined],
+    ['null', null],
+    ['string', '5'],
+    ['true', true],
+    ['false', false],
+    ['NaN', NaN],
+    ['Infinity', Infinity],
+    ['negative Infinity', -Infinity],
+    ['zero', 0],
+    ['negative', -1],
+    ['fraction', 0.5],
+    ['unsafe integer', Number.MAX_SAFE_INTEGER + 1],
+  ];
+  for (const [label, value] of cases) {
+    test(`rejects ${label} selected candidate size`, () => {
+      const entry = sizeEntry('webp', { webp: value, jpeg: 9 });
+      assert.match(
+        verifyFormatChoice(entry).join('\n'),
+        /candidate sizes must be positive safe integers/,
+      );
+    });
+    test(`rejects ${label} unselected candidate size`, () => {
+      const entry = sizeEntry('webp', { webp: 5, jpeg: value });
+      assert.match(
+        verifyFormatChoice(entry).join('\n'),
+        /candidate sizes must be positive safe integers/,
+      );
+    });
+  }
+}
+
+function registerRecordedByteMismatches() {
+  const cases = [
+    ['missing', undefined],
+    ['null', null],
+    ['string', '5'],
+    ['true', true],
+    ['false', false],
+    ['NaN', NaN],
+    ['Infinity', Infinity],
+    ['negative Infinity', -Infinity],
+    ['zero', 0],
+    ['negative', -1],
+    ['fraction', 5.5],
+    ['unsafe integer', Number.MAX_SAFE_INTEGER + 1],
+    ['smaller', 4],
+    ['larger', 6],
+  ];
+  for (const [label, bytes] of cases) {
+    test(`rejects ${label} recorded bytes for the selected candidate`, () => {
+      const entry = { ...sizeEntry('webp', { webp: 5, jpeg: 9 }), bytes };
+      assert.match(
+        verifyFormatChoice(entry).join('\n'),
+        /selected candidate bytes differ from its recorded bytes/,
+      );
+    });
+  }
+}
+
+function registerFormatChoiceControls() {
+  const cases = [
+    ['smaller WebP', 'webp', { webp: 5, jpeg: 9 }],
+    ['smaller JPEG', 'jpeg', { webp: 9, jpeg: 5 }],
+    ['smaller PNG', 'png', { webp: 9, png: 5 }],
+    ['WebP JPEG tie', 'webp', { jpeg: 5, webp: 5 }],
+    ['WebP PNG tie', 'webp', { png: 5, webp: 5 }],
+    ['WebP only', 'webp', { webp: 5 }],
+    ['maximum safe size', 'webp', { webp: Number.MAX_SAFE_INTEGER }],
+  ];
+  for (const [label, format, candidates] of cases) {
+    test(`accepts ${label} with matching recorded bytes`, () => {
+      assert.deepEqual(verifyFormatChoice(sizeEntry(format, candidates)), []);
+    });
+  }
+  test('rejects a selected format absent from the candidate map', () => {
+    const entry = sizeEntry('jpeg', { webp: 5 }, 5);
+    assert.deepEqual(verifyFormatChoice(entry), [`${entry.asset} has no jpeg candidate`]);
+  });
+  test('keeps the missing WebP error for missing, null, empty, and PNG-only maps', () => {
+    for (const candidates of [undefined, null, {}, { png: 5 }]) {
+      const entry = sizeEntry('png', candidates, 5);
+      assert.deepEqual(verifyFormatChoice(entry), [`${entry.asset} has no WebP candidate`]);
+    }
+  });
+}
+
+registerInvalidCandidateSizes();
+registerRecordedByteMismatches();
+registerFormatChoiceControls();
+
+async function candidateFixture(t) {
+  const copy = await mkdtemp(path.join(tmpdir(), 'candidate-sizes-'));
+  t.after(() => rm(copy, { recursive: true, force: true }));
+  const paths = workArtifactPaths(copy);
+  for (const directory of [
+    paths.output,
+    paths.sources,
+    paths.modules,
+    path.dirname(paths.content),
+  ]) {
+    await mkdir(directory, { recursive: true });
+  }
+  const bytes = riff([lossyFrame(16, 16)]);
+  const frame = { width: 16, height: 16 };
+  const entry = manifestEntry(
+    'assets/work/candidate.webp',
+    { format: 'webp', bytes, candidates: { webp: bytes.length, jpeg: bytes.length + 1 } },
+    frame,
+  );
+  await writeFile(path.join(paths.root, entry.asset), bytes);
+  await writeFile(
+    paths.content,
+    JSON.stringify({ systems: [{ artifact: { asset: entry.asset, ...frame } }] }),
+  );
+  const document = {
+    schema: manifestSchema,
+    input_sha256: await renderInputDigest(paths),
+    artifacts: [entry],
+  };
+  await writeFile(paths.manifest, JSON.stringify(document));
+  return { paths, bytes, document };
+}
+
+test('check mode rejects metadata-only candidate edits without changing file bytes or digest', async (t) => {
+  const { paths, bytes, document } = await candidateFixture(t);
+  assert.deepEqual(await verifyArtifacts(paths), []);
+  const original = document.artifacts[0];
+  const edited = { ...original, candidates: { webp: 1, jpeg: 2 } };
+  await writeFile(paths.manifest, JSON.stringify({ ...document, artifacts: [edited] }));
+  const recorded = JSON.parse(await readFile(paths.manifest, 'utf8')).artifacts[0];
+  assert.equal(recorded.bytes, original.bytes);
+  assert.equal(recorded.sha256, original.sha256);
+  assert.deepEqual(await readFile(path.join(paths.root, original.asset)), bytes);
+  assert.deepEqual(await verifyArtifacts(paths), [
+    `${original.asset} selected candidate bytes differ from its recorded bytes`,
+  ]);
+  await writeFile(paths.manifest, JSON.stringify(document));
+  assert.deepEqual(await verifyArtifacts(paths), []);
 });
 
 test('check mode detects stale inputs, edited assets, and orphans', async (t) => {

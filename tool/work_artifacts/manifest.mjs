@@ -133,6 +133,15 @@ export function verifyFormatChoice(entry) {
   if (!sizes.some(([format]) => format === 'webp')) {
     return [`${entry.asset} has no WebP candidate`];
   }
+  if (sizes.some(([, size]) => !Number.isSafeInteger(size) || size <= 0)) {
+    return [`${entry.asset} candidate sizes must be positive safe integers`];
+  }
+  if (!Object.hasOwn(entry.candidates, entry.format)) {
+    return [`${entry.asset} has no ${entry.format} candidate`];
+  }
+  if (entry.candidates[entry.format] !== entry.bytes) {
+    return [`${entry.asset} selected candidate bytes differ from its recorded bytes`];
+  }
   const smallest = Math.min(...sizes.map(([, size]) => size));
   const webpSize = entry.candidates.webp;
   const expected = webpSize === smallest ? 'webp' : entry.format;
