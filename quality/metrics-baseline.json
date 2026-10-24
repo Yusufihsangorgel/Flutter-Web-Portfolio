@@ -180,14 +180,14 @@
       "path": "test/unit/controllers/language_cubit_test.dart",
       "identity": "function:main/closure:1",
       "metric": "lines",
-      "value": 313,
+      "value": 245,
       "reason": "Existing lines debt measured when the AST metrics gate was introduced; refactor this callable separately and shrink this entry."
     },
     {
       "path": "test/unit/controllers/language_cubit_test.dart",
       "identity": "function:main",
       "metric": "lines",
-      "value": 315,
+      "value": 247,
       "reason": "Existing lines debt measured when the AST metrics gate was introduced; refactor this callable separately and shrink this entry."
     },
     {

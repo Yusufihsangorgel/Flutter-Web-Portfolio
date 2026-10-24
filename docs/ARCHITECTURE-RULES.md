@@ -142,7 +142,8 @@ implementations and shared controllers.
   `dart run tool/quality/dart_metrics.dart --shrink-baseline`. The command drops entries that are gone or within
   limits, lowers decreased values, keeps entry order and reasons, and writes nothing while a violation is new or
   increased.
-  File size remains a manual review criterion. Metric semantics and counts are recorded in
+  Physical Dart file limits are enforced before baseline writes; changed files also receive manual review.
+  Metric semantics and counts are recorded in
   [`docs/TECH-DEBT.md`](TECH-DEBT.md).
 
 ## 6. Quality gates

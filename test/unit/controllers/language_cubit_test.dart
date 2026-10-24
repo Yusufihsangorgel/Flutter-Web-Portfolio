@@ -25,9 +25,6 @@ void main() {
         documents: {
           'tr': {
             'screen': {'label': 'Portföy'},
-            'cv_data': {
-              'personal_info': {'name': 'Test'},
-            },
           },
         },
       );
@@ -243,79 +240,310 @@ void main() {
       },
     );
 
-    test(
-      'the latest language request wins even when responses reorder',
-      () async {
-        final repository = FakeLanguageRepository(
-          supportedLanguages: const {'en', 'tr', 'de'},
-          documents: {
-            'tr': {
-              'screen': {'label': 'Türkçe'},
-            },
-            'de': {
-              'screen': {'label': 'Deutsch'},
-            },
-          },
-          behavior: const FakeLanguageRepositoryBehavior(
-            loadDelays: {
-              'tr': Duration(milliseconds: 20),
-              'de': Duration(milliseconds: 1),
-            },
-          ),
-        );
-        final cubit = LanguageCubit(languageRepository: repository);
-        addTearDown(cubit.close);
-
-        final staleSelection = cubit.changeLanguage('tr');
-        await Future<void>.delayed(Duration.zero);
-        final latestSelection = cubit.changeLanguage('de');
-        await Future.wait([staleSelection, latestSelection]);
-
-        expect(cubit.state.status, LanguageStatus.ready);
-        expect(cubit.currentLanguage, 'de');
-        expect(cubit.strings.lookup('screen.label'), 'Deutsch');
-        expect(repository.savedLanguages, ['de']);
-      },
-    );
-
-    test(
-      'persistence is ordered and a stale save cannot overwrite the latest choice',
-      () async {
-        final repository = FakeLanguageRepository(
-          supportedLanguages: const {'en', 'tr', 'de'},
-          documents: {
-            'tr': {
-              'screen': {'label': 'Türkçe'},
-            },
-            'de': {
-              'screen': {'label': 'Deutsch'},
-            },
-          },
-          behavior: const FakeLanguageRepositoryBehavior(
-            saveDelays: {
-              'tr': Duration(milliseconds: 20),
-              'de': Duration(milliseconds: 1),
-            },
-          ),
-        );
-        final cubit = LanguageCubit(languageRepository: repository);
-        addTearDown(cubit.close);
-
-        final staleSelection = cubit.changeLanguage('tr');
-        await Future<void>.delayed(Duration.zero);
-        final latestSelection = cubit.changeLanguage('de');
-        await Future.wait([staleSelection, latestSelection]);
-
-        expect(repository.savedLanguages, ['tr', 'de']);
-        expect(repository.selectedLanguage, 'de');
-        expect(cubit.state.status, LanguageStatus.ready);
-        expect(cubit.currentLanguage, 'de');
-        expect(cubit.strings.lookup('screen.label'), 'Deutsch');
-      },
-    );
-
+    _registerLatestWinsTest();
+    _registerStaleSuccessFirstTest();
+    _registerStaleErrorTest();
+    _registerOrderedPersistenceTest();
+    _registerClosePersistenceTest();
+    _registerClosedLoadTest();
     _registerArbitraryLookupTest();
     _registerLanguageMetadataTests();
+  });
+}
+
+FakeLanguageRepository _languageRepository(
+  FakeLanguageRepositoryBehavior behavior,
+) => FakeLanguageRepository(
+  supportedLanguages: const {'en', 'tr', 'de'},
+  documents: {
+    'tr': {
+      'screen': {'label': 'Türkçe'},
+    },
+    'de': {
+      'screen': {'label': 'Deutsch'},
+    },
+  },
+  behavior: behavior,
+);
+
+Future<void> _drainLanguageWork(
+  LanguageCubit cubit,
+  List<Future<void>> pending,
+  List<(Object, StackTrace)> errors,
+) async {
+  try {
+    await Future.wait(pending, eagerError: false);
+  } finally {
+    try {
+      await cubit.close();
+    } on Object catch (error, stack) {
+      errors.add((error, stack));
+    }
+  }
+  expect(errors, isEmpty);
+}
+
+void _registerLatestWinsTest() {
+  test(
+    'the latest language request wins even when responses reorder',
+    () async {
+      final tr = FakeLanguageRepositoryGate();
+      final de = FakeLanguageRepositoryGate();
+      final repository = _languageRepository(
+        FakeLanguageRepositoryBehavior(loadGates: {'tr': tr, 'de': de}),
+      );
+      final cubit = LanguageCubit(languageRepository: repository);
+      final pending = <Future<void>>[];
+      final errors = <(Object, StackTrace)>[];
+      void record(Object error, StackTrace stack) => errors.add((error, stack));
+      addTearDown(() async {
+        tr.release();
+        de.release();
+        await _drainLanguageWork(cubit, pending, errors);
+      });
+
+      final staleSelection = cubit
+          .changeLanguage('tr')
+          .then<void>((_) {}, onError: record);
+      pending.add(staleSelection);
+      await tr.started;
+      final latestSelection = cubit
+          .changeLanguage('de')
+          .then<void>((_) {}, onError: record);
+      pending.add(latestSelection);
+      await de.started;
+      expect(repository.savedLanguages, isEmpty);
+      de.release();
+      await latestSelection;
+      final latestState = cubit.state;
+      tr.release();
+      await staleSelection;
+
+      expect(cubit.state, same(latestState));
+      expect(cubit.state.status, LanguageStatus.ready);
+      expect(cubit.currentLanguage, 'de');
+      expect(cubit.strings.lookup('screen.label'), 'Deutsch');
+      expect(repository.savedLanguages, ['de']);
+    },
+  );
+}
+
+void _registerStaleSuccessFirstTest() {
+  test('stale success first cannot replace the latest request', () async {
+    final tr = FakeLanguageRepositoryGate();
+    final de = FakeLanguageRepositoryGate();
+    final repository = _languageRepository(
+      FakeLanguageRepositoryBehavior(loadGates: {'tr': tr, 'de': de}),
+    );
+    final cubit = LanguageCubit(languageRepository: repository);
+    final pending = <Future<void>>[];
+    final errors = <(Object, StackTrace)>[];
+    void record(Object error, StackTrace stack) => errors.add((error, stack));
+    addTearDown(() async {
+      tr.release();
+      de.release();
+      await _drainLanguageWork(cubit, pending, errors);
+    });
+
+    final staleSelection = cubit
+        .changeLanguage('tr')
+        .then<void>((_) {}, onError: record);
+    pending.add(staleSelection);
+    await tr.started;
+    final latestSelection = cubit
+        .changeLanguage('de')
+        .then<void>((_) {}, onError: record);
+    pending.add(latestSelection);
+    await de.started;
+    tr.release();
+    await staleSelection;
+    expect(cubit.state.status, LanguageStatus.loading);
+    expect(repository.savedLanguages, isEmpty);
+    de.release();
+    await latestSelection;
+
+    expect(cubit.state.status, LanguageStatus.ready);
+    expect(cubit.currentLanguage, 'de');
+    expect(cubit.strings.lookup('screen.label'), 'Deutsch');
+    expect(repository.savedLanguages, ['de']);
+  });
+}
+
+void _registerStaleErrorTest() {
+  test('a stale load error cannot overwrite a newer valid state', () async {
+    final tr = FakeLanguageRepositoryGate();
+    final de = FakeLanguageRepositoryGate();
+    final repository = _languageRepository(
+      FakeLanguageRepositoryBehavior(
+        loadGates: {'tr': tr, 'de': de},
+        loadErrors: {'tr': StateError('stale catalog')},
+      ),
+    );
+    final cubit = LanguageCubit(languageRepository: repository);
+    final pending = <Future<void>>[];
+    final errors = <(Object, StackTrace)>[];
+    void record(Object error, StackTrace stack) => errors.add((error, stack));
+    addTearDown(() async {
+      tr.release();
+      de.release();
+      await _drainLanguageWork(cubit, pending, errors);
+    });
+
+    final staleSelection = cubit
+        .changeLanguage('tr')
+        .then<void>((_) {}, onError: record);
+    pending.add(staleSelection);
+    await tr.started;
+    final latestSelection = cubit
+        .changeLanguage('de')
+        .then<void>((_) {}, onError: record);
+    pending.add(latestSelection);
+    await de.started;
+    de.release();
+    await latestSelection;
+    final latestState = cubit.state;
+    tr.release();
+    await staleSelection;
+
+    expect(cubit.state, same(latestState));
+    expect(cubit.state.status, LanguageStatus.ready);
+    expect(cubit.state.errorMessage, isNull);
+    expect(cubit.strings.lookup('screen.label'), 'Deutsch');
+    expect(repository.savedLanguages, ['de']);
+  });
+}
+
+void _registerOrderedPersistenceTest() {
+  test(
+    'persistence is ordered and a stale save cannot overwrite the latest choice',
+    () async {
+      final tr = FakeLanguageRepositoryGate();
+      final de = FakeLanguageRepositoryGate();
+      final repository = _languageRepository(
+        FakeLanguageRepositoryBehavior(saveGates: {'tr': tr, 'de': de}),
+      );
+      final cubit = LanguageCubit(languageRepository: repository);
+      final pending = <Future<void>>[];
+      final errors = <(Object, StackTrace)>[];
+      void record(Object error, StackTrace stack) => errors.add((error, stack));
+      addTearDown(() async {
+        tr.release();
+        de.release();
+        await _drainLanguageWork(cubit, pending, errors);
+      });
+
+      final staleSelection = cubit
+          .changeLanguage('tr')
+          .then<void>((_) {}, onError: record);
+      pending.add(staleSelection);
+      await tr.started;
+      final latestSelection = cubit
+          .changeLanguage('de')
+          .then<void>((_) {}, onError: record);
+      pending.add(latestSelection);
+      await Future<void>(() {});
+      expect(de.hasStarted, isFalse);
+      tr.release();
+      await de.started;
+      expect(repository.saveEvents, ['start:tr', 'finish:tr', 'start:de']);
+      de.release();
+      await Future.wait([staleSelection, latestSelection]);
+
+      expect(repository.saveEvents, [
+        'start:tr',
+        'finish:tr',
+        'start:de',
+        'finish:de',
+      ]);
+      expect(repository.savedLanguages, ['tr', 'de']);
+      expect(repository.selectedLanguage, 'de');
+      expect(cubit.state.status, LanguageStatus.ready);
+      expect(cubit.currentLanguage, 'de');
+      expect(cubit.strings.lookup('screen.label'), 'Deutsch');
+    },
+  );
+}
+
+void _registerClosePersistenceTest() {
+  test('close waits for already queued persistence', () async {
+    final tr = FakeLanguageRepositoryGate();
+    final repository = _languageRepository(
+      FakeLanguageRepositoryBehavior(saveGates: {'tr': tr}),
+    );
+    final cubit = LanguageCubit(languageRepository: repository);
+    final pending = <Future<void>>[];
+    final errors = <(Object, StackTrace)>[];
+    void record(Object error, StackTrace stack) => errors.add((error, stack));
+    addTearDown(() async {
+      tr.release();
+      await _drainLanguageWork(cubit, pending, errors);
+    });
+
+    final selection = cubit
+        .changeLanguage('tr')
+        .then<void>((_) {}, onError: record);
+    pending.add(selection);
+    await tr.started;
+    var closeCompleted = false;
+    final closing = cubit.close().then<void>((_) {
+      closeCompleted = true;
+    }, onError: record);
+    pending.add(closing);
+
+    // Observe one event turn after pending microtasks while the save stays gated.
+    await Future<void>(() {});
+    expect(errors, isEmpty);
+    expect(closeCompleted, isFalse);
+    expect(repository.savedLanguages, isEmpty);
+    tr.release();
+    await closing;
+    final closedState = cubit.state;
+    await selection;
+
+    expect(closeCompleted, isTrue);
+    expect(cubit.isClosed, isTrue);
+    expect(cubit.state, same(closedState));
+    expect(repository.savedLanguages, ['tr']);
+    expect(repository.selectedLanguage, 'tr');
+  });
+}
+
+void _registerClosedLoadTest() {
+  test('late load after close has no state or persistence effect', () async {
+    final tr = FakeLanguageRepositoryGate();
+    final repository = _languageRepository(
+      FakeLanguageRepositoryBehavior(loadGates: {'tr': tr}),
+    );
+    final cubit = LanguageCubit(languageRepository: repository);
+    final pending = <Future<void>>[];
+    final errors = <(Object, StackTrace)>[];
+    void record(Object error, StackTrace stack) => errors.add((error, stack));
+    addTearDown(() async {
+      tr.release();
+      await _drainLanguageWork(cubit, pending, errors);
+    });
+    final states = <LanguageState>[];
+    final subscription = cubit.stream.listen(states.add);
+    addTearDown(subscription.cancel);
+
+    final selection = cubit
+        .changeLanguage('tr')
+        .then<void>((_) {}, onError: record);
+    pending.add(selection);
+    await tr.started;
+    final closing = cubit.close().then<void>((_) {}, onError: record);
+    pending.add(closing);
+    await closing;
+    expect(errors, isEmpty);
+    final closedState = cubit.state;
+    final closedStates = List<LanguageState>.of(states);
+    tr.release();
+    await selection;
+
+    expect(cubit.state, same(closedState));
+    expect(states, closedStates);
+    expect(repository.savedLanguages, isEmpty);
+    expect(repository.saveEvents, isEmpty);
   });
 }
 

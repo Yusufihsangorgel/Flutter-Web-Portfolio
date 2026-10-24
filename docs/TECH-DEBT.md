@@ -122,3 +122,11 @@ in the same change. Creating the first baseline refuses to overwrite an existing
 metrics closed its fourteen-parameter constructor entry, moving the retained count from 66 to 65; the new constructor
 measures one parameter, and no other baseline entry, order, reason, or limit changed. The fixture-free focused mapping,
 snapshot, and fallback tests pass; dataset-backed widget tests and browser verification remain pending.
+
+2026-10-24: Language test registration separates the race and close scenarios from the existing tests. Exact-base
+metrics measure 2,812 callables, 65 retained violations, and no ratchet issues. `main` and its group closure measure
+247/245 lines, down from 315/313; both remain open registered line debt. Explicit repository gates, event-queue
+checkpoints, and error-aware cleanup drain pending operations. The focused language file passes 18 tests; five
+selected regression files pass 13 tests, not coverage of all language consumers. Formatting, full-root static analysis,
+and all 137 metrics calibration checks pass. Whole-repository tests, coverage, browser verification, and release checks
+remain pending.
