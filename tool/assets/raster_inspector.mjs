@@ -188,7 +188,9 @@ function inspectWebp(bytes, label) {
     const chunkEnd = dataOffset + size + (size % 2);
     if (chunkEnd > bytes.length) throw new Error(`${label} has an invalid WebP chunk length`);
     const chunk = bytes.subarray(dataOffset, dataOffset + size);
-    dimensions ??= readWebpDimensions(type, chunk, label);
+    const chunkDimensions = readWebpDimensions(type, chunk, label);
+    if (chunkDimensions) validateDimensions(chunkDimensions.width, chunkDimensions.height, label);
+    dimensions ??= chunkDimensions;
     sawImage ||= type === 'VP8 ' || type === 'VP8L';
     cursor = chunkEnd;
   }
