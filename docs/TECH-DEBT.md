@@ -78,12 +78,12 @@ their own flow metrics, without increasing the parent's complexity or nesting.
 
 | Metric | Limit | Before strictness | Retained baseline |
 |---|---:|---:|---:|
-| Callable lines | 60 | 60 | 44 |
+| Callable lines | 60 | 60 | 43 |
 | `build()` lines | 100 | 0 | 0 |
 | Parameters | 4 | 24 | 20 |
 | Control-flow nesting | 4 | 0 | 0 |
 | Cyclomatic complexity | 15 | 2 | 1 |
-| Total violations | | 86 | 65 |
+| Total violations | | 86 | 64 |
 
 The retained-baseline column reflects the combined inventory; the dated measurements below refer to individual
 refactors.
@@ -130,3 +130,9 @@ checkpoints, and error-aware cleanup drain pending operations. The focused langu
 selected regression files pass 13 tests, not coverage of all language consumers. Formatting, full-root static analysis,
 and all 137 metrics calibration checks pass. Whole-repository tests, coverage, browser verification, and release checks
 remain pending.
+
+2026-10-24: The scene configuration test now registers its existing three cases through two small helpers, preserving
+both groups and their order. Exact-base measurement finds 2,814 callables and 64 retained violations: `main` is four
+lines; the helpers measure 22 and 50 lines. Only its resolved 71-line `main` waiver was removed (callable lines 44 to
+43; total 65 to 64); parameter and complexity counts remain 20 and 1. All three focused cases and the fresh 137-check
+metrics calibration pass. Whole-repository tests, coverage, browser verification, and release checks remain pending.

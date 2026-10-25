@@ -3,6 +3,11 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_web_portfolio/app/core/constants/scene_configs.dart';
 
 void main() {
+  _registerSceneConfigsTests();
+  _registerSceneConfigLerpTests();
+}
+
+void _registerSceneConfigsTests() {
   group('SceneConfigs', () {
     test('chapter slots reuse the document palette', () {
       expect(
@@ -23,7 +28,9 @@ void main() {
       }
     });
   });
+}
 
+void _registerSceneConfigLerpTests() {
   group('SceneConfig.lerp', () {
     const start = SceneConfig(
       palette: ScenePalette(

@@ -170,13 +170,6 @@
       "reason": "Existing lines debt measured when the AST metrics gate was introduced; refactor this callable separately and shrink this entry."
     },
     {
-      "path": "test/unit/constants/scene_configs_test.dart",
-      "identity": "function:main",
-      "metric": "lines",
-      "value": 71,
-      "reason": "Existing lines debt measured when the AST metrics gate was introduced; refactor this callable separately and shrink this entry."
-    },
-    {
       "path": "test/unit/controllers/language_cubit_test.dart",
       "identity": "function:main/closure:1",
       "metric": "lines",
